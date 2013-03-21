@@ -1,9 +1,5 @@
-/* -------- Toggle Button ---------------- */
-/*.root {
-    -fx-base: green;
-}*/
+/* -------- Segmented Button ---------------- */
 .segmented-button .toggle-button {
-    -fx-base: green;
     -fx-padding: 3 15 3 15;
     -fx-border-color: transparent -fx-outer-border transparent transparent;
 }
@@ -31,7 +27,7 @@
 }
 /* *************************** LEFT BUTTON ************************** */
 .segmented-button .first-button {
-    -fx-background-radius: 12 0 0 12;
+    -fx-background-radius: 3 0 0 3;
     -fx-background-insets: 0 0 -1 0, 0, 1 0 1 1, 2 0 2 2;
     -fx-border-insets: 4 0 4 0;
 }
@@ -46,7 +42,7 @@
 }
 /* *************************** RIGHT BUTTON ************************** */
 .segmented-button .last-button {
-    -fx-background-radius: 0 12 12 0;
+    -fx-background-radius: 0 3 3 0;
     -fx-background-insets: 0 0 -1 0, 0, 1 1 1 0, 2 2 2 0;
     -fx-border-color: transparent;
     -fx-border-insets: 4 0 4 0;

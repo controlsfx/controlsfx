@@ -1,0 +1,4 @@
+* Convert ToggleSwitch to full control
+* Resolve CSS issues with RangeSlider (it used to work, so maybe a FX 8.0 issue)
+* Clean up dialogs (consistent images, etc)
+* Make SegmentedButton a full control, improve style

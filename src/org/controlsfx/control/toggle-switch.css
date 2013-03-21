@@ -1,0 +1,46 @@
+/* -------- Toggle Swtich ---------------- */
+
+.toggle-switch {
+     -fx-background-insets: 0, 1, 2;
+     -fx-background-color:
+        derive(-fx-color,-36%),
+        derive(-fx-color,73%),
+        linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
+     -fx-background-radius: 30;
+}
+
+.on-label {
+    -fx-padding: 15 30 15 50;
+    -fx-background-insets: 0, 1, 2;
+     -fx-background-color:
+        derive(orange,-36%),
+        derive(orange,73%),
+        linear-gradient(to bottom, derive(orange,-19%),derive(orange,61%));
+     -fx-background-radius: 0 30 30 0;
+     -fx-font-family: "Arial";
+     -fx-font-size: 16;
+     -fx-font-weight: bold;
+}
+
+.off-label {
+    -fx-padding: 15 50 15 30;
+    -fx-background-insets: 0, 1, 2;
+     -fx-background-color:
+        derive(-fx-color,-36%),
+        derive(-fx-color,73%),
+        linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
+    -fx-background-radius: 30 0 0 30;
+    -fx-font-family: "Arial";
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+}
+
+.on-off-slider {
+    -fx-background-insets: -1, 0, 1, 2;
+    -fx-background-color:
+        derive(-fx-color,-36%),
+        derive(-fx-color,-36%),
+        derive(-fx-color,73%),
+        linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
+    -fx-background-radius: 30;
+}

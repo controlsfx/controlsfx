@@ -10,10 +10,6 @@ import javafx.stage.Stage;
 
 import org.controlsfx.control.SegmentedButton;
 
-/**
- *
- * @author paru
- */
 public class HelloSegmentedButton extends Application {
     
     @Override

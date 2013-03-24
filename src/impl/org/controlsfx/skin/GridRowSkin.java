@@ -86,7 +86,6 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     }
 
     private GridCell<T> createDefaultCellImpl() {
-        // TODO this is duplicated in GridViewSkin...
         return new GridCell<T>() {
             @Override protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);

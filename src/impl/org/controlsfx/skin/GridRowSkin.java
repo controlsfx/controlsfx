@@ -43,8 +43,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
 
         if (getSkinnable().indexProperty().get() >= 0) {
             for (int cellIndex = startCellIndex; cellIndex <= endCellIndex; cellIndex++) {
-                if (cellIndex < getSkinnable().gridView().get().getItems().size()) {
-                    T item = getSkinnable().gridView().get().getItems().get(cellIndex);
+                if (cellIndex < getSkinnable().gridViewProperty().get().getItems().size()) {
+                    T item = getSkinnable().gridViewProperty().get().getItems().get(cellIndex);
                     GridCell<T> cell = getSkinnable().getCellCache().getCellIfCached(cellIndex);
                     if (cell == null) {
                         cell = createCell();
@@ -64,8 +64,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
 
     private GridCell<T> createCell() {
         GridCell<T> cell;
-        if (getSkinnable().gridView().get().getCellFactory() != null) {
-            cell = getSkinnable().gridView().get().getCellFactory().call(getSkinnable().gridView().get());
+        if (getSkinnable().gridViewProperty().get().getCellFactory() != null) {
+            cell = getSkinnable().gridViewProperty().get().getCellFactory().call(getSkinnable().gridViewProperty().get());
         } else {
             cell = createDefaultCellImpl();
         }
@@ -94,7 +94,7 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     }
 
     @Override protected double computePrefHeight(double width) {
-        return getSkinnable().gridView().get().cellHeightProperty().doubleValue() + getSkinnable().gridView().get().verticalCellSpacingProperty().doubleValue() + getSkinnable().gridView().get().verticalCellSpacingProperty().doubleValue();
+        return getSkinnable().gridViewProperty().get().cellHeightProperty().doubleValue() + getSkinnable().gridViewProperty().get().verticalCellSpacingProperty().doubleValue() + getSkinnable().gridViewProperty().get().verticalCellSpacingProperty().doubleValue();
     }
 
     public int computeMaxCellsInRow() {
@@ -106,20 +106,20 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     }
 
     protected double computeCellWidth() {
-        return getSkinnable().gridView().get().cellWidthProperty().doubleValue() + getSkinnable().gridView().get().horizontalCellSpacingProperty().doubleValue() + getSkinnable().gridView().get().horizontalCellSpacingProperty().doubleValue();
+        return getSkinnable().gridViewProperty().get().cellWidthProperty().doubleValue() + getSkinnable().gridViewProperty().get().horizontalCellSpacingProperty().doubleValue() + getSkinnable().gridViewProperty().get().horizontalCellSpacingProperty().doubleValue();
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         double currentWidth = getSkinnable().getWidth();
-        double cellWidth = getSkinnable().gridView().get().getCellWidth();
-        double cellHeight = getSkinnable().gridView().get().getCellHeight();
-        double horizontalCellSpacing = getSkinnable().gridView().get().getHorizontalCellSpacing();
-        double verticalCellSpacing = getSkinnable().gridView().get().getVerticalCellSpacing();
+        double cellWidth = getSkinnable().gridViewProperty().get().getCellWidth();
+        double cellHeight = getSkinnable().gridViewProperty().get().getCellHeight();
+        double horizontalCellSpacing = getSkinnable().gridViewProperty().get().getHorizontalCellSpacing();
+        double verticalCellSpacing = getSkinnable().gridViewProperty().get().getVerticalCellSpacing();
 
         double xPos = 0;
         double yPos = 0;
 
-        HPos currentHorizontalAlignment = getSkinnable().gridView().get().getHorizontalAlignment();
+        HPos currentHorizontalAlignment = getSkinnable().gridViewProperty().get().getHorizontalAlignment();
         if (currentHorizontalAlignment != null) {
             if (currentHorizontalAlignment.equals(HPos.CENTER)) {
                 xPos = (currentWidth % computeCellWidth()) / 2;

@@ -8,7 +8,16 @@ import javafx.scene.control.Skin;
 import javafx.scene.media.Media;
 
 public class GridCell<T> extends IndexedCell<T> {
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
 
+    /**
+     * 
+     */
 	public GridCell() {
 		getStyleClass().add("grid-cell");
 		
@@ -22,6 +31,14 @@ public class GridCell<T> extends IndexedCell<T> {
 	@Override protected Skin<?> createDefaultSkin() {
         return new GridCellSkin<T>(this);
     }
+	
+	
+	
+   /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
 	
 	/**
 	 * For a better performance cells can be cached. Once a row is recycled it can use cached cells instead of creating a new one.

@@ -12,7 +12,7 @@ import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualFlowHelper;
 
-public class VirtualFlowBasedGridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewBehavior<T>, GridRow<T>> {
+public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewBehavior<T>, GridRow<T>> {
 
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
 
@@ -30,7 +30,7 @@ public class VirtualFlowBasedGridViewSkin<T> extends VirtualContainerBase<GridVi
 
     private GridCellCache<T> cellCache;
 
-    public VirtualFlowBasedGridViewSkin(GridView<T> control) {
+    public GridViewSkin(GridView<T> control) {
         super(control, new GridViewBehavior<>(control));
         
         cellCache = new GridCellCache<T>(this, flow);
@@ -44,7 +44,7 @@ public class VirtualFlowBasedGridViewSkin<T> extends VirtualContainerBase<GridVi
         // TODO: Hack, delete this code when the following code compiles
         VirtualFlowHelper.setCreateCell(flow, new Callback<VirtualFlow, GridRow<T>>() {
             @Override public GridRow<T> call(VirtualFlow flow) {
-                return VirtualFlowBasedGridViewSkin.this.createCell();
+                return GridViewSkin.this.createCell();
             }
         });
 //        flow.setCreateCell(new Callback<VirtualFlow, GridRow<T>>() {

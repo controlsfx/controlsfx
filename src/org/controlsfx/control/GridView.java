@@ -1,6 +1,6 @@
 package org.controlsfx.control;
 
-import impl.org.controlsfx.skin.VirtualFlowBasedGridViewSkin;
+import impl.org.controlsfx.skin.GridViewSkin;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -39,7 +39,7 @@ public class GridView<T> extends Control {
     }
     
     @Override protected Skin<?> createDefaultSkin() {
-        return new VirtualFlowBasedGridViewSkin<>(this);
+        return new GridViewSkin<>(this);
     }
 
     @Override public Orientation getContentBias() {

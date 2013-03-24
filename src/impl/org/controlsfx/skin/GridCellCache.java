@@ -17,7 +17,7 @@ public class GridCellCache<T> {
 
     private Vector<WeakReference<GridCell<T>>> cells;
 
-    public GridCellCache(final VirtualFlowBasedGridViewSkin<T> gridViewSkin, VirtualFlow<GridRow<T>> virtualFlow) {
+    public GridCellCache(final GridViewSkin<T> gridViewSkin, VirtualFlow<GridRow<T>> virtualFlow) {
         cells = new Vector<>();
 
         // TODO: Currently all Cells are cached. I would be better to cache only

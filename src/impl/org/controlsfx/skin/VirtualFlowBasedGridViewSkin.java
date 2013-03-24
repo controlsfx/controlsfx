@@ -32,7 +32,7 @@ public class VirtualFlowBasedGridViewSkin<T> extends VirtualContainerBase<GridVi
 
     public VirtualFlowBasedGridViewSkin(GridView<T> control) {
         super(control, new GridViewBehavior<>(control));
-
+        
         cellCache = new GridCellCache<T>(this, flow);
 
         updateGridViewItems();
@@ -41,12 +41,18 @@ public class VirtualFlowBasedGridViewSkin<T> extends VirtualContainerBase<GridVi
         flow.setPannable(false);
         flow.setVertical(true);
         flow.setFocusTraversable(getSkinnable().isFocusTraversable());
-        // TODO: HACK
+        // TODO: Hack, delete this code when the following code compiles
         VirtualFlowHelper.setCreateCell(flow, new Callback<VirtualFlow, GridRow<T>>() {
             @Override public GridRow<T> call(VirtualFlow flow) {
                 return VirtualFlowBasedGridViewSkin.this.createCell();
             }
         });
+//        flow.setCreateCell(new Callback<VirtualFlow, GridRow<T>>() {
+//            @Override public GridRow<T> call(VirtualFlow flow) {
+//                System.out.println("YOYO");
+//                return VirtualFlowBasedGridViewSkin.this.createCell();
+//            }
+//        });
         getChildren().add(flow);
 
         updateRowCount();

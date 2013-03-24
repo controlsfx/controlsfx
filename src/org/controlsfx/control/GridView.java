@@ -1,5 +1,6 @@
 package org.controlsfx.control;
 
+import impl.org.controlsfx.skin.VirtualFlowBasedGridViewSkin;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -9,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
 public class GridView<T> extends Control {
@@ -30,10 +32,14 @@ public class GridView<T> extends Control {
     public GridView() {
         this(FXCollections.<T> observableArrayList());
     }
-
+    
     public GridView(ObservableList<T> items) {
         getStyleClass().add("grid-view");
         setItems(items);
+    }
+    
+    @Override protected Skin<?> createDefaultSkin() {
+        return new VirtualFlowBasedGridViewSkin<>(this);
     }
 
     @Override public Orientation getContentBias() {
@@ -144,7 +150,7 @@ public class GridView<T> extends Control {
         }
         return items;
     }
-
+    
     @Override protected String getUserAgentStylesheet() {
         return GridView.class.getResource("gridview.css").toExternalForm();
     }

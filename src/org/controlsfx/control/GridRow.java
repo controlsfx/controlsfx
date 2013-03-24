@@ -1,11 +1,13 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridCellCache;
+import impl.org.controlsfx.skin.GridRowSkin;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexedCell;
+import javafx.scene.control.Skin;
 
 public class GridRow<T> extends IndexedCell<T>{
 
@@ -31,6 +33,10 @@ public class GridRow<T> extends IndexedCell<T>{
 		});
 		markAsDirty();
 	}
+	
+	@Override protected Skin<?> createDefaultSkin() {
+        return new GridRowSkin<T>(this);
+    }
 	
 	public void markAsDirty() {
 		dirtyProperty.set(true);

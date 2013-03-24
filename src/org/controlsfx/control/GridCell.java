@@ -1,6 +1,8 @@
 package org.controlsfx.control;
 
+import impl.org.controlsfx.skin.GridCellSkin;
 import javafx.scene.control.IndexedCell;
+import javafx.scene.control.Skin;
 
 public class GridCell<T> extends IndexedCell<T> {
 
@@ -8,8 +10,11 @@ public class GridCell<T> extends IndexedCell<T> {
 		getStyleClass().add("grid-cell");
 	}
 	
-	@Override
-	protected String getUserAgentStylesheet() {
+	@Override protected Skin<?> createDefaultSkin() {
+        return new GridCellSkin<T>(this);
+    }
+	
+	@Override protected String getUserAgentStylesheet() {
 		return GridView.class.getResource("gridview.css").toExternalForm();
 	}
 	

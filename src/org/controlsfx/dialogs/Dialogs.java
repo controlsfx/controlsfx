@@ -16,24 +16,25 @@ public class Dialogs {
     
     // NOT PUBLIC API
     static enum DialogType {
-        ERROR(DialogOptions.OK,"error48.image") {
+        ERROR(DialogOptions.OK,"error.image") {
             @Override public String getDefaultMasthead() { return "Error"; }  
         },
-        INFORMATION(DialogOptions.OK, "info48.image") {
+        INFORMATION(DialogOptions.OK, "info.image") {
             @Override public String getDefaultMasthead() { return "Message"; }
         },
-        WARNING(DialogOptions.OK,"warning48.image") {
+        WARNING(DialogOptions.OK,"warning.image") {
             @Override public String getDefaultMasthead() { return "Warning"; }
         },
-        CONFIRMATION(DialogOptions.YES_NO_CANCEL, "confirm48.image") {
+        CONFIRMATION(DialogOptions.YES_NO_CANCEL, "confirm.image") {
             @Override public String getDefaultMasthead() { return "Select an Option"; }
         },
-        INPUT(DialogOptions.OK_CANCEL, "confirm48.image") {
+        INPUT(DialogOptions.OK_CANCEL, "confirm.image") {
             @Override public String getDefaultMasthead() { return "Select an Option"; }
         };
         
         private final DialogOptions defaultOptions;
         private final String imageResource;
+        private ImageView imageView;
         
         
         DialogType(DialogOptions defaultOptions, String imageResource) {
@@ -42,7 +43,10 @@ public class Dialogs {
         }
         
         public ImageView getImage() {
-            return getIcon(imageResource);
+            if (imageView == null) {
+                imageView = getIcon(imageResource);
+            }
+            return imageView;
         }
 
         public String getDefaultTitle() {

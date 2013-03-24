@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="42" width="42" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 42 42">
+<defs>
+<radialGradient id="c" gradientUnits="userSpaceOnUse" cy="33" cx="21" gradientTransform="matrix(1 0 0 .5 0 17)" r="17">
+<stop offset="0"/>
+<stop stop-opacity="0" offset="1"/>
+</radialGradient>
+<linearGradient id="b" y2="33.7" gradientUnits="userSpaceOnUse" x2="21.2" gradientTransform="matrix(1.41 0 0 1.47 13.2 -17.5)" y1="19" x1="1">
+<stop stop-color="#e67c7c" offset="0"/>
+<stop stop-color="#d72f2f" offset="1"/>
+</linearGradient>
+<linearGradient id="a" x1="8" gradientUnits="userSpaceOnUse" x2="36" gradientTransform="translate(2,-9.1e-4)" y1="18" y2="34.3">
+<stop stop-color="#D4D4D4" offset="0"/>
+<stop stop-color="#E2E2E2" offset=".398"/>
+<stop stop-color="#fff" offset="1"/>
+</linearGradient>
+</defs>
+<ellipse opacity=".620" rx="18" ry="9" cy="33" cx="21" fill="url(#c)"/>
+<g stroke-linejoin="round">
+<path stroke="#9f0000" stroke-width="6" d="m4 35h34l-17-32z"/>
+<path stroke="url(#b)" stroke-width="4" d="m4 35h34l-17-32z"/>
+<path stroke="#c00" stroke-width="2" d="m4 35h34l-17-32z" fill="#c00"/>
+<path stroke="url(#a)" d="m7 33.2h28l-14-26.4z" fill="url(#a)"/>
+</g>
+<path d="m19.8 25.5-0.5-10h3.5l-0.6 10z"/>
+<circle cy="28.7" cx="21" r="2"/>
+</svg>

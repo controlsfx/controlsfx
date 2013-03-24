@@ -7,8 +7,12 @@ import java.security.PrivilegedExceptionAction;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import org.controlsfx.tools.SVGLoader;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 
 /**
  *
@@ -93,6 +97,11 @@ class DialogResources {
     }
 
     static public ImageView getIcon(URL url) {
+        if (url.toString().endsWith(".svg")) {
+            WritableImage image = new WritableImage(48, 48);
+            SVGLoader.loadSVGImage(url, image);
+            return new ImageView(image);
+        }
         return new ImageView(new Image(url.toString()));
     }
 }

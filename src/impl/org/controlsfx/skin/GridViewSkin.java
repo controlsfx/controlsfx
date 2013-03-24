@@ -10,7 +10,6 @@ import javafx.scene.control.SkinBase;
 
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
-import org.controlsfx.control.cell.DefaultGridCell;
 
 public class GridViewSkin<T> extends SkinBase<GridView<T>> {
 
@@ -135,7 +134,17 @@ public class GridViewSkin<T> extends SkinBase<GridView<T>> {
     }
 
     protected GridCell<T> createDefaultCellImpl() {
-        return new DefaultGridCell<T>();
+        // TODO this is duplicated in GridRowSkin
+        return new GridCell<T>() {
+            @Override protected void updateItem(T item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty) {
+                    setText("");
+                } else {
+                    setText(item.toString());
+                }
+            }
+        };
     }
 
     @Override protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {

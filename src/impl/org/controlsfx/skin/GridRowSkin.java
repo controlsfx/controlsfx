@@ -7,7 +7,6 @@ import javafx.scene.Node;
 
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridRow;
-import org.controlsfx.control.cell.DefaultGridCell;
 
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
@@ -87,7 +86,17 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     }
 
     private GridCell<T> createDefaultCellImpl() {
-        return new DefaultGridCell<>();
+        // TODO this is duplicated in GridViewSkin...
+        return new GridCell<T>() {
+            @Override protected void updateItem(T item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty) {
+                    setText("");
+                } else {
+                    setText(item.toString());
+                }
+            }
+        };
     }
 
     @Override protected double computeMinHeight(double width) {

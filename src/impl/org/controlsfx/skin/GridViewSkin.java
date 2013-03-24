@@ -163,7 +163,10 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
             // Generics in VirtualFlow?? <- Ask Jonathan / compare with JDK8
             GridRow<T> row = (GridRow<T>) flow.getVisibleCell(currentRowIndex);
             if (row != null) {
-                row.markAsDirty();
+                // FIXME hacky - need to better understand what this is about
+                int index = row.getIndex();
+                row.updateIndex(-1);
+                row.updateIndex(index);
             }
         }
     }

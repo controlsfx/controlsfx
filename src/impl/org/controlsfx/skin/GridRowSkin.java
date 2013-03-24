@@ -16,36 +16,23 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     public GridRowSkin(GridRow<T> control) {
         super(control, new CellBehaviorBase<GridRow<T>>(control));
 
-        getSkinnable().dirtyProperty().addListener(new ChangeListener<Boolean>() {
-
-            @Override public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-                if (newValue != null && newValue.booleanValue()) {
-                    updateCells();
-                    getSkinnable().dirtyProperty().set(false);
-                }
-            }
-        });
-
-        if (getSkinnable().dirtyProperty().get()) {
-            updateCells();
-            getSkinnable().dirtyProperty().set(false);
-        }
-
-        getSkinnable().widthProperty().addListener(new ChangeListener<Number>() {
-
-            @Override public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                updateCells();
-            }
-        });
-
-        getSkinnable().heightProperty().addListener(new ChangeListener<Number>() {
-
-            @Override public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                updateCells();
-            }
-        });
-
         updateCells();
+        
+        registerChangeListener(getSkinnable().indexProperty(), "INDEX");
+        registerChangeListener(getSkinnable().widthProperty(), "WIDTH");
+        registerChangeListener(getSkinnable().heightProperty(), "HEIGHT");
+    }
+    
+    @Override protected void handleControlPropertyChanged(String p) {
+        super.handleControlPropertyChanged(p);
+        
+        if ("INDEX".equals(p)) {
+            updateCells();
+        } else if ("WIDTH".equals(p)) {
+            updateCells();
+        } else if ("HEIGHT".equals(p)) {
+            updateCells();
+        }
     }
 
     public void updateCells() {

@@ -23,10 +23,6 @@ public class GridCell<T> extends IndexedCell<T> {
         return new GridCellSkin<T>(this);
     }
 	
-	@Override protected String getUserAgentStylesheet() {
-		return GridView.class.getResource("gridview.css").toExternalForm();
-	}
-	
 	/**
 	 * For a better performance cells can be cached. Once a row is recycled it can use cached cells instead of creating a new one.
 	 * @return

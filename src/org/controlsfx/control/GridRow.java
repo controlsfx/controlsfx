@@ -13,7 +13,7 @@ public class GridRow<T> extends IndexedCell<T>{
 
 	private SimpleObjectProperty<GridView<T>> gridView;
 	
-	private SimpleBooleanProperty dirtyProperty;
+//	private SimpleBooleanProperty dirtyProperty;
 	
 	private GridCellCache<T> cellCache;
 	
@@ -22,29 +22,27 @@ public class GridRow<T> extends IndexedCell<T>{
 		this.cellCache = cellCache;
 		getStyleClass().add("grid-row");
 		gridView = new SimpleObjectProperty<>();
-		dirtyProperty = new SimpleBooleanProperty(false);
-		indexProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0,
-					Number arg1, Number arg2) {
-				markAsDirty();
-			}
-		});
-		markAsDirty();
+//		dirtyProperty = new SimpleBooleanProperty(false);
+//		indexProperty().addListener(new ChangeListener<Number>() {
+//			@Override public void changed(ObservableValue<? extends Number> arg0,
+//					Number arg1, Number arg2) {
+//				markAsDirty();
+//			}
+//		});
+//		markAsDirty();
 	}
 	
 	@Override protected Skin<?> createDefaultSkin() {
         return new GridRowSkin<T>(this);
     }
 	
-	public void markAsDirty() {
-		dirtyProperty.set(true);
-	}
-	
-	public SimpleBooleanProperty dirtyProperty() {
-		return dirtyProperty;
-	}
+//	public void markAsDirty() {
+//		dirtyProperty.set(true);
+//	}
+//	
+//	public SimpleBooleanProperty dirtyProperty() {
+//		return dirtyProperty;
+//	}
 	
 	public final void updateGridView(GridView<T> gridView) {
         this.gridView.set(gridView);

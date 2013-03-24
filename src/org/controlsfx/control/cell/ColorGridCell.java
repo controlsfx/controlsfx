@@ -8,24 +8,27 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 
-
-
 public class ColorGridCell extends GridCell<Color> {
 	
-	public ColorGridCell() {
-		getStyleClass().add("color-grid-cell");
-		itemProperty().addListener(new ChangeListener<Color>() {
+	private Rectangle colorRect;
 
-			@Override
-			public void changed(ObservableValue<? extends Color> arg0,
-					Color arg1, Color arg2) {
-				getChildren().clear();
-				Rectangle colorRect = RectangleBuilder.create().fill(arg2)
-						.stroke(Color.BLACK).build();
-				colorRect.heightProperty().bind(heightProperty());
-				colorRect.widthProperty().bind(widthProperty());				
-				setGraphic(colorRect);
-			}
-		});
+    public ColorGridCell() {
+		getStyleClass().add("color-grid-cell");
+		
+		colorRect = RectangleBuilder.create().stroke(Color.BLACK).build();
+		colorRect.heightProperty().bind(heightProperty());
+		colorRect.widthProperty().bind(widthProperty());   
+		setGraphic(colorRect);
+	}
+	
+	@Override protected void updateItem(Color item, boolean empty) {
+	    super.updateItem(item, empty);
+	    
+	    if (empty) {
+	        setGraphic(null);
+	    } else {
+	        colorRect.setFill(item);
+	        setGraphic(colorRect);
+	    }
 	}
 }

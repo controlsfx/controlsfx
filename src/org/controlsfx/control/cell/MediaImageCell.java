@@ -10,29 +10,18 @@ import javafx.scene.media.MediaPlayerBuilder;
 import javafx.scene.media.MediaView;
 import javafx.scene.media.MediaViewBuilder;
 
-
 public class MediaImageCell extends GridCell<Media> {
 	
 	private MediaPlayer mediaPlayer;
+	private final MediaView mediaView;
 	
 	public MediaImageCell() {
 		getStyleClass().add("media-grid-cell");
-		itemProperty().addListener(new ChangeListener<Media>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Media> arg0,
-					Media arg1, Media arg2) {
-				getChildren().clear();
-				if(mediaPlayer != null) {
-					mediaPlayer.stop();
-				}
-				mediaPlayer = MediaPlayerBuilder.create().media(arg2).build();
-				MediaView mediaView = MediaViewBuilder.create().mediaPlayer(mediaPlayer).build();
-				mediaView.fitHeightProperty().bind(heightProperty());
-				mediaView.fitWidthProperty().bind(widthProperty());
-				setGraphic(mediaView);
-			}
-		});
+		
+        mediaView = MediaViewBuilder.create().mediaPlayer(mediaPlayer).build();
+        mediaView.fitHeightProperty().bind(heightProperty());
+        mediaView.fitWidthProperty().bind(widthProperty());
+        mediaView.setMediaPlayer(mediaPlayer);
 	}
 	
 	public void pause() {
@@ -51,5 +40,22 @@ public class MediaImageCell extends GridCell<Media> {
 		if(mediaPlayer != null) {
 			mediaPlayer.stop();
 		}
+	}
+	
+	@Override protected void updateItem(Media item, boolean empty) {
+	    super.updateItem(item, empty);
+	    
+	    getChildren().clear();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
+	    
+	    if (empty) {
+	        setGraphic(null);
+	    } else {
+	        mediaPlayer = MediaPlayerBuilder.create().media(item).build();
+	        mediaView.setMediaPlayer(mediaPlayer);
+	        setGraphic(mediaView);
+	    }
 	}
 }

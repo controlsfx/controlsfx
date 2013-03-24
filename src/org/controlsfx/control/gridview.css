@@ -1,0 +1,27 @@
+.grid-view {
+/*	-fx-skin: "impl.org.controlsfx.skin.VirtualFlowBasedGridViewSkin"; */
+	-fx-skin: "impl.org.controlsfx.skin.GridViewSkin";
+	-fx-vertical-cell-spacing: 12;
+	-fx-horizontal-cell-spacing: 12;
+	-fx-cell-height: 64;
+	-fx-cell-width: 64;
+	-fx-horizontal-alignment: CENTER;
+}
+
+.grid-row {
+	-fx-skin: "impl.org.controlsfx.skin.GridRowSkin";
+}
+
+.grid-cell {
+	-fx-skin: "impl.org.controlsfx.skin.GridCellSkin";
+}
+
+.color-grid-cell {
+	-fx-skin: "impl.org.controlsfx.skin.GridCellSkin";
+}
+.image-grid-cell {
+	-fx-skin: "impl.org.controlsfx.skin.GridCellSkin";
+}
+.media-grid-cell {
+	-fx-skin: "impl.org.controlsfx.skin.GridCellSkin";
+}

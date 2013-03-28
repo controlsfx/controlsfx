@@ -32,6 +32,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -72,12 +74,14 @@ class DialogTemplate<T> {
     // masthead
     private String mastheadString;
     private BorderPane mastheadPanel;
-    private ImageView mastheadIcon;
     private UITextArea mastheadTextArea;
     
     // center
     private Pane centerPanel;
     private String contentString = null;
+    
+    // masthead or center, depending on whether a mastheadString is specified
+    private ImageView dialogBigIcon;
     
     // Buttons
     private ObservableList<Button> buttons;
@@ -231,6 +235,10 @@ class DialogTemplate<T> {
      * Implementation                                                          *
      *                                                                         *
      **************************************************************************/
+    
+    private boolean isMastheadVisible() {
+        return mastheadString != null && ! mastheadString.isEmpty();
+    }
 
     /*
      * top part of the dialog contains short informative message, and either
@@ -238,6 +246,10 @@ class DialogTemplate<T> {
      */
     private Pane createMasthead() {
         mastheadPanel = new BorderPane();
+        if (! isMastheadVisible()) {
+            return mastheadPanel;
+        }
+        
         mastheadPanel.getStyleClass().add("top-panel");
 
         // Create panel with text area and icon or just a background image:
@@ -255,8 +267,8 @@ class DialogTemplate<T> {
 
         mastheadPanel.setLeft(mastheadVBox);
         BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
-        mastheadIcon = dialogType == null ? getIcon("java48.image") : dialogType.getImage();
-        mastheadPanel.setRight(mastheadIcon);
+        dialogBigIcon = dialogType == null ? getIcon("java48.image") : dialogType.getImage();
+        mastheadPanel.setRight(dialogBigIcon);
 
         return mastheadPanel;
     }
@@ -294,6 +306,14 @@ class DialogTemplate<T> {
         bottomPanel.getStyleClass().add("center-bottom-panel");
         bottomPanel.setRight(buttonsPanel);
         centerPanel.getChildren().add(bottomPanel);
+        
+        // dialog image can go to the left if there is no masthead
+        if (! isMastheadVisible()) {
+            dialogBigIcon = dialogType == null ? getIcon("java48.image") : dialogType.getImage();
+            Pane pane = new Pane(dialogBigIcon);
+            pane.setPadding(new Insets(12, 12, 0, 0));
+            contentPanel.setLeft(pane);
+        }
 
         return centerPanel;
     }

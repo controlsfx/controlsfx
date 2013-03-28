@@ -34,18 +34,44 @@ public class HelloDialog extends Application {
         Scene scene = new Scene(root, 600, 300);
         scene.setFill(Color.WHITE);
 
+        
+        
+        // *******************************************************************
+        // Information Dialog
+        // *******************************************************************
+        
+        grid.add(createLabel("Information Dialog: "), 0, 0);
+        
         final Hyperlink Hyperlink2 = new Hyperlink();
-        Hyperlink2.setText("Basic");
+        Hyperlink2.setText("No Masthead");
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.showInformationDialog(stage, 
                         "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...", 
-                        "Wouldn't this be nice?", 
-                        "JavaFX 2.1");
+                        null,
+                        "Wouldn't this be nice for JavaFX");
             }
         });
-        grid.add(createLabel("Information Dialog: "), 0, 0);
         grid.add(Hyperlink2, 1, 0);
+        
+        final Hyperlink Hyperlink2a = new Hyperlink();
+        Hyperlink2a.setText("With Masthead");
+        Hyperlink2a.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialogs.showInformationDialog(stage, 
+                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...", 
+                        "Wouldn't this be nice?", 
+                        "JavaFX");
+            }
+        });
+        grid.add(Hyperlink2a, 2, 0);
+        
+        
+        
+        
+        // *******************************************************************
+        // Confirmation Dialog
+        // *******************************************************************
         
         final Hyperlink Hyperlink3 = new Hyperlink();
         Hyperlink3.setText("Basic");
@@ -61,6 +87,13 @@ public class HelloDialog extends Application {
         grid.add(createLabel("Confirmation Dialog: "), 0, 1);
         grid.add(Hyperlink3, 1, 1);
         
+        
+        
+        
+        // *******************************************************************
+        // Warning Dialog
+        // *******************************************************************
+        
         final Hyperlink Hyperlink6 = new Hyperlink();
         Hyperlink6.setText("Basic");
         Hyperlink6.setOnAction(new EventHandler<ActionEvent>() {
@@ -75,25 +108,12 @@ public class HelloDialog extends Application {
         grid.add(createLabel("Warning Dialog: "), 0, 2);
         grid.add(Hyperlink6, 1, 2);
         
-//        final Hyperlink Hyperlink4 = new Hyperlink();
-//        Hyperlink4.setText("Scrollable Content Dialog");
-//        Hyperlink4.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override public void handle(ActionEvent e) {
-//                        "Scrollable Content Dialog", 
-//                        "A nice long message....\n\n\nThat\ncan\neasily\nbe\nsplit\nover\nmultiple\nlines....");
-//                System.out.println("response: " + response);
-//            }
-//        });
-//        vbox.getChildren().add(Hyperlink4);
         
-//        final Hyperlink Hyperlink4 = new Hyperlink();
-//        Hyperlink4.setText("List Dialog");
-//        Hyperlink4.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override public void handle(ActionEvent e) {
-//                System.out.println("response: " + response);
-//            }
-//        });
-//        vbox.getChildren().add(Hyperlink4);
+        
+        
+        // *******************************************************************
+        // Error Dialog
+        // *******************************************************************
         
         final Hyperlink Hyperlink7 = new Hyperlink();
         Hyperlink7.setText("Basic");
@@ -108,6 +128,13 @@ public class HelloDialog extends Application {
         });
         grid.add(createLabel("Error Dialog: "), 0, 3);
         grid.add(Hyperlink7, 1, 3);
+        
+        
+        
+        
+        // *******************************************************************
+        // Exception Dialog
+        // *******************************************************************
         
         final Hyperlink Hyperlink5 = new Hyperlink();
         Hyperlink5.setText("Basic");
@@ -125,6 +152,11 @@ public class HelloDialog extends Application {
         grid.add(Hyperlink5, 1, 4);
         
         
+        
+        // *******************************************************************
+        // Input Dialog
+        
+        // *******************************************************************
         // Input dialog tests
         final Hyperlink Hyperlink8 = new Hyperlink();
         Hyperlink8.setText("TextField");

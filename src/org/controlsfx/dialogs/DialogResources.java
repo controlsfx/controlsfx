@@ -70,12 +70,12 @@ class DialogResources {
     /**
      * Returns an <code>ImageView</code> given an image file name or resource name
      */
-    static public ImageView getIcon(final String key) {
+    static public Image getImage(final String key) {
         try {
             return AccessController.doPrivileged(
-                    new PrivilegedExceptionAction<ImageView>()   {
-                        @Override public ImageView run() {
-                            return getIcon_(key);
+                    new PrivilegedExceptionAction<Image>()   {
+                        @Override public Image run() {
+                            return getImage_(key);
                         }
             });
         } catch (Exception ex) {
@@ -84,7 +84,7 @@ class DialogResources {
         }
     }
 
-    static public ImageView getIcon_(String key) {
+    static public Image getImage_(String key) {
         String resourceName = getString(key);
         URL url = ControlResources.class.getResource(resourceName);
         if (url == null) {
@@ -93,15 +93,15 @@ class DialogResources {
                     "' and URL 'null'");
             return null;
         }
-        return getIcon(url);
+        return getImage(url);
     }
 
-    static public ImageView getIcon(URL url) {
+    static public Image getImage(URL url) {
         if (url.toString().endsWith(".svg")) {
             WritableImage image = new WritableImage(48, 48);
             SVGLoader.loadSVGImage(url, image);
-            return new ImageView(image);
+            return image;
         }
-        return new ImageView(new Image(url.toString()));
+        return new Image(url.toString());
     }
 }

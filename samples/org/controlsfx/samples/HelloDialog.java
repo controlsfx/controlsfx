@@ -31,7 +31,7 @@ public class HelloDialog extends Application {
         
         StackPane root = new StackPane();
         root.getChildren().add(grid);
-        Scene scene = new Scene(root, 600, 300);
+        Scene scene = new Scene(root, 700, 300);
         scene.setFill(Color.WHITE);
 
         
@@ -48,7 +48,6 @@ public class HelloDialog extends Application {
             @Override public void handle(ActionEvent e) {
                 Dialogs.showInformationDialog(stage, 
                         "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...", 
-                        null,
                         "Wouldn't this be nice for JavaFX");
             }
         });
@@ -59,9 +58,9 @@ public class HelloDialog extends Application {
         Hyperlink2a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.showInformationDialog(stage, 
-                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...", 
-                        "Wouldn't this be nice?", 
-                        "JavaFX");
+                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...",
+                        "JavaFX",
+                        "Wouldn't this be nice?");
             }
         });
         grid.add(Hyperlink2a, 2, 0);
@@ -73,9 +72,23 @@ public class HelloDialog extends Application {
         // Confirmation Dialog
         // *******************************************************************
         
+        grid.add(createLabel("Confirmation Dialog: "), 0, 1);
+        
         final Hyperlink Hyperlink3 = new Hyperlink();
-        Hyperlink3.setText("Basic");
+        Hyperlink3.setText("No Masthead");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialogs.DialogResponse response = Dialogs.showConfirmDialog(stage, 
+                        "I was a bit worried that you might not want them, so I wanted to double check.",
+                        "You do want dialogs right?");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink3, 1, 1);
+        
+        final Hyperlink Hyperlink3a = new Hyperlink();
+        Hyperlink3a.setText("With Masthead");
+        Hyperlink3a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.DialogResponse response = Dialogs.showConfirmDialog(stage, 
                         "I was a bit worried that you might not want them, so I wanted to double check.",
@@ -84,8 +97,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(createLabel("Confirmation Dialog: "), 0, 1);
-        grid.add(Hyperlink3, 1, 1);
+        grid.add(Hyperlink3a, 2, 1);
         
         
         
@@ -94,9 +106,23 @@ public class HelloDialog extends Application {
         // Warning Dialog
         // *******************************************************************
         
+        grid.add(createLabel("Warning Dialog: "), 0, 2);
+        
         final Hyperlink Hyperlink6 = new Hyperlink();
-        Hyperlink6.setText("Basic");
+        Hyperlink6.setText("No Masthead");
         Hyperlink6.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialogs.DialogResponse response = Dialogs.showWarningDialog(stage, 
+                        "This is a warning", 
+                        "I'm warning you!");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink6, 1, 2);
+        
+        final Hyperlink Hyperlink6a = new Hyperlink();
+        Hyperlink6a.setText("With Masthead");
+        Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.DialogResponse response = Dialogs.showWarningDialog(stage, 
                         "This is a warning", 
@@ -105,8 +131,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(createLabel("Warning Dialog: "), 0, 2);
-        grid.add(Hyperlink6, 1, 2);
+        grid.add(Hyperlink6a, 2, 2);
         
         
         
@@ -115,9 +140,23 @@ public class HelloDialog extends Application {
         // Error Dialog
         // *******************************************************************
         
+        grid.add(createLabel("Error Dialog: "), 0, 3);
+        
         final Hyperlink Hyperlink7 = new Hyperlink();
-        Hyperlink7.setText("Basic");
+        Hyperlink7.setText("No Masthead");
         Hyperlink7.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
+                        "Exception Encountered", 
+                        "It looks like you're making a bad decision");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink7, 1, 3);
+        
+        final Hyperlink Hyperlink7a = new Hyperlink();
+        Hyperlink7a.setText("With Masthead");
+        Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
                         "Exception Encountered", 
@@ -126,8 +165,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(createLabel("Error Dialog: "), 0, 3);
-        grid.add(Hyperlink7, 1, 3);
+        grid.add(Hyperlink7a, 2, 3);
         
         
         
@@ -136,9 +174,25 @@ public class HelloDialog extends Application {
         // Exception Dialog
         // *******************************************************************
         
+        grid.add(createLabel("Exception Dialog: "), 0, 4);
+        
         final Hyperlink Hyperlink5 = new Hyperlink();
-        Hyperlink5.setText("Basic");
+        Hyperlink5.setText("No Masthead");
         Hyperlink5.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
+                        "Better change your mind - this is really your last chance!",
+                        "It looks like you're making a bad decision", 
+                        null, 
+                        new RuntimeException("Pending Bad Decision Exception"));
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink5, 1, 4);
+        
+        final Hyperlink Hyperlink5a = new Hyperlink();
+        Hyperlink5a.setText("With Masthead");
+        Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
                         "Better change your mind - this is really your last chance!",
@@ -148,27 +202,27 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(createLabel("Exception Dialog: "), 0, 4);
-        grid.add(Hyperlink5, 1, 4);
+        grid.add(Hyperlink5a, 2, 4);
         
         
         
         // *******************************************************************
-        // Input Dialog
-        
+        // Input Dialog (with masthead)
         // *******************************************************************
-        // Input dialog tests
+        
+        grid.add(createLabel("Input Dialog (with Masthead): "), 0, 5);
+        
         final Hyperlink Hyperlink8 = new Hyperlink();
         Hyperlink8.setText("TextField");
         Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 String response = Dialogs.showInputDialog(stage, 
                         "What is your name?",
-                        "Name Check");
+                        "Name Check",
+                        "Please type in your name");
                 System.out.println("response: " + response);
             }
         });
-        grid.add(createLabel("Input Dialog: "), 0, 5);
         grid.add(Hyperlink8, 1, 5);
         
         final Hyperlink Hyperlink9 = new Hyperlink();
@@ -215,6 +269,73 @@ public class HelloDialog extends Application {
             }
         });
         grid.add(Hyperlink11, 4, 5);
+        
+        
+        
+        // *******************************************************************
+        // Input Dialog (without masthead)
+        // *******************************************************************
+        
+        grid.add(createLabel("Input Dialog (no Masthead): "), 0, 6);
+        
+        final Hyperlink Hyperlink20 = new Hyperlink();
+        Hyperlink20.setText("TextField");
+        Hyperlink20.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                String response = Dialogs.showInputDialog(stage, 
+                        "What is your name?",
+                        "Name Check");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink20, 1, 6);
+        
+        final Hyperlink Hyperlink21 = new Hyperlink();
+        Hyperlink21.setText("Initial Value Set");
+        Hyperlink21.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                String response = Dialogs.showInputDialog(stage, 
+                        "Pick a name?",
+                        "Name Guess",
+                        null,
+                        "Jonathan");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink21, 2, 6);
+        
+        final Hyperlink Hyperlink22 = new Hyperlink();
+        Hyperlink22.setText("Set Choices (< 10)");
+        Hyperlink22.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                String response = Dialogs.showInputDialog(stage, 
+                        "Pick a name?",
+                        "Name Guess",
+                        null,
+                        "Jonathan",
+                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink22, 3, 6);
+        
+        final Hyperlink Hyperlink23 = new Hyperlink();
+        Hyperlink23.setText("Set Choices (>= 10)");
+        Hyperlink23.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                String response = Dialogs.showInputDialog(stage, 
+                        "Pick a name?",
+                        "Name Guess",
+                        null,
+                        "Jonathan",
+                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
+                        "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink23, 4, 6);
+        
+        
         
         stage.setScene(scene);
         stage.show();

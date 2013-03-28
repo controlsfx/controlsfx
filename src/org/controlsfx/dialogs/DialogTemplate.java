@@ -1,6 +1,5 @@
 package org.controlsfx.dialogs;
 
-import static org.controlsfx.dialogs.DialogResources.getIcon;
 import static org.controlsfx.dialogs.DialogResources.getMessage;
 import static org.controlsfx.dialogs.Dialogs.DialogType.INFORMATION;
 import static org.controlsfx.dialogs.Dialogs.DialogType.WARNING;
@@ -150,7 +149,9 @@ class DialogTemplate<T> {
             }
         }
 
-        contentPane.getChildren().add(createMasthead());
+        if (isMastheadVisible()) {
+            contentPane.getChildren().add(createMasthead());
+        }
         contentPane.getChildren().add(createCenterPanel());
 
         Pane bottomPanel = createBottomPanel();
@@ -168,7 +169,9 @@ class DialogTemplate<T> {
 
         this.dialogType = DialogType.ERROR;
 
-        contentPane.getChildren().add(createMasthead());
+        if (isMastheadVisible()) {
+            contentPane.getChildren().add(createMasthead());
+        }
         contentPane.getChildren().add(createCenterPanel());
         
         Pane bottomPanel = createBottomPanel();
@@ -185,7 +188,9 @@ class DialogTemplate<T> {
         this.initialInputValue = initialValue;
         this.inputChoices = choices;
         
-        contentPane.getChildren().add(createMasthead());
+        if (isMastheadVisible()) {
+            contentPane.getChildren().add(createMasthead());
+        }
         contentPane.getChildren().add(createCenterPanel());
 
         Pane bottomPanel = createBottomPanel();
@@ -246,10 +251,6 @@ class DialogTemplate<T> {
      */
     private Pane createMasthead() {
         mastheadPanel = new BorderPane();
-        if (! isMastheadVisible()) {
-            return mastheadPanel;
-        }
-        
         mastheadPanel.getStyleClass().add("top-panel");
 
         // Create panel with text area and icon or just a background image:
@@ -267,7 +268,7 @@ class DialogTemplate<T> {
 
         mastheadPanel.setLeft(mastheadVBox);
         BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
-        dialogBigIcon = dialogType == null ? getIcon("java48.image") : dialogType.getImage();
+        dialogBigIcon = new ImageView(dialogType == null ? DialogResources.getImage("java48.image") : dialogType.getImage());
         mastheadPanel.setRight(dialogBigIcon);
 
         return mastheadPanel;
@@ -309,9 +310,8 @@ class DialogTemplate<T> {
         
         // dialog image can go to the left if there is no masthead
         if (! isMastheadVisible()) {
-            dialogBigIcon = dialogType == null ? getIcon("java48.image") : dialogType.getImage();
+            dialogBigIcon = new ImageView(dialogType == null ? DialogResources.getImage("java48.image") : dialogType.getImage());
             Pane pane = new Pane(dialogBigIcon);
-            pane.setPadding(new Insets(12, 12, 0, 0));
             contentPanel.setLeft(pane);
         }
 
@@ -319,7 +319,7 @@ class DialogTemplate<T> {
     }
     
     private Node createCenterContent() {
-        if (style == DialogStyle.SIMPLE) {
+        if (style == DialogStyle.SIMPLE || style == DialogStyle.ERROR) {
             if (contentString != null) {
                 UITextArea ta = new UITextArea(contentString);
                 ta.getStyleClass().add("center-content-area");
@@ -446,7 +446,7 @@ class DialogTemplate<T> {
         if (alertStrs == null || alertStrs.length == 0) {
             imageFile = SECURITY_ALERT_LOW;
         }
-        securityIcon = getIcon(imageFile);
+        securityIcon = new ImageView(DialogResources.getImage(imageFile));
 
         // Add icon to the bottom panel.
         bottomPanel.getChildren().add(securityIcon);

@@ -3,6 +3,8 @@ package org.controlsfx.dialogs;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
@@ -17,24 +19,29 @@ public class Dialogs {
     // NOT PUBLIC API
     static enum DialogType {
         ERROR(DialogOptions.OK,"error.image") {
-            @Override public String getDefaultMasthead() { return "Error"; }  
+            @Override public String getDefaultTitle() { return "Error"; }
+            @Override public String getDefaultMasthead() { return "Error"; }
         },
         INFORMATION(DialogOptions.OK, "info.image") {
+            @Override public String getDefaultTitle() { return "Message"; }
             @Override public String getDefaultMasthead() { return "Message"; }
         },
         WARNING(DialogOptions.OK,"warning.image") {
+            @Override public String getDefaultTitle() { return "Warning"; }
             @Override public String getDefaultMasthead() { return "Warning"; }
         },
         CONFIRMATION(DialogOptions.YES_NO_CANCEL, "confirm.image") {
-            @Override public String getDefaultMasthead() { return "Select an Option"; }
+            @Override public String getDefaultTitle() { return "Select an option"; }
+            @Override public String getDefaultMasthead() { return "Select an option"; }
         },
         INPUT(DialogOptions.OK_CANCEL, "confirm.image") {
-            @Override public String getDefaultMasthead() { return "Select an Option"; }
+            @Override public String getDefaultTitle() { return "Select an option"; }
+            @Override public String getDefaultMasthead() { return "Select an option"; }
         };
         
         private final DialogOptions defaultOptions;
         private final String imageResource;
-        private ImageView imageView;
+        private Image image;
         
         
         DialogType(DialogOptions defaultOptions, String imageResource) {
@@ -42,18 +49,16 @@ public class Dialogs {
             this.imageResource = imageResource;
         }
         
-        public ImageView getImage() {
-            if (imageView == null) {
-                imageView = getIcon(imageResource);
+        public Image getImage() {
+            if (image == null) {
+                image = DialogResources.getImage(imageResource);
             }
-            return imageView;
+            return image;
         }
 
-        public String getDefaultTitle() {
-            return getDefaultMasthead();
-        }
-        
         public abstract String getDefaultMasthead();
+        
+        public abstract String getDefaultTitle();
 
         public DialogOptions getDefaultOptions() {
             return defaultOptions;
@@ -99,41 +104,41 @@ public class Dialogs {
     public static DialogResponse showConfirmDialog(final Stage owner, 
                                                   final String message) {
         return showConfirmDialog(owner, 
-                                    message, 
-                                    DialogType.CONFIRMATION.getDefaultMasthead());
+                                 message, 
+                                 DialogType.CONFIRMATION.getDefaultTitle());
     }
     
     public static DialogResponse showConfirmDialog(final Stage owner, 
                                                    final String message,
-                                                   final String masthead) {
-        return showConfirmDialog(owner, 
-                                    message, 
-                                    masthead, 
-                                    DialogType.CONFIRMATION.getDefaultTitle());
-    }
-    
-    public static DialogResponse showConfirmDialog(final Stage owner, 
-                                                   final String message,
-                                                   final String masthead, 
                                                    final String title) {
         return showConfirmDialog(owner, 
-                                    message, 
-                                    masthead, 
-                                    title, 
-                                    DialogType.CONFIRMATION.getDefaultOptions());
+                                 message, 
+                                 title, 
+                                 null);
     }
     
     public static DialogResponse showConfirmDialog(final Stage owner, 
                                                    final String message,
-                                                   final String masthead, 
                                                    final String title, 
+                                                   final String masthead) {
+        return showConfirmDialog(owner, 
+                                 message, 
+                                 title, 
+                                 masthead, 
+                                 DialogType.CONFIRMATION.getDefaultOptions());
+    }
+    
+    public static DialogResponse showConfirmDialog(final Stage owner, 
+                                                   final String message,
+                                                   final String title, 
+                                                   final String masthead,
                                                    final DialogOptions options) {
         return showSimpleContentDialog(owner, 
-                                    title,
-                                    masthead, 
-                                    message, 
-                                    DialogType.CONFIRMATION,
-                                    options);
+                                       title,
+                                       masthead, 
+                                       message, 
+                                       DialogType.CONFIRMATION,
+                                       options);
     }
     
     
@@ -145,17 +150,17 @@ public class Dialogs {
     public static void showInformationDialog(final Stage owner,
                                              final String message) {
         showInformationDialog(owner, 
-                                    message, 
-                                    DialogType.INFORMATION.getDefaultMasthead());
+                              message, 
+                              DialogType.INFORMATION.getDefaultTitle());
     }
     
     public static void showInformationDialog(final Stage owner, 
                                              final String message,
-                                             final String masthead){
+                                             final String title) {
         showInformationDialog(owner, 
-                                    message, 
-                                    masthead,
-                                    DialogType.INFORMATION.getDefaultTitle());
+                              message, 
+                              title,
+                              null);
     }
     
     /*
@@ -167,14 +172,14 @@ public class Dialogs {
      */
     public static void showInformationDialog(final Stage owner, 
                                              final String message,
-                                             final String masthead, 
-                                             final String title){
+                                             final String title, 
+                                             final String masthead){
         showSimpleContentDialog(owner, 
-                                    title,
-                                    masthead, 
-                                    message, 
-                                    DialogType.INFORMATION,
-                                    DialogType.INFORMATION.getDefaultOptions());
+                                title,
+                                masthead, 
+                                message, 
+                                DialogType.INFORMATION,
+                                DialogType.INFORMATION.getDefaultOptions());
     }
     
     
@@ -202,34 +207,34 @@ public class Dialogs {
     public static DialogResponse showWarningDialog(final Stage owner, 
                                                    final String message) {
         return showWarningDialog(owner, 
-                                message, 
-                                DialogType.WARNING.getDefaultMasthead());
+                                 message, 
+                                 DialogType.WARNING.getDefaultTitle());
     }
     
     public static DialogResponse showWarningDialog(final Stage owner, 
                                                    final String message,
-                                                   final String masthead) {
-        return showWarningDialog(owner, 
-                                message, 
-                                masthead,
-                                DialogType.WARNING.getDefaultTitle());
-    }
-                                        
-    public static DialogResponse showWarningDialog(final Stage owner, 
-                                                   final String message,
-                                                   final String masthead, 
                                                    final String title) {
         return showWarningDialog(owner, 
-                                message, 
-                                masthead,
-                                title,
-                                DialogType.WARNING.getDefaultOptions());
+                                 message, 
+                                 title,
+                                 null);
     }
                                         
     public static DialogResponse showWarningDialog(final Stage owner, 
                                                    final String message,
-                                                   final String masthead, 
-                                                   final String title,
+                                                   final String title, 
+                                                   final String masthead) {
+        return showWarningDialog(owner, 
+                                 message, 
+                                 title,
+                                 masthead,
+                                 DialogType.WARNING.getDefaultOptions());
+    }
+                                        
+    public static DialogResponse showWarningDialog(final Stage owner, 
+                                                   final String message,
+                                                   final String title, 
+                                                   final String masthead,
                                                    final DialogOptions options) {
         return showSimpleContentDialog(owner, 
                                 title,
@@ -248,47 +253,47 @@ public class Dialogs {
     public static DialogResponse showErrorDialog(final Stage owner, 
                                                  final String message) {
         return showErrorDialog(owner, 
-                                message, 
-                                DialogType.ERROR.getDefaultMasthead());
+                               message, 
+                               DialogType.ERROR.getDefaultTitle());
     }
     
     public static DialogResponse showErrorDialog(final Stage owner,
                                                  final String message,
-                                                 final String masthead) {
-        return showErrorDialog(owner, 
-                                message, 
-                                masthead,
-                                masthead);
-    }
-    
-    public static DialogResponse showErrorDialog(final Stage owner, 
-                                                 final String message,
-                                                 final String masthead, 
                                                  final String title) {
         return showErrorDialog(owner, 
-                                message, 
-                                masthead,
-                                title,
-                                DialogType.ERROR.getDefaultOptions());
+                               message, 
+                               title,
+                               null);
     }
     
     public static DialogResponse showErrorDialog(final Stage owner, 
                                                  final String message,
-                                                 final String masthead, 
-                                                 final String title,
+                                                 final String title, 
+                                                 final String masthead) {
+        return showErrorDialog(owner, 
+                               message, 
+                               title,
+                               masthead,
+                               DialogType.ERROR.getDefaultOptions());
+    }
+    
+    public static DialogResponse showErrorDialog(final Stage owner, 
+                                                 final String message,
+                                                 final String title, 
+                                                 final String masthead,
                                                  final DialogOptions options) {
         return showSimpleContentDialog(owner, 
-                title,
-                masthead, 
-                message, 
-                DialogType.ERROR, 
-                options);
+                                       title,
+                                       masthead, 
+                                       message, 
+                                       DialogType.ERROR, 
+                                       options);
     }
     
     public static DialogResponse showErrorDialog(final Stage owner, 
                                                  final String message,
-                                                 final String masthead, 
                                                  final String title, 
+                                                 final String masthead, 
                                                  final Throwable throwable) {
         DialogTemplate template = new DialogTemplate(owner, title, masthead, null);
         template.setErrorContent(message, throwable);
@@ -304,43 +309,62 @@ public class Dialogs {
     
     public static String showInputDialog(final Stage owner, 
                                          final String message) {
-        return showInputDialog(owner, message, "Masthead");
+        return showInputDialog(owner, 
+                               message, 
+                               DialogType.ERROR.getDefaultTitle());
     }
     
     public static String showInputDialog(final Stage owner, 
                                          final String message,
-                                         final String masthead) {
-        return showInputDialog(owner, message, masthead, "Title");
-    }
-    
-    public static String showInputDialog(final Stage owner, 
-                                         final String message,
-                                         final String masthead, 
                                          final String title) {
-        return showInputDialog(owner, message, masthead, title, null);
+        return showInputDialog(owner, 
+                               message, 
+                               title, 
+                               null);
     }
     
     public static String showInputDialog(final Stage owner, 
                                          final String message,
-                                         final String masthead, 
-                                         final String title,
+                                         final String title, 
+                                         final String masthead) {
+        return showInputDialog(owner, 
+                               message, 
+                               title, 
+                               masthead, 
+                               null);
+    }
+    
+    public static String showInputDialog(final Stage owner, 
+                                         final String message,
+                                         final String title, 
+                                         final String masthead,
                                          final String initialValue) {
-        return showInputDialog(owner, message, masthead, title, initialValue, Collections.<String>emptyList());
+        return showInputDialog(owner, 
+                               message, 
+                               title, 
+                               masthead, 
+                               initialValue, 
+                               Collections.<String>emptyList());
     }
     
     public static <T> T showInputDialog(final Stage owner, 
                                         final String message,
-                                        final String masthead, 
-                                        final String title,
+                                        final String title, 
+                                        final String masthead,
                                         final T initialValue, 
                                         final T... choices) {
-        return showInputDialog(owner, message, masthead, title, initialValue, Arrays.asList(choices));
+        return showInputDialog(owner, 
+                               message, 
+                               title, 
+                               masthead, 
+                               initialValue, 
+                               Arrays.asList(choices));
     }
     
     public static <T> T showInputDialog(final Stage owner, 
                                         final String message,
-                                        final String masthead, 
-                                        final String title,
+                                        final String title, 
+                                        final String masthead,
                                         final T initialValue, 
                                         final List<T> choices) {
         DialogTemplate<T> template = new DialogTemplate<T>(owner, title, masthead, null);
@@ -354,11 +378,11 @@ public class Dialogs {
      * Private API
      **************************************************************************/
     private static <T> DialogResponse showSimpleContentDialog(final Stage owner,
-                                                          final String title, 
-                                                          final String masthead, 
-                                                          final String message, 
-                                                          final DialogType dialogType,
-                                                          final DialogOptions options) {
+                                                              final String title, 
+                                                              final String masthead, 
+                                                              final String message, 
+                                                              final DialogType dialogType,
+                                                              final DialogOptions options) {
         DialogTemplate<T> template = new DialogTemplate<T>(owner, title, masthead, options);
         template.setSimpleContent(message, dialogType);
         return showDialog(template);

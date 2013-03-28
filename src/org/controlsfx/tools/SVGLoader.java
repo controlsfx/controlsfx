@@ -19,19 +19,54 @@ import javafx.util.Callback;
 import com.sun.javafx.webkit.Accessor;
 import com.sun.webkit.WebPage;
 
+/**
+ * Convenience class that will attempt to load a given URL as an .svg file.
+ */
 public class SVGLoader {
     
     private SVGLoader() {
         // no-op
     }
 
+    /**
+     * This method will attempt to load the given svgImage URL into an ImageView
+     * node that will be provided asynchronously via the provided 
+     * {@link Callback}, and it will be sized to the given prefWidth / prefHeight.
+     * 
+     * <p>Note that it is valid to pass in -1 to prefWidth and / or prefHeight as
+     * an indicator to the SVG loader. If both values are -1, the default width
+     * of the SVG will be used. If one of the values is -1, then the SVG will
+     * be sized to ensure that it remains proportional.
+     * 
+     * @param svgImage The image to load.
+     * @param prefWidth The preferred width of the image when loaded, or -1 if 
+     *      there is no preferred width.
+     * @param prefHeight The preferred height of the image when loaded, or -1 if 
+     *      there is no preferred height.
+     * @param callback The {@link Callback} that will be called when the SVG 
+     *      image is loaded, where the {@link ImageView} containing the rendered
+     *      image will be available.
+     */
     public static void loadSVGImage(URL svgImage, final double prefWidth, final double prefHeight, final Callback<ImageView, Void> callback) {
         loadSVGImage(svgImage, prefWidth, prefHeight, callback, null);
     }
     
+    /**
+     * This method will attempt to load the given svgImage URL into the provided
+     * {@link WritableImage}, with the SVG scaled to fit the size of the
+     * WritableImage.
+     * 
+     * @param svgImage The image to load.
+     * @param outputImage The location to write the loaded image once it has 
+     *      been rendered (it will not happen synchronously).
+     * @throws NullPointerException The outputImage argument must be non-null.
+     */
     public static void loadSVGImage(URL svgImage, final WritableImage outputImage) {
-        final double w = outputImage == null ? -1 : outputImage.getWidth();
-        final double h = outputImage == null ? -1 : outputImage.getHeight();
+        if (outputImage == null) {
+            throw new NullPointerException("outputImage can not be null");
+        }
+        final double w = outputImage.getWidth();
+        final double h = outputImage.getHeight();
         loadSVGImage(svgImage, w, h, null, outputImage);
     }
     
@@ -55,8 +90,6 @@ public class SVGLoader {
         stage.show();
 
         String content = 
-//                "<body bgcolor=\"yellow\">" +
-//                "<body style=\"background: rgba(0, 0, 0, 1.0);\">" +
                 "<body style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; padding: 0;\">" +
                 "<img width=\"" + prefWidth + "\" height=\"" + prefHeight + "\" src=\"" + svgImage.toExternalForm() + "\" />";
         eng.loadContent(content);

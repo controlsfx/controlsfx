@@ -29,7 +29,7 @@ public class SVGTest extends Application {
 
         final StackPane root = new StackPane();
         
-        final Rectangle rect = new Rectangle(400, 400, Color.GREEN);
+        final Rectangle rect = new Rectangle(400, 400, Color.LIGHTBLUE);
         
         SVGLoader.loadSVGImage(pathToFile, 350, -1, new Callback<ImageView, Void>() {
             @Override public Void call(ImageView image) {

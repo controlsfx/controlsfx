@@ -29,7 +29,6 @@ public class HelloRangeSlider extends Application {
         Region verticalRangeSlider = createVerticalSlider();
         root.getChildren().addAll(horizontalRangeSlider, verticalRangeSlider);
         Scene scene = new Scene(root, 520, 360);
-        scene.setFill(Color.BEIGE);
 
         stage.setScene(scene);
         stage.show();

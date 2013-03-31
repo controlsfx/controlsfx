@@ -3,11 +3,15 @@ package org.controlsfx.samples;
 import org.controlsfx.dialogs.Dialogs;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -19,6 +23,8 @@ import javafx.stage.Stage;
 public class HelloDialog extends Application {
 
     @Override public void start(final Stage stage) {
+//        setUserAgentStylesheet(STYLESHEET_MODENA);
+        
         stage.setTitle("Dialog Sample");
 
 //        VBox vbox = new VBox(10);
@@ -31,16 +37,39 @@ public class HelloDialog extends Application {
         
         StackPane root = new StackPane();
         root.getChildren().add(grid);
-        Scene scene = new Scene(root, 700, 300);
+        Scene scene = new Scene(root, 800, 300);
         scene.setFill(Color.WHITE);
+        
+        int row = 0;
 
+        
+        // *******************************************************************
+        // Information Dialog
+        // *******************************************************************
+        
+        grid.add(createLabel("Operating system button placement: "), 0, 0);
+        
+        final String WINDOWS_UNIX = "Windows / Unix";
+        final String MAC_OS = "Mac OS";
+        final ChoiceBox<String> operatingSystem = new ChoiceBox<>(FXCollections.observableArrayList(WINDOWS_UNIX, MAC_OS));
+        operatingSystem.getSelectionModel().select(WINDOWS_UNIX);
+        operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                String os = operatingSystem.getSelectionModel().getSelectedItem();
+                Dialogs.setMacOS(MAC_OS.equals(os));
+                Dialogs.setWindows(WINDOWS_UNIX.equals(os));
+            }
+        });
+        grid.add(operatingSystem, 1, row);
+        
+        row++;
         
         
         // *******************************************************************
         // Information Dialog
         // *******************************************************************
         
-        grid.add(createLabel("Information Dialog: "), 0, 0);
+        grid.add(createLabel("Information Dialog: "), 0, row);
         
         final Hyperlink Hyperlink2 = new Hyperlink();
         Hyperlink2.setText("No Masthead");
@@ -51,7 +80,7 @@ public class HelloDialog extends Application {
                         "Wouldn't this be nice for JavaFX");
             }
         });
-        grid.add(Hyperlink2, 1, 0);
+        grid.add(Hyperlink2, 1, row);
         
         final Hyperlink Hyperlink2a = new Hyperlink();
         Hyperlink2a.setText("With Masthead");
@@ -63,8 +92,9 @@ public class HelloDialog extends Application {
                         "Wouldn't this be nice?");
             }
         });
-        grid.add(Hyperlink2a, 2, 0);
+        grid.add(Hyperlink2a, 2, row);
         
+        row++;
         
         
         
@@ -72,7 +102,7 @@ public class HelloDialog extends Application {
         // Confirmation Dialog
         // *******************************************************************
         
-        grid.add(createLabel("Confirmation Dialog: "), 0, 1);
+        grid.add(createLabel("Confirmation Dialog: "), 0, row);
         
         final Hyperlink Hyperlink3 = new Hyperlink();
         Hyperlink3.setText("No Masthead");
@@ -84,7 +114,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink3, 1, 1);
+        grid.add(Hyperlink3, 1, row);
         
         final Hyperlink Hyperlink3a = new Hyperlink();
         Hyperlink3a.setText("With Masthead");
@@ -97,16 +127,16 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink3a, 2, 1);
+        grid.add(Hyperlink3a, 2, row);
         
-        
+        row++;
         
         
         // *******************************************************************
         // Warning Dialog
         // *******************************************************************
         
-        grid.add(createLabel("Warning Dialog: "), 0, 2);
+        grid.add(createLabel("Warning Dialog: "), 0, row);
         
         final Hyperlink Hyperlink6 = new Hyperlink();
         Hyperlink6.setText("No Masthead");
@@ -118,7 +148,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink6, 1, 2);
+        grid.add(Hyperlink6, 1, row);
         
         final Hyperlink Hyperlink6a = new Hyperlink();
         Hyperlink6a.setText("With Masthead");
@@ -131,16 +161,16 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink6a, 2, 2);
+        grid.add(Hyperlink6a, 2, row);
         
-        
+        row++;
         
         
         // *******************************************************************
         // Error Dialog
         // *******************************************************************
         
-        grid.add(createLabel("Error Dialog: "), 0, 3);
+        grid.add(createLabel("Error Dialog: "), 0, row);
         
         final Hyperlink Hyperlink7 = new Hyperlink();
         Hyperlink7.setText("No Masthead");
@@ -152,7 +182,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink7, 1, 3);
+        grid.add(Hyperlink7, 1, row);
         
         final Hyperlink Hyperlink7a = new Hyperlink();
         Hyperlink7a.setText("With Masthead");
@@ -165,16 +195,16 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink7a, 2, 3);
+        grid.add(Hyperlink7a, 2, row);
         
-        
+        row++;
         
         
         // *******************************************************************
         // Exception Dialog
         // *******************************************************************
         
-        grid.add(createLabel("Exception Dialog: "), 0, 4);
+        grid.add(createLabel("Exception Dialog: "), 0, row);
         
         final Hyperlink Hyperlink5 = new Hyperlink();
         Hyperlink5.setText("No Masthead");
@@ -188,7 +218,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink5, 1, 4);
+        grid.add(Hyperlink5, 1, row);
         
         final Hyperlink Hyperlink5a = new Hyperlink();
         Hyperlink5a.setText("With Masthead");
@@ -202,15 +232,16 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink5a, 2, 4);
+        grid.add(Hyperlink5a, 2, row);
         
+        row++;
         
         
         // *******************************************************************
         // Input Dialog (with masthead)
         // *******************************************************************
         
-        grid.add(createLabel("Input Dialog (with Masthead): "), 0, 5);
+        grid.add(createLabel("Input Dialog (with Masthead): "), 0, row);
         
         final Hyperlink Hyperlink8 = new Hyperlink();
         Hyperlink8.setText("TextField");
@@ -223,7 +254,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink8, 1, 5);
+        grid.add(Hyperlink8, 1, row);
         
         final Hyperlink Hyperlink9 = new Hyperlink();
         Hyperlink9.setText("Initial Value Set");
@@ -237,7 +268,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink9, 2, 5);
+        grid.add(Hyperlink9, 2, row);
         
         final Hyperlink Hyperlink10 = new Hyperlink();
         Hyperlink10.setText("Set Choices (< 10)");
@@ -252,7 +283,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink10, 3, 5);
+        grid.add(Hyperlink10, 3, row);
         
         final Hyperlink Hyperlink11 = new Hyperlink();
         Hyperlink11.setText("Set Choices (>= 10)");
@@ -268,15 +299,16 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink11, 4, 5);
+        grid.add(Hyperlink11, 4, row);
         
+        row++;
         
         
         // *******************************************************************
         // Input Dialog (without masthead)
         // *******************************************************************
         
-        grid.add(createLabel("Input Dialog (no Masthead): "), 0, 6);
+        grid.add(createLabel("Input Dialog (no Masthead): "), 0, row);
         
         final Hyperlink Hyperlink20 = new Hyperlink();
         Hyperlink20.setText("TextField");
@@ -288,7 +320,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink20, 1, 6);
+        grid.add(Hyperlink20, 1, row);
         
         final Hyperlink Hyperlink21 = new Hyperlink();
         Hyperlink21.setText("Initial Value Set");
@@ -302,7 +334,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink21, 2, 6);
+        grid.add(Hyperlink21, 2, row);
         
         final Hyperlink Hyperlink22 = new Hyperlink();
         Hyperlink22.setText("Set Choices (< 10)");
@@ -317,7 +349,7 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink22, 3, 6);
+        grid.add(Hyperlink22, 3, row);
         
         final Hyperlink Hyperlink23 = new Hyperlink();
         Hyperlink23.setText("Set Choices (>= 10)");
@@ -333,8 +365,9 @@ public class HelloDialog extends Application {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink23, 4, 6);
+        grid.add(Hyperlink23, 4, row);
         
+        row++;
         
         
         stage.setScene(scene);

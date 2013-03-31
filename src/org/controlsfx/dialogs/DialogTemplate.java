@@ -4,11 +4,16 @@ import static org.controlsfx.dialogs.DialogResources.getMessage;
 import static org.controlsfx.dialogs.Dialogs.DialogType.INFORMATION;
 import static org.controlsfx.dialogs.Dialogs.DialogType.WARNING;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.controlsfx.dialogs.Dialogs.DialogOptions;
 import org.controlsfx.dialogs.Dialogs.DialogResponse;
 import org.controlsfx.dialogs.Dialogs.DialogType;
+
+import com.sun.javafx.Utils;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -32,7 +37,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -47,6 +51,14 @@ class DialogTemplate<T> {
         INPUT;
     }
     
+    // used for OS-specific button placement inside the dialog
+    private static final String BUTTON_TYPE = "button_type";
+    private static enum ButtonType {
+        OK,
+        NO,
+        CANCEL, 
+        ACTION;
+    }
     
     // Defines max dialog width.
     final static int DIALOG_WIDTH = 516;
@@ -54,6 +66,9 @@ class DialogTemplate<T> {
     // According to the UI spec, the width of the main message text in the upper
     // panel should be 426 pixels.
     private static int MAIN_TEXT_WIDTH = 400;
+    
+    // specifies the minimum allowable width for all buttons in the dialog
+    private static int MINIMUM_BUTTON_WIDTH = 75;
     
     private FXDialog dialog;
     private VBox contentPane;
@@ -83,7 +98,7 @@ class DialogTemplate<T> {
     private ImageView dialogBigIcon;
     
     // Buttons
-    private ObservableList<Button> buttons;
+//    private ObservableList<Button> buttons;
     private static final String okBtnStr = "common.ok.btn";
     private static final String yesBtnStr = "common.yes.btn";
     private static final String noBtnStr = "common.no.btn";
@@ -241,6 +256,34 @@ class DialogTemplate<T> {
      *                                                                         *
      **************************************************************************/
     
+    /**
+     * TODO delete me - this is just for testing!!
+     */
+    private static boolean isMac = false;
+    private static boolean isWindows = false;
+    
+    static void setMacOS(boolean b) {
+        isMac = b;
+        isWindows = !b;
+    }
+    
+    static void setWindows(boolean b) {
+        isMac = !b;
+        isWindows = b;
+    }
+    
+    private boolean isWindows() {
+        return isWindows || (! isMac && Utils.isWindows());
+    }
+    
+    private boolean isMac() {
+        return isMac || (! isWindows && Utils.isMac());
+    }
+    
+    private boolean isUnix() {
+        return Utils.isUnix();
+    }
+    
     private boolean isMastheadVisible() {
         return mastheadString != null && ! mastheadString.isEmpty();
     }
@@ -287,26 +330,14 @@ class DialogTemplate<T> {
             contentPanel.setCenter(content);
             contentPanel.setPadding(new Insets(0, 0, 12, 0));
         }
-
-        FlowPane buttonsPanel = new FlowPane(6, 0) {
-            @Override protected void layoutChildren() {
-                resizeButtons();
-                super.layoutChildren();
-            }
-        };
-        buttonsPanel.getStyleClass().add("button-bar");
-
-        // Create buttons from okBtnStr and cancelBtnStr strings.
-        buttonsPanel.getChildren().addAll(createButtons());
-            
+        
         if (contentPanel.getChildren().size() > 0) {
             centerPanel.getChildren().add(contentPanel);
         }
 
-        BorderPane bottomPanel = new BorderPane();
-        bottomPanel.getStyleClass().add("center-bottom-panel");
-        bottomPanel.setRight(buttonsPanel);
-        centerPanel.getChildren().add(bottomPanel);
+        // OS-specific button positioning
+        Node buttonPanel = createButtonPanel();
+        centerPanel.getChildren().add(buttonPanel);
         
         // dialog image can go to the left if there is no masthead
         if (! isMastheadVisible()) {
@@ -384,33 +415,83 @@ class DialogTemplate<T> {
         return null;
     }
     
-    private List<Button> createButtons() {
-        buttons = FXCollections.observableArrayList();
+    private Node createButtonPanel() {
+        // Create buttons from okBtnStr and cancelBtnStr strings.
+        final Map<ButtonType, Button> buttons = createButtons();
+        
+        HBox buttonsPanel = new HBox(6) {
+            @Override protected void layoutChildren() {
+                resizeButtons(buttons);
+                super.layoutChildren();
+            }
+        };
+        buttonsPanel.getStyleClass().add("button-bar");
+        
+        if (isWindows() || isUnix()) {
+            // push all buttons to the right
+            buttonsPanel.getChildren().add(createButtonSpacer());
+            
+            // then run in the following order:
+            // ButtonType -> OK, NO, CANCEL, ACTION
+            addButton(ButtonType.OK, buttons, buttonsPanel);
+            addButton(ButtonType.NO, buttons, buttonsPanel);
+            addButton(ButtonType.CANCEL, buttons, buttonsPanel);
+            addButton(ButtonType.ACTION, buttons, buttonsPanel);
+        } else if (isMac()) {
+            // put ButtonType.ACTION button on left
+            addButton(ButtonType.ACTION, buttons, buttonsPanel);
+            
+            // then put in spacer to push to right
+            buttonsPanel.getChildren().add(createButtonSpacer());
+            
+            // then run in the following order:
+            // ButtonType -> CANCEL, NO, OK
+            addButton(ButtonType.CANCEL, buttons, buttonsPanel);
+            addButton(ButtonType.NO, buttons, buttonsPanel);
+            addButton(ButtonType.OK, buttons, buttonsPanel);
+        }
+        
+        return buttonsPanel;
+    }
+    
+    private void addButton(final ButtonType type, final Map<ButtonType, Button> buttons, final HBox buttonsPanel) {
+        if (buttons.containsKey(type)) {
+            Button button = buttons.get(type);
+            buttonsPanel.getChildren().add(button);
+        }
+    }
+    
+    private Node createButtonSpacer() {
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        return spacer;
+    }
+
+    private Map<ButtonType, Button> createButtons() {
+        Map<ButtonType, Button> buttons = new HashMap<>();
         
         if (style == DialogStyle.INPUT) {
-            buttons.addAll(createButton(okBtnStr, DialogResponse.OK, true, false),
-                            createButton(cancelBtnStr, DialogResponse.CANCEL, false, true));
-        } else {
-            if (DialogType.ERROR == dialogType && throwable != null) {
-                // we've got an error dialog, which has 'OK' and 'Details..' buttons
-                buttons.addAll(createButton(okBtnStr, DialogResponse.OK, true, false));
+            buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
+            buttons.put(ButtonType.CANCEL, createButton(cancelBtnStr, DialogResponse.CANCEL, false, true));
+        } else if (DialogType.ERROR == dialogType && throwable != null) {
+            // we've got an error dialog, which has 'OK' and 'Details..' buttons
+            buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
 
-                Button detailsBtn = new Button((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
-                detailsBtn.setOnAction(exceptionDetailsHandler);
-                buttons.add(detailsBtn);
-            } else if (options == DialogOptions.OK) {
-                buttons.addAll(createButton(okBtnStr, DialogResponse.OK, true, false));
-            } else if (options == DialogOptions.OK_CANCEL) {
-                buttons.addAll(createButton(okBtnStr, DialogResponse.OK, true, false),
-                            createButton(cancelBtnStr, DialogResponse.CANCEL, false, true));
-            } else if (options == DialogOptions.YES_NO) {
-                buttons.addAll(createButton(yesBtnStr, DialogResponse.YES, true, false),
-                            createButton(noBtnStr, DialogResponse.NO, false, true));
-            } else if (options == DialogOptions.YES_NO_CANCEL) {
-                buttons.addAll(createButton(yesBtnStr, DialogResponse.YES, true, false),
-                            createButton(noBtnStr, DialogResponse.NO, false, true),
-                            createButton(cancelBtnStr, DialogResponse.CANCEL, false, false));
-            }
+            Button detailsBtn = new Button((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
+            detailsBtn.setOnAction(exceptionDetailsHandler);
+            buttons.put(ButtonType.ACTION, detailsBtn);
+        } else if (options == DialogOptions.OK) {
+            buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
+        } else if (options == DialogOptions.OK_CANCEL) {
+            buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
+            buttons.put(ButtonType.CANCEL, createButton(cancelBtnStr, DialogResponse.CANCEL, false, true));
+        } else if (options == DialogOptions.YES_NO) {
+            buttons.put(ButtonType.OK, createButton(yesBtnStr, DialogResponse.YES, true, false));
+            buttons.put(ButtonType.NO, createButton(noBtnStr, DialogResponse.NO, false, true));
+        } else if (options == DialogOptions.YES_NO_CANCEL) {
+            buttons.put(ButtonType.OK, createButton(yesBtnStr, DialogResponse.YES, true, false));
+            buttons.put(ButtonType.NO, createButton(noBtnStr, DialogResponse.NO, false, true));
+            buttons.put(ButtonType.CANCEL, createButton(cancelBtnStr, DialogResponse.CANCEL, false, false));
         }
         
         return buttons;
@@ -421,10 +502,9 @@ class DialogTemplate<T> {
         btn.setOnAction(createButtonHandler(response));
         btn.setDefaultButton(isDefault);
         btn.setCancelButton(isCancel);
-        
         return btn;
     }
-
+    
     /*
      * bottom panel contains icon indicating the security alert level,
      * two bullets with most significant security warnings,
@@ -481,18 +561,18 @@ class DialogTemplate<T> {
      * This function is to define the longest button in the array of buttons
      * and set all buttons in array to be the length of the longest button.
      */
-    private void resizeButtons() {
+    private void resizeButtons(Map<ButtonType, Button> buttonsMap) {
+        Collection<Button> buttons = buttonsMap.values();
+        
         // Find out the longest button...
-        double widest = 50;
-        for (int i = 0; i < buttons.size(); i++) {
-            Button btn = buttons.get(i);
+        double widest = MINIMUM_BUTTON_WIDTH;
+        for (Button btn : buttons) {
             if (btn == null) continue;
             widest = Math.max(widest, btn.prefWidth(-1));
         }
         
         // ...and set all buttons to be this width
-        for (int i = 0; i < buttons.size(); i++) {
-            Button btn = buttons.get(i);
+        for (Button btn : buttons) {
             if (btn == null) continue;
             btn.setPrefWidth(btn.isVisible() ? widest : 0);
         }

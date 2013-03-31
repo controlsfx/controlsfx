@@ -16,6 +16,20 @@ import static org.controlsfx.dialogs.Dialogs.DialogResponse.*;
  */
 public class Dialogs {
     
+    
+    /**
+     * TODO delete me - this is just for testing!!
+     */
+    public static void setMacOS(boolean b) {
+        DialogTemplate.setMacOS(b);
+    }
+    
+    public static void setWindows(boolean b) {
+        DialogTemplate.setWindows(b);
+    }
+    
+    
+    
     // NOT PUBLIC API
     static enum DialogType {
         ERROR(DialogOptions.OK,"error.image") {

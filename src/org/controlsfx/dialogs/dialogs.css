@@ -120,7 +120,6 @@
 }
 
 .dialog .center-panel .button-bar {
-    -fx-alignment: center-right;
     -fx-padding: 8 8 8 8;
 }
 

@@ -1,44 +1,49 @@
 package org.controlsfx.dialogs;
 
 import static org.controlsfx.dialogs.DialogResources.getMessage;
+import static org.controlsfx.dialogs.DialogResources.getString;
 import static org.controlsfx.dialogs.Dialogs.DialogType.INFORMATION;
 import static org.controlsfx.dialogs.Dialogs.DialogType.WARNING;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.controlsfx.dialogs.Dialogs.DialogOptions;
-import org.controlsfx.dialogs.Dialogs.DialogResponse;
-import org.controlsfx.dialogs.Dialogs.DialogType;
-
-import com.sun.javafx.Utils;
-
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import org.controlsfx.dialogs.Dialogs.DialogOptions;
+import org.controlsfx.dialogs.Dialogs.DialogResponse;
+import org.controlsfx.dialogs.Dialogs.DialogType;
+
+import com.sun.javafx.Utils;
 
 /**
  * 
@@ -71,7 +76,7 @@ class DialogTemplate<T> {
     private static int MINIMUM_BUTTON_WIDTH = 75;
     
     private FXDialog dialog;
-    private VBox contentPane;
+    private BorderPane contentPane;
     
     private DialogType dialogType = INFORMATION;
     private final DialogOptions options;
@@ -93,12 +98,12 @@ class DialogTemplate<T> {
     // center
     private Pane centerPanel;
     private String contentString = null;
+    private Pane resizableArea = null;
     
     // masthead or center, depending on whether a mastheadString is specified
     private ImageView dialogBigIcon;
     
     // Buttons
-//    private ObservableList<Button> buttons;
     private static final String okBtnStr = "common.ok.btn";
     private static final String yesBtnStr = "common.yes.btn";
     private static final String noBtnStr = "common.no.btn";
@@ -129,7 +134,7 @@ class DialogTemplate<T> {
     DialogTemplate(Stage owner, String title, String masthead, DialogOptions options) {
         this.dialog = new FXDialog(title, owner, true);
         
-        this.contentPane = new VBox();
+        this.contentPane = new BorderPane();
         this.dialog.setContentPane(contentPane);
 
         this.mastheadString = masthead;
@@ -165,13 +170,15 @@ class DialogTemplate<T> {
         }
 
         if (isMastheadVisible()) {
-            contentPane.getChildren().add(createMasthead());
+            contentPane.setTop(createMasthead());
         }
-        contentPane.getChildren().add(createCenterPanel());
+        
+        Node centerPanel = createCenterPanel();
+        contentPane.setCenter(centerPanel);
 
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null) {
-            contentPane.getChildren().add(bottomPanel);
+            contentPane.setBottom(bottomPanel);
         }
 
         dialog.setResizable(false);
@@ -185,13 +192,13 @@ class DialogTemplate<T> {
         this.dialogType = DialogType.ERROR;
 
         if (isMastheadVisible()) {
-            contentPane.getChildren().add(createMasthead());
+            contentPane.setTop(createMasthead());
         }
-        contentPane.getChildren().add(createCenterPanel());
+        contentPane.setCenter(createCenterPanel());
         
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null && bottomPanel.getChildren().size() > 0) {
-            contentPane.getChildren().add(bottomPanel);
+            contentPane.setBottom(bottomPanel);
         }
 
         dialog.setResizable(false);
@@ -204,13 +211,16 @@ class DialogTemplate<T> {
         this.inputChoices = choices;
         
         if (isMastheadVisible()) {
-            contentPane.getChildren().add(createMasthead());
+//            contentPane.getChildren().add(createMasthead());
+            contentPane.setTop(createMasthead());
         }
-        contentPane.getChildren().add(createCenterPanel());
+//        contentPane.getChildren().add(createCenterPanel());
+        contentPane.setCenter(createCenterPanel());
 
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null) {
-            contentPane.getChildren().add(bottomPanel);
+//            contentPane.getChildren().add(bottomPanel);
+            contentPane.setBottom(bottomPanel);
         }
 
         dialog.setResizable(false);
@@ -350,14 +360,54 @@ class DialogTemplate<T> {
     }
     
     private Node createCenterContent() {
-        if (style == DialogStyle.SIMPLE || style == DialogStyle.ERROR) {
+    	switch( style ) {
+    	case SIMPLE:
             if (contentString != null) {
                 UITextArea ta = new UITextArea(contentString);
                 ta.getStyleClass().add("center-content-area");
                 ta.setAlignment(Pos.TOP_LEFT);
                 return ta;
             }
-        } else if (style == DialogStyle.INPUT) {
+            break;
+    	case ERROR:
+            if (contentString != null) {
+                UITextArea ta = new UITextArea(contentString);
+                ta.getStyleClass().add("center-content-area");
+                ta.setAlignment(Pos.TOP_LEFT);
+            	VBox contentPanel = new VBox(10);
+            	contentPanel.getChildren().add(ta);
+            	
+            	resizableArea = null;
+            	if (throwable != null) {
+            		resizableArea = new VBox(10);
+
+                    Label label = new Label(getString("exception.dialog.label"));
+                    VBox.setVgrow(label, Priority.NEVER);
+
+                    resizableArea.getChildren().add(label);
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    throwable.printStackTrace(pw);
+                    TextArea text = new TextArea(sw.toString());
+                    text.setEditable(false);
+                    text.setWrapText(true);
+                    text.setPrefWidth(60 * 8);
+                    text.setMaxHeight(Double.MAX_VALUE);
+                    resizableArea.getChildren().add(text);
+		            VBox.setVgrow(text, Priority.ALWAYS);
+
+                    contentPanel.getChildren().add(resizableArea);
+                    VBox.setVgrow(resizableArea, Priority.ALWAYS);
+                    
+                    resizableArea.managedProperty().bind(resizableArea.visibleProperty());
+                    resizableArea.setVisible(false);
+                }
+            	
+                return contentPanel;
+            }
+            break;
+    	case INPUT:    
             Control inputControl = null;
             if (inputChoices == null || inputChoices.isEmpty()) {
                 // no input constraints, so use a TextField
@@ -418,7 +468,7 @@ class DialogTemplate<T> {
     
     private Node createButtonPanel() {
         // Create buttons from okBtnStr and cancelBtnStr strings.
-        final Map<ButtonType, Button> buttons = createButtons();
+        final Map<ButtonType, ButtonBase> buttons = createButtons();
         
         HBox buttonsPanel = new HBox(6) {
             @Override protected void layoutChildren() {
@@ -455,9 +505,9 @@ class DialogTemplate<T> {
         return buttonsPanel;
     }
     
-    private void addButton(final ButtonType type, final Map<ButtonType, Button> buttons, final HBox buttonsPanel) {
+    private void addButton(final ButtonType type, final Map<ButtonType, ButtonBase> buttons, final HBox buttonsPanel) {
         if (buttons.containsKey(type)) {
-            Button button = buttons.get(type);
+            ButtonBase button = buttons.get(type);
             buttonsPanel.getChildren().add(button);
         }
     }
@@ -468,8 +518,8 @@ class DialogTemplate<T> {
         return spacer;
     }
 
-    private Map<ButtonType, Button> createButtons() {
-        Map<ButtonType, Button> buttons = new HashMap<>();
+    private Map<ButtonType, ButtonBase> createButtons() {
+        Map<ButtonType, ButtonBase> buttons = new HashMap<>();
         
         if (style == DialogStyle.INPUT) {
             buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
@@ -478,9 +528,10 @@ class DialogTemplate<T> {
             // we've got an error dialog, which has 'OK' and 'Details..' buttons
             buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
 
-            Button detailsBtn = new Button((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
-            detailsBtn.setOnAction(exceptionDetailsHandler);
+//            Button detailsBtn = new Button((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
+            ToggleButton detailsBtn = new ToggleButton((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
             buttons.put(ButtonType.ACTION, detailsBtn);
+            detailsBtn.setOnAction(exceptionDetailsHandler);
         } else if (options == DialogOptions.OK) {
             buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
         } else if (options == DialogOptions.OK_CANCEL) {
@@ -562,18 +613,18 @@ class DialogTemplate<T> {
      * This function is to define the longest button in the array of buttons
      * and set all buttons in array to be the length of the longest button.
      */
-    private void resizeButtons(Map<ButtonType, Button> buttonsMap) {
-        Collection<Button> buttons = buttonsMap.values();
+    private void resizeButtons(Map<ButtonType, ButtonBase> buttonsMap) {
+        Collection<ButtonBase> buttons = buttonsMap.values();
         
         // Find out the longest button...
         double widest = MINIMUM_BUTTON_WIDTH;
-        for (Button btn : buttons) {
+        for (ButtonBase btn : buttons) {
             if (btn == null) continue;
             widest = Math.max(widest, btn.prefWidth(-1));
         }
         
         // ...and set all buttons to be this width
-        for (Button btn : buttons) {
+        for (ButtonBase btn : buttons) {
             if (btn == null) continue;
             btn.setPrefWidth(btn.isVisible() ? widest : 0);
         }
@@ -595,8 +646,14 @@ class DialogTemplate<T> {
     private EventHandler<ActionEvent> exceptionDetailsHandler = new EventHandler<ActionEvent>() {
         @Override public void handle(ActionEvent ae) {
             if (throwable != null) {
-                new ExceptionDialog(dialog, throwable).show();
-                return;
+                // old approach (show new window)
+                //new ExceptionDialog(dialog, throwable).show();
+                
+                // new approach (dynamic expanding dialog)
+            	boolean visible = !resizableArea.isVisible();
+            	resizableArea.setVisible(visible);
+            	dialog.setResizable(visible);
+            	dialog.sizeToScene();
             }
         }
     };

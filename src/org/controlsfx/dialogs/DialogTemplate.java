@@ -113,15 +113,15 @@ class DialogTemplate<T> {
     // This is used in the exception dialog only.
     private Throwable throwable = null;    
     
-    // Visual indication of security level alert - either high or medium.
-    // Located in the lower left corner at the bottom of the dialog.
-    private static final String SECURITY_ALERT_HIGH = "security.alert.high.image";
-    private static final String SECURITY_ALERT_LOW  = "security.alert.low.image";
-    private ImageView securityIcon;
-
-    // These are for security dialog only.
-    private String[] alertStrs;
-    private String[] infoStrs;
+//    // Visual indication of security level alert - either high or medium.
+//    // Located in the lower left corner at the bottom of the dialog.
+//    private static final String SECURITY_ALERT_HIGH = "security.alert.high.image";
+//    private static final String SECURITY_ALERT_LOW  = "security.alert.low.image";
+//    private ImageView securityIcon;
+//
+//    // These are for security dialog only.
+//    private String[] alertStrs;
+//    private String[] infoStrs;
     
     
     
@@ -150,24 +150,11 @@ class DialogTemplate<T> {
      *                                                                         *
      **************************************************************************/
     
-    void setSimpleContent(String contentString, DialogType dialogType) {
-        setSimpleContent(contentString, dialogType, null, true);
-    }
-    
-    void setSimpleContent(String contentString, DialogType dialogType,
-                          String infoString, boolean useWarningIcon) {
+    void setSimpleContent(final String contentString, final DialogType dialogType) {
         this.style = DialogStyle.SIMPLE;
         this.contentString = contentString;
         
         this.dialogType = dialogType == null ? WARNING : dialogType;
-        if (infoString != null) {
-            String[] strs = { infoString };
-            if (useWarningIcon) {
-                this.alertStrs = strs;
-            } else {
-                this.infoStrs = strs;
-            }
-        }
 
         if (isMastheadVisible()) {
             contentPane.setTop(createMasthead());
@@ -175,11 +162,6 @@ class DialogTemplate<T> {
         
         Node centerPanel = createCenterPanel();
         contentPane.setCenter(centerPanel);
-
-        Pane bottomPanel = createBottomPanel();
-        if (bottomPanel != null) {
-            contentPane.setBottom(bottomPanel);
-        }
 
         dialog.setResizable(false);
     }
@@ -194,13 +176,9 @@ class DialogTemplate<T> {
         if (isMastheadVisible()) {
             contentPane.setTop(createMasthead());
         }
+        
         contentPane.setCenter(createCenterPanel());
         
-        Pane bottomPanel = createBottomPanel();
-        if (bottomPanel != null && bottomPanel.getChildren().size() > 0) {
-            contentPane.setBottom(bottomPanel);
-        }
-
         dialog.setResizable(false);
     }
     
@@ -211,17 +189,10 @@ class DialogTemplate<T> {
         this.inputChoices = choices;
         
         if (isMastheadVisible()) {
-//            contentPane.getChildren().add(createMasthead());
             contentPane.setTop(createMasthead());
         }
-//        contentPane.getChildren().add(createCenterPanel());
+        
         contentPane.setCenter(createCenterPanel());
-
-        Pane bottomPanel = createBottomPanel();
-        if (bottomPanel != null) {
-//            contentPane.getChildren().add(bottomPanel);
-            contentPane.setBottom(bottomPanel);
-        }
 
         dialog.setResizable(false);
     }
@@ -557,57 +528,6 @@ class DialogTemplate<T> {
         return btn;
     }
     
-    /*
-     * bottom panel contains icon indicating the security alert level,
-     * two bullets with most significant security warnings,
-     * link label - to view more details about security warnings.
-     */
-    private Pane createBottomPanel() {
-        if (alertStrs == null && infoStrs == null) return null;
-            
-        HBox bottomPanel = new HBox();
-        bottomPanel.getStyleClass().add("bottom-panel");
-        
-        // Icon 32x32 pixels with indication of secutiry alert - high/low
-
-        // If there are no messages in securityAlerts, show
-        // SECURITY_ALERT_LOW icon in the lower left corner of
-        // security dialog.
-        String imageFile = SECURITY_ALERT_HIGH;
-
-        if (alertStrs == null || alertStrs.length == 0) {
-            imageFile = SECURITY_ALERT_LOW;
-        }
-        securityIcon = new ImageView(DialogResources.getImage(imageFile));
-
-        // Add icon to the bottom panel.
-        bottomPanel.getChildren().add(securityIcon);
-
-        // If there are no alerts (alertStrs is null, or length is 0),
-        // then we should show only first message from infoStrs.
-        // this is how it will work for security dialog...
-        int textAreaWidth = 333;
-        UITextArea bulletText = new UITextArea(textAreaWidth);
-        bulletText.getStyleClass().add("bottom-text");
-
-        if ((alertStrs == null || alertStrs.length == 0)
-            && infoStrs != null && infoStrs.length != 0) {
-            // If there are no alerts, use first string from the infoStrs.
-            bulletText.setText((infoStrs[0] != null) ? infoStrs[0] : " ");
-        } else if (alertStrs != null && alertStrs.length != 0) {
-            // If there are any alerts, use first string from alertStrs.
-            bulletText.setText((alertStrs[0] != null) ? alertStrs[0] : " ");
-        }
-
-        bottomPanel.getChildren().add(bulletText);
-
-//        if (moreInfoLbl != null) {
-//            bottomPanel.getChildren().add(moreInfoLbl);
-//        }
-
-        return bottomPanel;
-    }
-
     /*
      * According to UI guidelines, all buttons should have the same length.
      * This function is to define the longest button in the array of buttons

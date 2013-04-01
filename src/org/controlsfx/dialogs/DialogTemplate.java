@@ -110,18 +110,10 @@ class DialogTemplate<T> {
     private static final String cancelBtnStr = "common.cancel.btn";
     private static final String detailBtnStr = "common.detail.button";
     
-    // This is used in the exception dialog only.
-    private Throwable throwable = null;    
-    
-//    // Visual indication of security level alert - either high or medium.
-//    // Located in the lower left corner at the bottom of the dialog.
-//    private static final String SECURITY_ALERT_HIGH = "security.alert.high.image";
-//    private static final String SECURITY_ALERT_LOW  = "security.alert.low.image";
-//    private ImageView securityIcon;
-//
-//    // These are for security dialog only.
-//    private String[] alertStrs;
-//    private String[] infoStrs;
+    // This is used in the 'more details' dialog only.
+//    private Throwable throwable = null;   
+    private String moreDetails = null;
+    private boolean openInNewWindow = false;
     
     
     
@@ -166,10 +158,11 @@ class DialogTemplate<T> {
         dialog.setResizable(false);
     }
     
-    void setErrorContent(String contentString, Throwable throwable) {
+    void setMoreDetailsContent(String contentString, String moreDetails, final boolean openInNewWindow) {
         this.style = DialogStyle.ERROR;
         this.contentString = contentString;
-        this.throwable = throwable;
+        this.moreDetails = moreDetails;
+        this.openInNewWindow = openInNewWindow;
 
         this.dialogType = DialogType.ERROR;
 
@@ -347,7 +340,7 @@ class DialogTemplate<T> {
         	contentPanel.getChildren().add(contentArea);
         	
         	resizableArea = null;
-        	if (throwable != null) {
+        	if (moreDetails != null) {
         		resizableArea = new VBox(10);
 
                 Label label = new Label(getString("exception.dialog.label"));
@@ -355,10 +348,7 @@ class DialogTemplate<T> {
 
                 resizableArea.getChildren().add(label);
 
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                throwable.printStackTrace(pw);
-                TextArea text = new TextArea(sw.toString());
+                TextArea text = new TextArea(moreDetails);
                 text.setEditable(false);
                 text.setWrapText(true);
                 text.setPrefWidth(60 * 8);
@@ -506,14 +496,18 @@ class DialogTemplate<T> {
         if (style == DialogStyle.INPUT) {
             buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
             buttons.put(ButtonType.CANCEL, createButton(cancelBtnStr, DialogResponse.CANCEL, false, true));
-        } else if (DialogType.ERROR == dialogType && throwable != null) {
+        } else if (DialogType.ERROR == dialogType && moreDetails != null) {
             // we've got an error dialog, which has 'OK' and 'Details..' buttons
             buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
 
-//            Button detailsBtn = new Button((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
-            ToggleButton detailsBtn = new ToggleButton((detailBtnStr == null) ? "" : getMessage(detailBtnStr));
-            buttons.put(ButtonType.ACTION, detailsBtn);
-            detailsBtn.setOnAction(exceptionDetailsHandler);
+            // we use a toggle button in the situation where we expand the current
+            // dialog (so that it can be collapsed again), whereas we use a normal
+            // button when we open a new dialog to show the details (so that the
+            // button is not in a selected state when the second dialog is closed).
+            final String detailsString = (detailBtnStr == null) ? "" : getMessage(detailBtnStr);
+            ButtonBase detailsButton = openInNewWindow ? new Button(detailsString) : new ToggleButton(detailsString);
+            buttons.put(ButtonType.ACTION, detailsButton);
+            detailsButton.setOnAction(exceptionDetailsHandler);
         } else if (options == DialogOptions.OK) {
             buttons.put(ButtonType.OK, createButton(okBtnStr, DialogResponse.OK, true, false));
         } else if (options == DialogOptions.OK_CANCEL) {
@@ -576,15 +570,17 @@ class DialogTemplate<T> {
     
     private EventHandler<ActionEvent> exceptionDetailsHandler = new EventHandler<ActionEvent>() {
         @Override public void handle(ActionEvent ae) {
-            if (throwable != null) {
-                // old approach (show new window)
-                //new ExceptionDialog(dialog, throwable).show();
-                
-                // new approach (dynamic expanding dialog)
-            	boolean visible = !resizableArea.isVisible();
-            	resizableArea.setVisible(visible);
-            	dialog.setResizable(visible);
-            	dialog.sizeToScene();
+            if (moreDetails != null) {
+                if (openInNewWindow) {
+                    // old approach (show new window)
+                    new ExceptionDialog(dialog, moreDetails).show();
+                } else {
+                    // new approach (dynamic expanding dialog)
+                	boolean visible = !resizableArea.isVisible();
+                	resizableArea.setVisible(visible);
+                	dialog.setResizable(visible);
+                	dialog.sizeToScene();
+                }
             }
         }
     };

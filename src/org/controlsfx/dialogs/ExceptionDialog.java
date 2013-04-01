@@ -5,31 +5,29 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.io.StringWriter;
-import java.io.PrintWriter;
 import javafx.stage.Modality;
 
 import static org.controlsfx.dialogs.DialogResources.*;
 
 class ExceptionDialog extends FXDialog {
 
-    public ExceptionDialog(Stage parent, Throwable throwable) {
+    public ExceptionDialog(Stage parent, String moreDetails) {
         super(getMessage("exception.dialog.title"));
 
         initModality(Modality.APPLICATION_MODAL);
-        initComponents(throwable);
+        initComponents(moreDetails);
     }
 
     /*
      * Initialize components for this dialog.
      */
-    private void initComponents(Throwable throwable) {
+    private void initComponents(String moreDetails) {
         VBox contentPanel = new VBox();
         contentPanel.getStyleClass().add("more-info-dialog");
         
         contentPanel.setPrefSize(800, 600);
 
-        if (throwable != null) {
+        if (moreDetails != null) {
             BorderPane labelPanel = new BorderPane();
 
             Label label = new Label(getString("exception.dialog.label"));
@@ -37,10 +35,7 @@ class ExceptionDialog extends FXDialog {
 
             contentPanel.getChildren().add(labelPanel);
 
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            throwable.printStackTrace(pw);
-            TextArea text = new TextArea(sw.toString());
+            TextArea text = new TextArea(moreDetails);
             text.setEditable(false);
             text.setWrapText(true);
             text.setPrefWidth(60 * 8);

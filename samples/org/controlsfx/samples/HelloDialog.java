@@ -201,16 +201,16 @@ public class HelloDialog extends Application {
         
         
         // *******************************************************************
-        // Exception Dialog
+        // More Details Dialog
         // *******************************************************************
         
-        grid.add(createLabel("Exception Dialog: "), 0, row);
+        grid.add(createLabel("'More Details' Dialog: "), 0, row);
         
         final Hyperlink Hyperlink5 = new Hyperlink();
         Hyperlink5.setText("No Masthead");
         Hyperlink5.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
+                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
                         "Better change your mind - this is really your last chance!",
                         "It looks like you're making a bad decision", 
                         null, 
@@ -224,7 +224,7 @@ public class HelloDialog extends Application {
         Hyperlink5a.setText("With Masthead");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
+                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
                         "Better change your mind - this is really your last chance!",
                         "It looks like you're making a bad decision", 
                         "Exception Encountered", 
@@ -233,6 +233,21 @@ public class HelloDialog extends Application {
             }
         });
         grid.add(Hyperlink5a, 2, row);
+        
+        final Hyperlink Hyperlink5b = new Hyperlink();
+        Hyperlink5b.setText("Open in new window");
+        Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
+                        "Better change your mind - this is really your last chance!",
+                        "It looks like you're making a bad decision", 
+                        "Exception Encountered", 
+                        new RuntimeException("Pending Bad Decision Exception"), 
+                        true);
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink5b, 3, row);
         
         row++;
         

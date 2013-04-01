@@ -1,15 +1,15 @@
 package org.controlsfx.dialogs;
 
+import static org.controlsfx.dialogs.Dialogs.DialogResponse.CLOSED;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-
-import static org.controlsfx.dialogs.DialogResources.*;
-import static org.controlsfx.dialogs.Dialogs.DialogResponse.*;
 
 /**
  * A class containing a number of pre-built JavaFX modal dialogs.
@@ -32,6 +32,7 @@ public class Dialogs {
     
     // NOT PUBLIC API
     static enum DialogType {
+        // TODO maybe introduce a MORE_DETAILS type, rather than use the ERROR type?
         ERROR(DialogOptions.OK,"error.image") {
             @Override public String getDefaultTitle() { return "Error"; }
             @Override public String getDefaultMasthead() { return "Error"; }
@@ -261,7 +262,7 @@ public class Dialogs {
 
     
     /***************************************************************************
-     * Exception / Error Dialogs
+     * Error Dialogs
      **************************************************************************/
 
     public static DialogResponse showErrorDialog(final Stage owner, 
@@ -304,17 +305,58 @@ public class Dialogs {
                                        options);
     }
     
-    public static DialogResponse showErrorDialog(final Stage owner, 
-                                                 final String message,
-                                                 final String title, 
-                                                 final String masthead, 
-                                                 final Throwable throwable) {
-        DialogTemplate template = new DialogTemplate(owner, title, masthead, null);
-        template.setErrorContent(message, throwable);
-        return showDialog(template);
+    
+    
+    /***************************************************************************
+     * 'More Details' Dialogs
+     * FIXME: Need better name
+     **************************************************************************/
+    
+    public static DialogResponse showMoreDetailsDialog(final Stage owner, 
+                                                       final String message,
+                                                       final String title, 
+                                                       final String masthead, 
+                                                       final Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        String moreDetails = sw.toString();
+        
+        return showMoreDetailsDialog(owner, message, title, masthead, moreDetails, false);
     }
     
+    public static DialogResponse showMoreDetailsDialog(final Stage owner, 
+                                                       final String message,
+                                                       final String title, 
+                                                       final String masthead, 
+                                                       final Throwable throwable,
+                                                       final boolean openInNewWindow) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        String moreDetails = sw.toString();
+
+        return showMoreDetailsDialog(owner, message, title, masthead, moreDetails, openInNewWindow);
+    }
     
+    public static DialogResponse showMoreDetailsDialog(final Stage owner, 
+                                                       final String message,
+                                                       final String title, 
+                                                       final String masthead, 
+                                                       final String moreDetails) {
+        return showMoreDetailsDialog(owner, message, title, masthead, moreDetails, false);
+    }
+    
+    public static DialogResponse showMoreDetailsDialog(final Stage owner, 
+                                                       final String message,
+                                                       final String title, 
+                                                       final String masthead, 
+                                                       final String moreDetails,
+                                                       final boolean openInNewWindow) {
+        DialogTemplate<Void> template = new DialogTemplate<>(owner, title, masthead, null);
+        template.setMoreDetailsContent(message, moreDetails, openInNewWindow);
+        return showDialog(template);
+    }
     
     
     /***************************************************************************

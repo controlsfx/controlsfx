@@ -398,6 +398,7 @@ class DialogTemplate<T> {
             }
             
             HBox hbox = new HBox(10);
+            hbox.setPrefWidth(MAIN_TEXT_WIDTH);
             
             if (contentString != null && ! contentString.isEmpty()) {
                 Label label = new Label(contentString);

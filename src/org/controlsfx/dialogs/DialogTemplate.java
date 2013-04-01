@@ -171,7 +171,10 @@ class DialogTemplate<T> {
         if (isMastheadVisible()) {
             contentPane.getChildren().add(createMasthead());
         }
-        contentPane.getChildren().add(createCenterPanel());
+        
+        Node centerPanel = createCenterPanel();
+        VBox.setVgrow(centerPanel, Priority.ALWAYS);
+        contentPane.getChildren().add(centerPanel);
 
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null) {

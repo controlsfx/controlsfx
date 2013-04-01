@@ -5,15 +5,11 @@ import static org.controlsfx.dialogs.DialogResources.getString;
 import static org.controlsfx.dialogs.Dialogs.DialogType.INFORMATION;
 import static org.controlsfx.dialogs.Dialogs.DialogType.WARNING;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;

@@ -1,6 +1,5 @@
 package org.controlsfx.dialogs;
 
-import com.sun.javafx.scene.control.skin.resources.ControlResources;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
@@ -8,11 +7,12 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+
 import org.controlsfx.tools.SVGLoader;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
+import com.sun.javafx.scene.control.skin.resources.ControlResources;
 
 /**
  *

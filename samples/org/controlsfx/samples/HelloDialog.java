@@ -1,5 +1,7 @@
 package org.controlsfx.samples;
 
+import java.util.Arrays;
+
 import org.controlsfx.dialogs.Dialogs;
 
 import javafx.application.Application;
@@ -23,7 +25,7 @@ import javafx.stage.Stage;
 public class HelloDialog extends Application {
 
     @Override public void start(final Stage stage) {
-//        setUserAgentStylesheet(STYLESHEET_MODENA);
+        setUserAgentStylesheet(STYLESHEET_MODENA);
         
         stage.setTitle("Dialog Sample");
 
@@ -75,9 +77,13 @@ public class HelloDialog extends Application {
         Hyperlink2.setText("No Masthead");
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.showInformationDialog(stage, 
-                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...", 
-                        "Wouldn't this be nice for JavaFX");
+//                Dialogs.showInformationDialog(stage, 
+//                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...", 
+//                        "Wouldn't this be nice for JavaFX");
+            	Dialogs.builder(stage)
+	                 .message("A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
+	                 .title("JavaFX")
+	                 .showInformationDialog();
             }
         });
         grid.add(Hyperlink2, 1, row);
@@ -86,10 +92,15 @@ public class HelloDialog extends Application {
         Hyperlink2a.setText("With Masthead");
         Hyperlink2a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.showInformationDialog(stage, 
-                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...",
-                        "JavaFX",
-                        "Wouldn't this be nice?");
+//                Dialogs.showInformationDialog(stage, 
+//                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...",
+//                        "JavaFX",
+//                        "Wouldn't this be nice?");
+          	  Dialogs.builder(stage)
+ 	                 .message("A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
+ 	                 .title("JavaFX")
+ 	                 .masthead("Wouldn't this be nice?")
+ 	                 .showInformationDialog();
             }
         });
         grid.add(Hyperlink2a, 2, row);
@@ -108,9 +119,15 @@ public class HelloDialog extends Application {
         Hyperlink3.setText("No Masthead");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showConfirmDialog(stage, 
-                        "I was a bit worried that you might not want them, so I wanted to double check.",
-                        "You do want dialogs right?");
+//                Dialogs.DialogResponse response = Dialogs.showConfirmDialog(stage, 
+//                        "I was a bit worried that you might not want them, so I wanted to double check.",
+//                        "You do want dialogs right?");
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("I was a bit worried that you might not want them, so I wanted to double check.")
+                        .title("You do want dialogs right?")
+                        .showConfirmDialog();
+
                 System.out.println("response: " + response);
             }
         });
@@ -120,10 +137,16 @@ public class HelloDialog extends Application {
         Hyperlink3a.setText("With Masthead");
         Hyperlink3a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showConfirmDialog(stage, 
-                        "I was a bit worried that you might not want them, so I wanted to double check.",
-                        "You do want dialogs right?",
-                        "Just Checkin'");
+//                Dialogs.DialogResponse response = Dialogs.showConfirmDialog(stage, 
+//                        "I was a bit worried that you might not want them, so I wanted to double check.",
+//                        "You do want dialogs right?",
+//                        "Just Checkin'");
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("I was a bit worried that you might not want them, so I wanted to double check.")
+                        .title("You do want dialogs right?")
+                        .masthead("Just Checkin'")
+                        .showConfirmDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -142,9 +165,15 @@ public class HelloDialog extends Application {
         Hyperlink6.setText("No Masthead");
         Hyperlink6.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showWarningDialog(stage, 
-                        "This is a warning", 
-                        "I'm warning you!");
+//                Dialogs.DialogResponse response = Dialogs.showWarningDialog(stage, 
+//                        "This is a warning", 
+//                        "I'm warning you!");
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("This is a warning")
+                        .title("I'm warning you!")
+                        .showWarningDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -154,10 +183,17 @@ public class HelloDialog extends Application {
         Hyperlink6a.setText("With Masthead");
         Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showWarningDialog(stage, 
-                        "This is a warning", 
-                        "I'm warning you!", 
-                        "I'm glad I didn't need to use this...");
+//                Dialogs.DialogResponse response = Dialogs.showWarningDialog(stage, 
+//                        "This is a warning", 
+//                        "I'm warning you!", 
+//                        "I'm glad I didn't need to use this...");
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("This is a warning")
+                        .title("I'm warning you!")
+                        .masthead("I'm glad I didn't need to use this...")
+                        .showWarningDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -176,9 +212,16 @@ public class HelloDialog extends Application {
         Hyperlink7.setText("No Masthead");
         Hyperlink7.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
-                        "Exception Encountered", 
-                        "It looks like you're making a bad decision");
+//                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
+//                        "Exception Encountered", 
+//                        "It looks like you're making a bad decision");
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("Exception Encountered")
+                        .title("It looks like you're making a bad decision")
+                        .showErrorDialog();
+
+                
                 System.out.println("response: " + response);
             }
         });
@@ -188,10 +231,17 @@ public class HelloDialog extends Application {
         Hyperlink7a.setText("With Masthead");
         Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
-                        "Exception Encountered", 
-                        "It looks like you're making a bad decision", 
-                        "Better change your mind - this is really your last chance!");
+//                Dialogs.DialogResponse response = Dialogs.showErrorDialog(stage, 
+//                        "Exception Encountered", 
+//                        "It looks like you're making a bad decision", 
+//                        "Better change your mind - this is really your last chance!");
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("Exception Encountered")
+                        .title("It looks like you're making a bad decision")
+                        .masthead("Better change your mind - this is really your last chance!")
+                        .showErrorDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -210,11 +260,19 @@ public class HelloDialog extends Application {
         Hyperlink5.setText("No Masthead");
         Hyperlink5.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
-                        "Better change your mind - this is really your last chance!",
-                        "It looks like you're making a bad decision", 
-                        null, 
-                        new RuntimeException("Pending Bad Decision Exception"));
+//                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
+//                        "Better change your mind - this is really your last chance!",
+//                        "It looks like you're making a bad decision", 
+//                        null, 
+//                        new RuntimeException("Pending Bad Decision Exception"));
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("Better change your mind - this is really your last chance!")
+                        .title("It looks like you're making a bad decision")
+                        .details(new RuntimeException("Pending Bad Decision Exception"))
+                        .showMoreDetailsDialog();
+
+                
                 System.out.println("response: " + response);
             }
         });
@@ -224,11 +282,20 @@ public class HelloDialog extends Application {
         Hyperlink5a.setText("With Masthead");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
-                        "Better change your mind - this is really your last chance!",
-                        "It looks like you're making a bad decision", 
-                        "Exception Encountered", 
-                        new RuntimeException("Pending Bad Decision Exception"));
+//                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
+//                        "Better change your mind - this is really your last chance!",
+//                        "It looks like you're making a bad decision", 
+//                        "Exception Encountered", 
+//                        new RuntimeException("Pending Bad Decision Exception"));
+                
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("Better change your mind - this is really your last chance!")
+                        .title("It looks like you're making a bad decision")
+                        .masthead("Exception Encountered")
+                        .details(new RuntimeException("Pending Bad Decision Exception"))
+                        .showMoreDetailsDialog();
+                
+                
                 System.out.println("response: " + response);
             }
         });
@@ -238,12 +305,22 @@ public class HelloDialog extends Application {
         Hyperlink5b.setText("Open in new window");
         Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
-                        "Better change your mind - this is really your last chance!",
-                        "It looks like you're making a bad decision", 
-                        "Exception Encountered", 
-                        new RuntimeException("Pending Bad Decision Exception"), 
-                        true);
+//                Dialogs.DialogResponse response = Dialogs.showMoreDetailsDialog(stage, 
+//                        "Better change your mind - this is really your last chance!",
+//                        "It looks like you're making a bad decision", 
+//                        "Exception Encountered", 
+//                        new RuntimeException("Pending Bad Decision Exception"), 
+//                        true);
+            	
+                Dialogs.DialogResponse response = Dialogs.builder(stage) 
+                        .message("Better change your mind - this is really your last chance!")
+                        .title("It looks like you're making a bad decision")
+                        .masthead("Exception Encountered")
+                        .details(new RuntimeException("Pending Bad Decision Exception"))
+                        .openDetailsInNewWindow(true)
+                        .showMoreDetailsDialog();
+
+            	
                 System.out.println("response: " + response);
             }
         });
@@ -262,10 +339,17 @@ public class HelloDialog extends Application {
         Hyperlink8.setText("TextField");
         Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "What is your name?",
-                        "Name Check",
-                        "Please type in your name");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "What is your name?",
+//                        "Name Check",
+//                        "Please type in your name");
+                
+            	 String response = Dialogs.<String>builder(stage) 
+                        .message("What is your name?")
+                        .title("Name Check")
+                        .masthead("Please type in your name")
+                        .showInputDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -275,11 +359,20 @@ public class HelloDialog extends Application {
         Hyperlink9.setText("Initial Value Set");
         Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "Pick a name?",
-                        "Name Guess",
-                        "Name Guess",
-                        "Jonathan");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "Pick a name?",
+//                        "Name Guess",
+//                        "Name Guess",
+//                        "Jonathan");
+                
+                
+            	 String response = Dialogs.<String>builder(stage) 
+                        .message("Pick a name?")
+                        .title("Name Guess")
+                        .masthead("Name Guess")
+                        .inputInitialValue("Jonathan")
+                        .showInputDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -289,12 +382,19 @@ public class HelloDialog extends Application {
         Hyperlink10.setText("Set Choices (< 10)");
         Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "Pick a name?",
-                        "Name Guess",
-                        "Name Guess",
-                        "Jonathan",
-                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "Pick a name?",
+//                        "Name Guess",
+//                        "Name Guess",
+//                        "Jonathan",
+//                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+            	String response = Dialogs.<String>builder(stage) 
+                        .message("Pick a name?")
+                        .title("Name Guess")
+                        .masthead("Name Guess")
+                        .inputInitialValue("Jonathan")
+                        .inputChoices(Arrays.asList("Matthew", "Jonathan", "Ian", "Sue", "Hannah"))
+                        .showInputDialog();
                 System.out.println("response: " + response);
             }
         });
@@ -304,13 +404,23 @@ public class HelloDialog extends Application {
         Hyperlink11.setText("Set Choices (>= 10)");
         Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "Pick a name?",
-                        "Name Guess",
-                        "Name Guess",
-                        "Jonathan",
-                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
-                        "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "Pick a name?",
+//                        "Name Guess",
+//                        "Name Guess",
+//                        "Jonathan",
+//                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
+//                        "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid");
+                
+                String response = Dialogs.<String>builder(stage) 
+                        .message("Pick a name?")
+                        .title("Name Guess")
+                        .masthead("Name Guess")
+                        .inputInitialValue("Jonathan")
+                        .inputChoices(Arrays.asList("Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
+                              "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid"))
+                        .showInputDialog();
+                
                 System.out.println("response: " + response);
             }
         });
@@ -329,9 +439,15 @@ public class HelloDialog extends Application {
         Hyperlink20.setText("TextField");
         Hyperlink20.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "What is your name?",
-                        "Name Check");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "What is your name?",
+//                        "Name Check");
+            	
+            	String response = Dialogs.<String>builder(stage) 
+                        .message("What is your name?")
+                        .title("Name Check")
+                        .showInputDialog();
+            	
                 System.out.println("response: " + response);
             }
         });
@@ -341,11 +457,18 @@ public class HelloDialog extends Application {
         Hyperlink21.setText("Initial Value Set");
         Hyperlink21.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "Pick a name?",
-                        "Name Guess",
-                        null,
-                        "Jonathan");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "Pick a name?",
+//                        "Name Guess",
+//                        null,
+//                        "Jonathan");
+            	
+            	String response = Dialogs.<String>builder(stage) 
+                        .message("Pick a name?")
+                        .title("Name Guess")
+                        .inputInitialValue("Jonathan")
+                        .showInputDialog();
+            	
                 System.out.println("response: " + response);
             }
         });
@@ -355,12 +478,20 @@ public class HelloDialog extends Application {
         Hyperlink22.setText("Set Choices (< 10)");
         Hyperlink22.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "Pick a name?",
-                        "Name Guess",
-                        null,
-                        "Jonathan",
-                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "Pick a name?",
+//                        "Name Guess",
+//                        null,
+//                        "Jonathan",
+//                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+            	
+            	String response = Dialogs.<String>builder(stage) 
+                        .message("Pick a name?")
+                        .title("Name Guess")
+                        .inputInitialValue("Jonathan")
+                        .inputChoices(Arrays.asList("Matthew", "Jonathan", "Ian", "Sue", "Hannah"))
+                        .showInputDialog();
+            	
                 System.out.println("response: " + response);
             }
         });
@@ -370,13 +501,23 @@ public class HelloDialog extends Application {
         Hyperlink23.setText("Set Choices (>= 10)");
         Hyperlink23.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.showInputDialog(stage, 
-                        "Pick a name?",
-                        "Name Guess",
-                        null,
-                        "Jonathan",
-                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
-                        "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid");
+//                String response = Dialogs.showInputDialog(stage, 
+//                        "Pick a name?",
+//                        "Name Guess",
+//                        null,
+//                        "Jonathan",
+//                        "Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
+//                        "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid");
+            	
+            	  String response = Dialogs.<String>builder(stage) 
+                          .message("Pick a name?")
+                          .title("Name Guess")
+                          .inputInitialValue("Jonathan")
+                          .inputChoices(Arrays.asList("Matthew", "Jonathan", "Ian", "Sue", "Hannah", 
+                                "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid"))
+                          .showInputDialog();
+            	
+            	
                 System.out.println("response: " + response);
             }
         });

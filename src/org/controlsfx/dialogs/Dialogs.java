@@ -104,6 +104,11 @@ public class Dialogs {
     }
     
     
+    public static <T> DialogBuilder<T> builder( final Stage owner ) {
+    	return new DialogBuilder<T>(owner);
+    }
+    
+    
     /***************************************************************************
      * Confirmation Dialogs
      **************************************************************************/    

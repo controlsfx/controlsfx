@@ -27,8 +27,8 @@
 
 .dialog .window-title {
     -fx-padding: 4 0 0 0;
-    -fx-alignment: bottom_center;
-    -fx-font: 15px "Amble Cn";
+    -fx-alignment: center;
+    -fx-font-size: 1.166667em; /*15px;*/
     -fx-text-fill: #808080;
 }
 
@@ -100,12 +100,12 @@
 }
 
 .dialog .masthead-label-1 {
-    -fx-font: 15px "Amble Cn";
+    -fx-font-size: 1.166667em; /*15px;*/
     -fx-wrap-text: true;
 }
 
 .dialog .masthead-label-2 {
-    -fx-font: 15px "Amble Cn";
+    -fx-font-size: 1.166667em; /*15px;*/
     -fx-wrap-text: true;
     -fx-text-fill: #646464;
 }
@@ -116,7 +116,7 @@
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
     -fx-border-color: #b4b4b4 white #b4b4b4 white;
-    -fx-font: 13px "Amble Cn";
+    -fx-font-size: 1.083333em; /*13px;*/
 }
 
 .dialog .center-panel .button-bar {

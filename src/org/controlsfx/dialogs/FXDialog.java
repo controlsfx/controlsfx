@@ -1,9 +1,14 @@
 package org.controlsfx.dialogs;
 
-import javafx.css.PseudoClass;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.event.Event;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
@@ -25,21 +30,11 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import com.sun.javafx.css.StyleManager;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Set;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.geometry.Pos;
 
 class FXDialog extends Stage {
     
     // Use the CSS supplied with the JavaFX runtime, rather than our local tweak
-     private static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css");   
-//    private static final URL DIALOGS_CSS_URL = FXAboutDialog.class.getResource("deploydialogs.css");
+    private static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css");   
     
     private BorderPane root;
     private StackPane decoratedRoot;
@@ -112,8 +107,9 @@ class FXDialog extends Stage {
         };
         decoratedRoot.getChildren().add(root);
         scene = new Scene(decoratedRoot);
-        String css = (String) AccessController.doPrivileged(new PrivilegedAction() {
-            @Override public Object run() {
+        
+        String css = AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override public String run() {
                 return DIALOGS_CSS_URL.toExternalForm();
             }
         });
@@ -165,26 +161,26 @@ class FXDialog extends Stage {
 
         // add close min max
         Button closeButton = new WindowButton("close");
-        closeButton.setOnAction(new EventHandler() {
-            @Override public void handle(Event event) {
+        closeButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent event) {
                 FXDialog.this.hide();
             }
         });
         minButton = new WindowButton("minimize");
-        minButton.setOnAction(new EventHandler() {
-            @Override public void handle(Event event) {
+        minButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent event) {
                 setIconified(!isIconified());
             }
         });
 
         maxButton = new WindowButton("maximize");
-        maxButton.setOnAction(new EventHandler() {
+        maxButton.setOnAction(new EventHandler<ActionEvent>() {
             private double restoreX;
             private double restoreY;
             private double restoreW;
             private double restoreH;
 
-            @Override public void handle(Event event) {
+            @Override public void handle(ActionEvent event) {
                 Screen screen = Screen.getPrimary(); // todo something more sensible
                 double minX = screen.getVisualBounds().getMinX();
                 double minY = screen.getVisualBounds().getMinY();
@@ -226,7 +222,7 @@ class FXDialog extends Stage {
             private Point2D dragAnchor;
 
             @Override public void handle(MouseEvent event) {
-                EventType type = event.getEventType();
+                EventType<? extends MouseEvent> type = event.getEventType();
 
                 if (type == MouseEvent.MOUSE_PRESSED) {
                     width = getWidth();

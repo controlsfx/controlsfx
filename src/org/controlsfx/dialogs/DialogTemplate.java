@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -74,7 +76,7 @@ class DialogTemplate<T> {
     private static int MINIMUM_BUTTON_WIDTH = 75;
     
     private FXDialog dialog;
-    private VBox contentPane;
+    private BorderPane contentPane;
     
     private DialogType dialogType = INFORMATION;
     private final DialogOptions options;
@@ -102,7 +104,6 @@ class DialogTemplate<T> {
     private ImageView dialogBigIcon;
     
     // Buttons
-//    private ObservableList<Button> buttons;
     private static final String okBtnStr = "common.ok.btn";
     private static final String yesBtnStr = "common.yes.btn";
     private static final String noBtnStr = "common.no.btn";
@@ -133,7 +134,7 @@ class DialogTemplate<T> {
     DialogTemplate(Stage owner, String title, String masthead, DialogOptions options) {
         this.dialog = new FXDialog(title, owner, true);
         
-        this.contentPane = new VBox();
+        this.contentPane = new BorderPane();
         this.dialog.setContentPane(contentPane);
 
         this.mastheadString = masthead;
@@ -169,16 +170,15 @@ class DialogTemplate<T> {
         }
 
         if (isMastheadVisible()) {
-            contentPane.getChildren().add(createMasthead());
+            contentPane.setTop(createMasthead());
         }
         
         Node centerPanel = createCenterPanel();
-        VBox.setVgrow(centerPanel, Priority.ALWAYS);
-        contentPane.getChildren().add(centerPanel);
+        contentPane.setCenter(centerPanel);
 
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null) {
-            contentPane.getChildren().add(bottomPanel);
+            contentPane.setBottom(bottomPanel);
         }
 
         dialog.setResizable(false);
@@ -192,13 +192,13 @@ class DialogTemplate<T> {
         this.dialogType = DialogType.ERROR;
 
         if (isMastheadVisible()) {
-            contentPane.getChildren().add(createMasthead());
+            contentPane.setTop(createMasthead());
         }
-        contentPane.getChildren().add(createCenterPanel());
+        contentPane.setCenter(createCenterPanel());
         
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null && bottomPanel.getChildren().size() > 0) {
-            contentPane.getChildren().add(bottomPanel);
+            contentPane.setBottom(bottomPanel);
         }
 
         dialog.setResizable(false);
@@ -211,13 +211,16 @@ class DialogTemplate<T> {
         this.inputChoices = choices;
         
         if (isMastheadVisible()) {
-            contentPane.getChildren().add(createMasthead());
+//            contentPane.getChildren().add(createMasthead());
+            contentPane.setTop(createMasthead());
         }
-        contentPane.getChildren().add(createCenterPanel());
+//        contentPane.getChildren().add(createCenterPanel());
+        contentPane.setCenter(createCenterPanel());
 
         Pane bottomPanel = createBottomPanel();
         if (bottomPanel != null) {
-            contentPane.getChildren().add(bottomPanel);
+//            contentPane.getChildren().add(bottomPanel);
+            contentPane.setBottom(bottomPanel);
         }
 
         dialog.setResizable(false);
@@ -376,16 +379,12 @@ class DialogTemplate<T> {
             	
             	resizableArea = null;
             	if (throwable != null) {
-            		
-            		VBox vbox = new VBox(10);
-            		resizableArea = vbox;
-            		
-                    BorderPane labelPanel = new BorderPane();
+            		resizableArea = new VBox(10);
 
                     Label label = new Label(getString("exception.dialog.label"));
-                    labelPanel.setLeft(label);
+                    VBox.setVgrow(label, Priority.NEVER);
 
-                    vbox.getChildren().add(labelPanel);
+                    resizableArea.getChildren().add(label);
 
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
@@ -394,18 +393,16 @@ class DialogTemplate<T> {
                     text.setEditable(false);
                     text.setWrapText(true);
                     text.setPrefWidth(60 * 8);
-                    text.setPrefHeight(20 * 12);
-                    vbox.getChildren().add(text);
+                    text.setMaxHeight(Double.MAX_VALUE);
+                    resizableArea.getChildren().add(text);
 		            VBox.setVgrow(text, Priority.ALWAYS);
 
-                    contentPanel.getChildren().add(vbox);
-                    VBox.setVgrow(vbox, Priority.ALWAYS);
+                    contentPanel.getChildren().add(resizableArea);
+                    VBox.setVgrow(resizableArea, Priority.ALWAYS);
                     
                     resizableArea.managedProperty().bind(resizableArea.visibleProperty());
                     resizableArea.setVisible(false);
-                    
                 }
-            	
             	
                 return contentPanel;
             }
@@ -649,14 +646,14 @@ class DialogTemplate<T> {
     private EventHandler<ActionEvent> exceptionDetailsHandler = new EventHandler<ActionEvent>() {
         @Override public void handle(ActionEvent ae) {
             if (throwable != null) {
+                // old approach (show new window)
                 //new ExceptionDialog(dialog, throwable).show();
-            	resizableArea.managedProperty().bind(resizableArea.visibleProperty());
+                
+                // new approach (dynamic expanding dialog)
             	boolean visible = !resizableArea.isVisible();
-            	resizableArea.setVisible( visible );
-            	dialog.sizeToScene();
+            	resizableArea.setVisible(visible);
             	dialog.setResizable(visible);
-            	
-                return;
+            	dialog.sizeToScene();
             }
         }
     };

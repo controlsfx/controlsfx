@@ -93,7 +93,7 @@ class DialogTemplate<T> {
     // masthead
     private String mastheadString;
     private BorderPane mastheadPanel;
-    private UITextArea mastheadTextArea;
+    private Label mastheadTextArea;
     
     // center
     private Pane centerPanel;
@@ -281,7 +281,10 @@ class DialogTemplate<T> {
         // Create topPanel's components.  UITextArea determines
         // the size of the dialog by defining the number of columns
         // based on font size.
-        mastheadTextArea = new UITextArea(MAIN_TEXT_WIDTH);
+        mastheadTextArea = new Label();
+        mastheadTextArea.setPrefWidth(MAIN_TEXT_WIDTH);
+        mastheadTextArea.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        mastheadTextArea.setWrapText(true);
         mastheadTextArea.getStyleClass().add("masthead-label-1");
 
         VBox mastheadVBox = new VBox();
@@ -331,54 +334,47 @@ class DialogTemplate<T> {
     }
     
     private Node createCenterContent() {
-    	switch( style ) {
-    	case SIMPLE:
-            if (contentString != null) {
-                UITextArea ta = new UITextArea(contentString);
-                ta.getStyleClass().add("center-content-area");
-                ta.setAlignment(Pos.TOP_LEFT);
-                return ta;
+    	if (style == DialogStyle.SIMPLE) {
+    	    if (contentString == null) return null;
+    	    
+            return createContentArea(contentString);
+    	} else if (style == DialogStyle.ERROR) {
+    	    if (contentString == null) return null;
+    	    
+    	    VBox contentPanel = new VBox(10);
+    	    
+            Node contentArea = createContentArea(contentString);
+        	contentPanel.getChildren().add(contentArea);
+        	
+        	resizableArea = null;
+        	if (throwable != null) {
+        		resizableArea = new VBox(10);
+
+                Label label = new Label(getString("exception.dialog.label"));
+                VBox.setVgrow(label, Priority.NEVER);
+
+                resizableArea.getChildren().add(label);
+
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                throwable.printStackTrace(pw);
+                TextArea text = new TextArea(sw.toString());
+                text.setEditable(false);
+                text.setWrapText(true);
+                text.setPrefWidth(60 * 8);
+                text.setMaxHeight(Double.MAX_VALUE);
+                resizableArea.getChildren().add(text);
+	            VBox.setVgrow(text, Priority.ALWAYS);
+
+                contentPanel.getChildren().add(resizableArea);
+                VBox.setVgrow(resizableArea, Priority.ALWAYS);
+                
+                resizableArea.managedProperty().bind(resizableArea.visibleProperty());
+                resizableArea.setVisible(false);
             }
-            break;
-    	case ERROR:
-            if (contentString != null) {
-                UITextArea ta = new UITextArea(contentString);
-                ta.getStyleClass().add("center-content-area");
-                ta.setAlignment(Pos.TOP_LEFT);
-            	VBox contentPanel = new VBox(10);
-            	contentPanel.getChildren().add(ta);
-            	
-            	resizableArea = null;
-            	if (throwable != null) {
-            		resizableArea = new VBox(10);
-
-                    Label label = new Label(getString("exception.dialog.label"));
-                    VBox.setVgrow(label, Priority.NEVER);
-
-                    resizableArea.getChildren().add(label);
-
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    throwable.printStackTrace(pw);
-                    TextArea text = new TextArea(sw.toString());
-                    text.setEditable(false);
-                    text.setWrapText(true);
-                    text.setPrefWidth(60 * 8);
-                    text.setMaxHeight(Double.MAX_VALUE);
-                    resizableArea.getChildren().add(text);
-		            VBox.setVgrow(text, Priority.ALWAYS);
-
-                    contentPanel.getChildren().add(resizableArea);
-                    VBox.setVgrow(resizableArea, Priority.ALWAYS);
-                    
-                    resizableArea.managedProperty().bind(resizableArea.visibleProperty());
-                    resizableArea.setVisible(false);
-                }
-            	
-                return contentPanel;
-            }
-            break;
-    	case INPUT:    
+        	
+            return contentPanel;
+    	} else if (style == DialogStyle.INPUT) {
             Control inputControl = null;
             if (inputChoices == null || inputChoices.isEmpty()) {
                 // no input constraints, so use a TextField
@@ -435,6 +431,21 @@ class DialogTemplate<T> {
         }
         
         return null;
+    }
+    
+    private Node createContentArea(String contentString) {
+        if (contentString == null) return null;
+        
+        Label label = new Label(contentString);
+        label.getStyleClass().add("center-content-area");
+        label.setAlignment(Pos.TOP_LEFT);
+        
+        // FIXME we don't want to restrict the width, but for now this works ok
+        label.setPrefWidth(MAIN_TEXT_WIDTH);
+        label.setMaxWidth(360);
+        label.setWrapText(true);
+        
+        return label;
     }
     
     private Node createButtonPanel() {

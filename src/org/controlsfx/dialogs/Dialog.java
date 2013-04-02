@@ -9,13 +9,19 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public final class Dialog<T> {
+    
+    /**
+     * USE_DEFAULT can be passed in to {@link #title(String)} and
+     * {@link #masthead(String)} methods to specify that the default text for 
+     * the dialog should be used, where the default text is specific to the type
+     * of dialog being shown.  
+     */
+    public static final String USE_DEFAULT = "$$$";
 
     private final Stage owner;
     private String title;
-    private boolean useDefaultTitle = false;
     private String message;
     private String masthead;
-    private boolean useDefaultMasthead = false;
     private Options options;
     private String details;
     private boolean openDetailsInNewWindow = false;
@@ -147,11 +153,6 @@ public final class Dialog<T> {
         return this;
     }
     
-    public Dialog<T> useDefaultTitle() {
-        this.useDefaultTitle = true;
-        return this;
-    }
-
     public Dialog<T> message(final String message) {
         this.message = message;
         return this;
@@ -162,11 +163,6 @@ public final class Dialog<T> {
         return this;
     }
     
-    public Dialog<T> useDefaultMasthead() {
-        this.useDefaultMasthead = true;
-        return this;
-    }
-
     public Dialog<T> options(final Options options) {
         this.options = options;
         return this;
@@ -241,8 +237,8 @@ public final class Dialog<T> {
      **************************************************************************/
 
     private DialogTemplate<T> getDialogTemplate(final Type dlgType) {
-        String actualTitle = title != null ? title : (useDefaultTitle ? dlgType.getDefaultTitle() : null);
-        String actualMasthead = masthead != null ? masthead : (useDefaultMasthead ? dlgType.getDefaultMasthead() : null);
+        String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
+        String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         Options actualOptions = options == null ? dlgType.getDefaultOptions() : options;
         return new DialogTemplate<T>(owner, actualTitle, actualMasthead, actualOptions);
     }

@@ -373,7 +373,8 @@ public class HelloDialog extends Application {
             @Override
             public void handle(ActionEvent e) {
                 String response = Dialog.<String> build(stage)
-                        .message("What is your name?").title("Name Check")
+                        .message("What is your name?")
+                        .title("Name Check")
                         .showInputDialog();
 
                 System.out.println("response: " + response);

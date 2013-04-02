@@ -107,8 +107,7 @@ class DialogTemplate<T> {
      * * Constructors * *
      **************************************************************************/
 
-    DialogTemplate(Stage owner, String title, String masthead,
-            Dialog.Options options) {
+    DialogTemplate(Stage owner, String title, String masthead, Dialog.Options options) {
         this.dialog = new FXDialog(title, owner, true);
 
         this.contentPane = new BorderPane();

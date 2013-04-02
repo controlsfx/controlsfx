@@ -12,8 +12,10 @@ public final class Dialog<T> {
 
     private final Stage owner;
     private String title;
+    private boolean useDefaultTitle = false;
     private String message;
     private String masthead;
+    private boolean useDefaultMasthead = false;
     private Options options;
     private String details;
     private boolean openDetailsInNewWindow = false;
@@ -144,6 +146,11 @@ public final class Dialog<T> {
         this.title = title;
         return this;
     }
+    
+    public Dialog<T> useDefaultTitle() {
+        this.useDefaultTitle = true;
+        return this;
+    }
 
     public Dialog<T> message(final String message) {
         this.message = message;
@@ -152,6 +159,11 @@ public final class Dialog<T> {
 
     public Dialog<T> masthead(final String masthead) {
         this.masthead = masthead;
+        return this;
+    }
+    
+    public Dialog<T> useDefaultMasthead() {
+        this.useDefaultMasthead = true;
         return this;
     }
 
@@ -211,15 +223,13 @@ public final class Dialog<T> {
 
     // TODO: Has to be generalized to have details for any type of dialog
     public Response showMoreDetailsDialog() {
-        DialogTemplate<Void> template = new DialogTemplate<>(owner, title,
-                masthead, null);
+        DialogTemplate<Void> template = new DialogTemplate<>(owner, title, masthead, null);
         template.setMoreDetailsContent(message, details, openDetailsInNewWindow);
         return showDialog(template);
     }
 
     public T showInputDialog() {
-        DialogTemplate<T> template = new DialogTemplate<>(owner, title,
-                masthead, null);
+        DialogTemplate<T> template = new DialogTemplate<>(owner, title, masthead, null);
         template.setInputContent(message, inputInitialValue, inputChoices);
         template.getDialog().centerOnScreen();
         template.show();
@@ -231,13 +241,10 @@ public final class Dialog<T> {
      **************************************************************************/
 
     private DialogTemplate<T> getDialogTemplate(final Type dlgType) {
-        String actualTitle = title == null ? dlgType.getDefaultTitle() : title;
-        String actualMasthead = masthead == null ? dlgType.getDefaultMasthead()
-                : masthead;
-        Options actualOptions = options == null ? dlgType.getDefaultOptions()
-                : options;
-        return new DialogTemplate<T>(owner, actualTitle, actualMasthead,
-                actualOptions);
+        String actualTitle = title != null ? title : (useDefaultTitle ? dlgType.getDefaultTitle() : null);
+        String actualMasthead = masthead != null ? masthead : (useDefaultMasthead ? dlgType.getDefaultMasthead() : null);
+        Options actualOptions = options == null ? dlgType.getDefaultOptions() : options;
+        return new DialogTemplate<T>(owner, actualTitle, actualMasthead, actualOptions);
     }
 
     private Response showSimpleContentDialog(final Type dlgType) {

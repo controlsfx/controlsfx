@@ -32,10 +32,10 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 class FXDialog extends Stage {
-    
+
     // Use the CSS supplied with the JavaFX runtime, rather than our local tweak
     private static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css");   
-    
+
     private BorderPane root;
     private StackPane decoratedRoot;
     private HBox windowBtns;
@@ -73,7 +73,7 @@ class FXDialog extends Stage {
             @Override public void invalidated(Observable valueModel) {
                 resizeCorner.setVisible(isResizable());
                 maxButton.setVisible(isResizable());
-                
+
                 if (isResizable()) {
                     windowBtns.getChildren().add(1, maxButton);
                 } else {
@@ -107,7 +107,7 @@ class FXDialog extends Stage {
         };
         decoratedRoot.getChildren().add(root);
         scene = new Scene(decoratedRoot);
-        
+
         String css = AccessController.doPrivileged(new PrivilegedAction<String>() {
             @Override public String run() {
                 return DIALOGS_CSS_URL.toExternalForm();
@@ -263,7 +263,7 @@ class FXDialog extends Stage {
             setPrefSize(17, 17);
         }
     }
-    
+
     /***************************************************************************
      *                                                                         *
      * Stylesheet Handling                                                     *

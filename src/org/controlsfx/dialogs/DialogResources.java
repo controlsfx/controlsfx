@@ -18,7 +18,7 @@ import com.sun.javafx.scene.control.skin.resources.ControlResources;
  *
  */
 class DialogResources {
-    
+
     // Localization strings.
     private static ResourceBundle rbFX;
 
@@ -29,8 +29,8 @@ class DialogResources {
     static void reset() {
         rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialogs.resources.dialog-resources");
     }
-    
-    
+
+
     /**
      * Method to get an internationalized string from the deployment resource.
      */
@@ -44,10 +44,10 @@ class DialogResources {
             return key;
         }
     }
-    
+
     /**
-    * Returns a string from the resources
-    */
+     * Returns a string from the resources
+     */
     static String getString(String key) {
         try {
             return rbFX.getString(key);
@@ -60,8 +60,8 @@ class DialogResources {
     }
 
     /**
-    * Returns a string from a resource, substituting argument 1
-    */
+     * Returns a string from a resource, substituting argument 1
+     */
     static String getString(String key, Object... args) {
         return MessageFormat.format(getString(key), args);
     }
@@ -77,7 +77,7 @@ class DialogResources {
                         @Override public Image run() {
                             return getImage_(key);
                         }
-            });
+                    });
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

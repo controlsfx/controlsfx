@@ -24,7 +24,7 @@ class ExceptionDialog extends FXDialog {
     private void initComponents(String moreDetails) {
         VBox contentPanel = new VBox();
         contentPanel.getStyleClass().add("more-info-dialog");
-        
+
         contentPanel.setPrefSize(800, 600);
 
         if (moreDetails != null) {
@@ -64,7 +64,7 @@ class ExceptionDialog extends FXDialog {
                 dismissAction();
             }
         });
-        
+
         dismissBtn.setDefaultButton(true);
         btnPanel.getChildren().add(dismissBtn);
         return btnPanel;

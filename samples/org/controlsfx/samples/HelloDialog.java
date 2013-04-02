@@ -82,9 +82,9 @@ public class HelloDialog extends Application {
             @Override
             public void handle(ActionEvent e) {
                 Dialog.build(stage)
-                .message(
-                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
-                        .title("JavaFX").showInformationDialog();
+                .message("A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
+                .title("JavaFX")
+                .showInformationDialog();
             }
         });
         grid.add(Hyperlink2, 1, row);
@@ -95,10 +95,10 @@ public class HelloDialog extends Application {
             @Override
             public void handle(ActionEvent e) {
                 Dialog.build(stage)
-                .message(
-                        "A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
-                        .title("JavaFX").masthead("Wouldn't this be nice?")
-                        .showInformationDialog();
+                .message("A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
+                .title("JavaFX")
+                .masthead("Wouldn't this be nice?")
+                .showInformationDialog();
             }
         });
         grid.add(Hyperlink2a, 2, row);
@@ -118,10 +118,9 @@ public class HelloDialog extends Application {
             public void handle(ActionEvent e) {
                 Dialog.Response response = Dialog
                         .build(stage)
-                        .message(
-                                "I was a bit worried that you might not want them, so I wanted to double check.")
-                                .title("You do want dialogs right?")
-                                .showConfirmDialog();
+                        .message("I was a bit worried that you might not want them, so I wanted to double check.")
+                        .title("You do want dialogs right?")
+                        .showConfirmDialog();
 
                 System.out.println("response: " + response);
             }
@@ -135,10 +134,10 @@ public class HelloDialog extends Application {
             public void handle(ActionEvent e) {
                 Dialog.Response response = Dialog
                         .build(stage)
-                        .message(
-                                "I was a bit worried that you might not want them, so I wanted to double check.")
-                                .title("You do want dialogs right?")
-                                .masthead("Just Checkin'").showConfirmDialog();
+                        .message("I was a bit worried that you might not want them, so I wanted to double check.")
+                        .title("You do want dialogs right?")
+                        .masthead("Just Checkin'")
+                        .showConfirmDialog();
 
                 System.out.println("response: " + response);
             }
@@ -214,9 +213,8 @@ public class HelloDialog extends Application {
                         .build(stage)
                         .message("Exception Encountered")
                         .title("It looks like you're making a bad decision")
-                        .masthead(
-                                "Better change your mind - this is really your last chance!")
-                                .showErrorDialog();
+                        .masthead("Better change your mind - this is really your last chance!")
+                        .showErrorDialog();
 
                 System.out.println("response: " + response);
             }
@@ -238,13 +236,10 @@ public class HelloDialog extends Application {
             public void handle(ActionEvent e) {
                 Dialog.Response response = Dialog
                         .build(stage)
-                        .message(
-                                "Better change your mind - this is really your last chance!")
-                                .title("It looks like you're making a bad decision")
-                                .details(
-                                        new RuntimeException(
-                                                "Pending Bad Decision Exception"))
-                                                .showMoreDetailsDialog();
+                        .message("Better change your mind - this is really your last chance!")
+                        .title("It looks like you're making a bad decision")
+                        .details(new RuntimeException("Pending Bad Decision Exception"))
+                        .showMoreDetailsDialog();
 
                 System.out.println("response: " + response);
             }
@@ -258,14 +253,11 @@ public class HelloDialog extends Application {
             public void handle(ActionEvent e) {
                 Dialog.Response response = Dialog
                         .build(stage)
-                        .message(
-                                "Better change your mind - this is really your last chance!")
-                                .title("It looks like you're making a bad decision")
-                                .masthead("Exception Encountered")
-                                .details(
-                                        new RuntimeException(
-                                                "Pending Bad Decision Exception"))
-                                                .showMoreDetailsDialog();
+                        .message("Better change your mind - this is really your last chance!")
+                        .title("It looks like you're making a bad decision")
+                        .masthead("Exception Encountered")
+                        .details(new RuntimeException("Pending Bad Decision Exception"))
+                        .showMoreDetailsDialog();
 
                 System.out.println("response: " + response);
             }
@@ -279,14 +271,12 @@ public class HelloDialog extends Application {
             public void handle(ActionEvent e) {
                 Dialog.Response response = Dialog
                         .build(stage)
-                        .message(
-                                "Better change your mind - this is really your last chance!")
-                                .title("It looks like you're making a bad decision")
-                                .masthead("Exception Encountered")
-                                .details(
-                                        new RuntimeException(
-                                                "Pending Bad Decision Exception"))
-                                                .openDetailsInNewWindow(true).showMoreDetailsDialog();
+                        .message("Better change your mind - this is really your last chance!")
+                        .title("It looks like you're making a bad decision")
+                        .masthead("Exception Encountered")
+                        .details(new RuntimeException("Pending Bad Decision Exception"))
+                        .openDetailsInNewWindow(true)
+                        .showMoreDetailsDialog();
 
                 System.out.println("response: " + response);
             }
@@ -341,9 +331,8 @@ public class HelloDialog extends Application {
                         .title("Name Guess")
                         .masthead("Name Guess")
                         .inputInitialValue("Jonathan")
-                        .inputChoices(
-                                Arrays.asList("Matthew", "Jonathan", "Ian",
-                                        "Sue", "Hannah")).showInputDialog();
+                        .inputChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah")
+                        .showInputDialog();
                 System.out.println("response: " + response);
             }
         });
@@ -360,11 +349,10 @@ public class HelloDialog extends Application {
                         .title("Name Guess")
                         .masthead("Name Guess")
                         .inputInitialValue("Jonathan")
-                        .inputChoices(
-                                Arrays.asList("Matthew", "Jonathan", "Ian",
+                        .inputChoices("Matthew", "Jonathan", "Ian",
                                         "Sue", "Hannah", "Julia", "Denise",
-                                        "Stephan", "Sarah", "Ron", "Ingrid"))
-                                        .showInputDialog();
+                                        "Stephan", "Sarah", "Ron", "Ingrid")
+                        .showInputDialog();
 
                 System.out.println("response: " + response);
             }
@@ -417,9 +405,8 @@ public class HelloDialog extends Application {
                         .message("Pick a name?")
                         .title("Name Guess")
                         .inputInitialValue("Jonathan")
-                        .inputChoices(
-                                Arrays.asList("Matthew", "Jonathan", "Ian",
-                                        "Sue", "Hannah")).showInputDialog();
+                        .inputChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah")
+                        .showInputDialog();
 
                 System.out.println("response: " + response);
             }
@@ -436,11 +423,10 @@ public class HelloDialog extends Application {
                         .message("Pick a name?")
                         .title("Name Guess")
                         .inputInitialValue("Jonathan")
-                        .inputChoices(
-                                Arrays.asList("Matthew", "Jonathan", "Ian",
+                        .inputChoices("Matthew", "Jonathan", "Ian",
                                         "Sue", "Hannah", "Julia", "Denise",
-                                        "Stephan", "Sarah", "Ron", "Ingrid"))
-                                        .showInputDialog();
+                                        "Stephan", "Sarah", "Ron", "Ingrid")
+                        .showInputDialog();
 
                 System.out.println("response: " + response);
             }

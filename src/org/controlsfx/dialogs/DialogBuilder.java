@@ -4,6 +4,7 @@ import static org.controlsfx.dialogs.Dialogs.DialogResponse.CLOSED;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
 
 import org.controlsfx.dialogs.Dialogs.DialogOptions;
@@ -74,6 +75,10 @@ public final class DialogBuilder<T> {
 	public DialogBuilder<T> inputChoices( final List<T> choices ) {
 		this.inputChoices = choices;
 		return this;
+	}
+
+	public DialogBuilder<T> inputChoices( @SuppressWarnings("unchecked") final T... choices ) {
+		return inputChoices( Arrays.asList(choices));
 	}
 	
 	public void showInformationDialog() {

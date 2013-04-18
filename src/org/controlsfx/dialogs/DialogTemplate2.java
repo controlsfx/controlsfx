@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -24,6 +25,10 @@ public class DialogTemplate2 {
 	// According to the UI spec, the width of the main message text in the upper
 	// panel should be 426 pixels.
 	private static int MAIN_TEXT_WIDTH = 400;
+	
+    // Specifies the minimum allowable width for all buttons in the dialog
+    private static int MINIMUM_BUTTON_WIDTH = 75;
+
 
 	private final FXDialog dialog;
 	
@@ -166,18 +171,20 @@ public class DialogTemplate2 {
 
 	private Node createButtonPanel() {
 
-        HBox buttonsPanel = new HBox(6) {
-//            @Override
-//            protected void layoutChildren() {
-//                resizeButtons(buttons);
-//                super.layoutChildren();
-//            }
-        };
+        HBox buttonsPanel = new HBox(6);
         buttonsPanel.getStyleClass().add("button-bar");
         buttonsPanel.getChildren().add(createButtonSpacer()); // push buttons to the right
         
+        List<ButtonBase> buttons = new ArrayList<ButtonBase>();
+        double widest = MINIMUM_BUTTON_WIDTH;
         for ( Command cmd: commands ) {
-        	buttonsPanel.getChildren().add(createButton(cmd));
+        	Button b = createButton(cmd);
+            widest = Math.max(widest, b.prefWidth(-1));
+        	buttons.add( b );
+        }
+        for ( ButtonBase button: buttons ) {
+        	button.setPrefWidth(button.isVisible() ? widest : 0);
+        	buttonsPanel.getChildren().add(button);
         }
         
 //        if (isWindows() || isUnix()) {
@@ -192,7 +199,7 @@ public class DialogTemplate2 {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         return spacer;
     }
-	
+
 	
 	private Button createButton( final Command command ) {
 		Button button = new Button(command.getTitle());

@@ -9,12 +9,12 @@ import org.controlsfx.dialogs.DialogTemplate2.DialogAction;
 public class HelloDialogTemplate extends Application {
 
     @Override public void start(final Stage stage) {
-        new DialogTemplate2(stage, "Hello Dialog Template")
-        .resizable(false)
-        .masthead( "MASTEHAD" )
-        .content("Message Message Message")
-        .commands(DialogAction.OK, DialogAction.CANCEL)
-        .show();
+        DialogTemplate2 dlg = new DialogTemplate2(stage, "Hello Dialog Template");
+        dlg.setMasthead( "MASTEHAD" );
+        dlg.setContent("Message Message Message");
+        dlg.setResizable(true);
+        dlg.setActions(DialogAction.OK, DialogAction.CANCEL);
+        dlg.show();
     }
 
 }

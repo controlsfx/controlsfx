@@ -1,9 +1,14 @@
 package org.controlsfx.dialogs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -12,6 +17,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -19,6 +26,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import com.sun.javafx.collections.ImmutableObservableList;
 
 public class DialogTemplate2 {
 
@@ -34,13 +43,18 @@ public class DialogTemplate2 {
     private Action result = DialogAction.CLOSE;
 
     private final BorderPane contentPane;
-    private NodeBuilder mastheadBuilder;
-    private NodeBuilder contentBuilder;
-    private List<? extends Action> commands = Arrays.asList(DialogAction.CLOSE);
+    
+    private final ObjectProperty<Node> masthead = new SimpleObjectProperty<Node>();
+    private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>();
+    private final ListProperty<Action> actions = new SimpleListProperty<Action>(
+        new ImmutableObservableList<Action>(DialogAction.CLOSE)
+    );
+    private Image icon = DialogResources.getImage("java48.image"); 
+        
 
     public DialogTemplate2(Stage owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
-
+        
         this.contentPane = new BorderPane();
         contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
         this.dialog.setContentPane(contentPane);
@@ -59,53 +73,105 @@ public class DialogTemplate2 {
         return result;
     }
 
-    protected boolean isMastheadPresent() {
-        return mastheadBuilder != null;
-    }
 
-    protected void buildDialogContent() {
-        if (isMastheadPresent()) {
-            contentPane.setTop(mastheadBuilder.build());
-        }
-        Node content = contentBuilder != null ? contentBuilder.build() : new Pane();
-        Pane centerPanel = createCenterPanel(content);
-        contentPane.setCenter(centerPanel);
-        centerPanel.getChildren().add(createButtonPanel());
+    // Resizable property 
+    
+    public boolean getResizable() {
+        return dialog.isResizable();
     }
-
-    public DialogTemplate2 resizable(boolean resizable) {
+    
+    public void setResizable( boolean resizable ) {
         dialog.setResizable(resizable);
-        return this;
+    }
+    
+    public BooleanProperty resizableProperty() { return dialog.resizableProperty(); }
+    
+    
+    // Masthead property
+
+    public final Node getMasthead() {
+        return masthead.get();
+    }
+    
+    public final void setMasthead( Node masthead ) {
+        this.masthead.setValue(masthead);
     }
 
-    public DialogTemplate2 masthead(Node masthead) {
-        this.mastheadBuilder = new MasteheadBuilder(masthead);
-        return this;
+    public final void setMasthead( String mastheadText) {
+        BorderPane mastheadPanel = new BorderPane();
+        mastheadPanel.getStyleClass().add("top-panel");
+
+        // Create panel with text area and icon or just a background image:
+        // Create topPanel's components. UITextArea determines
+        // the size of the dialog by defining the number of columns
+        // based on font size.
+        Label mastheadTextArea = new Label();
+        mastheadTextArea.setPrefWidth(MAIN_TEXT_WIDTH);
+        mastheadTextArea.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        mastheadTextArea.setWrapText(true);
+        mastheadTextArea.getStyleClass().add("masthead-label-1");
+
+        VBox mastheadVBox = new VBox();
+        mastheadVBox.setAlignment(Pos.CENTER_LEFT);
+        mastheadTextArea.setText(mastheadText);
+        mastheadTextArea.setAlignment(Pos.CENTER_LEFT);
+        mastheadVBox.getChildren().add(mastheadTextArea);
+
+        mastheadPanel.setLeft(mastheadVBox);
+        BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
+        
+        if ( icon != null ) {
+            mastheadPanel.setRight(new ImageView(icon));
+        }
+
+        setMasthead(mastheadPanel);
+    }
+    
+    public ObjectProperty<Node> mastheadProperty() { return masthead; }    
+    
+
+    // Content property
+
+    public final Node getContent() {
+        return content.get();
+    }
+    
+    public final void setContent( Node content ) {
+        this.content.setValue(content);
     }
 
-    public DialogTemplate2 masthead(String masthead) {
-        this.mastheadBuilder = new MasteheadBuilder(masthead);
-        return this;
+    public final void setContent( String contentText) {
+        
+        Label label = new Label(contentText);
+        label.getStyleClass().add("center-content-area");
+        label.setAlignment(Pos.TOP_LEFT);
+
+        // FIXME we don't want to restrict the width, but for now this works ok
+        label.setPrefWidth(MAIN_TEXT_WIDTH);
+        label.setMaxWidth(360);
+        label.setWrapText(true);
+
+        setContent(label);
+    }
+    
+    public ObjectProperty<Node> contentProperty() { return content; }        
+    
+    
+    //Actions property
+    
+    public final ObservableList<? extends Action> getActions() {
+        return actions.get();
+    }
+    
+    public final void setActions( ObservableList<Action> actions) {
+        this.actions.setValue(actions);
     }
 
-    public DialogTemplate2 content(Node message) {
-        this.contentBuilder = new ContentBuilder(message);
-        return this;
+    public final void setActions( Action... actions) {
+        this.actions.setValue(new ImmutableObservableList<Action>(actions));
     }
-
-    public DialogTemplate2 content(String message) {
-        this.contentBuilder = new ContentBuilder(message);
-        return this;
-    }
-
-    public DialogTemplate2 commands(List<? extends Action> commands) {
-        this.commands = new ArrayList<Action>(commands);
-        return this;
-    }
-
-    public DialogTemplate2 commands(Action... commands) {
-        return commands(Arrays.asList(commands));
-    }
+    
+    public ListProperty<Action> actionsProperty() { return actions; }
 
     public interface Action {
         String getText();
@@ -162,6 +228,21 @@ public class DialogTemplate2 {
 
     // ///// PRIVATE API ///////////////////////////////////////////////////////////////////
 
+
+    protected boolean isMastheadPresent() {
+        return getMasthead() != null;//mastheadBuilder != null;
+    }
+
+    protected void buildDialogContent() {
+        contentPane.getChildren().clear();
+        if (isMastheadPresent()) {
+            contentPane.setTop(getMasthead());//mastheadBuilder.build());
+        }
+        Pane centerPanel = createCenterPanel( getContent() != null ? getContent() : new Pane() );
+        contentPane.setCenter(centerPanel);
+        centerPanel.getChildren().add(createButtonPanel());
+    }    
+    
     private Node createButtonPanel() {
 
         HBox buttonsPanel = new HBox(6);
@@ -173,7 +254,7 @@ public class DialogTemplate2 {
         List<ButtonBase> buttons = new ArrayList<ButtonBase>();
         double widest = MINIMUM_BUTTON_WIDTH;
         boolean hasDefault = false;
-        for (Action cmd : commands) {
+        for (Action cmd : actions) {
             Button b = createButton(cmd, !hasDefault);
             // keep only first default button
             hasDefault |= b.isDefaultButton();
@@ -238,105 +319,16 @@ public class DialogTemplate2 {
         // centerPanel.getChildren().add(buttonPanel);
         //
         // dialog image can go to the left if there is no masthead
-        if (!isMastheadPresent()) {
-            // ImageView dialogBigIcon = new ImageView(
+        if (!isMastheadPresent() && icon != null ) {
+             ImageView dialogBigIcon = new ImageView(icon);
             // dialogType == null ? DialogResources
             // .getImage("java48.image") : dialogType.getImage());
-            // Pane pane = new Pane(dialogBigIcon);
-            // contentPanel.setLeft(pane);
+             Pane pane = new Pane(dialogBigIcon);
+             contentPanel.setLeft(pane);
         }
 
         return centerPanel;
     }
 
-    private static abstract class NodeBuilder {
-
-        private Node node;
-        private String text;
-
-        public NodeBuilder(Node node) {
-            this.node = node;
-        }
-
-        public NodeBuilder(String text) {
-            this.text = text;
-        }
-
-        public final Node build() {
-            return node == null ? buildFromString(text) : node;
-        }
-
-        protected abstract Node buildFromString(String text);
-
-    }
-
-    private static class MasteheadBuilder extends NodeBuilder {
-
-        public MasteheadBuilder(Node node) {
-            super(node);
-        }
-
-        public MasteheadBuilder(String text) {
-            super(text);
-        }
-
-        @Override protected Node buildFromString(String text) {
-
-            BorderPane mastheadPanel = new BorderPane();
-            mastheadPanel.getStyleClass().add("top-panel");
-
-            // Create panel with text area and icon or just a background image:
-            // Create topPanel's components. UITextArea determines
-            // the size of the dialog by defining the number of columns
-            // based on font size.
-            Label mastheadTextArea = new Label();
-            mastheadTextArea.setPrefWidth(MAIN_TEXT_WIDTH);
-            mastheadTextArea.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-            mastheadTextArea.setWrapText(true);
-            mastheadTextArea.getStyleClass().add("masthead-label-1");
-
-            VBox mastheadVBox = new VBox();
-            mastheadVBox.setAlignment(Pos.CENTER_LEFT);
-            mastheadTextArea.setText(text);
-            mastheadTextArea.setAlignment(Pos.CENTER_LEFT);
-            mastheadVBox.getChildren().add(mastheadTextArea);
-
-            mastheadPanel.setLeft(mastheadVBox);
-            BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
-            // ImageView dialogBigIcon = new ImageView(
-            // dialogType == null ? DialogResources.getImage("java48.image")
-            // : dialogType.getImage());
-            // mastheadPanel.setRight(dialogBigIcon);
-
-            return mastheadPanel;
-        }
-
-    }
-
-    private static class ContentBuilder extends NodeBuilder {
-
-        public ContentBuilder(Node node) {
-            super(node);
-        }
-
-        public ContentBuilder(String text) {
-            super(text);
-        }
-
-        @Override protected Node buildFromString(String text) {
-
-            Label label = new Label(text);
-            label.getStyleClass().add("center-content-area");
-            label.setAlignment(Pos.TOP_LEFT);
-
-            // FIXME we don't want to restrict the width, but for now this works ok
-            label.setPrefWidth(MAIN_TEXT_WIDTH);
-            label.setMaxWidth(360);
-            label.setWrapText(true);
-
-            return label;
-        }
-
-    }
 
 }

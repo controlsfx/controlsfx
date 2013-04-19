@@ -7,6 +7,7 @@ import javafx.scene.Node;
 
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridRow;
+import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
@@ -84,17 +85,18 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
             }
         };
     }
-
-    @Override protected double computeMinHeight(double width) {
-        return computePrefHeight(width);
+    
+    @Override protected double computeMinHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
+        return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
 
-    @Override protected double computeMaxHeight(double width) {
+    @Override protected double computeMaxHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
         return Double.MAX_VALUE;
     }
 
-    @Override protected double computePrefHeight(double width) {
-        return getSkinnable().gridViewProperty().get().cellHeightProperty().doubleValue() + getSkinnable().gridViewProperty().get().verticalCellSpacingProperty().doubleValue() + getSkinnable().gridViewProperty().get().verticalCellSpacingProperty().doubleValue();
+    @Override protected double computePrefHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
+        GridView<T> gv = getSkinnable().gridViewProperty().get();
+        return gv.getCellHeight() + gv.getVerticalCellSpacing() * 2;
     }
 
     public int computeMaxCellsInRow() {

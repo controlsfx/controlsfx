@@ -110,9 +110,6 @@ public class DialogTemplate2 {
 	
 	public interface Command {
 		String getTitle();
-		public boolean isDefault();
-		public boolean isCancel(); 
-		public boolean isClosing();
 		void execute( DialogTemplate2 template );
 	}
 	
@@ -146,7 +143,6 @@ public class DialogTemplate2 {
 		    return title;
 		}
 		
-		@Override
 		public boolean isClosing() {
 		    return isClosing;
 		}
@@ -173,15 +169,21 @@ public class DialogTemplate2 {
 
         HBox buttonsPanel = new HBox(6);
         buttonsPanel.getStyleClass().add("button-bar");
-        buttonsPanel.getChildren().add(createButtonSpacer()); // push buttons to the right
+        
+        // push buttons to the right
+        buttonsPanel.getChildren().add(createButtonSpacer()); 
         
         List<ButtonBase> buttons = new ArrayList<ButtonBase>();
         double widest = MINIMUM_BUTTON_WIDTH;
+        boolean hasDefault = false;
         for ( Command cmd: commands ) {
-        	Button b = createButton(cmd);
+        	Button b = createButton(cmd, !hasDefault);
+        	// keep only first default button
+        	hasDefault |= b.isDefaultButton();
             widest = Math.max(widest, b.prefWidth(-1));
         	buttons.add( b );
         }
+        
         for ( ButtonBase button: buttons ) {
         	button.setPrefWidth(button.isVisible() ? widest : 0);
         	buttonsPanel.getChildren().add(button);
@@ -201,10 +203,8 @@ public class DialogTemplate2 {
     }
 
 	
-	private Button createButton( final Command command ) {
+	private Button createButton( final Command command, boolean keepDefault ) {
 		Button button = new Button(command.getTitle());
-		button.setDefaultButton(command.isDefault());
-		button.setCancelButton(command.isCancel());
 		button.setOnAction( new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent ae) {
@@ -212,6 +212,11 @@ public class DialogTemplate2 {
             	result = command;
             } 
 		});
+		if ( command instanceof StandardCommand) {
+		   StandardCommand stdCommand = (StandardCommand)command;	
+		   button.setDefaultButton(stdCommand.isDefault() && keepDefault);
+		   button.setCancelButton(stdCommand.isCancel());
+		}
 		return button;
 	}
 	

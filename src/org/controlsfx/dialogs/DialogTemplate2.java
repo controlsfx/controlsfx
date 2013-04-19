@@ -1,7 +1,6 @@
 package org.controlsfx.dialogs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -156,8 +155,7 @@ public class DialogTemplate2 {
     
     //Actions     
     
-    private final ObservableList<Action> actions = 
-            FXCollections.<Action>observableArrayList(Arrays.<Action>asList(DialogAction.CLOSE)); 
+    private final ObservableList<Action> actions = FXCollections.<Action>observableArrayList();  
     
     public final ObservableList<Action> getActions() {
         return actions;

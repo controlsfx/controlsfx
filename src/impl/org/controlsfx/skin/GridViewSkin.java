@@ -14,8 +14,7 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewBehavior<T>, GridRow<T>> {
 
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
-
-        @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends T> change) {
+        @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
             updateRowCount();
 
             // TODO: only removed the changed once
@@ -101,7 +100,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         getSkinnable().requestLayout();
     }
 
-    protected void updateRowCount() {
+    @Override protected void updateRowCount() {
         if (flow == null)
             return;
 

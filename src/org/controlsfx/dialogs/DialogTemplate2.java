@@ -69,7 +69,7 @@ public class DialogTemplate2 {
 
     // Resizable property 
     
-    public boolean getResizable() {
+    public boolean isResizable() {
         return dialog.isResizable();
     }
     

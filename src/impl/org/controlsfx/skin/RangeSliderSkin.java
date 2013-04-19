@@ -457,24 +457,24 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
     private double minTrackLength() {
         return 2*lowThumb.prefWidth(-1);
     }
-
-    @Override protected double computeMinWidth(double height) {
+    
+    @Override protected double computeMinWidth(double height, int topInset, int rightInset, int bottomInset, int leftInset) {
         if (isHorizontal()) {
-            return (getSkinnable().getInsets().getLeft() + minTrackLength() + lowThumb.minWidth(-1) + getSkinnable().getInsets().getRight());
+            return (leftInset + minTrackLength() + lowThumb.minWidth(-1) + rightInset);
         } else {
-            return(getSkinnable().getInsets().getLeft() + lowThumb.prefWidth(-1) + getSkinnable().getInsets().getRight());
+            return (leftInset + lowThumb.prefWidth(-1) + rightInset);
         }
     }
 
-    @Override protected double computeMinHeight(double width) {
+    @Override protected double computeMinHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
          if (isHorizontal()) {
-            return(getSkinnable().getInsets().getTop() + lowThumb.prefHeight(-1) + getSkinnable().getInsets().getBottom());
+            return (topInset + lowThumb.prefHeight(-1) + bottomInset);
         } else {
-            return(getSkinnable().getInsets().getTop() + minTrackLength() + lowThumb.prefHeight(-1) + getSkinnable().getInsets().getBottom());
+            return (topInset + minTrackLength() + lowThumb.prefHeight(-1) + bottomInset);
         }
     }
 
-    @Override protected double computePrefWidth(double height) {
+    @Override protected double computePrefWidth(double height, int topInset, int rightInset, int bottomInset, int leftInset) {
         if (isHorizontal()) {
             if(showTickMarks) {
                 return Math.max(140, tickLine.prefWidth(-1));
@@ -483,15 +483,15 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             }
         } else {
             //return (padding.getLeft()) + Math.max(thumb.prefWidth(-1), track.prefWidth(-1)) + padding.getRight();
-            return (getSkinnable().getInsets().getLeft()) + Math.max(lowThumb.prefWidth(-1), track.prefWidth(-1)) +
-            ((showTickMarks) ? (trackToTickGap+tickLine.prefWidth(-1)) : 0) + getSkinnable().getInsets().getRight();
+            return leftInset + Math.max(lowThumb.prefWidth(-1), track.prefWidth(-1)) +
+            ((showTickMarks) ? (trackToTickGap+tickLine.prefWidth(-1)) : 0) + rightInset;
         }
     }
 
-    @Override protected double computePrefHeight(double width) {
+    @Override protected double computePrefHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
         if (isHorizontal()) {
             return getSkinnable().getInsets().getTop() + Math.max(lowThumb.prefHeight(-1), track.prefHeight(-1)) +
-             ((showTickMarks) ? (trackToTickGap+tickLine.prefHeight(-1)) : 0)  + getSkinnable().getInsets().getBottom();
+             ((showTickMarks) ? (trackToTickGap+tickLine.prefHeight(-1)) : 0)  + bottomInset;
         } else {
             if(showTickMarks) {
                 return Math.max(140, tickLine.prefHeight(-1));
@@ -501,7 +501,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         }
     }
 
-    @Override protected double computeMaxWidth(double height) {
+    @Override protected double computeMaxWidth(double height, int topInset, int rightInset, int bottomInset, int leftInset) {
         if (isHorizontal()) {
             return Double.MAX_VALUE;
         } else {
@@ -509,7 +509,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         }
     }
 
-    @Override protected double computeMaxHeight(double width) {
+    @Override protected double computeMaxHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
         if (isHorizontal()) {
             return getSkinnable().prefHeight(width);
         } else {

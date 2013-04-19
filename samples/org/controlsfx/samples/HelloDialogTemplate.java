@@ -13,7 +13,7 @@ public class HelloDialogTemplate extends Application {
         dlg.setMasthead( "MASTEHAD" );
         dlg.setContent("Message Message Message");
         dlg.setResizable(true);
-        dlg.setActions(DialogAction.OK, DialogAction.CANCEL);
+        dlg.getActions().setAll(DialogAction.OK, DialogAction.CANCEL);
         dlg.show();
     }
 

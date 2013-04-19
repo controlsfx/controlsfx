@@ -1,13 +1,13 @@
 package org.controlsfx.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -27,8 +27,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import com.sun.javafx.collections.ImmutableObservableList;
-
 public class DialogTemplate2 {
 
     // According to the UI spec, the width of the main message text in the upper
@@ -44,11 +42,6 @@ public class DialogTemplate2 {
 
     private final BorderPane contentPane;
     
-    private final ObjectProperty<Node> masthead = new SimpleObjectProperty<Node>();
-    private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>();
-    private final ListProperty<Action> actions = new SimpleListProperty<Action>(
-        new ImmutableObservableList<Action>(DialogAction.CLOSE)
-    );
     private Image icon = DialogResources.getImage("java48.image"); 
         
 
@@ -88,6 +81,8 @@ public class DialogTemplate2 {
     
     
     // Masthead property
+
+    private final ObjectProperty<Node> masthead = new SimpleObjectProperty<Node>();
 
     public final Node getMasthead() {
         return masthead.get();
@@ -132,6 +127,8 @@ public class DialogTemplate2 {
 
     // Content property
 
+    private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>();
+
     public final Node getContent() {
         return content.get();
     }
@@ -157,25 +154,17 @@ public class DialogTemplate2 {
     public ObjectProperty<Node> contentProperty() { return content; }        
     
     
-    //Actions property
+    //Actions     
     
-    public final ObservableList<? extends Action> getActions() {
-        return actions.get();
+    private final ObservableList<Action> actions = 
+            FXCollections.<Action>observableArrayList(Arrays.<Action>asList(DialogAction.CLOSE)); 
+    
+    public final ObservableList<Action> getActions() {
+        return actions;
     }
     
-    public final void setActions( ObservableList<Action> actions) {
-        this.actions.setValue(actions);
-    }
-
-    public final void setActions( Action... actions) {
-        this.actions.setValue(new ImmutableObservableList<Action>(actions));
-    }
-    
-    public ListProperty<Action> actionsProperty() { return actions; }
-
     public interface Action {
         String getText();
-
         void execute(DialogTemplate2 template);
     }
 

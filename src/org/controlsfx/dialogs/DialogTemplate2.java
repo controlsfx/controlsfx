@@ -1,6 +1,7 @@
 package org.controlsfx.dialogs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -25,6 +26,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import com.sun.javafx.Utils;
 
 public class DialogTemplate2 {
 
@@ -215,6 +218,34 @@ public class DialogTemplate2 {
 
     // ///// PRIVATE API ///////////////////////////////////////////////////////////////////
 
+    /**
+     * TODO delete me - this is just for testing!!
+     */
+    private static boolean isMac = false;
+    private static boolean isWindows = false;
+
+    static void setMacOS(boolean b) {
+        isMac = b;
+        isWindows = !b;
+    }
+
+    static void setWindows(boolean b) {
+        isMac = !b;
+        isWindows = b;
+    }
+
+    private boolean isWindows() {
+        return isWindows || (!isMac && Utils.isWindows());
+    }
+
+    private boolean isMac() {
+        return isMac || (!isWindows && Utils.isMac());
+    }
+
+    private boolean isUnix() {
+        return Utils.isUnix();
+    }    
+    
 
     protected boolean isMastheadPresent() {
         return getMasthead() != null;//mastheadBuilder != null;
@@ -249,11 +280,14 @@ public class DialogTemplate2 {
             buttons.add(b);
         }
 
+        // OS based order of buttons
+        if ( isMac()) Collections.reverse(buttons);
+        
         for (ButtonBase button : buttons) {
             button.setPrefWidth(button.isVisible() ? widest : 0);
             buttonsPanel.getChildren().add(button);
         }
-
+        
         // if (isWindows() || isUnix()) {
         // } else if (isMac()) {
         // }

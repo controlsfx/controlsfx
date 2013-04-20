@@ -12,8 +12,6 @@ import javafx.scene.image.WritableImage;
 
 import org.controlsfx.tools.SVGLoader;
 
-import com.sun.javafx.scene.control.skin.resources.ControlResources;
-
 /**
  *
  */
@@ -86,7 +84,7 @@ class DialogResources {
 
     static public Image getImage_(String key) {
         String resourceName = getString(key);
-        URL url = ControlResources.class.getResource(resourceName);
+        URL url = DialogResources.class.getResource(resourceName);
         if (url == null) {
             System.out.println("Can't create ImageView for key '" + key + 
                     "', which has resource name '" + resourceName + 

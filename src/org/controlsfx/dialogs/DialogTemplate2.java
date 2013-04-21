@@ -25,6 +25,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import com.sun.javafx.Utils;
@@ -40,6 +41,7 @@ public class DialogTemplate2 {
 
     private final FXDialog dialog;
 
+    // Dialog result. By default set to CLOSE
     private Action result = DialogAction.CLOSE;
 
     private final BorderPane contentPane;
@@ -49,7 +51,6 @@ public class DialogTemplate2 {
 
     public DialogTemplate2(Stage owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
-        
         this.contentPane = new BorderPane();
         contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
         this.dialog.setContentPane(contentPane);
@@ -66,6 +67,10 @@ public class DialogTemplate2 {
 
     public Action getResult() {
         return result;
+    }
+    
+    protected FXDialog getDialog() {
+        return dialog;
     }
 
 
@@ -95,6 +100,9 @@ public class DialogTemplate2 {
     }
 
     public final void setMasthead( String mastheadText) {
+        
+        if ( mastheadText == null ) return;
+        
         BorderPane mastheadPanel = new BorderPane();
         mastheadPanel.getStyleClass().add("top-panel");
 
@@ -141,9 +149,13 @@ public class DialogTemplate2 {
 
     public final void setContent( String contentText) {
         
+        if ( contentText == null ) return;
+        
         Label label = new Label(contentText);
         label.getStyleClass().add("center-content-area");
         label.setAlignment(Pos.TOP_LEFT);
+        label.setTextAlignment(TextAlignment.CENTER);
+//        label.setStyle("-fx-border-color: red;");
 
         // FIXME we don't want to restrict the width, but for now this works ok
         label.setPrefWidth(MAIN_TEXT_WIDTH);
@@ -234,17 +246,17 @@ public class DialogTemplate2 {
         isWindows = b;
     }
 
-    private boolean isWindows() {
-        return isWindows || (!isMac && Utils.isWindows());
-    }
+//    private boolean isWindows() {
+//        return isWindows || (!isMac && Utils.isWindows());
+//    }
 
     private boolean isMac() {
         return isMac || (!isWindows && Utils.isMac());
     }
 
-    private boolean isUnix() {
-        return Utils.isUnix();
-    }    
+//    private boolean isUnix() {
+//        return Utils.isUnix();
+//    }    
     
 
     protected boolean isMastheadPresent() {
@@ -325,26 +337,20 @@ public class DialogTemplate2 {
         contentPanel.getStyleClass().add("center-content-panel");
         VBox.setVgrow(contentPanel, Priority.ALWAYS);
 
-        // Node content = createCenterContent();
         if (content != null) {
             contentPanel.setCenter(content);
-            contentPanel.setPadding(new Insets(0, 0, 12, 0));
+            //contentPanel.setPadding(new Insets(0, 0, 12, 0));
         }
 
         if (contentPanel.getChildren().size() > 0) {
             centerPanel.getChildren().add(contentPanel);
         }
 
-        // OS-specific button positioning
-        // Node buttonPanel = createButtonPanel();
-        // centerPanel.getChildren().add(buttonPanel);
-        //
         // dialog image can go to the left if there is no masthead
         if (!isMastheadPresent() && icon != null ) {
              ImageView dialogBigIcon = new ImageView(icon);
-            // dialogType == null ? DialogResources
-            // .getImage("java48.image") : dialogType.getImage());
              Pane pane = new Pane(dialogBigIcon);
+             pane.setPadding(new Insets(12, 12, 12, 12));
              contentPanel.setLeft(pane);
         }
 

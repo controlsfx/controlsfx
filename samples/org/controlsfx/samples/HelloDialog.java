@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.dialogs.Dialog;
+import org.controlsfx.dialogs.Dialog2;
 
 public class HelloDialog extends Application {
 
@@ -84,12 +85,11 @@ public class HelloDialog extends Application {
 		Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Dialog<?> dlg = Dialog.build(stage)
-				        .message("A collection of pre-built JavaFX dialogs?\n\nSeems like a great idea to me...")
-				        .title("JavaFX");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Wouldn't this be nice?");
-				dlg.showInformationDialog();
+				Dialog2.build(stage)
+                        .title("JavaFX")
+                        .masthead(cbShowMasthead.isSelected()? "Wouldn't this be nice?": null)
+				        .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
+				        .showInformationDialog();
 			}
 		});
 		grid.add(Hyperlink2, 1, row);

@@ -536,7 +536,7 @@ class DialogTemplate<T> {
         return buttons;
     }
 
-    private Button createButton(String extLabel, Dialog.Response response,
+	private Button createButton(String extLabel, Dialog.Response response,
             boolean isDefault, boolean isCancel) {
         Button btn = new Button((extLabel == null) ? "" : getMessage(extLabel));
         btn.setOnAction(createButtonHandler(response));

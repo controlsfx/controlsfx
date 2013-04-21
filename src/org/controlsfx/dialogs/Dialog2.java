@@ -3,12 +3,15 @@ package org.controlsfx.dialogs;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public final class Dialog<T> {
+import org.controlsfx.dialogs.DialogTemplate2.Action;
+import org.controlsfx.dialogs.DialogTemplate2.DialogAction;
+
+public final class Dialog2 {
     
     /**
      * USE_DEFAULT can be passed in to {@link #title(String)} and
@@ -22,11 +25,11 @@ public final class Dialog<T> {
     private String title;
     private String message;
     private String masthead;
-    private Options options;
+//    private Options options;
     private String details;
     private boolean openDetailsInNewWindow = false;
-    private T inputInitialValue = null;
-    private List<T> inputChoices = null;
+//    private T inputInitialValue = null;
+//    private List<T> inputChoices = null;
 
     /**
      * TODO delete me - this is just for testing!!
@@ -45,7 +48,7 @@ public final class Dialog<T> {
     static enum Type {
         // TODO maybe introduce a MORE_DETAILS type, rather than use the ERROR
         // type?
-        ERROR(Options.OK, "error.image") {
+        ERROR( "error.image", DialogAction.OK) {
             @Override
             public String getDefaultTitle() {
                 return "Error";
@@ -56,7 +59,7 @@ public final class Dialog<T> {
                 return "Error";
             }
         },
-        INFORMATION(Options.OK, "info.image") {
+        INFORMATION("info.image", DialogAction.OK) {
             @Override
             public String getDefaultTitle() {
                 return "Message";
@@ -67,7 +70,7 @@ public final class Dialog<T> {
                 return "Message";
             }
         },
-        WARNING(Options.OK, "warning.image") {
+        WARNING("warning.image", DialogAction.OK) {
             @Override
             public String getDefaultTitle() {
                 return "Warning";
@@ -78,7 +81,7 @@ public final class Dialog<T> {
                 return "Warning";
             }
         },
-        CONFIRMATION(Options.YES_NO_CANCEL, "confirm.image") {
+        CONFIRMATION("confirm.image", DialogAction.YES, DialogAction.NO, DialogAction.CANCEL) {
             @Override
             public String getDefaultTitle() {
                 return "Select an option";
@@ -89,7 +92,7 @@ public final class Dialog<T> {
                 return "Select an option";
             }
         },
-        INPUT(Options.OK_CANCEL, "confirm.image") {
+        INPUT("confirm.image", DialogAction.OK, DialogAction.CANCEL) {
             @Override
             public String getDefaultTitle() {
                 return "Select an option";
@@ -101,12 +104,14 @@ public final class Dialog<T> {
             }
         };
 
-        private final Options defaultOptions;
+//        private final Options defaultOptions;
+        private final Collection<Action> actions;
         private final String imageResource;
         private Image image;
 
-        Type(Options defaultOptions, String imageResource) {
-            this.defaultOptions = defaultOptions;
+        Type(String imageResource, Action...  actions) {
+//            this.defaultOptions = defaultOptions;
+            this.actions = Arrays.asList(actions);
             this.imageResource = imageResource;
         }
 
@@ -121,66 +126,58 @@ public final class Dialog<T> {
 
         public abstract String getDefaultTitle();
 
-        public Options getDefaultOptions() {
-            return defaultOptions;
+        public Collection<Action> getActions() {
+            return actions;
         }
-    }
-
-    /**
-     * An enumeration used to specify the response provided by the user when
-     * interacting with a dialog.
-     */
-    public static enum Response {
-        YES, NO, CANCEL, OK, CLOSED
     }
 
     /**
      * An enumeration used to specify which buttons to show to the user in a
      * Dialog.
      */
-    public static enum Options {
-        YES_NO, YES_NO_CANCEL, OK, OK_CANCEL;
+//    public static enum Options {
+//        YES_NO, YES_NO_CANCEL, OK, OK_CANCEL;
+//    }
+
+    public static Dialog2 build(final Stage owner) {
+        return new Dialog2(owner);
     }
 
-    public static <T> Dialog<T> build(final Stage owner) {
-        return new Dialog<T>(owner);
-    }
-
-    private Dialog(final Stage owner) {
+    private Dialog2(final Stage owner) {
         this.owner = owner;
     }
 
-    public Dialog<T> title(final String title) {
+    public Dialog2 title(final String title) {
         this.title = title;
         return this;
     }
     
-    public Dialog<T> message(final String message) {
+    public Dialog2 message(final String message) {
         this.message = message;
         return this;
     }
 
-    public Dialog<T> masthead(final String masthead) {
+    public Dialog2 masthead(final String masthead) {
         this.masthead = masthead;
         return this;
     }
     
-    public Dialog<T> options(final Options options) {
-        this.options = options;
-        return this;
-    }
+//    public Dialog2 actions(Actions) {
+//        this.options = options;
+//        return this;
+//    }
 
-    public Dialog<T> details(final String details) {
+    public Dialog2 details(final String details) {
         this.details = details;
         return this;
     }
 
-    public Dialog<T> openDetailsInNewWindow(final boolean openDetailsInNewWindow) {
+    public Dialog2 openDetailsInNewWindow(final boolean openDetailsInNewWindow) {
         this.openDetailsInNewWindow = openDetailsInNewWindow;
         return this;
     }
 
-    public Dialog<T> details(final Throwable throwable) {
+    public Dialog2 details(final Throwable throwable) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
@@ -188,76 +185,81 @@ public final class Dialog<T> {
         return this;
     }
 
-    public Dialog<T> inputInitialValue(final T initialValue) {
-        this.inputInitialValue = initialValue;
-        return this;
-    }
+//    public Dialog2 inputInitialValue(final T initialValue) {
+//        this.inputInitialValue = initialValue;
+//        return this;
+//    }
 
-    public Dialog<T> inputChoices(final List<T> choices) {
-        this.inputChoices = choices;
-        return this;
-    }
-
-    public Dialog<T> inputChoices(
-            @SuppressWarnings("unchecked") final T... choices) {
-        return inputChoices(Arrays.asList(choices));
-    }
+//    public <T> Dialog2 inputChoices(final List<T> choices) {
+//        this.inputChoices = choices;
+//        return this;
+//    }
+//
+//    public Dialog2<T> inputChoices(
+//            @SuppressWarnings("unchecked") final T... choices) {
+//        return inputChoices(Arrays.asList(choices));
+//    }
 
     public void showInformationDialog() {
         showSimpleContentDialog(Type.INFORMATION);
     }
 
-    public Response showConfirmDialog() {
+    public Action showConfirmDialog() {
         return showSimpleContentDialog(Type.CONFIRMATION);
     }
 
-    public Response showWarningDialog() {
+    public Action showWarningDialog() {
         return showSimpleContentDialog(Type.WARNING);
     }
 
-    public Response showErrorDialog() {
+    public Action showErrorDialog() {
         return showSimpleContentDialog(Type.ERROR);
     }
 
     // TODO: Has to be generalized to have details for any type of dialog
-    public Response showMoreDetailsDialog() {
-        DialogTemplate<Void> template = new DialogTemplate<>(owner, title, masthead, null);
-        template.setMoreDetailsContent(message, details, openDetailsInNewWindow);
+    public Action showMoreDetailsDialog() {
+        DialogTemplate2 template = new DialogTemplate2(owner, title);
+        template.setMasthead(masthead);
+        // null);
+//      template.setMoreDetailsContent(message, details, openDetailsInNewWindow);
         return showDialog(template);
     }
 
-    public T showInputDialog() {
-        DialogTemplate<T> template = new DialogTemplate<>(owner, title, masthead, null);
-        template.setInputContent(message, inputInitialValue, inputChoices);
-        template.getDialog().centerOnScreen();
-        template.show();
-        return template.getInputResponse();
-    }
+//    public T showInputDialog() {
+//        DialogTemplate<T> template = new DialogTemplate<>(owner, title, masthead, null);
+//        template.setInputContent(message, inputInitialValue, inputChoices);
+//        template.getDialog().centerOnScreen();
+//        template.show();
+//        return template.getInputResponse();
+//    }
 
     /***************************************************************************
      * Private API
      **************************************************************************/
 
-    private DialogTemplate<T> getDialogTemplate(final Type dlgType) {
+    private DialogTemplate2 getDialogTemplate(final Type dlgType) {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Options actualOptions = options == null ? dlgType.getDefaultOptions() : options;
-        return new DialogTemplate<T>(owner, actualTitle, actualMasthead, actualOptions);
+        DialogTemplate2 template = new DialogTemplate2(owner, actualTitle);
+        template.setMasthead(actualMasthead);
+        template.getActions().addAll(dlgType.getActions());
+        return template;
     }
 
-    private Response showSimpleContentDialog(final Type dlgType) {
-        DialogTemplate<T> template = getDialogTemplate(dlgType);
-        template.setSimpleContent(message, dlgType);
-        return showDialog(template);
+    private Action showSimpleContentDialog(final Type dlgType) {
+        DialogTemplate2 template = getDialogTemplate(dlgType);
+        template.setContent(message);//, dlgType); 
+        template.show();
+        return template.getResult();
     }
 
-    private static <T> Response showDialog(DialogTemplate<T> template) {
+    private static Action showDialog(DialogTemplate2 template) {
         try {
             template.getDialog().centerOnScreen();
             template.show();
-            return template.getResponse();
+            return template.getResult();
         } catch (Throwable e) {
-            return Response.CLOSED;
+            return DialogAction.CLOSE;
         }
     }
 

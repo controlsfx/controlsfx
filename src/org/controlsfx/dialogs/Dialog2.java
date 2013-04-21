@@ -48,71 +48,27 @@ public final class Dialog2 {
     static enum Type {
         // TODO maybe introduce a MORE_DETAILS type, rather than use the ERROR
         // type?
-        ERROR( "error.image", DialogAction.OK) {
-            @Override
-            public String getDefaultTitle() {
-                return "Error";
-            }
+        ERROR( "error.image", "Error", "Error", DialogAction.OK),
+        INFORMATION("info.image", "Message", "Message", DialogAction.OK),
+        WARNING("warning.image", "Warning", "Warning", DialogAction.OK),
+        CONFIRMATION("confirm.image", "Select an option", "Select an option", 
+                      DialogAction.YES, DialogAction.NO, DialogAction.CANCEL),
+        INPUT("confirm.image", "Select an option", "Select an option", 
+                      DialogAction.OK, DialogAction.CANCEL);
 
-            @Override
-            public String getDefaultMasthead() {
-                return "Error";
-            }
-        },
-        INFORMATION("info.image", DialogAction.OK) {
-            @Override
-            public String getDefaultTitle() {
-                return "Message";
-            }
 
-            @Override
-            public String getDefaultMasthead() {
-                return "Message";
-            }
-        },
-        WARNING("warning.image", DialogAction.OK) {
-            @Override
-            public String getDefaultTitle() {
-                return "Warning";
-            }
-
-            @Override
-            public String getDefaultMasthead() {
-                return "Warning";
-            }
-        },
-        CONFIRMATION("confirm.image", DialogAction.YES, DialogAction.NO, DialogAction.CANCEL) {
-            @Override
-            public String getDefaultTitle() {
-                return "Select an option";
-            }
-
-            @Override
-            public String getDefaultMasthead() {
-                return "Select an option";
-            }
-        },
-        INPUT("confirm.image", DialogAction.OK, DialogAction.CANCEL) {
-            @Override
-            public String getDefaultTitle() {
-                return "Select an option";
-            }
-
-            @Override
-            public String getDefaultMasthead() {
-                return "Select an option";
-            }
-        };
-
-//        private final Options defaultOptions;
+        private final String defaultTitle; 
+        private final String defaultMasthead;
         private final Collection<Action> actions;
         private final String imageResource;
         private Image image;
 
-        Type(String imageResource, Action...  actions) {
+        Type(String imageResource, String defaultTitle, String defaultMasthead, Action...  actions) {
 //            this.defaultOptions = defaultOptions;
             this.actions = Arrays.asList(actions);
             this.imageResource = imageResource;
+            this.defaultTitle = defaultTitle;
+            this.defaultMasthead = defaultMasthead;
         }
 
         public Image getImage() {
@@ -122,9 +78,13 @@ public final class Dialog2 {
             return image;
         }
 
-        public abstract String getDefaultMasthead();
+        public String getDefaultMasthead() {
+            return defaultMasthead;
+        }
 
-        public abstract String getDefaultTitle();
+        public String getDefaultTitle() {
+            return defaultTitle;
+        }
 
         public Collection<Action> getActions() {
             return actions;
@@ -241,6 +201,7 @@ public final class Dialog2 {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         DialogTemplate2 template = new DialogTemplate2(owner, actualTitle);
+        template.setIcon( dlgType.getImage() );
         template.setMasthead(actualMasthead);
         template.getActions().addAll(dlgType.getActions());
         return template;

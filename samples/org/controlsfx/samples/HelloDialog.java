@@ -80,8 +80,7 @@ public class HelloDialog extends Application {
 
 		grid.add(createLabel("Information Dialog: "), 0, row);
 
-		final Button Hyperlink2 = new Button();
-		Hyperlink2.setText("Show");
+		final Button Hyperlink2 = new Button("Show");
 		Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -102,8 +101,7 @@ public class HelloDialog extends Application {
 
 		grid.add(createLabel("Confirmation Dialog: "), 0, row);
 
-		final Button Hyperlink3 = new Button();
-		Hyperlink3.setText("Show");
+		final Button Hyperlink3 = new Button("Show");
 		Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -127,8 +125,7 @@ public class HelloDialog extends Application {
 
 		grid.add(createLabel("Warning Dialog: "), 0, row);
 
-		final Button Hyperlink6a = new Button();
-		Hyperlink6a.setText("Shpw");
+		final Button Hyperlink6a = new Button("Show");
 		Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -150,8 +147,7 @@ public class HelloDialog extends Application {
 
 		grid.add(createLabel("Error Dialog: "), 0, row);
 
-		final Button Hyperlink7a = new Button();
-		Hyperlink7a.setText("Show");
+		final Button Hyperlink7a = new Button("Show");
 		Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -174,8 +170,7 @@ public class HelloDialog extends Application {
 
 		grid.add(createLabel("'More Details' Dialog: "), 0, row);
 
-		final Button Hyperlink5a = new Button();
-		Hyperlink5a.setText("Show in the same window");
+		final Button Hyperlink5a = new Button("Show in the same window");
 		Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -192,8 +187,7 @@ public class HelloDialog extends Application {
 		});
 		grid.add(Hyperlink5a, 1, row);
 
-		final Button Hyperlink5b = new Button();
-		Hyperlink5b.setText("Open in new window");
+		final Button Hyperlink5b = new Button("Open in new window");
 		Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -219,8 +213,7 @@ public class HelloDialog extends Application {
 
 		grid.add(createLabel("Input Dialog (with Masthead): "), 0, row);
 
-		final Button Hyperlink8 = new Button();
-		Hyperlink8.setText("TextField");
+		final Button Hyperlink8 = new Button("TextField");
 		Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -234,8 +227,7 @@ public class HelloDialog extends Application {
 		});
 		grid.add(Hyperlink8, 1, row);
 
-		final Button Hyperlink9 = new Button();
-		Hyperlink9.setText("Initial Value Set");
+		final Button Hyperlink9 = new Button("Initial Value Set");
 		Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -250,8 +242,7 @@ public class HelloDialog extends Application {
 		});
 		grid.add(Hyperlink9, 2, row);
 
-		final Button Hyperlink10 = new Button();
-		Hyperlink10.setText("Set Choices (< 10)");
+		final Button Hyperlink10 = new Button("Set Choices (< 10)");
 		Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -265,8 +256,7 @@ public class HelloDialog extends Application {
 		});
 		grid.add(Hyperlink10, 3, row);
 
-		final Button Hyperlink11 = new Button();
-		Hyperlink11.setText("Set Choices (>= 10)");
+		final Button Hyperlink11 = new Button("Set Choices (>= 10)");
 		Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {

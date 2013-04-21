@@ -46,8 +46,6 @@ public class DialogTemplate2 {
 
     private final BorderPane contentPane;
     
-    private Image icon = DialogResources.getImage("java48.image"); 
-        
 
     public DialogTemplate2(Stage owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
@@ -85,6 +83,22 @@ public class DialogTemplate2 {
     }
     
     public BooleanProperty resizableProperty() { return dialog.resizableProperty(); }
+    
+
+    // Resizable property 
+    
+    private final ObjectProperty<Image> iconProperty = new SimpleObjectProperty<Image>(); 
+    
+    public Image getIcon() {
+        return iconProperty.get();
+    }
+    
+    public void setIcon( Image icon ) {
+        this.iconProperty.set(icon);
+    }
+    
+    public ObjectProperty<Image> iconProperty() { return iconProperty; }
+    
     
     
     // Masthead property
@@ -125,8 +139,8 @@ public class DialogTemplate2 {
         mastheadPanel.setLeft(mastheadVBox);
         BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
         
-        if ( icon != null ) {
-            mastheadPanel.setRight(new ImageView(icon));
+        if ( iconProperty.get() != null ) {
+            mastheadPanel.setRight(new ImageView(iconProperty.get()));
         }
 
         setMasthead(mastheadPanel);
@@ -146,6 +160,7 @@ public class DialogTemplate2 {
     public final void setContent( Node content ) {
         this.content.setValue(content);
     }
+    
 
     public final void setContent( String contentText) {
         
@@ -347,8 +362,8 @@ public class DialogTemplate2 {
         }
 
         // dialog image can go to the left if there is no masthead
-        if (!isMastheadPresent() && icon != null ) {
-             ImageView dialogBigIcon = new ImageView(icon);
+        if (!isMastheadPresent() && iconProperty != null ) {
+             ImageView dialogBigIcon = new ImageView(iconProperty.get());
              Pane pane = new Pane(dialogBigIcon);
              pane.setPadding(new Insets(12, 12, 12, 12));
              contentPanel.setLeft(pane);

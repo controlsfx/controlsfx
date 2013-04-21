@@ -89,7 +89,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
             foregroundContainer.setMouseTransparent(true);
             getChildren().add(foregroundContainer);
             
-            forgroundClipRect = new Rectangle(50,100);
+            forgroundClipRect = new Rectangle();
             forgroundClipRect.heightProperty().bind(getSkinnable().heightProperty());
             foregroundContainer.setClip(forgroundClipRect);
         }
@@ -163,10 +163,6 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         if (newRating == rating) return;
         
         rating = Utils.clamp(0, newRating, getSkinnable().getMax());
-        
-        if (rating == 1.0) {
-            System.out.println("hit");
-        }
         
         if (! getSkinnable().ratingProperty().isBound()) {
             getSkinnable().setRating(rating);

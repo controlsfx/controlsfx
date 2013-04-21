@@ -25,7 +25,7 @@ class DialogResources {
     }
 
     static void reset() {
-        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialogs.resources.dialog-resources");
+        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialogs.resources.oxygen.dialog-resources");
     }
 
 

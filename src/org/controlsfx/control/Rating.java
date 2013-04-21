@@ -44,16 +44,16 @@ public class Rating extends Control {
 
     
     // --- Rating
-    private IntegerProperty rating = new SimpleIntegerProperty(this, "rating", 3);
-    public final void setRating(int value) {
+    private DoubleProperty rating = new SimpleDoubleProperty(this, "rating", 3);
+    public final void setRating(double value) {
        ratingProperty().set(value);
     }
 
-    public final int getRating() {
+    public final double getRating() {
         return rating == null ? 3 : rating.get();
     }
 
-    public final IntegerProperty ratingProperty() {
+    public final DoubleProperty ratingProperty() {
         return rating;
     }
     

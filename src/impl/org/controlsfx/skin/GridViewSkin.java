@@ -10,13 +10,11 @@ import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
-import com.sun.javafx.scene.control.skin.VirtualFlowHelper;
 
 public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewBehavior<T>, GridRow<T>> {
 
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
-
-        @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends T> change) {
+        @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
             updateRowCount();
 
             // TODO: only removed the changed once
@@ -41,18 +39,11 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         flow.setPannable(false);
         flow.setVertical(true);
         flow.setFocusTraversable(getSkinnable().isFocusTraversable());
-        // TODO: Hack, delete this code when the following code compiles
-        VirtualFlowHelper.setCreateCell(flow, new Callback<VirtualFlow, GridRow<T>>() {
+        flow.setCreateCell(new Callback<VirtualFlow, GridRow<T>>() {
             @Override public GridRow<T> call(VirtualFlow flow) {
                 return GridViewSkin.this.createCell();
             }
         });
-//        flow.setCreateCell(new Callback<VirtualFlow, GridRow<T>>() {
-//            @Override public GridRow<T> call(VirtualFlow flow) {
-//                System.out.println("YOYO");
-//                return VirtualFlowBasedGridViewSkin.this.createCell();
-//            }
-//        });
         getChildren().add(flow);
 
         updateRowCount();
@@ -109,7 +100,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         getSkinnable().requestLayout();
     }
 
-    protected void updateRowCount() {
+    @Override protected void updateRowCount() {
         if (flow == null)
             return;
 

@@ -102,17 +102,17 @@ public class SVGLoader {
         
         // using non-public API to ensure background transparency
         final WebPage webPage = Accessor.getPageFor(eng);
-//        webPage.setBackgroundColor(webPage.getMainFrame(), 0xffffff00);
-//        webPage.setOpaque(webPage.getMainFrame(), false); 
+        webPage.setBackgroundColor(webPage.getMainFrame(), 0xffffff00);
+        webPage.setOpaque(webPage.getMainFrame(), false); 
         // end of non-public API
 
         // temporary scene / stage
         final Scene scene = new Scene(view);
         final Stage stage = new Stage();
         stage.setScene(scene);
-//        stage.setWidth(0);
-//        stage.setHeight(0);
-//        stage.setOpacity(0);
+        stage.setWidth(0);
+        stage.setHeight(0);
+        stage.setOpacity(0);
         stage.show();
         
 //        String svgString = readFile(svgImage);
@@ -155,7 +155,7 @@ public class SVGLoader {
                                 callback.call(image);
                             }
                             
-//                            stage.hide();
+                            stage.hide();
                             return null;
                         }
                     }, params, outputImage);

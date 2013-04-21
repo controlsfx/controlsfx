@@ -33,9 +33,9 @@ public class HelloRating extends Application {
         orientation.getSelectionModel().select(Orientation.HORIZONTAL);
         rating.orientationProperty().bind(orientation.getSelectionModel().selectedItemProperty());
         
-        ChoiceBox<Integer> ratingValue = new ChoiceBox<Integer>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        ChoiceBox<Double> ratingValue = new ChoiceBox<Double>(FXCollections.observableArrayList(0D, 1D, 2D, 3D, 4D, 5D, 6D, 7D, 8D, 9D, 10D));
         ratingValue.getSelectionModel().select(rating.getRating());
-        rating.ratingProperty().bind(ratingValue.getSelectionModel().selectedItemProperty());
+//        rating.ratingProperty().bind(ratingValue.getSelectionModel().selectedItemProperty());
         
         ChoiceBox<Integer> maxValue = new ChoiceBox<Integer>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         maxValue.getSelectionModel().select(rating.getMax());

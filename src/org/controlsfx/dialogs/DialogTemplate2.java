@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 
 import com.sun.javafx.Utils;
 
+@SuppressWarnings("restriction")
 public class DialogTemplate2 {
 
     // According to the UI spec, the width of the main message text in the upper
@@ -193,7 +194,7 @@ public class DialogTemplate2 {
     
     public interface Action {
         String getText();
-        void execute(DialogTemplate2 template);
+        void execute(ActionEvent ae);
     }
 
     public enum DialogAction implements Action {
@@ -236,9 +237,9 @@ public class DialogTemplate2 {
             return isCancel;
         }
 
-        public void execute(DialogTemplate2 template) {
-            if (isClosing())
-                template.hide();
+        public void execute(ActionEvent ae) {
+            if ( ae.getSource() instanceof DialogTemplate2 && isClosing() ) 
+                ((DialogTemplate2)ae.getSource()).hide();
         }
 
     }
@@ -328,16 +329,17 @@ public class DialogTemplate2 {
         return spacer;
     }
 
-    private Button createButton(final Action command, boolean keepDefault) {
-        Button button = new Button(command.getText());
+    
+    private Button createButton(final Action action, boolean keepDefault) {
+        Button button = new Button(action.getText());
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                command.execute(DialogTemplate2.this);
-                result = command;
+                action.execute(new ActionEvent(DialogTemplate2.this, ae.getTarget()));
+                result = action;
             }
         });
-        if (command instanceof DialogAction) {
-            DialogAction stdCommand = (DialogAction) command;
+        if (action instanceof DialogAction) {
+            DialogAction stdCommand = (DialogAction) action;
             button.setDefaultButton(stdCommand.isDefault() && keepDefault);
             button.setCancelButton(stdCommand.isCancel());
         }

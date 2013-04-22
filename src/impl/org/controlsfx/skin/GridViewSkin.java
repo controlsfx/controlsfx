@@ -159,4 +159,9 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
 
         return true;
     }
+    
+    @Override protected double computeMinHeight(double height, double topInset, double rightInset, double bottomInset,
+            double leftInset) {
+        return 0;
+    }
 }

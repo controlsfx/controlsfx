@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -30,9 +31,7 @@ public class HelloGridView extends Application {
         final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
         myGrid = new GridView<>(list);
         myGrid.setCellFactory(new Callback<GridView<Color>, GridCell<Color>>() {
-            
-            @Override
-            public GridCell<Color> call(GridView<Color> arg0) {
+            @Override public GridCell<Color> call(GridView<Color> arg0) {
                 return new ColorGridCell();
             }
         });
@@ -41,8 +40,7 @@ public class HelloGridView extends Application {
             list.add(new Color(r.nextDouble(), r.nextDouble(), r.nextDouble(), 1.0));
         }
 
-        final BorderPane root = new BorderPane();
-        root.setTop(myGrid);        
+        final StackPane root = new StackPane(myGrid);
         Scene scene = new Scene(root, 540, 210);
         primaryStage.setScene(scene);
         primaryStage.show();

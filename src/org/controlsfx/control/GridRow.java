@@ -1,19 +1,13 @@
 package org.controlsfx.control;
 
-import impl.org.controlsfx.skin.GridCellCache;
 import impl.org.controlsfx.skin.GridRowSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Skin;
 
 public class GridRow<T> extends IndexedCell<T>{
-
-    private GridCellCache<T> cellCache;
 
 
     /**************************************************************************
@@ -22,9 +16,8 @@ public class GridRow<T> extends IndexedCell<T>{
      * 
      **************************************************************************/	
 
-    public GridRow(GridCellCache<T> cellCache) {
+    public GridRow() {
         super();
-        this.cellCache = cellCache;
         getStyleClass().add("grid-row");
 
         // we need to do this (or something similar) to allow for mouse wheel
@@ -52,29 +45,17 @@ public class GridRow<T> extends IndexedCell<T>{
     /**
      * 
      */
-    private final SimpleObjectProperty<GridView<T>> gridView = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<GridView<T>> gridView = new SimpleObjectProperty<>(this, "gridView");
 
     public final void updateGridView(GridView<T> gridView) {
         this.gridView.set(gridView);
     }
+    
+    public GridView<T> getGridView() {
+        return gridView.get();
+    }
 
     public SimpleObjectProperty<GridView<T>> gridViewProperty() {
         return gridView;
-    }
-
-
-
-    /**************************************************************************
-     * 
-     * Public API
-     * 
-     **************************************************************************/
-
-    /**
-     * 
-     * @return
-     */
-    public GridCellCache<T> getCellCache() {
-        return cellCache;
     }
 }

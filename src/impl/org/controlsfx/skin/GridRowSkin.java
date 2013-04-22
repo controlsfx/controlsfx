@@ -37,6 +37,7 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     }
 
     public void updateCells() {
+        // TODO we can cache the cells locally like in TableRowSkinBase
         getChildren().clear();
 
         int startCellIndex = getSkinnable().indexProperty().get() * computeMaxCellsInRow();
@@ -45,15 +46,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
         if (getSkinnable().indexProperty().get() >= 0) {
             for (int cellIndex = startCellIndex; cellIndex <= endCellIndex; cellIndex++) {
                 if (cellIndex < getSkinnable().gridViewProperty().get().getItems().size()) {
-                    T item = getSkinnable().gridViewProperty().get().getItems().get(cellIndex);
-                    GridCell<T> cell = getSkinnable().getCellCache().getCellIfCached(cellIndex);
-                    if (cell == null) {
-                        cell = createCell();
-                        if (cell.isCacheable()) {
-                            getSkinnable().getCellCache().addCellToCache(cellIndex, cell);
-                        }
-                    }
-                    cell.setItem(item);
+                    GridCell<T> cell = createCell();
+                    cell.setGridRow(getSkinnable());
                     cell.updateIndex(cellIndex);
                     getChildren().add(cell);
                 }
@@ -86,15 +80,15 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
         };
     }
     
-    @Override protected double computeMinHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
+    @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
 
-    @Override protected double computeMaxHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
+    @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return Double.MAX_VALUE;
     }
 
-    @Override protected double computePrefHeight(double width, int topInset, int rightInset, int bottomInset, int leftInset) {
+    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         GridView<T> gv = getSkinnable().gridViewProperty().get();
         return gv.getCellHeight() + gv.getVerticalCellSpacing() * 2;
     }

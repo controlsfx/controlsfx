@@ -2,6 +2,7 @@ package impl.org.controlsfx.skin;
 
 import impl.org.controlsfx.behavior.GridViewBehavior;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.util.Callback;
 
@@ -16,23 +17,15 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
         @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
             updateRowCount();
-
-            // TODO: only removed the changed once
-            cellCache.clear();
-
             getSkinnable().requestLayout();
         }
     };
 
     private final WeakListChangeListener<T> weakGridViewItemsListener = new WeakListChangeListener<T>(gridViewItemsListener);
 
-    private GridCellCache<T> cellCache;
-
     public GridViewSkin(GridView<T> control) {
         super(control, new GridViewBehavior<>(control));
         
-        cellCache = new GridCellCache<T>(this, flow);
-
         updateGridViewItems();
 
         flow.setId("virtual-flow");
@@ -85,8 +78,6 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
     }
 
     public void updateGridViewItems() {
-        cellCache.clear();
-
         if (getSkinnable().getItems() != null) {
             getSkinnable().getItems().removeListener(weakGridViewItemsListener);
         }
@@ -106,14 +97,14 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
 
         int oldCount = flow.getCellCount();
         int newCount = getItemCount();
-
+        
         if (newCount != oldCount) {
             flow.setCellCount(newCount);
             flow.recreateCells();
         } else {
             flow.reconfigureCells();
         }
-        updateVisibleRows();
+        updateRows(newCount);
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {
@@ -126,19 +117,15 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
     }
 
     @Override public GridRow<T> createCell() {
-        GridRow<T> row = new GridRow<>(cellCache);
+        GridRow<T> row = new GridRow<>();
         row.updateGridView(getSkinnable());
         return row;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sun.javafx.scene.control.skin.VirtualContainerBase#getItemCount() Returns the row
-     * count
-     */
     @Override public int getItemCount() {
-        return getSkinnable().getItems() == null ? 0 : (getSkinnable().getItems().size() / computeMaxCellsInRow(getSkinnable().getWidth()));
+        final GridView<?> gv = getSkinnable();
+        final ObservableList<?> items = gv.getItems();
+        return items == null ? 0 : (items.size() / computeMaxCellsInRow(gv.getWidth()));
     }
 
     public int computeMaxCellsInRow(double width) {
@@ -149,15 +136,13 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         return getSkinnable().cellWidthProperty().doubleValue() + getSkinnable().horizontalCellSpacingProperty().doubleValue() + getSkinnable().horizontalCellSpacingProperty().doubleValue();
     }
 
-    protected void updateRows(int rowStartIndex, int rowEndIndex) {
-        for (int currentRowIndex = rowStartIndex; currentRowIndex <= rowEndIndex; currentRowIndex++) {
-            // Generics in VirtualFlow?? <- Ask Jonathan / compare with JDK8
-            GridRow<T> row = (GridRow<T>) flow.getVisibleCell(currentRowIndex);
+    protected void updateRows(int rowCount) {
+        for (int i = 0; i < rowCount; i++) {
+            GridRow<T> row = flow.getVisibleCell(i);
             if (row != null) {
                 // FIXME hacky - need to better understand what this is about
-                int index = row.getIndex();
                 row.updateIndex(-1);
-                row.updateIndex(index);
+                row.updateIndex(i);
             }
         }
     }
@@ -173,35 +158,5 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
             return false;
 
         return true;
-    }
-
-//    public void updateRow(int rowIndex) {
-//        if (!areRowsVisible())
-//            return;
-//
-//        int rowStartIndex = flow.getFirstVisibleCell().indexProperty().get();
-//        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
-//
-//        updateRows(rowStartIndex, rowEndIndex);
-//    }
-
-//    public void updateFromRow(int rowIndex) {
-//        if (!areRowsVisible())
-//            return;
-//
-//        int rowStartIndex = Math.max(flow.getFirstVisibleCell().indexProperty().get(), rowIndex);
-//        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
-//
-//        updateRows(rowStartIndex, rowEndIndex);
-//    }
-
-    public void updateVisibleRows() {
-        if (!areRowsVisible())
-            return;
-
-        int rowStartIndex = flow.getFirstVisibleCell().indexProperty().get();
-        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
-
-        updateRows(rowStartIndex, rowEndIndex);
     }
 }

@@ -30,9 +30,7 @@ public class HelloGridView extends Application {
         final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
         myGrid = new GridView<>(list);
         myGrid.setCellFactory(new Callback<GridView<Color>, GridCell<Color>>() {
-            
-            @Override
-            public GridCell<Color> call(GridView<Color> arg0) {
+            @Override public GridCell<Color> call(GridView<Color> arg0) {
                 return new ColorGridCell();
             }
         });

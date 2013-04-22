@@ -2,6 +2,8 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridCellCache;
 import impl.org.controlsfx.skin.GridRowSkin;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -25,6 +27,14 @@ public class GridRow<T> extends IndexedCell<T>{
 		this.cellCache = cellCache;
 		getStyleClass().add("grid-row");
 		
+		// we need to do this (or something similar) to allow for mouse wheel
+		// scrolling, as the GridRow has to report that it is non-empty (which
+		// is the second argument going into updateItem).
+		indexProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable observable) {
+                updateItem(null, getIndex() == -1);
+            }
+        });
 	}
 	
 	@Override protected Skin<?> createDefaultSkin() {

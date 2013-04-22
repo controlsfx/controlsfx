@@ -175,25 +175,25 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         return true;
     }
 
-    public void updateRow(int rowIndex) {
-        if (!areRowsVisible())
-            return;
+//    public void updateRow(int rowIndex) {
+//        if (!areRowsVisible())
+//            return;
+//
+//        int rowStartIndex = flow.getFirstVisibleCell().indexProperty().get();
+//        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
+//
+//        updateRows(rowStartIndex, rowEndIndex);
+//    }
 
-        int rowStartIndex = flow.getFirstVisibleCell().indexProperty().get();
-        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
-
-        updateRows(rowStartIndex, rowEndIndex);
-    }
-
-    public void updateFromRow(int rowIndex) {
-        if (!areRowsVisible())
-            return;
-
-        int rowStartIndex = Math.max(flow.getFirstVisibleCell().indexProperty().get(), rowIndex);
-        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
-
-        updateRows(rowStartIndex, rowEndIndex);
-    }
+//    public void updateFromRow(int rowIndex) {
+//        if (!areRowsVisible())
+//            return;
+//
+//        int rowStartIndex = Math.max(flow.getFirstVisibleCell().indexProperty().get(), rowIndex);
+//        int rowEndIndex = flow.getLastVisibleCell().indexProperty().get();
+//
+//        updateRows(rowStartIndex, rowEndIndex);
+//    }
 
     public void updateVisibleRows() {
         if (!areRowsVisible())

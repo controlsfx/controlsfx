@@ -31,8 +31,8 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     
     private static final String STRONG = "strong";
     
-    private static final boolean ALLOW_IMMEDIATE_CHANGE = true;
-    private static final boolean ALLOW_PARTIAL_RATING = true;
+    private boolean updateOnHover;
+    private boolean partialRating;
     
     // the container for the 'non-strong' graphics
     private Pane backgroundContainer;
@@ -48,12 +48,21 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     public RatingSkin(Rating control) {
         super(control, new RatingBehavior(control));
         
+        this.updateOnHover = control.isUpdateOnHover();
+        this.partialRating = control.isPartialRating();
+        
         // init
         this.group = new ToggleGroup();
         this.group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             @Override public void changed(ObservableValue<? extends Toggle> ov, Toggle t, Toggle t1) {
-                if (ALLOW_IMMEDIATE_CHANGE || t1 == null) return;
-                updateRating((Integer) t1.getUserData());
+                if (updateOnHover || t1 == null) return;
+                
+                if (partialRating) {
+                    updateClip();
+                    updateRating(calculatePartialRating());
+                } else {
+                    updateRating((Integer) t1.getUserData());
+                }
             }
         });
         
@@ -64,6 +73,8 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         registerChangeListener(control.ratingProperty(), "RATING");
         registerChangeListener(control.maxProperty(), "MAX");
         registerChangeListener(control.orientationProperty(), "ORIENTATION");
+        registerChangeListener(control.updateOnHoverProperty(), "UPDATE_ON_HOVER");
+        registerChangeListener(control.partialRatingProperty(), "PARTIAL_RATING");
     }
 
     @Override protected void handleControlPropertyChanged(String p) {
@@ -75,6 +86,11 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
             recreateButtons();
         } else if (p == "ORIENTATION") {
             recreateButtons();
+        } else if (p == "PARTIAL_RATING") {
+            this.partialRating = getSkinnable().isPartialRating();
+            recreateButtons();
+        } else if (p == "UPDATE_ON_HOVER") {
+            this.updateOnHover = getSkinnable().isUpdateOnHover();
         }
     }
     
@@ -83,16 +99,13 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         backgroundContainer.getStyleClass().add("container");
         getChildren().setAll(backgroundContainer);
         
-        if (ALLOW_PARTIAL_RATING) {
-            foregroundContainer = isVertical() ? new VBox() : new HBox();
-            foregroundContainer.getStyleClass().add("container");
-            foregroundContainer.setMouseTransparent(true);
-            getChildren().add(foregroundContainer);
-            
-            forgroundClipRect = new Rectangle();
-            forgroundClipRect.heightProperty().bind(getSkinnable().heightProperty());
-            foregroundContainer.setClip(forgroundClipRect);
-        }
+        foregroundContainer = isVertical() ? new VBox() : new HBox();
+        foregroundContainer.getStyleClass().add("container");
+        foregroundContainer.setMouseTransparent(true);
+        getChildren().add(foregroundContainer);
+        
+        forgroundClipRect = new Rectangle();
+        foregroundContainer.setClip(forgroundClipRect);
         
         for (int index = 0; index <= getSkinnable().getMax(); index++) {
             Node backgroundNode = createButton(index);
@@ -104,7 +117,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
                     backgroundContainer.getChildren().add(backgroundNode);
                 }
                 
-                if (ALLOW_PARTIAL_RATING) {
+                if (partialRating) {
                     Node foregroundNode = createButton(index);
                     foregroundNode.getStyleClass().add(STRONG);
                     foregroundNode.setMouseTransparent(true);
@@ -123,22 +136,68 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     
     EventHandler<MouseEvent> mouseMoveHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent event) {
-            Point2D b = foregroundContainer.sceneToLocal(event.getSceneX(), event.getSceneY());
-            forgroundClipRect.setWidth(b.getX());
+            lastMouseLocation = new Point2D(event.getSceneX(), event.getSceneY());
             
-            // 
-            if (ALLOW_IMMEDIATE_CHANGE) {
-                // TODO update the rating value on the control as a fraction
-                // between 0 and max value
-                final int max = getSkinnable().getMax();
-                final double w = getSkinnable().getWidth() - 
-                        (snappedLeftInset() + snappedRightInset()) -
-                        getSpacing() * max;
-                double newRating = (b.getX() / w * 2.5) * max;
+            final Rating control = getSkinnable();
+
+            // if we support partial ratings, we will use the partial rating value
+            // directly. If we don't, but we support updateOnHover, then we will
+            // ceil it. Otherwise, the rest of this method is a no op
+            double newRating = partialRating || updateOnHover ?
+                    calculatePartialRating() : -1;
+            
+            if (partialRating && updateOnHover) {
+                updateClip();
+            } else if (updateOnHover) {
+                newRating = Utils.clamp(1, Math.ceil(newRating), control.getMax());
+            }
+            
+            if (newRating > -1) {
                 updateRating(newRating);
             }
         }
     };
+    
+    private Point2D lastMouseLocation = new Point2D(0, 0);
+    private double calculatePartialRating() {
+        final Point2D b = foregroundContainer.sceneToLocal(lastMouseLocation.getX(), lastMouseLocation.getY());
+        
+        final double x = b.getX();
+        final double y = b.getY();
+        
+        final Rating control = getSkinnable();
+        final int max = control.getMax();
+        final double w = control.getWidth() - (snappedLeftInset() + snappedRightInset());
+        final double h = control.getHeight() - (snappedTopInset() + snappedBottomInset());
+        final double _w = w - getSpacing() * max;
+        
+        double newRating = -1;
+        
+        if (isVertical()) {
+            newRating = ((h - y) / h) * max;
+        } else {
+            newRating = (x / _w * 2.5) * max;
+        }
+        
+        return newRating;
+    }
+    
+    private void updateClip() {
+        final Point2D b = foregroundContainer.sceneToLocal(lastMouseLocation.getX(), lastMouseLocation.getY());
+        final Rating control = getSkinnable();
+        final double x = b.getX();
+        final double y = b.getY();
+        final double h = control.getHeight() - (snappedTopInset() + snappedBottomInset());
+        
+        if (isVertical()) {
+            forgroundClipRect.relocate(0, y);
+            forgroundClipRect.setWidth(control.getWidth());
+            forgroundClipRect.setHeight(h - y);
+        } else {
+            forgroundClipRect.setWidth(x);
+            forgroundClipRect.setHeight(control.getHeight());
+        }
+    }
     
     private double getSpacing() {
         return (backgroundContainer instanceof HBox) ?
@@ -169,7 +228,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         }
         
         // if we immediately change the rating, then we don't need the following
-        if (! ALLOW_IMMEDIATE_CHANGE) {
+        if (! partialRating) {
             int max = getSkinnable().getMax();
             for (int i = 0; i < max; i++) {
                 ToggleButton toggle = (ToggleButton) backgroundContainer.getChildren().get(i);

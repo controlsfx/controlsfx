@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -27,8 +28,8 @@ public class HelloRating extends Application {
         root.setPadding(new Insets(30, 30, 30, 30));
         final Rating rating = new Rating();
         
-        // controls
-        HBox controls = new HBox(5);
+        // controls, row 1
+        HBox controls_row1 = new HBox(5);
         ChoiceBox<Orientation> orientation = new ChoiceBox<Orientation>(FXCollections.observableArrayList(Orientation.values()));
         orientation.getSelectionModel().select(Orientation.HORIZONTAL);
         rating.orientationProperty().bind(orientation.getSelectionModel().selectedItemProperty());
@@ -41,9 +42,17 @@ public class HelloRating extends Application {
         maxValue.getSelectionModel().select(rating.getMax());
         rating.maxProperty().bind(maxValue.getSelectionModel().selectedItemProperty());
         
-        controls.getChildren().addAll(orientation, ratingValue, maxValue);
+        controls_row1.getChildren().addAll(orientation, ratingValue, maxValue);
         
-        root.getChildren().addAll(controls, rating);
+        // controls, row 2
+        CheckBox partialRating = new CheckBox("Allow partial ratings");
+        partialRating.selectedProperty().bindBidirectional(rating.partialRatingProperty());
+        
+        // controls, row 3
+        CheckBox updateOnHover = new CheckBox("Update rating on hover");
+        updateOnHover.selectedProperty().bindBidirectional(rating.updateOnHoverProperty());
+        
+        root.getChildren().addAll(controls_row1, partialRating, updateOnHover, rating);
         
         rating.ratingProperty().addListener(new ChangeListener<Number>() {
             @Override public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {

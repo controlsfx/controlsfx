@@ -30,11 +30,18 @@ public class Rating extends Control {
     
     
     
+    /***************************************************************************
+     * 
+     * Overriding public API
+     * 
+     **************************************************************************/
     
+    /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
         return new RatingSkin(this);
     }
 
+    /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
         return getClass().getResource("rating.css").toExternalForm();
     }
@@ -42,6 +49,11 @@ public class Rating extends Control {
     
     
 
+    /***************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
     
     // --- Rating
     private DoubleProperty rating = new SimpleDoubleProperty(this, "rating", 3);
@@ -93,5 +105,41 @@ public class Rating extends Control {
             orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL);
         }
         return orientation;
+    }
+    
+    
+    // --- partial rating
+    /**
+     * If true this allows for users to set a rating as a floating point value.
+     * In other words, the range of the rating 'stars' can be thought of as a
+     * range between [0, max], and whereever the user clicks will be calculated
+     * as the new rating value. If this is false the more typical approach is used
+     * where the selected 'star' is used as the rating.
+     */
+    private BooleanProperty partialRating = new SimpleBooleanProperty(this, "partialRating", false);
+    public final BooleanProperty partialRatingProperty() {
+        return partialRating;
+    }
+    public final void setPartialRating(boolean value) {
+        partialRatingProperty().set(value);
+    }
+    public final boolean isPartialRating() {
+        return partialRating == null ? false : partialRating.get();
+    }
+
+    
+    // --- update on hover
+    /**
+     * 
+     */
+    private BooleanProperty updateOnHover = new SimpleBooleanProperty(this, "updateOnHover", false);
+    public final BooleanProperty updateOnHoverProperty() {
+        return updateOnHover;
+    }
+    public final void setUpdateOnHover(boolean value) {
+        updateOnHoverProperty().set(value);
+    }
+    public final boolean isUpdateOnHover() {
+        return updateOnHover == null ? false : updateOnHover.get();
     }
 }

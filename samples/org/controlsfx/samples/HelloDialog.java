@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.dialogs.Dialog;
 import org.controlsfx.dialogs.Dialog2;
+import org.controlsfx.dialogs.DialogTemplate2.Action;
 
 public class HelloDialog extends Application {
 
@@ -105,12 +106,12 @@ public class HelloDialog extends Application {
 		Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Dialog<?> dlg = Dialog.build(stage)
-				        .message("I was a bit worried that you might not want them, so I wanted to double check.")
-				        .title("You do want dialogs right?");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Just Checkin'");
-				Dialog.Response response = dlg.showConfirmDialog();
+				Dialog2 dlg = Dialog2.build(stage)
+				        .title("You do want dialogs right?")
+				        .masthead(cbShowMasthead.isSelected()? "Just Checkin'": null)
+				        .message("I was a bit worried that you might not want them, so I wanted to double check.");
+				        
+				Action response = dlg.showConfirmDialog();
 
 				System.out.println("response: " + response);
 			}
@@ -129,10 +130,11 @@ public class HelloDialog extends Application {
 		Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Dialog<?> dlg = Dialog.build(stage).message("This is a warning").title("I'm warning you!");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("I'm glad I didn't need to use this...");
-				Dialog.Response response = dlg.showWarningDialog();
+				Dialog2 dlg = Dialog2.build(stage)
+				     .title("I'm warning you!")
+                     .masthead(cbShowMasthead.isSelected()? "I'm glad I didn't need to use this...": null)
+                     .message("This is a warning");
+				Action response = dlg.showWarningDialog();
 
 				System.out.println("response: " + response);
 			}
@@ -151,11 +153,10 @@ public class HelloDialog extends Application {
 		Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Dialog<?> dlg = Dialog.build(stage).message("Exception Encountered")
-				        .title("It looks like you're making a bad decision");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Better change your mind - this is really your last chance!");
-				Dialog.Response response = dlg.showErrorDialog();
+				Dialog2 dlg = Dialog2.build(stage).message("Exception Encountered")
+				        .title("It looks like you're making a bad decision")
+					    .masthead(cbShowMasthead.isSelected()? "Better change your mind - this is really your last chance!": null);
+				Action response = dlg.showErrorDialog();
 
 				System.out.println("response: " + response);
 			}

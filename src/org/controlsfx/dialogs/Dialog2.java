@@ -209,7 +209,7 @@ public final class Dialog2 {
 
     private Action showSimpleContentDialog(final Type dlgType) {
         DialogTemplate2 template = getDialogTemplate(dlgType);
-        template.setContent(message);//, dlgType); 
+        template.setContent(message);
         template.show();
         return template.getResult();
     }

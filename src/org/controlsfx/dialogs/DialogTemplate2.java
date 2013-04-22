@@ -17,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -194,27 +195,35 @@ public class DialogTemplate2 {
     
     public interface Action {
         String getText();
+        //TODO: needs getIcon method
         void execute(ActionEvent ae);
     }
-
+    
     public enum DialogAction implements Action {
 
         CANCEL("Cancel", true, true),
         CLOSE("Close", true, true),
         NO("No", true, true),
         OK("Ok", true, false),
-        YES("Yes", true, false);
+        YES("Yes", true, false),
+        DETAILS("Details", true, false, false, true);
 
         private String title;
         private boolean isClosing;
         private boolean isDefault;
         private boolean isCancel;
+        private boolean isToogle;
 
-        DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
+        DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing, boolean isToogle) {
             this.title = title;
             this.isClosing = isClosing;
             this.isDefault = isDefault;
             this.isCancel = isCancel;
+            this.isToogle = isToogle;
+        }
+        
+        DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
+            this( title, isDefault, isCancel, isClosing, false );
         }
 
         DialogAction(String title, boolean isDefault, boolean isCancel) {
@@ -301,9 +310,11 @@ public class DialogTemplate2 {
         double widest = MINIMUM_BUTTON_WIDTH;
         boolean hasDefault = false;
         for (Action cmd : actions) {
-            Button b = createButton(cmd, !hasDefault);
+            ButtonBase b = createButton(cmd, !hasDefault);
             // keep only first default button
-            hasDefault |= b.isDefaultButton();
+            if ( b instanceof Button ) {
+               hasDefault |= ((Button)b).isDefaultButton();
+            }
             widest = Math.max(widest, b.prefWidth(-1));
             buttons.add(b);
         }
@@ -330,20 +341,27 @@ public class DialogTemplate2 {
     }
 
     
-    private Button createButton(final Action action, boolean keepDefault) {
-        Button button = new Button(action.getText());
-        button.setOnAction(new EventHandler<ActionEvent>() {
+    private ButtonBase createButton(final Action action, boolean keepDefault) {
+        ButtonBase btn;
+        if (action instanceof DialogAction) {
+            DialogAction stdAction = (DialogAction) action;
+            btn = stdAction.isToogle? new ToggleButton(): new Button();
+            btn.setText(action.getText());
+            if ( btn instanceof Button ) {
+                Button button = (Button)btn;
+                button.setDefaultButton(stdAction.isDefault() && keepDefault);
+                button.setCancelButton(stdAction.isCancel());
+            }
+        } else {
+            btn = new Button(action.getText());
+        }
+        btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
                 action.execute(new ActionEvent(DialogTemplate2.this, ae.getTarget()));
                 result = action;
             }
         });
-        if (action instanceof DialogAction) {
-            DialogAction stdCommand = (DialogAction) action;
-            button.setDefaultButton(stdCommand.isDefault() && keepDefault);
-            button.setCancelButton(stdCommand.isCancel());
-        }
-        return button;
+        return btn;
     }
 
     private Pane createCenterPanel(Node content) {
@@ -356,7 +374,7 @@ public class DialogTemplate2 {
 
         if (content != null) {
             contentPanel.setCenter(content);
-            //contentPanel.setPadding(new Insets(0, 0, 12, 0));
+            contentPanel.setPadding(new Insets(0, 0, 12, 0));
         }
 
         if (contentPanel.getChildren().size() > 0) {
@@ -367,7 +385,7 @@ public class DialogTemplate2 {
         if (!isMastheadPresent() && iconProperty != null ) {
              ImageView dialogBigIcon = new ImageView(iconProperty.get());
              Pane pane = new Pane(dialogBigIcon);
-             pane.setPadding(new Insets(12, 12, 12, 12));
+             pane.setPadding(new Insets(0, 0, 0, 12));
              contentPanel.setLeft(pane);
         }
 

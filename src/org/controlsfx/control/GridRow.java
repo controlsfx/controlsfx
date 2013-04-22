@@ -13,68 +13,68 @@ import javafx.scene.control.Skin;
 
 public class GridRow<T> extends IndexedCell<T>{
 
-	private GridCellCache<T> cellCache;
-	
-	
+    private GridCellCache<T> cellCache;
+
+
     /**************************************************************************
      * 
      * Constructors
      * 
      **************************************************************************/	
-	
-	public GridRow(GridCellCache<T> cellCache) {
-		super();
-		this.cellCache = cellCache;
-		getStyleClass().add("grid-row");
-		
-		// we need to do this (or something similar) to allow for mouse wheel
-		// scrolling, as the GridRow has to report that it is non-empty (which
-		// is the second argument going into updateItem).
-		indexProperty().addListener(new InvalidationListener() {
+
+    public GridRow(GridCellCache<T> cellCache) {
+        super();
+        this.cellCache = cellCache;
+        getStyleClass().add("grid-row");
+
+        // we need to do this (or something similar) to allow for mouse wheel
+        // scrolling, as the GridRow has to report that it is non-empty (which
+        // is the second argument going into updateItem).
+        indexProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable observable) {
                 updateItem(null, getIndex() == -1);
             }
         });
-	}
-	
-	@Override protected Skin<?> createDefaultSkin() {
+    }
+
+    @Override protected Skin<?> createDefaultSkin() {
         return new GridRowSkin<T>(this);
     }
-	
-	
-	
-	/**************************************************************************
-	 * 
-	 * Properties
-	 * 
-	 **************************************************************************/
-	
-	/**
-	 * 
-	 */
-	private final SimpleObjectProperty<GridView<T>> gridView = new SimpleObjectProperty<>();
-	
-	public final void updateGridView(GridView<T> gridView) {
+
+
+
+    /**************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
+
+    /**
+     * 
+     */
+    private final SimpleObjectProperty<GridView<T>> gridView = new SimpleObjectProperty<>();
+
+    public final void updateGridView(GridView<T> gridView) {
         this.gridView.set(gridView);
     }
-	
-	public SimpleObjectProperty<GridView<T>> gridViewProperty() {
-		return gridView;
-	}
-	
-	
-	
-   /**************************************************************************
+
+    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
+        return gridView;
+    }
+
+
+
+    /**************************************************************************
      * 
      * Public API
      * 
      **************************************************************************/
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public GridCellCache<T> getCellCache() {
-		return cellCache;
-	}
+
+    /**
+     * 
+     * @return
+     */
+    public GridCellCache<T> getCellCache() {
+        return cellCache;
+    }
 }

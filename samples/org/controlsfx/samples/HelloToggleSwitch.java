@@ -15,7 +15,6 @@ public class HelloToggleSwitch extends Application {
         ToggleSwitch sc = new ToggleSwitch();
         Scene scene = newScene();
         ((Group)scene.getRoot()).getChildren().add(sc);
-        scene.getStylesheets().addAll("org/controlsfx/control/toggle-switch.css");
         scene.setFill(Color.LIGHTGRAY);
         stage.setScene(scene);
         stage.show();

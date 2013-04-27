@@ -378,7 +378,6 @@ public class DialogTemplate2 {
 
             ec.setVisible(false);
             ec.managedProperty().bind(ec.visibleProperty());
-
         }
 
         centerPanel.getChildren().add(createButtonPanel());
@@ -443,6 +442,7 @@ public class DialogTemplate2 {
                 setResizable(!content.isVisible());
                 content.setVisible(!content.isVisible());
                 detailsButton.setText(content.isVisible() ? "Less" : "More");
+                dialog.sizeToScene();
             }
         });
         return detailsButton;

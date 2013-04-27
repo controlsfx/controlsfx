@@ -224,7 +224,7 @@ public class DialogTemplate2 {
         this.expandableContentProperty.set(content);
     }
 
-    public ObjectProperty<Node> getExpandableContentProperty() {
+    public ObjectProperty<Node> expandableContentProperty() {
         return expandableContentProperty;
     }
 

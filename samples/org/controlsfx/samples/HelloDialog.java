@@ -25,277 +25,273 @@ import org.controlsfx.dialogs.DialogTemplate2.Action;
 
 public class HelloDialog extends Application {
 
-	CheckBox cbShowMasthead = new CheckBox("Show Masthead");
+    CheckBox cbShowMasthead = new CheckBox("Show Masthead");
 
-	@Override
-	public void start(final Stage stage) {
-		// setUserAgentStylesheet(STYLESHEET_MODENA);
+    @Override public void start(final Stage stage) {
+        // setUserAgentStylesheet(STYLESHEET_MODENA);
 
-		stage.setTitle("Dialog Sample");
+        stage.setTitle("Dialog Sample");
 
-		// VBox vbox = new VBox(10);
-		// vbox.setAlignment(Pos.CENTER);
+        // VBox vbox = new VBox(10);
+        // vbox.setAlignment(Pos.CENTER);
 
-		GridPane grid = new GridPane();
-		grid.setPadding(new Insets(10, 10, 10, 10));
-		grid.setHgap(10);
-		grid.setVgap(10);
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setHgap(10);
+        grid.setVgap(10);
 
-		StackPane root = new StackPane();
-		root.getChildren().add(grid);
-		Scene scene = new Scene(root, 800, 300);
-		scene.setFill(Color.WHITE);
+        StackPane root = new StackPane();
+        root.getChildren().add(grid);
+        Scene scene = new Scene(root, 800, 300);
+        scene.setFill(Color.WHITE);
 
-		int row = 0;
+        int row = 0;
 
-		// *******************************************************************
-		// Information Dialog
-		// *******************************************************************
+        // *******************************************************************
+        // Information Dialog
+        // *******************************************************************
 
-		grid.add(createLabel("Operating system button placement: "), 0, 0);
+        grid.add(createLabel("Operating system button placement: "), 0, 0);
 
-		final String WINDOWS_UNIX = "Windows / Unix";
-		final String MAC_OS = "Mac OS";
-		final ChoiceBox<String> operatingSystem = new ChoiceBox<>(FXCollections.observableArrayList(WINDOWS_UNIX,
-		        MAC_OS));
-		operatingSystem.getSelectionModel().select(WINDOWS_UNIX);
-		operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				String os = operatingSystem.getSelectionModel().getSelectedItem();
-				Dialog.setMacOS(MAC_OS.equals(os));
-				Dialog.setWindows(WINDOWS_UNIX.equals(os));
-			}
-		});
-		grid.add(operatingSystem, 1, row);
+        final String WINDOWS_UNIX = "Windows / Unix";
+        final String MAC_OS = "Mac OS";
+        final ChoiceBox<String> operatingSystem = new ChoiceBox<>(FXCollections.observableArrayList(WINDOWS_UNIX, MAC_OS));
+        operatingSystem.getSelectionModel().select(WINDOWS_UNIX);
+        operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                String os = operatingSystem.getSelectionModel().getSelectedItem();
+                Dialog.setMacOS(MAC_OS.equals(os));
+                Dialog.setWindows(WINDOWS_UNIX.equals(os));
+            }
+        });
+        grid.add(operatingSystem, 1, row);
 
-		row++;
-		grid.add(createLabel("Common Dialog attributes: "), 0, 1);
-		grid.add(cbShowMasthead, 1, row);
+        row++;
+        grid.add(createLabel("Common Dialog attributes: "), 0, 1);
+        grid.add(cbShowMasthead, 1, row);
 
-		row++;
+        row++;
 
-		// *******************************************************************
-		// Information Dialog
-		// *******************************************************************
+        // *******************************************************************
+        // Information Dialog
+        // *******************************************************************
 
-		grid.add(createLabel("Information Dialog: "), 0, row);
+        grid.add(createLabel("Information Dialog: "), 0, row);
 
-		final Button Hyperlink2 = new Button("Show");
-		Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog2.build(stage)
-                        .title("JavaFX")
-                        .masthead(cbShowMasthead.isSelected()? "Wouldn't this be nice?": null)
-				        .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
-				        .showInformationDialog();
-			}
-		});
-		grid.add(Hyperlink2, 1, row);
+        final Button Hyperlink2 = new Button("Show");
+        Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialog2.build(stage).title("JavaFX").masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null).message(
+                        "A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...").showInformation();
+            }
+        });
+        grid.add(Hyperlink2, 1, row);
 
-		row++;
+        row++;
 
-		// *******************************************************************
-		// Confirmation Dialog
-		// *******************************************************************
+        // *******************************************************************
+        // Confirmation Dialog
+        // *******************************************************************
 
-		grid.add(createLabel("Confirmation Dialog: "), 0, row);
+        grid.add(createLabel("Confirmation Dialog: "), 0, row);
 
-		final Button Hyperlink3 = new Button("Show");
-		Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog2 dlg = Dialog2.build(stage)
-				        .title("You do want dialogs right?")
-				        .masthead(cbShowMasthead.isSelected()? "Just Checkin'": null)
-				        .message("I was a bit worried that you might not want them, so I wanted to double check.");
-				        
-				Action response = dlg.showConfirmDialog();
+        final Button Hyperlink3 = new Button("Show");
+        Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialog2 dlg = Dialog2.build(stage).title("You do want dialogs right?").masthead(
+                        isMastheadVisible() ? "Just Checkin'" : null).message(
+                        "I was a bit worried that you might not want them, so I wanted to double check.");
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink3, 1, row);
+                Action response = dlg.showConfirm();
 
-		row++;
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink3, 1, row);
 
-		// *******************************************************************
-		// Warning Dialog
-		// *******************************************************************
+        row++;
 
-		grid.add(createLabel("Warning Dialog: "), 0, row);
+        // *******************************************************************
+        // Warning Dialog
+        // *******************************************************************
 
-		final Button Hyperlink6a = new Button("Show");
-		Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog2 dlg = Dialog2.build(stage)
-				     .title("I'm warning you!")
-                     .masthead(cbShowMasthead.isSelected()? "I'm glad I didn't need to use this...": null)
-                     .message("This is a warning");
-				Action response = dlg.showWarningDialog();
+        grid.add(createLabel("Warning Dialog: "), 0, row);
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink6a, 1, row);
+        final Button Hyperlink6a = new Button("Show");
+        Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialog2 dlg = Dialog2.build(stage).title("I'm warning you!").masthead(
+                        isMastheadVisible() ? "I'm glad I didn't need to use this..." : null).message("This is a warning");
+                Action response = dlg.showWarning();
 
-		row++;
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink6a, 1, row);
 
-		// *******************************************************************
-		// Error Dialog
-		// *******************************************************************
+        row++;
 
-		grid.add(createLabel("Error Dialog: "), 0, row);
+        // *******************************************************************
+        // Error Dialog
+        // *******************************************************************
 
-		final Button Hyperlink7a = new Button("Show");
-		Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog2 dlg = Dialog2.build(stage).message("Exception Encountered")
-				        .title("It looks like you're making a bad decision")
-					    .masthead(cbShowMasthead.isSelected()? "Better change your mind - this is really your last chance!": null);
-				Action response = dlg.showErrorDialog();
+        grid.add(createLabel("Error Dialog: "), 0, row);
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink7a, 1, row);
+        final Button Hyperlink7a = new Button("Show");
+        Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialog2 dlg = Dialog2.build(stage).message("Exception Encountered").title(
+                        "It looks like you're making a bad decision").masthead(
+                        isMastheadVisible() ? "Better change your mind - this is really your last chance!" : null);
+                Action response = dlg.showError();
 
-		row++;
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink7a, 1, row);
 
-		// *******************************************************************
-		// More Details Dialog
-		// *******************************************************************
+        row++;
 
-		grid.add(createLabel("'More Details' Dialog: "), 0, row);
+        // *******************************************************************
+        // More Details Dialog
+        // *******************************************************************
 
-		final Button Hyperlink5a = new Button("Show in the same window");
-		Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog<?> dlg = Dialog.build(stage)
-				        .message("Better change your mind - this is really your last chance!")
-				        .title("It looks like you're making a bad decision")
-				        .details(new RuntimeException("Pending Bad Decision Exception"));
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Exception Encountered");
-				Dialog.Response response = dlg.showMoreDetailsDialog();
+        grid.add(createLabel("'More Details' Dialog: "), 0, row);
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink5a, 1, row);
+        final Button Hyperlink5a = new Button("Show in the same window");
+        Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Dialog2 dlg = Dialog2.build(stage).message("Better change your mind - this is really your last chance!").title(
+                        "It looks like you're making a bad decision").masthead(
+                        isMastheadVisible() ? "Exception Encountered" : null);
+                Action response = dlg.showException(new RuntimeException("Pending Bad Decision Exception"));
 
-		final Button Hyperlink5b = new Button("Open in new window");
-		Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink5a, 1, row);
 
-				Dialog<?> dlg = Dialog.build(stage)
-				        .message("Better change your mind - this is really your last chance!")
-				        .title("It looks like you're making a bad decision")
-				        .details(new RuntimeException("Pending Bad Decision Exception")).openDetailsInNewWindow(true);
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Exception Encountered");
-				Dialog.Response response = dlg.showMoreDetailsDialog();
+        final Button Hyperlink5b = new Button("Open in new window");
+        Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink5b, 2, row);
+                Dialog<?> dlg = Dialog.build(stage).message("Better change your mind - this is really your last chance!").title(
+                        "It looks like you're making a bad decision").details(
+                        new RuntimeException("Pending Bad Decision Exception")).openDetailsInNewWindow(true);
+                if (isMastheadVisible())
+                    dlg.masthead("Exception Encountered");
+                Dialog.Response response = dlg.showMoreDetailsDialog();
 
-		row++;
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink5b, 2, row);
 
-		// *******************************************************************
-		// Input Dialog (with masthead)
-		// *******************************************************************
+        row++;
 
-		grid.add(createLabel("Input Dialog (with Masthead): "), 0, row);
+        // *******************************************************************
+        // Input Dialog (with masthead)
+        // *******************************************************************
 
-		final Button Hyperlink8 = new Button("TextField");
-		Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog<String> dlg = Dialog.<String> build(stage).message("What is your name?").title("Name Check");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Please type in your name");
-				String response = dlg.showInputDialog();
+        grid.add(createLabel("Input Dialog (with Masthead): "), 0, row);
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink8, 1, row);
+        final Button Hyperlink8 = new Button("TextField");
+        Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                // Dialog<String> dlg = Dialog.<String>
+                // build(stage).message("What is your name?").title("Name Check");
+                // if (isMastheadVisible())
+                // dlg.masthead("Please type in your name");
+                // String response = dlg.showInputDialog();
+                String response = Dialog2.build(stage).masthead(isMastheadVisible() ? "Please type in your name" : null).title(
+                        "Name Check").message("What is your name?").showTextInput();
 
-		final Button Hyperlink9 = new Button("Initial Value Set");
-		Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog<String> dlg = Dialog.<String> build(stage).message("Pick a name?").title("Name Guess")
-				        .inputInitialValue("Jonathan");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Name Guess");
-				String response = dlg.showInputDialog();
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink8, 1, row);
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink9, 2, row);
+        final Button Hyperlink9 = new Button("Initial Value Set");
+        Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                // Dialog<String> dlg = Dialog.<String>
+                // build(stage).message("Pick a name?").title("Name Guess")
+                // .inputInitialValue("Jonathan");
+                // if (isMastheadVisible())
+                // dlg.masthead("Name Guess");
+                // String response = dlg.showInputDialog();
+                String response = Dialog2.build(stage).masthead(isMastheadVisible() ? "Name Guess" : null).title("Name Guess").message(
+                        "Pick a name?").showTextInput("Jonathan");
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink9, 2, row);
 
-		final Button Hyperlink10 = new Button("Set Choices (< 10)");
-		Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog<String> dlg = Dialog.<String> build(stage).message("Pick a name?").title("Name Guess")
-				        .inputInitialValue("Jonathan").inputChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah");
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Name Guess");
-				String response = dlg.showInputDialog();
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink10, 3, row);
+        final Button Hyperlink10 = new Button("Set Choices (< 10)");
+        Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                // Dialog<String> dlg = Dialog.<String>
+                // build(stage).message("Pick a name?").title("Name Guess")
+                // .inputInitialValue("Jonathan").inputChoices("Matthew", "Jonathan", "Ian", "Sue",
+                // "Hannah");
+                // if (isMastheadVisible())
+                // dlg.masthead("Name Guess");
+                // String response = dlg.showInputDialog();
 
-		final Button Hyperlink11 = new Button("Set Choices (>= 10)");
-		Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Dialog<String> dlg = Dialog
-				        .<String> build(stage)
-				        .message("Pick a name?")
-				        .title("Name Guess")
-				        .inputInitialValue("Jonathan")
-				        .inputChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise", "Stephan",
-				                "Sarah", "Ron", "Ingrid");
+                String response = Dialog2.build(stage).masthead(isMastheadVisible() ? "Name Guess" : null).title("Name Guess").message(
+                        "Pick a name?").showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah");
 
-				if (cbShowMasthead.isSelected())
-					dlg.masthead("Name Guess");
-				String response = dlg.showInputDialog();
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink10, 3, row);
 
-				System.out.println("response: " + response);
-			}
-		});
-		grid.add(Hyperlink11, 4, row);
+        final Button Hyperlink11 = new Button("Set Choices (>= 10)");
+        Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                // Dialog<String> dlg = Dialog
+                // .<String> build(stage)
+                // .message("Pick a name?")
+                // .title("Name Guess")
+                // .inputInitialValue("Jonathan")
+                // .inputChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise",
+                // "Stephan",
+                // "Sarah", "Ron", "Ingrid");
+                // if (isMastheadVisible())
+                // dlg.masthead("Name Guess");
+                // String response = dlg.showInputDialog();
 
-		row++;
+                String response = Dialog2.build(stage).masthead(isMastheadVisible() ? "Name Guess" : null).title("Name Guess").message(
+                        "Pick a name?").showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise", "Stephan",
+                        "Sarah", "Ron", "Ingrid");
 
-		stage.setScene(scene);
-		stage.show();
-	}
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink11, 4, row);
 
-	/**
-	 * @param args
-	 *            the command line arguments
-	 */
-	public static void main(String[] args) {
-		Application.launch(args);
-	}
+        row++;
 
-	private Node createLabel(String text) {
-		Label label = new Label(text);
-		label.setFont(Font.font("Amble, Arial", 13));
-		label.setTextFill(Color.BLUE);
-		return label;
-	}
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    /**
+     * @param args
+     *            the command line arguments
+     */
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
+
+    private Node createLabel(String text) {
+        Label label = new Label(text);
+        label.setFont(Font.font("Amble, Arial", 13));
+        label.setTextFill(Color.BLUE);
+        return label;
+    }
+
+    private boolean isMastheadVisible() {
+        return cbShowMasthead.isSelected();
+    }
 }

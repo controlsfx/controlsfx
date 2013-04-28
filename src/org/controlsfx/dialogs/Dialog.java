@@ -151,7 +151,7 @@ public class Dialog {
 
     /**
      * Dialog's icon.
-     * Presented either in the mastehead, if one is available or in the content 
+     * Presented either in the masthead, if one is available or in the content 
      * @return dialog's icon
      */
     public Image getIcon() {

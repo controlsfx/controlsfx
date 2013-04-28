@@ -75,7 +75,7 @@ public final class Dialogs {
 
     private final Stage owner;
     private String title;
-    private String instruction;
+    private String message;
     private String masthead;
 
     /**
@@ -117,11 +117,11 @@ public final class Dialogs {
     
     /**
      * Assigns dialog's instructions
-     * @param instruction dialog instruction
+     * @param message dialog message
      * @return dialog instance
      */
-    public Dialogs instruction(final String instruction) {
-        this.instruction = instruction;
+    public Dialogs message(final String message) {
+        this.message = message;
         return this;
     }
 
@@ -305,7 +305,7 @@ public final class Dialogs {
 
     private Action showSimpleContentDialog(final Type dlgType) {
         Dialog template = getDialogTemplate(dlgType);
-        template.setContent(instruction);
+        template.setContent(message);
         template.show();
         return template.getResult();
     }
@@ -325,8 +325,8 @@ public final class Dialogs {
         HBox hbox = new HBox(10);
         hbox.setAlignment(Pos.BASELINE_LEFT);
         
-        if (instruction != null && !instruction.isEmpty()) {
-            Label label = new Label(instruction);
+        if (message != null && !message.isEmpty()) {
+            Label label = new Label(message);
             HBox.setHgrow(label, Priority.NEVER);
             hbox.getChildren().add(label);
         }

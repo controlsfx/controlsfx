@@ -19,7 +19,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import org.controlsfx.dialogs.Dialog;
 import org.controlsfx.dialogs.Dialog2;
 import org.controlsfx.dialogs.DialogTemplate2.Action;
 
@@ -60,8 +59,8 @@ public class HelloDialog extends Application {
         operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 String os = operatingSystem.getSelectionModel().getSelectedItem();
-                Dialog.setMacOS(MAC_OS.equals(os));
-                Dialog.setWindows(WINDOWS_UNIX.equals(os));
+                Dialog2.setMacOS(MAC_OS.equals(os));
+                Dialog2.setWindows(WINDOWS_UNIX.equals(os));
             }
         });
         grid.add(operatingSystem, 1, row);

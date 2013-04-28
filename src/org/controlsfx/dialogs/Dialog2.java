@@ -76,12 +76,12 @@ public final class Dialog2 {
      * TODO delete me - this is just for testing!!
      */
     public static void setMacOS(boolean b) {
-        DialogTemplate.setMacOS(b);
+        DialogTemplate2.setMacOS(b);
         DialogTemplate2.setMacOS(b);
     }
 
     public static void setWindows(boolean b) {
-        DialogTemplate.setWindows(b);
+        DialogTemplate2.setWindows(b);
         DialogTemplate2.setWindows(b);
     }
 

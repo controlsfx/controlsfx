@@ -61,10 +61,6 @@ import com.sun.javafx.Utils;
 /**
  * API for creating standardized dialogs which include: 
  * masthead, content, expandable content and button bar
- * 
- * @author Jonathan Files
- * @author Eugene Ryzhikov
- *
  */
 @SuppressWarnings("restriction")
 public class Dialog {
@@ -320,7 +316,6 @@ public class Dialog {
      * Common interface for dialog actions.
      * Actions are used to auto-generate buttons in the dialog's button bar
      * 
-     * @author Eugene Ryzhikov
      */
     public interface Action {
 
@@ -339,9 +334,6 @@ public class Dialog {
 
     /**
      * Common dialog actions
-     * 
-     * @author Eugene Ryzhikov
-     *
      */
     public enum DialogAction implements Action {
 

@@ -59,10 +59,6 @@ import org.controlsfx.dialogs.Dialog.Action;
 /**
  * Simplifies building commonly used dialogs
  * Uses fluent API for flexibility
- * 
- * @author Jonathan Giles
- * @author Eugene Ryzhikov
- *
  */
 public final class Dialogs {
 

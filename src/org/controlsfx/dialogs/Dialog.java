@@ -26,6 +26,8 @@
  */
 package org.controlsfx.dialogs;
 
+import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,11 +95,17 @@ public class Dialog {
 
     /**
      * Shows dialog and wait for user response.
-     * Dialog content is assembled together just before dialog is shown  
+     * @return action used to close the dialog
      */
-    public void show() {
-        buildDialogContent();
-        dialog.showAndWait();
+    public Action show() {
+        try {
+            buildDialogContent();
+            dialog.centerOnScreen();
+            dialog.showAndWait();
+            return result;
+        } catch (Throwable e) {
+            return CANCEL;
+        }
     }
 
     /**
@@ -107,17 +115,6 @@ public class Dialog {
         dialog.hide();
     }
 
-    /**
-     * Returns dialog result  
-     * @return An action which was used to close the dialog
-     */
-    public Action getResult() {
-        return result;
-    }
-
-    protected FXDialog getDialog() {
-        return dialog;
-    }
 
     /////// Resizable property
 

@@ -27,7 +27,6 @@
 package org.controlsfx.dialogs;
 
 import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
-import static org.controlsfx.dialogs.Dialog.DialogAction.CLOSE;
 import static org.controlsfx.dialogs.Dialog.DialogAction.NO;
 import static org.controlsfx.dialogs.Dialog.DialogAction.OK;
 import static org.controlsfx.dialogs.Dialog.DialogAction.YES;
@@ -168,10 +167,10 @@ public final class Dialogs {
      * @return action used to close dialog
      */
     public Action showException(Throwable exception) {
-        Dialog template = getDialogTemplate(Type.ERROR);
-        template.setContent(exception.getMessage());
-        template.setExpandableContent(buildExceptionDetails(exception));
-        return showDialog(template);
+        Dialog dlg = buildDialog(Type.ERROR);
+        dlg.setContent(exception.getMessage());
+        dlg.setExpandableContent(buildExceptionDetails(exception));
+        return dlg.show();
     }
 
     /**
@@ -180,10 +179,10 @@ public final class Dialogs {
      * @return text from input field if OK action is used otherwise null 
      */
     public String showTextInput(String defaultValue) {
-        Dialog template = getDialogTemplate(Type.INPUT);
+        Dialog dlg = buildDialog(Type.INPUT);
         final TextField textField = new TextField(defaultValue);
-        template.setContent(buildInputContent(textField));
-        return showDialog(template) == OK ? textField.getText() : null;
+        dlg.setContent(buildInputContent(textField));
+        return dlg.show() == OK ? textField.getText() : null;
     }
 
     /**
@@ -196,7 +195,7 @@ public final class Dialogs {
 
     @SuppressWarnings("unchecked") public <T> T showChoices(T defaultValue, Collection<T> choices) {
 
-        Dialog template = getDialogTemplate(Type.INPUT);
+        Dialog dlg = buildDialog(Type.INPUT);
         // Workaround: need final variable without custom change listener
         final Object[] response = new Object[1];
         ChangeListener<T> changeListener = new ChangeListener<T>() {
@@ -210,17 +209,17 @@ public final class Dialogs {
             comboBox.getItems().addAll(choices);
             comboBox.getSelectionModel().select(defaultValue);
             comboBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
-            template.setContent(buildInputContent(comboBox));
+            dlg.setContent(buildInputContent(comboBox));
         } else {
             // use ChoiceBox
             ChoiceBox<T> choiceBox = new ChoiceBox<T>();
             choiceBox.getItems().addAll(choices);
             choiceBox.getSelectionModel().select(defaultValue);
             choiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
-            template.setContent(buildInputContent(choiceBox));
+            dlg.setContent(buildInputContent(choiceBox));
         }
 
-        return showDialog(template) == OK ? (T) response[0] : null;
+        return dlg.show() == OK ? (T) response[0] : null;
 
     }
 
@@ -288,32 +287,21 @@ public final class Dialogs {
         }
     }
 
-    private Dialog getDialogTemplate(final Type dlgType) {
+    private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog template = new Dialog(owner, actualTitle);
-        template.setResizable(false);
-        template.setGraphic(dlgType.getImage());
-        template.setMasthead(actualMasthead);
-        template.getActions().addAll(dlgType.getActions());
-        return template;
+        Dialog dlg = new Dialog(owner, actualTitle);
+        dlg.setResizable(false);
+        dlg.setGraphic(dlgType.getImage());
+        dlg.setMasthead(actualMasthead);
+        dlg.getActions().addAll(dlgType.getActions());
+        return dlg;
     }
 
     private Action showSimpleContentDialog(final Type dlgType) {
-        Dialog template = getDialogTemplate(dlgType);
-        template.setContent(message);
-        template.show();
-        return template.getResult();
-    }
-
-    private static Action showDialog(Dialog template) {
-        try {
-            template.getDialog().centerOnScreen();
-            template.show();
-            return template.getResult();
-        } catch (Throwable e) {
-            return CLOSE;
-        }
+        Dialog dlg = buildDialog(dlgType);
+        dlg.setContent(message);
+        return dlg.show();
     }
 
     private Node buildInputContent(Control inputControl) {

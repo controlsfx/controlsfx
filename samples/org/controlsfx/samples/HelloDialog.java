@@ -19,8 +19,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import org.controlsfx.dialogs.Dialog2;
-import org.controlsfx.dialogs.DialogTemplate2.Action;
+import org.controlsfx.dialogs.Dialogs;
+import org.controlsfx.dialogs.Dialog.Action;
 
 public class HelloDialog extends Application {
 
@@ -59,8 +59,8 @@ public class HelloDialog extends Application {
         operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 String os = operatingSystem.getSelectionModel().getSelectedItem();
-                Dialog2.setMacOS(MAC_OS.equals(os));
-                Dialog2.setWindows(WINDOWS_UNIX.equals(os));
+                Dialogs.setMacOS(MAC_OS.equals(os));
+                Dialogs.setWindows(WINDOWS_UNIX.equals(os));
             }
         });
         grid.add(operatingSystem, 1, row);
@@ -80,7 +80,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink2 = new Button("Show");
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialog2.build(stage)
+                Dialogs.build(stage)
                    .title("JavaFX")
                    .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
                    .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
@@ -100,7 +100,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink3 = new Button("Show");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response =  Dialog2.build(stage)
+                Action response =  Dialogs.build(stage)
                     .title("You do want dialogs right?")
                     .masthead(isMastheadVisible() ? "Just Checkin'" : null)
                     .message( "I was a bit worried that you might not want them, so I wanted to double check.")
@@ -122,7 +122,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink6a = new Button("Show");
         Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialog2.build(stage)
+                Action response = Dialogs.build(stage)
                    .title("I'm warning you!")
                    .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
                    .message("This is a warning")
@@ -144,7 +144,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink7a = new Button("Show");
         Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialog2.build(stage)
+                Action response = Dialogs.build(stage)
                       .title("It looks like you're making a bad decision")
                       .message("Exception Encountered")
                       .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance!" : null)
@@ -166,7 +166,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink5a = new Button("Show");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialog2.build(stage)
+                Action response = Dialogs.build(stage)
                     .title("It looks like you're making a bad decision")
                     .message("Better change your mind - this is really your last chance!")
                     .masthead(isMastheadVisible() ? "Exception Encountered" : null)
@@ -209,7 +209,7 @@ public class HelloDialog extends Application {
                 // if (isMastheadVisible())
                 // dlg.masthead("Please type in your name");
                 // String response = dlg.showInputDialog();
-                String response = Dialog2.build(stage)
+                String response = Dialogs.build(stage)
                     .title("Name Check")
                     .masthead(isMastheadVisible() ? "Please type in your name" : null)
                     .message("What is your name?")
@@ -229,7 +229,7 @@ public class HelloDialog extends Application {
                 // if (isMastheadVisible())
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
-                String response = Dialog2.build(stage)
+                String response = Dialogs.build(stage)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
                         .message("Pick a name?")
@@ -250,7 +250,7 @@ public class HelloDialog extends Application {
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
 
-                String response = Dialog2.build(stage)
+                String response = Dialogs.build(stage)
                       .title("Name Guess")
                       .masthead(isMastheadVisible() ? "Name Guess" : null)
                       .message("Pick a name?")
@@ -276,7 +276,7 @@ public class HelloDialog extends Application {
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
 
-                String response = Dialog2.build(stage)
+                String response = Dialogs.build(stage)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
                         .message("Pick a name?")

@@ -58,7 +58,7 @@ import javafx.stage.Stage;
 import com.sun.javafx.Utils;
 
 @SuppressWarnings("restriction")
-public class DialogTemplate2 {
+public class Dialog {
 
     // According to the UI spec, the width of the main message text in the upper
     // panel should be 426 pixels.
@@ -74,7 +74,7 @@ public class DialogTemplate2 {
 
     private final BorderPane contentPane;
 
-    public DialogTemplate2(Stage owner, String title) {
+    public Dialog(Stage owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
         this.contentPane = new BorderPane();
         contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
@@ -282,8 +282,8 @@ public class DialogTemplate2 {
         }
 
         public void execute(ActionEvent ae) {
-            if (ae.getSource() instanceof DialogTemplate2 && isClosing())
-                ((DialogTemplate2) ae.getSource()).hide();
+            if (ae.getSource() instanceof Dialog && isClosing())
+                ((Dialog) ae.getSource()).hide();
         }
 
     }
@@ -458,7 +458,7 @@ public class DialogTemplate2 {
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                action.execute(new ActionEvent(DialogTemplate2.this, ae.getTarget()));
+                action.execute(new ActionEvent(Dialog.this, ae.getTarget()));
                 result = action;
             }
         });

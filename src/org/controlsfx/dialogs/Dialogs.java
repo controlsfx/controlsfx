@@ -27,11 +27,11 @@
 package org.controlsfx.dialogs;
 
 import static org.controlsfx.dialogs.DialogResources.getString;
-import static org.controlsfx.dialogs.DialogTemplate2.DialogAction.CANCEL;
-import static org.controlsfx.dialogs.DialogTemplate2.DialogAction.CLOSE;
-import static org.controlsfx.dialogs.DialogTemplate2.DialogAction.NO;
-import static org.controlsfx.dialogs.DialogTemplate2.DialogAction.OK;
-import static org.controlsfx.dialogs.DialogTemplate2.DialogAction.YES;
+import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
+import static org.controlsfx.dialogs.Dialog.DialogAction.CLOSE;
+import static org.controlsfx.dialogs.Dialog.DialogAction.NO;
+import static org.controlsfx.dialogs.Dialog.DialogAction.OK;
+import static org.controlsfx.dialogs.Dialog.DialogAction.YES;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,9 +54,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.dialogs.DialogTemplate2.Action;
+import org.controlsfx.dialogs.Dialog.Action;
 
-public final class Dialog2 {
+public final class Dialogs {
 
     /**
      * USE_DEFAULT can be passed in to {@link #title(String)} and {@link #masthead(String)} methods
@@ -76,34 +76,34 @@ public final class Dialog2 {
      * TODO delete me - this is just for testing!!
      */
     public static void setMacOS(boolean b) {
-        DialogTemplate2.setMacOS(b);
-        DialogTemplate2.setMacOS(b);
+        Dialog.setMacOS(b);
+        Dialog.setMacOS(b);
     }
 
     public static void setWindows(boolean b) {
-        DialogTemplate2.setWindows(b);
-        DialogTemplate2.setWindows(b);
+        Dialog.setWindows(b);
+        Dialog.setWindows(b);
     }
 
-    public static Dialog2 build(final Stage owner) {
-        return new Dialog2(owner);
+    public static Dialogs build(final Stage owner) {
+        return new Dialogs(owner);
     }
 
-    private Dialog2(final Stage owner) {
+    private Dialogs(final Stage owner) {
         this.owner = owner;
     }
 
-    public Dialog2 title(final String title) {
+    public Dialogs title(final String title) {
         this.title = title;
         return this;
     }
 
-    public Dialog2 message(final String message) {
+    public Dialogs message(final String message) {
         this.message = message;
         return this;
     }
 
-    public Dialog2 masthead(final String masthead) {
+    public Dialogs masthead(final String masthead) {
         this.masthead = masthead;
         return this;
     }
@@ -144,14 +144,14 @@ public final class Dialog2 {
 
     // TODO: Has to be generalized to have details for any type of dialog
     public Action showException(Throwable exception) {
-        DialogTemplate2 template = getDialogTemplate(Type.ERROR);
+        Dialog template = getDialogTemplate(Type.ERROR);
         template.setContent(exception.getMessage());
         template.setExpandableContent(buildExceptionDetails(exception));
         return showDialog(template);
     }
 
     public String showTextInput(String defaultValue) {
-        DialogTemplate2 template = getDialogTemplate(Type.INPUT);
+        Dialog template = getDialogTemplate(Type.INPUT);
         final TextField textField = new TextField(defaultValue);
         template.setContent(buildInputContent(textField));
         return showDialog(template) == OK ? textField.getText() : null;
@@ -163,7 +163,7 @@ public final class Dialog2 {
 
     @SuppressWarnings("unchecked") public <T> T showChoices(T defaultValue, Collection<T> choices) {
 
-        DialogTemplate2 template = getDialogTemplate(Type.INPUT);
+        Dialog template = getDialogTemplate(Type.INPUT);
         // Workaround: need final variable without custom change listener
         final Object[] response = new Object[1];
         ChangeListener<T> changeListener = new ChangeListener<T>() {
@@ -249,10 +249,10 @@ public final class Dialog2 {
         }
     }
 
-    private DialogTemplate2 getDialogTemplate(final Type dlgType) {
+    private Dialog getDialogTemplate(final Type dlgType) {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        DialogTemplate2 template = new DialogTemplate2(owner, actualTitle);
+        Dialog template = new Dialog(owner, actualTitle);
         template.setResizable(false);
         template.setIcon(dlgType.getImage());
         template.setMasthead(actualMasthead);
@@ -261,13 +261,13 @@ public final class Dialog2 {
     }
 
     private Action showSimpleContentDialog(final Type dlgType) {
-        DialogTemplate2 template = getDialogTemplate(dlgType);
+        Dialog template = getDialogTemplate(dlgType);
         template.setContent(message);
         template.show();
         return template.getResult();
     }
 
-    private static Action showDialog(DialogTemplate2 template) {
+    private static Action showDialog(Dialog template) {
         try {
             template.getDialog().centerOnScreen();
             template.show();

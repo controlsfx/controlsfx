@@ -26,12 +26,12 @@
  */
 package org.controlsfx.dialogs;
 
-import static org.controlsfx.dialogs.DialogResources.getString;
 import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
 import static org.controlsfx.dialogs.Dialog.DialogAction.CLOSE;
 import static org.controlsfx.dialogs.Dialog.DialogAction.NO;
 import static org.controlsfx.dialogs.Dialog.DialogAction.OK;
 import static org.controlsfx.dialogs.Dialog.DialogAction.YES;
+import static org.controlsfx.dialogs.DialogResources.getString;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -70,8 +70,6 @@ public final class Dialogs {
     private String message;
     private String masthead;
 
-    // private String details;
-    // private boolean openDetailsInNewWindow = false;
     /**
      * TODO delete me - this is just for testing!!
      */
@@ -108,24 +106,6 @@ public final class Dialogs {
         return this;
     }
 
-    // public Dialog2 details(final String details) {
-    // this.details = details;
-    // return this;
-    // }
-
-    // public Dialog2 openDetailsInNewWindow(final boolean openDetailsInNewWindow) {
-    // this.openDetailsInNewWindow = openDetailsInNewWindow;
-    // return this;
-    // }
-
-    // public Dialog2 details(final Throwable throwable) {
-    // StringWriter sw = new StringWriter();
-    // PrintWriter pw = new PrintWriter(sw);
-    // throwable.printStackTrace(pw);
-    // details(sw.toString());
-    // return this;
-    // }
-
     public void showInformation() {
         showSimpleContentDialog(Type.INFORMATION);
     }
@@ -142,7 +122,6 @@ public final class Dialogs {
         return showSimpleContentDialog(Type.ERROR);
     }
 
-    // TODO: Has to be generalized to have details for any type of dialog
     public Action showException(Throwable exception) {
         Dialog template = getDialogTemplate(Type.ERROR);
         template.setContent(exception.getMessage());
@@ -194,10 +173,6 @@ public final class Dialogs {
     public <T> T showChoices(Collection<T> choices) {
         return showChoices(null, choices);
     }
-
-    // public <T> T showChoices( T defaultValue, @SuppressWarnings("unchecked") T... choices ) {
-    // return showInputChoices( defaultValue, Arrays.asList(choices));
-    // }
 
     public <T> T showChoices(@SuppressWarnings("unchecked") T... choices) {
         return showChoices(Arrays.asList(choices));
@@ -282,8 +257,6 @@ public final class Dialogs {
         HBox hbox = new HBox(10);
         hbox.setAlignment(Pos.BASELINE_LEFT);
         
-        // hbox.setPrefWidth(MAIN_TEXT_WIDTH);
-
         if (message != null && !message.isEmpty()) {
             Label label = new Label(message);
             HBox.setHgrow(label, Priority.NEVER);

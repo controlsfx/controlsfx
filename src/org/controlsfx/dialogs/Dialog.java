@@ -306,17 +306,9 @@ public class Dialog {
         isWindows = b;
     }
 
-    // private boolean isWindows() {
-    // return isWindows || (!isMac && Utils.isWindows());
-    // }
-
     private boolean isMac() {
         return isMac || (!isWindows && Utils.isMac());
     }
-
-    // private boolean isUnix() {
-    // return Utils.isUnix();
-    // }
 
     private boolean hasMasthead() {
         return getMasthead() != null;
@@ -349,7 +341,6 @@ public class Dialog {
         Node content = getContent();
         content = content == null ? new Pane() : content;
         contentPanel.setCenter(content);
-        // contentPanel.setPadding(new Insets(0, 0, 12, 0));
         
         // dialog image can go to the left if there is no masthead
         if (!hasMasthead() && iconProperty != null) {
@@ -416,10 +407,6 @@ public class Dialog {
             button.setPrefWidth(button.isVisible() ? widest : 0);
             buttonsPanel.getChildren().add(button);
         }
-
-        // if (isWindows() || isUnix()) {
-        // } else if (isMac()) {
-        // }
 
         return buttonsPanel;
     }

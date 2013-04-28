@@ -42,6 +42,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
@@ -433,23 +434,20 @@ public class DialogTemplate2 {
         return spacer;
     }
 
-    private ToggleButton createDetailsButton() {
-        // TODO: Move images to resource folder, fix CSS
-        final ToggleButton detailsButton = new ToggleButton();
-        detailsButton.getStyleClass().clear();
-        detailsButton.getStyleClass().add("details-button");
-        detailsButton.setMinHeight(20);
+    private Hyperlink createDetailsButton() {
+        final Hyperlink detailsButton = new Hyperlink();
+        detailsButton.getStyleClass().setAll("details-button", "more");
         final String moreText = DialogResources.getString("common.detail.button.more");
         final String lessText = DialogResources.getString("common.detail.button.less");
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                Node content = getExpandableContent();
+                final Node content = getExpandableContent();
                 setResizable(!content.isVisible());
                 content.setVisible(!content.isVisible());
-                String moreText = DialogResources.getString("common.detail.button.more");
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
                 dialog.sizeToScene();
+                detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
             }
         });
         return detailsButton;

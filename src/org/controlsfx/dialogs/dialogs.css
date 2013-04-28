@@ -127,18 +127,17 @@
     -fx-alignment: CENTER_RIGHT;
 }
 
-.dialog .details-button  {
-  -fx-graphic: url("more-details.png");
+.dialog .details-button.more  {
+  -fx-graphic: url("../../../impl/org/controlsfx/dialogs/resources/more-details.png");
   -fx-alignment: baseline-left;
   -fx-focus-traversable: false;
   -fx-padding: 5;
 }
 
-.dialog .details-button:selected {
-  -fx-graphic: url("fewer-details.png");
+.dialog .details-button.less {
+  -fx-graphic: url("../../../impl/org/controlsfx/dialogs/resources/fewer-details.png");
 }
 
 .dialog .details-button:hover {
-  -fx-border-color: black;
-  -fx-border-style: dotted;
+    -fx-underline: true;
 }

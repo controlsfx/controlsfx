@@ -337,11 +337,11 @@ public class Dialog {
      */
     public enum DialogAction implements Action {
 
-        CANCEL("Cancel", true, true),
-        CLOSE("Close", true, true),
-        NO("No", true, true),
-        OK("Ok", true, false),
-        YES("Yes", true, false);
+        CANCEL( DialogResources.getString("common.cancel.button"), true, true),
+        CLOSE ( DialogResources.getString("common.close.button"),  true, true),
+        NO    ( DialogResources.getString("common.no.button"),     true, true),
+        OK    ( DialogResources.getString("common.ok.button"),     true, false),
+        YES   ( DialogResources.getString("common.yes.button"),    true, false);
 
         private String title;
         private boolean isClosing;

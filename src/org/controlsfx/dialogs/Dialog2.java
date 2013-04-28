@@ -40,6 +40,7 @@ import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -279,14 +280,19 @@ public final class Dialog2 {
     private Node buildInputContent(Control inputControl) {
 
         HBox hbox = new HBox(10);
+        hbox.setAlignment(Pos.BASELINE_LEFT);
+        
         // hbox.setPrefWidth(MAIN_TEXT_WIDTH);
 
         if (message != null && !message.isEmpty()) {
             Label label = new Label(message);
+            HBox.setHgrow(label, Priority.NEVER);
             hbox.getChildren().add(label);
         }
 
         if (inputControl != null) {
+            inputControl.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(inputControl, Priority.ALWAYS);
             hbox.getChildren().add(inputControl);
         }
 

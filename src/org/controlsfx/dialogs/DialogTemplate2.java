@@ -192,9 +192,7 @@ public class DialogTemplate2 {
     }
 
     public final void setContent(String contentText) {
-
-        if (contentText == null)
-            return;
+        if (contentText == null) return;
 
         Label label = new Label(contentText);
         label.getStyleClass().add("center-content-area");
@@ -349,18 +347,17 @@ public class DialogTemplate2 {
         contentPanel.getStyleClass().add("center-content-panel");
         VBox.setVgrow(contentPanel, Priority.ALWAYS);
 
-        Node content = getContent() != null ? getContent() : new Pane();
-
-        if (content != null) {
-            contentPanel.setCenter(content);
-            // contentPanel.setPadding(new Insets(0, 0, 12, 0));
-            // dialog image can go to the left if there is no masthead
-            if (!hasMasthead() && iconProperty != null) {
-                ImageView dialogBigIcon = new ImageView(iconProperty.get());
-                Pane pane = new Pane(dialogBigIcon);
-                pane.setPadding(new Insets(0, 0, 0, 12));
-                contentPanel.setLeft(pane);
-            }
+        Node content = getContent();
+        content = content == null ? new Pane() : content;
+        contentPanel.setCenter(content);
+        // contentPanel.setPadding(new Insets(0, 0, 12, 0));
+        
+        // dialog image can go to the left if there is no masthead
+        if (!hasMasthead() && iconProperty != null) {
+            ImageView dialogBigIcon = new ImageView(iconProperty.get());
+            Pane pane = new Pane(dialogBigIcon);
+            pane.setPadding(new Insets(0, 0, 0, 12));
+            contentPanel.setLeft(pane);
         }
 
         if (contentPanel.getChildren().size() > 0) {

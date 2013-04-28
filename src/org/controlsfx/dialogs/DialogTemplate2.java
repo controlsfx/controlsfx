@@ -434,14 +434,21 @@ public class DialogTemplate2 {
     }
 
     private ToggleButton createDetailsButton() {
-        // TODO: Optimize button text assignment, load from resources.
-        final ToggleButton detailsButton = new ToggleButton("More");
+        // TODO: Move images to resource folder, fix CSS
+        final ToggleButton detailsButton = new ToggleButton();
+        detailsButton.getStyleClass().clear();
+        detailsButton.getStyleClass().add("details-button");
+        detailsButton.setMinHeight(20);
+        final String moreText = DialogResources.getString("common.detail.button.more");
+        final String lessText = DialogResources.getString("common.detail.button.less");
+        detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
                 Node content = getExpandableContent();
                 setResizable(!content.isVisible());
                 content.setVisible(!content.isVisible());
-                detailsButton.setText(content.isVisible() ? "Less" : "More");
+                String moreText = DialogResources.getString("common.detail.button.more");
+                detailsButton.setText(content.isVisible() ? lessText : moreText);
                 dialog.sizeToScene();
             }
         });

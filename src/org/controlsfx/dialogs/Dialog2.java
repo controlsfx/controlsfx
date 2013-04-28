@@ -143,7 +143,8 @@ public final class Dialog2 {
 
     // TODO: Has to be generalized to have details for any type of dialog
     public Action showException(Throwable exception) {
-        DialogTemplate2 template = new DialogTemplate2(owner, title);
+        DialogTemplate2 template = getDialogTemplate(Type.ERROR);
+        template.setContent(exception.getMessage());
         template.setExpandableContent(buildExceptionDetails(exception));
         return showDialog(template);
     }

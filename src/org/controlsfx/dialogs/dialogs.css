@@ -114,7 +114,7 @@
 }
 
 .dialog .center-panel .button-bar {
-    -fx-padding: 8 8 8 8;
+    -fx-padding: 8 0 8 0;
 }
 
 .dialog .more-info-dialog {
@@ -125,4 +125,20 @@
 .dialog .more-info-dialog > .button-panel {
     -fx-padding: 12 0 12 12;
     -fx-alignment: CENTER_RIGHT;
+}
+
+.dialog .details-button  {
+  -fx-graphic: url("more-details.png");
+  -fx-alignment: baseline-left;
+  -fx-focus-traversable: false;
+  -fx-padding: 5;
+}
+
+.dialog .details-button:selected {
+  -fx-graphic: url("fewer-details.png");
+}
+
+.dialog .details-button:hover {
+  -fx-border-color: black;
+  -fx-border-style: dotted;
 }

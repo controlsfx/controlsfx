@@ -156,9 +156,9 @@ public class HelloDialog extends Application {
         // More Details Dialog
         // *******************************************************************
 
-        grid.add(createLabel("'More Details' Dialog: "), 0, row);
+        grid.add(createLabel("'Exception' Dialog: "), 0, row);
 
-        final Button Hyperlink5a = new Button("Show in the same window");
+        final Button Hyperlink5a = new Button("Show");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialog2 dlg = Dialog2.build(stage).message("Better change your mind - this is really your last chance!").title(
@@ -171,21 +171,21 @@ public class HelloDialog extends Application {
         });
         grid.add(Hyperlink5a, 1, row);
 
-        final Button Hyperlink5b = new Button("Open in new window");
-        Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-
-                Dialog<?> dlg = Dialog.build(stage).message("Better change your mind - this is really your last chance!").title(
-                        "It looks like you're making a bad decision").details(
-                        new RuntimeException("Pending Bad Decision Exception")).openDetailsInNewWindow(true);
-                if (isMastheadVisible())
-                    dlg.masthead("Exception Encountered");
-                Dialog.Response response = dlg.showMoreDetailsDialog();
-
-                System.out.println("response: " + response);
-            }
-        });
-        grid.add(Hyperlink5b, 2, row);
+//        final Button Hyperlink5b = new Button("Open in new window");
+//        Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
+//            @Override public void handle(ActionEvent e) {
+//
+//                Dialog<?> dlg = Dialog.build(stage).message("Better change your mind - this is really your last chance!").title(
+//                        "It looks like you're making a bad decision").details(
+//                        new RuntimeException("Pending Bad Decision Exception")).openDetailsInNewWindow(true);
+//                if (isMastheadVisible())
+//                    dlg.masthead("Exception Encountered");
+//                Dialog.Response response = dlg.showMoreDetailsDialog();
+//
+//                System.out.println("response: " + response);
+//            }
+//        });
+//        grid.add(Hyperlink5b, 2, row);
 
         row++;
 

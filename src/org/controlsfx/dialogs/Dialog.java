@@ -143,27 +143,27 @@ public class Dialog {
 
     // Resizable property
 
-    private final ObjectProperty<Image> iconProperty = new SimpleObjectProperty<Image>();
+    private final ObjectProperty<Image> graphicProperty = new SimpleObjectProperty<Image>();
 
     /**
-     * Dialog's icon.
+     * Dialog's graphic.
      * Presented either in the masthead, if one is available or in the content 
-     * @return dialog's icon
+     * @return dialog's graphic
      */
-    public Image getIcon() {
-        return iconProperty.get();
+    public Image getGraphic() {
+        return graphicProperty.get();
     }
 
     /**
-     * Sets dialog's icon
-     * @param icon dialog's icon. Used if not null.
+     * Sets dialog's graphic
+     * @param graphic dialog's graphic. Used if not null.
      */
-    public void setIcon(Image icon) {
-        this.iconProperty.set(icon);
+    public void setGraphic(Image graphic) {
+        this.graphicProperty.set(graphic);
     }
 
-    public ObjectProperty<Image> iconProperty() {
-        return iconProperty;
+    public ObjectProperty<Image> graphicProperty() {
+        return graphicProperty;
     }
 
     // Masthead property
@@ -198,7 +198,7 @@ public class Dialog {
         BorderPane mastheadPanel = new BorderPane();
         mastheadPanel.getStyleClass().add("top-panel");
 
-        // Create panel with text area and icon or just a background image:
+        // Create panel with text area and graphic or just a background image:
         // Create topPanel's components. UITextArea determines
         // the size of the dialog by defining the number of columns
         // based on font size.
@@ -217,8 +217,8 @@ public class Dialog {
         mastheadPanel.setLeft(mastheadVBox);
         BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
 
-        if (iconProperty.get() != null) {
-            mastheadPanel.setRight(new ImageView(iconProperty.get()));
+        if (graphicProperty.get() != null) {
+            mastheadPanel.setRight(new ImageView(graphicProperty.get()));
         }
 
         setMasthead(mastheadPanel);
@@ -311,7 +311,7 @@ public class Dialog {
         return actions;
     }
 
-    // TODO: needs JavaFX style properties: text, icon, tooltip, enabled
+    // TODO: needs JavaFX style properties: text, graphic, tooltip, enabled
     /**
      * Common interface for dialog actions.
      * Actions are used to auto-generate buttons in the dialog's button bar
@@ -447,9 +447,9 @@ public class Dialog {
         contentPanel.setCenter(content);
         
         // dialog image can go to the left if there is no masthead
-        if (!hasMasthead() && iconProperty != null) {
-            ImageView dialogBigIcon = new ImageView(iconProperty.get());
-            Pane pane = new Pane(dialogBigIcon);
+        if (!hasMasthead() && graphicProperty != null) {
+            ImageView dialogGraphic = new ImageView(graphicProperty.get());
+            Pane pane = new Pane(dialogGraphic);
             pane.setPadding(new Insets(0, 0, 0, 12));
             contentPanel.setLeft(pane);
         }

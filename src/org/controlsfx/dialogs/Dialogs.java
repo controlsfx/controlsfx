@@ -293,7 +293,7 @@ public final class Dialogs {
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         Dialog template = new Dialog(owner, actualTitle);
         template.setResizable(false);
-        template.setIcon(dlgType.getImage());
+        template.setGraphic(dlgType.getImage());
         template.setMasthead(actualMasthead);
         template.getActions().addAll(dlgType.getActions());
         return template;

@@ -56,6 +56,14 @@ import javafx.stage.Stage;
 
 import org.controlsfx.dialogs.Dialog.Action;
 
+/**
+ * Simplifies building commonly used dialogs
+ * Uses fluent API for flexibility
+ * 
+ * @author Jonathan Giles
+ * @author Eugene Ryzhikov
+ *
+ */
 public final class Dialogs {
 
     /**
@@ -67,7 +75,7 @@ public final class Dialogs {
 
     private final Stage owner;
     private String title;
-    private String message;
+    private String instruction;
     private String masthead;
 
     /**
@@ -83,6 +91,11 @@ public final class Dialogs {
         Dialog.setWindows(b);
     }
 
+    /**
+     * Builds the initial dialog
+     * @param owner dialogs owner 
+     * @return dialog instance
+     */
     public static Dialogs build(final Stage owner) {
         return new Dialogs(owner);
     }
@@ -91,37 +104,73 @@ public final class Dialogs {
         this.owner = owner;
     }
 
+    /**
+     * Assigns dialog's title
+     * @param title dialog title
+     * @return dialog instance
+     */
     public Dialogs title(final String title) {
         this.title = title;
         return this;
     }
 
-    public Dialogs message(final String message) {
-        this.message = message;
+    
+    /**
+     * Assigns dialog's instructions
+     * @param instruction dialog instruction
+     * @return dialog instance
+     */
+    public Dialogs instruction(final String instruction) {
+        this.instruction = instruction;
         return this;
     }
 
+    /**
+     * Assigns dialog's masthead
+     * @param masthead dialog masthead
+     * @return dialog instance
+     */
     public Dialogs masthead(final String masthead) {
         this.masthead = masthead;
         return this;
     }
 
+    /**
+     * Shows information dialog
+     */
     public void showInformation() {
         showSimpleContentDialog(Type.INFORMATION);
     }
 
+    /**
+     * Shows confirmation dialog
+     * @return action used to close dialog
+     */
     public Action showConfirm() {
         return showSimpleContentDialog(Type.CONFIRMATION);
     }
 
+    /**
+     * Shows warning dialog
+     * @return action used to close dialog
+     */
     public Action showWarning() {
         return showSimpleContentDialog(Type.WARNING);
     }
 
+    /**
+     * Show error dialog 
+     * @return action used to close dialog
+     */
     public Action showError() {
         return showSimpleContentDialog(Type.ERROR);
     }
 
+    /**
+     * Shows exception dialog with expandable stack trace.
+     * @param exception exception to present
+     * @return action used to close dialog
+     */
     public Action showException(Throwable exception) {
         Dialog template = getDialogTemplate(Type.ERROR);
         template.setContent(exception.getMessage());
@@ -129,6 +178,11 @@ public final class Dialogs {
         return showDialog(template);
     }
 
+    /**
+     * Shows dialog with one text field
+     * @param defaultValue text field default value 
+     * @return text from input field if OK action is used otherwise null 
+     */
     public String showTextInput(String defaultValue) {
         Dialog template = getDialogTemplate(Type.INPUT);
         final TextField textField = new TextField(defaultValue);
@@ -136,6 +190,10 @@ public final class Dialogs {
         return showDialog(template) == OK ? textField.getText() : null;
     }
 
+    /**
+     * Shows dialog with one text field 
+     * @return text from input field or null if dialog is cancelled 
+     */
     public String showTextInput() {
         return showTextInput("");
     }
@@ -170,10 +228,20 @@ public final class Dialogs {
 
     }
 
+    /**
+     * Show a dialog with one combobox filled with provided choices 
+     * @param choices dialog choices
+     * @return selected choice or null if dialog is cancelled
+     */
     public <T> T showChoices(Collection<T> choices) {
         return showChoices(null, choices);
     }
 
+    /**
+     * Show a dialog with one combobox filled with provided choices 
+     * @param choices dialog choices
+     * @return selected choice or null if dialog is cancelled
+     */
     public <T> T showChoices(@SuppressWarnings("unchecked") T... choices) {
         return showChoices(Arrays.asList(choices));
     }
@@ -237,7 +305,7 @@ public final class Dialogs {
 
     private Action showSimpleContentDialog(final Type dlgType) {
         Dialog template = getDialogTemplate(dlgType);
-        template.setContent(message);
+        template.setContent(instruction);
         template.show();
         return template.getResult();
     }
@@ -257,8 +325,8 @@ public final class Dialogs {
         HBox hbox = new HBox(10);
         hbox.setAlignment(Pos.BASELINE_LEFT);
         
-        if (message != null && !message.isEmpty()) {
-            Label label = new Label(message);
+        if (instruction != null && !instruction.isEmpty()) {
+            Label label = new Label(instruction);
             HBox.setHgrow(label, Priority.NEVER);
             hbox.getChildren().add(label);
         }

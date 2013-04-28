@@ -83,7 +83,7 @@ public class HelloDialog extends Application {
                 Dialogs.build(stage)
                    .title("JavaFX")
                    .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
-                   .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
+                   .instruction("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
                    .showInformation();
             }
         });
@@ -103,7 +103,7 @@ public class HelloDialog extends Application {
                 Action response =  Dialogs.build(stage)
                     .title("You do want dialogs right?")
                     .masthead(isMastheadVisible() ? "Just Checkin'" : null)
-                    .message( "I was a bit worried that you might not want them, so I wanted to double check.")
+                    .instruction( "I was a bit worried that you might not want them, so I wanted to double check.")
                     .showConfirm();
 
                 System.out.println("response: " + response);
@@ -125,7 +125,7 @@ public class HelloDialog extends Application {
                 Action response = Dialogs.build(stage)
                    .title("I'm warning you!")
                    .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
-                   .message("This is a warning")
+                   .instruction("This is a warning")
                    .showWarning();
 
                 System.out.println("response: " + response);
@@ -146,7 +146,7 @@ public class HelloDialog extends Application {
             @Override public void handle(ActionEvent e) {
                 Action response = Dialogs.build(stage)
                       .title("It looks like you're making a bad decision")
-                      .message("Exception Encountered")
+                      .instruction("Exception Encountered")
                       .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance!" : null)
                       .showError();
 
@@ -168,7 +168,7 @@ public class HelloDialog extends Application {
             @Override public void handle(ActionEvent e) {
                 Action response = Dialogs.build(stage)
                     .title("It looks like you're making a bad decision")
-                    .message("Better change your mind - this is really your last chance!")
+                    .instruction("Better change your mind - this is really your last chance!")
                     .masthead(isMastheadVisible() ? "Exception Encountered" : null)
                     .showException(new RuntimeException("Pending Bad Decision Exception"));
 
@@ -212,7 +212,7 @@ public class HelloDialog extends Application {
                 String response = Dialogs.build(stage)
                     .title("Name Check")
                     .masthead(isMastheadVisible() ? "Please type in your name" : null)
-                    .message("What is your name?")
+                    .instruction("What is your name?")
                     .showTextInput();
 
                 System.out.println("response: " + response);
@@ -232,7 +232,7 @@ public class HelloDialog extends Application {
                 String response = Dialogs.build(stage)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
-                        .message("Pick a name?")
+                        .instruction("Pick a name?")
                         .showTextInput("Jonathan");
                 System.out.println("response: " + response);
             }
@@ -253,7 +253,7 @@ public class HelloDialog extends Application {
                 String response = Dialogs.build(stage)
                       .title("Name Guess")
                       .masthead(isMastheadVisible() ? "Name Guess" : null)
-                      .message("Pick a name?")
+                      .instruction("Pick a name?")
                       .showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah");
 
                 System.out.println("response: " + response);
@@ -279,7 +279,7 @@ public class HelloDialog extends Application {
                 String response = Dialogs.build(stage)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
-                        .message("Pick a name?")
+                        .instruction("Pick a name?")
                         .showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise", "Stephan",
                              "Sarah", "Ron", "Ingrid");
 

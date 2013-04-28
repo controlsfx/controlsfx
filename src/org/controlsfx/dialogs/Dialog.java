@@ -57,6 +57,15 @@ import javafx.stage.Stage;
 
 import com.sun.javafx.Utils;
 
+
+/**
+ * API for creating standardized dialogs which include: 
+ * masthead, content, expandable content and button bar
+ * 
+ * @author Jonathan Files
+ * @author Eugene Ryzhikov
+ *
+ */
 @SuppressWarnings("restriction")
 public class Dialog {
 
@@ -69,11 +78,16 @@ public class Dialog {
 
     private final FXDialog dialog;
 
-    // Dialog result. By default set to CLOSE
-    private Action result = DialogAction.CLOSE;
+    // Dialog result.
+    private Action result = DialogAction.CANCEL;
 
     private final BorderPane contentPane;
 
+    /**
+     * Creates a dialog using specified owner and title
+     * @param owner dialog window  owner
+     * @param title dialog title
+     */
     public Dialog(Stage owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
         this.contentPane = new BorderPane();
@@ -81,15 +95,26 @@ public class Dialog {
         this.dialog.setContentPane(contentPane);
     }
 
+    /**
+     * Shows dialog and wait for user response.
+     * Dialog content is assembled together just before dialog is shown  
+     */
     public void show() {
         buildDialogContent();
         dialog.showAndWait();
     }
 
+    /**
+     * Hides the dialog
+     */
     public void hide() {
         dialog.hide();
     }
 
+    /**
+     * Returns dialog result  
+     * @return An action which was used to close the dialog
+     */
     public Action getResult() {
         return result;
     }
@@ -98,12 +123,20 @@ public class Dialog {
         return dialog;
     }
 
-    // Resizable property
+    /////// Resizable property
 
+    /**
+     * Determines of dialog is resizable
+     * @return true if dialog is resizable
+     */
     public boolean isResizable() {
         return dialog.isResizable();
     }
 
+    /**
+     * Changes the dialog's resizable attribute
+     * @param resizable true if dialog should be resizable
+     */
     public void setResizable(boolean resizable) {
         dialog.setResizable(resizable);
     }
@@ -116,10 +149,19 @@ public class Dialog {
 
     private final ObjectProperty<Image> iconProperty = new SimpleObjectProperty<Image>();
 
+    /**
+     * Dialog's icon.
+     * Presented either in the mastehead, if one is available or in the content 
+     * @return dialog's icon
+     */
     public Image getIcon() {
         return iconProperty.get();
     }
 
+    /**
+     * Sets dialog's icon
+     * @param icon dialog's icon. Used if not null.
+     */
     public void setIcon(Image icon) {
         this.iconProperty.set(icon);
     }
@@ -132,14 +174,26 @@ public class Dialog {
 
     private final ObjectProperty<Node> masthead = new SimpleObjectProperty<Node>();
 
+    /**
+     * Node which acts as dialog's masthead
+     * @return dialog's masthead
+     */
     public final Node getMasthead() {
         return masthead.get();
     }
 
+    /**
+     * Assigns dialog's masthead. Any Node can be used 
+     * @param masthead future masthead
+     */
     public final void setMasthead(Node masthead) {
         this.masthead.setValue(masthead);
     }
 
+    /**
+     * Asssign string as dialog's masthead
+     * @param mastheadText masthead text. Used if not null.
+     */
     public final void setMasthead(String mastheadText) {
 
         if (mastheadText == null)
@@ -182,14 +236,26 @@ public class Dialog {
 
     private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>();
 
+    /**
+     * Current dialog's content as Node
+     * @return dialog's content
+     */
     public final Node getContent() {
         return content.get();
     }
 
+    /**
+     * Assign dialog content. Any Node can be used
+     * @param content dialog's content
+     */
     public final void setContent(Node content) {
         this.content.setValue(content);
     }
 
+    /**
+     * Assign text as dialog's content
+     * @param contentText content text. Used if not null.
+     */
     public final void setContent(String contentText) {
         if (contentText == null) return;
 
@@ -214,10 +280,20 @@ public class Dialog {
 
     private final ObjectProperty<Node> expandableContentProperty = new SimpleObjectProperty<Node>();
 
+    /**
+     * Dialog's expandable content
+     * @return expandable content as Node
+     */
     public Node getExpandableContent() {
         return expandableContentProperty.get();
     }
 
+    /**
+     * Assigns dialog's expandable content. Any Node can be used.
+     * By default expandable conntent is hidden and can be made visible by clicking "Mode Details" hyperlink,
+     * which appears automatically of non-null expandable content exists 
+     * @param content expandable content.
+     */
     public void setExpandableContent(Node content) {
         this.expandableContentProperty.set(content);
     }
@@ -230,17 +306,43 @@ public class Dialog {
 
     private final ObservableList<Action> actions = FXCollections.<Action> observableArrayList();
 
+    /**
+     * Observable list of actions used for dialog's buttons bar.
+     * Can be used for manipulating actions before presenting the dialog
+     * @return actions lsit
+     */
     public final ObservableList<Action> getActions() {
         return actions;
     }
 
-    // TODO: needs getIcon method
+    // TODO: needs JavaFX style properties: text, icon, tooltip, enabled
+    /**
+     * Common interface for dialog actions.
+     * Actions are used to auto-generate buttons in the dialog's button bar
+     * 
+     * @author Eugene Ryzhikov
+     */
     public interface Action {
+
+        /**
+         * Action text
+         * @return 
+         */
         String getText();
 
+        /**
+         * Executes action 
+         * @param ae action context
+         */
         void execute(ActionEvent ae);
     }
 
+    /**
+     * Common dialog actions
+     * 
+     * @author Eugene Ryzhikov
+     *
+     */
     public enum DialogAction implements Action {
 
         CANCEL("Cancel", true, true),
@@ -254,6 +356,13 @@ public class Dialog {
         private boolean isDefault;
         private boolean isCancel;
 
+        /**
+         * Creates common dialog action
+         * @param title action title
+         * @param isDefault true if it should be default action on the dialog. Only one can be, so the first us used.
+         * @param isCancel true if action produces the dialog cancellation. 
+         * @param isClosing true if action is closing the dialog
+         */
         DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
             this.title = title;
             this.isClosing = isClosing;
@@ -282,8 +391,11 @@ public class Dialog {
         }
 
         public void execute(ActionEvent ae) {
-            if (ae.getSource() instanceof Dialog && isClosing())
-                ((Dialog) ae.getSource()).hide();
+            if (ae.getSource() instanceof Dialog && (isCancel() || isClosing()) ) {
+                Dialog dlg = ((Dialog) ae.getSource());
+                dlg.result = DialogAction.this;        
+                dlg.hide();
+            }
         }
 
     }

@@ -363,14 +363,14 @@ public class Dialog {
          * @param isCancel true if action produces the dialog cancellation. 
          * @param isClosing true if action is closing the dialog
          */
-        DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
+        private DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
             this.title = title;
             this.isClosing = isClosing;
             this.isDefault = isDefault;
             this.isCancel = isCancel;
         }
 
-        DialogAction(String title, boolean isDefault, boolean isCancel) {
+        private DialogAction(String title, boolean isDefault, boolean isCancel) {
             this(title, isDefault, isCancel, true);
         }
 

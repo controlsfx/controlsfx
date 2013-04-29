@@ -114,6 +114,7 @@ public class Dialog {
             dialog.showAndWait();
             return result;
         } catch (Throwable e) {
+            e.printStackTrace();
             return CANCEL;
         }
     }
@@ -347,9 +348,86 @@ public class Dialog {
          * @param ae action context
          */
         void execute(ActionEvent ae);
-
+    }
+    
+    public static abstract class AbstractAction implements Action {
+        private final StringProperty textProperty = 
+                new SimpleStringProperty(this, "text");
+        private final BooleanProperty disabledProperty = 
+                new SimpleBooleanProperty(this, "disabled");
+        private final ObjectProperty<Tooltip> tooltipProperty =
+                new SimpleObjectProperty<Tooltip>(this, "tooltip");
+        private final ObjectProperty<Node> graphicProperty =
+                new SimpleObjectProperty<Node>(this, "graphic");
+        
+        public AbstractAction(String text) {
+            setText(text);
+        }
+        
+        
+        // --- text
+        /**
+         * {@inheritDoc}
+         */
+        @Override public StringProperty textProperty() {
+            return textProperty;
+        }
+        public final String getText() {
+            return textProperty.get();
+        }
+        public final void setText(String value) {
+            textProperty.set(value);
+        }
+        
+        
+        // --- disabled
+        /**
+         * {@inheritDoc}
+         */
+        @Override public BooleanProperty disabledProperty() {
+            return disabledProperty;
+        }
+        public final boolean isDisabled() {
+            return disabledProperty.get();
+        }
+        public final void setDisabled(boolean value) {
+            disabledProperty.set(value);
+        }
 
         
+        // --- tooltip
+        /**
+         * {@inheritDoc}
+         */
+        @Override public ObjectProperty<Tooltip> tooltipProperty() {
+            return tooltipProperty;
+        }
+        public final Tooltip getTooltip() {
+            return tooltipProperty.get();
+        }
+        public final void setTooltip(Tooltip value) {
+            tooltipProperty.set(value);
+        }
+        
+        
+        // --- graphic
+        /**
+         * {@inheritDoc}
+         */
+        @Override public Property<Node> graphicProperty() {
+            return graphicProperty;
+        }
+        public final Node getGraphic() {
+            return graphicProperty.get();
+        }
+        public final void setGraphic(Node value) {
+            graphicProperty.set(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override public abstract void execute(ActionEvent ae);
     }
 
     /**

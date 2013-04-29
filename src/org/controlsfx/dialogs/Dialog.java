@@ -35,7 +35,11 @@ import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -47,6 +51,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -321,13 +326,26 @@ public class Dialog {
          * Action text
          * @return 
          */
-        String getText();
+        StringProperty textProperty();
+        
+        /**
+         * Action availability
+         * @return
+         */
+        BooleanProperty disabledProperty();
+
+        Property<Tooltip> tooltipProperty();
+        
+        Property<Node> graphicProperty();
 
         /**
          * Executes action 
          * @param ae action context
          */
         void execute(ActionEvent ae);
+
+
+        
     }
 
     /**
@@ -341,7 +359,11 @@ public class Dialog {
         OK    ( getString("common.ok.button"),     true, false),
         YES   ( getString("common.yes.button"),    true, false);
 
-        private String title;
+        private final StringProperty title = new SimpleStringProperty();
+        private final BooleanProperty disabled = new SimpleBooleanProperty(false);
+        private final Property<Tooltip> tooltip = new SimpleObjectProperty<Tooltip>();
+        private final Property<Node> graphic = new SimpleObjectProperty<Node>();
+        
         private boolean isClosing;
         private boolean isDefault;
         private boolean isCancel;
@@ -354,7 +376,7 @@ public class Dialog {
          * @param isClosing true if action is closing the dialog
          */
         private DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
-            this.title = title;
+            this.title.set(title);
             this.isClosing = isClosing;
             this.isDefault = isDefault;
             this.isCancel = isCancel;
@@ -364,10 +386,22 @@ public class Dialog {
             this(title, isDefault, isCancel, true);
         }
 
-        @Override public String getText() {
+        @Override public StringProperty textProperty() {
             return title;
         }
 
+        @Override public BooleanProperty disabledProperty() {
+            return disabled;
+        }
+        
+        @Override public Property<Tooltip> tooltipProperty() {
+            return tooltip;
+        }
+        
+        @Override public Property<Node> graphicProperty() {
+            return graphic;
+        }
+        
         public boolean isClosing() {
             return isClosing;
         }
@@ -381,10 +415,12 @@ public class Dialog {
         }
 
         public void execute(ActionEvent ae) {
-            if (ae.getSource() instanceof Dialog && (isCancel() || isClosing()) ) {
-                Dialog dlg = ((Dialog) ae.getSource());
-                dlg.result = DialogAction.this;        
-                dlg.hide();
+            if ( !disabled.get() ) {
+                if (ae.getSource() instanceof Dialog && (isCancel() || isClosing()) ) {
+                    Dialog dlg = ((Dialog) ae.getSource());
+                    dlg.result = DialogAction.this;        
+                    dlg.hide();
+                }
             }
         }
 
@@ -539,7 +575,13 @@ public class Dialog {
     }
 
     private Button createButton(final Action action, boolean keepDefault) {
-        Button button = new Button(action.getText());
+        Button button = new Button();
+        
+        button.textProperty().bindBidirectional(action.textProperty());
+        button.disableProperty().bindBidirectional(action.disabledProperty());
+        button.tooltipProperty().bindBidirectional(action.tooltipProperty());
+        button.graphicProperty().bindBidirectional(action.graphicProperty());
+        
         if (action instanceof DialogAction) {
             DialogAction stdAction = (DialogAction) action;
             button.setDefaultButton(stdAction.isDefault() && keepDefault);

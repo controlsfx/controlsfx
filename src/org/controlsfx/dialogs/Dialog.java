@@ -506,7 +506,9 @@ public class Dialog {
             ec.managedProperty().bind(ec.visibleProperty());
         }
 
-        centerPanel.getChildren().add(createButtonPanel());
+        if ( !getActions().isEmpty() || hasExpandableContent()) {
+           centerPanel.getChildren().add(createButtonPanel());
+        }
 
         return centerPanel;
     }

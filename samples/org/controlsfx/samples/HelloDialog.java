@@ -19,8 +19,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import org.controlsfx.dialogs.Dialogs;
 import org.controlsfx.dialogs.Dialog.Action;
+import org.controlsfx.dialogs.Dialogs;
+import org.controlsfx.dialogs.Dialogs.CommandLink;
 
 public class HelloDialog extends Application {
 
@@ -289,6 +290,28 @@ public class HelloDialog extends Application {
         grid.add(Hyperlink11, 4, row);
 
         row++;
+        
+        grid.add(createLabel("Command Links: "), 0, row);
+        final Button Hyperlink12 = new Button("Show");
+        Hyperlink12.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                int response = Dialogs.build(stage)
+                        .title("Manually connect to wireless network")
+                        .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
+                        .message("How do you want to add a network?")
+                        .showCommandLinks( 1,
+                             new CommandLink("Add a network that is in the range of this computer", 
+                                             "This shows you a list of networks that are currently available and lets you connect to one."),
+                             new CommandLink("Manually create a network profile", 
+                                             "This creates a new network profile or locates an existing one and saves it on your computer"),
+                             new CommandLink("Create an ad hoc network", 
+                                     "This creates a temporary network for sharing files or and Internet connection")
+                                );
+
+                System.out.println("response: " + response);
+            }
+        });
+        grid.add(Hyperlink12, 1, row);
 
         stage.setScene(scene);
         stage.show();

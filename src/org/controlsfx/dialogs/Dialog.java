@@ -123,7 +123,7 @@ public class Dialog {
      * Determines of dialog is resizable
      * @return true if dialog is resizable
      */
-    public boolean isResizable() {
+    public final boolean isResizable() {
         return dialog.isResizable();
     }
 
@@ -131,7 +131,7 @@ public class Dialog {
      * Changes the dialog's resizable attribute
      * @param resizable true if dialog should be resizable
      */
-    public void setResizable(boolean resizable) {
+    public final void setResizable(boolean resizable) {
         dialog.setResizable(resizable);
     }
 
@@ -148,7 +148,7 @@ public class Dialog {
      * Presented either in the masthead, if one is available or in the content 
      * @return dialog's graphic
      */
-    public Image getGraphic() {
+    public final Image getGraphic() {
         return graphicProperty.get();
     }
 
@@ -156,7 +156,7 @@ public class Dialog {
      * Sets dialog's graphic
      * @param graphic dialog's graphic. Used if not null.
      */
-    public void setGraphic(Image graphic) {
+    public final void setGraphic(Image graphic) {
         this.graphicProperty.set(graphic);
     }
 
@@ -278,7 +278,7 @@ public class Dialog {
      * Dialog's expandable content
      * @return expandable content as Node
      */
-    public Node getExpandableContent() {
+    public final Node getExpandableContent() {
         return expandableContentProperty.get();
     }
 
@@ -288,7 +288,7 @@ public class Dialog {
      * which appears automatically of non-null expandable content exists 
      * @param content expandable content.
      */
-    public void setExpandableContent(Node content) {
+    public final void setExpandableContent(Node content) {
         this.expandableContentProperty.set(content);
     }
 

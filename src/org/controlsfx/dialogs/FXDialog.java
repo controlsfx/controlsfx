@@ -276,8 +276,8 @@ class FXDialog extends Stage {
         if (owner != null) {
             // because Stage does not seem to centre itself over its owner, we
             // do it here.
-            final double x = owner.getX() + (owner.getWidth() / 4.0);
-            final double y = owner.getY() + (owner.getHeight() / 4.0);
+            final double x = owner.getX() + (owner.getWidth() / 2.0) - (root.prefWidth(-1) / 2.0);
+            final double y = owner.getY() + (owner.getHeight() / 2.0) - (root.prefHeight(-1)) / 2.0 - 50;
             setX(x);
             setY(y);
         }

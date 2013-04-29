@@ -36,16 +36,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -58,6 +54,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
+import org.controlsfx.dialogs.Dialog.AbstractAction;
 import org.controlsfx.dialogs.Dialog.Action;
 
 /**
@@ -65,8 +62,6 @@ import org.controlsfx.dialogs.Dialog.Action;
  * Uses fluent API for flexibility
  */
 public final class Dialogs {
-
-    private static final String COMMAND_LINK_ID = "command.link.id";
 
     /**
      * USE_DEFAULT can be passed in to {@link #title(String)} and {@link #masthead(String)} methods
@@ -191,6 +186,30 @@ public final class Dialogs {
         dlg.setExpandableContent(buildExceptionDetails(exception));
         return dlg.show();
     }
+    
+    /**
+     * Shows exception dialog with a button to open the exception text in a 
+     * new window.
+     * @param exception exception to present
+     * @return action used to close dialog
+     */
+    public Action showExceptionInNewWindow(final Throwable exception) {
+        Dialog dlg = buildDialog(Type.ERROR);
+        dlg.setContent(exception.getMessage());
+        
+        Action openExceptionAction = new AbstractAction("Open Exception") {
+            @Override public void execute(ActionEvent ae) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                exception.printStackTrace(pw);
+                String moreDetails = sw.toString();
+                new ExceptionDialog(owner, moreDetails).show();
+            }
+        };
+        dlg.getActions().add(openExceptionAction);
+        
+        return dlg.show();
+    }
 
     /**
      * Shows dialog with one text field
@@ -259,85 +278,7 @@ public final class Dialogs {
     public <T> T showChoices(@SuppressWarnings("unchecked") T... choices) {
         return showChoices(Arrays.asList(choices));
     }
-    
-    public int showCommandLinks( int defaultLinkIndex, List<CommandLink> links ) {
-        final Dialog dlg = buildDialog(Type.INFORMATION );
-        dlg.setContent(message);
-        VBox content = new VBox(10);
-        Node message = dlg.getContent();
-        if ( message != null ) {
-            content.getChildren().add(message);
-        }
-        
-        final int[] result = new int[]{-1};
-        int commandIndex = 0;
-        
-        for (CommandLink commandLink : links) {
-            final Button button = new Button(commandLink.getMessage() + "\n" + commandLink.getComment());
-            button.setDefaultButton( commandIndex == defaultLinkIndex );
-            button.setGraphic( commandLink.getGraphic());
-            button.setMaxWidth(Double.MAX_VALUE);
-            button.setPadding( new Insets(10,10,10,10));
-            button.setAlignment(Pos.BASELINE_LEFT);
-            button.getProperties().put(COMMAND_LINK_ID, commandIndex );
-            button.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent ae) {
-                    result[0]  = (int)( button.getProperties().get(COMMAND_LINK_ID));
-                    dlg.hide();
-                }
-            });
-            content.getChildren().add( button );
-            commandIndex++;
-        }
-        dlg.setContent(content);
-        dlg.getActions().clear();
-        dlg.show();
-        return result[0];
-    }
-    
-    public int showCommandLinks( List<CommandLink> links ) {
-        return showCommandLinks(0, links);
-    }
-    
-    public int showCommandLinks( int defaultLinkIndex, CommandLink... links ) {
-        return showCommandLinks( defaultLinkIndex, Arrays.asList(links));
-    }
-    
-    public int showCommandLinks( CommandLink... links ) {
-        return showCommandLinks(0, links);
-    }
 
-    
-    public static class CommandLink {
-        
-        private Node graphic;
-        private String message; 
-        private String comment;
-        
-        public CommandLink( Node graphic, String message, String comment ) {
-            this.graphic = graphic;
-            this.message = message;
-            this.comment = comment;
-        }
-        
-        public CommandLink( String message, String comment ) {
-            this(null, message, comment);
-        }
-        
-        public Node getGraphic() {
-            return graphic;
-        }
-        
-        public String getMessage() {
-            return message;
-        }
-        
-        public String getComment() {
-            return comment;
-        }
-        
-    }
-    
     /***************************************************************************
      * Private API
      **************************************************************************/

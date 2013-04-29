@@ -32,6 +32,7 @@ import static org.controlsfx.dialogs.DialogResources.getString;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -61,7 +62,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import com.sun.javafx.Utils;
@@ -87,6 +87,9 @@ public class Dialog {
     private Action result = DialogAction.CANCEL;
 
     private final BorderPane contentPane;
+    
+    // list containing user input buttons at bottom of dialog
+    private List<ButtonBase> buttons = new ArrayList<ButtonBase>();
 
     /**
      * Creates a dialog using specified owner and title
@@ -111,6 +114,7 @@ public class Dialog {
             dialog.showAndWait();
             return result;
         } catch (Throwable e) {
+            e.printStackTrace();
             return CANCEL;
         }
     }
@@ -344,9 +348,86 @@ public class Dialog {
          * @param ae action context
          */
         void execute(ActionEvent ae);
-
+    }
+    
+    public static abstract class AbstractAction implements Action {
+        private final StringProperty textProperty = 
+                new SimpleStringProperty(this, "text");
+        private final BooleanProperty disabledProperty = 
+                new SimpleBooleanProperty(this, "disabled");
+        private final ObjectProperty<Tooltip> tooltipProperty =
+                new SimpleObjectProperty<Tooltip>(this, "tooltip");
+        private final ObjectProperty<Node> graphicProperty =
+                new SimpleObjectProperty<Node>(this, "graphic");
+        
+        public AbstractAction(String text) {
+            setText(text);
+        }
+        
+        
+        // --- text
+        /**
+         * {@inheritDoc}
+         */
+        @Override public StringProperty textProperty() {
+            return textProperty;
+        }
+        public final String getText() {
+            return textProperty.get();
+        }
+        public final void setText(String value) {
+            textProperty.set(value);
+        }
+        
+        
+        // --- disabled
+        /**
+         * {@inheritDoc}
+         */
+        @Override public BooleanProperty disabledProperty() {
+            return disabledProperty;
+        }
+        public final boolean isDisabled() {
+            return disabledProperty.get();
+        }
+        public final void setDisabled(boolean value) {
+            disabledProperty.set(value);
+        }
 
         
+        // --- tooltip
+        /**
+         * {@inheritDoc}
+         */
+        @Override public ObjectProperty<Tooltip> tooltipProperty() {
+            return tooltipProperty;
+        }
+        public final Tooltip getTooltip() {
+            return tooltipProperty.get();
+        }
+        public final void setTooltip(Tooltip value) {
+            tooltipProperty.set(value);
+        }
+        
+        
+        // --- graphic
+        /**
+         * {@inheritDoc}
+         */
+        @Override public Property<Node> graphicProperty() {
+            return graphicProperty;
+        }
+        public final Node getGraphic() {
+            return graphicProperty.get();
+        }
+        public final void setGraphic(Node value) {
+            graphicProperty.set(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override public abstract void execute(ActionEvent ae);
     }
 
     /**
@@ -515,8 +596,14 @@ public class Dialog {
     }
 
     private Node createButtonPanel() {
-
-        HBox buttonsPanel = new HBox(6);
+        buttons.clear();
+        
+        final HBox buttonsPanel = new HBox(6) {
+            @Override protected void layoutChildren() {
+                resizeButtons();
+                super.layoutChildren();
+            }
+        };
         buttonsPanel.getStyleClass().add("button-bar");
 
         // show details button if expandable content is present
@@ -527,16 +614,13 @@ public class Dialog {
         // push buttons to the right
         buttonsPanel.getChildren().add(createButtonSpacer());
 
-        List<ButtonBase> buttons = new ArrayList<ButtonBase>();
-        double widest = MINIMUM_BUTTON_WIDTH;
         boolean hasDefault = false;
-        for (Action cmd : actions) {
+        for (Action cmd : getActions()) {
             ButtonBase b = createButton(cmd, !hasDefault);
             // keep only first default button
             if (b instanceof Button) {
                 hasDefault |= ((Button) b).isDefaultButton();
             }
-            widest = Math.max(widest, b.prefWidth(-1));
             buttons.add(b);
         }
 
@@ -545,11 +629,32 @@ public class Dialog {
             Collections.reverse(buttons);
 
         for (ButtonBase button : buttons) {
-            button.setPrefWidth(button.isVisible() ? widest : 0);
             buttonsPanel.getChildren().add(button);
         }
 
         return buttonsPanel;
+    }
+    
+    /*
+     * According to UI guidelines, all buttons should have the same length. This
+     * function is to define the longest button in the array of buttons and set
+     * all buttons in array to be the length of the longest button.
+     */
+    private void resizeButtons() {
+        // Find out the longest button...
+        double widest = MINIMUM_BUTTON_WIDTH;
+        for (ButtonBase btn : buttons) {
+            if (btn == null)
+                continue;
+            widest = Math.max(widest, btn.prefWidth(-1));
+        }
+
+        // ...and set all buttons to be this width
+        for (ButtonBase btn : buttons) {
+            if (btn == null)
+                continue;
+            btn.setPrefWidth(btn.isVisible() ? widest : 0);
+        }
     }
 
     private Node createButtonSpacer() {

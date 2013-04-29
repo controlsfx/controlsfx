@@ -27,6 +27,7 @@
 package org.controlsfx.dialogs;
 
 import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
+import static org.controlsfx.dialogs.DialogResources.getString;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -334,11 +335,11 @@ public class Dialog {
      */
     public enum DialogAction implements Action {
 
-        CANCEL( DialogResources.getString("common.cancel.button"), true, true),
-        CLOSE ( DialogResources.getString("common.close.button"),  true, true),
-        NO    ( DialogResources.getString("common.no.button"),     true, true),
-        OK    ( DialogResources.getString("common.ok.button"),     true, false),
-        YES   ( DialogResources.getString("common.yes.button"),    true, false);
+        CANCEL( getString("common.cancel.button"), true, true),
+        CLOSE ( getString("common.close.button"),  true, true),
+        NO    ( getString("common.no.button"),     true, true),
+        OK    ( getString("common.ok.button"),     true, false),
+        YES   ( getString("common.yes.button"),    true, false);
 
         private String title;
         private boolean isClosing;
@@ -521,8 +522,8 @@ public class Dialog {
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
         detailsButton.getStyleClass().setAll("details-button", "more");
-        final String moreText = DialogResources.getString("common.detail.button.more");
-        final String lessText = DialogResources.getString("common.detail.button.less");
+        final String moreText = getString("common.detail.button.more");
+        final String lessText = getString("common.detail.button.less");
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {

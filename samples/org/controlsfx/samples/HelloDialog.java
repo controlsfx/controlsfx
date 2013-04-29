@@ -306,7 +306,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink12 = new Button("Show");
         Hyperlink12.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                int response = Dialogs.build(stage)
+                int response = Dialogs.build().owner(stage)
                         .title("Manually connect to wireless network")
                         .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
                         .message("How do you want to add a network?")

@@ -32,7 +32,6 @@ import static org.controlsfx.dialogs.DialogResources.getString;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

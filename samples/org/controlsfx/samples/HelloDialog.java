@@ -24,7 +24,8 @@ import org.controlsfx.dialogs.Dialog.Action;
 
 public class HelloDialog extends Application {
 
-    CheckBox cbShowMasthead = new CheckBox("Show Masthead");
+    private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
+    private final CheckBox cbSetOwner = new CheckBox("Set Owner");
 
     @Override public void start(final Stage stage) {
         // setUserAgentStylesheet(STYLESHEET_MODENA);
@@ -68,6 +69,7 @@ public class HelloDialog extends Application {
         row++;
         grid.add(createLabel("Common Dialog attributes: "), 0, 1);
         grid.add(cbShowMasthead, 1, row);
+        grid.add(cbSetOwner, 2, row);
 
         row++;
 
@@ -80,7 +82,8 @@ public class HelloDialog extends Application {
         final Button Hyperlink2 = new Button("Show");
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.build(stage)
+                Dialogs.build()
+                   .owner(cbSetOwner.isSelected() ? stage : null)
                    .title("JavaFX")
                    .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
                    .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
@@ -100,7 +103,8 @@ public class HelloDialog extends Application {
         final Button Hyperlink3 = new Button("Show");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response =  Dialogs.build(stage)
+                Action response =  Dialogs.build()
+                    .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("You do want dialogs right?")
                     .masthead(isMastheadVisible() ? "Just Checkin'" : null)
                     .message( "I was a bit worried that you might not want them, so I wanted to double check.")
@@ -122,7 +126,8 @@ public class HelloDialog extends Application {
         final Button Hyperlink6a = new Button("Show");
         Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.build(stage)
+                Action response = Dialogs.build()
+                    .owner(cbSetOwner.isSelected() ? stage : null)
                    .title("I'm warning you!")
                    .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
                    .message("This is a warning")
@@ -144,7 +149,8 @@ public class HelloDialog extends Application {
         final Button Hyperlink7a = new Button("Show");
         Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.build(stage)
+                Action response = Dialogs.build()
+                      .owner(cbSetOwner.isSelected() ? stage : null)
                       .title("It looks like you're making a bad decision")
                       .message("Exception Encountered")
                       .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance!" : null)
@@ -166,7 +172,8 @@ public class HelloDialog extends Application {
         final Button Hyperlink5a = new Button("Show");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.build(stage)
+                Action response = Dialogs.build()
+                    .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("It looks like you're making a bad decision")
                     .message("Better change your mind - this is really your last chance!")
                     .masthead(isMastheadVisible() ? "Exception Encountered" : null)
@@ -209,7 +216,8 @@ public class HelloDialog extends Application {
                 // if (isMastheadVisible())
                 // dlg.masthead("Please type in your name");
                 // String response = dlg.showInputDialog();
-                String response = Dialogs.build(stage)
+                String response = Dialogs.build()
+                    .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("Name Check")
                     .masthead(isMastheadVisible() ? "Please type in your name" : null)
                     .message("What is your name?")
@@ -229,7 +237,8 @@ public class HelloDialog extends Application {
                 // if (isMastheadVisible())
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
-                String response = Dialogs.build(stage)
+                String response = Dialogs.build()
+                        .owner(cbSetOwner.isSelected() ? stage : null)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
                         .message("Pick a name?")
@@ -250,7 +259,8 @@ public class HelloDialog extends Application {
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
 
-                String response = Dialogs.build(stage)
+                String response = Dialogs.build()
+                      .owner(cbSetOwner.isSelected() ? stage : null)
                       .title("Name Guess")
                       .masthead(isMastheadVisible() ? "Name Guess" : null)
                       .message("Pick a name?")
@@ -276,7 +286,8 @@ public class HelloDialog extends Application {
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
 
-                String response = Dialogs.build(stage)
+                String response = Dialogs.build()
+                        .owner(cbSetOwner.isSelected() ? stage : null)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
                         .message("Pick a name?")

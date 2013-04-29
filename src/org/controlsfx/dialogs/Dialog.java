@@ -62,6 +62,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import com.sun.javafx.Utils;
 
@@ -92,7 +93,7 @@ public class Dialog {
      * @param owner dialog window  owner
      * @param title dialog title
      */
-    public Dialog(Stage owner, String title) {
+    public Dialog(Window owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
         this.contentPane = new BorderPane();
         contentPane.setPrefWidth(MAIN_TEXT_WIDTH);

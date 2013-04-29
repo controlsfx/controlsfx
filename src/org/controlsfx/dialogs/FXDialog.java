@@ -92,7 +92,11 @@ class FXDialog extends Stage {
         }
 
         if (modal) {
-            initModality(Modality.WINDOW_MODAL);
+            if (owner != null) {
+                initModality(Modality.WINDOW_MODAL);
+            } else {
+                initModality(Modality.APPLICATION_MODAL);
+            }
         }
 
         resizableProperty().addListener(new InvalidationListener() {
@@ -265,6 +269,19 @@ class FXDialog extends Stage {
 
         resizeCorner.setManaged(false);
         decoratedRoot.getChildren().add(resizeCorner);
+    }
+    
+    @Override public void showAndWait() {
+        Window owner = getOwner();
+        if (owner != null) {
+            // because Stage does not seem to centre itself over its owner, we
+            // do it here.
+            final double x = owner.getX() + (owner.getWidth() / 2.0) - (root.prefWidth(-1) / 2.0);
+            final double y = owner.getY() + (owner.getHeight() / 2.0) - (root.prefHeight(-1)) / 2.0 - 50;
+            setX(x);
+            setY(y);
+        }
+        super.showAndWait();
     }
 
     void setContentPane(Pane pane) {

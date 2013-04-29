@@ -56,7 +56,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.controlsfx.dialogs.Dialog.Action;
 
@@ -75,7 +75,7 @@ public final class Dialogs {
      */
     public static final String USE_DEFAULT = "$$$";
 
-    private final Stage owner;
+    private Window owner;
     private String title;
     private String message;
     private String masthead;
@@ -95,15 +95,27 @@ public final class Dialogs {
 
     /**
      * Builds the initial dialog
-     * @param owner dialogs owner 
      * @return dialog instance
      */
-    public static Dialogs build(final Stage owner) {
-        return new Dialogs(owner);
+    public static Dialogs build() {
+        return new Dialogs();
     }
 
-    private Dialogs(final Stage owner) {
+    private Dialogs() {
+        
+    }
+    
+    /**
+     * Assigns the owner of the dialog. If an owner is specified, the dialog will
+     * block input to the owner and all parent owners. If no owner is specified,
+     * or if owner is null, the dialog will block input to the entire application.
+     * 
+     * @param owner The dialog owner.
+     * @return 
+     */
+    public Dialogs owner(final Window owner) {
         this.owner = owner;
+        return this;
     }
 
     /**

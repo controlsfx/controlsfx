@@ -39,6 +39,7 @@ import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
@@ -53,6 +54,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
+import org.controlsfx.dialogs.Dialog.AbstractAction;
 import org.controlsfx.dialogs.Dialog.Action;
 
 /**
@@ -182,6 +184,30 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.ERROR);
         dlg.setContent(exception.getMessage());
         dlg.setExpandableContent(buildExceptionDetails(exception));
+        return dlg.show();
+    }
+    
+    /**
+     * Shows exception dialog with a button to open the exception text in a 
+     * new window.
+     * @param exception exception to present
+     * @return action used to close dialog
+     */
+    public Action showExceptionInNewWindow(final Throwable exception) {
+        Dialog dlg = buildDialog(Type.ERROR);
+        dlg.setContent(exception.getMessage());
+        
+        Action openExceptionAction = new AbstractAction("Open Exception") {
+            @Override public void execute(ActionEvent ae) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                exception.printStackTrace(pw);
+                String moreDetails = sw.toString();
+                new ExceptionDialog(owner, moreDetails).show();
+            }
+        };
+        dlg.getActions().add(openExceptionAction);
+        
         return dlg.show();
     }
 

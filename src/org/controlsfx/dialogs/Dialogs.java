@@ -74,7 +74,7 @@ public final class Dialogs {
      */
     public static final String USE_DEFAULT = "$$$";
 
-    private static final String COMMAND_LINK_ID = null;
+    private static final String COMMAND_LINK_ID = "command.link.id";
 
     private Window owner;
     private String title;

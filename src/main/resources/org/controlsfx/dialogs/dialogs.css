@@ -125,11 +125,6 @@
     -fx-font-size: 1.083333em; /*13px;*/
 }
 
-/* For the text displayed above command-link buttons (but below the masthead) */
-.dialog .center-panel .command-link-message {
-    -fx-font-size: 1.25em; 
-}
-
 .dialog .center-content-panel .graphic {
     -fx-padding: 0 0 0 12;
 }
@@ -161,4 +156,33 @@
 
 .dialog .details-button:hover {
     -fx-underline: true;
+}
+
+
+/******************************************************************************
+ * 
+ * Command Link
+ * 
+ ******************************************************************************/
+ /* For the text displayed above command-link buttons (but below the masthead) */
+.dialog .center-panel .command-link-message {
+    -fx-font-size: 1.25em; 
+}
+
+.dialog .command-link-button {
+    -fx-padding: 10 10 10 10;
+}
+
+.dialog .command-link-button > .container > .line-1 {
+    -fx-font-size: 1.25em; 
+    -fx-padding: -5 0 0 5;
+}
+
+.dialog .command-link-button > .container > .line-2 {
+    -fx-font-size: 1em; 
+    -fx-padding: 0 0 0 5;
+}
+
+.dialog .command-link-button > .container > .graphic-container {
+    -fx-padding: 10 10 0 0
 }

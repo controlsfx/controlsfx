@@ -38,12 +38,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -54,8 +56,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -289,7 +295,7 @@ public final class Dialogs {
         Node messageNode = dlg.getContent();
         messageNode.getStyleClass().add("command-link-message");
         
-        VBox content = new VBox(10);
+        final VBox content = new VBox(10);
         Node message = dlg.getContent();
         if ( message != null ) {
             content.getChildren().add(message);
@@ -299,16 +305,33 @@ public final class Dialogs {
         int commandIndex = 0;
         
         for (CommandLink commandLink : links) {
-            
             final Button button = buildCommandLinkButton(commandLink);
-            button.setDefaultButton( commandIndex == defaultLinkIndex );
-            button.getProperties().put(COMMAND_LINK_ID, commandIndex );
+            
+            DoubleBinding dialogWidthBinding = new DoubleBinding() {
+                {
+                    bind(dlg.widthProperty());
+                }
+                
+                @Override protected double computeValue() {
+                    // FIXME 100 is just plucked out of the air to get good
+                    // word wrapping in most circumstances
+                    double width = dlg.widthProperty().get();
+                    return width - 100;
+                }
+            };
+            button.prefWidthProperty().bind(dialogWidthBinding);
+            button.maxWidthProperty().bind(dialogWidthBinding);
+            
+            
+            button.setDefaultButton(commandIndex == defaultLinkIndex);
+            button.getProperties().put(COMMAND_LINK_ID, commandIndex);
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
-                    result[0]  = (int)( button.getProperties().get(COMMAND_LINK_ID));
+                    result[0]  = (int) button.getProperties().get(COMMAND_LINK_ID);
                     dlg.hide();
                 }
             });
+            VBox.setVgrow(button, Priority.SOMETIMES);
             
             content.getChildren().add( button );
             commandIndex++;
@@ -469,40 +492,43 @@ public final class Dialogs {
     
     
     private Button buildCommandLinkButton( CommandLink commandLink ) {
+        // put the content inside a button
         final Button button = new Button();
-        
+        button.getStyleClass().addAll("command-link-button");
+//        button.setPrefWidth(500);
         button.setMaxWidth(Double.MAX_VALUE);
-        button.setMaxHeight(Double.MAX_VALUE);
-        button.setPadding( new Insets(10,10,10,10));
+        button.setMaxHeight(Region.USE_PREF_SIZE);
         button.setAlignment(Pos.CENTER_LEFT);
         
-        VBox textBox = new VBox(-2);
+        
+        Label titleLabel = new Label(commandLink.getMessage() );
+        titleLabel.getStyleClass().addAll("line-1");
+        titleLabel.setWrapText(true);
+        titleLabel.setAlignment(Pos.TOP_LEFT);
+        titleLabel.maxWidthProperty().bind(button.maxWidthProperty());
+        GridPane.setVgrow(titleLabel, Priority.ALWAYS);
 
-        Label messageLabel = new Label(commandLink.getMessage() );
-        messageLabel.getStyleClass().addAll("main-message"/*, "test-border"*/);
+        Label messageLabel = new Label(commandLink.getComment() );
+        messageLabel.getStyleClass().addAll("line-2");
         messageLabel.setWrapText(true);
         messageLabel.setAlignment(Pos.TOP_LEFT);
-        textBox.getChildren().add(messageLabel);
-        VBox.setVgrow(messageLabel, Priority.ALWAYS);
+        messageLabel.maxWidthProperty().bind(button.maxWidthProperty());
+        GridPane.setVgrow(messageLabel, Priority.ALWAYS);
+        
+        Node graphic = commandLink.getGraphic();
+        graphic = graphic == null? new ImageView(DialogResources.getImage("command.link.icon")) : graphic;
+        Pane graphicContainer = new Pane(graphic);
+        graphicContainer.getStyleClass().add("graphic-container");
+        GridPane.setValignment(graphicContainer, VPos.TOP);
+        
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add("container");
+        grid.add(graphicContainer, 0, 0, 1, 2);
+        grid.add(titleLabel, 1, 0);
+        grid.add(messageLabel, 1, 1);
 
-        Label commentLabel = new Label(commandLink.getComment() );
-        commentLabel.getStyleClass().addAll("main-comment"/*, "test-border"*/);
-        commentLabel.setWrapText(true);
-        commentLabel.setAlignment(Pos.TOP_LEFT);
-        textBox.getChildren().add(commentLabel);
-        VBox.setVgrow(commentLabel, Priority.ALWAYS);            
+        button.setGraphic(grid);
         
-        HBox linkContent = new HBox(10);
-        
-        Node linkGraphic = commandLink.getGraphic();
-        linkContent.getChildren().add( 
-                linkGraphic == null? new ImageView(DialogResources.getImage("command.link.icon")) : linkGraphic);
-        linkContent.getChildren().add(textBox);
-        HBox.setHgrow(linkContent, Priority.NEVER);
-        
-        button.setGraphic(linkContent);
         return button;
     }
-    
-
 }

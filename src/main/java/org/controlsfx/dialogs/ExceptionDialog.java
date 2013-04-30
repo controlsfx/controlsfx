@@ -36,7 +36,7 @@ import javafx.stage.Modality;
 
 import static org.controlsfx.dialogs.DialogResources.*;
 
-public class ExceptionDialog extends FXDialog {
+class ExceptionDialog extends FXDialog {
 
     public ExceptionDialog(Window owner, String moreDetails) {
         super(getMessage("exception.dialog.title"));

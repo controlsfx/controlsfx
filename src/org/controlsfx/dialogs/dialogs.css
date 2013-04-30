@@ -1,4 +1,8 @@
 
+.root {
+    -fx-background-color: inherit;
+}
+
 /**** Window buttons: Close, Minimize, Maximize ****/
 
 .dialog {

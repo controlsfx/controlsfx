@@ -91,7 +91,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
                 updateClip();
             }
             
-            if (newRating > -1) {
+            if (updateOnHover && newRating > -1) {
                 updateRating(newRating);
             }
         }

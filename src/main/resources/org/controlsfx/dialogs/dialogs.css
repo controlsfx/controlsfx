@@ -3,7 +3,11 @@
     -fx-background-color: inherit;
 }
 
-/**** Window buttons: Close, Minimize, Maximize ****/
+/*******************************************************************************
+ *                                                                             *
+ * Window buttons: Close, Minimize, Maximize                                   *
+ *                                                                             *
+ ******************************************************************************/
 
 .dialog {
     -fx-padding: -1;
@@ -93,45 +97,61 @@
     -fx-shape: "M406.283,294.985h2.537v9.031h-2.538L406.283,294.985z M412.012,298.248v2.537h-9.001v-2.537H412.012z";
 }
 
-.dialog .content-pane {
-    -fx-background-color: #eeeeee;
-    -fx-text-fill: #292929;
-}
 
-.dialog .main-message {
-    -fx-font-size: 1em;
-}
-
-.dialog .main-comment {
-    -fx-font-size: 1em;
-}
-
-.dialog .top-panel {
+/*******************************************************************************
+ *                                                                             *
+ * Masthead                                                                    *
+ *                                                                             *
+ ******************************************************************************/
+ 
+.dialog .masthead-panel {
     -fx-padding: 10 14 10 14;
     -fx-background-color: linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
 }
 
-.dialog .masthead-label {
+.dialog .masthead-panel .label {
     -fx-font-size: 1.249999em; 
     -fx-wrap-text: true;
 }
 
-.dialog .center-panel {
+
+/*******************************************************************************
+ *                                                                             *
+ * Content area of the Dialog                                                  *
+ * (beneath title/masthead, but including above buttons)                       *
+ *                                                                             *
+ ******************************************************************************/
+ 
+.dialog > * > .content-pane > .center-panel {
     -fx-padding: 16 16 14 16;
     -fx-spacing: 14;
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
     -fx-border-color: #b4b4b4 white #b4b4b4 white;
     -fx-font-size: 1.083333em; /*13px;*/
+    -fx-text-fill: #292929;
 }
 
-.dialog .center-content-panel .graphic {
-    -fx-padding: 0 0 0 12;
+/* The area specifically for content, e.g. not including the button-bar */
+.dialog > * > .content-pane > .center-panel .content {
+    -fx-font-size: 1em;
+    -fx-padding: 5 0 10 0;
 }
 
-.dialog .center-panel .button-bar {
+.dialog > * > .content-pane > .center-panel .button-bar {
     -fx-padding: 8 0 8 0;
 }
+
+.dialog:no-masthead > * > .content-pane > .center-panel .graphic {
+    -fx-padding: 0 10 0 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Expandable Dialog                                                           *
+ *                                                                             *
+ ******************************************************************************/
 
 .dialog .more-info-dialog {
     -fx-background-color: #eeeeee;
@@ -159,13 +179,13 @@
 }
 
 
-/******************************************************************************
- * 
- * Command Link
- * 
+/*******************************************************************************
+ *                                                                             *
+ * Command Link                                                                *
+ *                                                                             *
  ******************************************************************************/
  /* For the text displayed above command-link buttons (but below the masthead) */
-.dialog .center-panel .command-link-message {
+.dialog > * > .content-pane > .center-panel .command-link-message {
     -fx-font-size: 1.25em; 
 }
 

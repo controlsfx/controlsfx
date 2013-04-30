@@ -285,9 +285,6 @@ class FXDialog extends Stage {
     }
 
     void setContentPane(Pane pane) {
-        if (pane.getId() == null) {
-            pane.getStyleClass().add("content-pane");
-        }
         root.setCenter(pane);
     }
 
@@ -307,6 +304,8 @@ class FXDialog extends Stage {
         }
     }
 
+    
+    
     /***************************************************************************
      *                                                                         *
      * Stylesheet Handling                                                     *

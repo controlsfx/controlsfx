@@ -43,7 +43,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -61,7 +60,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -448,6 +446,7 @@ public final class Dialogs {
     private Node buildInputContent(Control inputControl) {
 
         HBox hbox = new HBox(10);
+        hbox.setMaxWidth(Double.MAX_VALUE);
         hbox.setAlignment(Pos.BASELINE_LEFT);
         
         if (message != null && !message.isEmpty()) {

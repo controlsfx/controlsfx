@@ -43,19 +43,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -73,7 +74,7 @@ import com.sun.javafx.Utils;
  */
 @SuppressWarnings("restriction")
 public class Dialog {
-
+    
     // According to the UI spec, the width of the main message text in the upper
     // panel should be 426 pixels.
     private static int MAIN_TEXT_WIDTH = 400;
@@ -99,6 +100,7 @@ public class Dialog {
     public Dialog(Window owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
         this.contentPane = new BorderPane();
+        this.contentPane.getStyleClass().add("content-pane");
         contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
         this.dialog.setContentPane(contentPane);
     }
@@ -204,7 +206,7 @@ public class Dialog {
             return;
 
         BorderPane mastheadPanel = new BorderPane();
-        mastheadPanel.getStyleClass().add("top-panel");
+        mastheadPanel.getStyleClass().add("masthead-panel");
 
         // Create panel with text area and graphic or just a background image:
         // Create topPanel's components. UITextArea determines
@@ -214,7 +216,6 @@ public class Dialog {
         mastheadTextArea.setPrefWidth(MAIN_TEXT_WIDTH);
         mastheadTextArea.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         mastheadTextArea.setWrapText(true);
-        mastheadTextArea.getStyleClass().add("masthead-label");
 
         VBox mastheadVBox = new VBox();
         mastheadVBox.setAlignment(Pos.CENTER_LEFT);
@@ -238,7 +239,14 @@ public class Dialog {
 
     // Content property
 
-    private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>();
+    private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>() {
+        protected void invalidated() {
+            Node contentNode = getContent();
+            if (contentNode != null) {
+                contentNode.getStyleClass().addAll("content");
+            }
+        };
+    };
 
     /**
      * Current dialog's content as Node
@@ -264,7 +272,6 @@ public class Dialog {
         if (contentText == null) return;
 
         Label label = new Label(contentText);
-        label.getStyleClass().addAll("center-content-area", "main-message");
         label.setAlignment(Pos.TOP_LEFT);
         label.setTextAlignment(TextAlignment.LEFT);
         label.setMaxWidth(Double.MAX_VALUE);
@@ -432,57 +439,61 @@ public class Dialog {
     protected void buildDialogContent() {
 
         contentPane.getChildren().clear();
-        contentPane.getStyleClass().add("center-content-panel");
+//        contentPane.getStyleClass().add("center-content-panel");
 
         if (hasMasthead()) {
             contentPane.setTop(getMasthead());
         }
         contentPane.setCenter(createCenterPanel());
-
+        
+        Parent root = dialog.getScene().getRoot();
+        root.pseudoClassStateChanged(MASTHEAD_PSEUDO_CLASS,      hasMasthead());
+        root.pseudoClassStateChanged(NO_MASTHEAD_PSEUDO_CLASS,   !hasMasthead());
     }
 
     private Pane createCenterPanel() {
-        VBox centerPanel = new VBox();
-        centerPanel.getStyleClass().add("center-panel");
-
-        BorderPane contentPanel = new BorderPane();
-        contentPanel.getStyleClass().add("center-content-panel");
-        VBox.setVgrow(contentPanel, Priority.ALWAYS);
-
+        // -- new approach
+        GridPane grid = new GridPane();
+        grid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+//        grid.setGridLinesVisible(true);
+        grid.getStyleClass().add("center-panel");
+        
         Node content = getContent();
-        content = content == null ? new Pane() : content;
-        contentPanel.setCenter(content);
+        if (content != null) {
+            grid.add(content, 1, 0);
+            GridPane.setVgrow(content, Priority.ALWAYS);
+            
+            // FIXME this should be enabled (otherwise TextField input is not
+            // stretched, but by enabling we get an infinite loop in GridPane)
+//            GridPane.setHgrow(content, Priority.ALWAYS);
+        }
         
         // dialog image can go to the left if there is no masthead
         final Node graphic = getGraphic();
         if (!hasMasthead() && graphic != null) {
             Pane graphicPane = new Pane(graphic);
+            
+            final double w = graphic.getLayoutBounds().getWidth();
+            final double h = graphic.getLayoutBounds().getHeight();
+            graphicPane.setMinSize(w, h);
             graphicPane.getStyleClass().add("graphic");
-            contentPanel.setLeft(graphicPane);
+            grid.add(graphicPane, 0, 0);
+            GridPane.setValignment(graphicPane, VPos.TOP);
         }
-
-        if (contentPanel.getChildren().size() > 0) {
-            centerPanel.getChildren().add(contentPanel);
-            VBox.setVgrow(contentPanel, Priority.ALWAYS);
-        }
-
+        
         if (hasExpandableContent()) {
             Node ec = getExpandableContent();
-
-            centerPanel.getChildren().add(ec);
-            VBox.setVgrow(contentPanel, Priority.NEVER);
-            VBox.setVgrow(ec, Priority.ALWAYS);
-            VBox.setMargin(ec, new Insets(12, 0, 12, 0));
-
+            grid.add(ec, 0, 1, 2, 1);
             ec.setVisible(false);
             ec.managedProperty().bind(ec.visibleProperty());
         }
-
+        
         if ( !getActions().isEmpty() || hasExpandableContent()) {
-           centerPanel.getChildren().add(createButtonPanel());
-        }
+            Node buttonPanel = createButtonPanel();
+            grid.add(buttonPanel, 0, 2, 2, 1);
+       }
 
-        return centerPanel;
+        return grid;
     }
 
     private Node createButtonPanel() {
@@ -594,4 +605,14 @@ public class Dialog {
         return button;
     }
 
+    
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
+    private static final PseudoClass MASTHEAD_PSEUDO_CLASS = 
+            PseudoClass.getPseudoClass("masthead");
+    private static final PseudoClass NO_MASTHEAD_PSEUDO_CLASS = 
+            PseudoClass.getPseudoClass("no-masthead");
 }

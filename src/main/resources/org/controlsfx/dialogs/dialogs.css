@@ -125,6 +125,11 @@
     -fx-font-size: 1.083333em; /*13px;*/
 }
 
+/* For the text displayed above command-link buttons (but below the masthead) */
+.dialog .center-panel .command-link-message {
+    -fx-font-size: 1.25em; 
+}
+
 .dialog .center-content-panel .graphic {
     -fx-padding: 0 0 0 12;
 }

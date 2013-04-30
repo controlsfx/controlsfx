@@ -285,6 +285,10 @@ public final class Dialogs {
     public int showCommandLinks( int defaultLinkIndex, List<CommandLink> links ) {
         final Dialog dlg = buildDialog(Type.INFORMATION );
         dlg.setContent(message);
+        
+        Node messageNode = dlg.getContent();
+        messageNode.getStyleClass().add("command-link-message");
+        
         VBox content = new VBox(10);
         Node message = dlg.getContent();
         if ( message != null ) {

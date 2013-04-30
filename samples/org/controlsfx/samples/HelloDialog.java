@@ -19,7 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import org.controlsfx.dialogs.Dialog.Action;
+import org.controlsfx.dialogs.Action;
 import org.controlsfx.dialogs.Dialogs;
 import org.controlsfx.dialogs.Dialogs.CommandLink;
 

@@ -53,13 +53,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
-import org.controlsfx.dialogs.Dialog.AbstractAction;
-import org.controlsfx.dialogs.Dialog.Action;
 
 /**
  * Simplifies building commonly used dialogs
@@ -296,12 +295,9 @@ public final class Dialogs {
         int commandIndex = 0;
         
         for (CommandLink commandLink : links) {
-            final Button button = new Button(commandLink.getMessage() + "\n" + commandLink.getComment());
+            
+            final Button button = buildCommandLinkButton(commandLink);
             button.setDefaultButton( commandIndex == defaultLinkIndex );
-            button.setGraphic( commandLink.getGraphic());
-            button.setMaxWidth(Double.MAX_VALUE);
-            button.setPadding( new Insets(10,10,10,10));
-            button.setAlignment(Pos.BASELINE_LEFT);
             button.getProperties().put(COMMAND_LINK_ID, commandIndex );
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
@@ -309,6 +305,7 @@ public final class Dialogs {
                     dlg.hide();
                 }
             });
+            
             content.getChildren().add( button );
             commandIndex++;
         }
@@ -329,7 +326,6 @@ public final class Dialogs {
     public int showCommandLinks( CommandLink... links ) {
         return showCommandLinks(0, links);
     }
-
     
     public static class CommandLink {
         
@@ -366,8 +362,6 @@ public final class Dialogs {
      **************************************************************************/
 
     private static enum Type {
-        // TODO maybe introduce a MORE_DETAILS type, rather than use the ERROR
-        // type?
         ERROR("error.image", "Error", "Error", OK),
         INFORMATION("info.image", "Message", "Message", OK),
         WARNING("warning.image", "Warning", "Warning", OK),
@@ -468,5 +462,43 @@ public final class Dialogs {
         return detailsPane;
 
     }
+    
+    
+    private Button buildCommandLinkButton( CommandLink commandLink ) {
+        final Button button = new Button();
+        
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setMaxHeight(Double.MAX_VALUE);
+        button.setPadding( new Insets(10,10,10,10));
+        button.setAlignment(Pos.CENTER_LEFT);
+        
+        VBox textBox = new VBox(-2);
+
+        Label messageLabel = new Label(commandLink.getMessage() );
+        messageLabel.getStyleClass().addAll("main-message"/*, "test-border"*/);
+        messageLabel.setWrapText(true);
+        messageLabel.setAlignment(Pos.TOP_LEFT);
+        textBox.getChildren().add(messageLabel);
+        VBox.setVgrow(messageLabel, Priority.ALWAYS);
+
+        Label commentLabel = new Label(commandLink.getComment() );
+        commentLabel.getStyleClass().addAll("main-comment"/*, "test-border"*/);
+        commentLabel.setWrapText(true);
+        commentLabel.setAlignment(Pos.TOP_LEFT);
+        textBox.getChildren().add(commentLabel);
+        VBox.setVgrow(commentLabel, Priority.ALWAYS);            
+        
+        HBox linkContent = new HBox(10);
+        
+        Node linkGraphic = commandLink.getGraphic();
+        linkContent.getChildren().add( 
+                linkGraphic == null? new ImageView(DialogResources.getImage("command.link.icon")) : linkGraphic);
+        linkContent.getChildren().add(textBox);
+        HBox.setHgrow(linkContent, Priority.NEVER);
+        
+        button.setGraphic(linkContent);
+        return button;
+    }
+    
 
 }

@@ -94,6 +94,14 @@
     -fx-text-fill: #292929;
 }
 
+.dialog .main-message {
+    -fx-font-size: 1.166667em;
+}
+
+.dialog .main-comment {
+    -fx-font-size: 1em;
+}
+
 .dialog .top-panel {
     -fx-padding: 10 14 10 14;
     -fx-background-color: linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
@@ -140,4 +148,10 @@
 
 .dialog .details-button:hover {
     -fx-underline: true;
+}
+
+.dialog .test-border {
+    -fx-border-insets: 0;
+    -fx-border-width: 2px;
+    -fx-border-color: red;
 }

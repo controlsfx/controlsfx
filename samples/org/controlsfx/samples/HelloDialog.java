@@ -83,7 +83,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink2 = new Button("Show");
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.build()
+                Dialogs.create()
                    .owner(cbSetOwner.isSelected() ? stage : null)
                    .title("JavaFX")
                    .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
@@ -104,7 +104,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink3 = new Button("Show");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response =  Dialogs.build()
+                Action response =  Dialogs.create()
                     .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("You do want dialogs right?")
                     .masthead(isMastheadVisible() ? "Just Checkin'" : null)
@@ -127,7 +127,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink6a = new Button("Show");
         Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.build()
+                Action response = Dialogs.create()
                     .owner(cbSetOwner.isSelected() ? stage : null)
                    .title("I'm warning you!")
                    .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
@@ -150,7 +150,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink7a = new Button("Show");
         Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.build()
+                Action response = Dialogs.create()
                       .owner(cbSetOwner.isSelected() ? stage : null)
                       .title("It looks like you're making a bad decision")
                       .message("Exception Encountered")
@@ -173,7 +173,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink5a = new Button("Show");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.build()
+                Action response = Dialogs.create()
                     .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("It looks like you're making a bad decision")
                     .message("Better change your mind - this is really your last chance!")
@@ -189,7 +189,7 @@ public class HelloDialog extends Application {
         Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
 
-                Action response = Dialogs.build()
+                Action response = Dialogs.create()
                         .owner(cbSetOwner.isSelected() ? stage : null)
                         .message("Better change your mind - this is really your last chance!")
                         .title("It looks like you're making a bad decision")
@@ -217,7 +217,7 @@ public class HelloDialog extends Application {
                 // if (isMastheadVisible())
                 // dlg.masthead("Please type in your name");
                 // String response = dlg.showInputDialog();
-                String response = Dialogs.build()
+                String response = Dialogs.create()
                     .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("Name Check")
                     .masthead(isMastheadVisible() ? "Please type in your name" : null)
@@ -238,7 +238,7 @@ public class HelloDialog extends Application {
                 // if (isMastheadVisible())
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
-                String response = Dialogs.build()
+                String response = Dialogs.create()
                         .owner(cbSetOwner.isSelected() ? stage : null)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
@@ -260,7 +260,7 @@ public class HelloDialog extends Application {
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
 
-                String response = Dialogs.build()
+                String response = Dialogs.create()
                       .owner(cbSetOwner.isSelected() ? stage : null)
                       .title("Name Guess")
                       .masthead(isMastheadVisible() ? "Name Guess" : null)
@@ -287,7 +287,7 @@ public class HelloDialog extends Application {
                 // dlg.masthead("Name Guess");
                 // String response = dlg.showInputDialog();
 
-                String response = Dialogs.build()
+                String response = Dialogs.create()
                         .owner(cbSetOwner.isSelected() ? stage : null)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
@@ -306,7 +306,7 @@ public class HelloDialog extends Application {
         final Button Hyperlink12 = new Button("Show");
         Hyperlink12.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                int response = Dialogs.build().owner(stage)
+                int response = Dialogs.create().owner(stage)
                         .title("Manually connect to wireless network")
                         .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
                         .message("How do you want to add a network?")

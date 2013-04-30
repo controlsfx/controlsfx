@@ -95,16 +95,14 @@ public final class Dialogs {
     }
 
     /**
-     * Builds the initial dialog
+     * Creates the initial dialog
      * @return dialog instance
      */
-    public static Dialogs build() {
+    public static Dialogs create() {
         return new Dialogs();
     }
 
-    private Dialogs() {
-        
-    }
+    private Dialogs() {}
     
     /**
      * Assigns the owner of the dialog. If an owner is specified, the dialog will

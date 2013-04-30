@@ -111,7 +111,7 @@
     -fx-background-color: linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
 }
 
-.dialog .masthead-label-1 {
+.dialog .masthead-label {
     -fx-font-size: 1.249999em; 
     -fx-wrap-text: true;
 }

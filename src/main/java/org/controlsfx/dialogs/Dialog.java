@@ -213,7 +213,7 @@ public class Dialog {
         mastheadTextArea.setPrefWidth(MAIN_TEXT_WIDTH);
         mastheadTextArea.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         mastheadTextArea.setWrapText(true);
-        mastheadTextArea.getStyleClass().add("masthead-label-1");
+        mastheadTextArea.getStyleClass().add("masthead-label");
 
         VBox mastheadVBox = new VBox();
         mastheadVBox.setAlignment(Pos.CENTER_LEFT);

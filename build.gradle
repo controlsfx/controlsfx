@@ -16,14 +16,14 @@ sourceSets {
     samples {
         java {
             compileClasspath += main.output
-            runtimeClasspath += main.output
+            compileClasspath += configurations.jdk
         }
     }
 }
 
 dependencies {
     try {
-        jdk files(svJFXRTJar)
+        jdk files(jfxrtJar)
     } catch (MissingPropertyException pne) {
         jdk files("${System.properties['java.home']}/lib/jfxrt.jar")
         jdk files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
@@ -32,6 +32,7 @@ dependencies {
 
 javadoc {
     exclude 'impl/*'
+    classpath = project.sourceSets.main.compileClasspath + configurations.jdk
 }
 
 task jarSamples (type: Jar) {

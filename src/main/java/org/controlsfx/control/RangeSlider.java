@@ -290,7 +290,7 @@ public class RangeSlider extends Control {
     }
     
     /**
-     * Indicates whether the {@link #valueProperty() value} of the {@code Slider} should always
+     * Indicates whether the {@link #lowValueProperty()} value}/{@link #highValueProperty()} value} of the {@code Slider} should always
      * be aligned with the tick marks. This is honored even if the tick marks
      * are not shown.
      */

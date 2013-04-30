@@ -4,7 +4,15 @@ apply plugin: 'maven'
 group = 'org.controlsfx'
 version = '0.0'
 
+configurations {
+    samples.extendsFrom mainRuntime
+    jdk
+}
+
 sourceSets {
+    main {
+        compileClasspath += configurations.jdk
+    }
     samples {
         java {
             compileClasspath += main.output
@@ -13,12 +21,17 @@ sourceSets {
     }
 }
 
-configurations {
-    samples.extendsFrom mainRuntime
+dependencies {
+    try {
+        jdk files(svJFXRTJar)
+    } catch (MissingPropertyException pne) {
+        jdk files("${System.properties['java.home']}/lib/jfxrt.jar")
+        jdk files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
+    }
 }
 
-dependencies {
-    compile files("${System.properties['java.home']}/lib/jfxrt.jar") // for 1.7 builds
+javadoc {
+    exclude 'impl/*'
 }
 
 task jarSamples (type: Jar) {
@@ -26,8 +39,21 @@ task jarSamples (type: Jar) {
     from sourceSets.samples.output
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
 artifacts {
-    archives jar
+    archives sourceJar
+    archives javadocJar
     archives jarSamples
 }
 

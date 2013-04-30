@@ -27,38 +27,60 @@
  package org.controlsfx.dialogs;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 /**
- * Common interface for dialog actions.
- * Actions are used to auto-generate buttons in the dialog's button bar
+ * Common interface for dialog actions, where Actions are converted into buttons 
+ * in the dialogs button bar. It is highly recommended that rather than 
+ * implement this interface that developers instead use {@link AbstractAction}.
  * 
+ * @see AbstractAction
  */
 public interface Action {
 
     /**
-     * Action text
-     * @return 
+     * The text to show to the user.
+     * 
+     * @return An observable {@link StringProperty} that represents the current
+     *      text for this property, and which can be observed for changes.
      */
     public StringProperty textProperty();
     
     /**
-     * Action availability
-     * @return
+     * This represents whether the action should be available to the end user,
+     * or whether it should appeared 'grayed out'.
+     * 
+     * @return An observable {@link BooleanProperty} that represents the current
+     *      disabled state for this property, and which can be observed for 
+     *      changes.
      */
     public BooleanProperty disabledProperty();
 
-    public Property<Tooltip> tooltipProperty();
+    /**
+     * This {@link Tooltip} that should be shown to the user if their mouse 
+     * hovers over this action.
+     * 
+     * @return An observable {@link ObjectProperty} that represents the current
+     *      Tooltip for this property, and which can be observed for changes.
+     */
+    public ObjectProperty<Tooltip> tooltipProperty();
     
-    public Property<Node> graphicProperty();
+    /**
+     * This graphic that should be shown to the user in relation to this action.
+     * 
+     * @return An observable {@link ObjectProperty} that represents the current
+     *      graphic for this property, and which can be observed for changes.
+     */
+    public ObjectProperty<Node> graphicProperty();
 
     /**
-     * Executes action 
-     * @param ae action context
+     * This method is called when the user selects this action. 
+     * 
+     * @param ae The action context.
      */
     public void execute(ActionEvent ae);
 }

@@ -85,19 +85,6 @@ public final class Dialogs {
     private String masthead;
 
     /**
-     * TODO delete me - this is just for testing!!
-     */
-    public static void setMacOS(boolean b) {
-        Dialog.setMacOS(b);
-        Dialog.setMacOS(b);
-    }
-
-    public static void setWindows(boolean b) {
-        Dialog.setWindows(b);
-        Dialog.setWindows(b);
-    }
-
-    /**
      * Creates the initial dialog
      * @return dialog instance
      */

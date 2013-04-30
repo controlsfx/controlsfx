@@ -28,7 +28,6 @@ package org.controlsfx.dialogs;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -37,6 +36,13 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
+/**
+ * A convenience class that implements the {@link Action} interface and provides
+ * a simpler API. It is highly recommended to use this class rather than 
+ * implement the {@link Action} interface directly.
+ * 
+ * @see Action
+ */
 public abstract class AbstractAction implements Action {
     private final StringProperty textProperty = 
             new SimpleStringProperty(this, "text");
@@ -53,9 +59,6 @@ public abstract class AbstractAction implements Action {
     
     
     // --- text
-    /**
-     * {@inheritDoc}
-     */
     @Override public StringProperty textProperty() {
         return textProperty;
     }
@@ -68,9 +71,6 @@ public abstract class AbstractAction implements Action {
     
     
     // --- disabled
-    /**
-     * {@inheritDoc}
-     */
     @Override public BooleanProperty disabledProperty() {
         return disabledProperty;
     }
@@ -83,9 +83,6 @@ public abstract class AbstractAction implements Action {
 
     
     // --- tooltip
-    /**
-     * {@inheritDoc}
-     */
     @Override public ObjectProperty<Tooltip> tooltipProperty() {
         return tooltipProperty;
     }
@@ -98,10 +95,7 @@ public abstract class AbstractAction implements Action {
     
     
     // --- graphic
-    /**
-     * {@inheritDoc}
-     */
-    @Override public Property<Node> graphicProperty() {
+    @Override public ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
     public final Node getGraphic() {

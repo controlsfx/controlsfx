@@ -35,7 +35,6 @@ import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -67,13 +66,30 @@ import javafx.stage.Window;
 
 import com.sun.javafx.Utils;
 
-
 /**
- * API for creating standardized dialogs which include: 
- * masthead, content, expandable content and button bar
+ * A lower-level API for creating standardized dialogs consisting of the following
+ * subsections:
+ * 
+ * <ul>
+ *   <li>masthead, 
+ *   <li>content, 
+ *   <li>expandable content,
+ *   <li>button bar
+ * </ul>
+ * 
+ * For developers wanting a simpler API, consider using the high-level 
+ * {@link Dialogs} class, which provides a simpler, fluent API for displaying
+ * the most common types of dialog.
+ * 
+ * @see Dialogs
  */
-@SuppressWarnings("restriction")
 public class Dialog {
+    
+    /**************************************************************************
+     * 
+     * Static fields
+     * 
+     **************************************************************************/
     
     // According to the UI spec, the width of the main message text in the upper
     // panel should be 426 pixels.
@@ -81,6 +97,14 @@ public class Dialog {
 
     // Specifies the minimum allowable width for all buttons in the dialog
     private static int MINIMUM_BUTTON_WIDTH = 75;
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Fields
+     * 
+     **************************************************************************/
 
     private final FXDialog dialog;
 
@@ -91,11 +115,22 @@ public class Dialog {
     
     // list containing user input buttons at bottom of dialog
     private List<ButtonBase> buttons = new ArrayList<ButtonBase>();
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
 
     /**
-     * Creates a dialog using specified owner and title
-     * @param owner dialog window  owner
-     * @param title dialog title
+     * Creates a dialog using specified owner and title.
+     * 
+     * @param owner The dialog window owner - if specified the dialog will be
+     *      centered over the owner, otherwise the dialog will be shown in the 
+     *      middle of the screen.
+     * @param title The dialog title to be shown at the top of the dialog.
      */
     public Dialog(Window owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
@@ -104,10 +139,20 @@ public class Dialog {
         contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
         this.dialog.setContentPane(contentPane);
     }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
 
     /**
-     * Shows dialog and wait for user response.
-     * @return action used to close the dialog
+     * Shows the dialog and waits for user response (in other words, brings up a
+     * modal dialog).
+     * 
+     * @return The {@link Action} used to close the dialog.
      */
     public Action show() {
         try {
@@ -122,14 +167,22 @@ public class Dialog {
     }
 
     /**
-     * Hides the dialog
+     * Hides the dialog.
      */
     public void hide() {
         dialog.hide();
     }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
 
 
-    // Resizable property
+    // --- resizable
 
     /**
      * Determines of dialog is resizable
@@ -147,12 +200,15 @@ public class Dialog {
         dialog.setResizable(resizable);
     }
 
+    /**
+     * Represents whether the dialog is resizable.
+     */
     public BooleanProperty resizableProperty() {
         return dialog.resizableProperty();
     }
 
-    // graphic property
-
+    
+    // --- graphic
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>();
 
     /**
@@ -176,8 +232,8 @@ public class Dialog {
         return graphicProperty;
     }
 
-    // Masthead property
-
+    
+    // --- masthead
     private final ObjectProperty<Node> masthead = new SimpleObjectProperty<Node>();
 
     /**
@@ -237,10 +293,10 @@ public class Dialog {
         return masthead;
     }
 
-    // Content property
-
+    
+    // --- content
     private final ObjectProperty<Node> content = new SimpleObjectProperty<Node>() {
-        protected void invalidated() {
+        @Override protected void invalidated() {
             Node contentNode = getContent();
             if (contentNode != null) {
                 contentNode.getStyleClass().addAll("content");
@@ -288,8 +344,8 @@ public class Dialog {
         return content;
     }
 
-    // ExpandableContent property
-
+    
+    // --- expandable content
     private final ObjectProperty<Node> expandableContentProperty = new SimpleObjectProperty<Node>();
 
     /**
@@ -327,8 +383,7 @@ public class Dialog {
     }
     
 
-    // Actions
-
+    // --- actions
     private final ObservableList<Action> actions = FXCollections.<Action> observableArrayList();
 
     /**
@@ -339,6 +394,14 @@ public class Dialog {
     public final ObservableList<Action> getActions() {
         return actions;
     }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Support classes
+     * 
+     **************************************************************************/
 
     /**
      * Common dialog actions
@@ -353,8 +416,8 @@ public class Dialog {
 
         private final StringProperty title = new SimpleStringProperty();
         private final BooleanProperty disabled = new SimpleBooleanProperty(false);
-        private final Property<Tooltip> tooltip = new SimpleObjectProperty<Tooltip>();
-        private final Property<Node> graphic = new SimpleObjectProperty<Node>();
+        private final ObjectProperty<Tooltip> tooltip = new SimpleObjectProperty<Tooltip>();
+        private final ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>();
         
         private boolean isClosing;
         private boolean isDefault;
@@ -386,11 +449,11 @@ public class Dialog {
             return disabled;
         }
         
-        @Override public Property<Tooltip> tooltipProperty() {
+        @Override public ObjectProperty<Tooltip> tooltipProperty() {
             return tooltip;
         }
         
-        @Override public Property<Node> graphicProperty() {
+        @Override public ObjectProperty<Node> graphicProperty() {
             return graphic;
         }
         
@@ -406,7 +469,13 @@ public class Dialog {
 
     }
 
-    // ///// PRIVATE API ///////////////////////////////////////////////////////////////////
+    
+    
+    /**************************************************************************
+     * 
+     * Private Implementation
+     * 
+     **************************************************************************/
 
     /**
      * TODO delete me - this is just for testing!!
@@ -436,26 +505,24 @@ public class Dialog {
         return getExpandableContent() != null;
     }
 
-    protected void buildDialogContent() {
-
+    private void buildDialogContent() {
         contentPane.getChildren().clear();
-//        contentPane.getStyleClass().add("center-content-panel");
-
-        if (hasMasthead()) {
+        
+        final boolean hasMasthead = hasMasthead();
+        if (hasMasthead) {
             contentPane.setTop(getMasthead());
         }
         contentPane.setCenter(createCenterPanel());
         
         Parent root = dialog.getScene().getRoot();
-        root.pseudoClassStateChanged(MASTHEAD_PSEUDO_CLASS,      hasMasthead());
-        root.pseudoClassStateChanged(NO_MASTHEAD_PSEUDO_CLASS,   !hasMasthead());
+        root.pseudoClassStateChanged(MASTHEAD_PSEUDO_CLASS,      hasMasthead);
+        root.pseudoClassStateChanged(NO_MASTHEAD_PSEUDO_CLASS,   !hasMasthead);
     }
 
     private Pane createCenterPanel() {
         // -- new approach
         GridPane grid = new GridPane();
         grid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-//        grid.setGridLinesVisible(true);
         grid.getStyleClass().add("center-panel");
         
         Node content = getContent();
@@ -607,9 +674,9 @@ public class Dialog {
 
     
     /***************************************************************************
-     *                                                                         *
-     * Stylesheet Handling                                                     *
-     *                                                                         *
+     *                                                                         
+     * Stylesheet Handling                                                     
+     *                                                                         
      **************************************************************************/
     private static final PseudoClass MASTHEAD_PSEUDO_CLASS = 
             PseudoClass.getPseudoClass("masthead");

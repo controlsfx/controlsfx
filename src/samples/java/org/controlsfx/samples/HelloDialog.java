@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import org.controlsfx.dialogs.Action;
 import org.controlsfx.dialogs.Dialogs;
 import org.controlsfx.dialogs.Dialogs.CommandLink;
+import org.controlsfx.dialogs.DialogsAccessor;
 
 public class HelloDialog extends Application {
 
@@ -61,8 +62,8 @@ public class HelloDialog extends Application {
         operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 String os = operatingSystem.getSelectionModel().getSelectedItem();
-                Dialogs.setMacOS(MAC_OS.equals(os));
-                Dialogs.setWindows(WINDOWS_UNIX.equals(os));
+                DialogsAccessor.setMacOS(MAC_OS.equals(os));
+                DialogsAccessor.setWindows(WINDOWS_UNIX.equals(os));
             }
         });
         grid.add(operatingSystem, 1, row);

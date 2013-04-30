@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'org.controlsfx'
-version = '0.0'
+version = '8.0.0-developer-preview-1'
 
 configurations {
     samples.extendsFrom mainRuntime
@@ -30,8 +30,17 @@ dependencies {
     }
 }
 
+<<<<<<< local
 javadoc {
     exclude 'impl/*'
+=======
+dependencies {
+    try {
+        compile files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        compile files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
+    }
+>>>>>>> other
 }
 
 task jarSamples (type: Jar) {

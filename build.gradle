@@ -35,6 +35,14 @@ javadoc {
     classpath = project.sourceSets.main.compileClasspath + configurations.jdk
 }
 
+jar {
+    exclude '**/*.ico'
+    exclude '**/*.icns'
+    exclude '**/32/*'
+    exclude '**/64/*'
+    exclude '**/128/*'
+}
+
 task jarSamples (type: Jar) {
     classifier='samples'
     from sourceSets.samples.output
@@ -61,6 +69,6 @@ artifacts {
 ['HelloDialog', 'HelloGridView', 'HelloRangeSlider', 'HelloRating', 'HelloSegmentedButton', 'HelloToggleSwitch', 'SVGTest'].each { name ->
     task "$name" (type: JavaExec) {
         main = "org.controlsfx.samples.$name"
-        classpath = sourceSets.samples.runtimeClasspath
+        classpath = sourceSets.samples.runtimeClasspath + sourceSets.main.runtimeClasspath + configurations.jdk
     }
 }

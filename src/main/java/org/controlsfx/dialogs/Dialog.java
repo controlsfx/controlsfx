@@ -126,7 +126,7 @@ public class Dialog {
     }
 
 
-    /////// Resizable property
+    // Resizable property
 
     /**
      * Determines of dialog is resizable
@@ -148,16 +148,16 @@ public class Dialog {
         return dialog.resizableProperty();
     }
 
-    // Resizable property
+    // graphic property
 
-    private final ObjectProperty<Image> graphicProperty = new SimpleObjectProperty<Image>();
+    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>();
 
     /**
      * Dialog's graphic.
      * Presented either in the masthead, if one is available or in the content 
      * @return dialog's graphic
      */
-    public final Image getGraphic() {
+    public final Node getGraphic() {
         return graphicProperty.get();
     }
 
@@ -165,11 +165,11 @@ public class Dialog {
      * Sets dialog's graphic
      * @param graphic dialog's graphic. Used if not null.
      */
-    public final void setGraphic(Image graphic) {
+    public final void setGraphic(Node graphic) {
         this.graphicProperty.set(graphic);
     }
 
-    public ObjectProperty<Image> graphicProperty() {
+    public ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
 
@@ -225,7 +225,7 @@ public class Dialog {
         BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
 
         if (graphicProperty.get() != null) {
-            mastheadPanel.setRight(new ImageView(graphicProperty.get()));
+            mastheadPanel.setRight(getGraphic());
         }
 
         setMasthead(mastheadPanel);
@@ -266,10 +266,11 @@ public class Dialog {
         label.getStyleClass().addAll("center-content-area", "main-message");
         label.setAlignment(Pos.TOP_LEFT);
         label.setTextAlignment(TextAlignment.LEFT);
+        label.setMaxWidth(Double.MAX_VALUE);
 
         // FIXME we don't want to restrict the width, but for now this works ok
         label.setPrefWidth(MAIN_TEXT_WIDTH);
-        label.setMaxWidth(360);
+//        label.setMaxWidth(360);
         label.setWrapText(true);
 
         setContent(label);
@@ -439,11 +440,11 @@ public class Dialog {
         contentPanel.setCenter(content);
         
         // dialog image can go to the left if there is no masthead
-        if (!hasMasthead() && graphicProperty != null) {
-            ImageView dialogGraphic = new ImageView(graphicProperty.get());
-            Pane pane = new Pane(dialogGraphic);
-            pane.setPadding(new Insets(0, 0, 0, 12));
-            contentPanel.setLeft(pane);
+        final Node graphic = getGraphic();
+        if (!hasMasthead() && graphic != null) {
+            Pane graphicPane = new Pane(graphic);
+            graphicPane.getStyleClass().add("graphic");
+            contentPanel.setLeft(graphicPane);
         }
 
         if (contentPanel.getChildren().size() > 0) {
@@ -452,7 +453,6 @@ public class Dialog {
         }
 
         if (hasExpandableContent()) {
-
             Node ec = getExpandableContent();
 
             centerPanel.getChildren().add(ec);

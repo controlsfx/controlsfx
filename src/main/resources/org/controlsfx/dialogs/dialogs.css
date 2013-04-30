@@ -99,7 +99,7 @@
 }
 
 .dialog .main-message {
-    -fx-font-size: 1.166667em;
+    -fx-font-size: 1em;
 }
 
 .dialog .main-comment {
@@ -112,17 +112,21 @@
 }
 
 .dialog .masthead-label-1 {
-    -fx-font-size: 1.166667em; /*15px;*/
+    -fx-font-size: 1.249999em; 
     -fx-wrap-text: true;
 }
 
 .dialog .center-panel {
-    -fx-padding: 16 16 14 28;
+    -fx-padding: 16 16 14 16;
     -fx-spacing: 14;
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
     -fx-border-color: #b4b4b4 white #b4b4b4 white;
     -fx-font-size: 1.083333em; /*13px;*/
+}
+
+.dialog .center-content-panel .graphic {
+    -fx-padding: 0 0 0 12;
 }
 
 .dialog .center-panel .button-bar {
@@ -143,7 +147,7 @@
   -fx-graphic: url("../../../impl/org/controlsfx/dialogs/resources/more-details.png");
   -fx-alignment: baseline-left;
   -fx-focus-traversable: false;
-  -fx-padding: 5;
+  -fx-padding: 5 5 5 0;
 }
 
 .dialog .details-button.less {
@@ -152,10 +156,4 @@
 
 .dialog .details-button:hover {
     -fx-underline: true;
-}
-
-.dialog .test-border {
-    -fx-border-insets: 0;
-    -fx-border-width: 2px;
-    -fx-border-color: red;
 }

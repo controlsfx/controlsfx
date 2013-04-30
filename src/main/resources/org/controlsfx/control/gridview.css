@@ -1,0 +1,7 @@
+.grid-view {
+	-fx-vertical-cell-spacing: 12;
+	-fx-horizontal-cell-spacing: 12;
+	-fx-cell-height: 64;
+	-fx-cell-width: 64;
+	-fx-horizontal-alignment: CENTER;
+}

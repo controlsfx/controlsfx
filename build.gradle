@@ -1,0 +1,39 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'org.controlsfx'
+version = '0.0'
+
+sourceSets {
+    samples {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+}
+
+configurations {
+    samples.extendsFrom mainRuntime
+}
+
+dependencies {
+    compile files("${System.properties['java.home']}/lib/jfxrt.jar") // for 1.7 builds
+}
+
+task jarSamples (type: Jar) {
+    classifier='samples'
+    from sourceSets.samples.output
+}
+
+artifacts {
+    archives jar
+    archives jarSamples
+}
+
+['HelloDialog', 'HelloGridView', 'HelloRangeSlider', 'HelloRating', 'HelloSegmentedButton', 'HelloToggleSwitch', 'SVGTest'].each { name ->
+    task "$name" (type: JavaExec) {
+        main = "org.controlsfx.samples.$name"
+        classpath = sourceSets.samples.runtimeClasspath
+    }
+}

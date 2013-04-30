@@ -44,21 +44,21 @@ public interface Action {
      * Action text
      * @return 
      */
-    StringProperty textProperty();
+    public StringProperty textProperty();
     
     /**
      * Action availability
      * @return
      */
-    BooleanProperty disabledProperty();
+    public BooleanProperty disabledProperty();
 
-    Property<Tooltip> tooltipProperty();
+    public Property<Tooltip> tooltipProperty();
     
-    Property<Node> graphicProperty();
+    public Property<Node> graphicProperty();
 
     /**
      * Executes action 
      * @param ae action context
      */
-    void execute(ActionEvent ae);
+    public void execute(ActionEvent ae);
 }

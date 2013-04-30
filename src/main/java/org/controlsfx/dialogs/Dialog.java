@@ -26,7 +26,7 @@
  */
 package org.controlsfx.dialogs;
 
-import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
+import static org.controlsfx.dialogs.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialogs.DialogResources.getString;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class Dialog {
     private final FXDialog dialog;
 
     // Dialog result.
-    private Action result = DialogAction.CANCEL;
+    private Action result = Actions.CANCEL;
 
     private final BorderPane contentPane;
     
@@ -321,7 +321,7 @@ public class Dialog {
     /**
      * Common dialog actions
      */
-    public enum DialogAction implements Action {
+    public enum Actions implements Action {
 
         CANCEL( getString("common.cancel.button"), true, true),
         CLOSE ( getString("common.close.button"),  true, true),
@@ -345,14 +345,14 @@ public class Dialog {
          * @param isCancel true if action produces the dialog cancellation. 
          * @param isClosing true if action is closing the dialog
          */
-        private DialogAction(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
+        private Actions(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
             this.title.set(title);
             this.isClosing = isClosing;
             this.isDefault = isDefault;
             this.isCancel = isCancel;
         }
 
-        private DialogAction(String title, boolean isDefault, boolean isCancel) {
+        private Actions(String title, boolean isDefault, boolean isCancel) {
             this(title, isDefault, isCancel, true);
         }
 
@@ -372,23 +372,11 @@ public class Dialog {
             return graphic;
         }
         
-        public boolean isClosing() {
-            return isClosing;
-        }
-
-        public boolean isDefault() {
-            return isDefault;
-        }
-
-        public boolean isCancel() {
-            return isCancel;
-        }
-
-        public void execute(ActionEvent ae) {
+        @Override public void execute(ActionEvent ae) {
             if ( !disabled.get() ) {
-                if (ae.getSource() instanceof Dialog && (isCancel() || isClosing()) ) {
+                if (ae.getSource() instanceof Dialog && (isCancel || isClosing) ) {
                     Dialog dlg = ((Dialog) ae.getSource());
-                    dlg.result = DialogAction.this;        
+                    dlg.result = Actions.this;        
                     dlg.hide();
                 }
             }
@@ -578,10 +566,10 @@ public class Dialog {
         button.tooltipProperty().bindBidirectional(action.tooltipProperty());
         button.graphicProperty().bindBidirectional(action.graphicProperty());
         
-        if (action instanceof DialogAction) {
-            DialogAction stdAction = (DialogAction) action;
-            button.setDefaultButton(stdAction.isDefault() && keepDefault);
-            button.setCancelButton(stdAction.isCancel());
+        if (action instanceof Actions) {
+            Actions stdAction = (Actions) action;
+            button.setDefaultButton(stdAction.isDefault && keepDefault);
+            button.setCancelButton(stdAction.isCancel);
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {

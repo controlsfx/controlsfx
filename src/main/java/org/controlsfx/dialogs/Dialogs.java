@@ -26,10 +26,10 @@
  */
 package org.controlsfx.dialogs;
 
-import static org.controlsfx.dialogs.Dialog.DialogAction.CANCEL;
-import static org.controlsfx.dialogs.Dialog.DialogAction.NO;
-import static org.controlsfx.dialogs.Dialog.DialogAction.OK;
-import static org.controlsfx.dialogs.Dialog.DialogAction.YES;
+import static org.controlsfx.dialogs.Dialog.Actions.CANCEL;
+import static org.controlsfx.dialogs.Dialog.Actions.NO;
+import static org.controlsfx.dialogs.Dialog.Actions.OK;
+import static org.controlsfx.dialogs.Dialog.Actions.YES;
 import static org.controlsfx.dialogs.DialogResources.getString;
 
 import java.io.PrintWriter;

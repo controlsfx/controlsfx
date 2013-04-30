@@ -30,17 +30,8 @@ dependencies {
     }
 }
 
-<<<<<<< local
 javadoc {
     exclude 'impl/*'
-=======
-dependencies {
-    try {
-        compile files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        compile files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
-    }
->>>>>>> other
 }
 
 task jarSamples (type: Jar) {

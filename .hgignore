@@ -1,2 +1,8 @@
 syntax: glob
-bin/*
+*.class
+*.jar
+*.iml
+.DS_Store
+build/*
+.idea/*
+.gradle/*

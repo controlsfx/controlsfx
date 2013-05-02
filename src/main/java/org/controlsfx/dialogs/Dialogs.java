@@ -318,7 +318,14 @@ public final class Dialogs {
         }
         dlg.setContent(content);
         dlg.getActions().clear();
-        return (CommandLink)dlg.show();
+        
+        Action result = dlg.show();
+        if (result instanceof CommandLink) {
+            return (CommandLink) result;
+        }
+        
+        // this may be the case if the user has clicked the close cross
+        return null;
     }
     
     public CommandLink showCommandLinks( List<CommandLink> links ) {

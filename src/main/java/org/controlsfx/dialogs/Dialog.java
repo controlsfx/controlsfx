@@ -45,6 +45,7 @@ import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -529,6 +530,7 @@ public class Dialog {
         if (content != null) {
             grid.add(content, 1, 0);
             GridPane.setVgrow(content, Priority.ALWAYS);
+            GridPane.setValignment(content, VPos.TOP);
             
             // FIXME this should be enabled (otherwise TextField input is not
             // stretched, but by enabling we get an infinite loop in GridPane)
@@ -546,6 +548,7 @@ public class Dialog {
             graphicPane.getStyleClass().add("graphic");
             grid.add(graphicPane, 0, 0);
             GridPane.setValignment(graphicPane, VPos.TOP);
+            GridPane.setMargin(graphicPane, new Insets(0,8,0,0));
         }
         
         if (hasExpandableContent()) {

@@ -43,6 +43,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -506,6 +507,7 @@ public final class Dialogs {
         Pane graphicContainer = new Pane(graphic);
         graphicContainer.getStyleClass().add("graphic-container");
         GridPane.setValignment(graphicContainer, VPos.TOP);
+        GridPane.setMargin(graphicContainer, new Insets(0,10,0,0));
         
         GridPane grid = new GridPane();
         grid.getStyleClass().add("container");

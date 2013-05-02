@@ -291,7 +291,8 @@ public class HelloDialog extends Application {
                              "This creates a temporary network for sharing files or and Internet connection"));
                 
                 
-                CommandLink response = Dialogs.create().owner(stage)
+                CommandLink response = Dialogs.create()
+                        .owner(cbSetOwner.isSelected() ? stage : null)
                         .title("Manually connect to wireless network")
                         .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
                         .message("How do you want to add a network?")

@@ -111,8 +111,8 @@ public class Dialog {
 
     private final FXDialog dialog;
 
-    // Dialog result.
-    protected Action result = Actions.CANCEL;
+    // Dialog result, package-protected for Dialogs
+    Action result = Actions.CANCEL;
 
     private final BorderPane contentPane;
     

@@ -260,33 +260,24 @@ public class Dialog {
      * @param mastheadText masthead text. Used if not null.
      */
     public final void setMasthead(String mastheadText) {
-
-        if (mastheadText == null)
+        if (mastheadText == null) {
             return;
-
+        }
+        
         BorderPane mastheadPanel = new BorderPane();
         mastheadPanel.getStyleClass().add("masthead-panel");
 
-        // Create panel with text area and graphic or just a background image:
-        // Create topPanel's components. UITextArea determines
-        // the size of the dialog by defining the number of columns
-        // based on font size.
-        Label mastheadTextArea = new Label();
-        mastheadTextArea.setPrefWidth(MAIN_TEXT_WIDTH);
-        mastheadTextArea.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        // on left of masthead is the text
+        Label mastheadTextArea = new Label(mastheadText);
         mastheadTextArea.setWrapText(true);
-
-        VBox mastheadVBox = new VBox();
-        mastheadVBox.setAlignment(Pos.CENTER_LEFT);
-        mastheadTextArea.setText(mastheadText);
         mastheadTextArea.setAlignment(Pos.CENTER_LEFT);
-        mastheadVBox.getChildren().add(mastheadTextArea);
+        mastheadPanel.setLeft(mastheadTextArea);
+        BorderPane.setAlignment(mastheadTextArea, Pos.CENTER_LEFT);
 
-        mastheadPanel.setLeft(mastheadVBox);
-        BorderPane.setAlignment(mastheadVBox, Pos.CENTER_LEFT);
-
-        if (graphicProperty.get() != null) {
-            mastheadPanel.setRight(getGraphic());
+        // on the right of the masthead is a graphic, if one is specified
+        Node graphic = getGraphic();
+        if (graphic != null) {
+            mastheadPanel.setRight(graphic);
         }
 
         setMasthead(mastheadPanel);

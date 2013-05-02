@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -54,6 +56,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -655,11 +658,27 @@ public class Dialog {
     private Button createButton(final Action action, boolean keepDefault) {
         final Button button = new Button();
         
-        button.textProperty().bindBidirectional(action.textProperty());
-        button.disableProperty().bindBidirectional(action.disabledProperty());
-        button.graphicProperty().bindBidirectional(action.graphicProperty());
-//        button.setTooltip(new Tooltip());
-//        button.getTooltip().textProperty().bindBidirectional(action.longTextProperty());
+        // button bind to action properties
+        button.textProperty().bind(action.textProperty());
+        button.disableProperty().bind(action.disabledProperty());
+        button.graphicProperty().bind(action.graphicProperty());
+        
+        // tooltip requires some special handling (i.e. don't have one when
+        // the text property is null
+        button.tooltipProperty().bind(new ObjectBinding<Tooltip>() {
+            private Tooltip tooltip = new Tooltip();
+            
+            { 
+                bind(action.longTextProperty()); 
+                tooltip.textProperty().bind(action.longTextProperty());
+            }
+            
+            @Override protected Tooltip computeValue() {
+                String longText = action.longTextProperty().get();
+                return longText == null || longText.isEmpty() ? null : tooltip;
+            }
+        });
+        
         if (action instanceof Actions) {
             Actions stdAction = (Actions) action;
             button.setDefaultButton(stdAction.isDefault && keepDefault);

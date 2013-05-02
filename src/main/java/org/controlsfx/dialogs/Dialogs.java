@@ -78,8 +78,6 @@ public final class Dialogs {
      */
     public static final String USE_DEFAULT = "$$$";
 
-    private static final String COMMAND_LINK_ID = "command.link.id";
-
     private Window owner;
     private String title;
     private String message;
@@ -274,7 +272,7 @@ public final class Dialogs {
         return showChoices(Arrays.asList(choices));
     }
 
-    public int showCommandLinks( int defaultLinkIndex, List<CommandLink> links ) {
+    public CommandLink showCommandLinks( CommandLink defaultCommandLink, List<CommandLink> links ) {
         final Dialog dlg = buildDialog(Type.INFORMATION );
         dlg.setContent(message);
         
@@ -287,10 +285,10 @@ public final class Dialogs {
             content.getChildren().add(message);
         }
         
-        final int[] result = new int[]{-1};
-        int commandIndex = 0;
-        
-        for (CommandLink commandLink : links) {
+        for (final CommandLink commandLink : links) {
+            
+            if ( commandLink == null ) continue; 
+            
             final Button button = buildCommandLinkButton(commandLink);
             
             DoubleBinding dialogWidthBinding = new DoubleBinding() {
@@ -308,64 +306,49 @@ public final class Dialogs {
             button.prefWidthProperty().bind(dialogWidthBinding);
             button.maxWidthProperty().bind(dialogWidthBinding);
             
-            
-            button.setDefaultButton(commandIndex == defaultLinkIndex);
-            button.getProperties().put(COMMAND_LINK_ID, commandIndex);
+            button.setDefaultButton(commandLink == defaultCommandLink);
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
-                    result[0]  = (int) button.getProperties().get(COMMAND_LINK_ID);
-                    dlg.hide();
+                   commandLink.execute( new ActionEvent(dlg, ae.getTarget()));
                 }
             });
+                    
             VBox.setVgrow(button, Priority.SOMETIMES);
-            
             content.getChildren().add( button );
-            commandIndex++;
         }
         dlg.setContent(content);
         dlg.getActions().clear();
-        dlg.show();
-        return result[0];
+        return (CommandLink)dlg.show();
     }
     
-    public int showCommandLinks( List<CommandLink> links ) {
-        return showCommandLinks(0, links);
+    public CommandLink showCommandLinks( List<CommandLink> links ) {
+        return showCommandLinks( null, links);
     }
     
-    public int showCommandLinks( int defaultLinkIndex, CommandLink... links ) {
-        return showCommandLinks( defaultLinkIndex, Arrays.asList(links));
+    public CommandLink showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
+        return showCommandLinks( defaultCommandLink, Arrays.asList(links));
     }
     
-    public int showCommandLinks( CommandLink... links ) {
-        return showCommandLinks(0, links);
-    }
-    
-    public static class CommandLink {
+    public static class CommandLink extends AbstractAction {
         
-        private Node graphic;
-        private String message; 
-        private String comment;
-        
-        public CommandLink( Node graphic, String message, String comment ) {
-            this.graphic = graphic;
-            this.message = message;
-            this.comment = comment;
+        public CommandLink( Node graphic, String text, String longText ) {
+            super(text);
+            setLongText(longText);
+            setGraphic(graphic);
         }
         
         public CommandLink( String message, String comment ) {
             this(null, message, comment);
         }
-        
-        public Node getGraphic() {
-            return graphic;
+
+        @Override public final void execute(ActionEvent ae) {
+            Dialog dlg = (Dialog)ae.getSource();
+            dlg.result = this;
+            dlg.hide();
         }
-        
-        public String getMessage() {
-            return message;
-        }
-        
-        public String getComment() {
-            return comment;
+
+        @Override public String toString() {
+            return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
         }
         
     }    
@@ -488,14 +471,14 @@ public final class Dialogs {
         button.setAlignment(Pos.CENTER_LEFT);
         
         
-        Label titleLabel = new Label(commandLink.getMessage() );
+        Label titleLabel = new Label(commandLink.getText() );
         titleLabel.getStyleClass().addAll("line-1");
         titleLabel.setWrapText(true);
         titleLabel.setAlignment(Pos.TOP_LEFT);
         titleLabel.maxWidthProperty().bind(button.maxWidthProperty());
         GridPane.setVgrow(titleLabel, Priority.ALWAYS);
 
-        Label messageLabel = new Label(commandLink.getComment() );
+        Label messageLabel = new Label(commandLink.getLongText() );
         messageLabel.getStyleClass().addAll("line-2");
         messageLabel.setWrapText(true);
         messageLabel.setAlignment(Pos.TOP_LEFT);

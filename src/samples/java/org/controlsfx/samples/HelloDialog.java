@@ -1,5 +1,8 @@
 package org.controlsfx.samples;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -213,11 +216,6 @@ public class HelloDialog extends Application {
         final Button Hyperlink8 = new Button("TextField");
         Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                // Dialog<String> dlg = Dialog.<String>
-                // build(stage).message("What is your name?").title("Name Check");
-                // if (isMastheadVisible())
-                // dlg.masthead("Please type in your name");
-                // String response = dlg.showInputDialog();
                 String response = Dialogs.create()
                     .owner(cbSetOwner.isSelected() ? stage : null)
                     .title("Name Check")
@@ -233,12 +231,6 @@ public class HelloDialog extends Application {
         final Button Hyperlink9 = new Button("Initial Value Set");
         Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                // Dialog<String> dlg = Dialog.<String>
-                // build(stage).message("Pick a name?").title("Name Guess")
-                // .inputInitialValue("Jonathan");
-                // if (isMastheadVisible())
-                // dlg.masthead("Name Guess");
-                // String response = dlg.showInputDialog();
                 String response = Dialogs.create()
                         .owner(cbSetOwner.isSelected() ? stage : null)
                         .title("Name Guess")
@@ -253,13 +245,6 @@ public class HelloDialog extends Application {
         final Button Hyperlink10 = new Button("Set Choices (< 10)");
         Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                // Dialog<String> dlg = Dialog.<String>
-                // build(stage).message("Pick a name?").title("Name Guess")
-                // .inputInitialValue("Jonathan").inputChoices("Matthew", "Jonathan", "Ian", "Sue",
-                // "Hannah");
-                // if (isMastheadVisible())
-                // dlg.masthead("Name Guess");
-                // String response = dlg.showInputDialog();
 
                 String response = Dialogs.create()
                       .owner(cbSetOwner.isSelected() ? stage : null)
@@ -276,17 +261,6 @@ public class HelloDialog extends Application {
         final Button Hyperlink11 = new Button("Set Choices (>= 10)");
         Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                // Dialog<String> dlg = Dialog
-                // .<String> build(stage)
-                // .message("Pick a name?")
-                // .title("Name Guess")
-                // .inputInitialValue("Jonathan")
-                // .inputChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise",
-                // "Stephan",
-                // "Sarah", "Ron", "Ingrid");
-                // if (isMastheadVisible())
-                // dlg.masthead("Name Guess");
-                // String response = dlg.showInputDialog();
 
                 String response = Dialogs.create()
                         .owner(cbSetOwner.isSelected() ? stage : null)
@@ -307,18 +281,21 @@ public class HelloDialog extends Application {
         final Button Hyperlink12 = new Button("Show");
         Hyperlink12.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                int response = Dialogs.create().owner(stage)
+                
+                List<CommandLink> links = Arrays.asList(
+                     new CommandLink("Add a network that is in the range of this computer", 
+                                     "This shows you a list of networks that are currently available and lets you connect to one."),
+                     new CommandLink("Manually create a network profile", 
+                                     "This creates a new network profile or locates an existing one and saves it on your computer"),
+                     new CommandLink("Create an ad hoc network", 
+                             "This creates a temporary network for sharing files or and Internet connection"));
+                
+                
+                CommandLink response = Dialogs.create().owner(stage)
                         .title("Manually connect to wireless network")
                         .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
                         .message("How do you want to add a network?")
-                        .showCommandLinks( 1,
-                             new CommandLink("Add a network that is in the range of this computer", 
-                                             "This shows you a list of networks that are currently available and lets you connect to one."),
-                             new CommandLink("Manually create a network profile", 
-                                             "This creates a new network profile or locates an existing one and saves it on your computer"),
-                             new CommandLink("Create an ad hoc network", 
-                                     "This creates a temporary network for sharing files or and Internet connection")
-                                );
+                        .showCommandLinks( links.get(1), links );
 
                 System.out.println("response: " + response);
             }

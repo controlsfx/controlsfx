@@ -34,7 +34,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
 
 /**
  * A convenience class that implements the {@link Action} interface and provides
@@ -48,8 +47,8 @@ public abstract class AbstractAction implements Action {
             new SimpleStringProperty(this, "text");
     private final BooleanProperty disabledProperty = 
             new SimpleBooleanProperty(this, "disabled");
-    private final ObjectProperty<Tooltip> tooltipProperty =
-            new SimpleObjectProperty<Tooltip>(this, "tooltip");
+    private final StringProperty longTextProperty =
+            new SimpleStringProperty(this, "longText");
     private final ObjectProperty<Node> graphicProperty =
             new SimpleObjectProperty<Node>(this, "graphic");
     
@@ -82,15 +81,15 @@ public abstract class AbstractAction implements Action {
     }
 
     
-    // --- tooltip
-    @Override public ObjectProperty<Tooltip> tooltipProperty() {
-        return tooltipProperty;
+    // --- longText
+    @Override public StringProperty longTextProperty() {
+        return longTextProperty;
     }
-    public final Tooltip getTooltip() {
-        return tooltipProperty.get();
+    public final String getLongText() {
+        return longTextProperty.get();
     }
-    public final void setTooltip(Tooltip value) {
-        tooltipProperty.set(value);
+    public final void setLongText(String value) {
+        longTextProperty.set(value);
     }
     
     

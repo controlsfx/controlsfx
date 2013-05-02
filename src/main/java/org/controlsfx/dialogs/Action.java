@@ -31,7 +31,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
 
 /**
  * Common interface for dialog actions, where Actions are converted into buttons 
@@ -61,13 +60,14 @@ public interface Action {
     public BooleanProperty disabledProperty();
 
     /**
-     * This {@link Tooltip} that should be shown to the user if their mouse 
+     * The text to show to the user. On the button
+     * it is usually a tooltip that should be shown to the user if their mouse 
      * hovers over this action.
      * 
-     * @return An observable {@link ObjectProperty} that represents the current
-     *      Tooltip for this property, and which can be observed for changes.
+     * @return An observable {@link StringProperty} that represents the current
+     *      long text for this property, and which can be observed for changes.
      */
-    public ObjectProperty<Tooltip> tooltipProperty();
+    public StringProperty longTextProperty();
     
     /**
      * This graphic that should be shown to the user in relation to this action.

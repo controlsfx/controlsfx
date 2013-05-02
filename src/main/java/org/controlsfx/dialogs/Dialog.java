@@ -54,7 +54,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -110,7 +109,7 @@ public class Dialog {
     private final FXDialog dialog;
 
     // Dialog result.
-    private Action result = Actions.CANCEL;
+    protected Action result = Actions.CANCEL;
 
     private final BorderPane contentPane;
     
@@ -417,7 +416,7 @@ public class Dialog {
 
         private final StringProperty title = new SimpleStringProperty();
         private final BooleanProperty disabled = new SimpleBooleanProperty(false);
-        private final ObjectProperty<Tooltip> tooltip = new SimpleObjectProperty<Tooltip>();
+        private final StringProperty longText = new SimpleStringProperty(null);
         private final ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>();
         
         private boolean isClosing;
@@ -450,8 +449,8 @@ public class Dialog {
             return disabled;
         }
         
-        @Override public ObjectProperty<Tooltip> tooltipProperty() {
-            return tooltip;
+        @Override public StringProperty longTextProperty() {
+            return longText;
         }
         
         @Override public ObjectProperty<Node> graphicProperty() {
@@ -654,13 +653,13 @@ public class Dialog {
     }
 
     private Button createButton(final Action action, boolean keepDefault) {
-        Button button = new Button();
+        final Button button = new Button();
         
         button.textProperty().bindBidirectional(action.textProperty());
         button.disableProperty().bindBidirectional(action.disabledProperty());
-        button.tooltipProperty().bindBidirectional(action.tooltipProperty());
         button.graphicProperty().bindBidirectional(action.graphicProperty());
-        
+//        button.setTooltip(new Tooltip());
+//        button.getTooltip().textProperty().bindBidirectional(action.longTextProperty());
         if (action instanceof Actions) {
             Actions stdAction = (Actions) action;
             button.setDefaultButton(stdAction.isDefault && keepDefault);

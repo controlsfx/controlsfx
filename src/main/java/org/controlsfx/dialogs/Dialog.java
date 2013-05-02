@@ -522,7 +522,7 @@ public class Dialog {
         Node content = getContent();
         if (content != null) {
             grid.add(content, 1, 0);
-            GridPane.setVgrow(content, Priority.ALWAYS);
+            GridPane.setVgrow(content, Priority.SOMETIMES);
             GridPane.setValignment(content, VPos.TOP);
             
             // FIXME this should be enabled (otherwise TextField input is not
@@ -549,11 +549,17 @@ public class Dialog {
             grid.add(ec, 0, 1, 2, 1);
             ec.setVisible(false);
             ec.managedProperty().bind(ec.visibleProperty());
+            
+            GridPane.setHgrow(ec, Priority.ALWAYS);
+            GridPane.setVgrow(ec, Priority.ALWAYS);
         }
         
         if ( !getActions().isEmpty() || hasExpandableContent()) {
             Node buttonPanel = createButtonPanel();
             grid.add(buttonPanel, 0, 2, 2, 1);
+            
+            GridPane.setHgrow(buttonPanel, Priority.ALWAYS);
+            GridPane.setVgrow(buttonPanel, Priority.NEVER);
        }
 
         return grid;

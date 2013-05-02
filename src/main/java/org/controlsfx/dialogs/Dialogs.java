@@ -56,6 +56,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -444,12 +445,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        VBox detailsPane = new VBox(10);
-
         Label label = new Label(getString("exception.dialog.label"));
-        VBox.setVgrow(label, Priority.NEVER);
-
-        detailsPane.getChildren().add(label);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -458,15 +454,24 @@ public final class Dialogs {
         TextArea text = new TextArea(sw.toString());
         text.setEditable(false);
         text.setWrapText(true);
-        text.setPrefWidth(60 * 8);
+        
+        // FIXME without this, the text area will not grow when the expandable
+        // dialog is manually resized with the mouse. There is bound to be a 
+        // better solution, but I'm not entirely sure what it is right now.
+        text.setPrefWidth(3000);
+        
+        text.setMaxWidth(Double.MAX_VALUE);
         text.setMaxHeight(Double.MAX_VALUE);
-        detailsPane.getChildren().add(text);
-        VBox.setVgrow(text, Priority.ALWAYS);
+        GridPane.setVgrow(text, Priority.ALWAYS);
+        GridPane.setHgrow(text, Priority.ALWAYS);
+        
+        GridPane root = new GridPane();
+        root.setMaxWidth(Double.MAX_VALUE);
+        root.add(label, 0, 0);
+        root.add(text, 0, 1);
 
-        return detailsPane;
-
+        return root;
     }
-    
     
     private Button buildCommandLinkButton( CommandLink commandLink ) {
         // put the content inside a button

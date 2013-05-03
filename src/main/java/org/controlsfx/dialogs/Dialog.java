@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -63,7 +62,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
@@ -86,6 +84,7 @@ import com.sun.javafx.Utils;
  * 
  * @see Dialogs
  */
+@SuppressWarnings("restriction")
 public class Dialog {
     
     /**************************************************************************

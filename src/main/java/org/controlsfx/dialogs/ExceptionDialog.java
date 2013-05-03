@@ -26,15 +26,20 @@
  */
 package org.controlsfx.dialogs;
 
-import javafx.event.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import javafx.stage.Window;
-
+import static org.controlsfx.dialogs.DialogResources.getMessage;
+import static org.controlsfx.dialogs.DialogResources.getString;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
-
-import static org.controlsfx.dialogs.DialogResources.*;
+import javafx.stage.Window;
 
 class ExceptionDialog extends FXDialog {
 

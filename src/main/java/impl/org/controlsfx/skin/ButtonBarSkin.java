@@ -124,41 +124,52 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         
         Map<String, List<ButtonBase>> buttonMap = buildButtonMap(buttons);
         SpacerType preparedSpacer = SpacerType.NONE;
-        for ( char type: getSkinnable().getButtonOrder().toCharArray()) {
-            
-            if ( type == '+') {
+        String buttonOrderStr = getSkinnable().getButtonOrder();
+        
+        if (buttonOrderStr == null || buttonOrderStr.isEmpty()) {
+            throw new IllegalStateException("ButtonBar buttonOrder string can not be null or empty");
+        }
+         
+        char[] buttonOrder = buttonOrderStr.toCharArray();
+        
+        for (int i = 0; i < buttonOrder.length; i++) {
+            char type = buttonOrder[i];
+            if (type == '+') {
                preparedSpacer = preparedSpacer.replace(SpacerType.DYNAMIC);
-            } else if ( type == '_') {
+            } else if (type == '_') {
                preparedSpacer = preparedSpacer.replace(SpacerType.FIXED);
             } else {
-                
                 List<ButtonBase> buttonList = buttonMap.get(String.valueOf(type).toUpperCase());
-                if ( buttonList != null ) {
+                if (buttonList != null) {
                     Node spacer = preparedSpacer.create();
-                    if ( spacer != null ) {
+                    if (spacer != null) {
                         hbox.getChildren().add(spacer);
                         preparedSpacer = preparedSpacer.replace(SpacerType.NONE);
                     }
                     
-                    for( ButtonBase btn: buttonList) {
+                    for (ButtonBase btn: buttonList) {
                         hbox.getChildren().add(btn);
                         HBox.setHgrow(btn, Priority.ALWAYS);
                     }
                 } 
             }
         }
-        
     }
     
-    private String getButtonType( ButtonBase btn ) {
+    private String getButtonType(ButtonBase btn) {
         ButtonType buttonType =  (ButtonType) btn.getProperties().get(BUTTON_TYPE_PROPERTY);
+        
+        if (buttonType == null) {
+            // TODO throw exception or just assume it is ButtonType.OTHER?
+            throw new IllegalStateException("Button '" + btn.getText() + "' does not have a ButtonType specified");
+        }
+        
         String typeCode = buttonType.getTypeCode();
         typeCode = typeCode.length() > 0? typeCode.substring(0,1): "";
         return CATEGORIZED_TYPES.contains(typeCode.toUpperCase())? typeCode : "U"; 
     }
     
     private Map<String, List<ButtonBase>> buildButtonMap( List<? extends ButtonBase> buttons ) {
-        
         Map<String, List<ButtonBase>> buttonMap = new HashMap<>();
         for (ButtonBase btn : buttons) {
             if ( btn == null ) continue;
@@ -171,7 +182,6 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
             typedButtons.add( btn );
         }
         return buttonMap;
-        
     }
 
     

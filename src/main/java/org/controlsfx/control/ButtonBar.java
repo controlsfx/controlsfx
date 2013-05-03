@@ -45,6 +45,9 @@ import com.sun.javafx.Utils;
  * relative positions based on either OS-specific locations, or in an application
  * specific application (by setting the 
  * {@link #buttonOrderProperty() button order}).  
+ * 
+ * <p>The concept and API for this control borrows heavily from the MigLayout
+ * button bar functionality.
  */
 public final class ButtonBar extends Control {
     

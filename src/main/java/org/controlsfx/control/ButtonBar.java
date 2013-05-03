@@ -27,27 +27,25 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.ButtonBarSkin;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.sun.javafx.Utils;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 
+import com.sun.javafx.Utils;
+
+/**
+ * A ButtonBar is essentially an {@link HBox} for controls extending
+ * {@link ButtonBase}, most notably {@link Button}, which have been annotated
+ * with a specific type (from the {@link ButtonType} enumeration). By performing
+ * this annotation, the ButtonBar is able to place the buttons in their correct
+ * relative positions based on either OS-specific locations, or in an application
+ * specific application (by setting the 
+ * {@link #buttonOrderProperty() button order}).  
+ */
 public final class ButtonBar extends Control {
     
     /**************************************************************************
@@ -257,14 +255,25 @@ public final class ButtonBar extends Control {
      * available: {@link #BUTTON_ORDER_WINDOWS}, {@link #BUTTON_ORDER_MAC_OS},
      * {@link #BUTTON_ORDER_LINUX}.
      */
-    private final StringProperty buttonOrderProperty = 
-            new SimpleStringProperty(this, "buttonOrder", BUTTON_ORDER_WINDOWS);
     public final StringProperty buttonOrderProperty() {
         return buttonOrderProperty;
     }
+    private final StringProperty buttonOrderProperty = 
+            new SimpleStringProperty(this, "buttonOrder");
+    
+    /**
+     * Sets the {@link #buttonOrderProperty() button order}
+     * @param buttonOrder The currently set button order, which by default will
+     *      be the OS-specific button order.
+     */
     public final void setButtonOrder(String buttonOrder) {
         buttonOrderProperty.set(buttonOrder);
     }
+    
+    /**
+     * Returns the current {@link #buttonOrderProperty() button order}.
+     * @return The current {@link #buttonOrderProperty() button order}.
+     */
     public final String getButtonOrder() {
         return buttonOrderProperty.get();
     }

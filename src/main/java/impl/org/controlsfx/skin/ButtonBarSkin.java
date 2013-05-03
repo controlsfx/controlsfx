@@ -191,10 +191,9 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                 return spacer;
             }
             
-            public SpacerType replace( SpacerType type ) {
+            @Override public SpacerType replace( SpacerType type ) {
                 return type == NONE || type == DYNAMIC? type: this;
             }
-            
         },
         DYNAMIC {
             @Override public Node create() {
@@ -203,15 +202,14 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                 return spacer;
             }
             
-            public SpacerType replace( SpacerType type ) {
+            @Override public SpacerType replace( SpacerType type ) {
                 return type == NONE? type: this;
             }
         },
         NONE {
-            public SpacerType replace( SpacerType type ) {
+            @Override public SpacerType replace( SpacerType type ) {
                 return type == FIXED || type == DYNAMIC? type: this;
             }
-
         };
         
         public abstract SpacerType replace( SpacerType type );

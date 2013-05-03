@@ -577,41 +577,28 @@ public class Dialog {
     private Node createButtonPanel() {
         buttons.clear();
         
-        final HBox buttonsPanel = new HBox(6) {
-            @Override protected void layoutChildren() {
-                resizeButtons();
-                super.layoutChildren();
-            }
-        };
-        buttonsPanel.getStyleClass().add("button-bar");
-
+        ButtonBar buttonBar = new ButtonBar();
+        buttonBar.setButtonOrder(buttonBarOrder);
+        
         // show details button if expandable content is present
         if (hasExpandableContent()) {
-            buttonsPanel.getChildren().add(createDetailsButton());
+            buttonBar.addButton(createDetailsButton(), ButtonType.HELP_2);
         }
-
-        // push buttons to the right
-        buttonsPanel.getChildren().add(createButtonSpacer());
 
         boolean hasDefault = false;
         for (Action cmd : getActions()) {
             ButtonBase b = createButton(cmd, !hasDefault);
+            
             // keep only first default button
             if (b instanceof Button) {
                 hasDefault |= ((Button) b).isDefaultButton();
             }
             buttons.add(b);
         }
+        
+        buttonBar.getButtons().addAll(buttons);
 
-        // OS based order of buttons
-        if (isMac())
-            Collections.reverse(buttons);
-
-        for (ButtonBase button : buttons) {
-            buttonsPanel.getChildren().add(button);
-        }
-
-        return buttonsPanel;
+        return buttonBar;
     }
     
     /*
@@ -668,6 +655,16 @@ public class Dialog {
         button.textProperty().bind(action.textProperty());
         button.disableProperty().bind(action.disabledProperty());
         button.graphicProperty().bind(action.graphicProperty());
+        
+        // add all the properties of the action into the button, and set up
+        // a listener so they are always copied across
+        button.getProperties().putAll(action.getProperties());
+        action.getProperties().addListener(new MapChangeListener<Object, Object>() {
+            public void onChanged(MapChangeListener.Change<? extends Object,? extends Object> change) {
+                button.getProperties().clear();
+                button.getProperties().putAll(action.getProperties());
+            }
+        });
         
         // tooltip requires some special handling (i.e. don't have one when
         // the text property is null

@@ -257,6 +257,24 @@ public final class ButtonBar extends Control {
         return buttons;
     }
     
+    /**
+     * A convenience method which is a shortcut for code of the following form:
+     * 
+     * <code>
+     * Button detailsButton = createDetailsButton();
+     * ButtonBar.setType(detailsButton, ButtonType.HELP_2);
+     * buttonBar.getButtons().add(detailsButton);
+     * </code>
+     * 
+     * @param button The button to add to this button bar instance.
+     * @param buttonType The type of the button, such that it can be place correctly.
+     */
+    public void addButton(ButtonBase button, ButtonType buttonType) {
+        if (button == null) return;
+        
+        ButtonBar.setType(button, buttonType);
+        getButtons().add(button);
+    }
     
     
     /**************************************************************************

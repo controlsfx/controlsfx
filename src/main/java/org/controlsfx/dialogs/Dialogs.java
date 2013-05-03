@@ -38,6 +38,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
+
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -199,6 +202,7 @@ public final class Dialogs {
                 new ExceptionDialog(owner, moreDetails).show();
             }
         };
+//        ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
         
         return dlg.show();

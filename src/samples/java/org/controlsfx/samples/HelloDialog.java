@@ -58,15 +58,17 @@ public class HelloDialog extends Application {
 
         grid.add(createLabel("Operating system button placement: "), 0, 0);
 
-        final String WINDOWS_UNIX = "Windows / Unix";
+        final String WINDOWS = "Windows";
         final String MAC_OS = "Mac OS";
-        final ChoiceBox<String> operatingSystem = new ChoiceBox<>(FXCollections.observableArrayList(WINDOWS_UNIX, MAC_OS));
-        operatingSystem.getSelectionModel().select(WINDOWS_UNIX);
+        final String LINUX = "Linux";
+        final ChoiceBox<String> operatingSystem = new ChoiceBox<>(FXCollections.observableArrayList(WINDOWS, MAC_OS, LINUX));
+        operatingSystem.getSelectionModel().select(WINDOWS);
         operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 String os = operatingSystem.getSelectionModel().getSelectedItem();
                 DialogsAccessor.setMacOS(MAC_OS.equals(os));
-                DialogsAccessor.setWindows(WINDOWS_UNIX.equals(os));
+                DialogsAccessor.setWindows(WINDOWS.equals(os));
+                DialogsAccessor.setLinux(LINUX.equals(os));
             }
         });
         grid.add(operatingSystem, 1, row);

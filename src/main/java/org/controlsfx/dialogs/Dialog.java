@@ -483,22 +483,28 @@ public class Dialog {
     /**
      * TODO delete me - this is just for testing!!
      */
-    private static boolean isMac = false;
-    private static boolean isWindows = false;
+    static String buttonBarOrder = ButtonBar.BUTTON_ORDER_WINDOWS;
 
     static void setMacOS(boolean b) {
-        isMac = b;
-        isWindows = !b;
+        if (b) {
+            buttonBarOrder = ButtonBar.BUTTON_ORDER_MAC_OS;
+        }
     }
 
     static void setWindows(boolean b) {
-        isMac = !b;
-        isWindows = b;
+        if (b) {
+            buttonBarOrder = ButtonBar.BUTTON_ORDER_WINDOWS;
+        }
     }
-
-    private boolean isMac() {
-        return isMac || (!isWindows && Utils.isMac());
+    
+    static void setLinux(boolean b) {
+        if (b) {
+            buttonBarOrder = ButtonBar.BUTTON_ORDER_LINUX;
+        }
     }
+    // -- end of testing code
+    
+    
 
     private boolean hasMasthead() {
         return getMasthead() != null;

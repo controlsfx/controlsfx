@@ -272,6 +272,13 @@ public final class Dialogs {
         return showChoices(Arrays.asList(choices));
     }
 
+    /**
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * a set of available 'radio' buttons
+     * @param defaultCommandLink command is set to be default. Null means no default
+     * @param links list of command links presented in specified sequence
+     * @return action used to close dialog (it is either one of command links or CANCEL) 
+     */
     public Action showCommandLinks( CommandLink defaultCommandLink, List<CommandLink> links ) {
         final Dialog dlg = buildDialog(Type.INFORMATION );
         dlg.setContent(message);
@@ -322,14 +329,31 @@ public final class Dialogs {
         return dlg.show();
     }
     
+    /**
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * a set of available 'radio' buttons
+     * @param links list of command links presented in specified sequence
+     * @return action used to close dialog (it is either one of command links or CANCEL) 
+     */    
     public Action showCommandLinks( List<CommandLink> links ) {
         return showCommandLinks( null, links);
     }
     
+    /**
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * a set of available 'radio' buttons
+     * @param defaultCommandLink command is set to be default. Null means no default
+     * @param links command links presented in specified sequence
+     * @return action used to close dialog (it is either one of command links or CANCEL) 
+     */
     public Action showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
         return showCommandLinks( defaultCommandLink, Arrays.asList(links));
     }
     
+    /**
+     * Command Link class.
+     * Represents one command link in command links dialog. 
+     */
     public static class CommandLink extends AbstractAction {
         
         public CommandLink( Node graphic, String text, String longText ) {

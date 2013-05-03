@@ -217,6 +217,8 @@ public final class ButtonBar extends Control {
      **************************************************************************/
     
     public ButtonBar() {
+        getStyleClass().add("button-bar");
+        
         // set the default button order 
         if (Utils.isMac()) {
             setButtonOrder(BUTTON_ORDER_MAC_OS);

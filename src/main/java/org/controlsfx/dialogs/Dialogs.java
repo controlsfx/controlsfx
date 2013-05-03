@@ -56,7 +56,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -273,7 +272,7 @@ public final class Dialogs {
         return showChoices(Arrays.asList(choices));
     }
 
-    public CommandLink showCommandLinks( CommandLink defaultCommandLink, List<CommandLink> links ) {
+    public Action showCommandLinks( CommandLink defaultCommandLink, List<CommandLink> links ) {
         final Dialog dlg = buildDialog(Type.INFORMATION );
         dlg.setContent(message);
         
@@ -320,20 +319,14 @@ public final class Dialogs {
         dlg.setContent(content);
         dlg.getActions().clear();
         
-        Action result = dlg.show();
-        if (result instanceof CommandLink) {
-            return (CommandLink) result;
-        }
-        
-        // this may be the case if the user has clicked the close cross
-        return null;
+        return dlg.show();
     }
     
-    public CommandLink showCommandLinks( List<CommandLink> links ) {
+    public Action showCommandLinks( List<CommandLink> links ) {
         return showCommandLinks( null, links);
     }
     
-    public CommandLink showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
+    public Action showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
         return showCommandLinks( defaultCommandLink, Arrays.asList(links));
     }
     

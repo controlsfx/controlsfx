@@ -29,6 +29,8 @@ package org.controlsfx.control;
 import org.controlsfx.dialogs.Action;
 
 import impl.org.controlsfx.skin.ButtonBarSkin;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -219,14 +221,17 @@ public final class ButtonBar extends Control {
     public ButtonBar() {
         getStyleClass().add("button-bar");
         
-        // set the default button order 
+        // set the default values 
         if (Utils.isMac()) {
             setButtonOrder(BUTTON_ORDER_MAC_OS);
+            setButtonMinWidth(70);
         } else if (Utils.isUnix()) {
             setButtonOrder(BUTTON_ORDER_LINUX);
+            setButtonMinWidth(85);
         } else {
             // windows by default
             setButtonOrder(BUTTON_ORDER_WINDOWS);
+            setButtonMinWidth(75);
         }
     }
     
@@ -285,6 +290,7 @@ public final class ButtonBar extends Control {
      * 
      **************************************************************************/
     
+    // --- Button order
     /**
      * The order for the typical buttons in a standard button bar. It is 
      * one letter per button type, and the applicable options are part of 
@@ -313,6 +319,20 @@ public final class ButtonBar extends Control {
      */
     public final String getButtonOrder() {
         return buttonOrderProperty.get();
+    }
+    
+    
+    // --- button min width
+    public final DoubleProperty buttonMinWidthProperty() {
+        return buttonMinWidthProperty;
+    }
+    private final DoubleProperty buttonMinWidthProperty =
+            new SimpleDoubleProperty(this, "buttonMinWidthProperty");
+    public final void setButtonMinWidth(double value) {
+        buttonMinWidthProperty.set(value);
+    }
+    public final double getButtonMinWidth() {
+        return buttonMinWidthProperty.get();
     }
     
     

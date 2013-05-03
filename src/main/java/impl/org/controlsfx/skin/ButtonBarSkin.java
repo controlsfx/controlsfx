@@ -91,6 +91,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         });
         
         registerChangeListener(control.buttonOrderProperty(), "BUTTON_ORDER");
+        registerChangeListener(control.buttonMinWidthProperty(), "BUTTON_MIN_WIDTH");
     }
     
     
@@ -106,6 +107,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         
         if ("BUTTON_ORDER".equals(p)) {
             layoutButtons();
+        } else if ("BUTTON_MIN_WIDTH".equals(p)) {
+            layoutButtons();
         }
     }
     
@@ -118,9 +121,12 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
      **************************************************************************/
     
     private void layoutButtons() {
-        List<? extends ButtonBase> buttons = getSkinnable().getButtons();
+        final ButtonBar buttonBar = getSkinnable();
+        final List<? extends ButtonBase> buttons = buttonBar.getButtons();
+        final double buttonMinWidth = buttonBar.getButtonMinWidth();
         
         hbox.getChildren().clear();
+        
         
         Map<String, List<ButtonBase>> buttonMap = buildButtonMap(buttons);
         SpacerType preparedSpacer = SpacerType.NONE;
@@ -148,6 +154,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                     }
                     
                     for (ButtonBase btn: buttonList) {
+                        btn.setMinWidth(buttonMinWidth);
+                        
                         hbox.getChildren().add(btn);
                         HBox.setHgrow(btn, Priority.ALWAYS);
                     }

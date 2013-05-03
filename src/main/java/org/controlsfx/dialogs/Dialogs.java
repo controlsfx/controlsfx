@@ -468,24 +468,19 @@ public final class Dialogs {
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
 
-        TextArea text = new TextArea(sw.toString());
-        text.setEditable(false);
-        text.setWrapText(true);
+        TextArea textArea = new TextArea(sw.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
         
-        // FIXME without this, the text area will not grow when the expandable
-        // dialog is manually resized with the mouse. There is bound to be a 
-        // better solution, but I'm not entirely sure what it is right now.
-        text.setPrefWidth(3000);
-        
-        text.setMaxWidth(Double.MAX_VALUE);
-        text.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(text, Priority.ALWAYS);
-        GridPane.setHgrow(text, Priority.ALWAYS);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
         
         GridPane root = new GridPane();
         root.setMaxWidth(Double.MAX_VALUE);
         root.add(label, 0, 0);
-        root.add(text, 0, 1);
+        root.add(textArea, 0, 1);
 
         return root;
     }

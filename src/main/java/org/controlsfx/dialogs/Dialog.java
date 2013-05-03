@@ -30,19 +30,13 @@ import static org.controlsfx.dialogs.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialogs.DialogResources.getString;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import org.controlsfx.control.ButtonBar;
-import org.controlsfx.control.ButtonBar.ButtonType;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -51,6 +45,7 @@ import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -62,15 +57,15 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
-import com.sun.javafx.Utils;
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
 
 /**
  * A lower-level API for creating standardized dialogs consisting of the following
@@ -98,12 +93,15 @@ public class Dialog {
      * 
      **************************************************************************/
     
+    // enable to turn on grid lines, etc
+    private static final boolean DEBUG = false;
+    
     // According to the UI spec, the width of the main message text in the upper
     // panel should be 426 pixels.
     private static int MAIN_TEXT_WIDTH = 400;
 
-    // Specifies the minimum allowable width for all buttons in the dialog
-    private static int MINIMUM_BUTTON_WIDTH = 75;
+//    // Specifies the minimum allowable width for all buttons in the dialog
+//    private static int MINIMUM_BUTTON_WIDTH = 75;
     
     
     
@@ -118,7 +116,7 @@ public class Dialog {
     // Dialog result, package-protected for Dialogs
     Action result = Actions.CANCEL;
 
-    private final BorderPane contentPane;
+    private final GridPane contentPane;
     
     // list containing user input buttons at bottom of dialog
     private List<ButtonBase> buttons = new ArrayList<ButtonBase>();
@@ -141,9 +139,12 @@ public class Dialog {
      */
     public Dialog(Window owner, String title) {
         this.dialog = new FXDialog(title, owner, true);
-        this.contentPane = new BorderPane();
+        
+        this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane");
-        contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
+//        this.contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
+        this.contentPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        
         this.dialog.setContentPane(contentPane);
     }
     
@@ -329,10 +330,11 @@ public class Dialog {
         label.setAlignment(Pos.TOP_LEFT);
         label.setTextAlignment(TextAlignment.LEFT);
         label.setMaxWidth(Double.MAX_VALUE);
+        label.setMaxHeight(Double.MAX_VALUE);
 
         // FIXME we don't want to restrict the width, but for now this works ok
-        label.setPrefWidth(MAIN_TEXT_WIDTH);
-//        label.setMaxWidth(360);
+//        label.setPrefWidth(MAIN_TEXT_WIDTH);
+        label.setMaxWidth(360);
         label.setWrapText(true);
 
         setContent(label);
@@ -517,26 +519,46 @@ public class Dialog {
     private void buildDialogContent() {
         contentPane.getChildren().clear();
         
+        int row = 0;
+        
         final boolean hasMasthead = hasMasthead();
         if (hasMasthead) {
-            contentPane.setTop(getMasthead());
+            Node masthead = getMasthead();
+            contentPane.add(masthead, 0, row++);
         }
-        contentPane.setCenter(createCenterPanel());
+        
+        createCenterPanel(row);
         
         Parent root = dialog.getScene().getRoot();
         root.pseudoClassStateChanged(MASTHEAD_PSEUDO_CLASS,      hasMasthead);
         root.pseudoClassStateChanged(NO_MASTHEAD_PSEUDO_CLASS,   !hasMasthead);
+        
+        // the dialog has a simple grid layout. If there is a masthead, it consists
+        // of a single column. If there is no masthead, there are two columns.
+        // We always want the right-most column to expand to fill all available
+        // width.
+        ColumnConstraints leftColumn = new ColumnConstraints();
+        ColumnConstraints rightColumn = new ColumnConstraints();
+        rightColumn.setFillWidth(true);
+        
+        // FIXME this also causes an infinite loop in GridPane
+//        rightColumn.setHgrow(Priority.ALWAYS);
+        if (! hasMasthead) {
+            contentPane.getColumnConstraints().add(leftColumn);
+        }
+        contentPane.getColumnConstraints().add(rightColumn);
+        
+        this.contentPane.setGridLinesVisible(DEBUG);
     }
 
-    private Pane createCenterPanel() {
-        // -- new approach
-        GridPane grid = new GridPane();
-        grid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        grid.getStyleClass().add("center-panel");
+    private void createCenterPanel(final int startRow) {
+        final boolean hasMasthead = hasMasthead();
         
         Node content = getContent();
         if (content != null) {
-            grid.add(content, 1, 0);
+            content.getStyleClass().add("center");
+            
+            contentPane.add(content, hasMasthead ? 0 : 1, startRow);
             GridPane.setVgrow(content, Priority.SOMETIMES);
             GridPane.setValignment(content, VPos.TOP);
             
@@ -547,21 +569,21 @@ public class Dialog {
         
         // dialog image can go to the left if there is no masthead
         final Node graphic = getGraphic();
-        if (!hasMasthead() && graphic != null) {
+        if (!hasMasthead && graphic != null) {
             Pane graphicPane = new Pane(graphic);
             
             final double w = graphic.getLayoutBounds().getWidth();
             final double h = graphic.getLayoutBounds().getHeight();
             graphicPane.setMinSize(w, h);
             graphicPane.getStyleClass().add("graphic");
-            grid.add(graphicPane, 0, 0);
+            contentPane.add(graphicPane, 0, startRow);
             GridPane.setValignment(graphicPane, VPos.TOP);
             GridPane.setMargin(graphicPane, new Insets(0,8,0,0));
         }
         
         if (hasExpandableContent()) {
             Node ec = getExpandableContent();
-            grid.add(ec, 0, 1, 2, 1);
+            contentPane.add(ec, 0, startRow + 1, 2, 1);
             ec.setVisible(false);
             ec.managedProperty().bind(ec.visibleProperty());
             
@@ -570,17 +592,11 @@ public class Dialog {
         }
         
         if ( !getActions().isEmpty() || hasExpandableContent()) {
-            Node buttonPanel = createButtonPanel();
-            grid.add(buttonPanel, 0, 2, 2, 1);
-            
-            GridPane.setHgrow(buttonPanel, Priority.ALWAYS);
-            GridPane.setVgrow(buttonPanel, Priority.NEVER);
+            createButtonPanel(startRow + 2);
        }
-
-        return grid;
     }
 
-    private Node createButtonPanel() {
+    private void createButtonPanel(final int startRow) {
         buttons.clear();
         
         ButtonBar buttonBar = new ButtonBar();
@@ -604,37 +620,11 @@ public class Dialog {
         
         buttonBar.getButtons().addAll(buttons);
 
-        return buttonBar;
+        contentPane.add(buttonBar, 0, startRow, 2, 1);
+        GridPane.setHgrow(buttonBar, Priority.ALWAYS);
+        GridPane.setVgrow(buttonBar, Priority.NEVER);
     }
     
-    /*
-     * According to UI guidelines, all buttons should have the same length. This
-     * function is to define the longest button in the array of buttons and set
-     * all buttons in array to be the length of the longest button.
-     */
-    private void resizeButtons() {
-        // Find out the longest button...
-        double widest = MINIMUM_BUTTON_WIDTH;
-        for (ButtonBase btn : buttons) {
-            if (btn == null)
-                continue;
-            widest = Math.max(widest, btn.prefWidth(-1));
-        }
-
-        // ...and set all buttons to be this width
-        for (ButtonBase btn : buttons) {
-            if (btn == null)
-                continue;
-            btn.setPrefWidth(btn.isVisible() ? widest : 0);
-        }
-    }
-
-    private Node createButtonSpacer() {
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        return spacer;
-    }
-
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
         detailsButton.getStyleClass().setAll("details-button", "more");

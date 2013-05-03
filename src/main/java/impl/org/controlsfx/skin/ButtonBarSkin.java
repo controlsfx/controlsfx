@@ -191,6 +191,33 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         }
         return buttonMap;
     }
+    
+    
+    // Taken from Dialog, but now the Dialog is using ButtonBar I thought I would
+    // move this over here for when we support forcing all buttons to the same
+    // size. This was used by overriding layoutChildren and calling resizeButtons
+    // whenever that was called.
+//    /*
+//     * According to UI guidelines, all buttons should have the same length. This
+//     * function is to define the longest button in the array of buttons and set
+//     * all buttons in array to be the length of the longest button.
+//     */
+//    private void resizeButtons() {
+//        // Find out the longest button...
+//        double widest = MINIMUM_BUTTON_WIDTH;
+//        for (ButtonBase btn : buttons) {
+//            if (btn == null)
+//                continue;
+//            widest = Math.max(widest, btn.prefWidth(-1));
+//        }
+//
+//        // ...and set all buttons to be this width
+//        for (ButtonBase btn : buttons) {
+//            if (btn == null)
+//                continue;
+//            btn.setPrefWidth(btn.isVisible() ? widest : 0);
+//        }
+//    }
 
     
     

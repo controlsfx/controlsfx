@@ -122,8 +122,7 @@
  *                                                                             *
  ******************************************************************************/
  
-.dialog > * > .content-pane > .center-panel {
-    -fx-padding: 16 16 14 16;
+.dialog > * > .content-pane {
     -fx-spacing: 14;
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
@@ -131,18 +130,30 @@
     -fx-font-size: 1.083333em; /*13px;*/
     -fx-text-fill: #292929;
 }
+ 
+.dialog:no-masthead > * > .content-pane {
+    -fx-padding: 16 16 0 16;
+}
+
+.dialog:masthead > * > .content-pane > .center {
+    -fx-padding: 16 16 16 16;
+}
 
 /* The area specifically for content, e.g. not including the button-bar */
-.dialog > * > .content-pane > .center-panel .content {
+.dialog > * > .content-pane .content {
     -fx-font-size: 1em;
     -fx-padding: 5 0 10 0;
 }
 
-.dialog > * > .content-pane > .center-panel .button-bar {
-    -fx-padding: 8 0 8 0;
+.dialog:no-masthead > * > .content-pane .button-bar {
+    -fx-padding: 0 0 14 0;
 }
 
-.dialog:no-masthead > * > .content-pane > .center-panel .graphic {
+.dialog:masthead > * > .content-pane .button-bar {
+    -fx-padding: 0 16 14 0;
+}
+
+.dialog:no-masthead > * > .content-pane .graphic {
     -fx-padding: 0 10 0 0;
 }
 
@@ -185,7 +196,7 @@
  *                                                                             *
  ******************************************************************************/
  /* For the text displayed above command-link buttons (but below the masthead) */
-.dialog > * > .content-pane > .center-panel .command-link-message {
+.dialog > * > .content-pane .command-link-message {
     -fx-font-size: 1.25em; 
 }
 

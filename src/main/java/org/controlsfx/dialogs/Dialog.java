@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
+
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -42,7 +45,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -401,20 +406,17 @@ public class Dialog {
      */
     public enum Actions implements Action {
 
-        CANCEL( getString("common.cancel.button"), true, true),
-        CLOSE ( getString("common.close.button"),  true, true),
-        NO    ( getString("common.no.button"),     true, true),
-        OK    ( getString("common.ok.button"),     true, false),
-        YES   ( getString("common.yes.button"),    true, false);
+        CANCEL( getString("common.cancel.button"), ButtonType.CANCEL_CLOSE, true, true),
+        CLOSE ( getString("common.close.button"),  ButtonType.CANCEL_CLOSE, true, true),
+        NO    ( getString("common.no.button"),     ButtonType.NO,           true, true),
+        OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,      true, false),
+        YES   ( getString("common.yes.button"),    ButtonType.YES,          true, false);
 
-        private final StringProperty title = new SimpleStringProperty();
-        private final BooleanProperty disabled = new SimpleBooleanProperty(false);
-        private final StringProperty longText = new SimpleStringProperty(null);
-        private final ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>();
+        private final AbstractAction action;
         
-        private boolean isClosing;
-        private boolean isDefault;
-        private boolean isCancel;
+        private final boolean isClosing;
+        private final boolean isDefault;
+        private final boolean isCancel;
 
         /**
          * Creates common dialog action
@@ -423,43 +425,51 @@ public class Dialog {
          * @param isCancel true if action produces the dialog cancellation. 
          * @param isClosing true if action is closing the dialog
          */
-        private Actions(String title, boolean isDefault, boolean isCancel, boolean isClosing) {
-            this.title.set(title);
+        private Actions(String title, ButtonType type, boolean isDefault, boolean isCancel, boolean isClosing) {
+            this.action = new AbstractAction(title) {
+                @Override public void execute(ActionEvent ae) {
+                    Actions.this.execute(ae);
+                }
+            };
             this.isClosing = isClosing;
             this.isDefault = isDefault;
             this.isCancel = isCancel;
+            ButtonBar.setType(this, type);
         }
 
-        private Actions(String title, boolean isDefault, boolean isCancel) {
-            this(title, isDefault, isCancel, true);
+        private Actions(String title, ButtonType type, boolean isDefault, boolean isCancel) {
+            this(title, type, isDefault, isCancel, true);
         }
-
+        
         @Override public StringProperty textProperty() {
-            return title;
+            return action.textProperty();
         }
 
         @Override public BooleanProperty disabledProperty() {
-            return disabled;
+            return action.disabledProperty();
         }
         
         @Override public StringProperty longTextProperty() {
-            return longText;
+            return action.longTextProperty();
         }
         
         @Override public ObjectProperty<Node> graphicProperty() {
-            return graphic;
+            return action.graphicProperty();
         }
         
+        @Override public ObservableMap<Object, Object> getProperties() {
+            return action.getProperties();
+        }
+
         @Override public void execute(ActionEvent ae) {
-            if ( !disabled.get() ) {
+            if (! action.isDisabled()) {
                 if (ae.getSource() instanceof Dialog && (isCancel || isClosing) ) {
-                    Dialog dlg = ((Dialog) ae.getSource());
+                    Dialog dlg = (Dialog) ae.getSource();
                     dlg.result = Actions.this;        
                     dlg.hide();
                 }
             }
         }
-
     }
 
     

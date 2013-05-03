@@ -29,6 +29,7 @@
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 
@@ -76,7 +77,16 @@ public interface Action {
      *      graphic for this property, and which can be observed for changes.
      */
     public ObjectProperty<Node> graphicProperty();
-
+    
+    /**
+     * Returns an observable map of properties on this Action for use primarily
+     * by application developers.
+     *
+     * @return An observable map of properties on this Action for use primarily
+     * by application developers
+     */
+    public ObservableMap<Object, Object> getProperties();
+    
     /**
      * This method is called when the user selects this action. 
      * 

@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control;
 
+import org.controlsfx.dialogs.Action;
+
 import impl.org.controlsfx.skin.ButtonBarSkin;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -182,6 +184,18 @@ public final class ButtonBar extends Control {
      */
     public static void setType(ButtonBase button, ButtonType type) {
         button.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
+    }
+    
+    /**
+     * Sets the given ButtonType on the given {@link Action} If this action is
+     * subsequently placed in a {@link ButtonBar} it will be placed in the 
+     * correct position relative to all other buttons in the bar.
+     * 
+     * @param action The action to tag with the given type.
+     * @param type The type to designate the action as.
+     */
+    public static void setType(Action action, ButtonType type) {
+        action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
     }
     
     

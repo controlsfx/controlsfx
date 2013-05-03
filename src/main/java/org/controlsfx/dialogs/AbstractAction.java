@@ -32,6 +32,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 
@@ -51,6 +53,8 @@ public abstract class AbstractAction implements Action {
             new SimpleStringProperty(this, "longText");
     private final ObjectProperty<Node> graphicProperty =
             new SimpleObjectProperty<Node>(this, "graphic");
+    
+    private ObservableMap<Object, Object> properties;
     
     public AbstractAction(String text) {
         setText(text);
@@ -103,7 +107,18 @@ public abstract class AbstractAction implements Action {
     public final void setGraphic(Node value) {
         graphicProperty.set(value);
     }
+    
+    
+    // --- properties
+    @Override public ObservableMap<Object, Object> getProperties() {
+        if (properties == null) {
+            properties = FXCollections.observableHashMap();
+        }
+        return properties;
+    }
 
+    
+    // --- execute
     /**
      * {@inheritDoc}
      */

@@ -28,8 +28,13 @@ package org.controlsfx.dialogs;
 
 import static org.controlsfx.dialogs.DialogResources.getMessage;
 import static org.controlsfx.dialogs.DialogResources.getString;
+
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -85,10 +90,7 @@ class ExceptionDialog extends FXDialog {
      * This panel contains right-aligned "Close" button.  It should
      * dismiss the dialog and dispose of it.
      */
-    private Pane getBtnPanel() {
-        HBox btnPanel = new HBox();
-        btnPanel.getStyleClass().add("button-panel");
-
+    private Node getBtnPanel() {
         Button dismissBtn = new Button(getMessage("common.close.button"));
         dismissBtn.setPrefWidth(80);
         dismissBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -98,8 +100,10 @@ class ExceptionDialog extends FXDialog {
         });
 
         dismissBtn.setDefaultButton(true);
-        btnPanel.getChildren().add(dismissBtn);
-        return btnPanel;
+        
+        ButtonBar buttonBar = new ButtonBar();
+        buttonBar.addButton(dismissBtn, ButtonType.CANCEL_CLOSE);
+        return buttonBar;
     }
 
     /*

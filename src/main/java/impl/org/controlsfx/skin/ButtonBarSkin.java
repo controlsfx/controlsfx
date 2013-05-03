@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.layout.HBox;
@@ -80,6 +81,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         
         // TODO: the gap has to be OS dependent
         this.hbox = new HBox(10);
+        this.hbox.setAlignment(Pos.CENTER);
         getChildren().add(hbox);
         
         layoutButtons();

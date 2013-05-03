@@ -202,7 +202,7 @@ public final class Dialogs {
                 new ExceptionDialog(owner, moreDetails).show();
             }
         };
-//        ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
+        ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
         
         return dlg.show();

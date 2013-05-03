@@ -549,6 +549,7 @@ public class Dialog {
         contentPane.getColumnConstraints().add(rightColumn);
         
         this.contentPane.setGridLinesVisible(DEBUG);
+//        this.dialog.sizeToScene();
     }
 
     private void createCenterPanel(final int startRow) {
@@ -583,6 +584,8 @@ public class Dialog {
         
         if (hasExpandableContent()) {
             Node ec = getExpandableContent();
+            ec.getStyleClass().add("expandable-content");
+            
             contentPane.add(ec, 0, startRow + 1, 2, 1);
             ec.setVisible(false);
             ec.managedProperty().bind(ec.visibleProperty());
@@ -619,10 +622,12 @@ public class Dialog {
         }
         
         buttonBar.getButtons().addAll(buttons);
-
+        
         contentPane.add(buttonBar, 0, startRow, 2, 1);
         GridPane.setHgrow(buttonBar, Priority.ALWAYS);
         GridPane.setVgrow(buttonBar, Priority.NEVER);
+        GridPane.setMargin(buttonBar, new Insets(14, 14, 14, 0));
+//        GridPane.setValignment(buttonBar, VPos.BASELINE);
     }
     
     private Hyperlink createDetailsButton() {

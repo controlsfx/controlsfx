@@ -104,12 +104,12 @@
  *                                                                             *
  ******************************************************************************/
  
-.dialog .masthead-panel {
+.dialog:masthead .masthead-panel {
     -fx-padding: 10 14 10 14;
     -fx-background-color: linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
 }
 
-.dialog .masthead-panel .label {
+.dialog:masthead .masthead-panel .label {
     -fx-font-size: 1.249999em; 
     -fx-wrap-text: true;
 }
@@ -118,15 +118,13 @@
 /*******************************************************************************
  *                                                                             *
  * Content area of the Dialog                                                  *
- * (beneath title/masthead, but including above buttons)                       *
  *                                                                             *
  ******************************************************************************/
  
 .dialog > * > .content-pane {
-    -fx-spacing: 14;
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
-    -fx-border-color: #b4b4b4 white #b4b4b4 white;
+    -fx-border-color: #b4b4b4 null #b4b4b4 null;
     -fx-font-size: 1.083333em; /*13px;*/
     -fx-text-fill: #292929;
 }
@@ -135,27 +133,29 @@
     -fx-padding: 16 16 0 16;
 }
 
-.dialog:masthead > * > .content-pane > .center {
-    -fx-padding: 16 16 16 16;
-}
-
-/* The area specifically for content, e.g. not including the button-bar */
-.dialog > * > .content-pane .content {
-    -fx-font-size: 1em;
-    -fx-padding: 5 0 10 0;
-}
-
-.dialog:no-masthead > * > .content-pane .button-bar {
-    -fx-padding: 0 0 14 0;
-}
-
-.dialog:masthead > * > .content-pane .button-bar {
-    -fx-padding: 0 16 14 0;
-}
-
 .dialog:no-masthead > * > .content-pane .graphic {
     -fx-padding: 0 10 0 0;
 }
+
+.dialog:no-masthead > * > .content-pane .expandable-content {
+    -fx-padding: 16 8 0 8;
+}
+
+.dialog:masthead > * > .content-pane {
+    -fx-padding: 0 0 0 0;
+}
+
+.dialog:masthead > * > .content-pane .center {
+    -fx-padding: 16 16 0 16;
+    
+    /** This is the horizontal line beneath the masthead gradient */
+    -fx-border-color: #b4b4b4 transparent transparent transparent;
+}
+
+.dialog:masthead > * > .content-pane .expandable-content {
+    -fx-padding: 16 16 0 16;
+}
+
 
 
 /*******************************************************************************
@@ -169,8 +169,8 @@
     -fx-padding: 15 18 8 18;
 }
 
-.dialog .more-info-dialog > .button-panel {
-    -fx-padding: 12 0 12 12;
+.dialog .more-info-dialog > .button-bar {
+    -fx-padding: 12 0 6 12;
     -fx-alignment: CENTER_RIGHT;
 }
 

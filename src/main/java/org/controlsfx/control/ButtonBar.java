@@ -27,7 +27,9 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.ButtonBarSkin;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -335,6 +337,20 @@ public final class ButtonBar extends Control {
     }
     public final double getButtonMinWidth() {
         return buttonMinWidthProperty.get();
+    }
+
+    // --- button uniform size
+    
+    public final BooleanProperty buttonUniformSizeProperty() {
+        return buttonUniformSizeProperty;
+    }
+    private final BooleanProperty buttonUniformSizeProperty = new SimpleBooleanProperty(this, "buttonUniformSize", true);
+    public final void setButtonUniformSize(boolean value) {
+        buttonUniformSizeProperty.set(value);
+    }
+    
+    public final boolean isButtonUniformSize() {
+        return buttonUniformSizeProperty.get();
     }
     
     

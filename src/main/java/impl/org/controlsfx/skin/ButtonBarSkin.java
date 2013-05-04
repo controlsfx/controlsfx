@@ -45,6 +45,7 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
+@SuppressWarnings("restriction")
 public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<ButtonBar>> {
     
     /**************************************************************************
@@ -80,7 +81,14 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         super(control, new BehaviorBase<>(control));
         
         // TODO: the gap has to be OS dependent
-        this.hbox = new HBox(10);
+        this.hbox = new HBox(10) {
+            @Override
+            protected void layoutChildren() {
+                // has to be called first or layout is not correct somtimes 
+                resizeButtons();
+                super.layoutChildren();
+            }
+        };
         this.hbox.setAlignment(Pos.CENTER);
         getChildren().add(hbox);
         
@@ -94,8 +102,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         
         registerChangeListener(control.buttonOrderProperty(), "BUTTON_ORDER");
         registerChangeListener(control.buttonMinWidthProperty(), "BUTTON_MIN_WIDTH");
+        registerChangeListener(control.buttonUniformSizeProperty(), "BUTTON_UNIFORM_SIZE");
     }
-    
     
     
     /**************************************************************************
@@ -110,6 +118,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         if ("BUTTON_ORDER".equals(p)) {
             layoutButtons();
         } else if ("BUTTON_MIN_WIDTH".equals(p)) {
+            layoutButtons();
+        } else if ("BUTTON_UNIFORM_SIZE".equals(p)) {
             layoutButtons();
         }
     }
@@ -127,9 +137,6 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         final List<? extends ButtonBase> buttons = buttonBar.getButtons();
         final double buttonMinWidth = buttonBar.getButtonMinWidth();
         
-        hbox.getChildren().clear();
-        
-        
         Map<String, List<ButtonBase>> buttonMap = buildButtonMap(buttons);
         SpacerType preparedSpacer = SpacerType.NONE;
         String buttonOrderStr = getSkinnable().getButtonOrder();
@@ -139,6 +146,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         }
          
         char[] buttonOrder = buttonOrderStr.toCharArray();
+        hbox.getChildren().clear();
         
         for (int i = 0; i < buttonOrder.length; i++) {
             char type = buttonOrder[i];
@@ -157,12 +165,35 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                     
                     for (ButtonBase btn: buttonList) {
                         btn.setMinWidth(buttonMinWidth);
+                        btn.setMaxWidth(Double.MAX_VALUE);
                         
                         hbox.getChildren().add(btn);
                         HBox.setHgrow(btn, Priority.ALWAYS);
                     }
                 } 
             }
+        }
+        
+    }
+    
+    // Button sizing. If buttonUniformSize is true button size = max(buttonMinSize, max(all button pref sizes))
+    // otherwise button size = max(buttonBar.buttonMinSize, button pref size)
+    private void resizeButtons() {
+        
+        final ButtonBar buttonBar = getSkinnable();
+        double buttonMinWidth = buttonBar.getButtonMinWidth();
+        final List<? extends ButtonBase> buttons = buttonBar.getButtons();
+        
+        double widest = buttonMinWidth;
+        if ( buttonBar.isButtonUniformSize()) {
+            for (ButtonBase button : buttons) {
+                widest = Math.max( button.prefWidth(-1), widest);
+            }
+        }
+        for (ButtonBase button : buttons) {
+            double width = buttonBar.isButtonUniformSize()? widest: Math.max( buttonMinWidth, button.prefWidth(-1));
+            button.setMinWidth( width );
+            button.setMaxWidth( width );
         }
     }
     

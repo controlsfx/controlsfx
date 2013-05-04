@@ -26,6 +26,20 @@
  */
 package org.controlsfx.samples;
 
+import static org.controlsfx.control.ButtonBar.ButtonType.APPLY;
+import static org.controlsfx.control.ButtonBar.ButtonType.BACK_PREVIOUS;
+import static org.controlsfx.control.ButtonBar.ButtonType.CANCEL_CLOSE;
+import static org.controlsfx.control.ButtonBar.ButtonType.FINISH;
+import static org.controlsfx.control.ButtonBar.ButtonType.HELP;
+import static org.controlsfx.control.ButtonBar.ButtonType.HELP_2;
+import static org.controlsfx.control.ButtonBar.ButtonType.LEFT;
+import static org.controlsfx.control.ButtonBar.ButtonType.NEXT_FORWARD;
+import static org.controlsfx.control.ButtonBar.ButtonType.NO;
+import static org.controlsfx.control.ButtonBar.ButtonType.OK_DONE;
+import static org.controlsfx.control.ButtonBar.ButtonType.OTHER;
+import static org.controlsfx.control.ButtonBar.ButtonType.RIGHT;
+import static org.controlsfx.control.ButtonBar.ButtonType.YES;
+
 import java.util.Arrays;
 
 import javafx.application.Application;
@@ -37,15 +51,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-
-import static org.controlsfx.control.ButtonBar.ButtonType.*;
 
 public class HelloButtonBar extends Application {
     
@@ -53,7 +66,7 @@ public class HelloButtonBar extends Application {
         stage.setTitle("ButtonBar Demo");
         
         
-        BorderPane root = new BorderPane();
+        VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
         
         final ButtonBar buttonBar = new ButtonBar();
@@ -79,7 +92,14 @@ public class HelloButtonBar extends Application {
                 }
             }
         });
-        root.setTop(buttonOrderHbox);
+        root.getChildren().add(buttonOrderHbox);
+        VBox.setVgrow(buttonOrderHbox, Priority.NEVER);
+        
+        final ToggleButton uniformButtonBtn = new ToggleButton("Uniform Button Size");
+        uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
+        HBox panel = new HBox(uniformButtonBtn);
+        root.getChildren().add( panel);
+        VBox.setVgrow(panel, Priority.ALWAYS);
         
         // create button bar
         buttonBar.getButtons().addAll(Arrays.asList(
@@ -92,7 +112,7 @@ public class HelloButtonBar extends Application {
                 createButton("Unknown 1", OTHER),
                 createButton("Help(R)", HELP),
                 createButton("Help(L)", HELP_2),
-                createButton("Unknown 2", OTHER),
+                createButton("Unknown 2 xxxxxxxxxx", OTHER),
                 createButton("Yes", YES),
                 createButton("No", NO),
                 createButton("Next", NEXT_FORWARD),
@@ -104,7 +124,10 @@ public class HelloButtonBar extends Application {
                 createButton("Apply", APPLY)
                 
         ));
-        root.setBottom(buttonBar);
+        
+        
+        root.getChildren().add(buttonBar);
+        VBox.setVgrow(buttonBar, Priority.NEVER);
         
         Scene scene = new Scene(root, 1300, 300);
         scene.setFill(Color.WHITE);

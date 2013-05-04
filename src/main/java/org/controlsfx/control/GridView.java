@@ -54,8 +54,7 @@ import com.sun.javafx.css.converters.EnumConverter;
  * A GridView is a virtualised control for displaying {@link #getItems()} in a
  * visual, scrollable, grid-like fashion. In other words, whereas a ListView 
  * shows one {@link ListCell} per row, in a GridView there will be zero or more
- * {@link GridCell} instances on a single row (where each row is represented by
- * a single {@link GridRow}).
+ * {@link GridCell} instances on a single row.
  * 
  * <p> This approach means that the number of GridCell instances
  * instantiated will be a significantly smaller number than the number of 
@@ -76,7 +75,6 @@ import com.sun.javafx.css.converters.EnumConverter;
  *</ol>
  *
  * @see GridCell
- * @see GridRow 
  */
 public class GridView<T> extends Control {
 

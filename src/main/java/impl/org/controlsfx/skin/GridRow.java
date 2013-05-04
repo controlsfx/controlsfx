@@ -24,9 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.skin.GridRowSkin;
+import org.controlsfx.control.GridView;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,12 +36,9 @@ import javafx.scene.control.Skin;
 
 /**
  * A GridRow is a container for {@link GridCell}, and represents a single
- * row inside a {@link GridView}. In most circumstances developers should be
- * more interested in creating custom {@link GridCell} instances (via a custom
- * {@link GridView#cellFactoryProperty() cell factory}) than they should be in
- * custom GridRow types. 
+ * row inside a {@link GridView}.
  */
-public class GridRow<T> extends IndexedCell<T>{
+class GridRow<T> extends IndexedCell<T>{
 
 
     /**************************************************************************

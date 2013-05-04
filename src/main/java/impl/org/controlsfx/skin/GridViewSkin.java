@@ -32,7 +32,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.util.Callback;
 
-import org.controlsfx.control.GridRow;
 import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;

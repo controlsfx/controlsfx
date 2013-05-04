@@ -69,10 +69,9 @@ public class GridCell<T> extends IndexedCell<T> {
 		// containing GridView)
 		indexProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable observable) {
-                final GridRow<T> gridRow = getGridRow();
-                if (gridRow == null) return;
+                final GridView<T> gridView = getGridView();
+                if (gridView == null) return;
                 
-                GridView<T> gridView = gridRow.getGridView();
                 T item = gridView.getItems().get(getIndex());
                 
 //                updateIndex(getIndex());
@@ -95,26 +94,27 @@ public class GridCell<T> extends IndexedCell<T> {
      * Properties
      * 
      **************************************************************************/
-
-    /**
-     * The {@link GridRow} that this GridCell instance is currently placed within.
-     */
-	public SimpleObjectProperty<GridRow<T>> gridRowProperty() {
-        return gridRow;
-    }
-	private final SimpleObjectProperty<GridRow<T>> gridRow = new SimpleObjectProperty<>(this, "gridRow");
 	
 	/**
-     * Sets the {@link GridRow} that this GridCell instance is placed within.
+     * The {@link GridView} that this GridCell exists within.
      */
-    public final void setGridRow(GridRow<T> value) {
-        gridRow.set(value);
+    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
+        return gridView;
+    }
+    private final SimpleObjectProperty<GridView<T>> gridView = 
+            new SimpleObjectProperty<>(this, "gridView");
+    
+    /**
+     * Sets the {@link GridView} that this GridCell exists within.
+     */
+    public final void updateGridView(GridView<T> gridView) {
+        this.gridView.set(gridView);
     }
     
     /**
-     * Returns the {@link GridRow} that this GridCell instance is currently placed within.
+     * Returns the {@link GridView} that this GridCell exists within.
      */
-    public GridRow<T> getGridRow() {
-        return gridRow.get();
+    public GridView<T> getGridView() {
+        return gridView.get();
     }
 }

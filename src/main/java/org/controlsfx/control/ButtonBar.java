@@ -372,10 +372,18 @@ public final class ButtonBar extends Control {
         return buttonUniformSizeProperty;
     }
     private final BooleanProperty buttonUniformSizeProperty = new SimpleBooleanProperty(this, "buttonUniformSize", true);
+    
+    /**
+     * Sets all buttons to be uniform size
+     * @param value true if size should be uniform otherwise preferred size is used
+     */
     public final void setButtonUniformSize(boolean value) {
         buttonUniformSizeProperty.set(value);
     }
     
+    /**
+     * Checks if all buttons should have uniform size
+     */
     public final boolean isButtonUniformSize() {
         return buttonUniformSizeProperty.get();
     }

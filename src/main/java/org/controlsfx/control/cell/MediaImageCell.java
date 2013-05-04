@@ -28,19 +28,26 @@ package org.controlsfx.control.cell;
 
 import org.controlsfx.control.GridCell;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayerBuilder;
 import javafx.scene.media.MediaView;
 import javafx.scene.media.MediaViewBuilder;
 
+/**
+ * A {@link GridCell} that can be used to show media (i.e. movies) inside the 
+ * {@link GridView} control.
+ *
+ * @see GridView
+ */
 public class MediaImageCell extends GridCell<Media> {
 	
 	private MediaPlayer mediaPlayer;
 	private final MediaView mediaView;
 	
+	/**
+	 * Creates a default MediaGridCell instance.
+	 */
 	public MediaImageCell() {
 		getStyleClass().add("media-grid-cell");
 		
@@ -50,24 +57,36 @@ public class MediaImageCell extends GridCell<Media> {
         mediaView.setMediaPlayer(mediaPlayer);
 	}
 	
+	/**
+	 * Pauses the media player inside this cell.
+	 */
 	public void pause() {
 		if(mediaPlayer != null) {
 			mediaPlayer.pause();
 		}
 	}
 	
+	/**
+     * Starts playing the media player inside this cell.
+     */
 	public void play() {
 		if(mediaPlayer != null) {
 			mediaPlayer.play();
 		}
 	}
 	
+	/**
+     * Stops playing the media player inside this cell.
+     */
 	public void stop() {
 		if(mediaPlayer != null) {
 			mediaPlayer.stop();
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override protected void updateItem(Media item, boolean empty) {
 	    super.updateItem(item, empty);
 	    

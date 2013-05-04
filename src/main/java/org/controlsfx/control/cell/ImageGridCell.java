@@ -28,16 +28,23 @@ package org.controlsfx.control.cell;
 
 import org.controlsfx.control.GridCell;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.ImageViewBuilder;
 
+/**
+ * A {@link GridCell} that can be used to show images inside the 
+ * {@link GridView} control.
+ *
+ * @see GridView
+ */
 public class ImageGridCell extends GridCell<Image> {
 	
     private final ImageView imageView;
     
+    /**
+     * Creates a default ImageGridCell instance.
+     */
 	public ImageGridCell() {
 		getStyleClass().add("image-grid-cell");
 		
@@ -46,6 +53,9 @@ public class ImageGridCell extends GridCell<Image> {
         imageView.fitWidthProperty().bind(widthProperty());
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override protected void updateItem(Image item, boolean empty) {
 	    super.updateItem(item, empty);
 	    

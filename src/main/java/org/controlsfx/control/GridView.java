@@ -50,6 +50,34 @@ import javafx.util.Callback;
 
 import com.sun.javafx.css.converters.EnumConverter;
 
+/**
+ * A GridView is a virtualised control for displaying {@link #getItems()} in a
+ * visual, scrollable, grid-like fashion. In other words, whereas a ListView 
+ * shows one {@link ListCell} per row, in a GridView there will be zero or more
+ * {@link GridCell} instances on a single row (where each row is represented by
+ * a single {@link GridRow}).
+ * 
+ * <p> This approach means that the number of GridCell instances
+ * instantiated will be a significantly smaller number than the number of 
+ * items in the GridView items list, as only enough GridCells are created for
+ * the visible area of the GridView. This helps to improve performance and 
+ * reduce memory consumption. 
+ * 
+ * <p>Because each {@link GridCell} extends from {@link Cell}, the same approach
+ * of cell factories that is taken in other UI controls is also taken in GridView.
+ * This has two main benefits: 
+ * 
+ * <ol>
+ *   <li>GridCells are created on demand and without user involvement,
+ *   <li>GridCells can be arbitrarily complex. A simple GridCell may just have 
+ *   its {@link GridCell#textProperty() text property} set, whereas a more complex
+ *   GridCell can have an arbitrarily complex scenegraph set inside its
+ *   {@link GridCell#graphicProperty() graphic property} (as it accepts any Node).
+ *</ol>
+ *
+ * @see GridCell
+ * @see GridRow 
+ */
 public class GridView<T> extends Control {
 
     /**************************************************************************
@@ -59,15 +87,16 @@ public class GridView<T> extends Control {
      **************************************************************************/
     
     /**
-     * 
+     * Creates a default, empty GridView control.
      */
     public GridView() {
         this(FXCollections.<T> observableArrayList());
     }
     
     /**
+     * Creates a default GridView control with the provided items prepopulated.
      * 
-     * @param items
+     * @param items The items to display inside the GridView.
      */
     public GridView(ObservableList<T> items) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);

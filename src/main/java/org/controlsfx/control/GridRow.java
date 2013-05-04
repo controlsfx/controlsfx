@@ -33,6 +33,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Skin;
 
+/**
+ * A GridRow is a container for {@link GridCell}, and represents a single
+ * row inside a {@link GridView}. In most circumstances developers should be
+ * more interested in creating custom {@link GridCell} instances (via a custom
+ * {@link GridView#cellFactoryProperty() cell factory}) than they should be in
+ * custom GridRow types. 
+ */
 public class GridRow<T> extends IndexedCell<T>{
 
 
@@ -42,6 +49,9 @@ public class GridRow<T> extends IndexedCell<T>{
      * 
      **************************************************************************/	
 
+    /**
+     * 
+     */
     public GridRow() {
         super();
         getStyleClass().add("grid-row");
@@ -56,6 +66,9 @@ public class GridRow<T> extends IndexedCell<T>{
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override protected Skin<?> createDefaultSkin() {
         return new GridRowSkin<T>(this);
     }
@@ -69,19 +82,25 @@ public class GridRow<T> extends IndexedCell<T>{
      **************************************************************************/
 
     /**
-     * 
+     * The {@link GridView} that this GridRow exists within.
      */
-    private final SimpleObjectProperty<GridView<T>> gridView = new SimpleObjectProperty<>(this, "gridView");
-
+    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
+        return gridView;
+    }
+    private final SimpleObjectProperty<GridView<T>> gridView = 
+            new SimpleObjectProperty<>(this, "gridView");
+    
+    /**
+     * Sets the {@link GridView} that this GridRow exists within.
+     */
     public final void updateGridView(GridView<T> gridView) {
         this.gridView.set(gridView);
     }
     
+    /**
+     * Returns the {@link GridView} that this GridRow exists within.
+     */
     public GridView<T> getGridView() {
         return gridView.get();
-    }
-
-    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
-        return gridView;
     }
 }

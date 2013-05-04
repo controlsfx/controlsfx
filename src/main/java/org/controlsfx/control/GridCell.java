@@ -30,11 +30,19 @@ import impl.org.controlsfx.skin.GridCellSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Skin;
 
+/**
+ * A GridCell is created to represent items in the {@link GridView} 
+ * {@link GridView#getItems() items list}. As with other JavaFX UI controls
+ * (like {@link ListView}, {@link TableView}, etc), the {@link GridView} control
+ * is virtualised, meaning it is exceedingly memory and CPU efficient. Refer to
+ * the {@link GridView} class documentation for more details.
+ *  
+ * @see GridView
+ * @see GridCell
+ */
 public class GridCell<T> extends IndexedCell<T> {
     
     /**************************************************************************
@@ -44,7 +52,7 @@ public class GridCell<T> extends IndexedCell<T> {
      **************************************************************************/
 
     /**
-     * 
+     * Creates a default GridCell instance.
      */
 	public GridCell() {
 		getStyleClass().add("grid-cell");
@@ -73,6 +81,9 @@ public class GridCell<T> extends IndexedCell<T> {
         });
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override protected Skin<?> createDefaultSkin() {
         return new GridCellSkin<T>(this);
     }
@@ -86,18 +97,24 @@ public class GridCell<T> extends IndexedCell<T> {
      **************************************************************************/
 
     /**
-     * 
+     * The {@link GridRow} that this GridCell instance is currently placed within.
      */
-    private final SimpleObjectProperty<GridRow<T>> gridRow = new SimpleObjectProperty<>(this, "gridRow");
-
+	public SimpleObjectProperty<GridRow<T>> gridRowProperty() {
+        return gridRow;
+    }
+	private final SimpleObjectProperty<GridRow<T>> gridRow = new SimpleObjectProperty<>(this, "gridRow");
+	
+	/**
+     * Sets the {@link GridRow} that this GridCell instance is placed within.
+     */
     public final void setGridRow(GridRow<T> value) {
         gridRow.set(value);
     }
+    
+    /**
+     * Returns the {@link GridRow} that this GridCell instance is currently placed within.
+     */
     public GridRow<T> getGridRow() {
         return gridRow.get();
     }
-    public SimpleObjectProperty<GridRow<T>> gridRowProperty() {
-        return gridRow;
-    }
-	
 }

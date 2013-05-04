@@ -45,6 +45,8 @@ import java.util.Arrays;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -53,9 +55,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -66,12 +66,23 @@ import javafx.stage.Stage;
 import org.controlsfx.Sample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
+import org.controlsfx.control.SegmentedButton;
 
 public class HelloButtonBar extends Application implements Sample {
     
     @Override public String getSampleName() {
         return "ButtonBar";
     }
+    
+    private ToggleButton createToggle( final String caption, final ButtonBar buttonBar, final String buttonBarOrder ) {
+        final ToggleButton btn = new ToggleButton(caption);
+        btn.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+                if ( newValue) buttonBar.setButtonOrder(buttonBarOrder);
+            }});
+        return btn;
+    }
+    
     
     @Override public Node getPanel(final Stage stage) {
         VBox root = new VBox(10);
@@ -91,28 +102,16 @@ public class HelloButtonBar extends Application implements Sample {
         details.setWrapText(true);
         root.getChildren().add(details);
         
-        // create toggle button to switch button orders 
-        HBox buttonOrderHbox = new HBox(10);
-        ToggleGroup group = new ToggleGroup();
-        final ToggleButton windowsBtn = new ToggleButton("Windows");
-        final ToggleButton macBtn = new ToggleButton("Mac OS");
-        final ToggleButton linuxBtn = new ToggleButton("Linux");
-        buttonOrderHbox.getChildren().setAll(windowsBtn, macBtn, linuxBtn);
-        group.getToggles().setAll(windowsBtn, macBtn, linuxBtn);
-        windowsBtn.setSelected(true);
-        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            @Override public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if (windowsBtn.equals(newValue)) {
-                    buttonBar.setButtonOrder(ButtonBar.BUTTON_ORDER_WINDOWS);
-                } else if (macBtn.equals(newValue)) {
-                    buttonBar.setButtonOrder(ButtonBar.BUTTON_ORDER_MAC_OS);
-                } else if (linuxBtn.equals(newValue)) {
-                    buttonBar.setButtonOrder(ButtonBar.BUTTON_ORDER_LINUX);
-                }
-            }
-        });
-        root.getChildren().add(buttonOrderHbox);
-        VBox.setVgrow(buttonOrderHbox, Priority.NEVER);
+        final ToggleButton windowsBtn = createToggle("Windows", buttonBar, ButtonBar.BUTTON_ORDER_WINDOWS);
+        final ToggleButton macBtn = createToggle("Mac OS", buttonBar, ButtonBar.BUTTON_ORDER_MAC_OS);
+        final ToggleButton linuxBtn = createToggle("Linux", buttonBar, ButtonBar.BUTTON_ORDER_LINUX);
+        windowsBtn.selectedProperty().set(true);
+        
+        final ObservableList<ToggleButton> toggles = FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn);
+        SegmentedButton osChoice = new SegmentedButton(toggles);
+        root.getChildren().add(osChoice);
+        
+        VBox.setVgrow(osChoice, Priority.NEVER);
         
         // uniform size
         final CheckBox uniformButtonBtn = new CheckBox("Set all buttons to a uniform size");

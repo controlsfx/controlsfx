@@ -56,7 +56,6 @@ import com.sun.javafx.Utils;
  * <p>The concept and API for this control borrows heavily from the MigLayout
  * button bar functionality.
  */
-@SuppressWarnings("restriction")
 public final class ButtonBar extends Control {
     
     /**************************************************************************
@@ -158,6 +157,7 @@ public final class ButtonBar extends Control {
          * All Uncategorized, Other, or "Unknown" buttons. Tag will be "other".
          */
         OTHER("U"),
+
         
         /**
          * A glue push gap that will take as much space as it can and at least 
@@ -189,7 +189,21 @@ public final class ButtonBar extends Control {
      * @param type The type to designate the button as.
      */
     public static void setType(ButtonBase button, ButtonType type) {
+        setType(button, type, false);
+    }
+    
+    /**
+     * Sets the given ButtonType on the given button. If this button is
+     * subsequently placed in a {@link ButtonBar} it will be placed in the 
+     * correct position relative to all other buttons in the bar.
+     * 
+     * @param button The button to tag with the given type.
+     * @param type The type to designate the button as.
+     * @param sizeIndependence if true excludes button from uniform resizing
+     */
+    public static void setType(ButtonBase button, ButtonType type, Boolean sizeIndependence) {
         button.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
+        button.getProperties().put(ButtonBarSkin.BUTTON_SIZE_INDEPENDENCE, sizeIndependence);
     }
     
     /**
@@ -201,9 +215,23 @@ public final class ButtonBar extends Control {
      * @param type The type to designate the action as.
      */
     public static void setType(Action action, ButtonType type) {
-        action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
+        //action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
+        setType(action, type, false);
     }
     
+    /**
+     * Sets the given ButtonType on the given {@link Action} If this action is
+     * subsequently placed in a {@link ButtonBar} it will be placed in the 
+     * correct position relative to all other buttons in the bar.
+     * 
+     * @param action The action to tag with the given type.
+     * @param type The type to designate the action as.
+     * @param sizeIndependence if true excludes action from uniform resizing
+     */
+    public static void setType(Action action, ButtonType type, Boolean sizeIndependence) {
+        action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
+        action.getProperties().put(ButtonBarSkin.BUTTON_SIZE_INDEPENDENCE, sizeIndependence);
+    }
     
     
     /**************************************************************************
@@ -303,6 +331,12 @@ public final class ButtonBar extends Control {
         getButtons().add(button);
     }
     
+    public void addButton(ButtonBase button, ButtonType buttonType, Boolean sizeIndependence ) {
+        if (button == null) return;
+        
+        ButtonBar.setType(button, buttonType, sizeIndependence);
+        getButtons().add(button);
+    }
     
     /**************************************************************************
      * 

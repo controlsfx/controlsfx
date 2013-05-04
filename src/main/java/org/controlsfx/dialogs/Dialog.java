@@ -603,7 +603,7 @@ public class Dialog {
         
         // show details button if expandable content is present
         if (hasExpandableContent()) {
-            buttonBar.addButton(createDetailsButton(), ButtonType.HELP_2);
+            buttonBar.addButton(createDetailsButton(), ButtonType.HELP_2, true);
         }
 
         List<ButtonBase> buttons = new ArrayList<ButtonBase>();

@@ -58,6 +58,9 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     // represented as a ButtonType
     public static String BUTTON_TYPE_PROPERTY     = "controlfx.button.type";
     
+    // allows to exclude button from uniform resizing
+    public static String BUTTON_SIZE_INDEPENDENCE = "controlfx.button.size.indepenence";
+    
     
     /**************************************************************************
      * 
@@ -186,14 +189,19 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         double widest = buttonMinWidth;
         if (buttonBar.isButtonUniformSize()) {
             for (ButtonBase button : buttons) {
-                widest = Math.max(button.prefWidth(-1), widest);
+                if ( !isButtonIndependent(button)) {
+                   widest = Math.max(button.prefWidth(-1), widest);
+                }
             }
         }
         
         // set the width of all buttons
         for (ButtonBase button : buttons) {
+            
             if (buttonBar.isButtonUniformSize()) {
-                button.setPrefWidth(widest);
+                if ( !isButtonIndependent(button)) { 
+                    button.setPrefWidth(widest);
+                }
             } else if (buttonMinWidth > 0){
                 button.setMinWidth(buttonMinWidth);
             } else {
@@ -205,6 +213,10 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
 //            button.setMaxWidth( width );
 //            button.setPrefWidth(width);
         }
+    }
+    
+    private Boolean isButtonIndependent( ButtonBase btn ) {
+        return Boolean.TRUE.equals(btn.getProperties().get(BUTTON_SIZE_INDEPENDENCE));
     }
     
     private String getButtonType(ButtonBase btn) {

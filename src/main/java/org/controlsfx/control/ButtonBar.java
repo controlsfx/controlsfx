@@ -85,7 +85,7 @@ public final class ButtonBar extends Control {
      **************************************************************************/
     
     /**
-     * An enumeration of all available button types. By designating ever button
+     * An enumeration of all available button types. By designating every button
      * in a {@link ButtonBar} as one of these types, the buttons will be 
      * appropriately positioned relative to all other buttons in the ButtonBar.
      */
@@ -218,19 +218,35 @@ public final class ButtonBar extends Control {
      * 
      **************************************************************************/
     
+    /**
+     * Creates a default ButtonBar instance using the default properties for
+     * the users operating system.
+     */
     public ButtonBar() {
+        this(null);
+    }
+    
+    /**
+     * Creates a ButtonBar with the given button order (refer to 
+     * {@link #buttonOrderProperty()} for more information).
+     * 
+     * @param buttonOrder The button order to use in this button bar instance.
+     */
+    public ButtonBar(final String buttonOrder) {
         getStyleClass().add("button-bar");
+        
+        final boolean buttonOrderEmpty = buttonOrder == null || buttonOrder.isEmpty();
         
         // set the default values 
         if (Utils.isMac()) {
-            setButtonOrder(BUTTON_ORDER_MAC_OS);
+            setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_MAC_OS : buttonOrder);
             setButtonMinWidth(70);
         } else if (Utils.isUnix()) {
-            setButtonOrder(BUTTON_ORDER_LINUX);
+            setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_LINUX : buttonOrder);
             setButtonMinWidth(85);
         } else {
             // windows by default
-            setButtonOrder(BUTTON_ORDER_WINDOWS);
+            setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_WINDOWS : buttonOrder);
             setButtonMinWidth(75);
         }
     }
@@ -323,14 +339,25 @@ public final class ButtonBar extends Control {
     
     
     // --- button min width
+    /**
+     * Specifies the minimum width of all buttons placed in this button bar.
+     */
     public final DoubleProperty buttonMinWidthProperty() {
         return buttonMinWidthProperty;
     }
     private final DoubleProperty buttonMinWidthProperty =
             new SimpleDoubleProperty(this, "buttonMinWidthProperty");
+    
+    /**
+     * Sets the minimum width of all buttons placed in this button bar.
+     */
     public final void setButtonMinWidth(double value) {
         buttonMinWidthProperty.set(value);
     }
+    
+    /**
+     * Returns the minimum width of all buttons placed in this button bar.
+     */
     public final double getButtonMinWidth() {
         return buttonMinWidthProperty.get();
     }

@@ -53,7 +53,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 import com.sun.javafx.Utils;
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;

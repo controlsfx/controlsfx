@@ -96,7 +96,7 @@ public class Dialog {
     
     // According to the UI spec, the width of the main message text in the upper
     // panel should be 426 pixels.
-    private static int MAIN_TEXT_WIDTH = 400;
+//    private static int MAIN_TEXT_WIDTH = 400;
 
 //    // Specifies the minimum allowable width for all buttons in the dialog
 //    private static int MINIMUM_BUTTON_WIDTH = 75;

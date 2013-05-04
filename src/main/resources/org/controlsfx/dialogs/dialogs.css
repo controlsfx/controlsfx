@@ -125,7 +125,7 @@
 .dialog > * > .content-pane {
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
-    -fx-border-color: #b4b4b4 null #b4b4b4 null;
+    -fx-border-color: #b4b4b4 transparent #b4b4b4 transparent;
     -fx-font-size: 1.083333em; /*13px;*/
     -fx-text-fill: #292929;
 }

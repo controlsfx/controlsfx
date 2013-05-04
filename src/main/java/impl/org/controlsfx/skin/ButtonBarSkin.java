@@ -45,7 +45,6 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
-@SuppressWarnings("restriction")
 public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<ButtonBar>> {
     
     /**************************************************************************
@@ -57,8 +56,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     private static String CATEGORIZED_TYPES = "LRHEYNXBIACO";
     
     // represented as a ButtonType
-    public static String BUTTON_TYPE_PROPERTY = "controlfx.button.type";
-    
+    public static String BUTTON_TYPE_PROPERTY     = "controlfx.button.type";
     
     
     /**************************************************************************
@@ -152,7 +150,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         for (int i = 0; i < buttonOrder.length; i++) {
             char type = buttonOrder[i];
             if (type == '+') {
-               preparedSpacer = preparedSpacer.replace(SpacerType.DYNAMIC);
+                preparedSpacer = preparedSpacer.replace(SpacerType.DYNAMIC);
             } else if (type == '_') {
                preparedSpacer = preparedSpacer.replace(SpacerType.FIXED);
             } else {
@@ -169,7 +167,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                         btn.setMaxWidth(Double.MAX_VALUE);
                         
                         hbox.getChildren().add(btn);
-                        HBox.setHgrow(btn, Priority.ALWAYS);
+                        HBox.setHgrow(btn, Priority.NEVER);
                     }
                 } 
             }

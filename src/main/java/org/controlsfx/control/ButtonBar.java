@@ -189,21 +189,15 @@ public final class ButtonBar extends Control {
      * @param type The type to designate the button as.
      */
     public static void setType(ButtonBase button, ButtonType type) {
-        setType(button, type, false);
+        button.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
     }
     
     /**
-     * Sets the given ButtonType on the given button. If this button is
-     * subsequently placed in a {@link ButtonBar} it will be placed in the 
-     * correct position relative to all other buttons in the bar.
-     * 
-     * @param button The button to tag with the given type.
-     * @param type The type to designate the button as.
-     * @param sizeIndependence if true excludes button from uniform resizing
+     * Excludes button from uniform resizing
+     * @param button button to exclude
      */
-    public static void setType(ButtonBase button, ButtonType type, Boolean sizeIndependence) {
-        button.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
-        button.getProperties().put(ButtonBarSkin.BUTTON_SIZE_INDEPENDENCE, sizeIndependence);
+    public static void setSizeIndependent(ButtonBase button) {
+        button.getProperties().put(ButtonBarSkin.BUTTON_SIZE_INDEPENDENCE, true);
     }
     
     /**
@@ -215,22 +209,15 @@ public final class ButtonBar extends Control {
      * @param type The type to designate the action as.
      */
     public static void setType(Action action, ButtonType type) {
-        //action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
-        setType(action, type, false);
+        action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
     }
     
     /**
-     * Sets the given ButtonType on the given {@link Action} If this action is
-     * subsequently placed in a {@link ButtonBar} it will be placed in the 
-     * correct position relative to all other buttons in the bar.
-     * 
-     * @param action The action to tag with the given type.
-     * @param type The type to designate the action as.
-     * @param sizeIndependence if true excludes action from uniform resizing
+     * Excludes action from uniform resizing
+     * @param action action to exclude
      */
-    public static void setType(Action action, ButtonType type, Boolean sizeIndependence) {
-        action.getProperties().put(ButtonBarSkin.BUTTON_TYPE_PROPERTY, type);
-        action.getProperties().put(ButtonBarSkin.BUTTON_SIZE_INDEPENDENCE, sizeIndependence);
+    public static void setSizeIndependent(Action action) {
+        action.getProperties().put(ButtonBarSkin.BUTTON_SIZE_INDEPENDENCE, true);
     }
     
     
@@ -323,20 +310,38 @@ public final class ButtonBar extends Control {
      * 
      * @param button The button to add to this button bar instance.
      * @param buttonType The type of the button, such that it can be place correctly.
+     * @return true if button was added
      */
-    public void addButton(ButtonBase button, ButtonType buttonType) {
-        if (button == null) return;
+    public boolean addButton(ButtonBase button, ButtonType buttonType) {
+        if (button == null) return false;
         
         ButtonBar.setType(button, buttonType);
         getButtons().add(button);
+        return true;
+    }
+
+    
+    /**
+     * A convenience method which is a shortcut for code of the following form:
+     * 
+     * <code>
+     * Button detailsButton = createDetailsButton();
+     * ButtonBar.setType(detailsButton, ButtonType.HELP_2);
+     * ButtonBar.setSizeIndependent(detailsButton);
+     * buttonBar.getButtons().add(detailsButton);
+     * </code>
+     * 
+     * @param button The button to add to this button bar instance.
+     * @param buttonType The type of the button, such that it can be place correctly.
+     * @return true if button was added
+     */
+    public boolean addSizeIndependentButton(ButtonBase button, ButtonType buttonType ) {
+        Boolean result = addButton( button, buttonType);
+        if (result) ButtonBar.setSizeIndependent(button);
+        return result;
+        
     }
     
-    public void addButton(ButtonBase button, ButtonType buttonType, Boolean sizeIndependence ) {
-        if (button == null) return;
-        
-        ButtonBar.setType(button, buttonType, sizeIndependence);
-        getButtons().add(button);
-    }
     
     /**************************************************************************
      * 

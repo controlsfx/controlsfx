@@ -45,7 +45,6 @@ import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -84,7 +83,6 @@ import org.controlsfx.control.ButtonBar.ButtonType;
  * 
  * @see Dialogs
  */
-@SuppressWarnings("restriction")
 public class Dialog {
     
     /**************************************************************************
@@ -118,8 +116,6 @@ public class Dialog {
 
     private final GridPane contentPane;
     
-    // list containing user input buttons at bottom of dialog
-    private List<ButtonBase> buttons = new ArrayList<ButtonBase>();
     
     
     
@@ -600,7 +596,7 @@ public class Dialog {
     }
 
     private void createButtonPanel(final int startRow) {
-        buttons.clear();
+        
         
         ButtonBar buttonBar = new ButtonBar();
         buttonBar.setButtonOrder(buttonBarOrder);
@@ -610,6 +606,7 @@ public class Dialog {
             buttonBar.addButton(createDetailsButton(), ButtonType.HELP_2);
         }
 
+        List<ButtonBase> buttons = new ArrayList<ButtonBase>();
         boolean hasDefault = false;
         for (Action cmd : getActions()) {
             ButtonBase b = createButton(cmd, !hasDefault);

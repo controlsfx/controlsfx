@@ -171,12 +171,13 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         
         if (buttonType == null) {
             // TODO throw exception or just assume it is ButtonType.OTHER?
-            throw new IllegalStateException("Button '" + btn.getText() + "' does not have a ButtonType specified");
+            //throw new IllegalStateException("Button '" + btn.getText() + "' does not have a ButtonType specified");
+            buttonType = ButtonType.OTHER;
         }
         
         String typeCode = buttonType.getTypeCode();
         typeCode = typeCode.length() > 0? typeCode.substring(0,1): "";
-        return CATEGORIZED_TYPES.contains(typeCode.toUpperCase())? typeCode : "U"; 
+        return CATEGORIZED_TYPES.contains(typeCode.toUpperCase())? typeCode : ButtonType.OTHER.getTypeCode(); 
     }
     
     private Map<String, List<ButtonBase>> buildButtonMap( List<? extends ButtonBase> buttons ) {

@@ -50,7 +50,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -76,7 +78,8 @@ public class HelloButtonBar extends Application implements Sample {
         root.setPadding(new Insets(10, 10, 10, 10));
         
         final ButtonBar buttonBar = new ButtonBar();
-        buttonBar.setButtonMinWidth(0);
+//        buttonBar.setButtonMinWidth(0);
+//        buttonBar.setButtonUniformSize(true);
         
         // explanation text
         Label details = new Label("The ButtonBar allows for buttons to be positioned" +
@@ -111,16 +114,22 @@ public class HelloButtonBar extends Application implements Sample {
         root.getChildren().add(buttonOrderHbox);
         VBox.setVgrow(buttonOrderHbox, Priority.NEVER);
         
-        final ToggleButton uniformButtonBtn = new ToggleButton("Uniform Button Size");
+        // uniform size
+        final CheckBox uniformButtonBtn = new CheckBox("Set all buttons to a uniform size");
         uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
-        HBox panel = new HBox(uniformButtonBtn);
+        root.getChildren().add( uniformButtonBtn);
+        
+        // minimum size slider
+        final Slider minSizeSlider = new Slider(0, 100, 0);
+        HBox minSizeBox = new HBox(10, new Label("Button min size:"), minSizeSlider);
+        buttonBar.buttonMinWidthProperty().bind(minSizeSlider.valueProperty());
+        root.getChildren().add(minSizeBox);
+        
         
         // spacer to push button bar to bottom
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
         root.getChildren().add(spacer);
-        root.getChildren().add( panel);
-        VBox.setVgrow(panel, Priority.ALWAYS);
         
         // create button bar
         buttonBar.getButtons().addAll(Arrays.asList(
@@ -145,8 +154,6 @@ public class HelloButtonBar extends Application implements Sample {
                 createButton("Apply", APPLY)
                 
         ));
-        root.getChildren().add(buttonBar);
-        
         root.getChildren().add(buttonBar);
         VBox.setVgrow(buttonBar, Priority.NEVER);
         

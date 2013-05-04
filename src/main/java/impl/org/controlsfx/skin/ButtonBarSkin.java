@@ -120,7 +120,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         } else if ("BUTTON_MIN_WIDTH".equals(p)) {
             layoutButtons();
         } else if ("BUTTON_UNIFORM_SIZE".equals(p)) {
-            layoutButtons();
+//            layoutButtons();
+            resizeButtons();
         }
     }
     
@@ -179,21 +180,32 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     // Button sizing. If buttonUniformSize is true button size = max(buttonMinSize, max(all button pref sizes))
     // otherwise button size = max(buttonBar.buttonMinSize, button pref size)
     private void resizeButtons() {
-        
         final ButtonBar buttonBar = getSkinnable();
         double buttonMinWidth = buttonBar.getButtonMinWidth();
         final List<? extends ButtonBase> buttons = buttonBar.getButtons();
         
+        // determine the widest button
         double widest = buttonMinWidth;
-        if ( buttonBar.isButtonUniformSize()) {
+        if (buttonBar.isButtonUniformSize()) {
             for (ButtonBase button : buttons) {
-                widest = Math.max( button.prefWidth(-1), widest);
+                widest = Math.max(button.prefWidth(-1), widest);
             }
         }
+        
+        // set the width of all buttons
         for (ButtonBase button : buttons) {
-            double width = buttonBar.isButtonUniformSize()? widest: Math.max( buttonMinWidth, button.prefWidth(-1));
-            button.setMinWidth( width );
-            button.setMaxWidth( width );
+            if (buttonBar.isButtonUniformSize()) {
+                button.setPrefWidth(widest);
+            } else if (buttonMinWidth > 0){
+                button.setMinWidth(buttonMinWidth);
+            } else {
+                button.setMinWidth(0);
+                button.setPrefWidth(Region.USE_COMPUTED_SIZE);
+            }
+//            double width = buttonBar.isButtonUniformSize()? widest : Math.max(buttonMinWidth, button.prefWidth(-1));
+//            button.setMinWidth( width );
+//            button.setMaxWidth( width );
+//            button.setPrefWidth(width);
         }
     }
     
@@ -226,33 +238,6 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         return buttonMap;
     }
     
-    
-    // Taken from Dialog, but now the Dialog is using ButtonBar I thought I would
-    // move this over here for when we support forcing all buttons to the same
-    // size. This was used by overriding layoutChildren and calling resizeButtons
-    // whenever that was called.
-//    /*
-//     * According to UI guidelines, all buttons should have the same length. This
-//     * function is to define the longest button in the array of buttons and set
-//     * all buttons in array to be the length of the longest button.
-//     */
-//    private void resizeButtons() {
-//        // Find out the longest button...
-//        double widest = MINIMUM_BUTTON_WIDTH;
-//        for (ButtonBase btn : buttons) {
-//            if (btn == null)
-//                continue;
-//            widest = Math.max(widest, btn.prefWidth(-1));
-//        }
-//
-//        // ...and set all buttons to be this width
-//        for (ButtonBase btn : buttons) {
-//            if (btn == null)
-//                continue;
-//            btn.setPrefWidth(btn.isVisible() ? widest : 0);
-//        }
-//    }
-
     
     
     /**************************************************************************

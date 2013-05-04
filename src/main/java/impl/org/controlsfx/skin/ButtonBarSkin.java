@@ -36,6 +36,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
@@ -53,13 +54,16 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
      * 
      **************************************************************************/
 
-    private static String CATEGORIZED_TYPES = "LRHEYNXBIACO";
+    //TODO: Make it platform dependent
+    private static final double GAP_SIZE = 10; 
+    
+    private static final String CATEGORIZED_TYPES = "LRHEYNXBIACO";
     
     // represented as a ButtonType
-    public static String BUTTON_TYPE_PROPERTY     = "controlfx.button.type";
+    public static final String BUTTON_TYPE_PROPERTY  = "controlfx.button.type";
     
     // allows to exclude button from uniform resizing
-    public static String BUTTON_SIZE_INDEPENDENCE = "controlfx.button.size.indepenence";
+    public static final String BUTTON_SIZE_INDEPENDENCE = "controlfx.button.size.indepenence";
     
     
     /**************************************************************************
@@ -81,8 +85,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     public ButtonBarSkin(final ButtonBar control) {
         super(control, new BehaviorBase<>(control));
         
-        // TODO: the gap has to be OS dependent
-        this.hbox = new HBox(10) {
+        this.hbox = new HBox(GAP_SIZE) {
             @Override
             protected void layoutChildren() {
                 // has to be called first or layout is not correct somtimes 
@@ -140,7 +143,6 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         final double buttonMinWidth = buttonBar.getButtonMinWidth();
         
         Map<String, List<ButtonBase>> buttonMap = buildButtonMap(buttons);
-        SpacerType preparedSpacer = SpacerType.NONE;
         String buttonOrderStr = getSkinnable().getButtonOrder();
         
         if (buttonOrderStr == null || buttonOrderStr.isEmpty()) {
@@ -150,20 +152,21 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         char[] buttonOrder = buttonOrderStr.toCharArray();
         hbox.getChildren().clear();
         
+        int buttonIndex = 0; // to determine edge cases
+        Spacer spacer = Spacer.NONE;
+        
         for (int i = 0; i < buttonOrder.length; i++) {
             char type = buttonOrder[i];
+            boolean edgeCase = buttonIndex <= 0 && buttonIndex >= buttons.size()-1;
             if (type == '+') {
-                preparedSpacer = preparedSpacer.replace(SpacerType.DYNAMIC);
+                spacer = spacer.replace(Spacer.DYNAMIC);
             } else if (type == '_') {
-               preparedSpacer = preparedSpacer.replace(SpacerType.FIXED);
+                spacer = spacer.replace(Spacer.FIXED);
             } else {
                 List<ButtonBase> buttonList = buttonMap.get(String.valueOf(type).toUpperCase());
                 if (buttonList != null) {
-                    Node spacer = preparedSpacer.create();
-                    if (spacer != null) {
-                        hbox.getChildren().add(spacer);
-                        preparedSpacer = preparedSpacer.replace(SpacerType.NONE);
-                    }
+                    
+                    spacer.add(hbox,edgeCase);
                     
                     for (ButtonBase btn: buttonList) {
                         btn.setMinWidth(buttonMinWidth);
@@ -171,7 +174,9 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                         
                         hbox.getChildren().add(btn);
                         HBox.setHgrow(btn, Priority.NEVER);
+                        buttonIndex++;
                     }
+                    spacer = spacer.replace(Spacer.NONE);
                 } 
             }
         }
@@ -256,40 +261,46 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
      * 
      **************************************************************************/
     
-    private enum SpacerType {
+    private enum Spacer {
         FIXED {
-            @Override public Node create() {
+            @Override protected Node create(boolean edgeCase) {
+                if ( edgeCase ) return null;
                 Region spacer = new Region();
-                spacer.setMinWidth(10);
+                spacer.setMinWidth(GAP_SIZE);
                 HBox.setHgrow(spacer, Priority.NEVER);
                 return spacer;
             }
             
-            @Override public SpacerType replace( SpacerType type ) {
-                return type == NONE || type == DYNAMIC? type: this;
-            }
         },
         DYNAMIC {
-            @Override public Node create() {
+            @Override protected Node create(boolean edgeCase) {
                 Region spacer = new Region();
+                spacer.setMinWidth( edgeCase? 0: GAP_SIZE);
                 HBox.setHgrow(spacer, Priority.ALWAYS);
                 return spacer;
             }
-            
-            @Override public SpacerType replace( SpacerType type ) {
-                return type == NONE? type: this;
+
+            @Override public Spacer replace( Spacer spacer ) {
+                return FIXED == spacer? this: spacer;
             }
+
         },
-        NONE {
-            @Override public SpacerType replace( SpacerType type ) {
-                return type == FIXED || type == DYNAMIC? type: this;
-            }
-        };
+        NONE;
         
-        public abstract SpacerType replace( SpacerType type );
-        
-        public Node create() {
+        protected Node create(boolean edgeCase) {
             return null;
         }
+        
+        public Spacer replace( Spacer spacer ) {
+            return spacer;
+        }
+        
+        public void add( Pane pane, boolean edgeCase) {
+            Node spacer = create(edgeCase);
+            if (spacer != null) {
+                pane.getChildren().add(spacer);
+            }
+        }
+        
     }
 }

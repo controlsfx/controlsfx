@@ -32,32 +32,50 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.Sample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 
 import static org.controlsfx.control.ButtonBar.ButtonType.*;
 
-public class HelloButtonBar extends Application {
+public class HelloButtonBar extends Application implements Sample {
     
-     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("ButtonBar Demo");
-        
-        
-        BorderPane root = new BorderPane();
+    @Override public String getSampleName() {
+        return "ButtonBar";
+    }
+    
+    @Override public Node getPanel(final Stage stage) {
+        VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
         
         final ButtonBar buttonBar = new ButtonBar();
+        buttonBar.setButtonMinWidth(0);
         
+        // explanation text
+        Label details = new Label("The ButtonBar allows for buttons to be positioned" +
+        		" in a way that is OS-specific (or in any way that suits your use case." +
+        		" For example, try toggling the OS toggle buttons below (note, you'll want " +
+        		"to increase the width of this window first!\n\n" +
+        		"Note that, to allow for this sample to display the buttons are not configured" +
+        		" to use a consistent minimum width, but that is possible vis API on ButtonBar.");
+        details.setWrapText(true);
+        root.getChildren().add(details);
         
         // create toggle button to switch button orders 
         HBox buttonOrderHbox = new HBox(10);
@@ -79,7 +97,12 @@ public class HelloButtonBar extends Application {
                 }
             }
         });
-        root.setTop(buttonOrderHbox);
+        root.getChildren().add(buttonOrderHbox);
+        
+        // spacer to push button bar to bottom
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+        root.getChildren().add(spacer);
         
         // create button bar
         buttonBar.getButtons().addAll(Arrays.asList(
@@ -104,9 +127,15 @@ public class HelloButtonBar extends Application {
                 createButton("Apply", APPLY)
                 
         ));
-        root.setBottom(buttonBar);
+        root.getChildren().add(buttonBar);
         
-        Scene scene = new Scene(root, 1300, 300);
+        return root;
+    }
+    
+    @Override public void start(Stage stage) throws Exception {
+        stage.setTitle("ButtonBar Demo");
+        
+        Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
         scene.setFill(Color.WHITE);
         
         stage.setScene(scene);

@@ -3,32 +3,43 @@ package org.controlsfx.samples;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.Sample;
 import org.controlsfx.control.RangeSlider;
 
-public class HelloRangeSlider extends Application {
+public class HelloRangeSlider extends Application implements Sample {
     
     public static void main(String[] args) {
         launch(args);
+    }
+    
+    @Override public String getSampleName() {
+        return "RangeSlider";
+    }
+    
+    @Override public Node getPanel(Stage stage) {
+        VBox root = new VBox(15);
+        
+        Region horizontalRangeSlider = createHorizontalSlider();
+        Region verticalRangeSlider = createVerticalSlider();
+        root.getChildren().addAll(horizontalRangeSlider, verticalRangeSlider);
+        
+        return root;
     }
     
     @Override public void start(Stage stage) {
         setUserAgentStylesheet(STYLESHEET_CASPIAN);
         stage.setTitle("RangeSlider Demo");
 
-        VBox root = new VBox(15);
-        
-        Region horizontalRangeSlider = createHorizontalSlider();
-        Region verticalRangeSlider = createVerticalSlider();
-        root.getChildren().addAll(horizontalRangeSlider, verticalRangeSlider);
-        Scene scene = new Scene(root, 520, 360);
+        Scene scene = new Scene((Parent)getPanel(stage), 520, 360);
 
         stage.setScene(scene);
         stage.show();

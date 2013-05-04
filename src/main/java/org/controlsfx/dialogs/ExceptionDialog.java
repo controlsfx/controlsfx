@@ -28,10 +28,6 @@ package org.controlsfx.dialogs;
 
 import static org.controlsfx.dialogs.DialogResources.getMessage;
 import static org.controlsfx.dialogs.DialogResources.getString;
-
-import org.controlsfx.control.ButtonBar;
-import org.controlsfx.control.ButtonBar.ButtonType;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -39,12 +35,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Window;
+
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
 
 class ExceptionDialog extends FXDialog {
 

@@ -26,8 +26,6 @@
  */
 package org.controlsfx.control;
 
-import org.controlsfx.dialogs.Action;
-
 import impl.org.controlsfx.skin.ButtonBarSkin;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -38,6 +36,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.HBox;
+
+import org.controlsfx.dialogs.Action;
 
 import com.sun.javafx.Utils;
 
@@ -53,6 +54,7 @@ import com.sun.javafx.Utils;
  * <p>The concept and API for this control borrows heavily from the MigLayout
  * button bar functionality.
  */
+@SuppressWarnings("restriction")
 public final class ButtonBar extends Control {
     
     /**************************************************************************
@@ -157,12 +159,12 @@ public final class ButtonBar extends Control {
         
         /**
          * A glue push gap that will take as much space as it can and at least 
-         * an "unrelated" gap. (Platform dependant)
+         * an "unrelated" gap. (Platform dependent)
          */
         BIG_GAP("+"),
         
         /**
-         * An "unrelated" gap. (Platform dependant)
+         * An "unrelated" gap. (Platform dependent)
          */
         SMALL_GAP("_");
         

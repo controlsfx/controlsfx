@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -22,22 +23,23 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import org.controlsfx.Sample;
 import org.controlsfx.dialogs.Action;
 import org.controlsfx.dialogs.Dialogs;
 import org.controlsfx.dialogs.Dialogs.CommandLink;
 import org.controlsfx.dialogs.DialogsAccessor;
 
-public class HelloDialog extends Application {
+public class HelloDialog extends Application implements Sample {
 
     private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
     private final CheckBox cbSetOwner = new CheckBox("Set Owner");
-
-    @Override public void start(final Stage stage) {
-        // setUserAgentStylesheet(STYLESHEET_MODENA);
-
-        stage.setTitle("Dialog Sample");
-
-        // VBox vbox = new VBox(10);
+    
+    @Override public String getSampleName() {
+        return "Dialogs";
+    }
+    
+    @Override public Node getPanel(final Stage stage) {
+     // VBox vbox = new VBox(10);
         // vbox.setAlignment(Pos.CENTER);
 
         GridPane grid = new GridPane();
@@ -45,10 +47,10 @@ public class HelloDialog extends Application {
         grid.setHgap(10);
         grid.setVgap(10);
 
-        StackPane root = new StackPane();
-        root.getChildren().add(grid);
-        Scene scene = new Scene(root, 800, 300);
-        scene.setFill(Color.WHITE);
+//        StackPane root = new StackPane();
+//        root.getChildren().add(grid);
+//        Scene scene = new Scene(root, 800, 300);
+//        scene.setFill(Color.WHITE);
 
         int row = 0;
 
@@ -304,6 +306,17 @@ public class HelloDialog extends Application {
             }
         });
         grid.add(Hyperlink12, 1, row);
+        
+        return grid;
+    }
+
+    @Override public void start(final Stage stage) {
+        // setUserAgentStylesheet(STYLESHEET_MODENA);
+
+        stage.setTitle("Dialog Sample");
+
+        Scene scene = new Scene((Parent)getPanel(stage), 800, 300);
+        scene.setFill(Color.WHITE);
 
         stage.setScene(scene);
         stage.show();

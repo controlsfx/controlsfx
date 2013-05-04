@@ -6,6 +6,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -13,17 +15,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.Sample;
 import org.controlsfx.control.Rating;
 
-public class HelloRating extends Application {
+public class HelloRating extends Application implements Sample {
     
     public static void main(String[] args) {
         launch(args);
     }
     
-    @Override public void start(Stage stage) {
-        stage.setTitle("Rating Demo");
-
+    @Override public String getSampleName() {
+        return "Rating";
+    }
+    
+    @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));
         final Rating rating = new Rating();
@@ -60,7 +65,13 @@ public class HelloRating extends Application {
             }
         });
         
-        Scene scene = new Scene(root, 520, 360);
+        return root;
+    }
+    
+    @Override public void start(Stage stage) {
+        stage.setTitle("Rating Demo");
+
+        Scene scene = new Scene((Parent) getPanel(stage), 520, 360);
 
         stage.setScene(scene);
         stage.show();

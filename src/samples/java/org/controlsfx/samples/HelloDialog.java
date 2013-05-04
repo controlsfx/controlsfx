@@ -15,15 +15,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
+import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.dialogs.Action;
 import org.controlsfx.dialogs.Dialogs;
 import org.controlsfx.dialogs.Dialogs.CommandLink;
@@ -37,6 +37,23 @@ public class HelloDialog extends Application implements Sample {
     @Override public String getSampleName() {
         return "Dialogs";
     }
+    
+    private static final String WINDOWS = "Windows";
+    private static final String MAC_OS = "Mac OS";
+    private static final String LINUX = "Linux";
+    
+    
+    private ToggleButton createToggle( final String caption ) {
+        final ToggleButton btn = new ToggleButton(caption);
+        btn.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+                DialogsAccessor.setMacOS(MAC_OS.equals(caption));
+                DialogsAccessor.setWindows(WINDOWS.equals(caption));
+                DialogsAccessor.setLinux(LINUX.equals(caption));
+            }});
+        return btn;
+    }    
+    
     
     @Override public Node getPanel(final Stage stage) {
      // VBox vbox = new VBox(10);
@@ -60,20 +77,14 @@ public class HelloDialog extends Application implements Sample {
 
         grid.add(createLabel("Operating system button placement: "), 0, 0);
 
-        final String WINDOWS = "Windows";
-        final String MAC_OS = "Mac OS";
-        final String LINUX = "Linux";
-        final ChoiceBox<String> operatingSystem = new ChoiceBox<>(FXCollections.observableArrayList(WINDOWS, MAC_OS, LINUX));
-        operatingSystem.getSelectionModel().select(WINDOWS);
-        operatingSystem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                String os = operatingSystem.getSelectionModel().getSelectedItem();
-                DialogsAccessor.setMacOS(MAC_OS.equals(os));
-                DialogsAccessor.setWindows(WINDOWS.equals(os));
-                DialogsAccessor.setLinux(LINUX.equals(os));
-            }
-        });
-        grid.add(operatingSystem, 1, row);
+        final ToggleButton windowsBtn = createToggle(WINDOWS);
+        final ToggleButton macBtn = createToggle(MAC_OS);
+        final ToggleButton linuxBtn = createToggle(LINUX);
+        windowsBtn.selectedProperty().set(true);
+        
+        SegmentedButton operatingSystem = new SegmentedButton(FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
+        
+        grid.add(operatingSystem, 1, row, 2, 1);
 
         row++;
         grid.add(createLabel("Common Dialog attributes: "), 0, 1);

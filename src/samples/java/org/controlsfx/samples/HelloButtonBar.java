@@ -46,7 +46,6 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -107,10 +106,8 @@ public class HelloButtonBar extends Application implements Sample {
         final ToggleButton linuxBtn = createToggle("Linux", buttonBar, ButtonBar.BUTTON_ORDER_LINUX);
         windowsBtn.selectedProperty().set(true);
         
-        final ObservableList<ToggleButton> toggles = FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn);
-        SegmentedButton osChoice = new SegmentedButton(toggles);
+        SegmentedButton osChoice = new SegmentedButton(FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
         root.getChildren().add(osChoice);
-        
         VBox.setVgrow(osChoice, Priority.NEVER);
         
         // uniform size

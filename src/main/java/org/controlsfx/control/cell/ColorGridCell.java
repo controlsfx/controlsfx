@@ -26,19 +26,28 @@
  */
 package org.controlsfx.control.cell;
 
-import org.controlsfx.control.GridCell;
-
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 
+import org.controlsfx.control.GridCell;
+
+/**
+ * A {@link GridCell} that can be used to show coloured rectangles inside the 
+ * {@link GridView} control.
+ *
+ * @see GridView
+ */
 public class ColorGridCell extends GridCell<Color> {
 	
 	private Rectangle colorRect;
 	
 	private static final boolean debug = false;
 
+	/**
+	 * Creates a default ColorGridCell instance.
+	 */
     public ColorGridCell() {
 		getStyleClass().add("color-grid-cell");
 		
@@ -52,6 +61,9 @@ public class ColorGridCell extends GridCell<Color> {
 		}
 	}
 	
+    /**
+     * {@inheritDoc}
+     */
 	@Override protected void updateItem(Color item, boolean empty) {
 	    super.updateItem(item, empty);
 	    

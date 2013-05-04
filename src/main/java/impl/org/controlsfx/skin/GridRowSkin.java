@@ -32,7 +32,6 @@ import javafx.geometry.HPos;
 import javafx.scene.Node;
 
 import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridRow;
 import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
@@ -73,7 +72,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
             for (int cellIndex = startCellIndex; cellIndex <= endCellIndex; cellIndex++) {
                 if (cellIndex < getSkinnable().gridViewProperty().get().getItems().size()) {
                     GridCell<T> cell = createCell();
-                    cell.setGridRow(getSkinnable());
+//                    cell.setGridRow(getSkinnable());
+                    cell.updateGridView(getSkinnable().getGridView());
                     cell.updateIndex(cellIndex);
                     getChildren().add(cell);
                 }

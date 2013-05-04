@@ -30,11 +30,19 @@ import impl.org.controlsfx.skin.GridCellSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Skin;
 
+/**
+ * A GridCell is created to represent items in the {@link GridView} 
+ * {@link GridView#getItems() items list}. As with other JavaFX UI controls
+ * (like {@link ListView}, {@link TableView}, etc), the {@link GridView} control
+ * is virtualised, meaning it is exceedingly memory and CPU efficient. Refer to
+ * the {@link GridView} class documentation for more details.
+ *  
+ * @see GridView
+ * @see GridCell
+ */
 public class GridCell<T> extends IndexedCell<T> {
     
     /**************************************************************************
@@ -44,7 +52,7 @@ public class GridCell<T> extends IndexedCell<T> {
      **************************************************************************/
 
     /**
-     * 
+     * Creates a default GridCell instance.
      */
 	public GridCell() {
 		getStyleClass().add("grid-cell");
@@ -61,10 +69,9 @@ public class GridCell<T> extends IndexedCell<T> {
 		// containing GridView)
 		indexProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable observable) {
-                final GridRow<T> gridRow = getGridRow();
-                if (gridRow == null) return;
+                final GridView<T> gridView = getGridView();
+                if (gridView == null) return;
                 
-                GridView<T> gridView = gridRow.getGridView();
                 T item = gridView.getItems().get(getIndex());
                 
 //                updateIndex(getIndex());
@@ -73,6 +80,9 @@ public class GridCell<T> extends IndexedCell<T> {
         });
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override protected Skin<?> createDefaultSkin() {
         return new GridCellSkin<T>(this);
     }
@@ -84,20 +94,27 @@ public class GridCell<T> extends IndexedCell<T> {
      * Properties
      * 
      **************************************************************************/
-
-    /**
-     * 
-     */
-    private final SimpleObjectProperty<GridRow<T>> gridRow = new SimpleObjectProperty<>(this, "gridRow");
-
-    public final void setGridRow(GridRow<T> value) {
-        gridRow.set(value);
-    }
-    public GridRow<T> getGridRow() {
-        return gridRow.get();
-    }
-    public SimpleObjectProperty<GridRow<T>> gridRowProperty() {
-        return gridRow;
-    }
 	
+	/**
+     * The {@link GridView} that this GridCell exists within.
+     */
+    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
+        return gridView;
+    }
+    private final SimpleObjectProperty<GridView<T>> gridView = 
+            new SimpleObjectProperty<>(this, "gridView");
+    
+    /**
+     * Sets the {@link GridView} that this GridCell exists within.
+     */
+    public final void updateGridView(GridView<T> gridView) {
+        this.gridView.set(gridView);
+    }
+    
+    /**
+     * Returns the {@link GridView} that this GridCell exists within.
+     */
+    public GridView<T> getGridView() {
+        return gridView.get();
+    }
 }

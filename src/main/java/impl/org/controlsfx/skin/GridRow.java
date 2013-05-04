@@ -24,16 +24,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.skin.GridRowSkin;
+import org.controlsfx.control.GridView;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Skin;
 
-public class GridRow<T> extends IndexedCell<T>{
+/**
+ * A GridRow is a container for {@link GridCell}, and represents a single
+ * row inside a {@link GridView}.
+ */
+class GridRow<T> extends IndexedCell<T>{
 
 
     /**************************************************************************
@@ -42,6 +47,9 @@ public class GridRow<T> extends IndexedCell<T>{
      * 
      **************************************************************************/	
 
+    /**
+     * 
+     */
     public GridRow() {
         super();
         getStyleClass().add("grid-row");
@@ -56,6 +64,9 @@ public class GridRow<T> extends IndexedCell<T>{
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override protected Skin<?> createDefaultSkin() {
         return new GridRowSkin<T>(this);
     }
@@ -69,19 +80,25 @@ public class GridRow<T> extends IndexedCell<T>{
      **************************************************************************/
 
     /**
-     * 
+     * The {@link GridView} that this GridRow exists within.
      */
-    private final SimpleObjectProperty<GridView<T>> gridView = new SimpleObjectProperty<>(this, "gridView");
-
+    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
+        return gridView;
+    }
+    private final SimpleObjectProperty<GridView<T>> gridView = 
+            new SimpleObjectProperty<>(this, "gridView");
+    
+    /**
+     * Sets the {@link GridView} that this GridRow exists within.
+     */
     public final void updateGridView(GridView<T> gridView) {
         this.gridView.set(gridView);
     }
     
+    /**
+     * Returns the {@link GridView} that this GridRow exists within.
+     */
     public GridView<T> getGridView() {
         return gridView.get();
-    }
-
-    public SimpleObjectProperty<GridView<T>> gridViewProperty() {
-        return gridView;
     }
 }

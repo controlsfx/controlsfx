@@ -32,6 +32,12 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+/**
+ * A control for allowing users to provide a rating. This control supports
+ * {@link #partialRatingProperty() partial ratings} (i.e. not whole numbers and
+ * dependent upon where the user clicks in the control) and 
+ * {@link #updateOnHoverProperty() updating the rating on hover}.
+ */
 public class Rating extends Control {
     
     /***************************************************************************
@@ -39,14 +45,32 @@ public class Rating extends Control {
      * Constructors
      * 
      **************************************************************************/
+    
+    /**
+     * Creates a default instance with a minimum rating of 0 and a maximum 
+     * rating of 5.
+     */
     public Rating() {
         this(5);
     }
     
+    /**
+     * Creates a default instance with a minimum rating of 0 and a maximum rating
+     * as provided by the argument.
+     * 
+     * @param max The maximum allowed rating value.
+     */
     public Rating(int max) {
         this(max, -1);
     }
     
+    /**
+     * Creates a Rating instance with a minimum rating of 0, a maximum rating
+     * as provided by the {@code max} argument, and a current rating as provided
+     * by the {@code rating} argument.
+     * 
+     * @param max The maximum allowed rating value.
+     */
     public Rating(int max, int rating) {
         getStyleClass().setAll("rating");
         
@@ -74,7 +98,6 @@ public class Rating extends Control {
     
     
     
-
     /***************************************************************************
      * 
      * Properties
@@ -82,49 +105,57 @@ public class Rating extends Control {
      **************************************************************************/
     
     // --- Rating
+    /**
+     * The current rating value.
+     */
+    public final DoubleProperty ratingProperty() {
+        return rating;
+    }
     private DoubleProperty rating = new SimpleDoubleProperty(this, "rating", 3);
+    
+    /**
+     * Sets the current rating value.
+     */
     public final void setRating(double value) {
        ratingProperty().set(value);
     }
-
+    
+    /**
+     * Returns the current rating value.
+     */
     public final double getRating() {
         return rating == null ? 3 : rating.get();
     }
 
-    public final DoubleProperty ratingProperty() {
-        return rating;
-    }
-    
     
     // --- Max
+    /**
+     * The maximum-allowed rating value.
+     */
+    public final IntegerProperty maxProperty() {
+        return max;
+    }
     private IntegerProperty max = new SimpleIntegerProperty(this, "max", 5);
+    
+    /**
+     * Sets the maximum-allowed rating value.
+     */
     public final void setMax(int value) {
        maxProperty().set(value);
     }
 
+    /**
+     * Returns the maximum-allowed rating value.
+     */
     public final int getMax() {
         return max == null ? 5 : max.get();
-    }
-
-    public final IntegerProperty maxProperty() {
-        return max;
     }
     
     
     // --- Orientation
-    private ObjectProperty<Orientation> orientation;
-    
-    public final void setOrientation(Orientation value) {
-        orientationProperty().set(value);
-    };
-    
-    public final Orientation getOrientation() {
-        return orientation == null ? Orientation.HORIZONTAL : orientation.get();
-    }
-    
     /**
-     * The orientation of the {@code Rating} - this can either be horizontal
-     * or vertical.
+     * The {@link Orientation} of the {@code Rating} - this can either be 
+     * horizontal or vertical.
      */
     public final ObjectProperty<Orientation> orientationProperty() {
         if (orientation == null) {
@@ -132,7 +163,24 @@ public class Rating extends Control {
         }
         return orientation;
     }
+    private ObjectProperty<Orientation> orientation;
     
+    /**
+     * Sets the {@link Orientation} of the {@code Rating} - this can either be 
+     * horizontal or vertical.
+     */
+    public final void setOrientation(Orientation value) {
+        orientationProperty().set(value);
+    };
+    
+    /**
+     * Returns the {@link Orientation} of the {@code Rating} - this can either 
+     * be horizontal or vertical.
+     */
+    public final Orientation getOrientation() {
+        return orientation == null ? Orientation.HORIZONTAL : orientation.get();
+    }
+
     
     // --- partial rating
     /**
@@ -142,13 +190,23 @@ public class Rating extends Control {
      * as the new rating value. If this is false the more typical approach is used
      * where the selected 'star' is used as the rating.
      */
-    private BooleanProperty partialRating = new SimpleBooleanProperty(this, "partialRating", false);
     public final BooleanProperty partialRatingProperty() {
         return partialRating;
     }
+    private BooleanProperty partialRating = new SimpleBooleanProperty(this, "partialRating", false);
+    
+    /**
+     * Sets whether {@link #partialRatingProperty() partial rating} support is
+     * enabled or not.
+     */
     public final void setPartialRating(boolean value) {
         partialRatingProperty().set(value);
     }
+    
+    /**
+     * Returns whether {@link #partialRatingProperty() partial rating} support is
+     * enabled or not.
+     */
     public final boolean isPartialRating() {
         return partialRating == null ? false : partialRating.get();
     }
@@ -156,15 +214,28 @@ public class Rating extends Control {
     
     // --- update on hover
     /**
-     * 
+     * If true this allows for the {@link #ratingProperty() rating property} to
+     * be updated simply by the user hovering their mouse over the control. If
+     * false the user is required to click on their preferred rating to register
+     * the new rating with this control.
      */
-    private BooleanProperty updateOnHover = new SimpleBooleanProperty(this, "updateOnHover", false);
     public final BooleanProperty updateOnHoverProperty() {
         return updateOnHover;
     }
+    private BooleanProperty updateOnHover = new SimpleBooleanProperty(this, "updateOnHover", false);
+    
+    /**
+     * Sets whether {@link #updateOnHoverProperty() update on hover} support is
+     * enabled or not.
+     */
     public final void setUpdateOnHover(boolean value) {
         updateOnHoverProperty().set(value);
     }
+    
+    /**
+     * Returns whether {@link #updateOnHoverProperty() update on hover} support is
+     * enabled or not.
+     */
     public final boolean isUpdateOnHover() {
         return updateOnHover == null ? false : updateOnHover.get();
     }

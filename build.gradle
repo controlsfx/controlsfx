@@ -66,9 +66,9 @@ artifacts {
     archives jarSamples
 }
 
-['HelloDialog', 'HelloGridView', 'HelloRangeSlider', 'HelloRating', 'HelloSegmentedButton', 'HelloToggleSwitch', 'SVGTest'].each { name ->
+['HelloControlsFX'/*, 'HelloGridView', 'HelloRangeSlider', 'HelloRating', 'HelloSegmentedButton', 'HelloToggleSwitch', 'SVGTest'*/].each { name ->
     task "$name" (type: JavaExec) {
-        main = "org.controlsfx.samples.$name"
+        main = "org.controlsfx.$name"
         classpath = sourceSets.samples.runtimeClasspath + sourceSets.main.runtimeClasspath + configurations.jdk
     }
 }

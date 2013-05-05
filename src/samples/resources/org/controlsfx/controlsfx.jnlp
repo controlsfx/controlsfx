@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="6.0+" codebase="http://www.jonathangiles.net/javafx/controlsfx" href="controlsfx.jnlp">
+  <information>
+    <title>ControlsFX Sample Application</title>
+    <vendor>Jonathan Giles</vendor>
+    <homepage href="http://www.fxexperience.com/controlsfx"/>
+    <description>ControlsFX Sample Application</description>
+    <description kind="short">A demo of the capabilities of ControlsFX.</description>
+    <offline-allowed/> 
+  </information>
+  <resources>
+    <j2se version="1.8+"/>
+    <jar href="controlsfx.jar"/>
+    <jar href="controlsfx-samples.jar"/>
+  </resources>
+  <application-desc main-class="org.controlsfx.HelloControlsFX"/>
+</jnlp>

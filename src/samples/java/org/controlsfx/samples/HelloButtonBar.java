@@ -43,16 +43,19 @@ import static org.controlsfx.control.ButtonBar.ButtonType.YES;
 import java.util.Arrays;
 
 import javafx.application.Application;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
@@ -86,18 +89,15 @@ public class HelloButtonBar extends Application implements Sample {
     @Override public Node getPanel(final Stage stage) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
+        root.setMaxHeight(Double.MAX_VALUE);
         
         final ButtonBar buttonBar = new ButtonBar();
-//        buttonBar.setButtonMinWidth(0);
-//        buttonBar.setButtonUniformSize(true);
         
         // explanation text
         Label details = new Label("The ButtonBar allows for buttons to be positioned" +
         		" in a way that is OS-specific (or in any way that suits your use case." +
         		" For example, try toggling the OS toggle buttons below (note, you'll want " +
-        		"to increase the width of this window first!\n\n" +
-        		"Note that, to allow for this sample to display the buttons are not configured" +
-        		" to use a consistent minimum width, but that is possible vis API on ButtonBar.");
+        		"to increase the width of this window first!)\n\n");
         details.setWrapText(true);
         root.getChildren().add(details);
         
@@ -115,9 +115,18 @@ public class HelloButtonBar extends Application implements Sample {
         uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
         root.getChildren().add( uniformButtonBtn);
         
-        // minimum size slider
-        final Slider minSizeSlider = new Slider(0, 100, 0);
-        HBox minSizeBox = new HBox(10, new Label("Button min size:"), minSizeSlider);
+        // minimum size slider / label
+        final Slider minSizeSlider = new Slider(0, 200, 0);
+        Label pixelCountLabel = new Label();
+        pixelCountLabel.textProperty().bind(new StringBinding() {
+            { bind(minSizeSlider.valueProperty()); }
+            
+            @Override protected String computeValue() {
+                return (int)minSizeSlider.getValue() + "px";
+            }
+        });
+        HBox minSizeBox = new HBox(10, new Label("Button min size:"), minSizeSlider, pixelCountLabel);
+        minSizeBox.setAlignment(Pos.BASELINE_LEFT);
         buttonBar.buttonMinWidthProperty().bind(minSizeSlider.valueProperty());
         root.getChildren().add(minSizeBox);
         
@@ -150,8 +159,14 @@ public class HelloButtonBar extends Application implements Sample {
                 createButton("Apply", APPLY)
                 
         ));
-        root.getChildren().add(buttonBar);
-        VBox.setVgrow(buttonBar, Priority.NEVER);
+        
+        // put the ButtonBar inside a ScrollPane so that the user can scroll horizontally
+        // when the button width is large
+        ScrollPane sp = new ScrollPane(buttonBar);
+        sp.setStyle("-fx-background-color: -fx-background; -fx-background-insets: 0");
+        
+        root.getChildren().add(sp);
+        VBox.setVgrow(sp, Priority.ALWAYS);
         
         return root;
     }

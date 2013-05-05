@@ -122,7 +122,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         if ("BUTTON_ORDER".equals(p)) {
             layoutButtons();
         } else if ("BUTTON_MIN_WIDTH".equals(p)) {
-            layoutButtons();
+//            layoutButtons();
+            resizeButtons();
         } else if ("BUTTON_UNIFORM_SIZE".equals(p)) {
 //            layoutButtons();
             resizeButtons();
@@ -194,7 +195,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         double widest = buttonMinWidth;
         if (buttonBar.isButtonUniformSize()) {
             for (ButtonBase button : buttons) {
-                if ( !isButtonIndependent(button)) {
+                if (!isButtonIndependent(button)) {
                    widest = Math.max(button.prefWidth(-1), widest);
                 }
             }
@@ -202,10 +203,9 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         
         // set the width of all buttons
         for (ButtonBase button : buttons) {
-            
             if (buttonBar.isButtonUniformSize()) {
-                if ( !isButtonIndependent(button)) { 
-                    button.setPrefWidth(widest);
+                if (!isButtonIndependent(button)) { 
+                    button.setMinWidth(widest);
                 }
             } else if (buttonMinWidth > 0){
                 button.setMinWidth(buttonMinWidth);

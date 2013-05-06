@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import impl.org.controlsfx.behavior.RatingBehavior;
@@ -213,17 +215,17 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         final double y = b.getY();
         
         final Rating control = getSkinnable();
+        
         final int max = control.getMax();
         final double w = control.getWidth() - (snappedLeftInset() + snappedRightInset());
         final double h = control.getHeight() - (snappedTopInset() + snappedBottomInset());
-        final double _w = w - getSpacing() * max;
         
         double newRating = -1;
         
         if (isVertical()) {
             newRating = ((h - y) / h) * max;
         } else {
-            newRating = (x / _w * 2.5) * max;
+            newRating = (x / w) * max;
         }
         
         if (! partialRating) {
@@ -280,9 +282,17 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         
         // if we immediately change the rating, then we don't need the following
         if (! partialRating) {
-            int max = getSkinnable().getMax();
+            final int max = getSkinnable().getMax();
+
+            // make a copy of the buttons list so that we can reverse the order if
+            // the list is vertical (as the buttons are ordered bottom to top).
+            List<Node> buttons = new ArrayList<Node>(backgroundContainer.getChildren());
+            if (isVertical()) {
+                Collections.reverse(buttons);
+            }
+            
             for (int i = 0; i < max; i++) {
-                Node button = backgroundContainer.getChildren().get(i);
+                Node button = buttons.get(i);
     
                 final List<String> styleClass = button.getStyleClass();
                 final boolean containsStrong = styleClass.contains(STRONG);
@@ -300,5 +310,9 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     
     private boolean isVertical() {
         return getSkinnable().getOrientation() == Orientation.VERTICAL;
+    }
+    
+    @Override protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
     }
 }

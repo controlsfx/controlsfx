@@ -36,7 +36,7 @@ public class HelloRangeSlider extends Application implements Sample {
     }
     
     @Override public void start(Stage stage) {
-        setUserAgentStylesheet(STYLESHEET_CASPIAN);
+//        setUserAgentStylesheet(STYLESHEET_CASPIAN);
         stage.setTitle("RangeSlider Demo");
 
         Scene scene = new Scene((Parent)getPanel(stage), 520, 360);

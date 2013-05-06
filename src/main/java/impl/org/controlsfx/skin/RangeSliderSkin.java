@@ -128,7 +128,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             }
         });
 
-        EventHandler keyEventHandler = new EventHandler<KeyEvent>() {
+        EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
             @Override public void handle(KeyEvent event) {
                 if (KeyCode.TAB.equals(event.getCode())) {
                     if (lowThumb.isFocused()) {

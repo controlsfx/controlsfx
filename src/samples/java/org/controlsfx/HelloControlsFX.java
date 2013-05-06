@@ -76,6 +76,8 @@ public class HelloControlsFX extends Application {
     }
     
     @Override public void start(final Stage primaryStage) throws Exception {
+        setUserAgentStylesheet(STYLESHEET_MODENA);
+        
         // instantiate the samples
         ObservableList<Sample> samples = FXCollections.observableArrayList();
         for (Class clazz : samplesArray) {

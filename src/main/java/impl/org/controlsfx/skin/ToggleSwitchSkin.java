@@ -31,6 +31,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -47,8 +48,8 @@ public class ToggleSwitchSkin extends BehaviorSkinBase<ToggleSwitch, ToggleSwitc
     private double preDragLayoutX;
     private double preDragClipX;
 
-    private final Label offLabel = new Label("OFF");
-    private final Label onLabel = new Label("ON");
+    private final Label offLabel = new Label("Off");
+    private final Label onLabel = new Label("On");
     private final StackPane slider = new StackPane();
 
     private Timeline timeline = new Timeline();
@@ -84,7 +85,11 @@ public class ToggleSwitchSkin extends BehaviorSkinBase<ToggleSwitch, ToggleSwitc
                     animate();
                     return;
                 }
-                double fullWidth = snapSize(offLabel.prefWidth(-1)-(control.prefWidth(-1)/4)/2);
+                
+////                double fullWidth = snapSize(offLabel.prefWidth(-1)-(control.prefWidth(-1)/4)/2);
+                double fullWidth = getSkinnable().getWidth();
+                
+                
                 if (Math.abs(dragWidth) < fullWidth-fullWidth/2) {
                     // restore position before partial drag
                     clipRect.setX(preDragClipX);
@@ -118,15 +123,20 @@ public class ToggleSwitchSkin extends BehaviorSkinBase<ToggleSwitch, ToggleSwitc
     }
         
     private void moveDelta(double delta) {
-        double min = -snapSize((offLabel.prefWidth(-1)-((getSkinnable().prefWidth(-1)/4)/2)));
+//        double min = -snapSize((offLabel.prefWidth(-1)-((getSkinnable().prefWidth(-1)/4)/2)));
+        final double buttonWidth = getButtonWidth(getSkinnable().getHeight()) - offLabel.getPadding().getLeft() - 2;
+        double min = -buttonWidth;
         double max = 0;
-        if (getSkinnable().getLayoutX()+delta < min || getSkinnable().getLayoutX()+delta > max) return;
-        clipRect.setX(clipRect.getX()-delta);
-        getSkinnable().setLayoutX(getSkinnable().getLayoutX()+delta);
+        final double layoutX = getSkinnable().getLayoutX();
+        final double newLayoutX = layoutX + delta;
+        if (newLayoutX < min || newLayoutX > max) return;
+        clipRect.setX(clipRect.getX() - delta);
+        getSkinnable().setLayoutX(newLayoutX);
     }
         
     private void animate() {
-        double movingWidth = snapSize(offLabel.prefWidth(-1)-(getSkinnable().prefWidth(-1)/4)/2);
+//        double movingWidth = snapSize(offLabel.prefWidth(-1) + offLabel.getPadding().getLeft() -(getSkinnable().prefWidth(-1)/4)/2);
+        final double movingWidth = getButtonWidth(getSkinnable().getHeight()) - offLabel.getPadding().getLeft() - 2;
         timeline.getKeyFrames().addAll (
                  new KeyFrame(Duration.ZERO, new KeyValue(clipRect.xProperty(), 0)),
                  new KeyFrame(Duration.ZERO, new KeyValue(getSkinnable().layoutXProperty(), 0)),
@@ -139,8 +149,14 @@ public class ToggleSwitchSkin extends BehaviorSkinBase<ToggleSwitch, ToggleSwitc
         getSkinnable().setSelected(! getSkinnable().isSelected());
     }
     
+    private double getButtonWidth(double h) {
+        final double buttonWidth = Math.max(snapSize(offLabel.prefWidth(h)), snapSize(onLabel.prefWidth(h)));
+        return buttonWidth;
+    }
+    
     @Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return leftInset + 2 * snapSize(offLabel.prefWidth(height)) + rightInset;
+        final double buttonWidth = getButtonWidth(height);
+        return leftInset + snapSize(buttonWidth) + rightInset + 1;
     }
     
     @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
@@ -148,20 +164,22 @@ public class ToggleSwitchSkin extends BehaviorSkinBase<ToggleSwitch, ToggleSwitc
     }
     
     @Override protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
-        double sliderWidth = snapSize(getSkinnable().prefWidth(-1)/4);
+//        double sliderWidth = snapSize(getSkinnable().prefWidth(-1)/4);
+        final double thumbSize = Math.max(contentWidth / 4, contentHeight);
+        final Insets offLabelPadding = offLabel.getPadding();
+        
+        final double buttonWidth = getButtonWidth(contentHeight);
 
-        offLabel.resizeRelocate(contentX, contentY, snapSize(offLabel.prefWidth(-1)), 
-                snapSize(offLabel.prefHeight(-1)));
-        onLabel.resizeRelocate(contentX+snapSize(offLabel.prefWidth(-1)), contentY, 
-                snapSize(offLabel.prefWidth(-1)), snapSize(onLabel.prefHeight(-1)));
+        offLabel.resizeRelocate(contentX + 1, contentY, buttonWidth, contentHeight);
+        onLabel.resizeRelocate(contentX + 1 + buttonWidth, contentY, buttonWidth, contentHeight);
 
-        clipRect.setWidth(snapSize(offLabel.prefWidth(-1)+sliderWidth/2));
-        clipRect.setHeight(snapSize(getSkinnable().prefHeight(-1)));
-        clipRect.setArcWidth(55);
-        clipRect.setArcHeight(45);
+        clipRect.setWidth(contentWidth/2.0 + thumbSize/2.0 + offLabelPadding.getLeft());
+        clipRect.setHeight(contentHeight);
+        clipRect.setArcWidth(20);
+        clipRect.setArcHeight(20);
 
-        slider.resize(sliderWidth, snapSize(getSkinnable().prefHeight(-1)));
-        slider.relocate(snapSize(getSkinnable().prefWidth(-1))/2-sliderWidth/2, 0);
+        slider.resize(thumbSize, thumbSize);
+        slider.relocate(contentWidth/2.0-thumbSize/2.0 + offLabelPadding.getLeft(), contentY);
     }
 
 }

@@ -3,44 +3,35 @@
 .toggle-switch {
      -fx-background-insets: 0, 1, 2;
      -fx-background-color:
-        derive(-fx-color,-36%),
-        derive(-fx-color,73%),
-        linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
-     -fx-background-radius: 30;
+        -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border;
+     -fx-background-radius: 6;
 }
 
-.on-label {
-    -fx-padding: 15 30 15 50;
+.toggle-switch .on-label {
+    -fx-padding: 4 6 4 15;
     -fx-background-insets: 0, 1, 2;
      -fx-background-color:
         derive(orange,-36%),
         derive(orange,73%),
         linear-gradient(to bottom, derive(orange,-19%),derive(orange,61%));
-     -fx-background-radius: 0 30 30 0;
-     -fx-font-family: "Arial";
-     -fx-font-size: 16;
-     -fx-font-weight: bold;
+     -fx-background-radius: 0 6 6 0;
 }
 
-.off-label {
-    -fx-padding: 15 50 15 30;
+.toggle-switch .off-label {
+    -fx-padding: 4 15 4 8;
     -fx-background-insets: 0, 1, 2;
      -fx-background-color:
         derive(-fx-color,-36%),
         derive(-fx-color,73%),
         linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
-    -fx-background-radius: 30 0 0 30;
-    -fx-font-family: "Arial";
-    -fx-font-size: 16;
-    -fx-font-weight: bold;
+    -fx-background-radius: 6 0 0 6;
 }
 
-.on-off-slider {
-    -fx-background-insets: -1, 0, 1, 2;
-    -fx-background-color:
-        derive(-fx-color,-36%),
-        derive(-fx-color,-36%),
-        derive(-fx-color,73%),
-        linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
+.toggle-switch .on-off-slider {
+    -fx-background-color: 
+        linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)),
+        -fx-inner-border,
+        -fx-body-color;
+    -fx-background-insets: 0, 1, 2;
     -fx-background-radius: 30;
 }

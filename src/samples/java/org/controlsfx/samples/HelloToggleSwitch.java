@@ -1,10 +1,13 @@
 package org.controlsfx.samples;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -18,15 +21,27 @@ public class HelloToggleSwitch extends Application implements Sample {
     }
 
     @Override public Node getPanel(Stage stage) {
+        
+        Button btn1 = new Button("Button 1");
+        Button btn2 = new Button("Button 2");
         ToggleSwitch sc = new ToggleSwitch();
         
-        Group g = new Group();
-        g.setLayoutX(100);
-        g.setLayoutY(100);
+//        sc.setStyle("-fx-border-color: green");
         
-        g.getChildren().add(sc);
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 0, 0, 10));
+        grid.add(sc, 0, 0);
+        grid.add(btn1, 1, 0);
+        grid.add(btn2, 0, 1);
         
-        return g;
+//        Group g = new Group();
+//        g.setLayoutX(100);
+//        g.setLayoutY(100);
+//        g.getChildren().add(sc);
+        
+        return grid;
     }
 
     @Override public void start(Stage stage) throws Exception {

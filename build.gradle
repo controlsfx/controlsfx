@@ -46,6 +46,11 @@ jar {
 task jarSamples (type: Jar) {
     classifier='samples'
     from sourceSets.samples.output
+    manifest {
+        attributes(
+            'Main-Class': 'org.controlsfx.HelloControlsFX'
+        )
+    }
 }
 
 task sourceJar(type: Jar) {

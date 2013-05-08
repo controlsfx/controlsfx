@@ -35,6 +35,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -124,12 +125,12 @@ public final class ButtonBar extends Control {
         NO("N"),
         
         /**
-         * A tag for the "next >" or "forward >" button.
+         * A tag for the "next" or "forward" button.
          */
         NEXT_FORWARD("X"),
         
         /**
-         * A tag for the "< back>" or "< previous" button.
+         * A tag for the "back" or "previous" button.
          */
         BACK_PREVIOUS("B"),
         

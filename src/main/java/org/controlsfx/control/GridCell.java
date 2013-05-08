@@ -31,7 +31,9 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.IndexedCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TableView;
 
 /**
  * A GridCell is created to represent items in the {@link GridView} 

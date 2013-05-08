@@ -44,7 +44,9 @@ import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.geometry.HPos;
+import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 

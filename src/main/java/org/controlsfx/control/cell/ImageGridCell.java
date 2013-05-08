@@ -27,6 +27,7 @@
 package org.controlsfx.control.cell;
 
 import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

@@ -32,6 +32,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 
 import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 
 /**
  * A {@link GridCell} that can be used to show coloured rectangles inside the 

@@ -32,6 +32,7 @@ dependencies {
 
 javadoc {
     exclude 'impl/*'
+    failOnError = false
     classpath = project.sourceSets.main.compileClasspath + configurations.jdk
 }
 

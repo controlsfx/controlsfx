@@ -50,7 +50,6 @@ import org.controlsfx.samples.HelloGridView;
 import org.controlsfx.samples.HelloRangeSlider;
 import org.controlsfx.samples.HelloRating;
 import org.controlsfx.samples.HelloSegmentedButton;
-import org.controlsfx.samples.HelloToggleSwitch;
 import org.controlsfx.samples.SVGTest;
 
 public class HelloControlsFX extends Application {

@@ -63,8 +63,8 @@ public class HelloControlsFX extends Application {
         HelloRangeSlider.class,
         HelloRating.class,
         HelloSegmentedButton.class,
-        HelloToggleSwitch.class,
-        SVGTest.class
+        HelloToggleSwitch.class
+//        SVGTest.class
     };
     
     private GridPane grid;

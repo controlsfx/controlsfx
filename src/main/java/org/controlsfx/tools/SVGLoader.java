@@ -48,7 +48,7 @@ import com.sun.webkit.WebPage;
 /**
  * Convenience class that will attempt to load a given URL as an .svg file.
  */
-public class SVGLoader {
+class SVGLoader {
     
     private SVGLoader() {
         // no-op

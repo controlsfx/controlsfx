@@ -36,8 +36,6 @@ import java.util.ResourceBundle;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 
-import org.controlsfx.tools.SVGLoader;
-
 /**
  *
  */
@@ -121,11 +119,11 @@ class DialogResources {
     }
 
     static public Image getImage(URL url) {
-        if (url.toString().endsWith(".svg")) {
-            WritableImage image = new WritableImage(48, 48);
-            SVGLoader.loadSVGImage(url, image);
-            return image;
-        }
+//        if (url.toString().endsWith(".svg")) {
+//            WritableImage image = new WritableImage(48, 48);
+//            SVGLoader.loadSVGImage(url, image);
+//            return image;
+//        }
         return new Image(url.toString());
     }
 }

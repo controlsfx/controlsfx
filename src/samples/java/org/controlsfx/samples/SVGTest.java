@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import org.controlsfx.Sample;
-import org.controlsfx.tools.SVGLoader;
 
 public class SVGTest extends Application implements Sample {
     
@@ -61,11 +60,11 @@ public class SVGTest extends Application implements Sample {
     private void loadImage(final String filename, final VBox container) throws Exception {
         final URL pathToFile = SVGTest.class.getResource(filename).toURI().toURL();
 
-        SVGLoader.loadSVGImage(pathToFile, IMAGE_HEIGHT, -1, new Callback<ImageView, Void>() {
-            @Override public Void call(ImageView image) {
-                container.getChildren().addAll(image);
-                return null;
-            }
-        });
+//        SVGLoader.loadSVGImage(pathToFile, IMAGE_HEIGHT, -1, new Callback<ImageView, Void>() {
+//            @Override public Void call(ImageView image) {
+//                container.getChildren().addAll(image);
+//                return null;
+//            }
+//        });
     }
 }

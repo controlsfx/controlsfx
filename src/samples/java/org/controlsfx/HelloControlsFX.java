@@ -62,8 +62,7 @@ public class HelloControlsFX extends Application {
         HelloGridView.class,
         HelloRangeSlider.class,
         HelloRating.class,
-        HelloSegmentedButton.class,
-        HelloToggleSwitch.class
+        HelloSegmentedButton.class
 //        SVGTest.class
     };
     

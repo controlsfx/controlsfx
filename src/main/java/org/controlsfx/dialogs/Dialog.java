@@ -60,6 +60,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
@@ -632,6 +633,15 @@ public class Dialog {
         detailsButton.getStyleClass().setAll("details-button", "more");
         final String moreText = getString("common.detail.button.more");
         final String lessText = getString("common.detail.button.less");
+        
+        final Button innerButton = new Button();
+        innerButton.getStyleClass().add("arrowbutton");
+        final Region iconRegion = new Region();
+        iconRegion.setId("icon-down");
+        innerButton.setGraphic(iconRegion);
+        
+        detailsButton.setGraphic(innerButton);
+
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
@@ -641,6 +651,7 @@ public class Dialog {
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
                 dialog.sizeToScene();
                 detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
+                iconRegion.setId(content.isVisible() ? "icon-up" : "icon-down");
             }
         });
         return detailsButton;

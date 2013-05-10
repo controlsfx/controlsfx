@@ -41,6 +41,7 @@ jar {
     exclude '**/32/*'
     exclude '**/64/*'
     exclude '**/128/*'
+    exclude '**/oxygen/svg/*'
 }
 
 task jarSamples (type: Jar) {

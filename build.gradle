@@ -37,8 +37,7 @@ javadoc {
 }
 
 jar {
-    exclude '**/*.ico'
-    exclude '**/*.icns'
+    exclude '**/16/*
     exclude '**/32/*'
     exclude '**/64/*'
     exclude '**/128/*'

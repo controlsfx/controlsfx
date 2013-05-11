@@ -38,9 +38,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.controlsfx.control.ButtonBar;
-import org.controlsfx.control.ButtonBar.ButtonType;
-
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -67,11 +64,51 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
+
 
 /**
  * Simplifies building commonly used dialogs
- * Uses fluent API for flexibility
- */
+ * Uses fluent API for flexibility<br/><br/>
+ * 
+ * Usage example:
+ * <pre>
+ * {@code
+ *  Action response = Dialogs.create()
+ *      .owner( isOwnerSelected ? stage : null)
+ *      .title("You do want dialogs right?")
+ *      .masthead(isMastheadVisible() ? "Just Checkin'" : null)
+ *      .message( "I was a bit worried that you might not want them, so I wanted to double check.")
+ *      .showConfirm();
+ * }
+ * </pre>
+ * 
+ * The code above will setup and show a confirmation dialog.<br/><br/> 
+ * 
+ * Following is an example of setting up a CommandLink dialog
+ * 
+ * <pre>
+ * {@code 
+ *   List<CommandLink> links = Arrays.asList(
+ *        new CommandLink("Add a network that is in the range of this computer", 
+ *                        "This shows you a list of networks that are currently available and lets you connect to one."),
+ *        new CommandLink("Manually create a network profile", 
+ *                        "This creates a new network profile or locates an existing one and saves it on your computer"),
+ *        new CommandLink("Create an ad hoc network", 
+ *                "This creates a temporary network for sharing files or and Internet connection"));
+ *   
+ *   
+ *   Action response = Dialogs.create()
+ *           .owner(cbSetOwner.isSelected() ? stage : null)
+ *           .title("Manually connect to wireless network")
+ *           .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
+ *           .message("How do you want to add a network?")
+ *           .showCommandLinks( links.get(1), links );
+ * }
+ * </pre>
+ * 
+ * */
 public final class Dialogs {
 
     /**

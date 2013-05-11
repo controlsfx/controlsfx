@@ -80,7 +80,25 @@ import org.controlsfx.control.ButtonBar.ButtonType;
  * 
  * For developers wanting a simpler API, consider using the high-level 
  * {@link Dialogs} class, which provides a simpler, fluent API for displaying
- * the most common types of dialog.
+ * the most common types of dialog.<br/><br/>
+ * Here is the example of building a dialog:
+ * 
+ * <pre>
+ * {@code
+ *    Dialog dlg = new Dialog( owner, "Dialog Title");
+ *    dlg.setResizable(false);
+ *    dlg.setGraphic(new ImageView(getImage()));
+ *    dlg.setMasthead("Dialog Masthead");
+ *    dlg.getActions().addAll(Dialog.Actions.OK, Dialog.Actions.CANCEL);
+ *    dlg.setContent("Dialog message");
+ *    dlg.setExpandableContent( new Label("Expandable content"));
+ *    return dlg.show();
+ * }
+ * </pre>
+ * 
+ * The code above will setup and present the non resizable dialog with masthead, message and "OK" and "Cancel" buttons. 
+ * Also it will have expandable area, visibility of which is triggered by automatically presented "Details" button 
+ * <br/><br/>
  * 
  * @see Dialogs
  */

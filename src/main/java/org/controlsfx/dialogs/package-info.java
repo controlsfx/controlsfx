@@ -14,7 +14,7 @@
  * <pre>
  * {@code
  *  Action response = Dialogs.create()
- *      .owner(cbSetOwner.isSelected() ? stage : null)
+ *      .owner(isOwnerSelected ? stage : null)
  *      .title("You do want dialogs right?")
  *      .masthead(isMastheadVisible() ? "Just Checkin'" : null)
  *      .message( "I was a bit worried that you might not want them, so I wanted to double check.")

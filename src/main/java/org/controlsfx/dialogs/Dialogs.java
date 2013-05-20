@@ -275,9 +275,12 @@ public final class Dialogs {
                 response[0] = t1;
             }
         };
+        
+        final double MIN_WIDTH = 150;
         if (choices.size() > 10) {
             // use ComboBox
             ComboBox<T> comboBox = new ComboBox<T>();
+            comboBox.setMinWidth(MIN_WIDTH);
             comboBox.getItems().addAll(choices);
             comboBox.getSelectionModel().select(defaultValue);
             comboBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
@@ -285,6 +288,7 @@ public final class Dialogs {
         } else {
             // use ChoiceBox
             ChoiceBox<T> choiceBox = new ChoiceBox<T>();
+            choiceBox.setMinWidth(MIN_WIDTH);
             choiceBox.getItems().addAll(choices);
             choiceBox.getSelectionModel().select(defaultValue);
             choiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);

@@ -182,9 +182,9 @@
     -fx-underline: true;
 }
 
-#icon-up {
+.dialog .icon-up {
 	-fx-shape:"m 349.99845,528.19757 5.04282,5.02927 0,1.26897 -1.04554,0.89945 -0.99159,0 -3.00569,-3.23952 -3.13233,3.23952 -1.01852,0 -0.84754,-0.96612 0,-1.06887 z";
-    -fx-padding: 4.0px;
+    -fx-padding: 4 4 4 4;
     -fx-background-insets: 3.0px -2.0px 4.0px -2.0px;
     -fx-border-color: linear-gradient(rgb(251.0, 251.0, 251.0, 0.8), rgb(240.0, 240.0, 240.0, 0.8));
     -fx-border-width: 1.0px;
@@ -192,7 +192,7 @@
     -fx-background-color: rgb(51.0, 51.0, 51.0);
 }
 
-#icon-down {
+.dialog .icon-down {
     -fx-shape:"m 349.99845,535.39526 5.04282,-5.02927 0,-1.26897 -1.04554,-0.89945 -0.99159,0 -3.00569,3.23952 -3.13233,-3.23952 -1.01852,0 -0.84754,0.96612 0,1.06887 z";
     -fx-padding: 4px;
     -fx-background-insets: 4px -2px 3px -2px;
@@ -202,7 +202,7 @@
     -fx-background-color: rgb(51, 51, 51);
 }
 
-.button.arrowbutton {
+.dialog .button.arrowbutton {
 	-fx-border-radius: 3.0em;
 	-fx-border-color: rgb(140.0, 140.0, 140.0);
 	-fx-border-width: 1.0px;
@@ -213,21 +213,20 @@
 	-fx-padding: 0.1em 0.4em 0.1em 0.4em
 }
 
-.button.arrowbutton:focused {
+.dialog .button.arrowbutton:focused {
     -fx-border-color: rgb(60.0, 127.0, 177.0);
     -fx-background-color: linear-gradient(rgb(253.0, 253.0, 253.0), rgb(220.0, 233.0, 239.0)),
         linear-gradient(rgb(240.0, 248.0, 254.0) 25.0%, rgb(159.0, 207.0, 233.0) );
 }
 
-
-.button.arrowbutton:armed {
+.dialog .button.arrowbutton:armed {
     -fx-border-color: rgb(44.0, 98.0, 139.0);
     -fx-background-color:
         linear-gradient(rgb(231.0, 244.0, 250.0) 25.0%, rgb(189.0, 221.0, 237.0) 50%, rgb(144.0, 198.0, 227.0) 50%, rgb(97.0, 168.0, 205.0));
     -fx-effect: innershadow(one-pass-box, rgb(94.0, 94.0, 94.0, 0.5), 4.0, 0.1, 2.0, 2.0); 
 }
 
-.button.arrowbutton:focused #icon-up, .button.arrowbutton:focused #icon-down {
+.dialog .button.arrowbutton:focused .icon-up, .dialog .button.arrowbutton:focused .icon-down {
     -fx-border-color: linear-gradient(rgb(253.0, 253.0, 253.0, 0.8), rgb(220.0, 233.0, 239.0, 0.8));
 }
 

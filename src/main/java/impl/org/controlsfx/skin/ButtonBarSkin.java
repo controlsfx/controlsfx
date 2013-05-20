@@ -159,9 +159,10 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         for (int i = 0; i < buttonOrder.length; i++) {
             char type = buttonOrder[i];
             boolean edgeCase = buttonIndex <= 0 && buttonIndex >= buttons.size()-1;
+            boolean hasChildren = ! hbox.getChildren().isEmpty();
             if (type == '+') {
                 spacer = spacer.replace(Spacer.DYNAMIC);
-            } else if (type == '_') {
+            } else if (type == '_' && hasChildren) {
                 spacer = spacer.replace(Spacer.FIXED);
             } else {
                 List<ButtonBase> buttonList = buttonMap.get(String.valueOf(type).toUpperCase());

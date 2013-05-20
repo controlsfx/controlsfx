@@ -61,6 +61,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
@@ -297,7 +298,9 @@ public class Dialog {
         // on the right of the masthead is a graphic, if one is specified
         Node graphic = getGraphic();
         if (graphic != null) {
-            mastheadPanel.setRight(graphic);
+            StackPane pane = new StackPane(graphic);
+            pane.getStyleClass().add("graphic-container");
+            mastheadPanel.setRight(pane);
         }
 
         setMasthead(mastheadPanel);

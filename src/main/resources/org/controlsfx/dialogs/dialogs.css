@@ -115,6 +115,10 @@
     -fx-wrap-text: true;
 }
 
+.dialog:masthead .masthead-panel .graphic-container {
+    -fx-padding: 0 0 0 10;
+}
+
 
 /*******************************************************************************
  *                                                                             *

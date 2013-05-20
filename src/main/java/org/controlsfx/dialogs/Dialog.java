@@ -642,7 +642,7 @@ public class Dialog {
         contentPane.add(buttonBar, 0, startRow, 2, 1);
         GridPane.setHgrow(buttonBar, Priority.ALWAYS);
         GridPane.setVgrow(buttonBar, Priority.NEVER);
-        GridPane.setMargin(buttonBar, new Insets(14, 14, 14, 0));
+        GridPane.setMargin(buttonBar, new Insets(14, 0, 14, 0));
 //        GridPane.setValignment(buttonBar, VPos.BASELINE);
     }
     

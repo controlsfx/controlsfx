@@ -133,7 +133,7 @@
 .dialog > * > .content-pane > .button-bar {
     -fx-font-size: 1em;
 }
- 
+
 .dialog:no-masthead > * > .content-pane {
     -fx-padding: 16 16 0 16;
 }
@@ -144,6 +144,10 @@
 
 .dialog:no-masthead > * > .content-pane .expandable-content {
     -fx-padding: 16 8 0 8;
+}
+
+.dialog:masthead > * > .content-pane > .button-bar {
+    -fx-padding: 0 14 0 14;
 }
 
 .dialog:masthead > * > .content-pane {

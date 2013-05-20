@@ -129,6 +129,10 @@
     -fx-font-size: 1.083333em; /*13px;*/
     -fx-text-fill: #292929;
 }
+
+.dialog > * > .content-pane > .button-bar {
+    -fx-font-size: 1em;
+}
  
 .dialog:no-masthead > * > .content-pane {
     -fx-padding: 16 16 0 16;

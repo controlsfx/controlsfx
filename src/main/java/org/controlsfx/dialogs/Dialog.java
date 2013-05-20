@@ -555,9 +555,7 @@ public class Dialog {
         ColumnConstraints leftColumn = new ColumnConstraints();
         ColumnConstraints rightColumn = new ColumnConstraints();
         rightColumn.setFillWidth(true);
-        
-        // FIXME this also causes an infinite loop in GridPane
-//        rightColumn.setHgrow(Priority.ALWAYS);
+        rightColumn.setHgrow(Priority.ALWAYS);
         if (! hasMasthead) {
             contentPane.getColumnConstraints().add(leftColumn);
         }
@@ -577,10 +575,7 @@ public class Dialog {
             contentPane.add(content, hasMasthead ? 0 : 1, startRow);
             GridPane.setVgrow(content, Priority.SOMETIMES);
             GridPane.setValignment(content, VPos.TOP);
-            
-            // FIXME this should be enabled (otherwise TextField input is not
-            // stretched, but by enabling we get an infinite loop in GridPane)
-//            GridPane.setHgrow(content, Priority.ALWAYS);
+            GridPane.setHgrow(content, Priority.ALWAYS);
         }
         
         // dialog image can go to the left if there is no masthead

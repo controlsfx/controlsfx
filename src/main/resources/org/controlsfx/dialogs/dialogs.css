@@ -126,11 +126,21 @@
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
     -fx-border-color: #b4b4b4 transparent #b4b4b4 transparent;
-    
+    -fx-font-size: 1.083333em; /*13px;*/
     -fx-text-fill: #292929;
 }
 
 .dialog > * > .content-pane > .button-bar {
+    -fx-font-size: 1em;
+}
+
+/* fixes a bug where the TextField / ChoiceBox / ComboBox would jump in size on 
+ user interaction. This is not a great long-term solution as any other control
+ placed in the dialog will likely have similar issues, but as a temporary 
+ solution this will do. This is likely just a JavaFX 8.0 dev preview bug. */
+.dialog > * > .content-pane .text-field,
+.dialog > * > .content-pane .choice-box,
+.dialog > * > .content-pane .combo-box {
     -fx-font-size: 1em;
 }
 

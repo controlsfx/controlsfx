@@ -655,7 +655,7 @@ public class Dialog {
         final Button innerButton = new Button();
         innerButton.getStyleClass().add("arrowbutton");
         final Region iconRegion = new Region();
-        iconRegion.setId("icon-down");
+        iconRegion.getStyleClass().add("icon-down");
         innerButton.setGraphic(iconRegion);
         
         detailsButton.setGraphic(innerButton);
@@ -669,7 +669,8 @@ public class Dialog {
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
                 dialog.sizeToScene();
                 detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
-                iconRegion.setId(content.isVisible() ? "icon-up" : "icon-down");
+                iconRegion.getStyleClass().remove(content.isVisible() ? "icon-down" : "icon-up");
+                iconRegion.getStyleClass().add(content.isVisible() ? "icon-up" : "icon-down");
             }
         });
         return detailsButton;

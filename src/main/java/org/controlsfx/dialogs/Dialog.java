@@ -646,7 +646,7 @@ public class Dialog {
     
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
-        detailsButton.getStyleClass().setAll("details-button", "more");
+        detailsButton.getStyleClass().setAll("details-button");
         final String moreText = getString("common.detail.button.more");
         final String lessText = getString("common.detail.button.less");
         
@@ -666,7 +666,6 @@ public class Dialog {
                 content.setVisible(!content.isVisible());
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
                 dialog.sizeToScene();
-                detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
                 iconRegion.getStyleClass().remove(content.isVisible() ? "icon-down" : "icon-up");
                 iconRegion.getStyleClass().add(content.isVisible() ? "icon-up" : "icon-down");
             }

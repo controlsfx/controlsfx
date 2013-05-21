@@ -37,10 +37,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -66,7 +70,13 @@ public class HelloControlsFX extends Application {
     };
     
     private GridPane grid;
-    private StackPane samplePane;
+
+    private TabPane tabPane;
+    private Tab welcomeTab;
+    private Tab sampleTab;
+    private Tab javadocTab;
+    
+    private WebView webview;
     
     
     public static void main(String[] args) {
@@ -116,17 +126,21 @@ public class HelloControlsFX extends Application {
         grid.add(samplesListView, 0, 0);
         
         // right hand side
-        samplePane = new StackPane();
-        samplePane.setStyle("-fx-border-color: lightgray");
-        samplePane.setMinWidth(600);
-//        samplePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        GridPane.setHgrow(samplePane, Priority.ALWAYS);
-        GridPane.setVgrow(samplePane, Priority.ALWAYS);
-        GridPane.setMargin(samplePane, new Insets(10, 10, 10, 0));
-        grid.add(samplePane, 1, 0);
+        tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+        tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
+        GridPane.setHgrow(tabPane, Priority.ALWAYS);
+        GridPane.setVgrow(tabPane, Priority.ALWAYS);
+        GridPane.setMargin(tabPane, new Insets(5, 10, 10, 0));
+        grid.add(tabPane, 1, 0);
+        
+        sampleTab = new Tab("Sample");
+        javadocTab = new Tab("JavaDoc");
+        webview = new WebView();
+    	javadocTab.setContent(webview);
         
         // by default we'll have a welcome message in the right-hand side
-        samplePane.getChildren().add(buildInitialVBox());
+        buildInitialVBox();
         
         // put it all together
         Scene scene = new Scene(grid);
@@ -140,10 +154,18 @@ public class HelloControlsFX extends Application {
     }
 
     private void changeSample(Sample newSample, final Stage stage) {
-        samplePane.getChildren().setAll(newSample.getPanel(stage));
+    	if (tabPane.getTabs().contains(welcomeTab)) {
+    		tabPane.getTabs().setAll(sampleTab, javadocTab);
+    	}
+    	
+    	// update the sample tab
+    	sampleTab.setContent(newSample.getPanel(stage));
+    	
+    	// update the javadoc tab
+    	webview.getEngine().load(newSample.getJavaDocURL());
     }
     
-    private Node buildInitialVBox() {
+    private void buildInitialVBox() {
         // line 1
         Label welcomeLabel1 = new Label("Welcome to ControlsFX!");
         welcomeLabel1.setStyle("-fx-font-size: 2em; -fx-padding: 0 0 0 5;");
@@ -161,6 +183,10 @@ public class HelloControlsFX extends Application {
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
         
         VBox initialVBox = new VBox(5, welcomeLabel1, welcomeLabel2);
-        return initialVBox;
+        
+        welcomeTab = new Tab("Welcome to ControlsFX!");
+        welcomeTab.setContent(initialVBox);
+        
+        tabPane.getTabs().add(welcomeTab);
     }
 }

@@ -28,6 +28,10 @@ public class HelloRating extends Application implements Sample {
         return "Rating";
     }
     
+    @Override public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/Rating.html";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));

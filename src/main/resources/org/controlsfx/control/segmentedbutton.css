@@ -34,12 +34,12 @@
 }
 
 .segmented-button .first-button:focused {
-        -fx-background-insets: -2 0 -2 -2, 0 0 0 0, 1, 2;
+     -fx-background-insets: -2 0 -2 -2, 0 0 0 0, 1, 2;
 	-fx-border-color: transparent;
 }
 
 .segmented-button .first-button:selected:focused {
-        -fx-background-insets: 0 0 -1 0, 0, 1 0 1 1, 1 0 1 1;
+    -fx-background-insets: 0 0 -1 0, 0, 1 0 1 1, 1 0 1 1;
 	-fx-border-color: transparent;
 }
 

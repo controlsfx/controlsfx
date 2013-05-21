@@ -60,9 +60,7 @@ public class SegmentedButton extends Control {
         setFocusTraversable(true);
     }
     
-    @Override protected Skin<?> createDefaultSkin() {
-        return new SegmentedButtonSkin(this);
-    }
+
     
     
     /**************************************************************************
@@ -70,6 +68,11 @@ public class SegmentedButton extends Control {
      * Public API
      * 
      *************************************************************************/
+    
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
+        return new SegmentedButtonSkin(this);
+    }
     
     /**
      * 

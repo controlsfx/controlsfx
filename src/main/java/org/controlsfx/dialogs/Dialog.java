@@ -646,18 +646,10 @@ public class Dialog {
     
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
-        detailsButton.getStyleClass().setAll("details-button");
+        detailsButton.getStyleClass().setAll("details-button", "more");
         final String moreText = getString("common.detail.button.more");
         final String lessText = getString("common.detail.button.less");
         
-        final Button innerButton = new Button();
-        innerButton.getStyleClass().add("arrowbutton");
-        final Region iconRegion = new Region();
-        iconRegion.getStyleClass().add("icon-down");
-        innerButton.setGraphic(iconRegion);
-        
-        detailsButton.setGraphic(innerButton);
-
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
@@ -665,9 +657,8 @@ public class Dialog {
                 setResizable(!content.isVisible());
                 content.setVisible(!content.isVisible());
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
+                detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
                 dialog.sizeToScene();
-                iconRegion.getStyleClass().remove(content.isVisible() ? "icon-down" : "icon-up");
-                iconRegion.getStyleClass().add(content.isVisible() ? "icon-up" : "icon-down");
             }
         });
         return detailsButton;

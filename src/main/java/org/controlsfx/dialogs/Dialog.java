@@ -114,13 +114,8 @@ public class Dialog {
     // enable to turn on grid lines, etc
     private static final boolean DEBUG = false;
     
-    // According to the UI spec, the width of the main message text in the upper
-    // panel should be 426 pixels.
-//    private static int MAIN_TEXT_WIDTH = 400;
+    private static int MIN_DIALOG_WIDTH = 426;
 
-//    // Specifies the minimum allowable width for all buttons in the dialog
-//    private static int MINIMUM_BUTTON_WIDTH = 75;
-    
     
     
     /**************************************************************************
@@ -289,11 +284,12 @@ public class Dialog {
         mastheadPanel.getStyleClass().add("masthead-panel");
 
         // on left of masthead is the text
-        Label mastheadTextArea = new Label(mastheadText);
-        mastheadTextArea.setWrapText(true);
-        mastheadTextArea.setAlignment(Pos.CENTER_LEFT);
-        mastheadPanel.setLeft(mastheadTextArea);
-        BorderPane.setAlignment(mastheadTextArea, Pos.CENTER_LEFT);
+        Label mastheadLabel = new Label(mastheadText);
+        mastheadLabel.setWrapText(true);
+        mastheadLabel.setAlignment(Pos.CENTER_LEFT);
+        mastheadLabel.setMaxWidth(MIN_DIALOG_WIDTH);
+        mastheadPanel.setLeft(mastheadLabel);
+        BorderPane.setAlignment(mastheadLabel, Pos.CENTER_LEFT);
 
         // on the right of the masthead is a graphic, if one is specified
         Node graphic = getGraphic();
@@ -563,6 +559,10 @@ public class Dialog {
             contentPane.getColumnConstraints().add(leftColumn);
         }
         contentPane.getColumnConstraints().add(rightColumn);
+        
+        
+        // now that all the content is built, we apply the min size rules
+        contentPane.setMinWidth(MIN_DIALOG_WIDTH);
         
         this.contentPane.setGridLinesVisible(DEBUG);
 //        this.dialog.sizeToScene();

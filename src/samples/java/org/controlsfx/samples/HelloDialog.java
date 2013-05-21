@@ -173,7 +173,7 @@ public class HelloDialog extends Application implements Sample {
                       .owner(cbSetOwner.isSelected() ? stage : null)
                       .title("It looks like you're making a bad decision")
                       .message("Exception Encountered")
-                      .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance!" : null)
+                      .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance! Even longer text that should probably wrap" : null)
                       .showError();
 
                 System.out.println("response: " + response);

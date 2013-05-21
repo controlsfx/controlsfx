@@ -106,8 +106,8 @@
  
 .dialog:masthead .masthead-panel {
     -fx-padding: 10 14 10 14;
-    -fx-background-color: linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
-    -fx-border-color: transparent transparent #b4b4b4 transparent;
+    -fx-background-insets: 0 -1 0 -1, 0 -1 1 -1;
+    -fx-background-color: #b4b4b4, linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
 }
 
 .dialog:masthead .masthead-panel .label {

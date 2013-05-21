@@ -189,6 +189,10 @@
     -fx-padding: 15 18 8 18;
 }
 
+.dialog .more-info-dialog .label {
+    -fx-font-size: 1.083333em;
+}
+
 .dialog .more-info-dialog > .button-bar {
     -fx-padding: 12 0 6 12;
     -fx-alignment: CENTER_RIGHT;

@@ -485,25 +485,23 @@ public final class Dialogs {
     }
 
     private Node buildInputContent(Control inputControl) {
-
-        HBox hbox = new HBox(10);
-        hbox.setMaxWidth(Double.MAX_VALUE);
-        hbox.setAlignment(Pos.BASELINE_LEFT);
-        
+    	GridPane grid = new GridPane();
+    	grid.setHgap(10);
+    	grid.setMaxWidth(Double.MAX_VALUE);
+    	
         if (message != null && !message.isEmpty()) {
             Label label = new Label(message);
-            HBox.setHgrow(label, Priority.NEVER);
-            hbox.getChildren().add(label);
+            GridPane.setHgrow(label, Priority.NEVER);
+            grid.add(label, 0, 0);
         }
 
         if (inputControl != null) {
             inputControl.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(inputControl, Priority.ALWAYS);
-            hbox.getChildren().add(inputControl);
+            GridPane.setHgrow(inputControl, Priority.ALWAYS);
+            grid.add(inputControl, 1, 0);
         }
 
-        return hbox;
-
+        return grid;
     }
 
     private Node buildExceptionDetails(Throwable exception) {

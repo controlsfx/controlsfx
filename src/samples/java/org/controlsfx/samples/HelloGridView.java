@@ -30,6 +30,10 @@ public class HelloGridView extends Application implements Sample {
         return "GridView";
     }
     
+    @Override public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/GridView.html";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
         myGrid = new GridView<>(list);

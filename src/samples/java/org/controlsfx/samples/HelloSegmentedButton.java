@@ -19,6 +19,10 @@ public class HelloSegmentedButton extends Application implements Sample {
         return "SegmentedButton";
     }
     
+    @Override public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/SegmentedButton.html";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         ToggleButton b1 = new ToggleButton("day");
         ToggleButton b2 = new ToggleButton("week");

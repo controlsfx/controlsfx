@@ -42,5 +42,7 @@ public interface Sample {
      * @return
      */
     public Node getPanel(final Stage stage);
+    
+    public String getJavaDocURL();
 
 }

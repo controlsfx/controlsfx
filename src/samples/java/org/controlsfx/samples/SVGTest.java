@@ -32,6 +32,10 @@ public class SVGTest extends Application implements Sample {
         return "SVG Rendering";
     }
     
+    @Override public String getJavaDocURL() {
+        return null;
+    }
+    
     @Override public Node getPanel(Stage stage) {
         VBox container = new VBox(IMAGE_SPACING);
         

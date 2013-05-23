@@ -72,7 +72,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
      * 
      **************************************************************************/
     
-    private HBox hbox;
+    private HBox layout;
     
     
     
@@ -85,7 +85,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     public ButtonBarSkin(final ButtonBar control) {
         super(control, new BehaviorBase<>(control));
         
-        this.hbox = new HBox(GAP_SIZE) {
+        this.layout = new HBox(GAP_SIZE) {
             @Override
             protected void layoutChildren() {
                 // has to be called first or layout is not correct somtimes 
@@ -93,8 +93,8 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                 super.layoutChildren();
             }
         };
-        this.hbox.setAlignment(Pos.CENTER);
-        getChildren().add(hbox);
+        this.layout.setAlignment(Pos.CENTER);
+        getChildren().add(layout);
         
         layoutButtons();
         
@@ -151,7 +151,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         }
          
         char[] buttonOrder = buttonOrderStr.toCharArray();
-        hbox.getChildren().clear();
+        layout.getChildren().clear();
         
         int buttonIndex = 0; // to determine edge cases
         Spacer spacer = Spacer.NONE;
@@ -159,7 +159,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         for (int i = 0; i < buttonOrder.length; i++) {
             char type = buttonOrder[i];
             boolean edgeCase = buttonIndex <= 0 && buttonIndex >= buttons.size()-1;
-            boolean hasChildren = ! hbox.getChildren().isEmpty();
+            boolean hasChildren = ! layout.getChildren().isEmpty();
             if (type == '+') {
                 spacer = spacer.replace(Spacer.DYNAMIC);
             } else if (type == '_' && hasChildren) {
@@ -168,13 +168,13 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
                 List<ButtonBase> buttonList = buttonMap.get(String.valueOf(type).toUpperCase());
                 if (buttonList != null) {
                     
-                    spacer.add(hbox,edgeCase);
+                    spacer.add(layout,edgeCase);
                     
                     for (ButtonBase btn: buttonList) {
                         btn.setMinWidth(buttonMinWidth);
                         btn.setMaxWidth(Double.MAX_VALUE);
                         
-                        hbox.getChildren().add(btn);
+                        layout.getChildren().add(btn);
                         HBox.setHgrow(btn, Priority.NEVER);
                         buttonIndex++;
                     }

@@ -73,7 +73,7 @@ public final class ButtonBar extends Control {
     /**
      * The default button ordering on Mac OS.
      */
-    public static final String BUTTON_ORDER_MAC_OS  = "L_HE+U+FBI_NYCOA_R";
+    public static final String BUTTON_ORDER_MAC_OS  = "L_HE+U+FBI_NCYOA_R";
     
     /**
      * The default button ordering on Linux (specifically, GNOME).

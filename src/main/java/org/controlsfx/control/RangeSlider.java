@@ -51,12 +51,55 @@ import javafx.css.StyleableProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.control.Slider;
 
 import com.sun.javafx.Utils;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;
 
+/**
+ * The RangeSlider control is simply a JavaFX {@link Slider} control with support
+ * for two 'thumbs', rather than one. A thumb is the non-technical name for the
+ * draggable area inside the Slider / RangeSlider that allows for a value to be
+ * set. 
+ * 
+ * <p>Because the RangeSlider has two thumbs, it also has a few additional rules
+ * and user interactions:
+ * 
+ * <ol>
+ *   <li>The 'lower value' thumb can not move past the 'higher value' thumb.
+ *   <li>Whereas the {@link Slider} control only has one 
+ *       {@link Slider#valueProperty() value} property, the RangeSlider has a 
+ *       {@link #lowValueProperty() low value} and a 
+ *       {@link #highValueProperty() high value} property, not surprisingly 
+ *       represented by the 'low value' and 'high value' thumbs.
+ *   <li>The area between the low and high values represents the allowable range.
+ *       For example, if the low value is 2 and the high value is 8, then the
+ *       allowable range is between 2 and 8. 
+ *   <li>The allowable range area is rendered differently. This area is able to 
+ *       be dragged with mouse / touch input to allow for the entire range to
+ *       be modified. For example, following on from the previous example of the
+ *       allowable range being between 2 and 8, if the user drags the range bar
+ *       to the right, the low value will adjust to 3, and the high value 9, and
+ *       so on until the user stops adjusting. 
+ * </ol>
+ * 
+ * <h3>Screenshots</h3>
+ * Because the RangeSlider supports both horizontal and vertical 
+ * {@link #orientationProperty() orientation}, there are two screenshots below:
+ * 
+ * <table border="0">
+ *   <tr>
+ *     <td width="75" valign="center"><strong>Horizontal:</strong></td>
+ *     <td><img src="rangeSlider-horizontal.png"></td>
+ *   </tr>
+ *   <tr>
+ *     <td width="75" valign="top"><strong>Vertical:</strong></td>
+ *     <td><img src="rangeSlider-vertical.png"></td>
+ *   </tr>
+ * </table>
+ */
 public class RangeSlider extends Control {
     
     /***************************************************************************

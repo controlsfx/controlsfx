@@ -67,6 +67,7 @@ import javafx.stage.Window;
 
 import org.controlsfx.action.AbstractAction;
 import org.controlsfx.action.Action;
+import org.controlsfx.action.ActionUtils;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 
@@ -667,38 +668,7 @@ public class Dialog {
     }
 
     private Button createButton(final Action action, boolean keepDefault) {
-        final Button button = new Button();
-        
-        // button bind to action properties
-        button.textProperty().bind(action.textProperty());
-        button.disableProperty().bind(action.disabledProperty());
-        button.graphicProperty().bind(action.graphicProperty());
-        
-        // add all the properties of the action into the button, and set up
-        // a listener so they are always copied across
-        button.getProperties().putAll(action.getProperties());
-        action.getProperties().addListener(new MapChangeListener<Object, Object>() {
-            public void onChanged(MapChangeListener.Change<? extends Object,? extends Object> change) {
-                button.getProperties().clear();
-                button.getProperties().putAll(action.getProperties());
-            }
-        });
-        
-        // tooltip requires some special handling (i.e. don't have one when
-        // the text property is null
-        button.tooltipProperty().bind(new ObjectBinding<Tooltip>() {
-            private Tooltip tooltip = new Tooltip();
-            
-            { 
-                bind(action.longTextProperty()); 
-                tooltip.textProperty().bind(action.longTextProperty());
-            }
-            
-            @Override protected Tooltip computeValue() {
-                String longText = action.longTextProperty().get();
-                return longText == null || longText.isEmpty() ? null : tooltip;
-            }
-        });
+        final Button button = ActionUtils.createButton(action);
         
         if (action instanceof Actions) {
             Actions stdAction = (Actions) action;

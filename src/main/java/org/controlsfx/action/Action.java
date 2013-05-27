@@ -38,6 +38,15 @@ import javafx.scene.Node;
  * in the dialogs button bar. It is highly recommended that rather than 
  * implement this interface that developers instead use {@link AbstractAction}.
  * 
+ * <h3>What is an Action?</h3>
+ * An action in JavaFX can be used to separate functionality and state from a 
+ * control. For example, if you have two or more controls that perform the same 
+ * function (e.g. one in a {@link Menu} and another on a toolbar), consider 
+ * using an Action object to implement the function. An Action object provides 
+ * centralized handling of the state of action-event-firing components such as 
+ * buttons, menu items, etc. The state that an action can handle includes text, 
+ * graphic, long text (i.e. tooltip text), and disabled.
+ * 
  * @see AbstractAction
  */
 public interface Action {

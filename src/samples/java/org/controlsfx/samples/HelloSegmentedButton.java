@@ -5,12 +5,11 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
@@ -35,10 +34,13 @@ public class HelloSegmentedButton extends Application implements Sample {
         // without segmented button
         grid.add(new Label("Without SegmentedButton (with 10px spacing): "), 0, 0);
         
-        ToggleButton without_b1 = new ToggleButton("day");
+        ToggleButton without_b1 = new ToggleButton("day"); 
         ToggleButton without_b2 = new ToggleButton("week");
         ToggleButton without_b3 = new ToggleButton("month");
         ToggleButton without_b4 = new ToggleButton("year");
+        
+        final ToggleGroup group = new ToggleGroup();
+        group.getToggles().addAll(without_b1, without_b2, without_b3, without_b4);
         
         HBox toggleButtons = new HBox(without_b1, without_b2, without_b3, without_b4);
         toggleButtons.setSpacing(10);

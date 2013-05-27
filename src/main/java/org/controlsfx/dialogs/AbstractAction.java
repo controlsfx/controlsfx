@@ -36,80 +36,134 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 
 /**
  * A convenience class that implements the {@link Action} interface and provides
  * a simpler API. It is highly recommended to use this class rather than 
  * implement the {@link Action} interface directly.
  * 
+ * <p>To better understand how to use actions, and where they fit within the
+ * JavaFX ecosystem, refer to the {@link Action} class documentation.
+ * 
  * @see Action
  */
 public abstract class AbstractAction implements Action {
-    private final StringProperty textProperty = 
-            new SimpleStringProperty(this, "text");
-    private final BooleanProperty disabledProperty = 
-            new SimpleBooleanProperty(this, "disabled");
-    private final StringProperty longTextProperty =
-            new SimpleStringProperty(this, "longText");
-    private final ObjectProperty<Node> graphicProperty =
-            new SimpleObjectProperty<Node>(this, "graphic");
+    
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
     
     private ObservableMap<Object, Object> properties;
     
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
+    
+    /**
+     * Creates a new AbstractAction instance with the given String set as the 
+     * {@link #textProperty() text} value.
+     *  
+     * @param text The string to display in the text property of controls such
+     *      as {@link Button#textProperty() Button}.
+     */
     public AbstractAction(String text) {
         setText(text);
     }
     
     
+    
+    
+    /**************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
+    
     // --- text
+    private final StringProperty textProperty = new SimpleStringProperty(this, "text");
+    
+    /** {@inheritDoc} */
     @Override public StringProperty textProperty() {
         return textProperty;
     }
+    
+    //  javadoc auto-generated from property
     public final String getText() {
         return textProperty.get();
     }
+
+    //  javadoc auto-generated from property
     public final void setText(String value) {
         textProperty.set(value);
     }
     
     
     // --- disabled
+    private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled");
+    
+    /** {@inheritDoc} */
     @Override public BooleanProperty disabledProperty() {
         return disabledProperty;
     }
+    
+    //  javadoc auto-generated from property
     public final boolean isDisabled() {
         return disabledProperty.get();
     }
+    
+    //  javadoc auto-generated from property
     public final void setDisabled(boolean value) {
         disabledProperty.set(value);
     }
 
     
     // --- longText
+    private final StringProperty longTextProperty = new SimpleStringProperty(this, "longText");
+    
+    /** {@inheritDoc} */
     @Override public StringProperty longTextProperty() {
         return longTextProperty;
     }
+    
+    //  javadoc auto-generated from property
     public final String getLongText() {
         return longTextProperty.get();
     }
+    
+    //  javadoc auto-generated from property
     public final void setLongText(String value) {
         longTextProperty.set(value);
     }
     
     
     // --- graphic
+    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic");
+    
+    /** {@inheritDoc} */
     @Override public ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
+    
+    //  javadoc auto-generated from property
     public final Node getGraphic() {
         return graphicProperty.get();
     }
+    
+    //  javadoc auto-generated from property
     public final void setGraphic(Node value) {
         graphicProperty.set(value);
     }
     
     
     // --- properties
+    /** {@inheritDoc} */
     @Override public ObservableMap<Object, Object> getProperties() {
         if (properties == null) {
             properties = FXCollections.observableHashMap();
@@ -118,9 +172,14 @@ public abstract class AbstractAction implements Action {
     }
 
     
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
+    
     // --- execute
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override public abstract void execute(ActionEvent ae);
 }

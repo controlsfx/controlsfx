@@ -87,8 +87,8 @@ import com.sun.javafx.css.converters.EnumConverter;
  * <br/>
  * <img src="gridView.png"/>
  * 
- * <p>To create this GridView was simple. Note that the major of the code below
- * is related to randomly creating colours to be represented:
+ * <p>To create this GridView was simple. Note that the majority of the code below
+ * is related to randomly creating the colours to be represented:
  * 
  * <pre>
  * {@code
@@ -103,7 +103,7 @@ import com.sun.javafx.css.converters.EnumConverter;
  *     list.add(new Color(r.nextDouble(), r.nextDouble(), r.nextDouble(), 1.0));
  * }
  * }</pre>
- *
+ * 
  * @see GridCell
  */
 public class GridView<T> extends Control {
@@ -162,15 +162,10 @@ public class GridView<T> extends Control {
      **************************************************************************/
     
     // --- horizontal cell spacing
-    private DoubleProperty horizontalCellSpacing;
-    public void setHorizontalCellSpacing(double value) {
-        horizontalCellSpacingProperty().set(value);
-    }
-
-    public double getHorizontalCellSpacing() {
-        return horizontalCellSpacing == null ? 12.0 : horizontalCellSpacing.get();
-    }
-
+    /**
+     * Property for specifying how much spacing there is between each cell
+     * in a row (i.e. how much horizontal spacing there is).
+     */
     public final DoubleProperty horizontalCellSpacingProperty() {
         if (horizontalCellSpacing == null) {
             horizontalCellSpacing = new StyleableDoubleProperty(12) {
@@ -189,18 +184,33 @@ public class GridView<T> extends Control {
         }
         return horizontalCellSpacing;
     }
+    private DoubleProperty horizontalCellSpacing;
+    
+    /**
+     * Sets the amount of horizontal spacing there should be between cells in
+     * the same row.
+     * @param value The amount of spacing to use.
+     */
+    public final void setHorizontalCellSpacing(double value) {
+        horizontalCellSpacingProperty().set(value);
+    }
+    
+    /**
+     * Returns the amount of horizontal spacing there is between cells in
+     * the same row.
+     */
+    public final double getHorizontalCellSpacing() {
+        return horizontalCellSpacing == null ? 12.0 : horizontalCellSpacing.get();
+    }
+
 
     
     // --- vertical cell spacing
+    /**
+     * Property for specifying how much spacing there is between each cell
+     * in a column (i.e. how much vertical spacing there is).
+     */
     private DoubleProperty verticalCellSpacing;
-    public void setVerticalCellSpacing(double value) {
-        verticalCellSpacingProperty().set(value);
-    }
-
-    public double getVerticalCellSpacing() {
-        return verticalCellSpacing == null ? 12.0 : verticalCellSpacing.get();
-    }
-
     public final DoubleProperty verticalCellSpacingProperty() {
         if (verticalCellSpacing == null) {
             verticalCellSpacing = new StyleableDoubleProperty(12) {
@@ -219,10 +229,30 @@ public class GridView<T> extends Control {
         }
         return verticalCellSpacing;
     }
+    
+    /**
+     * Sets the amount of vertical spacing there should be between cells in
+     * the same column.
+     * @param value The amount of spacing to use.
+     */
+    public final void setVerticalCellSpacing(double value) {
+        verticalCellSpacingProperty().set(value);
+    }
+
+    /**
+     * Returns the amount of vertical spacing there is between cells in
+     * the same column.
+     */
+    public final double getVerticalCellSpacing() {
+        return verticalCellSpacing == null ? 12.0 : verticalCellSpacing.get();
+    }
 
     
+    
     // --- cell width
-    private DoubleProperty cellWidth;
+    /**
+     * Property representing the width that all cells should be.
+     */
     public final DoubleProperty cellWidthProperty() {
         if (cellWidth == null) {
             cellWidth = new StyleableDoubleProperty(64) {
@@ -241,18 +271,27 @@ public class GridView<T> extends Control {
         }
         return cellWidth;
     }
+    private DoubleProperty cellWidth;
 
-    public void setCellWidth(double value) {
+    /**
+     * Sets the width that all cells should be.
+     */
+    public final void setCellWidth(double value) {
         cellWidthProperty().set(value);
     }
 
-    public double getCellWidth() {
+    /**
+     * Returns the width that all cells should be.
+     */
+    public final double getCellWidth() {
         return cellWidth == null ? 64.0 : cellWidth.get();
     }
 
     
     // --- cell height
-    private DoubleProperty cellHeight;
+    /**
+     * Property representing the height that all cells should be.
+     */
     public final DoubleProperty cellHeightProperty() {
         if (cellHeight == null) {
             cellHeight = new StyleableDoubleProperty(64) {
@@ -271,80 +310,130 @@ public class GridView<T> extends Control {
         }
         return cellHeight;
     }
+    private DoubleProperty cellHeight;
 
-    public void setCellHeight(double value) {
+    /**
+     * Sets the height that all cells should be.
+     */
+    public final void setCellHeight(double value) {
         cellHeightProperty().set(value);
     }
 
-    public double getCellHeight() {
+    /**
+     * Returns the height that all cells should be.
+     */
+    public final double getCellHeight() {
         return cellHeight == null ? 64.0 : cellHeight.get();
     }
 
     
-    // --- horizontal alignment
-    private ObjectProperty<HPos> horizontalAlignment;
-    public final ObjectProperty<HPos> horizontalAlignmentProperty() {
-        if (horizontalAlignment == null) {
-            horizontalAlignment = new StyleableObjectProperty<HPos>(HPos.CENTER) {
-                @Override public CssMetaData<GridView<?>,HPos> getCssMetaData() {
-                    return GridView.StyleableProperties.HORIZONTAL_ALIGNMENT;
-                }
-                
-                @Override public Object getBean() {
-                    return GridView.this;
-                }
-
-                @Override public String getName() {
-                    return "horizontalAlignment";
-                }
-            };
-        }
-        return horizontalAlignment;
-    }
-
-    public final void setHorizontalAlignment(HPos value) {
-        horizontalAlignmentProperty().set(value);
-    }
-
-    public final HPos getHorizontalAlignment() {
-        return horizontalAlignment == null ? HPos.CENTER : horizontalAlignment.get();
-    }
+    // I've removed this functionality until there is a clear need for it.
+    // To re-enable it, there is code in GridRowSkin that has been commented
+    // out that must be re-enabled.
+    // Don't forget also to enable the styleable property further down in this
+    // class.
+//    // --- horizontal alignment
+//    private ObjectProperty<HPos> horizontalAlignment;
+//    public final ObjectProperty<HPos> horizontalAlignmentProperty() {
+//        if (horizontalAlignment == null) {
+//            horizontalAlignment = new StyleableObjectProperty<HPos>(HPos.CENTER) {
+//                @Override public CssMetaData<GridView<?>,HPos> getCssMetaData() {
+//                    return GridView.StyleableProperties.HORIZONTAL_ALIGNMENT;
+//                }
+//                
+//                @Override public Object getBean() {
+//                    return GridView.this;
+//                }
+//
+//                @Override public String getName() {
+//                    return "horizontalAlignment";
+//                }
+//            };
+//        }
+//        return horizontalAlignment;
+//    }
+//
+//    public final void setHorizontalAlignment(HPos value) {
+//        horizontalAlignmentProperty().set(value);
+//    }
+//
+//    public final HPos getHorizontalAlignment() {
+//        return horizontalAlignment == null ? HPos.CENTER : horizontalAlignment.get();
+//    }
 
     
     // --- cell factory
-    private ObjectProperty<Callback<GridView<T>, GridCell<T>>> cellFactory;
+    /**
+     * Property representing the cell factory that is currently set in this
+     * GridView, or null if no cell factory has been set (in which case the 
+     * default cell factory provided by the GridView skin will be used). The cell
+     * factory is used for instantiating enough GridCell instances for the 
+     * visible area of the GridView. Refer to the GridView class documentation
+     * for more information and examples.
+     */
     public final ObjectProperty<Callback<GridView<T>, GridCell<T>>> cellFactoryProperty() {
         if (cellFactory == null) {
             cellFactory = new SimpleObjectProperty<Callback<GridView<T>, GridCell<T>>>(this, "cellFactory");
         }
         return cellFactory;
     }
+    private ObjectProperty<Callback<GridView<T>, GridCell<T>>> cellFactory;
 
+    /**
+     * Sets the cell factory to use to create {@link GridCell} instances to 
+     * show in the GridView.
+     */
     public final void setCellFactory(Callback<GridView<T>, GridCell<T>> value) {
         cellFactoryProperty().set(value);
     }
 
+    /**
+     * Returns the cell factory that will be used to create {@link GridCell} 
+     * instances to show in the GridView.
+     */
     public final Callback<GridView<T>, GridCell<T>> getCellFactory() {
         return cellFactory == null ? null : cellFactory.get();
     }
 
     
     // --- items
-    private ObjectProperty<ObservableList<T>> items;
-    public final void setItems(ObservableList<T> value) {
-        itemsProperty().set(value);
-    }
-
-    public final ObservableList<T> getItems() {
-        return items == null ? null : items.get();
-    }
-
+    /**
+     * The items to be displayed in the GridView (as rendered via {@link GridCell}
+     * instances). For example, if the {@link ColorGridCell} were being used
+     * (as in the case at the top of this class documentation), this items list
+     * would be populated with {@link Color} values. It is important to 
+     * appreciate that the items list is used for the data, not the rendering.
+     * What is meant by this is that the items list should contain Color values,
+     * not the {@link Node nodes} that represent the Color. The actual rendering
+     * should be left up to the {@link #cellFactoryProperty() cell factory},
+     * where it will take the Color value and create / update the display as
+     * necessary. 
+     */
     public final ObjectProperty<ObservableList<T>> itemsProperty() {
         if (items == null) {
             items = new SimpleObjectProperty<ObservableList<T>>(this, "items");
         }
         return items;
     }
+    private ObjectProperty<ObservableList<T>> items;
+    
+    /**
+     * Sets a new {@link ObservableList} as the items list underlying GridView.
+     * The old items list will be discarded.
+     */
+    public final void setItems(ObservableList<T> value) {
+        itemsProperty().set(value);
+    }
+
+    /**
+     * Returns the currently-in-use items list that is being used by the
+     * GridView.
+     */
+    public final ObservableList<T> getItems() {
+        return items == null ? null : items.get();
+    }
+
+    
     
     
     
@@ -426,23 +515,23 @@ public class GridView<T> extends Control {
             }
         };
         
-        private static final CssMetaData<GridView<?>,HPos> HORIZONTAL_ALIGNMENT = 
-            new CssMetaData<GridView<?>,HPos>("-fx-horizontal_alignment",
-                new EnumConverter<HPos>(HPos.class), 
-                HPos.CENTER) {
-
-            @Override public HPos getInitialValue(GridView node) {
-                return node.getHorizontalAlignment();
-            }
-
-            @Override public boolean isSettable(GridView n) {
-                return n.horizontalAlignment == null || !n.horizontalAlignment.isBound();
-            }
-
-            @Override public StyleableProperty<HPos> getStyleableProperty(GridView n) {
-                return (StyleableProperty<HPos>)n.horizontalAlignmentProperty();
-            }
-        };
+//        private static final CssMetaData<GridView<?>,HPos> HORIZONTAL_ALIGNMENT = 
+//            new CssMetaData<GridView<?>,HPos>("-fx-horizontal_alignment",
+//                new EnumConverter<HPos>(HPos.class), 
+//                HPos.CENTER) {
+//
+//            @Override public HPos getInitialValue(GridView node) {
+//                return node.getHorizontalAlignment();
+//            }
+//
+//            @Override public boolean isSettable(GridView n) {
+//                return n.horizontalAlignment == null || !n.horizontalAlignment.isBound();
+//            }
+//
+//            @Override public StyleableProperty<HPos> getStyleableProperty(GridView n) {
+//                return (StyleableProperty<HPos>)n.horizontalAlignmentProperty();
+//            }
+//        };
             
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
         static {
@@ -452,7 +541,7 @@ public class GridView<T> extends Control {
             styleables.add(VERTICAL_CELL_SPACING);
             styleables.add(CELL_WIDTH);
             styleables.add(CELL_HEIGHT);
-            styleables.add(HORIZONTAL_ALIGNMENT);
+//            styleables.add(HORIZONTAL_ALIGNMENT);
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }

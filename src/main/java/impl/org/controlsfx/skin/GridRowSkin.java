@@ -141,14 +141,16 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
         double xPos = 0;
         double yPos = 0;
 
-        HPos currentHorizontalAlignment = getSkinnable().gridViewProperty().get().getHorizontalAlignment();
-        if (currentHorizontalAlignment != null) {
-            if (currentHorizontalAlignment.equals(HPos.CENTER)) {
-                xPos = (currentWidth % computeCellWidth()) / 2;
-            } else if (currentHorizontalAlignment.equals(HPos.RIGHT)) {
-                xPos = currentWidth % computeCellWidth();
-            }
-        }
+        // This has been commented out as I removed the API from GridView until
+        // a use case was created.
+//        HPos currentHorizontalAlignment = getSkinnable().gridViewProperty().get().getHorizontalAlignment();
+//        if (currentHorizontalAlignment != null) {
+//            if (currentHorizontalAlignment.equals(HPos.CENTER)) {
+//                xPos = (currentWidth % computeCellWidth()) / 2;
+//            } else if (currentHorizontalAlignment.equals(HPos.RIGHT)) {
+//                xPos = currentWidth % computeCellWidth();
+//            }
+//        }
 
         for (Node child : getChildren()) {
             child.relocate(xPos + horizontalCellSpacing, yPos + verticalCellSpacing);

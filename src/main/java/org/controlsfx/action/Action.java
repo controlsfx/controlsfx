@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- package org.controlsfx.dialogs;
+ package org.controlsfx.action;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -61,9 +61,9 @@ public interface Action {
     public BooleanProperty disabledProperty();
 
     /**
-     * The text to show to the user. On the button
-     * it is usually a tooltip that should be shown to the user if their mouse 
-     * hovers over this action.
+     * The longer form of the text to show to the user (e.g. on a 
+     * {@link Button}, it is usually a tooltip that should be shown to the user 
+     * if their mouse hovers over this action).
      * 
      * @return An observable {@link StringProperty} that represents the current
      *      long text for this property, and which can be observed for changes.

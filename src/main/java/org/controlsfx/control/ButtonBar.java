@@ -41,7 +41,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.HBox;
 
-import org.controlsfx.dialogs.Action;
+import org.controlsfx.action.Action;
 
 import com.sun.javafx.Utils;
 

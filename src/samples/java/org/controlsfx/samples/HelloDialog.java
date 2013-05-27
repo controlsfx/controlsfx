@@ -23,8 +23,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
+import org.controlsfx.action.Action;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.dialogs.Action;
 import org.controlsfx.dialogs.Dialogs;
 import org.controlsfx.dialogs.Dialogs.CommandLink;
 import org.controlsfx.dialogs.DialogsAccessor;

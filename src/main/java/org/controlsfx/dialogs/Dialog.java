@@ -65,6 +65,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
+import org.controlsfx.action.AbstractAction;
+import org.controlsfx.action.Action;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 

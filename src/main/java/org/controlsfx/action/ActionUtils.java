@@ -7,8 +7,11 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 
@@ -126,8 +129,68 @@ public class ActionUtils {
         return btn;
     }
     
+    /**
+     * Takes the provided {@link Action} and returns a {@link MenuItem} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link MenuItem} should bind to.
+     * @return A {@link MenuItem} that is bound to the state of the provided 
+     *      {@link Action}
+     */
+    public static MenuItem createMenuItem(final Action action) {
+        if (action == null) {
+            throw new NullPointerException("Action can not be null");
+        }
+            
+        final MenuItem btn = new MenuItem();
+        
+        configure(btn, action);
+        
+        return btn;
+    }
+    
+    /**
+     * Takes the provided {@link Action} and returns a {@link CheckMenuItem} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link CheckMenuItem} should bind to.
+     * @return A {@link CheckMenuItem} that is bound to the state of the provided 
+     *      {@link Action}
+     */
+    public static CheckMenuItem createCheckMenuItem(final Action action) {
+        if (action == null) {
+            throw new NullPointerException("Action can not be null");
+        }
+            
+        final CheckMenuItem btn = new CheckMenuItem();
+        
+        configure(btn, action);
+        
+        return btn;
+    }
+    
+    /**
+     * Takes the provided {@link Action} and returns a {@link RadioMenuItem} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link RadioMenuItem} should bind to.
+     * @return A {@link RadioMenuItem} that is bound to the state of the provided 
+     *      {@link Action}
+     */
+    public static RadioMenuItem createRadioMenuItem(final Action action) {
+        if (action == null) {
+            throw new NullPointerException("Action can not be null");
+        }
+            
+        final RadioMenuItem btn = new RadioMenuItem(action.textProperty().get());
+        
+        configure(btn, action);
+        
+        return btn;
+    }
+    
     private static void configure(final ButtonBase btn, final Action action) {
-     // button bind to action properties
+        // button bind to action properties
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
         btn.graphicProperty().bind(action.graphicProperty());
@@ -157,6 +220,37 @@ public class ActionUtils {
                 return longText == null || longText.isEmpty() ? null : tooltip;
             }
         });
+        
+        // TODO handle the selected state of the button if it is of the applicable
+        // type
+        
+        // Just call the execute method on the action itself when the action
+        // event occurs on the button
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent ae) {
+                action.execute(ae);
+            }
+        });
+    }
+    
+    private static void configure(final MenuItem btn, final Action action) {
+        // button bind to action properties
+        btn.textProperty().bind(action.textProperty());
+        btn.disableProperty().bind(action.disabledProperty());
+        btn.graphicProperty().bind(action.graphicProperty());
+        
+        // add all the properties of the action into the button, and set up
+        // a listener so they are always copied across
+        btn.getProperties().putAll(action.getProperties());
+        action.getProperties().addListener(new MapChangeListener<Object, Object>() {
+            public void onChanged(MapChangeListener.Change<? extends Object,? extends Object> change) {
+                btn.getProperties().clear();
+                btn.getProperties().putAll(action.getProperties());
+            }
+        });
+        
+        // TODO handle the selected state of the menu item if it is a 
+        // CheckMenuItem or RadioMenuItem
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button

@@ -48,14 +48,82 @@ import com.sun.javafx.Utils;
 /**
  * A ButtonBar is essentially an {@link HBox} for controls extending
  * {@link ButtonBase}, most notably {@link Button}, which have been annotated
- * with a specific type (from the {@link ButtonType} enumeration). By performing
+ * with a specific type (from the {@link ButtonType} enumeration). By applying
  * this annotation, the ButtonBar is able to place the buttons in their correct
  * relative positions based on either OS-specific locations, or in an application
- * specific application (by setting the 
- * {@link #buttonOrderProperty() button order}).  
+ * specific application (by setting the {@link #buttonOrderProperty() button order}).
  * 
  * <p>The concept and API for this control borrows heavily from the MigLayout
  * button bar functionality.
+ * 
+ * <h3>Screenshots</h3>
+ * <p>Because a ButtonBar comes with built-in support for Windows, Mac OS
+ * and Linux, there are three screenshots shown below, with the same buttons
+ * laid out on each of the three operating systems.
+ * 
+ * <p>
+ * <strong>Windows:</strong><br/><img src="buttonBar-windows.png" /><br>
+ * <strong>Mac OS:</strong><br/><img src="buttonBar-mac.png" /><br>
+ * <strong>Linux:</strong><br/><img src="buttonBar-linux.png" /><br>
+ * 
+ * <h3>Code Samples</h3>
+ * <p>Instantiating and using the ButtonBar is simple, simply do the following:
+ * 
+ * <pre>
+ * {@code
+ * // Create the ButtonBar instance 
+ * ButtonBar buttonBar = new ButtonBar();
+ * 
+ * // Create the buttons to go into the ButtonBar
+ * Button yesButton = new Button("Yes");
+ * ButtonBar.setType(yesButton, ButtonBar.ButtonType.YES); 
+ * 
+ * Button noButton = new Button("No");
+ * ButtonBar.setType(noButton, ButtonBar.ButtonType.NO);
+ * 
+ * // Add buttons to the ButtonBar
+ * buttonBar.getButtons().addAll(yesButton, noButton);
+ * }</pre>
+ * 
+ * <p>The code sample above will position the Yes and No buttons relative to the
+ * users operating system. This means that on Windows and Linux the Yes button 
+ * will come before the No button, whereas on Mac OS it'll be No and then Yes.
+ * 
+ * <p>In most cases the OS-specific layout is the best choice, but in cases 
+ * where you want a custom layout, this is achieved be modifying the 
+ * {@link #buttonOrderProperty() button order property}. These are cryptic-looking
+ * strings that are shorthand representations for the button order. The built-in
+ * orders for Windows, Mac OS and Linux are:
+ * 
+ * <table border="0">
+ *   <tr>
+ *     <td width="75"><strong>Windows:</strong></td>
+ *     <td>L_E+U+FBI_YNOCAH_R</td>
+ *   </tr>
+ *   <tr>
+ *     <td><strong>Mac OS:</strong></td>
+ *     <td>L_HE+U+FBI_NYCOA_R</td>
+ *   </tr>
+ *   <tr>
+ *     <td><strong>Linux:</strong></td>
+ *     <td>L_HE+UNYACBXIO_R</td>
+ *   </tr>
+ * </table>
+ *   
+ * <p>You should refer to the {@link ButtonType} enumeration for a description of
+ * what each of these characters mean. However, if your ButtonBar only consisted
+ * of {@link ButtonType#YES} and {@link ButtonType#NO} buttons, you always
+ * wanted the yes buttons before the no buttons, and you wanted the buttons to
+ * be {@link ButtonType#BIG_GAP right-aligned}, you could do the following:
+ * 
+ * <pre>
+ * {@code
+ * // Create the ButtonBar instance 
+ * ButtonBar buttonBar = new ButtonBar();
+ * 
+ * // Set the custom button order
+ * buttonBar.setButtonOrder("+YN"); 
+ * }</pre>
  */
 public final class ButtonBar extends Control {
     
@@ -92,70 +160,99 @@ public final class ButtonBar extends Control {
      * An enumeration of all available button types. By designating every button
      * in a {@link ButtonBar} as one of these types, the buttons will be 
      * appropriately positioned relative to all other buttons in the ButtonBar.
+     * 
+     * <p>For details on the button order code for each button type, refer to 
+     * the javadoc comment for that type. 
      */
     public static enum ButtonType {
         /**
          * Buttons with this style tag will statically end up on the left end of the bar.
+         * 
+         * <p><strong>Button order code:</strong> L
          */
         LEFT("L"),
         
         /**
          * Buttons with this style tag will statically end up on the right end of the bar.
+         * 
+         * <p><strong>Button order code:</strong> R 
          */
         RIGHT("R"),
         
         /**
          * A tag for the "help" button that normally is supposed to be on the right.
+         * 
+         * <p><strong>Button order code:</strong> H
          */
         HELP("H"),
         
         /**
          * A tag for the "help2" button that normally is supposed to be on the left.
+         * 
+         * <p><strong>Button order code:</strong> E
          */
         HELP_2("E"),
         
         /**
          * A tag for the "yes" button.
+         * 
+         * <p><strong>Button order code:</strong> Y
          */
         YES("Y"),
         
         /**
          * A tag for the "no" button.
+         * 
+         * <p><strong>Button order code:</strong> N
          */
         NO("N"),
         
         /**
          * A tag for the "next" or "forward" button.
+         * 
+         * <p><strong>Button order code:</strong> X
          */
         NEXT_FORWARD("X"),
         
         /**
          * A tag for the "back" or "previous" button.
+         * 
+         * <p><strong>Button order code:</strong> B
          */
         BACK_PREVIOUS("B"),
         
         /**
          * A tag for the "finish".
+         * 
+         * <p><strong>Button order code:</strong> I
          */
         FINISH("I"),
         
         /**
          * A tag for the "apply" button.
+         * 
+         * <p><strong>Button order code:</strong> A
          */
         APPLY("A"),
         
         /**
          * A tag for the "cancel" or "close" button.
+         * 
+         * <p><strong>Button order code:</strong> C
          */
         CANCEL_CLOSE("C"),
         
         /**
          * A tag for the "ok" or "done" button.
+         * 
+         * <p><strong>Button order code:</strong> O
          */
         OK_DONE("O"),
         
         /**
          * All Uncategorized, Other, or "Unknown" buttons. Tag will be "other".
+         * 
+         * <p><strong>Button order code:</strong> U
          */
         OTHER("U"),
 
@@ -163,11 +260,15 @@ public final class ButtonBar extends Control {
         /**
          * A glue push gap that will take as much space as it can and at least 
          * an "unrelated" gap. (Platform dependent)
+         * 
+         * <p><strong>Button order code:</strong> +
          */
         BIG_GAP("+"),
         
         /**
          * An "unrelated" gap. (Platform dependent)
+         * 
+         * <p><strong>Button order code:</strong> _ (underscore)
          */
         SMALL_GAP("_");
         
@@ -406,8 +507,12 @@ public final class ButtonBar extends Control {
         return buttonMinWidthProperty.get();
     }
 
+    
     // --- button uniform size
     
+    /**
+     * Specifies that all buttons in the button bar should be the same size.
+     */
     public final BooleanProperty buttonUniformSizeProperty() {
         return buttonUniformSizeProperty;
     }

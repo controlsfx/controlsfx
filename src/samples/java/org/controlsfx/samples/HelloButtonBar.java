@@ -141,28 +141,27 @@ public class HelloButtonBar extends Application implements Sample {
         root.getChildren().add(spacer);
         
         // create button bar
-        buttonBar.getButtons().addAll(Arrays.asList(
-                createButton("OK", OK_DONE),
-                createButton("Cancel", CANCEL_CLOSE),
-                createButton("Left 1", LEFT),
-                createButton("Left 2", LEFT),
-                createButton("Left 3", LEFT),
-                createButton("Right 1", RIGHT),
-                createButton("Unknown 1", OTHER),
-                createButton("Help(R)", HELP),
-                createButton("Help(L)", HELP_2),
-                createButton("Unknown 2 xxxxxxxxxx", OTHER),
-                createButton("Yes", YES),
-                createButton("No", NO),
-                createButton("Next", NEXT_FORWARD),
-                createButton("Unknown 3", OTHER),
-                createButton("Back", BACK_PREVIOUS),
-                createButton("Right 2", RIGHT),
-                createButton("Finish", FINISH),
-                createButton("Right 3", RIGHT),
-                createButton("Apply", APPLY)
-                
-        ));
+        buttonBar.getButtons().addAll(
+            createButton("OK", OK_DONE),
+            createButton("Cancel", CANCEL_CLOSE),
+            createButton("Left 1", LEFT),
+            createButton("Left 2", LEFT),
+            createButton("Left 3", LEFT),
+            createButton("Right 1", RIGHT),
+            createButton("Unknown 1", OTHER),
+            createButton("Help(R)", HELP),
+            createButton("Help(L)", HELP_2),
+            createButton("Unknown 2 xxxxxxxxxx", OTHER),
+            createButton("Yes", YES),
+            createButton("No", NO),
+            createButton("Next", NEXT_FORWARD),
+            createButton("Unknown 3", OTHER),
+            createButton("Back", BACK_PREVIOUS),
+            createButton("Right 2", RIGHT),
+            createButton("Finish", FINISH),
+            createButton("Right 3", RIGHT),
+            createButton("Apply", APPLY)
+        );
         
         // put the ButtonBar inside a ScrollPane so that the user can scroll horizontally
         // when the button width is large

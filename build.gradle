@@ -34,10 +34,25 @@ javadoc {
     exclude 'impl/*'
     failOnError = false
     classpath = project.sourceSets.main.compileClasspath + configurations.jdk
+    
+    options.windowTitle("ControlsFX Project ${version}")
+    options.links("http://download.oracle.com/javase/7/docs/api/");
+    options.links("http://docs.oracle.com/javafx/2/api/");
+    options.addBooleanOption("Xdoclint:none").setValue(true);
+    
+    // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
+    // over the doc-files if they are embedded with the sources. I find this arrangement
+    // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
+    doLast {
+        copy {
+            from "src/main/docs"
+            into "$buildDir/docs/javadoc"
+        }
+    }
 }
 
 jar {
-    exclude '**/16/*
+    exclude '**/16/*'
     exclude '**/32/*'
     exclude '**/64/*'
     exclude '**/128/*'

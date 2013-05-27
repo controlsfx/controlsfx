@@ -31,6 +31,9 @@ import impl.org.controlsfx.skin.GridViewSkin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
+import org.controlsfx.control.cell.ColorGridCell;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -48,6 +51,7 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Skin;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import com.sun.javafx.css.converters.EnumConverter;
@@ -74,7 +78,31 @@ import com.sun.javafx.css.converters.EnumConverter;
  *   its {@link GridCell#textProperty() text property} set, whereas a more complex
  *   GridCell can have an arbitrarily complex scenegraph set inside its
  *   {@link GridCell#graphicProperty() graphic property} (as it accepts any Node).
- *</ol>
+ * </ol>
+ *
+ * <h3>Examples</h3>
+ * <p>The following screenshot shows the GridView with the {@link ColorGridCell}
+ * being used:
+ * 
+ * <br/>
+ * <img src="gridView.png"/>
+ * 
+ * <p>To create this GridView was simple. Note that the major of the code below
+ * is related to randomly creating colours to be represented:
+ * 
+ * <pre>
+ * {@code
+ * GridView<Color> myGrid = new GridView<>(list);
+ * myGrid.setCellFactory(new Callback<GridView<Color>, GridCell<Color>>() {
+ *     public GridCell<Color> call(GridView<Color> gridView) {
+ *         return new ColorGridCell();
+ *     }
+ * });
+ * Random r = new Random(System.currentTimeMillis());
+ * for(int i = 0; i < 500; i++) {
+ *     list.add(new Color(r.nextDouble(), r.nextDouble(), r.nextDouble(), 1.0));
+ * }
+ * }</pre>
  *
  * @see GridCell
  */

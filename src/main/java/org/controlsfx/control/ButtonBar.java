@@ -102,7 +102,7 @@ import com.sun.javafx.Utils;
  *   </tr>
  *   <tr>
  *     <td><strong>Mac OS:</strong></td>
- *     <td>L_HE+U+FBI_NYCOA_R</td>
+ *     <td>L_HE+U+FBI_NCYOA_R</td>
  *   </tr>
  *   <tr>
  *     <td><strong>Linux:</strong></td>

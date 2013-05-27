@@ -24,10 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.dialogs;
+package org.controlsfx.dialog;
 
-import static org.controlsfx.dialogs.DialogResources.getMessage;
-import static org.controlsfx.dialogs.DialogResources.getString;
+import static org.controlsfx.dialog.DialogResources.getMessage;
+import static org.controlsfx.dialog.DialogResources.getString;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;

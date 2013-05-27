@@ -44,4 +44,4 @@
  * Also it will have expandable area, visibility of which is triggered by automatically presented "Details" button 
  * 
  */
-package org.controlsfx.dialogs;
+package org.controlsfx.dialog;

@@ -1,4 +1,6 @@
-package org.controlsfx.dialogs;
+package org.controlsfx.dialog;
+
+import org.controlsfx.dialog.Dialog;
 
 public class DialogsAccessor {
 

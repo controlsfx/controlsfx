@@ -23,11 +23,11 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.action.Action;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.dialogs.Dialogs;
-import org.controlsfx.dialogs.Dialogs.CommandLink;
-import org.controlsfx.dialogs.DialogsAccessor;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.dialog.DialogsAccessor;
+import org.controlsfx.dialog.Dialogs.CommandLink;
 
 public class HelloDialog extends Application implements Sample {
 

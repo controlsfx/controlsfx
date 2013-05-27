@@ -24,10 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.dialogs;
+package org.controlsfx.dialog;
 
-import static org.controlsfx.dialogs.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialogs.DialogResources.getString;
+import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
+import static org.controlsfx.dialog.DialogResources.getString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,11 +65,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
-import org.controlsfx.action.AbstractAction;
-import org.controlsfx.action.Action;
-import org.controlsfx.action.ActionUtils;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
+import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 
 /**
  * A lower-level API for creating standardized dialogs consisting of the following

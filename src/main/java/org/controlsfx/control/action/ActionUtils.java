@@ -1,4 +1,4 @@
-package org.controlsfx.action;
+package org.controlsfx.control.action;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.MapChangeListener;

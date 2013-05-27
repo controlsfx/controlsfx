@@ -24,13 +24,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.dialogs;
+package org.controlsfx.dialog;
 
-import static org.controlsfx.dialogs.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialogs.Dialog.Actions.NO;
-import static org.controlsfx.dialogs.Dialog.Actions.OK;
-import static org.controlsfx.dialogs.Dialog.Actions.YES;
-import static org.controlsfx.dialogs.DialogResources.getString;
+import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
+import static org.controlsfx.dialog.Dialog.Actions.NO;
+import static org.controlsfx.dialog.Dialog.Actions.OK;
+import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.DialogResources.getString;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -64,10 +64,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
-import org.controlsfx.action.AbstractAction;
-import org.controlsfx.action.Action;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
+import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 
 
 /**

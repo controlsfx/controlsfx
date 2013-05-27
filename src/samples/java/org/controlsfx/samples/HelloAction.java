@@ -38,8 +38,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.action.AbstractAction;
-import org.controlsfx.action.ActionUtils;
+import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.ActionUtils;
 
 public class HelloAction extends Application implements Sample {
     

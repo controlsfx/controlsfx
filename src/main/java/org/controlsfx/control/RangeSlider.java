@@ -99,6 +99,50 @@ import com.sun.javafx.css.converters.SizeConverter;
  *     <td><img src="rangeSlider-vertical.png"></td>
  *   </tr>
  * </table>
+ * 
+ * <h3>Code Samples</h3>
+ * Instantiating a RangeSlider is simple. The first decision is to decide whether
+ * a horizontal or a vertical track is more appropriate. By default RangeSlider
+ * instances are horizontal, but this can be changed by setting the 
+ * {@link #orientationProperty() orientation} property.
+ * 
+ * <p>Once the orientation is determined, the next most important decision is
+ * to determine what the {@link #minProperty() min} / {@link #maxProperty() max}
+ * and default {@link #lowValueProperty() low} / {@link #highValueProperty() high}
+ * values are. The min / max values represent the smallest and largest legal
+ * values for the thumbs to be set to, whereas the low / high values represent
+ * where the thumbs are currently, within the bounds of the min / max values.
+ * Because all four values are required in all circumstances, they are all
+ * required parameters to instantiate a RangeSlider: the constructor takes
+ * four doubles, representing min, max, lowValue and highValue (in that order).
+ * 
+ * <p>For example, here is a simple horizontal RangeSlider that has a minimum
+ * value of 0, a maximum value of 100, a low value of 10 and a high value of 90: 
+ * 
+ * <pre>{@code final RangeSlider hSlider = new RangeSlider(0, 100, 10, 90);}</pre>
+ * 
+ * <p>To configure the hSlider to look like the RangeSlider in the horizontal
+ * RangeSlider screenshot above only requires a few additional properties to be 
+ * set:
+ * 
+ * <pre>
+ * {@code
+ * final RangeSlider hSlider = new RangeSlider(0, 100, 10, 90);
+ * hSlider.setShowTickMarks(true);
+ * hSlider.setShowTickLabels(true);
+ * hSlider.setBlockIncrement(10);}</pre>
+ * 
+ * <p>To create a vertical slider, simply do the following:
+ * 
+ * <pre>
+ * {@code
+ * final RangeSlider vSlider = new RangeSlider(0, 200, 30, 150);
+ * vSlider.setOrientation(Orientation.VERTICAL);}</pre>
+ * 
+ * <p>This code creates a RangeSlider with a min value of 0, a max value of 200,
+ * a low value of 30, and a high value of 150.
+ * 
+ * @see Slider
  */
 public class RangeSlider extends Control {
     
@@ -108,10 +152,23 @@ public class RangeSlider extends Control {
      *                                                                         *
      **************************************************************************/
     
-    public RangeSlider() {
-        getStyleClass().setAll(DEFAULT_STYLE_CLASS);
+    /**
+     * For now we force the developer to set the min/max/low/high values in the
+     * other RangeSlider constructor, as this method is private
+     */
+    private RangeSlider() {
+        // no-op
     }
 
+    /**
+     * Instantiates a default, horizontal RangeSlider with the specified 
+     * min/max/low/high values.
+     * 
+     * @param min The minimum allowable value that the RangeSlider will allow.
+     * @param max The maximum allowable value that the RangeSlider will allow.
+     * @param lowValue The initial value for the low value in the RangeSlider.
+     * @param highValue The initial value for the high value in the RangeSlider.
+     */
     public RangeSlider(double min, double max, double lowValue, double highValue) {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
         
@@ -122,11 +179,16 @@ public class RangeSlider extends Control {
         setHighValue(highValue);
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
     @Override protected String getUserAgentStylesheet() {
         return getClass().getResource("rangeslider.css").toExternalForm();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override protected Skin<?> createDefaultSkin() {
         return new RangeSliderSkin(this);
     }
@@ -135,43 +197,50 @@ public class RangeSlider extends Control {
     
     /***************************************************************************
      *                                                                         *
-     * New properties                                                          *
+     * New properties (over and above what is in Slider)                       *
      *                                                                         *
      **************************************************************************/
     
+    // --- low value
+    /**
+     * The low value property represents the current position of the low value
+     * thumb, and is within the allowable range as specified by the
+     * {@link #minProperty() min} and {@link #maxProperty() max} properties. By
+     * default this value is 0.
+     */
+    public final DoubleProperty lowValueProperty() {
+        return lowValue;
+    }
     private DoubleProperty lowValue = new SimpleDoubleProperty(this, "lowValue", 0.0D) {
         @Override protected void invalidated() {
             adjustLowValues();
         }
     };
     
+    /**
+     * Sets the low value for the range slider, which may or may not be clamped
+     * to be within the allowable range as specified by the
+     * {@link #minProperty() min} and {@link #maxProperty() max} properties.
+     */
     public final void setLowValue(double d) {
         lowValueProperty().set(d);
     }
 
+    /**
+     * Returns the current low value for the range slider.
+     */
     public final double getLowValue() {
         return lowValue != null ? lowValue.get() : 0.0D;
     }
 
-    public final DoubleProperty lowValueProperty() {
-        return lowValue;
-    }
     
+    
+    // --- low value changing
     /**
-     * When true, indicates the current low value of this Slider is changing.
+     * When true, indicates the current low value of this RangeSlider is changing.
      * It provides notification that the low value is changing. Once the low 
-     * value is computed, it is reset back to false.
+     * value is computed, it is set back to false.
      */
-    private BooleanProperty lowValueChanging;
-
-    public final void setLowValueChanging(boolean value) {
-        lowValueChangingProperty().set(value);
-    }
-
-    public final boolean isLowValueChanging() {
-        return lowValueChanging == null ? false : lowValueChanging.get();
-    }
-
     public final BooleanProperty lowValueChangingProperty() {
         if (lowValueChanging == null) {
             lowValueChanging = new SimpleBooleanProperty(this, "lowValueChanging", false);
@@ -179,7 +248,38 @@ public class RangeSlider extends Control {
         return lowValueChanging;
     }
     
+    private BooleanProperty lowValueChanging;
+
+    /**
+     * Call this when the low value is changing.
+     * @param value True if the low value is changing, false otherwise.
+     * @expert This function is intended to be used by experts, primarily
+     *         by those implementing new Skins or Behaviors. It is not common
+     *         for developers or designers to access this function directly.
+     */
+    public final void setLowValueChanging(boolean value) {
+        lowValueChangingProperty().set(value);
+    }
+
+    /**
+     * Returns whether or not the low value of this RangeSlider is currently
+     * changing.
+     */
+    public final boolean isLowValueChanging() {
+        return lowValueChanging == null ? false : lowValueChanging.get();
+    }
+
     
+    // --- high value
+    /**
+     * The high value property represents the current position of the high value
+     * thumb, and is within the allowable range as specified by the
+     * {@link #minProperty() min} and {@link #maxProperty() max} properties. By
+     * default this value is 100.
+     */
+    public final DoubleProperty highValueProperty() {
+        return highValue;
+    }
     private DoubleProperty highValue = new SimpleDoubleProperty(this, "highValue", 100D) {
         @Override protected void invalidated() {
             adjustHighValues();
@@ -194,39 +294,58 @@ public class RangeSlider extends Control {
         }
     };
     
+    /**
+     * Sets the high value for the range slider, which may or may not be clamped
+     * to be within the allowable range as specified by the
+     * {@link #minProperty() min} and {@link #maxProperty() max} properties.
+     */
     public final void setHighValue(double d) {
         if (!highValueProperty().isBound()) highValueProperty().set(d);
     }
 
+    /**
+     * Returns the current high value for the range slider.
+     */
     public final double getHighValue() {
         return highValue != null ? highValue.get() : 100D;
     }
 
-    public final DoubleProperty highValueProperty() {
-        return highValue;
-    }
-
-    /**
-     * When true, indicates the current high value of this Slider is changing.
-     * It provides notification that the high value is changing. Once the high 
-     * value is computed, it is reset back to false.
-     */
-    private BooleanProperty highValueChanging;
-
-    public final void setHighValueChanging(boolean value) {
-        highValueChangingProperty().set(value);
-    }
-
-    public final boolean isHighValueChanging() {
-        return highValueChanging == null ? false : highValueChanging.get();
-    }
     
+
+    // --- high value changing
+    /**
+     * When true, indicates the current high value of this RangeSlider is changing.
+     * It provides notification that the high value is changing. Once the high 
+     * value is computed, it is set back to false.
+     */
     public final BooleanProperty highValueChangingProperty() {
         if (highValueChanging == null) {
             highValueChanging = new SimpleBooleanProperty(this, "highValueChanging", false);
         }
         return highValueChanging;
     }
+    private BooleanProperty highValueChanging;
+
+    /**
+     * Call this when high low value is changing.
+     * @param value True if the high value is changing, false otherwise.
+     * @expert This function is intended to be used by experts, primarily
+     *         by those implementing new Skins or Behaviors. It is not common
+     *         for developers or designers to access this function directly.
+     */
+    public final void setHighValueChanging(boolean value) {
+        highValueChangingProperty().set(value);
+    }
+
+    /**
+     * Returns whether or not the high value of this RangeSlider is currently
+     * changing.
+     */
+    public final boolean isHighValueChanging() {
+        return highValueChanging == null ? false : highValueChanging.get();
+    }
+    
+    
     
     
     
@@ -236,21 +355,86 @@ public class RangeSlider extends Control {
      *                                                                         *
      **************************************************************************/
     
-    
+    /**
+     * Increments the {@link #lowValueProperty() low value} by the 
+     * {@link #blockIncrementProperty() block increment} amount.
+     */
     public void incrementLowValue() {
         adjustLowValue(getLowValue() + getBlockIncrement());
     }
 
+    /**
+     * Decrements the {@link #lowValueProperty() low value} by the 
+     * {@link #blockIncrementProperty() block increment} amount.
+     */
     public void decrementLowValue() {
         adjustLowValue(getLowValue() - getBlockIncrement());
     }
     
+    /**
+     * Increments the {@link #highValueProperty() high value} by the 
+     * {@link #blockIncrementProperty() block increment} amount.
+     */
     public void incrementHighValue() {
         adjustHighValue(getHighValue() + getBlockIncrement());
     }
 
+    /**
+     * Decrements the {@link #highValueProperty() high value} by the 
+     * {@link #blockIncrementProperty() block increment} amount.
+     */
     public void decrementHighValue() {
         adjustHighValue(getHighValue() - getBlockIncrement());
+    }
+    
+    /**
+     * Adjusts {@link #lowValueProperty() lowValue} to match <code>newValue</code>,
+     * or as closely as possible within the constraints imposed by the 
+     * {@link #minProperty() min} and {@link #maxProperty() max} properties. 
+     * This function also takes into account 
+     * {@link #snapToTicksProperty() snapToTicks}, which is the main difference 
+     * between <code>adjustLowValue</code> and 
+     * {@link #setLowValue(double) setLowValue}.
+     *
+     * @expert This function is intended to be used by experts, primarily
+     *         by those implementing new Skins or Behaviors. It is not common
+     *         for developers or designers to access this function directly.
+     */
+    public void adjustLowValue(double newValue) {
+        double d1 = getMin();
+        double d2 = getMax();
+        if (d2 <= d1) {
+            // no-op
+        } else {
+            newValue = newValue >= d1 ? newValue : d1;
+            newValue = newValue <= d2 ? newValue : d2;
+            setLowValue(snapValueToTicks(newValue));
+        }
+    }
+
+    /**
+     * Adjusts {@link #highValueProperty() highValue} to match <code>newValue</code>,
+     * or as closely as possible within the constraints imposed by the 
+     * {@link #minProperty() min} and {@link #maxProperty() max} properties. 
+     * This function also takes into account 
+     * {@link #snapToTicksProperty() snapToTicks}, which is the main difference 
+     * between <code>adjustHighValue</code> and 
+     * {@link #setHighValue(double) setHighValue}.
+     *
+     * @expert This function is intended to be used by experts, primarily
+     *         by those implementing new Skins or Behaviors. It is not common
+     *         for developers or designers to access this function directly.
+     */
+    public void adjustHighValue(double newValue) {
+        double d1 = getMin();
+        double d2 = getMax();
+        if (d2 <= d1) {
+            // no-op
+        } else {
+            newValue = newValue >= d1 ? newValue : d1;
+            newValue = newValue <= d2 ? newValue : d2;
+            setHighValue(snapValueToTicks(newValue));
+        }
     }
 
     
@@ -577,28 +761,7 @@ public class RangeSlider extends Control {
         return showTickMarks;
     }
     
-//    /**
-//     * Adjusts {@link #valueProperty() value} to match <code>newValue</code>. The 
-//     * <code>value</code>is the actual amount between the 
-//     * {@link #minProperty() min} and {@link #maxProperty() max}. This function
-//     * also takes into account {@link #snapToTicksProperty() snapToTicks}, which
-//     * is the main difference between adjustValue and setValue. It also ensures 
-//     * that the value is some valid number between min and max.
-//     *
-//     * @expert This function is intended to be used by experts, primarily
-//     *         by those implementing new Skins or Behaviors. It is not common
-//     *         for developers or designers to access this function directly.
-//     */
-//    public void adjustValue(double newValue) {
-//        // figure out the "value" associated with the specified position
-//        final double _min = getMin();
-//        final double _max = getMax();
-//        if (_max <= _min) return;
-//        newValue = newValue < _min ? _min : newValue;
-//        newValue = newValue > _max ? _max : newValue;
-//
-//        setValue(snapValueToTicks(newValue));
-//    }
+
     
      /***************************************************************************
      *                                                                         *
@@ -623,30 +786,6 @@ public class RangeSlider extends Control {
         }
     }
     
-    public void adjustLowValue(double d) {
-        double d1 = getMin();
-        double d2 = getMax();
-        if (d2 <= d1) {
-        }
-        else {
-            d = d >= d1 ? d : d1;
-            d = d <= d2 ? d : d2;
-            setLowValue(snapValueToTicks(d));
-        }
-    }
-
-    public void adjustHighValue(double d) {
-        double d1 = getMin();
-        double d2 = getMax();
-        if (d2 <= d1) {
-        }
-        else {
-            d = d >= d1 ? d : d1;
-            d = d <= d2 ? d : d2;
-            setHighValue(snapValueToTicks(d));
-        }
-    }
-
     private double snapValueToTicks(double d) {
         double d1 = d;
         if (isSnapToTicks()) {
@@ -671,14 +810,12 @@ public class RangeSlider extends Control {
     }
 
     
-
     
-    
-     /**************************************************************************
-     *                                                                         *
-     * Stylesheet Handling                                                     *
-     *                                                                         *
-     **************************************************************************/
+    /**************************************************************************
+    *                                                                         *
+    * Stylesheet Handling                                                     *
+    *                                                                         *
+    **************************************************************************/
     
     private static final String DEFAULT_STYLE_CLASS = "range-slider";
     

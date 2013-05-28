@@ -38,15 +38,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static Button createButton(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final Button btn = new Button();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new Button(), action);
     }
     
     /**
@@ -58,15 +50,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static Hyperlink createHyperlink(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final Hyperlink btn = new Hyperlink();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new Hyperlink(), action);
     }
     
     /**
@@ -78,15 +62,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static ToggleButton createToggleButton(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final ToggleButton btn = new ToggleButton();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new ToggleButton(), action);
     }
     
     /**
@@ -98,15 +74,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static CheckBox createCheckBox(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final CheckBox btn = new CheckBox();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new CheckBox(), action);
     }
     
     /**
@@ -118,15 +86,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static RadioButton createRadioButton(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final RadioButton btn = new RadioButton();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new RadioButton(), action);
     }
     
     /**
@@ -138,15 +98,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static MenuItem createMenuItem(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final MenuItem btn = new MenuItem();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new MenuItem(), action);
     }
     
     /**
@@ -158,15 +110,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static CheckMenuItem createCheckMenuItem(final Action action) {
-        if (action == null) {
-            throw new NullPointerException("Action can not be null");
-        }
-            
-        final CheckMenuItem btn = new CheckMenuItem();
-        
-        configure(btn, action);
-        
-        return btn;
+        return configure(new CheckMenuItem(), action);
     }
     
     /**
@@ -178,18 +122,15 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static RadioMenuItem createRadioMenuItem(final Action action) {
+        return configure(new RadioMenuItem(action.textProperty().get()), action);
+    }
+    
+    private static <T extends ButtonBase> T configure(final T btn, final Action action) {
+        
         if (action == null) {
             throw new NullPointerException("Action can not be null");
         }
-            
-        final RadioMenuItem btn = new RadioMenuItem(action.textProperty().get());
         
-        configure(btn, action);
-        
-        return btn;
-    }
-    
-    private static void configure(final ButtonBase btn, final Action action) {
         // button bind to action properties
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
@@ -231,9 +172,16 @@ public class ActionUtils {
                 action.execute(ae);
             }
         });
+        
+        return btn;
     }
     
-    private static void configure(final MenuItem btn, final Action action) {
+    private static <T extends MenuItem> T configure(final T btn, final Action action) {
+        
+        if (action == null) {
+            throw new NullPointerException("Action can not be null");
+        }
+        
         // button bind to action properties
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
@@ -259,5 +207,7 @@ public class ActionUtils {
                 action.execute(ae);
             }
         });
+        
+        return btn;
     }
 }

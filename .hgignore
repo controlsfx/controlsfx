@@ -8,3 +8,5 @@ build/*
 .gradle/*
 bin/*
 doc/*
+.settings/*
+

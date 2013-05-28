@@ -423,7 +423,7 @@ public class Dialog {
     /**
      * Common dialog actions
      */
-    public enum Actions implements Action {
+    public enum Actions implements org.controlsfx.control.action.Action {
 
         CANCEL( getString("common.cancel.button"), ButtonType.CANCEL_CLOSE, true, true),
         CLOSE ( getString("common.close.button"),  ButtonType.CANCEL_CLOSE, true, true),

@@ -56,6 +56,24 @@ public class HelloSegmentedButton extends Application implements Sample {
         
         SegmentedButton segmentedButton = new SegmentedButton(with_b1, with_b2, with_b3, with_b4);    
         grid.add(segmentedButton, 1, 1);
+        
+        
+        // Using modena pill button styling
+        grid.add(new Label("SegmentedButton (with modena styling): "), 0, 2);
+        
+        ToggleButton pill_b1 = new ToggleButton("day");
+        pill_b1.getStyleClass().add("left-pill");
+        ToggleButton pill_b2 = new ToggleButton("week");
+        pill_b2.getStyleClass().add("center-pill");
+        ToggleButton pill_b3 = new ToggleButton("month");
+        pill_b3.getStyleClass().add("center-pill");
+        ToggleButton pill_b4 = new ToggleButton("year");
+        pill_b4.getStyleClass().add("right-pill");
+        ToggleGroup tg = new ToggleGroup();
+        tg.getToggles().addAll(pill_b1, pill_b2, pill_b3, pill_b4);
+        HBox pillBox = new HBox(pill_b1, pill_b2, pill_b3, pill_b4);
+        grid.add(pillBox, 1, 2);
+        
 
         return grid;
     }

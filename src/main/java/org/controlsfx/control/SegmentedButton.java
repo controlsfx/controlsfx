@@ -45,6 +45,8 @@ import javafx.scene.control.ToggleGroup;
  * <img src="segmentedButton.png"/>
  * </center>
  * 
+ * <h3>Code Samples</h3>
+ * 
  * <p>There is very little API on this control, you essentially create
  * {@link ToggleButton} instances as per usual (and don't bother putting them
  * into a {@link ToggleGroup}, as this is done by the SegmentedButton itself), and then 
@@ -65,6 +67,19 @@ import javafx.scene.control.ToggleGroup;
  * into the varargs constructor, as such:
  * 
  * <pre>{@code SegmentedButton segmentedButton = new SegmentedButton(b1, b2, b3, b4);}</pre>
+ * 
+ * <h3>Alternative Styling</h3>
+ * <p>As is visible in the screenshot at the top of this class documentation, 
+ * there are two different styles supported by the SegmentedButton control.
+ * Firstly, there is the default style based on the JavaFX Modena look. The 
+ * alternative style is what is currently referred to as the 'dark' look. To 
+ * enable this functionality, simply do the following:
+ * 
+ * <pre>
+ * {@code
+ * SegmentedButton segmentedButton = new SegmentedButton();   
+ * segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+ * }</pre>
  * 
  * @see ToggleButton
  * @see ToggleGroup

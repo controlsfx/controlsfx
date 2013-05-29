@@ -1,10 +1,10 @@
 /* -------- Segmented Button ---------------- */
-.segmented-button .toggle-button {
+.segmented-button.dark .toggle-button {
     -fx-padding: 3 15 3 15;
     -fx-border-color: transparent -fx-outer-border transparent transparent;
 }
 
-.segmented-button .toggle-button:focused {
+.segmented-button.dark .toggle-button:focused {
     -fx-background-color:
         rgba(23,134,248,0.2),
         -fx-focus-color,
@@ -12,11 +12,11 @@
         -fx-body-color;
 }
 
-.segmented-button .toggle-button:selected Text {
+.segmented-button.dark .toggle-button:selected Text {
     -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 2, 0.0 , 0 , 1 );
 }
 
-.segmented-button .toggle-button:selected {
+.segmented-button.dark .toggle-button:selected {
     -fx-background-color:
         -fx-shadow-highlight-color,
         linear-gradient( to bottom, derive(-fx-color,-90%) 0%, derive(-fx-color,-60%) 100% ),        
@@ -28,52 +28,52 @@
 }
 
 /* *************************** LEFT BUTTON ************************** */
-.segmented-button .first-button {
+.segmented-button.dark .toggle-button.left-pill {
     -fx-background-radius: 3 0 0 3;
     -fx-background-insets: 0 0 -1 0, 0, 1 0 1 1, 2 0 2 2;
 }
 
-.segmented-button .first-button:focused {
+.segmented-button.dark .toggle-button.left-pill:focused {
      -fx-background-insets: -2 0 -2 -2, 0 0 0 0, 1, 2;
 	-fx-border-color: transparent;
 }
 
-.segmented-button .first-button:selected:focused {
+.segmented-button.dark .toggle-button.left-pill:selected:focused {
     -fx-background-insets: 0 0 -1 0, 0, 1 0 1 1, 1 0 1 1;
 	-fx-border-color: transparent;
 }
 
 /* *************************** RIGHT BUTTON ************************** */
-.segmented-button .last-button {
+.segmented-button.dark .toggle-button.right-pill {
     -fx-background-radius: 0 3 3 0;
     -fx-background-insets: 0 0 -1 0, 0, 1 1 1 0, 2 2 2 0;
     -fx-border-color: transparent;
 }
 
-.segmented-button .last-button:focused {
+.segmented-button.dark .toggle-button.right-pill:focused {
 	-fx-background-insets: -2 -2 -2 0, 0, 1, 2;
      -fx-border-color: transparent;
 }
 
-.segmented-button .last-button:selected:focused {
+.segmented-button.dark .toggle-button.right-pill:selected:focused {
 	-fx-background-insets: -1 -1 -1 -1, 0 0 0 -1, 1 1 1 0, 1 1 1 0;
     -fx-border-color: transparent;
 }
 
 /* *************************** CENTER BUTTON ************************** */
-.segmented-button .middle-button {
+.segmented-button.dark .toggle-button.center-pill {
 	-fx-background-radius: 0;
 	-fx-background-insets: 0 0 -1 0, 0, 1 0 1 0, 2 0 2 0;
     
 }
 
-.segmented-button .middle-button:focused {
+.segmented-button.dark .toggle-button.center-pill:focused {
 	-fx-background-radius: 0;
 	-fx-background-insets: -2 0 -2 -2, 0 0 0 -1, 1 1 1 0, 2 2 2 1;
 	-fx-border-color: transparent;
 }
 
-.segmented-button .middle-button:selected:focused {
+.segmented-button.dark .toggle-button.center-pill:selected:focused {
 	-fx-background-insets: -1.4 0 -1.4 -1, 0 0 0 -1, 1 1 1 0, 1 1 1 0;
 	-fx-border-color: transparent;
 }

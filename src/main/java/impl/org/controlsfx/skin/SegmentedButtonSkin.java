@@ -79,12 +79,12 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
                 if(i == 0) {
                     t.getStyleClass().add("only-button");
                 } else {
-                    t.getStyleClass().add("last-button");
+                    t.getStyleClass().add("right-pill");
                 }
             } else if (i == 0) {
-                t.getStyleClass().add("first-button");
+                t.getStyleClass().add("left-pill");
             } else {
-                t.getStyleClass().add("middle-button");
+                t.getStyleClass().add("center-pill");
             }
         }
     }

@@ -71,6 +71,34 @@ import javafx.scene.control.ToggleGroup;
  */
 public class SegmentedButton extends Control {
     
+    /**************************************************************************
+     * 
+     * Static fields
+     * 
+     *************************************************************************/
+    
+    /**
+     * An alternative styling for the segmented button, with a darker pressed 
+     * color which stands out more than the default modena styling. Refer to
+     * the class documentation for details on how to use (and screenshots), but
+     * in short, simply do the following to get the dark styling:
+     * 
+     * <pre>
+     * {@code
+     * SegmentedButton segmentedButton = new SegmentedButton();   
+     * segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+     * }</pre>
+     */
+    public static final String STYLE_CLASS_DARK = "dark";
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     *************************************************************************/
+    
     private final ObservableList<ToggleButton> buttons;
     
     /**************************************************************************

@@ -334,7 +334,8 @@ public final class Dialogs {
         Node messageNode = dlg.getContent();
         messageNode.getStyleClass().add("command-link-message");
         
-        final VBox content = new VBox(10);
+        final int gapSize = 10;
+        final VBox content = new VBox(gapSize);
         Node message = dlg.getContent();
         if ( message != null ) {
             content.getChildren().add(message);
@@ -371,6 +372,12 @@ public final class Dialogs {
             VBox.setVgrow(button, Priority.SOMETIMES);
             content.getChildren().add( button );
         }
+        
+        Region spacer = new Region();
+        spacer.setMinHeight(gapSize);
+        VBox.setVgrow(spacer, Priority.NEVER);
+        content.getChildren().add( spacer );
+        
         dlg.setContent(content);
         dlg.getActions().clear();
         
@@ -546,7 +553,6 @@ public final class Dialogs {
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMaxHeight(Region.USE_PREF_SIZE);
         button.setAlignment(Pos.CENTER_LEFT);
-        
         
         Label titleLabel = new Label(commandLink.getText() );
         titleLabel.getStyleClass().addAll("line-1");

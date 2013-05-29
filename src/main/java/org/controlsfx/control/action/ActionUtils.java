@@ -1,5 +1,8 @@
 package org.controlsfx.control.action;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
@@ -8,11 +11,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.Separator;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -39,6 +49,10 @@ public class ActionUtils {
      */
     public static Button createButton(final Action action) {
         return configure(new Button(), action);
+    }
+    
+    public static MenuButton createMenuButton(final Action action) {
+        return configure(new MenuButton(), action);
     }
     
     /**
@@ -101,6 +115,10 @@ public class ActionUtils {
         return configure(new MenuItem(), action);
     }
     
+    public static Menu createMenu(final Action action) {
+        return configure(new Menu(), action);
+    }
+    
     /**
      * Takes the provided {@link Action} and returns a {@link CheckMenuItem} instance
      * with all relevant properties bound to the properties of the Action.
@@ -123,6 +141,80 @@ public class ActionUtils {
      */
     public static RadioMenuItem createRadioMenuItem(final Action action) {
         return configure(new RadioMenuItem(action.textProperty().get()), action);
+    }
+    
+    public static ToolBar createToolBar( Collection<? extends Action> actions ) {
+        
+        ToolBar toolbar = new ToolBar();
+        for (Action action : actions) {
+           
+            if ( action instanceof ActionGroup ) {
+                MenuButton menu = createMenuButton( action );
+                menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
+                toolbar.getItems().add(menu);
+            } else if ( action == null ) {
+                toolbar.getItems().add( new Separator());
+            } else {
+                toolbar.getItems().add( createButton(action));
+            }
+            
+        }
+        
+        return toolbar;
+        
+    }
+    
+    public static MenuBar createMenuBar( Collection<? extends Action> actions ) {
+        
+        MenuBar menuBar = new MenuBar();
+        for (Action action : actions) {
+            
+            Menu menu = createMenu( action );
+            
+            if ( action instanceof ActionGroup ) {
+               menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
+            } 
+            
+            menuBar.getMenus().add(menu);
+            
+        }
+        
+        return menuBar;
+        
+    }
+    
+    public static ContextMenu createContextMenu( Collection<? extends Action> actions ) {
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().addAll(toMenuItems(actions));
+        return menu;
+    }
+    
+    private static Collection<MenuItem> toMenuItems( Collection<? extends Action> actions ) {
+        
+        Collection<MenuItem> items = new ArrayList<MenuItem>();
+        
+        for (Action action : actions) {
+            
+            if ( action instanceof ActionGroup ) {
+                
+               Menu menu = createMenu( action );
+               menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
+               items.add(menu);
+                
+            } else if ( action == null ) {
+                
+                items.add( new SeparatorMenuItem());
+                
+            } else {
+                
+                items.add( createMenuItem(action));
+                
+            }
+            
+        }
+        
+        return items;
+        
     }
     
     private static <T extends ButtonBase> T configure(final T btn, final Action action) {

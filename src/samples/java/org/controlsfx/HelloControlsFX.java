@@ -32,7 +32,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -42,30 +41,30 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import org.controlsfx.samples.HelloActionFactory;
 import org.controlsfx.samples.HelloButtonBar;
 import org.controlsfx.samples.HelloDialog;
 import org.controlsfx.samples.HelloGridView;
 import org.controlsfx.samples.HelloRangeSlider;
 import org.controlsfx.samples.HelloRating;
 import org.controlsfx.samples.HelloSegmentedButton;
-import org.controlsfx.samples.SVGTest;
 
 public class HelloControlsFX extends Application {
 
     // TODO dynamically discover samples
-    private final Class[] samplesArray = new Class[] {
+    private final Class<?>[] samplesArray = new Class<?>[] {
         HelloButtonBar.class,
         HelloDialog.class,
         HelloGridView.class,
         HelloRangeSlider.class,
         HelloRating.class,
-        HelloSegmentedButton.class
+        HelloSegmentedButton.class,
+        HelloActionFactory.class
 //        SVGTest.class
     };
     
@@ -88,7 +87,7 @@ public class HelloControlsFX extends Application {
         
         // instantiate the samples
         ObservableList<Sample> samples = FXCollections.observableArrayList();
-        for (Class clazz : samplesArray) {
+        for (Class<?> clazz : samplesArray) {
             Sample sample = (Sample) clazz.newInstance();
             samples.add(sample);
         }

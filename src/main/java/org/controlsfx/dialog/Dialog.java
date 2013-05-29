@@ -78,29 +78,44 @@ import org.controlsfx.control.action.ActionUtils;
  *   <li>button bar
  * </ul>
  * 
- * For developers wanting a simpler API, consider using the high-level 
+ * <p>For developers wanting a simpler API, consider using the high-level 
  * {@link Dialogs} class, which provides a simpler, fluent API for displaying
- * the most common types of dialog.<br/><br/>
- * Here is the example of building a dialog:
+ * the most common types of dialog.
+ * 
+ * <h3>Code Examples</h3>
+ * Here is an example of building a dialog:
  * 
  * <pre>
  * {@code
- *    Dialog dlg = new Dialog( owner, "Dialog Title");
- *    dlg.setResizable(false);
- *    dlg.setGraphic(new ImageView(getImage()));
- *    dlg.setMasthead("Dialog Masthead");
- *    dlg.getActions().addAll(Dialog.Actions.OK, Dialog.Actions.CANCEL);
- *    dlg.setContent("Dialog message");
- *    dlg.setExpandableContent( new Label("Expandable content"));
- *    return dlg.show();
- * }
- * </pre>
+ * Dialog dlg = new Dialog(owner, "Dialog Title");
+ * dlg.setResizable(false);
+ * dlg.setGraphic(new ImageView(getImage()));
+ * dlg.setMasthead("Dialog Masthead");
+ * dlg.getActions().addAll(Dialog.Actions.OK, Dialog.Actions.CANCEL);
+ * dlg.setContent("Dialog message");
+ * dlg.setExpandableContent( new Label("Expandable content"));
+ * Action result = dlg.show();}</pre>
  * 
- * The code above will setup and present the non resizable dialog with masthead, message and "OK" and "Cancel" buttons. 
- * Also it will have expandable area, visibility of which is triggered by automatically presented "Details" button 
- * <br/><br/>
+ * <p>The code above will setup and present a non-resizable dialog with a
+ * masthead, message and "OK" and "Cancel" buttons. Also it will have an
+ * expandable area, the visibility of which is triggered by an automatically 
+ * presented "Shows Details" button. Note that when the user clicks either the "OK"
+ * or "Cancel" buttons, the dialog will be hidden, and their response will be
+ * returned from the {@link #show() show} method that was called to bring the
+ * dialog up in the first place. In other words, following on from the code
+ * above, you might do the following:
+ * 
+ * <pre>
+ * {@code 
+ * if (result == Dialog.Actions.OK) {
+ *     // ... submit user input
+ * } else {
+ *     // ... user cancelled, reset form to default
+ * }}</pre>
  * 
  * @see Dialogs
+ * @see Action
+ * @see Actions
  */
 public class Dialog {
     
@@ -119,7 +134,7 @@ public class Dialog {
     
     /**************************************************************************
      * 
-     * Fields
+     * Private fields
      * 
      **************************************************************************/
 
@@ -167,8 +182,8 @@ public class Dialog {
      **************************************************************************/
 
     /**
-     * Shows the dialog and waits for user response (in other words, brings up a
-     * modal dialog).
+     * Shows the dialog and waits for the user response (in other words, brings 
+     * up a modal dialog, with the returned value the users input).
      * 
      * @return The {@link Action} used to close the dialog.
      */
@@ -201,9 +216,16 @@ public class Dialog {
 
 
     // --- resizable
-
     /**
-     * Determines of dialog is resizable
+     * Represents whether the dialog is resizable.
+     */
+    public BooleanProperty resizableProperty() {
+        return dialog.resizableProperty();
+    }
+    
+    /**
+     * Returns whether or not the dialog is resizable.
+     * 
      * @return true if dialog is resizable
      */
     public final boolean isResizable() {
@@ -211,18 +233,12 @@ public class Dialog {
     }
 
     /**
-     * Changes the dialog's resizable attribute
-     * @param resizable true if dialog should be resizable
+     * Sets whether the dialog can be resized by the user. 
+     * 
+     * @param resizable true if dialog should be resizable.
      */
     public final void setResizable(boolean resizable) {
         dialog.setResizable(resizable);
-    }
-
-    /**
-     * Represents whether the dialog is resizable.
-     */
-    public BooleanProperty resizableProperty() {
-        return dialog.resizableProperty();
     }
 
     
@@ -230,24 +246,28 @@ public class Dialog {
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>();
 
     /**
-     * Dialog's graphic.
-     * Presented either in the masthead, if one is available or in the content 
-     * @return dialog's graphic
+     * The dialog graphic, presented either in the masthead, if one is showing,
+     * or to the left of the {@link #contentProperty() content}.
+     *  
+     * @return The currently set dialog graphic.
      */
+    public ObjectProperty<Node> graphicProperty() {
+        return graphicProperty;
+    }
+    
+    // auto-generated JavaDoc
     public final Node getGraphic() {
         return graphicProperty.get();
     }
 
     /**
-     * Sets dialog's graphic
-     * @param graphic dialog's graphic. Used if not null.
+     * Sets the dialog graphic, which will be displayed either in the masthead, 
+     * if one is showing, or to the left of the {@link #contentProperty() content}.
+     * 
+     * @param graphic The new dialog graphic, or null if no graphic should be shown. 
      */
     public final void setGraphic(Node graphic) {
         this.graphicProperty.set(graphic);
-    }
-
-    public ObjectProperty<Node> graphicProperty() {
-        return graphicProperty;
     }
 
     
@@ -417,14 +437,39 @@ public class Dialog {
      **************************************************************************/
 
     /**
-     * Common dialog actions
+     * An enumeration of common dialog actions, ideal for use in dialogs if 
+     * the common behavior of presenting options to a user and listening to their
+     * response is all that is necessary. Refer to the {@link Dialog} class
+     * documentation for examples on how to use this enumeration.
+     * 
+     * @see Dialog
+     * @see Action
      */
     public enum Actions implements org.controlsfx.control.action.Action {
 
+        /**
+         * An action that, by default, will show 'Cancel'.
+         */
         CANCEL( getString("common.cancel.button"), ButtonType.CANCEL_CLOSE, true, true),
+        
+        /**
+         * An action that, by default, will show 'Close'.
+         */
         CLOSE ( getString("common.close.button"),  ButtonType.CANCEL_CLOSE, true, true),
+        
+        /**
+         * An action that, by default, will show 'No'.
+         */
         NO    ( getString("common.no.button"),     ButtonType.NO,           true, true),
+        
+        /**
+         * An action that, by default, will show 'OK'.
+         */
         OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,      true, false),
+        
+        /**
+         * An action that, by default, will show 'Yes'.
+         */
         YES   ( getString("common.yes.button"),    ButtonType.YES,          true, false);
 
         private final AbstractAction action;

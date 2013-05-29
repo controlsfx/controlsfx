@@ -72,18 +72,25 @@ import org.controlsfx.control.action.ActionUtils;
  * subsections:
  * 
  * <ul>
+ *   <li>title,
  *   <li>masthead, 
  *   <li>content, 
  *   <li>expandable content,
  *   <li>button bar
  * </ul>
  * 
+ * <p>This is more easily demonstrated in the diagram shown below:
+ * 
+ * <br>
+ * <center><img src="dialog-overview.png"></center>
+ * 
  * <p>For developers wanting a simpler API, consider using the high-level 
  * {@link Dialogs} class, which provides a simpler, fluent API for displaying
  * the most common types of dialog.
  * 
  * <h3>Code Examples</h3>
- * Here is an example of building a dialog:
+ * 
+ * <p>Here is an example of building a dialog:
  * 
  * <pre>
  * {@code
@@ -291,8 +298,9 @@ public class Dialog {
     }
 
     /**
-     * Asssign string as dialog's masthead
-     * @param mastheadText masthead text. Used if not null.
+     * Sets the string to show in the dialog masthead area.
+     * 
+     * @param mastheadText The masthead text to show in the masthead area.
      */
     public final void setMasthead(String mastheadText) {
         if (mastheadText == null) {
@@ -321,6 +329,9 @@ public class Dialog {
         setMasthead(mastheadPanel);
     }
 
+    /**
+     * Property representing the masthead area of the dialog.
+     */
     public ObjectProperty<Node> mastheadProperty() {
         return masthead;
     }
@@ -337,7 +348,10 @@ public class Dialog {
     };
 
     /**
-     * Current dialog's content as Node
+     * Returns the dialog content as a Node (even if it was set as a String using
+     * {@link #setContent(String)} - this was simply transformed into a 
+     * {@link Node} (most probably a {@link Label}).
+     * 
      * @return dialog's content
      */
     public final Node getContent() {
@@ -353,8 +367,10 @@ public class Dialog {
     }
 
     /**
-     * Assign text as dialog's content
-     * @param contentText content text. Used if not null.
+     * Assign text as the dialog's content (this will be transformed into a 
+     * {@link Node} and then set via {@link #setContent(Node)}).
+     * 
+     * @param contentText The text to show in the main section of the dialog. 
      */
     public final void setContent(String contentText) {
         if (contentText == null) return;
@@ -373,6 +389,9 @@ public class Dialog {
         setContent(label);
     }
 
+    /**
+     * Property representing the content area of the dialog.
+     */
     public ObjectProperty<Node> contentProperty() {
         return content;
     }
@@ -380,39 +399,64 @@ public class Dialog {
     
     // --- expandable content
     private final ObjectProperty<Node> expandableContentProperty = new SimpleObjectProperty<Node>();
+    
+    /**
+     * A property that represents the dialog expandable content area. Any Node 
+     * can be placed in this area, but it will only be shown when the user clicks
+     * the 'Show Details' expandable button. This button will be added automatically
+     * when the expandable content property is non-null.
+     */
+    public ObjectProperty<Node> expandableContentProperty() {
+        return expandableContentProperty;
+    }
 
     /**
-     * Dialog's expandable content
-     * @return expandable content as Node
+     * Returns the dialog expandable content node, if one is set, or null otherwise.
      */
     public final Node getExpandableContent() {
         return expandableContentProperty.get();
     }
 
     /**
-     * Assigns dialog's expandable content. Any Node can be used.
-     * By default expandable conntent is hidden and can be made visible by clicking "Mode Details" hyperlink,
-     * which appears automatically of non-null expandable content exists 
-     * @param content expandable content.
+     * Sets the dialog expandable content node, or null if no expandable content
+     * needs to be shown.
      */
     public final void setExpandableContent(Node content) {
         this.expandableContentProperty.set(content);
     }
 
-    public ObjectProperty<Node> expandableContentProperty() {
-        return expandableContentProperty;
-    }
+    
     
     
     // --- width
+    /**
+     * Property representing the width of the dialog.
+     */
     ReadOnlyDoubleProperty widthProperty() {
         return dialog.widthProperty();
     }
     
+    /**
+     * Returns the width of the dialog.
+     */
+    public final double getWidth() {
+        return dialog.getWidth();
+    }
+    
     
     // --- height
+    /**
+     * Property representing the height of the dialog.
+     */
     ReadOnlyDoubleProperty heightProperty() {
         return dialog.heightProperty();
+    }
+    
+    /**
+     * Returns the height of the dialog.
+     */
+    public final double getHeight() {
+        return dialog.getHeight();
     }
     
 
@@ -420,9 +464,10 @@ public class Dialog {
     private final ObservableList<Action> actions = FXCollections.<Action> observableArrayList();
 
     /**
-     * Observable list of actions used for dialog's buttons bar.
-     * Can be used for manipulating actions before presenting the dialog
-     * @return actions list
+     * Observable list of actions used for the dialog {@link ButtonBar}. 
+     * Modifying the contents of this list will change the actions available to
+     * the user.
+     * @return The {@link ObservableList} of actions available to the user.
      */
     public final ObservableList<Action> getActions() {
         return actions;
@@ -473,7 +518,6 @@ public class Dialog {
         YES   ( getString("common.yes.button"),    ButtonType.YES,          true, false);
 
         private final AbstractAction action;
-        
         private final boolean isClosing;
         private final boolean isDefault;
         private final boolean isCancel;
@@ -501,26 +545,32 @@ public class Dialog {
             this(title, type, isDefault, isCancel, true);
         }
         
+        /** {@inheritDoc} */
         @Override public StringProperty textProperty() {
             return action.textProperty();
         }
 
+        /** {@inheritDoc} */
         @Override public BooleanProperty disabledProperty() {
             return action.disabledProperty();
         }
         
+        /** {@inheritDoc} */
         @Override public StringProperty longTextProperty() {
             return action.longTextProperty();
         }
         
+        /** {@inheritDoc} */
         @Override public ObjectProperty<Node> graphicProperty() {
             return action.graphicProperty();
         }
         
+        /** {@inheritDoc} */
         @Override public ObservableMap<Object, Object> getProperties() {
             return action.getProperties();
         }
 
+        /** {@inheritDoc} */
         @Override public void execute(ActionEvent ae) {
             if (! action.isDisabled()) {
                 if (ae.getSource() instanceof Dialog && (isCancel || isClosing) ) {

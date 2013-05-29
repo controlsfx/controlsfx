@@ -159,7 +159,7 @@ public class ActionUtils {
             @Override protected Tooltip computeValue() {
                 String longText = action.longTextProperty().get();
                 return longText == null || longText.isEmpty() ? null : tooltip;
-            }
+            } 
         });
         
         // TODO handle the selected state of the button if it is of the applicable

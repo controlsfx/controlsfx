@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -57,7 +58,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -256,6 +256,7 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.INPUT);
         final TextField textField = new TextField(defaultValue);
         dlg.setContent(buildInputContent(textField));
+        
         return dlg.show() == OK ? textField.getText() : null;
     }
 
@@ -486,7 +487,7 @@ public final class Dialogs {
         return dlg.show();
     }
 
-    private Node buildInputContent(Control inputControl) {
+    private Node buildInputContent(final Control inputControl) {
     	GridPane grid = new GridPane();
     	grid.setHgap(10);
     	grid.setMaxWidth(Double.MAX_VALUE);
@@ -502,6 +503,13 @@ public final class Dialogs {
             GridPane.setHgrow(inputControl, Priority.ALWAYS);
             grid.add(inputControl, 1, 0);
         }
+        
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                inputControl.requestFocus();
+            }
+        });
 
         return grid;
     }

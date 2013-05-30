@@ -48,7 +48,7 @@ public class HelloAction extends Application implements Sample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/dialog/Action.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/action/Action.html";
     }
     
     @Override public Node getPanel(final Stage stage) {

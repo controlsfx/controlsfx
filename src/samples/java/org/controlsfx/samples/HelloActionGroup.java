@@ -48,7 +48,7 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionUtils;
 
-public class HelloActionFactory extends Application implements Sample {
+public class HelloActionGroup extends Application implements Sample {
     
     private Collection<? extends Action> actions = Arrays.asList(
         new ActionGroup("Group 1",  new DummyAction("Action 1.1"), 
@@ -79,7 +79,7 @@ public class HelloActionFactory extends Application implements Sample {
     }
     
     @Override public String getJavaDocURL() {
-        return null;//Utils.JAVADOC_BASE + "org/controlsfx/control/dialog/Action.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/action/ActionGroup.html";
     }
     
     @Override public Node getPanel(final Stage stage) {
@@ -103,7 +103,7 @@ public class HelloActionFactory extends Application implements Sample {
     }
     
     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Action Factory Demo");
+        stage.setTitle("Action Group Demo");
         
         Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
         scene.setFill(Color.WHITE);

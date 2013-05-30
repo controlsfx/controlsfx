@@ -54,7 +54,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import org.controlsfx.samples.HelloActionFactory;
+import org.controlsfx.samples.HelloActionGroup;
 import org.controlsfx.samples.HelloButtonBar;
 import org.controlsfx.samples.HelloDialog;
 import org.controlsfx.samples.HelloGridView;
@@ -72,7 +72,7 @@ public class HelloControlsFX extends Application {
         HelloRangeSlider.class,
         HelloRating.class,
         HelloSegmentedButton.class,
-        HelloActionFactory.class
+        HelloActionGroup.class
 //        SVGTest.class
     };
     

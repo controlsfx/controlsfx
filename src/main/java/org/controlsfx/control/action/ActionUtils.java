@@ -261,7 +261,9 @@ public class ActionUtils {
         // event occurs on the button
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                action.execute(ae);
+                if ( !action.disabledProperty().get()) {
+                    action.execute(ae);
+                }
             }
         });
         
@@ -296,7 +298,9 @@ public class ActionUtils {
         // event occurs on the button
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                action.execute(ae);
+                if ( !action.disabledProperty().get()) {
+                    action.execute(ae);
+                }
             }
         });
         

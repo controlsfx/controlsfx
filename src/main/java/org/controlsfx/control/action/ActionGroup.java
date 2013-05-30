@@ -22,4 +22,8 @@ public class ActionGroup extends AbstractAction {
         return actions;
     }
     
+    @Override public String toString() {
+        return getText();
+    }
+    
 }

@@ -30,13 +30,20 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -57,8 +64,9 @@ public class HelloActionGroup extends Application implements Sample {
                                     new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
                                                                   new DummyAction("Action 2.2.2")),
                                     new DummyAction("Action 2.3") ),
-        new ActionGroup("Group 3",  new DummyAction("Action 3.1"), 
-                                    new DummyAction("Action 3.2") )
+        new DummyAction("Action 3"),
+        new ActionGroup("Group 4",  new DummyAction("Action 4.1"), 
+                                    new DummyAction("Action 4.2"))
     );
     
     static class DummyAction extends AbstractAction {
@@ -71,6 +79,23 @@ public class HelloActionGroup extends Application implements Sample {
             System.out.println( String.format("Action '%s' is executed", getText()));
         }
         
+        @Override public String toString() {
+            return getText();
+        }
+
+        
+    }
+    
+    private ObservableList<Action> flatten( Collection<? extends Action> actions, ObservableList<Action> dest ) {
+        
+        for (Action a : actions) {
+           dest.add(a); 
+           if ( a instanceof ActionGroup ) {
+               flatten( ((ActionGroup)a).getActions(), dest);
+           }
+        }
+        
+        return dest;
     }
     
     
@@ -79,21 +104,53 @@ public class HelloActionGroup extends Application implements Sample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/action/ActionGroup.html";
+        return null;//Utils.JAVADOC_BASE + "org/controlsfx/control/dialog/Action.html";
     }
     
     @Override public Node getPanel(final Stage stage) {
+        
         VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
         
+        Label overview = new Label("MenuBar, TaskBar and ContenxtMenu presented here are effortlesly built out of the same action tree. " +
+        		"Action properties can be dynamically changed, triggering changes in all related controls");
+        overview.setWrapText(true);
+        root.getChildren().add(overview);
+        
+        HBox hbox = new HBox(10);
+        final ComboBox<Action> cbActions = new ComboBox<Action>(  flatten( actions, FXCollections.<Action>observableArrayList()));
+        cbActions.getSelectionModel().select(0);
+        
+        hbox.getChildren().add(new Label("Dynamically enable/disable action: "));
+        hbox.getChildren().add(cbActions);
+        
+        Action toggleAction = new AbstractAction("Enable/Disable") {
+
+            @Override public void execute(ActionEvent ae) {
+               Action action = cbActions.getSelectionModel().getSelectedItem();
+               if ( action != null ) {
+                   BooleanProperty p = action.disabledProperty();
+                   p.set(!p.get());
+               }
+            }
+        };
+        
+        hbox.getChildren().add(ActionUtils.createButton(toggleAction));
+        
+        root.getChildren().add(hbox);
+        root.getChildren().add( new Separator());
+
+        root.getChildren().add(new Label("MenuBar"));
         MenuBar menuBar = ActionUtils.createMenuBar(actions);
         root.getChildren().add(menuBar);
 
+        root.getChildren().add(new Label("ToolBar"));
         ToolBar toolBar = ActionUtils.createToolBar(actions);
         root.getChildren().add(toolBar);
 
         
+        root.getChildren().add(new Label("ContextMenu"));
         Label context = new Label("Right-click to see the context menu");
         context.setContextMenu( ActionUtils.createContextMenu(actions));  
         root.getChildren().add(context);
@@ -103,7 +160,7 @@ public class HelloActionGroup extends Application implements Sample {
     }
     
     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Action Group Demo");
+        stage.setTitle("Action Factory Demo");
         
         Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
         scene.setFill(Color.WHITE);

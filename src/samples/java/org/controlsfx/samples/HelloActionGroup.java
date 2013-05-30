@@ -104,7 +104,7 @@ public class HelloActionGroup extends Application implements Sample {
     }
     
     @Override public String getJavaDocURL() {
-        return null;//Utils.JAVADOC_BASE + "org/controlsfx/control/dialog/Action.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/action/ActionGroup.html";
     }
     
     @Override public Node getPanel(final Stage stage) {
@@ -160,7 +160,7 @@ public class HelloActionGroup extends Application implements Sample {
     }
     
     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Action Factory Demo");
+        stage.setTitle("Action Group Demo");
         
         Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
         scene.setFill(Color.WHITE);

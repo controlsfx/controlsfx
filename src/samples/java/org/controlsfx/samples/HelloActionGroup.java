@@ -75,7 +75,7 @@ public class HelloActionGroup extends Application implements Sample {
     
     
     @Override public String getSampleName() {
-        return "Action Factory";
+        return "Action Group";
     }
     
     @Override public String getJavaDocURL() {

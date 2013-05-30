@@ -57,6 +57,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
+// Not public API (class is package-protected), so no JavaDoc is required.
 class FXDialog extends Stage {
 
     // Use the CSS supplied with the JavaFX runtime, rather than our local tweak

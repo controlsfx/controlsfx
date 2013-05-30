@@ -26,51 +26,84 @@
  */
 package org.controlsfx.samples;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.ToolBar;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionUtils;
 
-public class HelloAction extends Application implements Sample {
+public class HelloActionGroup extends Application implements Sample {
+    
+    private Collection<? extends Action> actions = Arrays.asList(
+        new ActionGroup("Group 1",  new DummyAction("Action 1.1"), 
+                                    new DummyAction("Action 2.1") ),
+        new ActionGroup("Group 2",  new DummyAction("Action 2.1"), 
+                                    new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
+                                                                  new DummyAction("Action 2.2.2")),
+                                    new DummyAction("Action 2.3") ),
+        new ActionGroup("Group 3",  new DummyAction("Action 3.1"), 
+                                    new DummyAction("Action 3.2") )
+    );
+    
+    static class DummyAction extends AbstractAction {
+        
+        public DummyAction( String name ) {
+            super(name);
+        }
+
+        @Override public void execute(javafx.event.ActionEvent ae) {
+            System.out.println( String.format("Action '%s' is executed", getText()));
+        }
+        
+    }
+    
     
     @Override public String getSampleName() {
-        return "Actions";
+        return "Action Group";
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/action/Action.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/action/ActionGroup.html";
     }
     
     @Override public Node getPanel(final Stage stage) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
+        
+        MenuBar menuBar = ActionUtils.createMenuBar(actions);
+        root.getChildren().add(menuBar);
 
-        AbstractAction action = new AbstractAction("Text") {
-            @Override public void execute(ActionEvent ae) {
-                System.out.println(ae);
-            }
-        };
-        action.setLongText("Tooltip text");
-        Button btn = ActionUtils.createButton(action);
+        ToolBar toolBar = ActionUtils.createToolBar(actions);
+        root.getChildren().add(toolBar);
 
-        root.getChildren().add(btn);
+        
+        Label context = new Label("Right-click to see the context menu");
+        context.setContextMenu( ActionUtils.createContextMenu(actions));  
+        root.getChildren().add(context);
+        VBox.setVgrow(context, Priority.ALWAYS);
         
         return root;
     }
     
     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Actions Demo");
+        stage.setTitle("Action Group Demo");
         
         Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
         scene.setFill(Color.WHITE);

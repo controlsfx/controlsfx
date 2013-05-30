@@ -43,6 +43,7 @@ import javafx.stage.Window;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 
+// Not public API (class is package-protected), so no JavaDoc is required.
 class ExceptionDialog extends FXDialog {
 
     public ExceptionDialog(Window owner, String moreDetails) {

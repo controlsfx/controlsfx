@@ -39,7 +39,7 @@ public class HelloDialog extends Application implements Sample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/dialogs/Dialogs.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
     }
     
     private static final String WINDOWS = "Windows";

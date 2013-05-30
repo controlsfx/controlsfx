@@ -36,9 +36,7 @@ import java.util.ResourceBundle;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 
-/**
- *
- */
+// Not public API (class is package-protected), so no JavaDoc is required.
 class DialogResources {
 
     // Localization strings.

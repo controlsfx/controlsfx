@@ -113,7 +113,7 @@ public class HelloControlsFX extends Application {
         // simple layout: ListView on left, sample area on right
         
         grid = new GridPane();
-        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setPadding(new Insets(5, 10, 10, 10));
         grid.setHgap(10);
         grid.setVgap(10);
         
@@ -134,6 +134,7 @@ public class HelloControlsFX extends Application {
                 filteredSamples.setPredicate(predicate);
             }
         });
+        GridPane.setMargin(searchBox, new Insets(5, 0, 0, 0));
         grid.add(searchBox, 0, 0);
         
         // then the listview goes beneath the search box

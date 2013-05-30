@@ -26,11 +26,17 @@
  */
 package org.controlsfx;
 
+import java.util.Comparator;
+import java.util.function.Predicate;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -39,6 +45,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -85,19 +93,51 @@ public class HelloControlsFX extends Application {
     @Override public void start(final Stage primaryStage) throws Exception {
         setUserAgentStylesheet(STYLESHEET_MODENA);
         
-        // instantiate the samples
+        // instantiate the samples into a normal list
         ObservableList<Sample> samples = FXCollections.observableArrayList();
         for (Class<?> clazz : samplesArray) {
             Sample sample = (Sample) clazz.newInstance();
             samples.add(sample);
         }
         
+        // then we'll sort that list based on the sample names
+        final SortedList<Sample> sortedSamples = new SortedList<Sample>(samples, new Comparator<Sample>() {
+            @Override public int compare(Sample s1, Sample s2) {
+                return s1.getSampleName().compareTo(s2.getSampleName());
+            }
+        });
+        
+        final FilteredList<Sample> filteredSamples = new FilteredList<>(sortedSamples);
+        
+        
         // simple layout: ListView on left, sample area on right
         
         grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setHgap(10);
+        grid.setVgap(10);
         
-        //left hand side
-        ListView<Sample> samplesListView = new ListView<>(samples);
+        // --- left hand side
+        // firstly, we have a search box
+        final TextField searchBox = new TextField();
+        searchBox.setPromptText("Type to filter samples");
+        searchBox.setOnKeyTyped(new EventHandler<KeyEvent>() {
+            @Override public void handle(KeyEvent e) {
+                final String typedInput = searchBox.getText().toUpperCase(); 
+                
+                Predicate<Sample> predicate = new Predicate<Sample>() {
+                    @Override public boolean test(Sample t) {
+                        return t.getSampleName().toUpperCase().contains(typedInput);
+                    }
+                };
+                
+                filteredSamples.setPredicate(predicate);
+            }
+        });
+        grid.add(searchBox, 0, 0);
+        
+        // then the listview goes beneath the search box
+        ListView<Sample> samplesListView = new ListView<>(filteredSamples);
         samplesListView.setMinWidth(150);
         samplesListView.setMaxWidth(150);
         samplesListView.setCellFactory(new Callback<ListView<Sample>, ListCell<Sample>>() {
@@ -121,8 +161,7 @@ public class HelloControlsFX extends Application {
             }
         });
         GridPane.setVgrow(samplesListView, Priority.ALWAYS);
-        GridPane.setMargin(samplesListView, new Insets(10, 10, 10, 10));
-        grid.add(samplesListView, 0, 0);
+        grid.add(samplesListView, 0, 1);
         
         // right hand side
         tabPane = new TabPane();
@@ -130,8 +169,7 @@ public class HelloControlsFX extends Application {
         tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
         GridPane.setHgrow(tabPane, Priority.ALWAYS);
         GridPane.setVgrow(tabPane, Priority.ALWAYS);
-        GridPane.setMargin(tabPane, new Insets(5, 10, 10, 0));
-        grid.add(tabPane, 1, 0);
+        grid.add(tabPane, 1, 0, 1, 2);
         
         sampleTab = new Tab("Sample");
         javadocTab = new Tab("JavaDoc");
@@ -150,9 +188,15 @@ public class HelloControlsFX extends Application {
         primaryStage.setHeight(600);
         primaryStage.setTitle("ControlsFX!");
         primaryStage.show();
+        
+        samplesListView.requestFocus();
     }
 
     private void changeSample(Sample newSample, final Stage stage) {
+        if (newSample == null) {
+            return;
+        }
+        
     	if (tabPane.getTabs().contains(welcomeTab)) {
     		tabPane.getTabs().setAll(sampleTab, javadocTab);
     	}

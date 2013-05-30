@@ -29,21 +29,96 @@ package org.controlsfx.control.action;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.ToolBar;
 
+/**
+ * An ActionGroup (unsurprisingly) groups together zero or more {@link Action} 
+ * instances, allowing for more complex controls like {@link ToolBar}, 
+ * {@link MenuBar} and {@link ContextMenu} to be automatically generated from
+ * the collection of actions inside the ActionGroup. For your convenience,
+ * there are a number of utility methods that do precisely this in the 
+ * {@link ActionUtils} class.
+ * 
+ * <h3>Code Examples</h3>
+ * <p>Consider the following code example (note that DummyAction is a fake class
+ * that extends from (and implements) {@link AbstractAction}):
+ * 
+ * <pre>
+ * {@code
+ * // Firstly, create a list of Actions
+ * Collection<? extends Action> actions = Arrays.asList(
+ *     new ActionGroup("Group 1",  new DummyAction("Action 1.1"), 
+ *                                 new DummyAction("Action 2.1") ),
+ *     new ActionGroup("Group 2",  new DummyAction("Action 2.1"), 
+ *                                 new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
+ *                                                               new DummyAction("Action 2.2.2")),
+ *                                 new DummyAction("Action 2.3") ),
+ *     new ActionGroup("Group 3",  new DummyAction("Action 3.1"), 
+ *                                 new DummyAction("Action 3.2") )
+ *   );
+ *   
+ *   // Use the ActionUtils class to create UI controls from these actions, e.g:
+ *   MenuBar menuBar = ActionUtils.createMenuBar(actions);
+ *   
+ *   ToolBar toolBar = ActionUtils.createToolBar(actions);
+ *   
+ *   Label context = new Label("Right-click to see the context menu");
+ *   context.setContextMenu(ActionUtils.createContextMenu(actions));  
+ * }</pre>
+ * 
+ * <p>The end result of running the code above is shown in the screenshots below
+ * (hopefully it goes without saying that within the 'Group 1', 'Group 2' and 
+ * 'Group 3' options are the 'Action 1.1', etc actions that have been specified
+ * in the code above):
+ *
+ * <table border="0">
+ *   <tr>
+ *     <td width="75" valign="center"><strong>MenuBar:</strong></td>
+ *     <td><img src="actionGroup-menubar.png"></td>
+ *   </tr>
+ *     <td width="75" valign="center"><strong>ToolBar:</strong></td>
+ *     <td><img src="actionGroup-toolbar.png"></td>
+ *   </tr>
+ *   <td width="75" valign="top"><strong>ContextMenu:</strong></td>
+ *     <td><img src="actionGroup-contextmenu.png"></td>
+ *   </tr>
+ * </table>
+ * 
+ * @see Action
+ * @see ActionUtils
+ */
 public class ActionGroup extends AbstractAction {
     
+    /**
+     * Creates an ActionGroup with the given text as the name of the {@link Action}, 
+     * and zero or more Actions as members of this ActionGroup. Note that it is
+     * legitimate to pass in zero Actions to this constructor, and to later 
+     * set the actions directly into the {@link #getActions() actions} list.
+     * 
+     * @param text The {@link Action#textProperty() text} of this {@link Action}.
+     * @param actions Zero or more actions to insert into this ActionGroup.
+     */
     public ActionGroup(String text, Action... actions) {
         super(text);
         getActions().addAll(actions);
     }
 
-    @Override 
-    public final void execute(ActionEvent ae) {
+    /**
+     * By default the execute method in an ActionGroup is a no-op.
+     */
+    @Override public final void execute(ActionEvent ae) {
+        // no-op
     }
 
     // --- actions
     private final ObservableList<Action> actions = FXCollections.<Action> observableArrayList();
 
+    /**
+     * The list of {@link Action} instances that exist within this ActionGroup.
+     * This list may be modified, as shown in the class documentation.
+     */
     public final ObservableList<Action> getActions() {
         return actions;
     }

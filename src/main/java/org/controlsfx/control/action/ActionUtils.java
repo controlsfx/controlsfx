@@ -57,13 +57,33 @@ import javafx.scene.control.Tooltip;
  * necessary for now as there is no built-in support for Action in JavaFX 
  * UI controls at present).
  * 
+ * <p>Some of the methods in this class take a {@link Collection} of 
+ * {@link Action actions}. In these cases, it is likely they are designed to
+ * work with {@link ActionGroup action groups}. For examples on how to work with
+ * these methods, refer to the {@link ActionGroup} class documentation.
+ * 
  * @see Action
+ * @see ActionGroup
  */
 public class ActionUtils {
+    
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
 
     private ActionUtils() {
         // no-op
     }
+    
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Action API                                                              *
+     *                                                                         *
+     **************************************************************************/
     
     /**
      * Takes the provided {@link Action} and returns a {@link Button} instance
@@ -77,6 +97,15 @@ public class ActionUtils {
         return configure(new Button(), action);
     }
     
+    
+    /**
+     * Takes the provided {@link Action} and returns a {@link MenuButton} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link MenuButton} should bind to.
+     * @return A {@link MenuButton} that is bound to the state of the provided 
+     *      {@link Action}
+     */
     public static MenuButton createMenuButton(final Action action) {
         return configure(new MenuButton(), action);
     }
@@ -141,6 +170,14 @@ public class ActionUtils {
         return configure(new MenuItem(), action);
     }
     
+    /**
+     * Takes the provided {@link Action} and returns a {@link Menu} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link Menu} should bind to.
+     * @return A {@link Menu} that is bound to the state of the provided 
+     *      {@link Action}
+     */
     public static Menu createMenu(final Action action) {
         return configure(new Menu(), action);
     }
@@ -169,11 +206,27 @@ public class ActionUtils {
         return configure(new RadioMenuItem(action.textProperty().get()), action);
     }
     
-    public static ToolBar createToolBar( Collection<? extends Action> actions ) {
-        
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * ActionGroup API                                                         *
+     *                                                                         *
+     **************************************************************************/
+    
+    /**
+     * Takes the provided {@link Collection} of {@link Action} (or subclasses,
+     * such as {@link ActionGroup}) instances and returns a {@link ToolBar} 
+     * populated with appropriate {@link Node nodes} bound to the provided 
+     * {@link Action actions}.
+     * 
+     * @param actions The {@link Action actions} to place on the {@link ToolBar}.
+     * @return A {@link ToolBar} that contains {@link Node nodes} which are bound 
+     *      to the state of the provided {@link Action}
+     */
+    public static ToolBar createToolBar(Collection<? extends Action> actions) {
         ToolBar toolbar = new ToolBar();
         for (Action action : actions) {
-           
             if ( action instanceof ActionGroup ) {
                 MenuButton menu = createMenuButton( action );
                 menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
@@ -183,18 +236,24 @@ public class ActionUtils {
             } else {
                 toolbar.getItems().add( createButton(action));
             }
-            
         }
         
         return toolbar;
-        
     }
     
-    public static MenuBar createMenuBar( Collection<? extends Action> actions ) {
-        
+    /**
+     * Takes the provided {@link Collection} of {@link Action} (or subclasses,
+     * such as {@link ActionGroup}) instances and returns a {@link MenuBar} 
+     * populated with appropriate {@link Node nodes} bound to the provided 
+     * {@link Action actions}.
+     * 
+     * @param actions The {@link Action actions} to place on the {@link MenuBar}.
+     * @return A {@link MenuBar} that contains {@link Node nodes} which are bound 
+     *      to the state of the provided {@link Action}
+     */
+    public static MenuBar createMenuBar(Collection<? extends Action> actions) {
         MenuBar menuBar = new MenuBar();
         for (Action action : actions) {
-            
             Menu menu = createMenu( action );
             
             if ( action instanceof ActionGroup ) {
@@ -202,18 +261,34 @@ public class ActionUtils {
             } 
             
             menuBar.getMenus().add(menu);
-            
         }
         
         return menuBar;
-        
     }
     
-    public static ContextMenu createContextMenu( Collection<? extends Action> actions ) {
+    /**
+     * Takes the provided {@link Collection} of {@link Action} (or subclasses,
+     * such as {@link ActionGroup}) instances and returns a {@link ContextMenu} 
+     * populated with appropriate {@link Node nodes} bound to the provided 
+     * {@link Action actions}.
+     * 
+     * @param actions The {@link Action actions} to place on the {@link ContextMenu}.
+     * @return A {@link ContextMenu} that contains {@link Node nodes} which are bound 
+     *      to the state of the provided {@link Action}
+     */    
+    public static ContextMenu createContextMenu(Collection<? extends Action> actions) {
         ContextMenu menu = new ContextMenu();
         menu.getItems().addAll(toMenuItems(actions));
         return menu;
     }
+    
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Private implementation                                                  *
+     *                                                                         *
+     **************************************************************************/
     
     private static Collection<MenuItem> toMenuItems( Collection<? extends Action> actions ) {
         

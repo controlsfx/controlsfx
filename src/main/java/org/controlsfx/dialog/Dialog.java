@@ -72,11 +72,11 @@ import org.controlsfx.control.action.ActionUtils;
  * subsections:
  * 
  * <ul>
- *   <li>title,
- *   <li>masthead, 
- *   <li>content, 
- *   <li>expandable content,
- *   <li>button bar
+ *   <li>Title,
+ *   <li>Masthead, 
+ *   <li>Content, 
+ *   <li>Expandable content,
+ *   <li>Button bar
  * </ul>
  * 
  * <p>This is more easily demonstrated in the diagram shown below:

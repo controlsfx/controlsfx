@@ -68,30 +68,118 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog.Actions;
 
 
 /**
- * Simplifies building commonly used dialogs
- * Uses fluent API for flexibility<br/><br/>
+ * A simple (yet flexible) API for showing the most common forms of (modal) UI 
+ * dialogs. This class contains a fluent API to make building and customising
+ * the pre-built dialogs really easy, but for those developers who want complete
+ * control, you may be interested in instead using the {@link Dialog} class
+ * (which is what all of these pre-built dialogs use as well).
  * 
- * Usage example:
- * <pre>
- * {@code
+ * <p>A dialog consists of a number of sections, and the pre-built dialogs in 
+ * this class modify these sections as required. Refer to the {@link Dialog} 
+ * class documentation for more detail, but a brief overview is provided in 
+ * the following section.
+ * 
+ * <h3>Anatomy of a Dialog</h3>
+ * 
+ * <p>A dialog consists of the following sections:
+ * 
+ * <ul>
+ *   <li>Title,
+ *   <li>Masthead, 
+ *   <li>Content, 
+ *   <li>Expandable content,
+ *   <li>Button bar
+ * </ul>
+ * 
+ * <p>This is more easily demonstrated in the diagram shown below:
+ * 
+ * <br>
+ * <center><img src="dialog-overview.png"></center>
+ * 
+ * <h3>Screenshots</h3>
+ * <p>To better explain the dialogs, here is a table showing the default look
+ * of all available pre-built dialogs when run on Windows (the button placement
+ * in dialogs uses the {@link ButtonBar} control, so the buttons vary in order
+ * based on the operating system in which the dialog is shown):
+ * 
+ * <br>
+ * <table style="border: 1px solid gray;">
+ *   <tr>
+ *     <th></th>
+ *     <th><center><h3>Without Masthead</h3></center></th>
+ *     <th><center><h3>With Masthead</h3></center></th>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Information</strong></td>
+ *     <td><center><img src="dialog-information-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-information-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Confirmation</strong></td>
+ *     <td><center><img src="dialog-confirmation-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-confirmation-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Warning</strong></td>
+ *     <td><center><img src="dialog-warning-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-warning-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Error</strong></td>
+ *     <td><center><img src="dialog-error-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-error-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Exception</strong></td>
+ *     <td><center><img src="dialog-exception-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-exception-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Exception (Expanded)</strong></td>
+ *     <td><center><img src="dialog-exception-expanded-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-exception-expanded-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Exception (new window)</strong></td>
+ *     <td colspan="2"><center><img src="dialog-exception-new-window.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Text Input</strong></td>
+ *     <td><center><img src="dialog-text-input-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-text-input-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Choice Input<br>(ChoiceBox/ComboBox)</strong></td>
+ *     <td><center><img src="dialog-choicebox-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-choicebox-masthead.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Command Link</strong></td>
+ *     <td><center></center></td>
+ *     <td><center></center></td>
+ *   </tr>
+ * </table>
+ * 
+ * 
+ * <h3>Code Examples</h3>
+ * 
+ * <p>The code below will setup and show a confirmation dialog:
+ * 
+ * <pre>{@code
  *  Action response = Dialogs.create()
  *      .owner( isOwnerSelected ? stage : null)
  *      .title("You do want dialogs right?")
  *      .masthead(isMastheadVisible() ? "Just Checkin'" : null)
  *      .message( "I was a bit worried that you might not want them, so I wanted to double check.")
- *      .showConfirm();
- * }
- * </pre>
+ *      .showConfirm();}</pre>
  * 
- * The code above will setup and show a confirmation dialog.<br/><br/> 
+ * <p>The following code is an example of setting up a CommandLink dialog:
  * 
- * Following is an example of setting up a CommandLink dialog
- * 
- * <pre>
- * {@code 
+ * <pre>{@code 
  *   List<CommandLink> links = Arrays.asList(
  *        new CommandLink("Add a network that is in the range of this computer", 
  *                        "This shows you a list of networks that are currently available and lets you connect to one."),
@@ -100,17 +188,18 @@ import org.controlsfx.control.action.Action;
  *        new CommandLink("Create an ad hoc network", 
  *                "This creates a temporary network for sharing files or and Internet connection"));
  *   
- *   
  *   Action response = Dialogs.create()
  *           .owner(cbSetOwner.isSelected() ? stage : null)
  *           .title("Manually connect to wireless network")
  *           .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
  *           .message("How do you want to add a network?")
- *           .showCommandLinks( links.get(1), links );
- * }
- * </pre>
- * 
- * */
+ *           .showCommandLinks( links.get(1), links );}</pre>
+ *
+ * @see Dialog
+ * @see Action
+ * @see Actions
+ * @see AbstractAction
+ */
 public final class Dialogs {
 
     /**

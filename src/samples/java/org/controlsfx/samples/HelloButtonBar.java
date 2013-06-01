@@ -39,9 +39,6 @@ import static org.controlsfx.control.ButtonBar.ButtonType.OK_DONE;
 import static org.controlsfx.control.ButtonBar.ButtonType.OTHER;
 import static org.controlsfx.control.ButtonBar.ButtonType.RIGHT;
 import static org.controlsfx.control.ButtonBar.ButtonType.YES;
-
-import java.util.Arrays;
-
 import javafx.application.Application;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;

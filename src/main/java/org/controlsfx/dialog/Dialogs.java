@@ -456,7 +456,6 @@ public final class Dialogs {
                 return ph * 1.5;
             }
         };
-        content.setPadding(new Insets(0, 0, 10, 0));
         content.setHgap(gapSize);
         content.setVgap(gapSize);
         
@@ -482,6 +481,9 @@ public final class Dialogs {
             content.add(button, 0, row++);
             buttons.add(button);
         }
+        
+        // last button gets some extra padding (hacky)
+        GridPane.setMargin(buttons.get(buttons.size() - 1), new Insets(0,0,10,0));
         
         dlg.setContent(content);
         dlg.getActions().clear();

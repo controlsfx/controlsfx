@@ -26,6 +26,8 @@
  */
 package org.controlsfx.samples;
 
+import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -61,9 +63,11 @@ public class HelloActionGroup extends Application implements Sample {
         new ActionGroup("Group 1",  new DummyAction("Action 1.1"), 
                                     new DummyAction("Action 2.1") ),
         new ActionGroup("Group 2",  new DummyAction("Action 2.1"), 
+                                    ACTION_SEPARATOR,
                                     new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
                                                                   new DummyAction("Action 2.2.2")),
                                     new DummyAction("Action 2.3") ),
+        ACTION_SEPARATOR,                                    
         new DummyAction("Action 3"),
         new ActionGroup("Group 4",  new DummyAction("Action 4.1"), 
                                     new DummyAction("Action 4.2"))
@@ -89,6 +93,7 @@ public class HelloActionGroup extends Application implements Sample {
     private ObservableList<Action> flatten( Collection<? extends Action> actions, ObservableList<Action> dest ) {
         
         for (Action a : actions) {
+           if ( a == null || a == ActionUtils.ACTION_SEPARATOR ) continue;
            dest.add(a); 
            if ( a instanceof ActionGroup ) {
                flatten( ((ActionGroup)a).getActions(), dest);

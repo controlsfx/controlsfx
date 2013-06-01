@@ -30,7 +30,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -78,6 +82,36 @@ public class ActionUtils {
         // no-op
     }
     
+    public static Action ACTION_SEPARATOR = new Action() {
+
+        @Override public StringProperty textProperty() {
+            return null;
+        }
+
+        @Override public BooleanProperty disabledProperty() {
+            return null;
+        }
+
+        @Override public StringProperty longTextProperty() {
+            return null;
+        }
+
+        @Override public ObjectProperty<Node> graphicProperty() {
+            return null;
+        }
+
+        @Override public ObservableMap<Object, Object> getProperties() {
+            return null;
+        }
+
+        @Override public void execute(ActionEvent ae) {
+        }
+        
+        public String toString() { 
+            return "Separator"; 
+        };
+        
+    };
     
     
     /***************************************************************************
@@ -232,8 +266,9 @@ public class ActionUtils {
                 MenuButton menu = createMenuButton( action );
                 menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
                 toolbar.getItems().add(menu);
-            } else if ( action == null ) {
+            } else if ( action == ACTION_SEPARATOR ) {
                 toolbar.getItems().add( new Separator());
+            } else if ( action == null ) {
             } else {
                 toolbar.getItems().add( createButton(action));
             }
@@ -255,11 +290,15 @@ public class ActionUtils {
     public static MenuBar createMenuBar(Collection<? extends Action> actions) {
         MenuBar menuBar = new MenuBar();
         for (Action action : actions) {
+            
+            if ( action == ACTION_SEPARATOR ) continue;
+            
             Menu menu = createMenu( action );
             
             if ( action instanceof ActionGroup ) {
                menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
-            } 
+            } else if ( action == null ) {
+            }
             
             menuBar.getMenus().add(menu);
         }
@@ -303,10 +342,11 @@ public class ActionUtils {
                menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
                items.add(menu);
                 
-            } else if ( action == null ) {
+            } else if ( action == ACTION_SEPARATOR ) {
                 
                 items.add( new SeparatorMenuItem());
                 
+            } else if ( action == null ) {    
             } else {
                 
                 items.add( createMenuItem(action));

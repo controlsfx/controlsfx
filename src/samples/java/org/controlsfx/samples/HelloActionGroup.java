@@ -109,7 +109,7 @@ public class HelloActionGroup extends Application implements Sample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/action/ActionGroup.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionGroup.html";
     }
     
     @Override public Node getPanel(final Stage stage) {

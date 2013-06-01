@@ -57,6 +57,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
@@ -135,7 +136,7 @@ public class Dialog {
     // enable to turn on grid lines, etc
     private static final boolean DEBUG = false;
     
-    private static int MIN_DIALOG_WIDTH = 426;
+    static int MIN_DIALOG_WIDTH = 426;
 
     
     
@@ -656,7 +657,9 @@ public class Dialog {
         
         
         // now that all the content is built, we apply the min size rules
-        contentPane.setMinWidth(MIN_DIALOG_WIDTH);
+        if (! contentPane.minWidthProperty().isBound()) {
+            contentPane.setMinWidth(MIN_DIALOG_WIDTH);
+        }
         
         this.contentPane.setGridLinesVisible(DEBUG);
 //        this.dialog.sizeToScene();
@@ -673,6 +676,8 @@ public class Dialog {
             GridPane.setVgrow(content, Priority.SOMETIMES);
             GridPane.setValignment(content, VPos.TOP);
             GridPane.setHgrow(content, Priority.ALWAYS);
+            
+            contentPane.minWidthProperty().bind(((Region)content).minWidthProperty());
         }
         
         // dialog image can go to the left if there is no masthead
@@ -707,8 +712,6 @@ public class Dialog {
     }
 
     private void createButtonPanel(final int startRow) {
-        
-        
         ButtonBar buttonBar = new ButtonBar();
         buttonBar.setButtonOrder(buttonBarOrder);
         

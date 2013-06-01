@@ -34,6 +34,7 @@ import static org.controlsfx.dialog.DialogResources.getString;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -48,6 +49,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -423,41 +425,51 @@ public final class Dialogs {
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks( CommandLink defaultCommandLink, List<CommandLink> links ) {
-        final Dialog dlg = buildDialog(Type.INFORMATION );
+    public Action showCommandLinks(CommandLink defaultCommandLink, List<CommandLink> links) {
+        final Dialog dlg = buildDialog(Type.INFORMATION);
+        dlg.setResizable(true);
         dlg.setContent(message);
         
         Node messageNode = dlg.getContent();
         messageNode.getStyleClass().add("command-link-message");
         
         final int gapSize = 10;
-        final VBox content = new VBox(gapSize);
+        final List<Button> buttons = new ArrayList<>(links.size());
+        
+        GridPane content = new GridPane() {
+            @Override protected double computePrefWidth(double height) {
+                double pw = 0;
+                
+                for (int i = 0; i < buttons.size(); i++) {
+                    Button btn = buttons.get(i);
+                    pw = Math.min(pw, btn.prefWidth(-1));
+                }
+                return pw + gapSize;
+            }
+            
+            @Override protected double computePrefHeight(double width) {
+                double ph = 0;
+                for (int i = 0; i < buttons.size(); i++) {
+                    Button btn = buttons.get(i);
+                    ph += btn.prefHeight(width) + gapSize;
+                }
+                return ph * 1.5;
+            }
+        };
+        content.setPadding(new Insets(0, 0, 10, 0));
+        content.setHgap(gapSize);
+        content.setVgap(gapSize);
+        
+        int row = 0;
         Node message = dlg.getContent();
-        if ( message != null ) {
-            content.getChildren().add(message);
+        if (message != null) {
+            content.add(message, 0, row++);
         }
         
         for (final CommandLink commandLink : links) {
+            if (commandLink == null) continue; 
             
-            if ( commandLink == null ) continue; 
-            
-            final Button button = buildCommandLinkButton(commandLink);
-            
-            DoubleBinding dialogWidthBinding = new DoubleBinding() {
-                {
-                    bind(dlg.widthProperty());
-                }
-                
-                @Override protected double computeValue() {
-                    // FIXME 100 is just plucked out of the air to get good
-                    // word wrapping in most circumstances
-                    double width = dlg.widthProperty().get();
-                    return width - 100;
-                }
-            };
-            button.prefWidthProperty().bind(dialogWidthBinding);
-            button.maxWidthProperty().bind(dialogWidthBinding);
-            
+            final Button button = buildCommandLinkButton(commandLink);            
             button.setDefaultButton(commandLink == defaultCommandLink);
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
@@ -465,14 +477,11 @@ public final class Dialogs {
                 }
             });
                     
-            VBox.setVgrow(button, Priority.SOMETIMES);
-            content.getChildren().add( button );
+            GridPane.setHgrow(button, Priority.ALWAYS);
+            GridPane.setVgrow(button, Priority.ALWAYS);
+            content.add(button, 0, row++);
+            buttons.add(button);
         }
-        
-        Region spacer = new Region();
-        spacer.setMinHeight(gapSize);
-        VBox.setVgrow(spacer, Priority.NEVER);
-        content.getChildren().add( spacer );
         
         dlg.setContent(content);
         dlg.getActions().clear();
@@ -641,28 +650,35 @@ public final class Dialogs {
         return root;
     }
     
-    private Button buildCommandLinkButton( CommandLink commandLink ) {
+    private Button buildCommandLinkButton(CommandLink commandLink) {
         // put the content inside a button
         final Button button = new Button();
         button.getStyleClass().addAll("command-link-button");
-//        button.setPrefWidth(500);
+        button.setMaxHeight(Double.MAX_VALUE);
         button.setMaxWidth(Double.MAX_VALUE);
-        button.setMaxHeight(Region.USE_PREF_SIZE);
         button.setAlignment(Pos.CENTER_LEFT);
         
-        Label titleLabel = new Label(commandLink.getText() );
+        final Label titleLabel = new Label(commandLink.getText() );
+        titleLabel.minWidthProperty().bind(new DoubleBinding() {
+            {
+                bind(titleLabel.prefWidthProperty());
+            }
+            
+            @Override protected double computeValue() {
+                return titleLabel.getPrefWidth() + 400;
+            }
+        });
         titleLabel.getStyleClass().addAll("line-1");
         titleLabel.setWrapText(true);
         titleLabel.setAlignment(Pos.TOP_LEFT);
-        titleLabel.maxWidthProperty().bind(button.maxWidthProperty());
-        GridPane.setVgrow(titleLabel, Priority.ALWAYS);
+        GridPane.setVgrow(titleLabel, Priority.NEVER);
 
         Label messageLabel = new Label(commandLink.getLongText() );
         messageLabel.getStyleClass().addAll("line-2");
         messageLabel.setWrapText(true);
         messageLabel.setAlignment(Pos.TOP_LEFT);
-        messageLabel.maxWidthProperty().bind(button.maxWidthProperty());
-        GridPane.setVgrow(messageLabel, Priority.ALWAYS);
+        messageLabel.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(messageLabel, Priority.SOMETIMES);
         
         Node graphic = commandLink.getGraphic();
         graphic = graphic == null? new ImageView(DialogResources.getImage("command.link.icon")) : graphic;
@@ -672,12 +688,16 @@ public final class Dialogs {
         GridPane.setMargin(graphicContainer, new Insets(0,10,0,0));
         
         GridPane grid = new GridPane();
+        grid.minWidthProperty().bind(titleLabel.prefWidthProperty());
+        grid.setMaxHeight(Double.MAX_VALUE);
+        grid.setMaxWidth(Double.MAX_VALUE);
         grid.getStyleClass().add("container");
         grid.add(graphicContainer, 0, 0, 1, 2);
         grid.add(titleLabel, 1, 0);
         grid.add(messageLabel, 1, 1);
 
         button.setGraphic(grid);
+        button.minWidthProperty().bind(titleLabel.prefWidthProperty());
         
         return button;
     }

@@ -161,8 +161,8 @@ import org.controlsfx.dialog.Dialog.Actions;
  *   </tr>
  *   <tr>
  *     <td valign="center" style="text-align:right;"><strong>Command Link</strong></td>
- *     <td><center></center></td>
- *     <td><center></center></td>
+ *     <td><center><img src="dialog-commandlink-no-masthead.png"></center></td>
+ *     <td><center><img src="dialog-commandlink-masthead.png"></center></td>
  *   </tr>
  * </table>
  * 

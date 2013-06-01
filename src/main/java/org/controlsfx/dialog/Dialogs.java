@@ -427,7 +427,6 @@ public final class Dialogs {
      */
     public Action showCommandLinks(CommandLink defaultCommandLink, List<CommandLink> links) {
         final Dialog dlg = buildDialog(Type.INFORMATION);
-        dlg.setResizable(true);
         dlg.setContent(message);
         
         Node messageNode = dlg.getContent();
@@ -448,7 +447,8 @@ public final class Dialogs {
             }
             
             @Override protected double computePrefHeight(double width) {
-                double ph = 0;
+                double ph = masthead == null || masthead.isEmpty() ? 0 : 10;
+                
                 for (int i = 0; i < buttons.size(); i++) {
                     Button btn = buttons.get(i);
                     ph += btn.prefHeight(width) + gapSize;

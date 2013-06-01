@@ -82,38 +82,6 @@ public class ActionUtils {
         // no-op
     }
     
-    public static Action ACTION_SEPARATOR = new Action() {
-
-        @Override public StringProperty textProperty() {
-            return null;
-        }
-
-        @Override public BooleanProperty disabledProperty() {
-            return null;
-        }
-
-        @Override public StringProperty longTextProperty() {
-            return null;
-        }
-
-        @Override public ObjectProperty<Node> graphicProperty() {
-            return null;
-        }
-
-        @Override public ObservableMap<Object, Object> getProperties() {
-            return null;
-        }
-
-        @Override public void execute(ActionEvent ae) {
-        }
-        
-        public String toString() { 
-            return "Separator"; 
-        };
-        
-    };
-    
-    
     /***************************************************************************
      *                                                                         *
      * Action API                                                              *
@@ -248,6 +216,43 @@ public class ActionUtils {
      * ActionGroup API                                                         *
      *                                                                         *
      **************************************************************************/
+    
+    
+    /**
+     * Action representation of the generic separator. Adding this action anywhere in the 
+     * action tree serves as indication that separator has be created in its place.
+     * See {@link ActionGroup} for example of action tree creation
+     */
+    public static Action ACTION_SEPARATOR = new Action() {
+
+        @Override public StringProperty textProperty() {
+            return null;
+        }
+
+        @Override public BooleanProperty disabledProperty() {
+            return null;
+        }
+
+        @Override public StringProperty longTextProperty() {
+            return null;
+        }
+
+        @Override public ObjectProperty<Node> graphicProperty() {
+            return null;
+        }
+
+        @Override public ObservableMap<Object, Object> getProperties() {
+            return null;
+        }
+
+        @Override public void execute(ActionEvent ae) {
+        }
+        
+        public String toString() { 
+            return "Separator"; 
+        };
+        
+    };    
     
     /**
      * Takes the provided {@link Collection} of {@link Action} (or subclasses,

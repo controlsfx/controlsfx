@@ -357,7 +357,14 @@ public final class Dialogs {
         return showTextInput("");
     }
 
-    @SuppressWarnings("unchecked") public <T> T showChoices(T defaultValue, Collection<T> choices) {
+    /**
+     * Show a dialog with one combobox filled with provided choices. The combobox selection 
+     * will be set to a default value if one is provided.
+     * @param defaultChoice default combobox selection 
+     * @param choices dialog choices
+     * @return selected choice or null if dialog is cancelled
+     */
+    @SuppressWarnings("unchecked") public <T> T showChoices(T defaultChoice, Collection<T> choices) {
 
         Dialog dlg = buildDialog(Type.INPUT);
         // Workaround: need final variable without custom change listener
@@ -374,7 +381,7 @@ public final class Dialogs {
             ComboBox<T> comboBox = new ComboBox<T>();
             comboBox.setMinWidth(MIN_WIDTH);
             comboBox.getItems().addAll(choices);
-            comboBox.getSelectionModel().select(defaultValue);
+            comboBox.getSelectionModel().select(defaultChoice);
             comboBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
             dlg.setContent(buildInputContent(comboBox));
         } else {
@@ -382,7 +389,7 @@ public final class Dialogs {
             ChoiceBox<T> choiceBox = new ChoiceBox<T>();
             choiceBox.setMinWidth(MIN_WIDTH);
             choiceBox.getItems().addAll(choices);
-            choiceBox.getSelectionModel().select(defaultValue);
+            choiceBox.getSelectionModel().select(defaultChoice);
             choiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
             dlg.setContent(buildInputContent(choiceBox));
         }

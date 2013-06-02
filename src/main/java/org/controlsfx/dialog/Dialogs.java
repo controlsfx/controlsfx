@@ -72,7 +72,7 @@ import org.controlsfx.dialog.Dialog.Actions;
 
 /**
  * A simple (yet flexible) API for showing the most common forms of (modal) UI 
- * dialogs. This class contains a fluent API to make building and customising
+ * dialogs. This class contains a fluent API to make building and customizing
  * the pre-built dialogs really easy, but for those developers who want complete
  * control, you may be interested in instead using the {@link Dialog} class
  * (which is what all of these pre-built dialogs use as well).
@@ -93,11 +93,16 @@ import org.controlsfx.dialog.Dialog.Actions;
  *   <li>Expandable content,
  *   <li>Button bar
  * </ul>
- * 
+ *  * 
  * <p>This is more easily demonstrated in the diagram shown below:
  * 
  * <br>
  * <center><img src="dialog-overview.png"></center>
+ * 
+ * <br>
+ * The system buttons are hidden, only "close" button is visible by default. 
+ * "Maximize" button is only available when dialog becomes resizable.
+ * This happens for example with the Exception dialog when details are expanded. 
  * 
  * <h3>Screenshots</h3>
  * <p>To better explain the dialogs, here is a table showing the default look

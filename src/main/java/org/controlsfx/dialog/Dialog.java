@@ -74,6 +74,7 @@ import org.controlsfx.control.action.ActionUtils;
  * 
  * <ul>
  *   <li>Title,
+ *   <li>System buttons,
  *   <li>Masthead, 
  *   <li>Content, 
  *   <li>Expandable content,
@@ -97,6 +98,7 @@ import org.controlsfx.control.action.ActionUtils;
  * {@code
  * Dialog dlg = new Dialog(owner, "Dialog Title");
  * dlg.setResizable(false);
+ * dlg.setIconifiable(false);
  * dlg.setGraphic(new ImageView(getImage()));
  * dlg.setMasthead("Dialog Masthead");
  * dlg.getActions().addAll(Dialog.Actions.OK, Dialog.Actions.CANCEL);

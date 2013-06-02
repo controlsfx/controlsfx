@@ -88,12 +88,13 @@ import org.controlsfx.dialog.Dialog.Actions;
  * 
  * <ul>
  *   <li>Title,
+ *   <li>System buttons (min, max, close),
  *   <li>Masthead, 
  *   <li>Content, 
  *   <li>Expandable content,
  *   <li>Button bar
  * </ul>
- *  * 
+ * 
  * <p>This is more easily demonstrated in the diagram shown below:
  * 
  * <br>

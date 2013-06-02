@@ -75,7 +75,7 @@ import org.controlsfx.control.action.ActionUtils;
  * 
  * <ul>
  *   <li>Title,
- *   <li>System buttons,
+ *   <li>System buttons (min, max, close),
  *   <li>Masthead, 
  *   <li>Content, 
  *   <li>Expandable content,

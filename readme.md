@@ -69,7 +69,6 @@ In other words, we do not differentiate between bug fix and feature releases we 
 
 ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers, but our interpretation of this license suggests to us that it is business friendly, requiring only the redistribution of the [3-clause BSD license we distribute with ControlsFX][19]. As always, I suggest you review the license with the appropriate people, rather than take the advice of software engineers. If this license is not suitable, please contact [Jonathan Giles][20] to discuss an alternative license.
 
-Ive been hinting at this project for a really long time, and Im finally ready to take the wraps off of it. I am incredibly pleased to announce the immediate availability of the first developer preview release of the brand new ControlsFX project. You can visit the ControlsFX page for all the details on how [...]
 
    [1]: https://bitbucket.org/JonathanGiles/controlsfx
    [2]: http://cache.fxexperience.com/wp-content/uploads/2013/04/buttonBar.png

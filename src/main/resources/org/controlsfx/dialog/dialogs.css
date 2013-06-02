@@ -231,6 +231,23 @@
 
 .dialog .command-link-button {
     -fx-padding: 10 10 10 10;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+}
+
+.dialog .command-link-button:hover {
+    -fx-border-color: -fx-default-button;
+}
+
+.dialog .command-link-button:default,
+.dialog .command-link-button:default:hover {
+    -fx-border-color: -fx-default-button;
+}
+
+.dialog .command-link-button:armed  {
+    -fx-background-color: #cce3f4;
 }
 
 .dialog .command-link-button > .container > .line-1 {

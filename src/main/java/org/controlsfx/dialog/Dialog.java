@@ -241,7 +241,9 @@ public class Dialog {
     }
 
     /**
-     * Sets whether the dialog can be resized by the user. 
+     * Sets whether the dialog can be resized by the user.
+     * Resizable dialogs can also be maximized ( maximize button
+     * becomes visible)  
      * 
      * @param resizable true if dialog should be resizable.
      */
@@ -249,6 +251,21 @@ public class Dialog {
         dialog.setResizable(resizable);
     }
 
+    /**
+     * Sets whether the dialog can be iconified (minimized)
+     * @param iconifiable if dialog should be iconifiable
+     */
+    public void setIconifiable(boolean iconifiable) {
+        dialog.setIconifiable(iconifiable);
+    }
+    
+    /**
+     * Sets whether the dialog can be closed
+     * @param iconifiable if dialog should be closable
+     */
+    public void setClosable( boolean closable ) {
+        dialog.setClosable( closable );
+    }
     
     // --- graphic
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>();

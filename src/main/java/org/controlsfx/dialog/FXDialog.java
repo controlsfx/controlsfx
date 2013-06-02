@@ -66,6 +66,7 @@ class FXDialog extends Stage {
     private BorderPane root;
     private StackPane decoratedRoot;
     private HBox windowBtns;
+    private Button closeButton;
     private Button minButton;
     private Button maxButton;
     private Rectangle resizeCorner;
@@ -191,7 +192,7 @@ class FXDialog extends Stage {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add close min max
-        Button closeButton = new WindowButton("close");
+        closeButton = new WindowButton("close");
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 FXDialog.this.hide();
@@ -291,6 +292,10 @@ class FXDialog extends Stage {
 
     public void setIconifiable(boolean iconifiable) {
         minButton.setVisible(iconifiable);
+    }
+    
+    public void setClosable( boolean closable ) {
+        closeButton.setVisible( closable );
     }
 
     private static class WindowButton extends Button {

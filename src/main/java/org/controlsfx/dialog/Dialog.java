@@ -32,6 +32,7 @@ import static org.controlsfx.dialog.DialogResources.getString;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -674,20 +675,18 @@ public class Dialog {
         }
         contentPane.getColumnConstraints().add(rightColumn);
         
-        
         // now that all the content is built, we apply the min size rules
         if (! contentPane.minWidthProperty().isBound()) {
             contentPane.setMinWidth(MIN_DIALOG_WIDTH);
         }
         
         this.contentPane.setGridLinesVisible(DEBUG);
-//        this.dialog.sizeToScene();
     }
 
     private void createCenterPanel(final int startRow) {
         final boolean hasMasthead = hasMasthead();
         
-        Node content = getContent();
+        final Node content = getContent();
         if (content != null) {
             content.getStyleClass().add("center");
             
@@ -696,7 +695,17 @@ public class Dialog {
             GridPane.setValignment(content, VPos.TOP);
             GridPane.setHgrow(content, Priority.ALWAYS);
             
-            contentPane.minWidthProperty().bind(((Region)content).minWidthProperty());
+            if (content instanceof Region) {
+                contentPane.minWidthProperty().bind(new DoubleBinding() {
+                    {
+                        bind(((Region)content).minWidthProperty());
+                    }
+                    
+                    @Override protected double computeValue() {
+                        return Math.max(MIN_DIALOG_WIDTH, ((Region) content).getMinWidth());
+                    }
+                });
+            }
         }
         
         // dialog image can go to the left if there is no masthead

@@ -1,49 +1,5 @@
 ControlsFX is an [open source project][1] for JavaFX that aims to provide really high quality UI controls and other tools to complement the core JavaFX distribution. It has been developed for JavaFX 8.0 and beyond, and has a guiding principle of only accepting new controls / features when all existing code is at an acceptably high level, including thankless jobs like having high quality javadoc documentation. This ensure a high quality release is available at all times, with all experimental work being done in branches of the main code base.
 
-## Features
-
-ControlsFX 8.0.0 will include the following features:
-
-#### ButtonBar
-**A horizontal container for buttons, which automatically places the buttons in the correct position for the underlying operating system. Just annotate the buttons with their type and itll handle the rest!
-
-![ButtonBar][2]
-
-* * *
-#### Dialogs
-A collection of pre-built, modal dialogs providing a really simple yet powerful API. Supports all manner of pre-built dialogs, and even allows for custom dialogs to be easily created.
-
-![Dialogs][3]
-
-* * *
-
-#### GridView
-A fast, virtualised grid container similar to ListView, except that there can be multiple cells on each row. Great for showing images!
-
-![GridView][4]
-
-* * *
-
-#### RangeSlider
-When you want a user to specify a range, right now you need to give them two text fields to type into (or two sliders). Yuck! This control is essentially the standard JavaFX slider but with two draggable thumbs on it one representing the low value and the other the high value. Much better!
-
-![RangeSlider][5]
-
-* * *
-
-#### Rating
-** A simple control that allows users to specify a rating between zero and a maximum value. This control supports partial ratings and updating on hover or on click.
-
-![Rating][6]
-
-* * *
-
-#### SegmentedButton
-When you have a ToggleGroup with buttons in it, it looks nicer when the buttons are grouped together (rather than individual buttons). This is exactly what the SegmentedButton control does it merges together all of your buttons in a ToggleGroup so that it is clear to users that the buttons are related.
-
-![SegmentedButton][7]
-
-* * *
 
 **Important note: **ControlsFX will only work on JavaFX 8.0 b87 or later. If you are running on earlier versions of JDK 8, please [upgrade][8]. If you are still using JavaFX 2.x then unfortunately this library will not work for you.
 

@@ -306,6 +306,11 @@ public class HelloDialog extends Application implements Sample {
 
         row++;
         
+
+        // *******************************************************************
+        // Command links
+        // *******************************************************************
+        
         grid.add(createLabel("Command Links: "), 0, row);
         final Button Hyperlink12 = new Button("Show");
         Hyperlink12.setOnAction(new EventHandler<ActionEvent>() {
@@ -332,7 +337,12 @@ public class HelloDialog extends Application implements Sample {
         });
         grid.add(Hyperlink12, 1, row);
         
-        row += 3;
+        row ++;
+        
+
+        // *******************************************************************
+        // Custom dialogs
+        // *******************************************************************
         
         grid.add(createLabel("Custom Dialog: "), 0, row);
         final Button Hyperlink14 = new Button("Show");
@@ -383,9 +393,9 @@ public class HelloDialog extends Application implements Sample {
                 
                 dlg.setResizable(false);
                 dlg.setIconifiable(false);
-                dlg.setGraphic( new ImageView( HelloDialog.class.getResource("login.png").toString()));
+                dlg.setGraphic(new ImageView(HelloDialog.class.getResource("login.png").toString()));
                 dlg.setContent(content);
-                dlg.getActions().addAll( actionLogin, Dialog.Actions.CANCEL);
+                dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
                 validate();
                 
                 Platform.runLater(new Runnable() {
@@ -411,7 +421,7 @@ public class HelloDialog extends Application implements Sample {
 
         stage.setTitle("Dialog Sample");
 
-        Scene scene = new Scene((Parent)getPanel(stage), 800, 300);
+        Scene scene = new Scene((Parent)getPanel(stage), 800, 400);
         scene.setFill(Color.WHITE);
 
         stage.setScene(scene);

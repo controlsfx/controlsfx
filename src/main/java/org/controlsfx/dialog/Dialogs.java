@@ -181,6 +181,23 @@ import org.controlsfx.dialog.Dialog.Actions;
  *      .masthead(isMastheadVisible() ? "Just Checkin'" : null)
  *      .message( "I was a bit worried that you might not want them, so I wanted to double check.")
  *      .showConfirm();}</pre>
+ *      
+ * <p>The most important point to note about the dialogs is that they are modal,
+ * which means that they stop the application code from progressing until the
+ * dialog is closed. Because of this, it is very easy to retrieve the users input:
+ * when the user closes the dialog (e.g. by clicking on one of the buttons), the 
+ * dialog will be hidden, and their response will be returned from the 
+ * {@link #show() show} method that was called to bring the dialog up in the 
+ * first place. In other words, following on from the code sample above, you 
+ * might do the following:
+ * 
+ * <pre>
+ * {@code 
+ * if (response == Dialog.Actions.OK) {
+ *     // ... submit user input
+ * } else {
+ *     // ... user cancelled, reset form to default
+ * }}</pre>
  * 
  * <p>The following code is an example of setting up a CommandLink dialog:
  * 

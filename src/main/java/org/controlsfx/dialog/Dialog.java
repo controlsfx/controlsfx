@@ -93,63 +93,111 @@ import org.controlsfx.control.action.ActionUtils;
  * 
  * <h3>Code Examples</h3>
  * 
- * <p>Here is an example of building a custom dialog:
- * 
- * <pre>
- * {@code
- * 
- * final GridPane content = new GridPane();
- * content.setHgap(10);
- * content.setVgap(10);
- * 
- * TextField txUserName = new TextField();
- * PasswordField txPassword = new PasswordField();
- * content.add(new Label("User name"), 0, 0);
- * content.add(txUserName, 1, 0);
- * GridPane.setHgrow(txUserName, Priority.ALWAYS);
- * content.add(new Label("Password"), 0, 1);
- * content.add(txPassword, 1, 1);
- * GridPane.setHgrow(txPassword, Priority.ALWAYS);
- * 
- * final Action actionLogin = new AbstractAction("Login") {
- *               
- *   {  
- *       ButtonBar.setType(this, ButtonType.OK_DONE); 
- *   }
- *   
- *   @Override public void execute(ActionEvent ae) {
- *       Dialog dlg = (Dialog) ae.getSource();
- *       // login code here
- *       dlg.hide();
- *   }
- * };
- * 
- * Dialog dlg = new Dialog(owner, "Login");
- * dlg.setResizable(false);
- * dlg.setIconifiable(false);
- * dlg.setGraphic(new ImageView(getImage()));
- * dlg.setMasthead("Enter correct user name and password");
- * dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
- * dlg.setContent(content);
- * dlg.setExpandableContent( new Label("Expandable content"));
- * Action result = dlg.show();}</pre>
- * 
- * <p>The code above will setup and present a non-resizable dialog with a
- * masthead, message and "OK" and "Cancel" buttons. Also it will have an
- * expandable area, the visibility of which is triggered by an automatically 
- * presented "Shows Details" button. Note that when the user clicks either the "OK"
- * or "Cancel" buttons, the dialog will be hidden, and their response will be
- * returned from the {@link #show() show} method that was called to bring the
- * dialog up in the first place. In other words, following on from the code
- * above, you might do the following:
+ * <p><strong>Getting The User Response</strong><br>The most important point to 
+ * note about the dialogs is that they are modal,
+ * which means that they stop the application code from progressing until the
+ * dialog is closed. Because of this, it is very easy to retrieve the users input:
+ * when the user closes the dialog (e.g. by clicking on one of the buttons), the 
+ * dialog will be hidden, and their response will be returned from the 
+ * {@link #show() show} method that was called to bring the dialog up in the 
+ * first place. In other words, you might do the following:
  * 
  * <pre>
  * {@code 
- * if (result == Dialog.Actions.OK) {
+ * Action response = Dialogs.create()
+ *      .title("You do want dialogs right?")
+ *      .masthead("Just Checkin'")
+ *      .message( "I was a bit worried that you might not want them, so I wanted to double check.")
+ *      .showConfirm();
+ *      
+ * if (response == Dialog.Actions.OK) {
  *     // ... submit user input
  * } else {
  *     // ... user cancelled, reset form to default
  * }}</pre>
+ * 
+ * <p><strong>Custom Dialogs</strong><br>It is not always the case that one of 
+ * the pre-built {@link Dialogs} suits the requirements of your application. In 
+ * that case, you can build a custom dialog. Shown below is a screenshot of one
+ * such custom dialog, and below that the source code used to create the code.
+ * I hope you'll agree that the code is logical and simple!
+ * 
+ * <br>
+ * <center>
+ * <img src="dialog-login-sample.png"/>
+ * </center>
+ * 
+ * <pre>
+ * {@code
+ * // This dialog will consist of two input fields (username and password),
+ * // and have two buttons: Login and Cancel.
+ * 
+ * final TextField txUserName = new TextField();
+ * final PasswordField txPassword = new PasswordField();
+ * final Action actionLogin = new AbstractAction("Login") {
+ *     {  
+ *         ButtonBar.setType(this, ButtonType.OK_DONE); 
+ *     }
+ *       
+ *     // This method is called when the login button is clicked...
+ *     public void execute(ActionEvent ae) {
+ *          Dialog dlg = (Dialog) ae.getSource();
+ *          // real login code here
+ *          dlg.hide();
+ *      }
+ * };
+ *   
+ * // This method is called when the user types into the username / password fields  
+ * private void validate() {
+ *     actionLogin.disabledProperty().set( 
+ *           txUserName.getText().trim().isEmpty() || txPassword.getText().trim().isEmpty());
+ * }
+ *   
+ * // Imagine that this method is called somewhere in your codebase
+ * private void showLoginDialog() {
+ *     Dialog dlg = new Dialog(null, "Login Dialog");
+ *       
+ *     // listen to user input on dialog (to enable / disable the login button)
+ *     ChangeListener<String> changeListener = new ChangeListener<String>() {
+ *         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+ *             validate();
+ *         }
+ *     };
+ *     txUserName.textProperty().addListener(changeListener);
+ *     txPassword.textProperty().addListener(changeListener);
+ *       
+ *     // layout a custom GridPane containing the input fields and labels
+ *     final GridPane content = new GridPane();
+ *     content.setHgap(10);
+ *     content.setVgap(10);
+ *       
+ *     content.add(new Label("User name"), 0, 0);
+ *     content.add(txUserName, 1, 0);
+ *     GridPane.setHgrow(txUserName, Priority.ALWAYS);
+ *     content.add(new Label("Password"), 0, 1);
+ *     content.add(txPassword, 1, 1);
+ *     GridPane.setHgrow(txPassword, Priority.ALWAYS);
+ *       
+ *     // create the dialog with a custom graphic and the gridpane above as the
+ *     // main content region
+ *     dlg.setResizable(false);
+ *     dlg.setIconifiable(false);
+ *     dlg.setGraphic(new ImageView(HelloDialog.class.getResource("login.png").toString()));
+ *     dlg.setContent(content);
+ *     dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
+ *     validate();
+ *       
+ *     // request focus on the username field by default (so the user can
+ *     // type immediately without having to click first)
+ *     Platform.runLater(new Runnable() {
+ *         public void run() {
+ *             txUserName.requestFocus();
+ *         }
+ *     });
+ *
+ *     dlg.show();
+ * }
+ * }</pre>
  * 
  * @see Dialogs
  * @see Action

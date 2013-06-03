@@ -370,6 +370,9 @@ public class HelloDialog extends Application implements Sample {
             
             @Override public void handle(ActionEvent arg0) {
                 Dialog dlg = new Dialog(cbSetOwner.isSelected() ? stage : null, "Login Dialog");
+                if (cbShowMasthead.isSelected()) {
+                    dlg.setMasthead("Login to ControlsFX");
+                }
                 
                 ChangeListener<String> changeListener = new ChangeListener<String>() {
                     @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {

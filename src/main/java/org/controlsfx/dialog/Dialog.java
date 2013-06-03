@@ -93,17 +93,44 @@ import org.controlsfx.control.action.ActionUtils;
  * 
  * <h3>Code Examples</h3>
  * 
- * <p>Here is an example of building a dialog:
+ * <p>Here is an example of building a custom dialog:
  * 
  * <pre>
  * {@code
- * Dialog dlg = new Dialog(owner, "Dialog Title");
+ * 
+ * final GridPane content = new GridPane();
+ * content.setHgap(10);
+ * content.setVgap(10);
+ * 
+ * TextField txUserName = new TextField();
+ * PasswordField txPassword = new PasswordField();
+ * content.add(new Label("User name"), 0, 0);
+ * content.add(txUserName, 1, 0);
+ * GridPane.setHgrow(txUserName, Priority.ALWAYS);
+ * content.add(new Label("Password"), 0, 1);
+ * content.add(txPassword, 1, 1);
+ * GridPane.setHgrow(txPassword, Priority.ALWAYS);
+ * 
+ * final Action actionLogin = new AbstractAction("Login") {
+ *               
+ *   {  
+ *       ButtonBar.setType(this, ButtonType.OK_DONE); 
+ *   }
+ *   
+ *   @Override public void execute(ActionEvent ae) {
+ *       Dialog dlg = (Dialog) ae.getSource();
+ *       // login code here
+ *       dlg.hide();
+ *   }
+ * };
+ * 
+ * Dialog dlg = new Dialog(owner, "Login");
  * dlg.setResizable(false);
  * dlg.setIconifiable(false);
  * dlg.setGraphic(new ImageView(getImage()));
- * dlg.setMasthead("Dialog Masthead");
- * dlg.getActions().addAll(Dialog.Actions.OK, Dialog.Actions.CANCEL);
- * dlg.setContent("Dialog message");
+ * dlg.setMasthead("Enter correct user name and password");
+ * dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
+ * dlg.setContent(content);
  * dlg.setExpandableContent( new Label("Expandable content"));
  * Action result = dlg.show();}</pre>
  * 

@@ -381,7 +381,8 @@ public class HelloDialog extends Application implements Sample {
                 content.add(txPassword, 1, 1);
                 GridPane.setHgrow(txPassword, Priority.ALWAYS);
                 
-
+                dlg.setResizable(false);
+                dlg.setIconifiable(false);
                 dlg.setGraphic( new ImageView( HelloDialog.class.getResource("login.png").toString()));
                 dlg.setContent(content);
                 dlg.getActions().addAll( actionLogin, Dialog.Actions.CANCEL);

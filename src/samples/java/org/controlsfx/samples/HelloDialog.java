@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -16,20 +17,29 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
-import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.dialog.Dialogs.CommandLink;
+import org.controlsfx.dialog.DialogsAccessor;
 
 public class HelloDialog extends Application implements Sample {
+
 
     private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
     private final CheckBox cbSetOwner = new CheckBox("Set Owner");
@@ -322,6 +332,76 @@ public class HelloDialog extends Application implements Sample {
         });
         grid.add(Hyperlink12, 1, row);
         
+        row += 3;
+        
+        grid.add(createLabel("Custom Dialog: "), 0, row);
+        final Button Hyperlink14 = new Button("Show");
+        Hyperlink14.setOnAction(new EventHandler<ActionEvent>() {
+
+            final TextField txUserName = new TextField();
+            final PasswordField txPassword = new PasswordField();
+            final Action actionLogin = new AbstractAction("Login") {
+                
+                {  
+                    ButtonBar.setType(this, ButtonType.OK_DONE); 
+                }
+                
+                @Override public void execute(ActionEvent ae) {
+                    Dialog dlg = (Dialog) ae.getSource();
+                    // real login code here
+                    dlg.hide();
+                }
+            };
+            
+            private void validate() {
+                actionLogin.disabledProperty().set( 
+                    txUserName.getText().trim().isEmpty() || txPassword.getText().trim().isEmpty());
+            }
+            
+            @Override public void handle(ActionEvent arg0) {
+                Dialog dlg = new Dialog(cbSetOwner.isSelected() ? stage : null, "Login Dialog");
+                
+                ChangeListener<String> changeListener = new ChangeListener<String>() {
+                    @Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                        validate();
+                    }
+                };
+                
+                txUserName.textProperty().addListener(changeListener);
+                txPassword.textProperty().addListener(changeListener);
+                
+                final GridPane content = new GridPane();
+                content.setHgap(10);
+                content.setVgap(10);
+                
+                content.add(new Label("User name"), 0, 0);
+                content.add(txUserName, 1, 0);
+                GridPane.setHgrow(txUserName, Priority.ALWAYS);
+                content.add(new Label("Password"), 0, 1);
+                content.add(txPassword, 1, 1);
+                GridPane.setHgrow(txPassword, Priority.ALWAYS);
+                
+
+                dlg.setGraphic( new ImageView( HelloDialog.class.getResource("login.png").toString()));
+                dlg.setContent(content);
+                dlg.getActions().addAll( actionLogin, Dialog.Actions.CANCEL);
+                validate();
+                
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        txUserName.requestFocus();
+                    }
+                });
+
+                
+                dlg.show();
+            }
+            
+        });
+        grid.add(Hyperlink14, 1, row);
+
+        
         return grid;
     }
 
@@ -355,4 +435,5 @@ public class HelloDialog extends Application implements Sample {
     private boolean isMastheadVisible() {
         return cbShowMasthead.isSelected();
     }
+    
 }

@@ -1,10 +1,5 @@
 package org.controlsfx.control;
 
-/**
- * User: rbair
- * Date: 6/3/13
- * Time: 10:47 AM
- */
 import javafx.animation.FadeTransition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

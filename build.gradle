@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'org.controlsfx'
-version = '8.0.0-developer-preview-2'
+version = '8.0.0'
 
 configurations {
     samples.extendsFrom mainRuntime

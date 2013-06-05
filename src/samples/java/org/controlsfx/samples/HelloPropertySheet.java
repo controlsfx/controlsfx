@@ -2,8 +2,10 @@ package org.controlsfx.samples;
 
 import javafx.application.Application;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
@@ -28,13 +30,17 @@ public class HelloPropertySheet extends Application implements Sample {
 
     @Override public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Property Sheet");
-        propertySheet.getItems().addAll(  BeanPropertyUtils.getProperties( new Button("Title")) );
-        Scene scene = new Scene( propertySheet, 400, 800);
+        
+        Scene scene = new Scene( (Parent)getPanel(primaryStage), 400, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     @Override public Node getPanel(Stage stage) {
-        return propertySheet;
+        propertySheet.getItems().addAll(  BeanPropertyUtils.getProperties( new Button("Title")) );
+        
+        BorderPane pane = new BorderPane();
+        pane.setCenter(propertySheet);
+        return pane;
     }
 }

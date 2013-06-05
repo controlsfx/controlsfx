@@ -58,6 +58,7 @@ import org.controlsfx.samples.HelloActionGroup;
 import org.controlsfx.samples.HelloButtonBar;
 import org.controlsfx.samples.HelloDialog;
 import org.controlsfx.samples.HelloGridView;
+import org.controlsfx.samples.HelloPropertySheet;
 import org.controlsfx.samples.HelloRangeSlider;
 import org.controlsfx.samples.HelloRating;
 import org.controlsfx.samples.HelloSegmentedButton;
@@ -74,7 +75,8 @@ public class HelloControlsFX extends Application {
         HelloRating.class,
         HelloSegmentedButton.class,
         HelloActionGroup.class,
-        HelloWorkerProgressPane.class
+        HelloWorkerProgressPane.class,
+        HelloPropertySheet.class
 //        SVGTest.class
     };
     

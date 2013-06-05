@@ -27,15 +27,23 @@
 package org.controlsfx.samples;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import javax.swing.JPanel;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.property.BeanPropertyUtils;
 
 public class HelloPropertySheet extends Application implements Sample {
@@ -63,10 +71,35 @@ public class HelloPropertySheet extends Application implements Sample {
     }
 
     @Override public Node getPanel(Stage stage) {
-        propertySheet.getItems().addAll(  BeanPropertyUtils.getProperties( new Button("Title")) );
         
-        BorderPane pane = new BorderPane();
-        pane.setCenter(propertySheet);
+        
+        VBox infoPane = new VBox(10);
+        infoPane.setPadding( new Insets(20,20,20,20));
+        
+        ToggleButton b1 = new ToggleButton("Button");
+        b1.setOnAction( new EventHandler<ActionEvent>() {
+            
+            @Override public void handle(ActionEvent arg0) {
+                propertySheet.getItems().setAll(  BeanPropertyUtils.getProperties( new Button("Title")) );
+            }
+        });
+        ToggleButton b2 = new ToggleButton("JPanel");
+        b2.setOnAction( new EventHandler<ActionEvent>() {
+            
+            @Override public void handle(ActionEvent arg0) {
+                propertySheet.getItems().setAll(  BeanPropertyUtils.getProperties( new JPanel()) );
+            }
+        });
+        
+        SegmentedButton segmentedButton_dark = new SegmentedButton(b1, b2);   
+        segmentedButton_dark.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+        b1.fire();
+        infoPane.getChildren().add(segmentedButton_dark);
+        
+        
+        SplitPane pane = new SplitPane();
+        pane.getItems().addAll( infoPane, propertySheet );
+        
         return pane;
     }
 }

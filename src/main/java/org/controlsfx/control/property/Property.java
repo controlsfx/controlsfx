@@ -1,4 +1,4 @@
-package org.controlsfx.control.propertysheet;
+package org.controlsfx.control.property;
 
 public interface Property {
      

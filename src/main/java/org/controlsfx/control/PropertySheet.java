@@ -1,4 +1,6 @@
-package org.controlsfx.control.propertysheet;
+package org.controlsfx.control;
+
+import org.controlsfx.control.property.Property;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -46,6 +48,7 @@ public class PropertySheet extends BorderPane {
     
     private void refreshProperties() {
         
+        pane.getChildren().clear();
         int row = 0;
         for (Property p : properties ) {
 

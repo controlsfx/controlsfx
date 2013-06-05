@@ -61,6 +61,7 @@ import org.controlsfx.samples.HelloGridView;
 import org.controlsfx.samples.HelloRangeSlider;
 import org.controlsfx.samples.HelloRating;
 import org.controlsfx.samples.HelloSegmentedButton;
+import org.controlsfx.samples.HelloWorkerProgressPane;
 
 public class HelloControlsFX extends Application {
 
@@ -72,7 +73,8 @@ public class HelloControlsFX extends Application {
         HelloRangeSlider.class,
         HelloRating.class,
         HelloSegmentedButton.class,
-        HelloActionGroup.class
+        HelloActionGroup.class,
+        HelloWorkerProgressPane.class
 //        SVGTest.class
     };
     

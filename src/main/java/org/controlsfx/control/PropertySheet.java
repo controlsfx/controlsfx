@@ -1,6 +1,6 @@
 package org.controlsfx.control;
 
-import org.controlsfx.control.property.Property;
+import org.controlsfx.property.Property;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;

@@ -1,4 +1,4 @@
-package org.controlsfx.control.property;
+package org.controlsfx.property;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

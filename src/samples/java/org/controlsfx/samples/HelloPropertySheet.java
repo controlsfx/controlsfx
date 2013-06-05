@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.control.property.BeanPropertyUtils;
+import org.controlsfx.property.BeanPropertyUtils;
 
 public class HelloPropertySheet extends Application implements Sample {
 

@@ -4,7 +4,11 @@ import javafx.animation.FadeTransition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
@@ -43,16 +47,18 @@ public class WorkerProgressPane extends Region {
     public final void setFadeOutTime(Duration value) { fadeOutTime.set(value); }
     public final ObjectProperty<Duration> fadeOutTimeProperty() { return fadeOutTime; }
 
-    private ChangeListener<Worker.State> stateListener = (observable, old, value) -> {
-        switch(value) {
-            case CANCELLED:
-            case FAILED:
-            case SUCCEEDED:
-                end();
-                break;
-            case SCHEDULED:
-                begin();
-                break;
+    private ChangeListener<Worker.State> stateListener = new ChangeListener<Worker.State>() {
+        @Override public void changed(ObservableValue<? extends State> observable, State old, State value) {
+            switch(value) {
+                case CANCELLED:
+                case FAILED:
+                case SUCCEEDED:
+                    end();
+                    break;
+                case SCHEDULED:
+                    begin();
+                    break;
+            }
         }
     };
     private ObjectProperty<Worker> worker = new SimpleObjectProperty<Worker>(this, "worker") {
@@ -168,7 +174,11 @@ public class WorkerProgressPane extends Region {
             // adjust
             fadeOutTx.jumpTo(fadeTime.multiply(1 - getOpacity()));
         }
-        fadeOutTx.setOnFinished((e) -> { setVisible(false); });
+        fadeOutTx.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent arg0) {
+                setVisible(false);
+            }
+        });
         fadeOutTx.play();
     }
 

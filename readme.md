@@ -1,13 +1,13 @@
 ControlsFX is an [open source project][1] for JavaFX that aims to provide really high quality UI controls and other tools to complement the core JavaFX distribution. It has been developed for JavaFX 8.0 and beyond, and has a guiding principle of only accepting new controls / features when all existing code is at an acceptably high level, including thankless jobs like having high quality javadoc documentation. This ensure a high quality release is available at all times, with all experimental work being done in branches of the main code base.
 
 
-**Important note: **ControlsFX will only work on JavaFX 8.0 b87 or later. If you are running on earlier versions of JDK 8, please [upgrade][8]. If you are still using JavaFX 2.x then unfortunately this library will not work for you.
+**Important note: **ControlsFX will only work on JavaFX 8.0 b91 or later. If you are running on earlier versions of JDK 8, please [upgrade][8]. If you are still using JavaFX 2.x then unfortunately this library will not work for you.
 
 ### Getting Started
 
 If you want to **play with** the ControlsFX sample application, either clone the ControlsFX repo from bitbucket and then run the [org.controlsfx.HelloControlsFX][10] application that resides within the [src/samples/java][11] directory, or run the samples jar file from the command line with the following command (or a variation depending on your operating system):
 
-java -cp controlsfx-8.0.0-developer-preview-1.jar:controlsfx-8.0.0-developer-preview-1-samples.jar org.controlsfx.HelloControlsFX
+java -cp controlsfx-8.0.0.jar:controlsfx-8.0.0-samples.jar org.controlsfx.HelloControlsFX
 
 If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug youd like to file, please direct it to the [issue tracker over at the ControlsFX bitbucket website][12].
 

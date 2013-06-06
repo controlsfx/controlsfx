@@ -27,6 +27,10 @@
 package org.controlsfx.samples;
 
 import javafx.application.Application;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -35,7 +39,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -44,7 +47,10 @@ import javax.swing.JPanel;
 import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
+import org.controlsfx.property.Property;
 
 public class HelloPropertySheet extends Application implements Sample {
 
@@ -70,31 +76,57 @@ public class HelloPropertySheet extends Application implements Sample {
         primaryStage.show();
     }
 
-    @Override public Node getPanel(Stage stage) {
+    class ActionShowInPropertySheet extends AbstractAction {
         
+        private Object bean;
+
+        public ActionShowInPropertySheet( String title, Object bean ) {
+            super(title);
+            this.bean = bean;
+        }
+
+        @Override public void execute(ActionEvent ae) {
+            
+            // retrieving bean properties may take some time
+            // so we have to put it on separated thread to keep UI responsive
+
+            Service<?> service = new Service<ObservableList<Property>>() {
+
+                @Override protected Task<ObservableList<Property>> createTask() {
+                    return new Task<ObservableList<Property>>() {
+                        @Override protected ObservableList<Property> call() throws Exception {
+                            return BeanPropertyUtils.getProperties(bean);
+                        }
+                    };
+                }
+
+            };
+            service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+                @SuppressWarnings("unchecked") @Override public void handle(WorkerStateEvent e) {
+                    propertySheet.getItems().setAll((ObservableList<Property>) e.getSource().getValue());
+
+                }
+            });
+            service.start();
+            
+        }
+        
+    }
+    
+    @Override public Node getPanel(Stage stage) {
         
         VBox infoPane = new VBox(10);
         infoPane.setPadding( new Insets(20,20,20,20));
         
-        ToggleButton b1 = new ToggleButton("Button");
-        b1.setOnAction( new EventHandler<ActionEvent>() {
-            
-            @Override public void handle(ActionEvent arg0) {
-                propertySheet.getItems().setAll(  BeanPropertyUtils.getProperties( new Button("Title")) );
-            }
-        });
-        ToggleButton b2 = new ToggleButton("JPanel");
-        b2.setOnAction( new EventHandler<ActionEvent>() {
-            
-            @Override public void handle(ActionEvent arg0) {
-                propertySheet.getItems().setAll(  BeanPropertyUtils.getProperties( new JPanel()) );
-            }
-        });
+        SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
+                new ActionShowInPropertySheet( "Button", new Button("Title") ),
+                new ActionShowInPropertySheet( "JPanel", new JPanel() )
+            );
+        segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+        segmentedButton.getButtons().get(0).fire();
         
-        SegmentedButton segmentedButton_dark = new SegmentedButton(b1, b2);   
-        segmentedButton_dark.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
-        b1.fire();
-        infoPane.getChildren().add(segmentedButton_dark);
+        infoPane.getChildren().add(segmentedButton);
         
         
         SplitPane pane = new SplitPane();

@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
@@ -35,12 +36,12 @@ import javafx.scene.control.Skin;
 import org.controlsfx.property.Property;
 
 public class PropertySheet extends Control {
-
     
     private final ObservableList<Property> properties = FXCollections.observableArrayList();
     
     public PropertySheet() {
         getStyleClass().add("property-sheet");
+        modeProperty.set(Mode.CATEGORY);
     }
     
     @Override protected Skin<?> createDefaultSkin() {
@@ -50,4 +51,12 @@ public class PropertySheet extends Control {
     public ObservableList<Property> getItems() {
         return properties;
     }
+    
+    public final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
+    
+    public enum Mode {
+        NAME,
+        CATEGORY
+    }
+    
 }

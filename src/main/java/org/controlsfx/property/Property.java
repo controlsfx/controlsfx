@@ -29,10 +29,15 @@ package org.controlsfx.property;
 public interface Property {
      
      Class<?> getType();
-     String getGroup();
+     
+     String getCategory();
     
      String getName();
      
+     String getDescription();
+     
      Object getValue();
+     
+     void setValue( Object value );
     
 }

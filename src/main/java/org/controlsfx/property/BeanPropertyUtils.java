@@ -33,6 +33,7 @@ import java.beans.PropertyDescriptor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 
 public class BeanPropertyUtils {
 
@@ -47,8 +48,9 @@ public class BeanPropertyUtils {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
             for (PropertyDescriptor p : beanInfo.getPropertyDescriptors()) {
-                // Add filtering
-                list.add(( new BeanProperty(bean.getClass(), p)));
+                if ( isProperty(p) ) {
+                    list.add(( new BeanProperty(bean, p)));
+                }
             }
         } catch (IntrospectionException e) {
             e.printStackTrace();
@@ -56,4 +58,11 @@ public class BeanPropertyUtils {
 
         return list;
     }
+    
+    private static boolean isProperty( PropertyDescriptor p ) {
+        //TODO  Add more filtering
+        return p.getWriteMethod() != null &&
+               !p.getPropertyType().isAssignableFrom(EventHandler.class);  
+    }
+    
 }

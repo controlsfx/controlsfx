@@ -39,10 +39,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import javax.swing.JPanel;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
@@ -119,14 +118,18 @@ public class HelloPropertySheet extends Application implements Sample {
         VBox infoPane = new VBox(10);
         infoPane.setPadding( new Insets(20,20,20,20));
         
+        Button button = new Button("Title");
+        TextField textField = new TextField();
         SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
-                new ActionShowInPropertySheet( "Button", new Button("Title") ),
-                new ActionShowInPropertySheet( "JPanel", new JPanel() )
+                new ActionShowInPropertySheet( "Button", button ),
+                new ActionShowInPropertySheet( "TextField", textField )
             );
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();
         
         infoPane.getChildren().add(segmentedButton);
+        infoPane.getChildren().add(button);
+        infoPane.getChildren().add(textField);
         
         
         SplitPane pane = new SplitPane();

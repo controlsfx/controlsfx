@@ -27,19 +27,27 @@
 package org.controlsfx.property;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class BeanProperty implements Property {
 
-    private final Class<?> type;
+    private final Object bean;
     private final PropertyDescriptor propertyDescriptor;
+    private final Method readMethod;
 
-    public BeanProperty( Class<?> type, PropertyDescriptor propertyDescriptor ) {
+    public BeanProperty( Object bean, PropertyDescriptor propertyDescriptor ) {
+        this.bean = bean;
         this.propertyDescriptor = propertyDescriptor;
-        this.type = type;
+        readMethod = propertyDescriptor.getReadMethod();
     }
     
     @Override public String getName() {
         return propertyDescriptor.getDisplayName();
+    }
+    
+    @Override public String getDescription() {
+        return propertyDescriptor.getShortDescription();
     }
     
     @Override public Class<?> getType() {
@@ -47,11 +55,29 @@ public class BeanProperty implements Property {
     }
 
     @Override public Object getValue() {
-        return propertyDescriptor.getValue(getName());
+        try {
+            return readMethod.invoke(bean);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    @Override public void setValue(Object value) {
+        
+        Method writeMethod = propertyDescriptor.getWriteMethod();
+        if ( writeMethod != null ) {
+            try {
+                writeMethod.invoke(bean, value);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        
     }
 
-    @Override public String getGroup() {
-        return type.getSimpleName();
+    @Override public String getCategory() {
+        return propertyDescriptor.isExpert()? "Expert": "Basic";
     }
 
 }

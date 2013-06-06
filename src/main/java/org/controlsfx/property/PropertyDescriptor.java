@@ -24,39 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package org.controlsfx.property;
 
-import impl.org.controlsfx.skin.PropertySheetSkin;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
-
-import org.controlsfx.property.PropertyDescriptor;
-
-public class PropertySheet extends Control {
+public interface PropertyDescriptor {
+     
+     Class<?> getType();
+     
+     String getCategory();
     
-    private final ObservableList<PropertyDescriptor> properties = FXCollections.observableArrayList();
-    
-    public PropertySheet() {
-        getStyleClass().add("property-sheet");
-        modeProperty.set(Mode.CATEGORY);
-    }
-    
-    @Override protected Skin<?> createDefaultSkin() {
-        return new PropertySheetSkin(this);
-    }
-    
-    public ObservableList<PropertyDescriptor> getItems() {
-        return properties;
-    }
-    
-    public final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
-    
-    public enum Mode {
-        NAME,
-        CATEGORY
-    }
+     String getName();
+     
+     String getDescription();
+     
+     Object getValue();
+     
+     void setValue( Object value );
     
 }

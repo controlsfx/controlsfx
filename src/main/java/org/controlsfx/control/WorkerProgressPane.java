@@ -61,10 +61,10 @@ public class WorkerProgressPane extends Region {
             }
         }
     };
-    private ObjectProperty<Worker> worker = new SimpleObjectProperty<Worker>(this, "worker") {
-        private Worker old;
+    private ObjectProperty<Worker<?>> worker = new SimpleObjectProperty<Worker<?>>(this, "worker") {
+        private Worker<?> old;
         @Override protected void invalidated() {
-            Worker n = get();
+            Worker<?> n = get();
             if (n != old) {
                 if (old != null) {
                     old.stateProperty().removeListener(stateListener);
@@ -81,9 +81,9 @@ public class WorkerProgressPane extends Region {
             }
         }
     };
-    public final Worker getWorker() { return worker.get(); }
-    public final void setWorker(Worker value) { worker.set(value); }
-    public final ObjectProperty<Worker> workerProperty() { return worker; }
+    public final Worker<?> getWorker() { return worker.get(); }
+    public final void setWorker(Worker<?> value) { worker.set(value); }
+    public final ObjectProperty<Worker<?>> workerProperty() { return worker; }
 
     // TODO SimpleObjectProperty constructor wouldn't take a ProgressBar, but should have.
     private ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<ProgressIndicator>(this, "progressIndicator") {
@@ -127,7 +127,7 @@ public class WorkerProgressPane extends Region {
     }
 
     private void begin() {
-        final Worker w = worker.get();
+        final Worker<?> w = worker.get();
         final ProgressIndicator p = progressIndicator.get();
         p.progressProperty().bind(w.progressProperty());
 

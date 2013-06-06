@@ -24,59 +24,28 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.property;
+package org.controlsfx.property.editor;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.paint.Color;
 
-public class BeanProperty implements PropertyDescriptor {
+import org.controlsfx.property.PropertyDescriptor;
 
-    private final Object bean;
-    private final java.beans.PropertyDescriptor beanPropertyDescriptor;
-    private final Method readMethod;
+public class ColorEditor extends AbstractPropertyEditor< ColorPicker> {
 
-    public BeanProperty( Object bean, java.beans.PropertyDescriptor propertyDescriptor ) {
-        this.bean = bean;
-        this.beanPropertyDescriptor = propertyDescriptor;
-        readMethod = propertyDescriptor.getReadMethod();
+    public ColorEditor( PropertyDescriptor property ) {
+        super(property, new ColorPicker());
     }
     
-    @Override public String getName() {
-        return beanPropertyDescriptor.getDisplayName();
-    }
-    
-    @Override public String getDescription() {
-        return beanPropertyDescriptor.getShortDescription();
-    }
-    
-    @Override public Class<?> getType() {
-        return beanPropertyDescriptor.getPropertyType();
+    @Override protected ObservableValue<?> getObservableValue() {
+        return control.valueProperty();
     }
 
-    @Override public Object getValue() {
-        try {
-            return readMethod.invoke(bean);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
     @Override public void setValue(Object value) {
-        
-        Method writeMethod = beanPropertyDescriptor.getWriteMethod();
-        if ( writeMethod != null ) {
-            try {
-                writeMethod.invoke(bean, value);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+        if ( value instanceof Color ) {
+           control.setValue((Color) value);
         }
-        
-    }
-
-    @Override public String getCategory() {
-        return beanPropertyDescriptor.isExpert()? "Expert": "Basic";
     }
 
 }

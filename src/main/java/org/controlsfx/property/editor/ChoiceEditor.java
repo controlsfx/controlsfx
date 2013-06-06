@@ -24,39 +24,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package org.controlsfx.property.editor;
 
-import impl.org.controlsfx.skin.PropertySheetSkin;
-import javafx.beans.property.SimpleObjectProperty;
+import java.util.Collection;
+
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
+import javafx.scene.control.ComboBox;
 
 import org.controlsfx.property.PropertyDescriptor;
 
-public class PropertySheet extends Control {
-    
-    private final ObservableList<PropertyDescriptor> properties = FXCollections.observableArrayList();
-    
-    public PropertySheet() {
-        getStyleClass().add("property-sheet");
-        modeProperty.set(Mode.CATEGORY);
+public class ChoiceEditor extends AbstractPropertyEditor<ComboBox<Object>> {
+
+    public ChoiceEditor(  PropertyDescriptor property, Collection<Object> choices ) {
+        super(property, new ComboBox<Object>());
+        control.setItems(FXCollections.observableArrayList(choices));
     }
     
-    @Override protected Skin<?> createDefaultSkin() {
-        return new PropertySheetSkin(this);
+    @Override protected ObservableValue<?> getObservableValue() {
+        return control.selectionModelProperty();
     }
-    
-    public ObservableList<PropertyDescriptor> getItems() {
-        return properties;
+
+    @Override public void setValue(Object value) {
+          control.getSelectionModel().select(value);
     }
-    
-    public final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
-    
-    public enum Mode {
-        NAME,
-        CATEGORY
-    }
-    
+
 }

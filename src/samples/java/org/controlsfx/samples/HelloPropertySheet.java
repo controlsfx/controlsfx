@@ -39,18 +39,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javax.swing.JPanel;
-
 import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
-import org.controlsfx.property.Property;
+import org.controlsfx.property.PropertyDescriptor;
 
 public class HelloPropertySheet extends Application implements Sample {
 
@@ -71,7 +71,7 @@ public class HelloPropertySheet extends Application implements Sample {
     @Override public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Property Sheet");
         
-        Scene scene = new Scene( (Parent)getPanel(primaryStage), 400, 800);
+        Scene scene = new Scene( (Parent)getPanel(primaryStage), 800, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -90,11 +90,11 @@ public class HelloPropertySheet extends Application implements Sample {
             // retrieving bean properties may take some time
             // so we have to put it on separated thread to keep UI responsive
 
-            Service<?> service = new Service<ObservableList<Property>>() {
+            Service<?> service = new Service<ObservableList<PropertyDescriptor>>() {
 
-                @Override protected Task<ObservableList<Property>> createTask() {
-                    return new Task<ObservableList<Property>>() {
-                        @Override protected ObservableList<Property> call() throws Exception {
+                @Override protected Task<ObservableList<PropertyDescriptor>> createTask() {
+                    return new Task<ObservableList<PropertyDescriptor>>() {
+                        @Override protected ObservableList<PropertyDescriptor> call() throws Exception {
                             return BeanPropertyUtils.getProperties(bean);
                         }
                     };
@@ -104,7 +104,7 @@ public class HelloPropertySheet extends Application implements Sample {
             service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
                 @SuppressWarnings("unchecked") @Override public void handle(WorkerStateEvent e) {
-                    propertySheet.getItems().setAll((ObservableList<Property>) e.getSource().getValue());
+                    propertySheet.getItems().setAll((ObservableList<PropertyDescriptor>) e.getSource().getValue());
 
                 }
             });
@@ -119,14 +119,25 @@ public class HelloPropertySheet extends Application implements Sample {
         VBox infoPane = new VBox(10);
         infoPane.setPadding( new Insets(20,20,20,20));
         
+        SegmentedButton modeSelector = ActionUtils.createSegmentedButton(
+                new ActionModeChange("Arrange By Name", Mode.NAME),
+                new ActionModeChange("Array By Category", Mode.CATEGORY));
+
+        infoPane.getChildren().add(modeSelector);
+        modeSelector.getButtons().get(0).fire();
+        
+        Button button = new Button("Title");
+        TextField textField = new TextField();
         SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
-                new ActionShowInPropertySheet( "Button", new Button("Title") ),
-                new ActionShowInPropertySheet( "JPanel", new JPanel() )
+                new ActionShowInPropertySheet( "Bean: Button", button ),
+                new ActionShowInPropertySheet( "Bean: TextField", textField )
             );
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();
         
         infoPane.getChildren().add(segmentedButton);
+        infoPane.getChildren().add(button);
+        infoPane.getChildren().add(textField);
         
         
         SplitPane pane = new SplitPane();
@@ -134,4 +145,20 @@ public class HelloPropertySheet extends Application implements Sample {
         
         return pane;
     }
+    
+    class ActionModeChange extends AbstractAction {
+        
+        private Mode mode;
+        
+        public ActionModeChange( String title, Mode mode ) {
+            super( title );
+            this.mode = mode;
+        }
+
+        @Override public void execute(ActionEvent ae) {
+            propertySheet.modeProperty.set(mode);
+        }
+        
+    }
+    
 }

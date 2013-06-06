@@ -1,3 +1,11 @@
+package org.controlsfx.property.editor;
+
+import java.lang.reflect.InvocationTargetException;
+
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.TextField;
+
+import org.controlsfx.property.PropertyDescriptor;
 /**
  * Copyright (c) 2013, ControlsFX
  * All rights reserved.
@@ -24,59 +32,52 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.property;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+public class NumericEditor extends AbstractPropertyEditor<NumericField> {
 
-public class BeanProperty implements PropertyDescriptor {
+    private Class<? extends Number> sourceClass = Double.class;
 
-    private final Object bean;
-    private final java.beans.PropertyDescriptor beanPropertyDescriptor;
-    private final Method readMethod;
-
-    public BeanProperty( Object bean, java.beans.PropertyDescriptor propertyDescriptor ) {
-        this.bean = bean;
-        this.beanPropertyDescriptor = propertyDescriptor;
-        readMethod = propertyDescriptor.getReadMethod();
+    
+    public NumericEditor( PropertyDescriptor property ) {
+        super(property, new NumericField());
     }
     
-    @Override public String getName() {
-        return beanPropertyDescriptor.getDisplayName();
+    @Override protected ObservableValue<?> getObservableValue() {
+        return control.textProperty();
     }
     
-    @Override public String getDescription() {
-        return beanPropertyDescriptor.getShortDescription();
-    }
-    
-    @Override public Class<?> getType() {
-        return beanPropertyDescriptor.getPropertyType();
-    }
 
     @Override public Object getValue() {
         try {
-            return readMethod.invoke(bean);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            return sourceClass.getConstructor( String.class).newInstance(control.getText());
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
             return null;
         }
     }
+
     
+    @SuppressWarnings("unchecked")
     @Override public void setValue(Object value) {
-        
-        Method writeMethod = beanPropertyDescriptor.getWriteMethod();
-        if ( writeMethod != null ) {
-            try {
-                writeMethod.invoke(bean, value);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+        if ( value instanceof Number ) {
+           sourceClass = (Class<? extends Number>) value.getClass(); 
+           control.setText(value.toString());
         }
-        
     }
 
-    @Override public String getCategory() {
-        return beanPropertyDescriptor.isExpert()? "Expert": "Basic";
-    }
+}
 
+//TODO: Expose as new control?
+class NumericField extends TextField {
+    
+    private static String regex = "^(([1-9]*)|(([1-9]*).([0-9]*)))$";
+    
+    @Override public void replaceText(int start, int end, String text) {
+        String txt = getText().substring(0,start) + text + getText().substring(end);
+        if (txt.matches(regex)) {
+            super.replaceText(start, end, text);
+        }
+    }
+    
 }

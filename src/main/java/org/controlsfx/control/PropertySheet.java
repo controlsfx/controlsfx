@@ -33,11 +33,11 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
-import org.controlsfx.property.Property;
+import org.controlsfx.property.PropertyDescriptor;
 
 public class PropertySheet extends Control {
     
-    private final ObservableList<Property> properties = FXCollections.observableArrayList();
+    private final ObservableList<PropertyDescriptor> properties = FXCollections.observableArrayList();
     
     public PropertySheet() {
         getStyleClass().add("property-sheet");
@@ -48,7 +48,7 @@ public class PropertySheet extends Control {
         return new PropertySheetSkin(this);
     }
     
-    public ObservableList<Property> getItems() {
+    public ObservableList<PropertyDescriptor> getItems() {
         return properties;
     }
     

@@ -1,10 +1,11 @@
 package org.controlsfx.property.editor;
 
-import javafx.scene.control.Control;
+import javafx.scene.layout.Region;
+
 
 public interface PropertyEditor {
 
-    Control asControl();
+    Region asNode();
     
     Object getValue();
     void setValue( Object value );

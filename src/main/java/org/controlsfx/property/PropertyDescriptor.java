@@ -26,7 +26,7 @@
  */
 package org.controlsfx.property;
 
-public interface Property {
+public interface PropertyDescriptor {
      
      Class<?> getType();
      

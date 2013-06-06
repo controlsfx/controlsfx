@@ -2,19 +2,24 @@ package org.controlsfx.property.editor;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.property.Property;
+import org.controlsfx.property.PropertyDescriptor;
 
-public class NumericEditor extends AbstractPropertyEditor<TextField> {
+public class NumericEditor extends AbstractPropertyEditor<NumericField> {
 
     private Class<? extends Number> sourceClass = Double.class;
 
     
-    public NumericEditor( Property property ) {
+    public NumericEditor( PropertyDescriptor property ) {
         super(property, new NumericField());
-        control.textProperty().addListener( getPropertyChangeListener() );
     }
+    
+    @Override protected ObservableValue<?> getObservableValue() {
+        return control.textProperty();
+    }
+    
 
     @Override public Object getValue() {
         try {

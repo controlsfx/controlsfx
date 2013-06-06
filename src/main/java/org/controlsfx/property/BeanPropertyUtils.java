@@ -29,7 +29,6 @@ package org.controlsfx.property;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,13 +40,13 @@ public class BeanPropertyUtils {
         // no op
     }
 
-    public static ObservableList<Property> getProperties(final Object bean) {
+    public static ObservableList<PropertyDescriptor> getProperties(final Object bean) {
 
-        ObservableList<Property> list = FXCollections.observableArrayList();
+        ObservableList<PropertyDescriptor> list = FXCollections.observableArrayList();
 
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
-            for (PropertyDescriptor p : beanInfo.getPropertyDescriptors()) {
+            for (java.beans.PropertyDescriptor p : beanInfo.getPropertyDescriptors()) {
                 if ( isProperty(p) ) {
                     list.add(( new BeanProperty(bean, p)));
                 }
@@ -59,7 +58,7 @@ public class BeanPropertyUtils {
         return list;
     }
     
-    private static boolean isProperty( PropertyDescriptor p ) {
+    private static boolean isProperty( java.beans.PropertyDescriptor p ) {
         //TODO  Add more filtering
         return p.getWriteMethod() != null &&
                !p.getPropertyType().isAssignableFrom(EventHandler.class);  

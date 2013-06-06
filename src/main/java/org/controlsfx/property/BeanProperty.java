@@ -26,32 +26,31 @@
  */
 package org.controlsfx.property;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class BeanProperty implements Property {
+public class BeanProperty implements PropertyDescriptor {
 
     private final Object bean;
-    private final PropertyDescriptor propertyDescriptor;
+    private final java.beans.PropertyDescriptor beanPropertyDescriptor;
     private final Method readMethod;
 
-    public BeanProperty( Object bean, PropertyDescriptor propertyDescriptor ) {
+    public BeanProperty( Object bean, java.beans.PropertyDescriptor propertyDescriptor ) {
         this.bean = bean;
-        this.propertyDescriptor = propertyDescriptor;
+        this.beanPropertyDescriptor = propertyDescriptor;
         readMethod = propertyDescriptor.getReadMethod();
     }
     
     @Override public String getName() {
-        return propertyDescriptor.getDisplayName();
+        return beanPropertyDescriptor.getDisplayName();
     }
     
     @Override public String getDescription() {
-        return propertyDescriptor.getShortDescription();
+        return beanPropertyDescriptor.getShortDescription();
     }
     
     @Override public Class<?> getType() {
-        return propertyDescriptor.getPropertyType();
+        return beanPropertyDescriptor.getPropertyType();
     }
 
     @Override public Object getValue() {
@@ -65,7 +64,7 @@ public class BeanProperty implements Property {
     
     @Override public void setValue(Object value) {
         
-        Method writeMethod = propertyDescriptor.getWriteMethod();
+        Method writeMethod = beanPropertyDescriptor.getWriteMethod();
         if ( writeMethod != null ) {
             try {
                 writeMethod.invoke(bean, value);
@@ -77,7 +76,7 @@ public class BeanProperty implements Property {
     }
 
     @Override public String getCategory() {
-        return propertyDescriptor.isExpert()? "Expert": "Basic";
+        return beanPropertyDescriptor.isExpert()? "Expert": "Basic";
     }
 
 }

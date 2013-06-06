@@ -49,7 +49,7 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
-import org.controlsfx.property.Property;
+import org.controlsfx.property.PropertyDescriptor;
 
 public class HelloPropertySheet extends Application implements Sample {
 
@@ -89,11 +89,11 @@ public class HelloPropertySheet extends Application implements Sample {
             // retrieving bean properties may take some time
             // so we have to put it on separated thread to keep UI responsive
 
-            Service<?> service = new Service<ObservableList<Property>>() {
+            Service<?> service = new Service<ObservableList<PropertyDescriptor>>() {
 
-                @Override protected Task<ObservableList<Property>> createTask() {
-                    return new Task<ObservableList<Property>>() {
-                        @Override protected ObservableList<Property> call() throws Exception {
+                @Override protected Task<ObservableList<PropertyDescriptor>> createTask() {
+                    return new Task<ObservableList<PropertyDescriptor>>() {
+                        @Override protected ObservableList<PropertyDescriptor> call() throws Exception {
                             return BeanPropertyUtils.getProperties(bean);
                         }
                     };
@@ -103,7 +103,7 @@ public class HelloPropertySheet extends Application implements Sample {
             service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
                 @SuppressWarnings("unchecked") @Override public void handle(WorkerStateEvent e) {
-                    propertySheet.getItems().setAll((ObservableList<Property>) e.getSource().getValue());
+                    propertySheet.getItems().setAll((ObservableList<PropertyDescriptor>) e.getSource().getValue());
 
                 }
             });

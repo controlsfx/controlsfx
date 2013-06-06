@@ -1,18 +1,18 @@
 package org.controlsfx.property.editor;
 
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.property.Property;
+import org.controlsfx.property.PropertyDescriptor;
 
 public class TextEditor extends AbstractPropertyEditor<TextField> {
 
-    public TextEditor( Property property ) {
+    public TextEditor( PropertyDescriptor property ) {
         super(property, new TextField());
-        control.textProperty().addListener( getPropertyChangeListener() );
     }
-
-    @Override public Object getValue() {
-        return control.getText();
+    
+    @Override protected StringProperty getObservableValue() {
+        return control.textProperty();
     }
 
     @Override public void setValue(Object value) {

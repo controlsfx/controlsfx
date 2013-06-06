@@ -1,19 +1,19 @@
 package org.controlsfx.property.editor;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
 
-import org.controlsfx.property.Property;
+import org.controlsfx.property.PropertyDescriptor;
 
 public class ColorEditor extends AbstractPropertyEditor< ColorPicker> {
 
-    public ColorEditor( Property property ) {
+    public ColorEditor( PropertyDescriptor property ) {
         super(property, new ColorPicker());
-        control.valueProperty().addListener(getPropertyChangeListener());
     }
-
-    @Override public Color getValue() {
-        return control.getValue();
+    
+    @Override protected ObservableValue<?> getObservableValue() {
+        return control.valueProperty();
     }
 
     @Override public void setValue(Object value) {

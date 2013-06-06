@@ -7,7 +7,6 @@ configurations {
     published { extendsFrom archives, signatures}
 }
 
-
 signing {
     required = { gradle.taskGraph.hasTask(uploadPublished) && !version.endsWith("SNAPSHOT") }
     sign configurations.archives
@@ -22,7 +21,7 @@ repositories {
 uploadPublished {
 
     doFirst {
-        // configure repositories ina  doFirst so we can late bind the proeprties
+        // configure repositories in a doFirst so we can late bind the properties
         checkPasswords()
         repositories {
             mavenDeployer {
@@ -47,13 +46,11 @@ install {
     configuration = configurations.published
 }
 
-
-
 private configurePOM(def pom) {
     pom.project {
         name 'ControlsFX'
         description 'High quality UI controls and other tools to complement the core JavaFX distribution'
-        url 'http://fxexperience.com/controlsfx/'
+        url 'http://www.controlsfx.org/'
         modelVersion '4.0.0'
         packaging 'jar'
         scm {
@@ -64,7 +61,7 @@ private configurePOM(def pom) {
         developers {
             developer {
                 name 'Jonathan Giles'
-                email 'jonathangiles@oracle.com'
+                email 'jonathan@jonathangiles.net'
                 roles {
                     role 'author'
                     role 'developer'
@@ -73,7 +70,7 @@ private configurePOM(def pom) {
         }
         licenses {
             license {
-                name 'The BSD License'
+                name 'The 3-Clause BSD License'
                 url 'http://www.opensource.org/licenses/bsd-license.php'
                 distribution 'repo'
             }

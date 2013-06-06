@@ -33,7 +33,9 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -55,6 +57,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+
+import org.controlsfx.control.SegmentedButton;
 
 /**
  * Convenience class for users of the {@link Action} API. Primarily this class
@@ -136,6 +140,22 @@ public class ActionUtils {
     public static ToggleButton createToggleButton(final Action action) {
         return configure(new ToggleButton(), action);
     }
+    
+    /**
+     * Takes the provided {@link Collection} of {@link Action}  and returns a {@link SegmentedButton} instance
+     * with all relevant properties bound to the properties of the actions.
+     * 
+     * @param actions The {@link Collection} of {@link Action} that the {@link SegmentedButton} should bind to.
+     * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
+     */
+    public static SegmentedButton createSegmentedButton(Action... actions) {
+        ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
+        for( Action a: actions ) {
+            buttons.add( createToggleButton(a));
+        }
+        return new SegmentedButton( buttons );
+    }
+    
     
     /**
      * Takes the provided {@link Action} and returns a {@link CheckBox} instance

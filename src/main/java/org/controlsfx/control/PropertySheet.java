@@ -59,4 +59,8 @@ public class PropertySheet extends Control {
         CATEGORY
     }
     
+    @Override protected String getUserAgentStylesheet() {
+        return getClass().getResource("propertysheet.css").toExternalForm();
+    }
+    
 }

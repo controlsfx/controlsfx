@@ -45,6 +45,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
@@ -70,7 +71,7 @@ public class HelloPropertySheet extends Application implements Sample {
     @Override public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Property Sheet");
         
-        Scene scene = new Scene( (Parent)getPanel(primaryStage), 400, 800);
+        Scene scene = new Scene( (Parent)getPanel(primaryStage), 800, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -118,11 +119,18 @@ public class HelloPropertySheet extends Application implements Sample {
         VBox infoPane = new VBox(10);
         infoPane.setPadding( new Insets(20,20,20,20));
         
+        SegmentedButton modeSelector = ActionUtils.createSegmentedButton(
+                new ActionModeChange("Arrange By Name", Mode.NAME),
+                new ActionModeChange("Array By Category", Mode.CATEGORY));
+
+        infoPane.getChildren().add(modeSelector);
+        modeSelector.getButtons().get(0).fire();
+        
         Button button = new Button("Title");
         TextField textField = new TextField();
         SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
-                new ActionShowInPropertySheet( "Button", button ),
-                new ActionShowInPropertySheet( "TextField", textField )
+                new ActionShowInPropertySheet( "Bean: Button", button ),
+                new ActionShowInPropertySheet( "Bean: TextField", textField )
             );
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();
@@ -137,4 +145,20 @@ public class HelloPropertySheet extends Application implements Sample {
         
         return pane;
     }
+    
+    class ActionModeChange extends AbstractAction {
+        
+        private Mode mode;
+        
+        public ActionModeChange( String title, Mode mode ) {
+            super( title );
+            this.mode = mode;
+        }
+
+        @Override public void execute(ActionEvent ae) {
+            propertySheet.modeProperty.set(mode);
+        }
+        
+    }
+    
 }

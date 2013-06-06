@@ -35,26 +35,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.control.PropertySheet.Mode;
-import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
-import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.PropertyDescriptor;
 import org.controlsfx.property.editor.CheckEditor;
 import org.controlsfx.property.editor.ChoiceEditor;
@@ -82,7 +75,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
-    private final BorderPane content = new BorderPane();
+//    private final BorderPane content = new BorderPane();
     private final ScrollPane scroller = new ScrollPane();
     
     /**************************************************************************
@@ -95,21 +88,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         super(control, new BehaviorBase<>(control));
         
         scroller.setFitToWidth(true);
-        content.setCenter(scroller);
-        
-        ToolBar toolbar = new ToolBar();
-        
-        SegmentedButton modeSelector = ActionUtils.createSegmentedButton(
-           new ActionModeChange( "Name", Mode.NAME ),
-           new ActionModeChange( "Category", Mode.CATEGORY )
-        );
-        
-        toolbar.getItems().add(new Label("Arrange by:"));
-        toolbar.getItems().add( modeSelector);
-        
-        content.setTop(toolbar);
-        
-        getChildren().add(content);
+        getChildren().add(scroller);
         
         // setup listeners
         registerChangeListener(control.modeProperty, "MODE");
@@ -119,10 +98,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 refreshProperties();
             }
         });
-        
-        // initialize state
-        // TODO: should be based on control.mode 
-        modeSelector.getButtons().get(0).fire();
         
     }
 
@@ -141,7 +116,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     }
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {
-        content.resizeRelocate(x, y, w, h);
+        scroller.resizeRelocate(x, y, w, h);
     }
 
 
@@ -300,21 +275,5 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         
     }
-    
-    class ActionModeChange extends AbstractAction {
-        
-        private Mode mode;
-        
-        public ActionModeChange( String title, Mode mode ) {
-            super( title );
-            this.mode = mode;
-        }
-
-        @Override public void execute(ActionEvent ae) {
-            getSkinnable().modeProperty.set(mode);
-        }
-        
-    }
-
 
 }

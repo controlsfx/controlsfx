@@ -111,7 +111,11 @@ public class HelloControlsFX extends Application {
             }
         });
         
-        final FilteredList<Sample> filteredSamples = new FilteredList<>(sortedSamples);
+        final FilteredList<Sample> filteredSamples = new FilteredList<>(sortedSamples, new Predicate<Sample>() {
+            public boolean test(Sample t) {
+                return true;
+            };
+        });
         
         
         // simple layout: ListView on left, sample area on right

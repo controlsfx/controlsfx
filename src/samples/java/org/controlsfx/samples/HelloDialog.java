@@ -40,7 +40,15 @@ import org.controlsfx.dialog.DialogsAccessor;
 
 public class HelloDialog extends Application implements Sample {
 
-
+    private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs") {
+        {
+            setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent arg0) {
+                    DialogsAccessor.setUseLightweightDialogs(cbUseLightweightDialog.isSelected());
+                }
+            });
+        }
+    };
     private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
     private final CheckBox cbSetOwner = new CheckBox("Set Owner");
     
@@ -66,7 +74,11 @@ public class HelloDialog extends Application implements Sample {
                 DialogsAccessor.setLinux(LINUX.equals(caption));
             }});
         return btn;
-    }    
+    }   
+    
+    private boolean includeOwner() {
+        return cbSetOwner.isSelected() || cbUseLightweightDialog.isSelected();
+    }
     
     
     @Override public Node getPanel(final Stage stage) {
@@ -98,12 +110,13 @@ public class HelloDialog extends Application implements Sample {
         
         SegmentedButton operatingSystem = new SegmentedButton(FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
         
-        grid.add(operatingSystem, 1, row, 2, 1);
+        grid.add(operatingSystem, 1, row, 3, 1);
 
         row++;
         grid.add(createLabel("Common Dialog attributes: "), 0, 1);
-        grid.add(cbShowMasthead, 1, row);
-        grid.add(cbSetOwner, 2, row);
+        grid.add(cbUseLightweightDialog, 1, row);
+        grid.add(cbShowMasthead, 2, row);
+        grid.add(cbSetOwner, 3, row);
 
         row++;
 
@@ -117,7 +130,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Dialogs.create()
-                   .owner(cbSetOwner.isSelected() ? stage : null)
+                   .owner(includeOwner() ? stage : null)
                    .title("JavaFX")
                    .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
                    .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
@@ -138,7 +151,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Action response =  Dialogs.create()
-                    .owner(cbSetOwner.isSelected() ? stage : null)
+                    .owner(includeOwner() ? stage : null)
                     .title("You do want dialogs right?")
                     .masthead(isMastheadVisible() ? "Just Checkin'" : null)
                     .message( "I was a bit worried that you might not want them, so I wanted to double check.")
@@ -161,7 +174,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Action response = Dialogs.create()
-                    .owner(cbSetOwner.isSelected() ? stage : null)
+                    .owner(includeOwner() ? stage : null)
                    .title("I'm warning you!")
                    .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
                    .message("This is a warning")
@@ -184,7 +197,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Action response = Dialogs.create()
-                      .owner(cbSetOwner.isSelected() ? stage : null)
+                      .owner(includeOwner() ? stage : null)
                       .title("It looks like you're making a bad decision")
                       .message("Exception Encountered")
                       .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance! Even longer text that should probably wrap" : null)
@@ -207,7 +220,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Action response = Dialogs.create()
-                    .owner(cbSetOwner.isSelected() ? stage : null)
+                    .owner(includeOwner() ? stage : null)
                     .title("It looks like you're making a bad decision")
                     .message("Better change your mind - this is really your last chance!")
                     .masthead(isMastheadVisible() ? "Exception Encountered" : null)
@@ -223,7 +236,7 @@ public class HelloDialog extends Application implements Sample {
             @Override public void handle(ActionEvent e) {
 
                 Action response = Dialogs.create()
-                        .owner(cbSetOwner.isSelected() ? stage : null)
+                        .owner(includeOwner() ? stage : null)
                         .message("Better change your mind - this is really your last chance!")
                         .title("It looks like you're making a bad decision")
                         .masthead(isMastheadVisible() ? "Exception Encountered" : null)
@@ -246,7 +259,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 String response = Dialogs.create()
-                    .owner(cbSetOwner.isSelected() ? stage : null)
+                    .owner(includeOwner() ? stage : null)
                     .title("Name Check")
                     .masthead(isMastheadVisible() ? "Please type in your name" : null)
                     .message("What is your name?")
@@ -261,7 +274,7 @@ public class HelloDialog extends Application implements Sample {
         Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 String response = Dialogs.create()
-                        .owner(cbSetOwner.isSelected() ? stage : null)
+                        .owner(includeOwner() ? stage : null)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
                         .message("Pick a name?")
@@ -276,7 +289,7 @@ public class HelloDialog extends Application implements Sample {
             @Override public void handle(ActionEvent e) {
 
                 String response = Dialogs.create()
-                      .owner(cbSetOwner.isSelected() ? stage : null)
+                      .owner(includeOwner() ? stage : null)
                       .title("Name Guess")
                       .masthead(isMastheadVisible() ? "Name Guess" : null)
                       .message("Pick a name?")
@@ -292,7 +305,7 @@ public class HelloDialog extends Application implements Sample {
             @Override public void handle(ActionEvent e) {
 
                 String response = Dialogs.create()
-                        .owner(cbSetOwner.isSelected() ? stage : null)
+                        .owner(includeOwner() ? stage : null)
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
                         .message("Pick a name?")
@@ -326,7 +339,7 @@ public class HelloDialog extends Application implements Sample {
                 
                 
                 Action response = Dialogs.create()
-                        .owner(cbSetOwner.isSelected() ? stage : null)
+                        .owner(includeOwner() ? stage : null)
                         .title("Manually connect to wireless network")
                         .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
                         .message("How do you want to add a network?")
@@ -369,7 +382,7 @@ public class HelloDialog extends Application implements Sample {
             }
             
             @Override public void handle(ActionEvent arg0) {
-                Dialog dlg = new Dialog(cbSetOwner.isSelected() ? stage : null, "Login Dialog");
+                Dialog dlg = new Dialog(includeOwner() ? stage : null, "Login Dialog");
                 if (cbShowMasthead.isSelected()) {
                     dlg.setMasthead("Login to ControlsFX");
                 }

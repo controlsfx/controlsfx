@@ -313,6 +313,10 @@ class HeavyweightDialog extends FXDialog {
         return stage.titleProperty();
     }
     
+    @Override public void sizeToScene() {
+        stage.sizeToScene();
+    }
+    
     
     
     /***************************************************************************

@@ -895,7 +895,7 @@ public class Dialog {
                 content.setVisible(!content.isVisible());
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
                 detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
-//                dialog.sizeToScene();
+                dialog.sizeToScene();
             }
         });
         return detailsButton;

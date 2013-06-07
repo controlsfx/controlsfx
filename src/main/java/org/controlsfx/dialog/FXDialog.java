@@ -3,7 +3,6 @@ package org.controlsfx.dialog;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -14,6 +13,7 @@ abstract class FXDialog {
     
     public abstract void hide();
     
+    public abstract void sizeToScene();
     
     // --- resizable
 //    private final BooleanProperty resizable = new SimpleBooleanProperty(this, "resizable", false);

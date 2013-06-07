@@ -30,7 +30,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 
-public class LightweightDialog extends FXDialog {
+class LightweightDialog extends FXDialog {
 
     private static final URL DIALOGS_CSS_URL = HeavyweightDialog.class.getResource("dialogs.css");   
 
@@ -52,7 +52,7 @@ public class LightweightDialog extends FXDialog {
 
     private static final int HEADER_HEIGHT = 28;
 
-    public LightweightDialog(String title, Scene scene) {
+    LightweightDialog(String title, Scene scene) {
         this.scene = scene;
         
         setTitle(title);
@@ -300,6 +300,10 @@ public class LightweightDialog extends FXDialog {
     @Override
     public void setContentPane(Pane pane) {
         root.setCenter(pane);        
+    }
+    
+    @Override public void sizeToScene() {
+        // TODO Auto-generated method stub
     }
     
     

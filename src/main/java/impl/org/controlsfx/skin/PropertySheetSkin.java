@@ -40,6 +40,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -75,7 +76,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
-//    private final BorderPane content = new BorderPane();
     private final ScrollPane scroller = new ScrollPane();
     
     /**************************************************************************
@@ -224,10 +224,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class PropertyPane extends GridPane {
         
-//        public PropertyPane() {
-//            this( Collections.<Property>emptyList());
-//        }
-        
         public PropertyPane( List<PropertyDescriptor> properties ) {
             setVgap(5);
             setHgap(5);
@@ -264,6 +260,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                     control.setMinWidth(MIN_COLUMN_WIDTH);
                     add(control, 1, row);
                     GridPane.setHgrow(control, Priority.ALWAYS);
+                } else {
+                    
+                    TextField message = new TextField("No suitable editor found");
+                    message.setEditable(false);
+                    message.setDisable(true);
+                    add( message, 1, row);
+                    message.setMaxWidth(Double.MAX_VALUE);
+                    GridPane.setHgrow(message, Priority.ALWAYS);
                 }
                 
                 //TODO add support for recursive properties

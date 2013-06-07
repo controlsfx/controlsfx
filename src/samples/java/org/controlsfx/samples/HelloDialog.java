@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -114,9 +115,7 @@ public class HelloDialog extends Application implements Sample {
 
         row++;
         grid.add(createLabel("Common Dialog attributes: "), 0, 1);
-        grid.add(cbUseLightweightDialog, 1, row);
-        grid.add(cbShowMasthead, 2, row);
-        grid.add(cbSetOwner, 3, row);
+        grid.add(new HBox(10, cbUseLightweightDialog, cbShowMasthead, cbSetOwner), 1, row);
 
         row++;
 
@@ -137,7 +136,7 @@ public class HelloDialog extends Application implements Sample {
                    .showInformation();
             }
         });
-        grid.add(Hyperlink2, 1, row);
+        grid.add(new HBox(10, Hyperlink2), 1, row);
 
         row++;
 
@@ -160,7 +159,7 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink3, 1, row);
+        grid.add(new HBox(10, Hyperlink3), 1, row);
 
         row++;
 
@@ -183,7 +182,7 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink6a, 1, row);
+        grid.add(new HBox(10, Hyperlink6a), 1, row);
 
         row++;
 
@@ -206,7 +205,7 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink7a, 1, row);
+        grid.add(new HBox(10, Hyperlink7a), 1, row);
 
         row++;
 
@@ -229,7 +228,6 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink5a, 1, row);
 
         final Button Hyperlink5b = new Button("Open in new window");
         Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
@@ -245,8 +243,8 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink5b, 2, row);
-
+        
+        grid.add(new HBox(10, Hyperlink5a, Hyperlink5b), 1, row);
         row++;
 
         // *******************************************************************
@@ -268,7 +266,6 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink8, 1, row);
 
         final Button Hyperlink9 = new Button("Initial Value Set");
         Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
@@ -282,7 +279,6 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink9, 2, row);
 
         final Button Hyperlink10 = new Button("Set Choices (< 10)");
         Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
@@ -298,7 +294,6 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink10, 3, row);
 
         final Button Hyperlink11 = new Button("Set Choices (>= 10)");
         Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
@@ -315,8 +310,8 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink11, 4, row);
-
+        
+        grid.add(new HBox(10, Hyperlink8, Hyperlink9, Hyperlink10, Hyperlink11), 1, row);
         row++;
         
 
@@ -348,8 +343,8 @@ public class HelloDialog extends Application implements Sample {
                 System.out.println("response: " + response);
             }
         });
-        grid.add(Hyperlink12, 1, row);
         
+        grid.add(new HBox(10, Hyperlink12), 1, row);
         row ++;
         
 
@@ -424,9 +419,10 @@ public class HelloDialog extends Application implements Sample {
                 
                 dlg.show();
             }
-            
         });
-        grid.add(Hyperlink14, 1, row);
+        
+        
+        grid.add(new HBox(10, Hyperlink14), 1, row);
 
         
         return grid;

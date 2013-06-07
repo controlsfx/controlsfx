@@ -1,13 +1,3 @@
-package org.controlsfx.property.editor;
-
-import java.lang.reflect.InvocationTargetException;
-
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.IndexRange;
-import javafx.scene.control.TextField;
-
-import org.controlsfx.property.PropertyDescriptor;
-
 /**
  * Copyright (c) 2013, ControlsFX All rights reserved.
  * 
@@ -29,6 +19,17 @@ import org.controlsfx.property.PropertyDescriptor;
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.controlsfx.property.editor;
+
+import java.lang.reflect.InvocationTargetException;
+
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.IndexRange;
+import javafx.scene.control.TextField;
+
+import org.controlsfx.property.PropertyDescriptor;
+
+
 
 public class NumericEditor extends AbstractPropertyEditor<NumericField> {
 

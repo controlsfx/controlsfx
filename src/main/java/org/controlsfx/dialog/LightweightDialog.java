@@ -35,20 +35,20 @@ class LightweightDialog extends FXDialog {
     private static final URL DIALOGS_CSS_URL = HeavyweightDialog.class.getResource("dialogs.css");   
 
     private BorderPane root;
-    private StackPane decoratedRoot;
     private HBox windowBtns;
     private Button closeButton;
     private Button minButton;
     private Button maxButton;
     private Rectangle resizeCorner;
-    private double mouseDragOffsetX = 0;
-    private double mouseDragOffsetY = 0;
+    private double mouseDragDeltaX = 0;
+    private double mouseDragDeltaY = 0;
     protected Label titleLabel;
     
     private final Scene scene;
     private Region opaqueLayer;
     private StackPane dialogStack;
     private Parent originalParent;
+    private StackPane lightweightDialog;
 
     private static final int HEADER_HEIGHT = 28;
 
@@ -77,7 +77,7 @@ class LightweightDialog extends FXDialog {
 
         // *** The rest is for adding window decorations ***
 
-        decoratedRoot = new StackPane() {
+        lightweightDialog = new StackPane() {
             @Override protected void layoutChildren() {
                 super.layoutChildren();
                 if (resizeCorner != null) {
@@ -85,8 +85,8 @@ class LightweightDialog extends FXDialog {
                 }
             }
         };
-        decoratedRoot.getChildren().add(root);
-        decoratedRoot.getStyleClass().addAll("dialog", "decorated-root");
+        lightweightDialog.getChildren().add(root);
+        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root");
 
 //        focusedProperty().addListener(new InvalidationListener() {
 //            @Override public void invalidated(Observable valueModel) {                
@@ -104,14 +104,14 @@ class LightweightDialog extends FXDialog {
         // add window dragging
         toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
-                mouseDragOffsetX = event.getSceneX();
-                mouseDragOffsetY = event.getSceneY();
+                mouseDragDeltaX = lightweightDialog.getLayoutX() - event.getSceneX();
+                mouseDragDeltaY = lightweightDialog.getLayoutY() - event.getSceneY();
             }
         });
         toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
-//                setLayoutX(event.getScreenX() - mouseDragOffsetX);
-//                setLayoutY(event.getScreenY() - mouseDragOffsetY);
+                lightweightDialog.setLayoutX(event.getSceneX() + mouseDragDeltaX);
+                lightweightDialog.setLayoutY(event.getSceneY() + mouseDragDeltaY);
             }
         });
 
@@ -192,7 +192,7 @@ class LightweightDialog extends FXDialog {
 
             @Override public void handle(MouseEvent event) {
                 EventType<? extends MouseEvent> type = event.getEventType();
-
+                
 //                if (type == MouseEvent.MOUSE_PRESSED) {
 //                    width = getWidth();
 //                    height = getHeight();
@@ -207,10 +207,10 @@ class LightweightDialog extends FXDialog {
         resizeCorner.setOnMouseDragged(resizeHandler);
 
         resizeCorner.setManaged(false);
-        decoratedRoot.getChildren().add(resizeCorner);
+        lightweightDialog.getChildren().add(resizeCorner);
         
-        decoratedRoot.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        decoratedRoot.pseudoClassStateChanged(ACTIVE_PSEUDO_CLASS, true);
+        lightweightDialog.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        lightweightDialog.pseudoClassStateChanged(ACTIVE_PSEUDO_CLASS, true);
         
 //        getChildren().add(decoratedRoot);
     }
@@ -263,14 +263,14 @@ class LightweightDialog extends FXDialog {
         
         // modify scene root to install opaque layer and the dialog
         originalParent = scene.getRoot();
-        dialogStack = new StackPane(originalParent, opaqueLayer, decoratedRoot);
-        decoratedRoot.setVisible(true);
+        dialogStack = new StackPane(originalParent, opaqueLayer, lightweightDialog);
+        lightweightDialog.setVisible(true);
         scene.setRoot(dialogStack);
     }
     
     @Override public void hide() {
         opaqueLayer.setVisible(false);
-        decoratedRoot.setVisible(false);
+        lightweightDialog.setVisible(false);
         
         dialogStack.getChildren().remove(originalParent);
         scene.setRoot(originalParent);
@@ -282,7 +282,7 @@ class LightweightDialog extends FXDialog {
     }
 
     @Override public Node getRoot() {
-        return decoratedRoot;
+        return lightweightDialog;
     }
 
     @Override

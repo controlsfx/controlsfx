@@ -26,26 +26,30 @@
  */
 package org.controlsfx.property.editor;
 
-import javafx.beans.property.StringProperty;
-import javafx.scene.control.TextField;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.TextInputControl;
 
-import org.controlsfx.property.PropertyDescriptor;
+class EditorUtils {
 
-public class TextEditor extends AbstractPropertyEditor<TextField> {
-
-    public TextEditor( PropertyDescriptor property ) {
-        super(property, new TextField());
-        EditorUtils.enableAutoSelectAll(control);
+    private EditorUtils() {
+       // no op
     }
     
-    @Override protected StringProperty getObservableValue() {
-        return control.textProperty();
-    }
+    public static void enableAutoSelectAll(final TextInputControl control) {
 
-    @Override public void setValue(Object value) {
-        if ( value instanceof String ) {
-           control.setText((String)value);
-        }
+        control.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            control.selectAll();
+                        }
+                    });
+                }
+            }
+        });
     }
-
+    
 }

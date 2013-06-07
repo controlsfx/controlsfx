@@ -191,20 +191,20 @@ class HeavyweightDialog extends FXDialog {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add close min max
-        closeButton = new WindowButton("close");
+        closeButton = new LightweightDialog.WindowButton("close");
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 HeavyweightDialog.this.hide();
             }
         });
-        minButton = new WindowButton("minimize");
+        minButton = new LightweightDialog.WindowButton("minimize");
         minButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 stage.setIconified(!stage.isIconified());
             }
         });
 
-        maxButton = new WindowButton("maximize");
+        maxButton = new LightweightDialog.WindowButton("maximize");
         maxButton.setOnAction(new EventHandler<ActionEvent>() {
             private double restoreX;
             private double restoreY;
@@ -325,17 +325,6 @@ class HeavyweightDialog extends FXDialog {
      *                                                                         *
      **************************************************************************/
 
-    private static class WindowButton extends Button {
-        WindowButton(String name) {
-            getStyleClass().setAll("window-button");
-            getStyleClass().add("window-"+name+"-button");
-            StackPane graphic = new StackPane();
-            graphic.getStyleClass().setAll("graphic");
-            setGraphic(graphic);
-            setMinSize(17, 17);
-            setPrefSize(17, 17);
-        }
-    }
 
     
     

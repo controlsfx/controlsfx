@@ -59,14 +59,16 @@ class LightweightDialog extends FXDialog {
         
         resizableProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable valueModel) {
-//                resizeCorner.setVisible(isResizable());
-//                maxButton.setVisible(isResizable());
-//
-//                if (isResizable()) {
-//                    windowBtns.getChildren().add(1, maxButton);
-//                } else {
-//                    windowBtns.getChildren().remove(maxButton);
-//                }
+                resizeCorner.setVisible(resizableProperty().get());
+                maxButton.setVisible(resizableProperty().get());
+
+                if (resizableProperty().get()) {
+                    if (! windowBtns.getChildren().contains(maxButton)) {
+                        windowBtns.getChildren().add(1, maxButton);
+                    }
+                } else {
+                    windowBtns.getChildren().remove(maxButton);
+                }
             }
         });
 
@@ -143,6 +145,7 @@ class LightweightDialog extends FXDialog {
         });
 
         maxButton = new WindowButton("maximize");
+        maxButton.setVisible(false);
         maxButton.setOnAction(new EventHandler<ActionEvent>() {
             private double restoreX;
             private double restoreY;
@@ -150,27 +153,33 @@ class LightweightDialog extends FXDialog {
             private double restoreH;
 
             @Override public void handle(ActionEvent event) {
-                Screen screen = Screen.getPrimary(); // todo something more sensible
+                // TODO redo this code - we don't want to use Screen here
+                Screen screen = Screen.getPrimary(); 
                 double minX = screen.getVisualBounds().getMinX();
                 double minY = screen.getVisualBounds().getMinY();
                 double maxW = screen.getVisualBounds().getWidth();
                 double maxH = screen.getVisualBounds().getHeight();
 
-//                if (restoreW == 0 || getLayoutX() != minX || getLayoutY() != minY || getWidth() != maxW || getHeight() != maxH) {
-//                    restoreX = getLayoutX();
-//                    restoreY = getLayoutY();
-//                    restoreW = getWidth();
-//                    restoreH = getHeight();
-//                    setLayoutX(minX);
-//                    setLayoutY(minY);
-//                    setWidth(maxW);
-//                    setHeight(maxH);
-//                } else {
-//                    setLayoutX(restoreX);
-//                    setLayoutY(restoreY);
-//                    setWidth(restoreW);
-//                    setHeight(restoreH);
-//                }
+                final double layouxX = lightweightDialog.getLayoutX();
+                final double layouxY = lightweightDialog.getLayoutY();
+                final double width = lightweightDialog.getWidth();
+                final double height = lightweightDialog.getHeight();
+                
+                if (restoreW == 0 || layouxX != minX || layouxY != minY || width != maxW || height != maxH) {
+                    restoreX = layouxX;
+                    restoreY = layouxY;
+                    restoreW = width;
+                    restoreH = height;
+                    lightweightDialog.setLayoutX(minX);
+                    lightweightDialog.setLayoutY(minY);
+                    lightweightDialog.setPrefWidth(maxW);
+                    lightweightDialog.setPrefHeight(maxH);
+                } else {
+                    lightweightDialog.setLayoutX(restoreX);
+                    lightweightDialog.setLayoutY(restoreY);
+                    lightweightDialog.setPrefWidth(restoreW);
+                    lightweightDialog.setPrefHeight(restoreH);
+                }
             }
         });
 
@@ -211,23 +220,8 @@ class LightweightDialog extends FXDialog {
         
         lightweightDialog.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         lightweightDialog.pseudoClassStateChanged(ACTIVE_PSEUDO_CLASS, true);
-        
-//        getChildren().add(decoratedRoot);
     }
     
-//    @Override public void showAndWait() {
-//        Window owner = getOwner();
-//        if (owner != null) {
-//            // because Stage does not seem to centre itself over its owner, we
-//            // do it here.
-//            final double x = owner.getX() + (owner.getWidth() / 2.0) - (root.prefWidth(-1) / 2.0);
-//            final double y = owner.getY() + (owner.getHeight() / 2.0) - (root.prefHeight(-1)) / 2.0 - 50;
-//            setX(x);
-//            setY(y);
-//        }
-//        super.showAndWait();
-//    }
-
     public void setIconifiable(boolean iconifiable) {
         minButton.setVisible(iconifiable);
     }
@@ -291,6 +285,8 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         dialogStack.getChildren().remove(originalParent);
+        originalParent.getStyleClass().remove("root");
+        
         scene.setRoot(originalParent);
     }
 
@@ -303,16 +299,12 @@ class LightweightDialog extends FXDialog {
         return lightweightDialog;
     }
 
-    @Override
-    ReadOnlyDoubleProperty widthProperty() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override ReadOnlyDoubleProperty widthProperty() {
+        return lightweightDialog.widthProperty();
     }
 
-    @Override
-    ReadOnlyDoubleProperty heightProperty() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override ReadOnlyDoubleProperty heightProperty() {
+        return lightweightDialog.heightProperty();
     }    
     
     @Override
@@ -328,7 +320,7 @@ class LightweightDialog extends FXDialog {
     
     
 
-    private static class WindowButton extends Button {
+    static class WindowButton extends Button {
         WindowButton(String name) {
             getStyleClass().setAll("window-button");
             getStyleClass().add("window-"+name+"-button");

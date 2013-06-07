@@ -3,7 +3,7 @@ ControlsFX is an [open source project][1] for JavaFX that aims to provide really
 
 **Important note: **ControlsFX will only work on JavaFX 8.0 b91 or later. If you are running on earlier versions of JDK 8, please [upgrade][8]. If you are still using JavaFX 2.x then unfortunately this library will not work for you.
 
-### Getting Started
+## Getting Started
 
 If you want to **play with** the ControlsFX sample application, either clone the ControlsFX repo from bitbucket and then run the [org.controlsfx.HelloControlsFX][10] application that resides within the [src/samples/java][11] directory, or run the samples jar file from the command line with the following command (or a variation depending on your operating system):
 
@@ -16,13 +16,13 @@ If you **want to use** ControlsFX, then youre probably wondering how to use the 
 
 Another great place to explore is our **sample code**, all located in the [src/samples directory][14] of our [code repository][15]. Weve put a bunch of effort into making these examples something you can learn from.
 
-### Release Versioning
+## Release Versioning
 
 ControlsFX has a slightly different approach to version numbers than other projects. We use the fairly traditional x.y.z numbering system, except in the case of ControlsFX, the x.y portion is used to represent the base JavaFX version required. In other words, ControlsFX 8.0.0 is the first release of ControlsFX to work on JavaFX 8.0 and above. ControlsFX 8.1.5 (if we ever release that version) is used to represent that the release will work on JavaFX 8.1 (and not JavaFX 8.0), and is the 6th release (remember: real programmers count from zero ![:-\)][16] ).
 
 In other words, we do not differentiate between bug fix and feature releases we will clarify what the release contains on a per-release basis. Also, we will always aim to require the minimal version of JavaFX possible, but we are also not going to hold back features / bug fixes / etc if we can resolve them by moving to a newer release. Prior to moving up to a new JavaFX version we will always tag the [repository][17] and make available a download of the source and compiled code for the earlier version, for people who are unable to move to the newer JavaFX release.
 
-### License
+## License
 
 ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers, but our interpretation of this license suggests to us that it is business friendly, requiring only the redistribution of the [3-clause BSD license we distribute with ControlsFX][19]. As always, I suggest you review the license with the appropriate people, rather than take the advice of software engineers. If this license is not suitable, please contact [Jonathan Giles][20] to discuss an alternative license.
 

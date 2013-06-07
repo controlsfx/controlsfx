@@ -253,7 +253,7 @@ public class Dialog {
      * @param title The dialog title to be shown at the top of the dialog.
      */
     public Dialog(Window owner, String title) {
-        this.dialog = new FXDialog(title, owner, true);
+        this.dialog = DialogFactory.createDialog(useLightWeightDialogs, title, owner, true);
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane");
@@ -280,8 +280,7 @@ public class Dialog {
     public Action show() {
         try {
             buildDialogContent();
-            dialog.centerOnScreen();
-            dialog.showAndWait();
+            dialog.show();
             return result;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -319,7 +318,7 @@ public class Dialog {
      * @return true if dialog is resizable
      */
     public final boolean isResizable() {
-        return dialog.isResizable();
+        return resizableProperty().get();
     }
 
     /**
@@ -330,7 +329,7 @@ public class Dialog {
      * @param resizable true if dialog should be resizable.
      */
     public final void setResizable(boolean resizable) {
-        dialog.setResizable(resizable);
+        resizableProperty().set(resizable);
     }
 
     /**
@@ -569,7 +568,7 @@ public class Dialog {
      * Returns the width of the dialog.
      */
     public final double getWidth() {
-        return dialog.getWidth();
+        return widthProperty().get();
     }
     
     
@@ -585,7 +584,7 @@ public class Dialog {
      * Returns the height of the dialog.
      */
     public final double getHeight() {
-        return dialog.getHeight();
+        return heightProperty().get();
     }
     
 
@@ -723,6 +722,7 @@ public class Dialog {
      * TODO delete me - this is just for testing!!
      */
     static String buttonBarOrder = ButtonBar.BUTTON_ORDER_WINDOWS;
+    static boolean useLightWeightDialogs = false;
 
     static void setMacOS(boolean b) {
         if (b) {
@@ -740,6 +740,10 @@ public class Dialog {
         if (b) {
             buttonBarOrder = ButtonBar.BUTTON_ORDER_LINUX;
         }
+    }
+    
+    static void setUseLightweightDialogs(boolean b) {
+        useLightWeightDialogs = b;
     }
     // -- end of testing code
     
@@ -766,7 +770,7 @@ public class Dialog {
         
         createCenterPanel(row);
         
-        Parent root = dialog.getScene().getRoot();
+        Node root = dialog.getRoot();
         root.pseudoClassStateChanged(MASTHEAD_PSEUDO_CLASS,      hasMasthead);
         root.pseudoClassStateChanged(NO_MASTHEAD_PSEUDO_CLASS,   !hasMasthead);
         
@@ -891,7 +895,7 @@ public class Dialog {
                 content.setVisible(!content.isVisible());
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
                 detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
-                dialog.sizeToScene();
+//                dialog.sizeToScene();
             }
         });
         return detailsButton;

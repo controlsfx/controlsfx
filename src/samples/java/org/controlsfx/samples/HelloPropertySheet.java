@@ -156,7 +156,7 @@ public class HelloPropertySheet extends Application implements Sample {
         }
 
         @Override public void execute(ActionEvent ae) {
-            propertySheet.modeProperty.set(mode);
+            propertySheet.modeProperty().set(mode);
         }
         
     }

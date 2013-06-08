@@ -91,7 +91,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         getChildren().add(scroller);
         
         // setup listeners
-        registerChangeListener(control.modeProperty, "MODE");
+        registerChangeListener(control.modeProperty(), "MODE");
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
@@ -132,7 +132,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     }
     
     private Node buildPropertySheetContainer() {
-        switch( getSkinnable().modeProperty.get() ) {
+        switch( getSkinnable().modeProperty().get() ) {
 
             case CATEGORY: {
                 

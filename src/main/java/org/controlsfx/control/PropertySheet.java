@@ -39,7 +39,7 @@ public class PropertySheet extends Control {
     
     public PropertySheet() {
         getStyleClass().add("property-sheet");
-        modeProperty.set(Mode.CATEGORY);
+        modeProperty.set(Mode.NAME);
     }
     
     @Override protected Skin<?> createDefaultSkin() {
@@ -50,7 +50,11 @@ public class PropertySheet extends Control {
         return properties;
     }
     
-    public final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
+    
+    public final SimpleObjectProperty<Mode> modeProperty() {
+    	return modeProperty;
+    }
     
     public enum Mode {
         NAME,

@@ -1,6 +1,5 @@
 package org.controlsfx.dialog;
 
-import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 
 class DialogFactory {

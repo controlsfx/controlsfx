@@ -145,11 +145,7 @@ abstract class FXDialog {
         minButton = new WindowButton("minimize");
         minButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
-                // heavyweight:
-//                stage.setIconified(!stage.isIconified());
-                
-                // lightweight:
-//                setIconified(!isIconified());
+                setIconified(isIconified());
             }
         });
 
@@ -220,6 +216,10 @@ abstract class FXDialog {
      * @param iconifiable if dialog should be iconifiable
      */
     abstract void setIconifiable(boolean iconifiable);
+    
+    abstract void setIconified(boolean iconified);
+    
+    abstract boolean isIconified();
     
     /**
      * Sets whether the dialog can be closed

@@ -5,7 +5,6 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
@@ -15,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.stage.Screen;
 
 class LightweightDialog extends FXDialog {
 
@@ -64,43 +62,11 @@ class LightweightDialog extends FXDialog {
             }
         });
 
-        // support maximising the dialog
-        maxButton.setOnAction(new EventHandler<ActionEvent>() {
-            private double restoreX;
-            private double restoreY;
-            private double restoreW;
-            private double restoreH;
-
-            @Override public void handle(ActionEvent event) {
-                // TODO redo this code - we don't want to use Screen here
-                Screen screen = Screen.getPrimary(); 
-                double minX = screen.getVisualBounds().getMinX();
-                double minY = screen.getVisualBounds().getMinY();
-                double maxW = screen.getVisualBounds().getWidth();
-                double maxH = screen.getVisualBounds().getHeight();
-
-                final double layouxX = lightweightDialog.getLayoutX();
-                final double layouxY = lightweightDialog.getLayoutY();
-                final double width = lightweightDialog.getWidth();
-                final double height = lightweightDialog.getHeight();
-                
-                if (restoreW == 0 || layouxX != minX || layouxY != minY || width != maxW || height != maxH) {
-                    restoreX = layouxX;
-                    restoreY = layouxY;
-                    restoreW = width;
-                    restoreH = height;
-                    lightweightDialog.setLayoutX(minX);
-                    lightweightDialog.setLayoutY(minY);
-                    lightweightDialog.setPrefWidth(maxW);
-                    lightweightDialog.setPrefHeight(maxH);
-                } else {
-                    lightweightDialog.setLayoutX(restoreX);
-                    lightweightDialog.setLayoutY(restoreY);
-                    lightweightDialog.setPrefWidth(restoreW);
-                    lightweightDialog.setPrefHeight(restoreH);
-                }
-            }
-        });
+        // we don't support maximising or minimising lightweight dialogs, so we 
+        // remove these from the toolbar
+        minButton = null;
+        maxButton = null;
+        windowBtns.getChildren().setAll(closeButton);
         
         // add window resizing
         EventHandler<MouseEvent> resizeHandler = new EventHandler<MouseEvent>() {
@@ -136,14 +102,6 @@ class LightweightDialog extends FXDialog {
      * Public API
      * 
      **************************************************************************/
-    
-    @Override public void setIconifiable(boolean iconifiable) {
-        minButton.setVisible(iconifiable);
-    }
-    
-    @Override public void setClosable( boolean closable ) {
-        closeButton.setVisible( closable );
-    }
     
     @Override public StringProperty titleProperty() {
         if (title == null) {
@@ -227,5 +185,21 @@ class LightweightDialog extends FXDialog {
     
     @Override public void sizeToScene() {
         // no-op: This isn't needed when there is not stage...
+    }
+    
+    @Override void setIconified(boolean iconified) {
+        // no-op: We don't want to iconify lightweight dialogs
+    }
+    
+    @Override boolean isIconified() {
+        return false;
+    }
+    
+    @Override public void setIconifiable(boolean iconifiable) {
+        // no-op: We don't want to iconify lightweight dialogs
+    }
+    
+    @Override public void setClosable( boolean closable ) {
+        closeButton.setVisible( closable );
     }
 }

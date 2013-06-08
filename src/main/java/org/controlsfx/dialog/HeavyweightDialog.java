@@ -234,6 +234,14 @@ class HeavyweightDialog extends FXDialog {
     @Override public void sizeToScene() {
         stage.sizeToScene();
     }
+    
+    @Override void setIconified(boolean iconified) {
+        stage.setIconified(iconified);
+    }
+    
+    @Override boolean isIconified() {
+        return stage.isIconified();
+    }
 
     
     

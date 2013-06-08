@@ -32,11 +32,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 
 public class ChoiceEditor extends AbstractPropertyEditor<ComboBox<Object>> {
 
-    public ChoiceEditor(  PropertyDescriptor property, Collection<Object> choices ) {
+    public ChoiceEditor( Item property, Collection<Object> choices ) {
         super(property, new ComboBox<Object>());
         control.setItems(FXCollections.observableArrayList(choices));
     }

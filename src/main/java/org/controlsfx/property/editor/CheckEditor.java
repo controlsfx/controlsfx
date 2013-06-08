@@ -29,11 +29,11 @@ package org.controlsfx.property.editor;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 
 public class CheckEditor extends AbstractPropertyEditor<CheckBox> {
 
-    public CheckEditor( PropertyDescriptor property ) {
+    public CheckEditor( Item property ) {
         super(property, new CheckBox());
     }
     

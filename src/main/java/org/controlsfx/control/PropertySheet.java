@@ -33,11 +33,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
-import org.controlsfx.property.PropertyDescriptor;
-
 public class PropertySheet extends Control {
     
-    private final ObservableList<PropertyDescriptor> properties = FXCollections.observableArrayList();
+    private final ObservableList<Item> properties = FXCollections.observableArrayList();
     
     public PropertySheet() {
         getStyleClass().add("property-sheet");
@@ -48,7 +46,7 @@ public class PropertySheet extends Control {
         return new PropertySheetSkin(this);
     }
     
-    public ObservableList<PropertyDescriptor> getItems() {
+    public ObservableList<Item> getItems() {
         return properties;
     }
     
@@ -62,5 +60,22 @@ public class PropertySheet extends Control {
     @Override protected String getUserAgentStylesheet() {
         return getClass().getResource("propertysheet.css").toExternalForm();
     }
+    
+    
+    public static interface Item {
+        
+        Class<?> getType();
+        
+        String getCategory();
+       
+        String getName();
+        
+        String getDescription();
+        
+        Object getValue();
+        
+        void setValue( Object value );
+       
+   }
     
 }

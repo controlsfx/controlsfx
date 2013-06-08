@@ -27,7 +27,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 
 
 
@@ -35,7 +35,7 @@ public class NumericEditor extends AbstractPropertyEditor<NumericField> {
 
     private Class<? extends Number> sourceClass = Double.class;
 
-    public NumericEditor(PropertyDescriptor property) {
+    public NumericEditor(Item property) {
         super(property, new NumericField());
         EditorUtils.enableAutoSelectAll(control);
     }

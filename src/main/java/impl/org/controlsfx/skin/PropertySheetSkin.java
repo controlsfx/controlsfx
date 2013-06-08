@@ -49,7 +49,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.editor.CheckEditor;
 import org.controlsfx.property.editor.ChoiceEditor;
 import org.controlsfx.property.editor.ColorEditor;
@@ -93,8 +93,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         // setup listeners
         registerChangeListener(control.modeProperty, "MODE");
         
-        control.getItems().addListener( new ListChangeListener<PropertyDescriptor>() {
-            @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends PropertyDescriptor> change) {
+        control.getItems().addListener( new ListChangeListener<Item>() {
+            @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
                 refreshProperties();
             }
         });
@@ -137,10 +137,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             case CATEGORY: {
                 
                 // group by category
-                Map<String, List<PropertyDescriptor>> categoryMap = new TreeMap<>();
-                for( PropertyDescriptor p: getSkinnable().getItems()) {
+                Map<String, List<Item>> categoryMap = new TreeMap<>();
+                for( Item p: getSkinnable().getItems()) {
                     String category = p.getCategory();
-                    List<PropertyDescriptor> list = categoryMap.get(category);
+                    List<Item> list = categoryMap.get(category);
                     if ( list == null ) {
                         list = new ArrayList<>();
                         categoryMap.put( category, list);
@@ -185,7 +185,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         return false;
     }
     
-    private PropertyEditor createEditor( PropertyDescriptor p  ) {
+    private PropertyEditor createEditor( Item p  ) {
         
         Class<?> type = p.getType();
         
@@ -224,7 +224,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class PropertyPane extends GridPane {
         
-        public PropertyPane( List<PropertyDescriptor> properties ) {
+        public PropertyPane( List<Item> properties ) {
             setVgap(5);
             setHgap(5);
             setPadding(new Insets(5, 15, 5, 15));
@@ -232,10 +232,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
 //            setGridLinesVisible(true);
         }
         
-        public void setItems( List<PropertyDescriptor> properties ) {
+        public void setItems( List<Item> properties ) {
             getChildren().clear();
             int row = 0;
-            for (PropertyDescriptor p : getSkinnable().getItems()) {
+            for (Item p : getSkinnable().getItems()) {
                 
                 // setup property label
                 Label label = new Label(p.getName());

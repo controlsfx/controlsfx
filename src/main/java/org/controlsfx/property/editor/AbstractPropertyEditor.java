@@ -30,14 +30,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.Region;
 
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 
 public abstract class AbstractPropertyEditor<T extends Region> implements PropertyEditor {
 
-    protected final PropertyDescriptor property;
+    protected final Item property;
     protected final T control;
     
-    public AbstractPropertyEditor( PropertyDescriptor property, T control ) {
+    public AbstractPropertyEditor( Item property, T control ) {
         this.control = control;
         this.property = property;
         getObservableValue().addListener(new ChangeListener<Object>() {

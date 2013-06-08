@@ -33,6 +33,7 @@ import java.beans.Introspector;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import org.controlsfx.control.PropertySheet.Item;
 
 public class BeanPropertyUtils {
 
@@ -40,9 +41,9 @@ public class BeanPropertyUtils {
         // no op
     }
 
-    public static ObservableList<PropertyDescriptor> getProperties(final Object bean) {
+    public static ObservableList<Item> getProperties(final Object bean) {
 
-        ObservableList<PropertyDescriptor> list = FXCollections.observableArrayList();
+        ObservableList<Item> list = FXCollections.observableArrayList();
 
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);

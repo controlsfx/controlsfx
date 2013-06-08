@@ -30,11 +30,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
 
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 
 public class ColorEditor extends AbstractPropertyEditor< ColorPicker> {
 
-    public ColorEditor( PropertyDescriptor property ) {
+    public ColorEditor( Item property ) {
         super(property, new ColorPicker());
     }
     

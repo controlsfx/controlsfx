@@ -29,7 +29,9 @@ package org.controlsfx.property;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class BeanProperty implements PropertyDescriptor {
+import org.controlsfx.control.PropertySheet.Item;
+
+public class BeanProperty implements Item {
 
     private final Object bean;
     private final java.beans.PropertyDescriptor beanPropertyDescriptor;

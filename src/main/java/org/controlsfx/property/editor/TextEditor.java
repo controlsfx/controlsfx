@@ -29,11 +29,11 @@ package org.controlsfx.property.editor;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.property.PropertyDescriptor;
+import org.controlsfx.control.PropertySheet.Item;
 
 public class TextEditor extends AbstractPropertyEditor<TextField> {
 
-    public TextEditor( PropertyDescriptor property ) {
+    public TextEditor( Item property ) {
         super(property, new TextField());
         EditorUtils.enableAutoSelectAll(control);
     }

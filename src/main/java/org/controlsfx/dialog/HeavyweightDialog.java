@@ -26,10 +26,6 @@
  */
 package org.controlsfx.dialog;
 
-import java.net.URL;
-
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -41,18 +37,9 @@ import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToolBar;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -62,28 +49,29 @@ import javafx.stage.Window;
 // Not public API (class is package-protected), so no JavaDoc is required.
 class HeavyweightDialog extends FXDialog {
 
-    private static final URL DIALOGS_CSS_URL = HeavyweightDialog.class.getResource("dialogs.css");  
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
     
     private final Stage stage;
 
-    private BorderPane root;
-    private StackPane decoratedRoot;
-    private HBox windowBtns;
-    private Button closeButton;
-    private Button minButton;
-    private Button maxButton;
-    private Rectangle resizeCorner;
-    private double mouseDragOffsetX = 0;
-    private double mouseDragOffsetY = 0;
-    protected Label titleLabel;
-
-    private static final int HEADER_HEIGHT = 28;
-
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
+    
     HeavyweightDialog(String title, Window owner, boolean modal) {
         this(title, owner, modal, StageStyle.TRANSPARENT);
     }
 
     private HeavyweightDialog(String title, Window owner, boolean modal, StageStyle stageStyle) {
+        super();
+        
         stage = new Stage(stageStyle) {
             @Override public void showAndWait() {
                 Window owner = getOwner();
@@ -98,7 +86,6 @@ class HeavyweightDialog extends FXDialog {
                 super.showAndWait();
             }
         };
-        stage.setTitle(title);
 
         if (owner != null) {
             stage.initOwner(owner);
@@ -112,99 +99,31 @@ class HeavyweightDialog extends FXDialog {
             }
         }
 
-        resizableProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable valueModel) {
-                resizeCorner.setVisible(stage.isResizable());
-                maxButton.setVisible(stage.isResizable());
-
-                if (stage.isResizable()) {
-                    windowBtns.getChildren().add(1, maxButton);
-                } else {
-                    windowBtns.getChildren().remove(maxButton);
-                }
-            }
-        });
-
-        root = new BorderPane();
-
-        Scene scene;
-
-
-
         // *** The rest is for adding window decorations ***
+        init(title);
 
-        decoratedRoot = new StackPane() {
-            @Override protected void layoutChildren() {
-                super.layoutChildren();
-                if (resizeCorner != null) {
-                    resizeCorner.relocate(getWidth() - 20, getHeight() - 20);
-                }
-            }
-        };
-        decoratedRoot.getChildren().add(root);
-        scene = new Scene(decoratedRoot);
-
+        Scene scene = new Scene(lightweightDialog);
         scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
 
-        decoratedRoot.getStyleClass().addAll("dialog", "decorated-root");
-
-        stage.focusedProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable valueModel) {                
-                boolean active = ((ReadOnlyBooleanProperty)valueModel).get();
-                decoratedRoot.pseudoClassStateChanged(ACTIVE_PSEUDO_CLASS, active);
-            }
-        });
-
-        ToolBar toolBar = new ToolBar();
-        toolBar.getStyleClass().add("window-header");
-        toolBar.setPrefHeight(HEADER_HEIGHT);
-        toolBar.setMinHeight(HEADER_HEIGHT);
-        toolBar.setMaxHeight(HEADER_HEIGHT);
+        
 
         // add window dragging
         toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
-                mouseDragOffsetX = event.getSceneX();
-                mouseDragOffsetY = event.getSceneY();
+                mouseDragDeltaX = event.getSceneX();
+                mouseDragDeltaY = event.getSceneY();
             }
         });
         toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
-                stage.setX(event.getScreenX() - mouseDragOffsetX);
-                stage.setY(event.getScreenY() - mouseDragOffsetY);
+                stage.setX(event.getScreenX() - mouseDragDeltaX);
+                stage.setY(event.getScreenY() - mouseDragDeltaY);
             }
         });
 
-        titleLabel = new Label();
-        titleLabel.getStyleClass().add("window-title");
-        titleLabel.setText(titleProperty().get());
-
-        titleProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable valueModel) {
-                titleLabel.setText(titleProperty().get());
-            }
-        });
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // add close min max
-        closeButton = new LightweightDialog.WindowButton("close");
-        closeButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent event) {
-                HeavyweightDialog.this.hide();
-            }
-        });
-        minButton = new LightweightDialog.WindowButton("minimize");
-        minButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent event) {
-                stage.setIconified(!stage.isIconified());
-            }
-        });
-
-        maxButton = new LightweightDialog.WindowButton("maximize");
+        // support maximising the dialog
         maxButton.setOnAction(new EventHandler<ActionEvent>() {
             private double restoreX;
             private double restoreY;
@@ -236,16 +155,6 @@ class HeavyweightDialog extends FXDialog {
             }
         });
 
-        windowBtns = new HBox(3);
-        windowBtns.getStyleClass().add("window-buttons");
-        windowBtns.getChildren().addAll(minButton, maxButton, closeButton);
-
-        toolBar.getItems().addAll(titleLabel, spacer, windowBtns);
-        root.setTop(toolBar);
-
-        resizeCorner = new Rectangle(10, 10);
-        resizeCorner.getStyleClass().add("window-resize-corner");
-
         // add window resizing
         EventHandler<MouseEvent> resizeHandler = new EventHandler<MouseEvent>() {
             private double width;
@@ -260,27 +169,32 @@ class HeavyweightDialog extends FXDialog {
                     height = stage.getHeight();
                     dragAnchor = new Point2D(event.getSceneX(), event.getSceneY());
                 } else if (type == MouseEvent.MOUSE_DRAGGED) {
-                    stage.setWidth(Math.max(decoratedRoot.minWidth(-1),   width  + (event.getSceneX() - dragAnchor.getX())));
-                    stage.setHeight(Math.max(decoratedRoot.minHeight(-1), height + (event.getSceneY() - dragAnchor.getY())));
+                    stage.setWidth(Math.max(lightweightDialog.minWidth(-1),   width  + (event.getSceneX() - dragAnchor.getX())));
+                    stage.setHeight(Math.max(lightweightDialog.minHeight(-1), height + (event.getSceneY() - dragAnchor.getY())));
                 }
             }
         };
         resizeCorner.setOnMousePressed(resizeHandler);
         resizeCorner.setOnMouseDragged(resizeHandler);
-
-        resizeCorner.setManaged(false);
-        decoratedRoot.getChildren().add(resizeCorner);
     }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
     
     @Override public void setContentPane(Pane pane) {
         root.setCenter(pane);
     }
 
-    public void setIconifiable(boolean iconifiable) {
+    @Override public void setIconifiable(boolean iconifiable) {
         minButton.setVisible(iconifiable);
     }
     
-    public void setClosable( boolean closable ) {
+    @Override public void setClosable(boolean closable) {
         closeButton.setVisible( closable );
     }
     
@@ -313,18 +227,21 @@ class HeavyweightDialog extends FXDialog {
         return stage.titleProperty();
     }
     
+    @Override ReadOnlyBooleanProperty focusedProperty() {
+        return stage.focusedProperty();
+    }
+    
     @Override public void sizeToScene() {
         stage.sizeToScene();
     }
     
+    @Override void setIconified(boolean iconified) {
+        stage.setIconified(iconified);
+    }
     
-    
-    /***************************************************************************
-     *                                                                         *
-     * Support classes                                                         *
-     *                                                                         *
-     **************************************************************************/
-
+    @Override boolean isIconified() {
+        return stage.isIconified();
+    }
 
     
     

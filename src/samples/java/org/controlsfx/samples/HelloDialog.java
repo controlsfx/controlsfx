@@ -41,15 +41,7 @@ import org.controlsfx.dialog.DialogsAccessor;
 
 public class HelloDialog extends Application implements Sample {
 
-    private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs") {
-        {
-            setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent arg0) {
-                    DialogsAccessor.setUseLightweightDialogs(cbUseLightweightDialog.isSelected());
-                }
-            });
-        }
-    };
+    private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
     private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
     private final CheckBox cbSetOwner = new CheckBox("Set Owner");
     
@@ -64,6 +56,8 @@ public class HelloDialog extends Application implements Sample {
     private static final String WINDOWS = "Windows";
     private static final String MAC_OS = "Mac OS";
     private static final String LINUX = "Linux";
+    
+    private Stage stage;
     
     
     private ToggleButton createToggle( final String caption ) {
@@ -128,11 +122,11 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink2 = new Button("Show");
         Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Dialogs.create()
-                   .owner(includeOwner() ? stage : null)
-                   .title("JavaFX")
-                   .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
-                   .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me...")
+                configureSampleDialog(
+                    Dialogs.create()
+                       .title("JavaFX")
+                       .masthead(isMastheadVisible() ? "Wouldn't this be nice?" : null)
+                       .message("A collection of pre-built JavaFX dialogs?\nSeems like a great idea to me..."))
                    .showInformation();
             }
         });
@@ -149,11 +143,11 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink3 = new Button("Show");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response =  Dialogs.create()
-                    .owner(includeOwner() ? stage : null)
-                    .title("You do want dialogs right?")
-                    .masthead(isMastheadVisible() ? "Just Checkin'" : null)
-                    .message( "I was a bit worried that you might not want them, so I wanted to double check.")
+                Action response = configureSampleDialog(
+                    Dialogs.create()
+                        .title("You do want dialogs right?")
+                        .masthead(isMastheadVisible() ? "Just Checkin'" : null)
+                        .message( "I was a bit worried that you might not want them, so I wanted to double check."))
                     .showConfirm();
 
                 System.out.println("response: " + response);
@@ -172,11 +166,11 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink6a = new Button("Show");
         Hyperlink6a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.create()
-                    .owner(includeOwner() ? stage : null)
-                   .title("I'm warning you!")
-                   .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
-                   .message("This is a warning")
+                Action response = configureSampleDialog(
+                    Dialogs.create()
+                       .title("I'm warning you!")
+                       .masthead(isMastheadVisible() ? "I'm glad I didn't need to use this..." : null)
+                       .message("This is a warning"))
                    .showWarning();
 
                 System.out.println("response: " + response);
@@ -195,12 +189,12 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink7a = new Button("Show");
         Hyperlink7a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.create()
-                      .owner(includeOwner() ? stage : null)
+                Action response = configureSampleDialog(
+                    Dialogs.create()
                       .title("It looks like you're making a bad decision")
                       .message("Exception Encountered")
-                      .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance! Even longer text that should probably wrap" : null)
-                      .showError();
+                      .masthead( isMastheadVisible() ? "Better change your mind - this is really your last chance! Even longer text that should probably wrap" : null))
+                    .showError();
 
                 System.out.println("response: " + response);
             }
@@ -218,11 +212,11 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink5a = new Button("Show");
         Hyperlink5a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Action response = Dialogs.create()
-                    .owner(includeOwner() ? stage : null)
-                    .title("It looks like you're making a bad decision")
-                    .message("Better change your mind - this is really your last chance!")
-                    .masthead(isMastheadVisible() ? "Exception Encountered" : null)
+                Action response = configureSampleDialog(
+                    Dialogs.create()
+                        .title("It looks like you're making a bad decision")
+                        .message("Better change your mind - this is really your last chance!")
+                        .masthead(isMastheadVisible() ? "Exception Encountered" : null))
                     .showException(new RuntimeException("Pending Bad Decision Exception"));
 
                 System.out.println("response: " + response);
@@ -232,13 +226,12 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink5b = new Button("Open in new window");
         Hyperlink5b.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-
-                Action response = Dialogs.create()
-                        .owner(includeOwner() ? stage : null)
+                Action response = configureSampleDialog(
+                    Dialogs.create()
                         .message("Better change your mind - this is really your last chance!")
                         .title("It looks like you're making a bad decision")
-                        .masthead(isMastheadVisible() ? "Exception Encountered" : null)
-                        .showExceptionInNewWindow(new RuntimeException("Pending Bad Decision Exception"));
+                        .masthead(isMastheadVisible() ? "Exception Encountered" : null))
+                    .showExceptionInNewWindow(new RuntimeException("Pending Bad Decision Exception"));
 
                 System.out.println("response: " + response);
             }
@@ -256,11 +249,11 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink8 = new Button("TextField");
         Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.create()
-                    .owner(includeOwner() ? stage : null)
-                    .title("Name Check")
-                    .masthead(isMastheadVisible() ? "Please type in your name" : null)
-                    .message("What is your name?")
+                String response = configureSampleDialog(
+                    Dialogs.create()
+                        .title("Name Check")
+                        .masthead(isMastheadVisible() ? "Please type in your name" : null)
+                        .message("What is your name?"))
                     .showTextInput();
 
                 System.out.println("response: " + response);
@@ -270,12 +263,12 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink9 = new Button("Initial Value Set");
         Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                String response = Dialogs.create()
-                        .owner(includeOwner() ? stage : null)
+                String response = configureSampleDialog(
+                    Dialogs.create()
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
-                        .message("Pick a name?")
-                        .showTextInput("Jonathan");
+                        .message("Pick a name?"))
+                    .showTextInput("Jonathan");
                 System.out.println("response: " + response);
             }
         });
@@ -283,13 +276,12 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink10 = new Button("Set Choices (< 10)");
         Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-
-                String response = Dialogs.create()
-                      .owner(includeOwner() ? stage : null)
+                String response = configureSampleDialog(
+                    Dialogs.create()
                       .title("Name Guess")
                       .masthead(isMastheadVisible() ? "Name Guess" : null)
-                      .message("Pick a name?")
-                      .showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+                      .message("Pick a name?"))
+                  .showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah");
 
                 System.out.println("response: " + response);
             }
@@ -298,14 +290,12 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink11 = new Button("Set Choices (>= 10)");
         Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-
-                String response = Dialogs.create()
-                        .owner(includeOwner() ? stage : null)
+                String response = configureSampleDialog(
+                    Dialogs.create()
                         .title("Name Guess")
                         .masthead(isMastheadVisible() ? "Name Guess" : null)
-                        .message("Pick a name?")
-                        .showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise", "Stephan",
-                             "Sarah", "Ron", "Ingrid");
+                        .message("Pick a name?"))
+                    .showChoices("Matthew", "Jonathan", "Ian", "Sue", "Hannah", "Julia", "Denise", "Stephan", "Sarah", "Ron", "Ingrid");
 
                 System.out.println("response: " + response);
             }
@@ -333,12 +323,12 @@ public class HelloDialog extends Application implements Sample {
                              "This creates a temporary network for sharing files or and Internet connection"));
                 
                 
-                Action response = Dialogs.create()
-                        .owner(includeOwner() ? stage : null)
+                Action response = configureSampleDialog(
+                    Dialogs.create()
                         .title("Manually connect to wireless network")
                         .masthead(isMastheadVisible() ? "Manually connect to wireless network": null)
-                        .message("How do you want to add a network?")
-                        .showCommandLinks( links.get(1), links );
+                        .message("How do you want to add a network?"))
+                    .showCommandLinks( links.get(1), links );
 
                 System.out.println("response: " + response);
             }
@@ -377,7 +367,7 @@ public class HelloDialog extends Application implements Sample {
             }
             
             @Override public void handle(ActionEvent arg0) {
-                Dialog dlg = new Dialog(includeOwner() ? stage : null, "Login Dialog");
+                Dialog dlg = new Dialog(includeOwner() ? stage : null, "Login Dialog", cbUseLightweightDialog.isSelected());
                 if (cbShowMasthead.isSelected()) {
                     dlg.setMasthead("Login to ControlsFX");
                 }
@@ -427,9 +417,22 @@ public class HelloDialog extends Application implements Sample {
         
         return grid;
     }
+    
+    private Dialogs configureSampleDialog(Dialogs dialog) {
+        if (cbSetOwner.isSelected()) {
+            dialog.owner(includeOwner() ? stage : null);
+        }
+        
+        if (cbUseLightweightDialog.isSelected()) {
+            dialog.lightweight();
+        }
+        
+        return dialog;
+    }
 
     @Override public void start(final Stage stage) {
         // setUserAgentStylesheet(STYLESHEET_MODENA);
+        this.stage = stage;
 
         stage.setTitle("Dialog Sample");
 

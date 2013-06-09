@@ -16,7 +16,7 @@ public class DialogsAccessor {
         Dialog.setLinux(b);
     }
     
-    public static void setUseLightweightDialogs(boolean b) {
-        Dialog.setUseLightweightDialogs(b);
-    }
+//    public static void setUseLightweightDialogs(boolean b) {
+//        Dialog.setUseLightweightDialogs(b);
+//    }
 }

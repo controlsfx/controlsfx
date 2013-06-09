@@ -2,8 +2,6 @@ package org.controlsfx.dialog;
 
 import java.util.Iterator;
 
-import com.sun.javafx.Utils;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -16,11 +14,14 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.effect.Effect;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
+import com.sun.javafx.Utils;
 
 class LightweightDialog extends FXDialog {
 
@@ -38,6 +39,9 @@ class LightweightDialog extends FXDialog {
     private BooleanProperty focused;
     private StringProperty title;
     private BooleanProperty resizable;
+    
+    private Effect effect;
+    private Effect tempEffect;
     
     
     
@@ -76,7 +80,8 @@ class LightweightDialog extends FXDialog {
         
         // *** The rest is for adding window decorations ***
         init(title);
-
+        lightweightDialog.getStyleClass().add("lightweight");
+        
         // add window dragging
         toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
@@ -147,6 +152,10 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
+    public void setEffect(Effect e) {
+        this.effect = e;
+    }
+    
     @Override public StringProperty titleProperty() {
         if (title == null) {
             title = new SimpleStringProperty(this, "title");
@@ -155,20 +164,19 @@ class LightweightDialog extends FXDialog {
     }
     
     @Override public void show() {
-        // opaque layer
-        opaqueLayer = new Region();
-        opaqueLayer.setStyle("-fx-background-color: #00000044");
-        
         // install CSS
         scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
         
         // modify scene root to install opaque layer and the dialog
         originalParent = scene.getRoot();
-        dialogStack = new Pane(originalParent, opaqueLayer, lightweightDialog) {
+        dialogStack = new Pane(originalParent, lightweightDialog) {
             protected void layoutChildren() {
                 final double w = dialogStack.getWidth();
                 final double h = dialogStack.getHeight();
-                opaqueLayer.resizeRelocate(0, 0, w, h);
+                
+                if (opaqueLayer != null) {
+                    opaqueLayer.resizeRelocate(0, 0, w, h);
+                }
                 
                 final double dialogWidth = lightweightDialog.prefWidth(-1);
                 final double dialogHeight = lightweightDialog.prefHeight(-1);
@@ -183,14 +191,35 @@ class LightweightDialog extends FXDialog {
                 lightweightDialog.resize(snapSize(dialogWidth), snapSize(dialogHeight));
             }
         };
+        
+        if (effect == null) {
+            // opaque layer
+            opaqueLayer = new Region();
+            opaqueLayer.getStyleClass().add("lightweight-dialog-background");
+            
+            dialogStack.getChildren().add(1, opaqueLayer);
+        } else {
+            tempEffect = originalParent.getEffect();
+            originalParent.setEffect(effect);
+        }
+        
         lightweightDialog.setVisible(true);
         scene.setRoot(dialogStack);
     }
     
     @Override public void hide() {
-        opaqueLayer.setVisible(false);
+        // remove the opaque layer behind the dialog, if it was used
+        if (opaqueLayer != null) {
+            opaqueLayer.setVisible(false);
+        }
+        
+        // reset the effect on the parent
+        originalParent.setEffect(tempEffect);
+        
+        // hide the dialog
         lightweightDialog.setVisible(false);
         
+        // reset the scene root
         dialogStack.getChildren().remove(originalParent);
         originalParent.getStyleClass().remove("root");
         

@@ -101,6 +101,7 @@ class HeavyweightDialog extends FXDialog {
 
         // *** The rest is for adding window decorations ***
         init(title);
+        lightweightDialog.getStyleClass().add("heavyweight");
 
         Scene scene = new Scene(lightweightDialog);
         scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());

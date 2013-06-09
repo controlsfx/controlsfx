@@ -49,11 +49,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -61,6 +63,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.controlsfx.control.ButtonBar;
@@ -231,10 +234,11 @@ public final class Dialogs {
      */
     public static final String USE_DEFAULT = "$$$";
 
-    private Window owner;
+    private Object owner;
     private String title;
     private String message;
     private String masthead;
+    private boolean lightweight;
 
     /**
      * Creates the initial dialog
@@ -254,7 +258,7 @@ public final class Dialogs {
      * @param owner The dialog owner.
      * @return 
      */
-    public Dialogs owner(final Window owner) {
+    public Dialogs owner(final Object owner) {
         this.owner = owner;
         return this;
     }
@@ -289,7 +293,12 @@ public final class Dialogs {
         this.masthead = masthead;
         return this;
     }
-
+    
+    public Dialogs lightweight() {
+        this.lightweight = true;
+        return this;
+    }
+    
     /**
      * Shows information dialog
      */
@@ -349,7 +358,7 @@ public final class Dialogs {
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
                 String moreDetails = sw.toString();
-                new ExceptionDialog(owner, moreDetails).show();
+                new ExceptionDialog((Window)owner, moreDetails).show();
             }
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
@@ -532,6 +541,14 @@ public final class Dialogs {
         return showCommandLinks( defaultCommandLink, Arrays.asList(links));
     }
     
+    
+    
+    /***************************************************************************
+     * 
+     * Support classes
+     * 
+     **************************************************************************/
+    
     /**
      * Command Link class.
      * Represents one command link in command links dialog. 
@@ -560,8 +577,12 @@ public final class Dialogs {
         
     }    
     
+    
+    
     /***************************************************************************
+     * 
      * Private API
+     * 
      **************************************************************************/
 
     private static enum Type {
@@ -607,7 +628,7 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         dlg.setGraphic(new ImageView(dlgType.getImage()));

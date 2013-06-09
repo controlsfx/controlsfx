@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -88,14 +89,17 @@ class LightweightDialog extends FXDialog {
                 final double w = lightweightDialog.getWidth();
                 final double h = lightweightDialog.getHeight();
                 
-                // TODO remove the hard coded value
-                final int DROP_SHADOW_SIZE = 10;
+                // remove the drop shadow out of the width calculations
+                final double DROP_SHADOW_SIZE = (lightweightDialog.getBoundsInParent().getWidth() - lightweightDialog.getLayoutBounds().getWidth()) / 2.0;
+                final Insets padding = lightweightDialog.getPadding();
+                final double rightPadding = padding.getRight();
+                final double bottomPadding = padding.getBottom();
                 
                 double newX = event.getSceneX() + mouseDragDeltaX;
-                newX = Utils.clamp(0, newX, scene.getWidth() - w + DROP_SHADOW_SIZE);
+                newX = Utils.clamp(0, newX, scene.getWidth() - w + DROP_SHADOW_SIZE + rightPadding);
                 
                 double newY = event.getSceneY() + mouseDragDeltaY;
-                newY = Utils.clamp(0, newY, scene.getHeight() - h + DROP_SHADOW_SIZE);
+                newY = Utils.clamp(0, newY, scene.getHeight() - h + DROP_SHADOW_SIZE + bottomPadding);
                 
                 lightweightDialog.setLayoutX(newX);
                 lightweightDialog.setLayoutY(newY);

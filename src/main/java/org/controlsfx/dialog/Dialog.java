@@ -36,6 +36,7 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -243,21 +244,35 @@ public class Dialog {
      * Constructors
      * 
      **************************************************************************/
-
+    
     /**
-     * Creates a dialog using specified owner and title.
+     * Creates a heavyweight dialog using specified owner and title.
      * 
      * @param owner The dialog window owner - if specified the dialog will be
      *      centered over the owner, otherwise the dialog will be shown in the 
      *      middle of the screen.
      * @param title The dialog title to be shown at the top of the dialog.
      */
-    public Dialog(Window owner, String title) {
-        this.dialog = DialogFactory.createDialog(useLightWeightDialogs, title, owner, true);
+    public Dialog(Object owner, String title) {
+        this(owner, title, false);
+    }
+
+    /**
+     * Creates a dialog using specified owner and title, which may be rendered
+     * in either a heavyweight or lightweight fashion.
+     * 
+     * @param owner The dialog window owner - if specified the dialog will be
+     *      centered over the owner, otherwise the dialog will be shown in the 
+     *      middle of the screen.
+     * @param title The dialog title to be shown at the top of the dialog.
+     * @param lightweight If true this dialog will be rendered inside the given
+     *      owner, rather than in a separate window (as heavyweight dialogs are).
+     */
+    public Dialog(Object owner, String title, boolean lightweight) {
+        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true);
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane");
-//        this.contentPane.setPrefWidth(MAIN_TEXT_WIDTH);
         this.contentPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         
         this.dialog.setContentPane(contentPane);
@@ -722,7 +737,6 @@ public class Dialog {
      * TODO delete me - this is just for testing!!
      */
     static String buttonBarOrder = ButtonBar.BUTTON_ORDER_WINDOWS;
-    static boolean useLightWeightDialogs = false;
 
     static void setMacOS(boolean b) {
         if (b) {
@@ -742,9 +756,6 @@ public class Dialog {
         }
     }
     
-    static void setUseLightweightDialogs(boolean b) {
-        useLightWeightDialogs = b;
-    }
     // -- end of testing code
     
     

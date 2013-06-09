@@ -12,11 +12,11 @@ class DialogFactory {
         return createDialog(false, title, null, false);
     }
 
-    static FXDialog createDialog(boolean useLightweight, String title, Window owner, boolean modal) {
+    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
         if (useLightweight) {
-            return new LightweightDialog(title, owner.getScene());
+            return new LightweightDialog(title, owner);
         } else {
-            return new HeavyweightDialog(title, owner, modal);
+            return new HeavyweightDialog(title, (Window) owner, modal);
         }
     }
 }

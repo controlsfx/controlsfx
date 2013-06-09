@@ -13,9 +13,8 @@ public class DecorationPaneSkin  extends BehaviorSkinBase<DecorationPane, Behavi
 	
 	private final StackPane stackPane = new StackPane();
 	private final Node node;
-	private final Region overlay = new Region();
 	
-	public DecorationPaneSkin(DecorationPane control) {
+	public DecorationPaneSkin(DecorationPane control, Region overlay) {
 		super(control, new BehaviorBase<>(control));
 		node = control.getNode();
 		stackPane.getChildren().add(node);

@@ -1,5 +1,7 @@
 package org.controlsfx.dialog;
 
+import java.util.Iterator;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,6 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 class LightweightDialog extends FXDialog {
 
@@ -23,7 +27,7 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
-    private final Scene scene;
+    private Scene scene;
     private Region opaqueLayer;
     private Pane dialogStack;
     private Parent originalParent;
@@ -40,10 +44,32 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
-    LightweightDialog(String title, Scene scene) {
+    LightweightDialog(String title, Object owner) {
         super();
         
-        this.scene = scene;
+        // we need to determine the type of the owner, so that we can appropriately
+        // show the dialog
+        if (owner == null) {
+            // lets just get the focused stage and show the dialog in there
+            Iterator<Window> windows = Window.impl_getWindows();
+            Window window = null;
+            while (windows.hasNext()) {
+                window = windows.next();
+                if (window.isFocused()) {
+                    break;
+                }
+            }
+            owner = window;
+        } 
+        
+        if (owner instanceof Scene) {
+            this.scene = (Scene) owner;
+        } else if (owner instanceof Stage) {
+            this.scene = ((Stage) owner).getScene();
+        } else {
+            throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
+        }
+        
         
         // *** The rest is for adding window decorations ***
         init(title);

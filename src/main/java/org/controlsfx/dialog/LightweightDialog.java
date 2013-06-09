@@ -161,8 +161,8 @@ class LightweightDialog extends FXDialog {
                 double dialogY = lightweightDialog.getLayoutY();
                 dialogY = dialogY == 0.0 ? h/2.0-dialogHeight/2.0 : dialogY;
                 
-                lightweightDialog.relocate(dialogX, dialogY);
-                lightweightDialog.resize(dialogWidth, dialogHeight);
+                lightweightDialog.relocate(snapPosition(dialogX), snapPosition(dialogY));
+                lightweightDialog.resize(snapSize(dialogWidth), snapSize(dialogHeight));
             }
         };
         lightweightDialog.setVisible(true);

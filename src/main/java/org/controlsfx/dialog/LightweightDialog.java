@@ -2,6 +2,8 @@ package org.controlsfx.dialog;
 
 import java.util.Iterator;
 
+import com.sun.javafx.Utils;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -83,8 +85,20 @@ class LightweightDialog extends FXDialog {
         });
         toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
-                lightweightDialog.setLayoutX(event.getSceneX() + mouseDragDeltaX);
-                lightweightDialog.setLayoutY(event.getSceneY() + mouseDragDeltaY);
+                final double w = lightweightDialog.getWidth();
+                final double h = lightweightDialog.getHeight();
+                
+                // TODO remove the hard coded value
+                final int DROP_SHADOW_SIZE = 10;
+                
+                double newX = event.getSceneX() + mouseDragDeltaX;
+                newX = Utils.clamp(0, newX, scene.getWidth() - w + DROP_SHADOW_SIZE);
+                
+                double newY = event.getSceneY() + mouseDragDeltaY;
+                newY = Utils.clamp(0, newY, scene.getHeight() - h + DROP_SHADOW_SIZE);
+                
+                lightweightDialog.setLayoutX(newX);
+                lightweightDialog.setLayoutY(newY);
             }
         });
 

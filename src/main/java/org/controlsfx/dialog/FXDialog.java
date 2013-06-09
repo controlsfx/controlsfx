@@ -82,14 +82,17 @@ abstract class FXDialog {
         resizableProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable valueModel) {
                 resizeCorner.setVisible(resizableProperty().get());
-                maxButton.setVisible(resizableProperty().get());
-
-                if (resizableProperty().get()) {
-                    if (! windowBtns.getChildren().contains(maxButton)) {
-                        windowBtns.getChildren().add(1, maxButton);
+                
+                if (maxButton != null) {
+                    maxButton.setVisible(resizableProperty().get());
+    
+                    if (resizableProperty().get()) {
+                        if (! windowBtns.getChildren().contains(maxButton)) {
+                            windowBtns.getChildren().add(1, maxButton);
+                        }
+                    } else {
+                        windowBtns.getChildren().remove(maxButton);
                     }
-                } else {
-                    windowBtns.getChildren().remove(maxButton);
                 }
             }
         });

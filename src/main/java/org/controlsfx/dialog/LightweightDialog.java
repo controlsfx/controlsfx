@@ -207,6 +207,8 @@ class LightweightDialog extends FXDialog {
         
         lightweightDialog.setVisible(true);
         scene.setRoot(dialogStack);
+        
+        // This forces the lightweight dialog to be modal
         Toolkit.getToolkit().enterNestedEventLoop(this);
     }
     
@@ -228,6 +230,8 @@ class LightweightDialog extends FXDialog {
         
         scene.setRoot(originalParent);
         
+        // stop the lightweight dialog from being modal (i.e. restart the 
+        // execution after it paused with the dialog being shown)
         Toolkit.getToolkit().exitNestedEventLoop(this, null);
     }
 

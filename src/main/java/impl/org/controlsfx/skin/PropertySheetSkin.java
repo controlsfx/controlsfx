@@ -36,6 +36,7 @@ import java.util.TreeMap;
 
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
@@ -47,9 +48,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.RectangleBuilder;
 
+import org.controlsfx.control.DecorationPane;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
+import org.controlsfx.decoration.DecorationUtils;
+import org.controlsfx.decoration.DefaultDecoration;
 import org.controlsfx.property.editor.CheckEditor;
 import org.controlsfx.property.editor.ChoiceEditor;
 import org.controlsfx.property.editor.ColorEditor;
@@ -77,6 +83,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
     
     private final ScrollPane scroller = new ScrollPane();
+    private DecorationPane decorationPane;
     
     /**************************************************************************
      * 
@@ -89,6 +96,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         scroller.setFitToWidth(true);
         getChildren().add(scroller);
+              
         
         // setup listeners
         registerChangeListener(control.modeProperty(), "MODE");
@@ -128,7 +136,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
 
     private void refreshProperties() {
-        scroller.setContent(buildPropertySheetContainer());
+    	decorationPane = new DecorationPane(buildPropertySheetContainer());
+        scroller.setContent(decorationPane);
     }
     
     private Node buildPropertySheetContainer() {
@@ -260,6 +269,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                     control.setMinWidth(MIN_COLUMN_WIDTH);
                     add(control, 1, row);
                     GridPane.setHgrow(control, Priority.ALWAYS);
+                    Rectangle r = new Rectangle(10,10);
+                    r.setFill(Color.RED);
+					DecorationUtils.registerDecoration( control, new DefaultDecoration(r));
                 } else {
                     
                     TextField message = new TextField("No suitable editor found");

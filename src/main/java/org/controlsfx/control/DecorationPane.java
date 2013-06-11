@@ -1,30 +1,19 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.DecorationPaneSkin;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
-import javafx.scene.layout.Pane;
 
 public class DecorationPane extends Control {
 	
-	private final Node node;
-	private final Pane overlay = new Pane();
+	private final Node base;
+	
+	public DecorationPane( Node base ) {
+		this.base = base;
+	}
 
-	public DecorationPane( Node node ) {
-		this.node = node;
-	}
-    
-    @Override protected Skin<?> createDefaultSkin() {
-        return new DecorationPaneSkin(this, overlay);
+    @Override protected DecorationPaneSkin createDefaultSkin() {
+        return new DecorationPaneSkin(this, base);
     }
     
-    public Node getNode() {
-		return node;
-	}
-    
-    public final ObservableList<Node> getChildren() {
-    	return overlay.getChildren();
-    }
 }

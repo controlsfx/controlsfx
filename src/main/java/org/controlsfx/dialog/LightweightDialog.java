@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import com.sun.javafx.Utils;
+import com.sun.javafx.tk.Toolkit;
 
 class LightweightDialog extends FXDialog {
 
@@ -203,8 +204,10 @@ class LightweightDialog extends FXDialog {
             originalParent.setEffect(effect);
         }
         
+        
         lightweightDialog.setVisible(true);
         scene.setRoot(dialogStack);
+        Toolkit.getToolkit().enterNestedEventLoop(this);
     }
     
     @Override public void hide() {
@@ -224,6 +227,8 @@ class LightweightDialog extends FXDialog {
         originalParent.getStyleClass().remove("root");
         
         scene.setRoot(originalParent);
+        
+        Toolkit.getToolkit().exitNestedEventLoop(this, null);
     }
 
     @Override BooleanProperty resizableProperty() {

@@ -1,4 +1,8 @@
 
+/*
+ * FIXME this .root rule allows for dropshadows in heavyweight dialogs, but
+ * breaks rendering of the root scene in lightweight dialogs.
+ */
 .root {
     -fx-background-color: inherit;
 }

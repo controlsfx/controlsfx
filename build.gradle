@@ -34,7 +34,7 @@ dependencies {
 javadoc {
     exclude 'impl/*'
     failOnError = false
-    classpath = project.sourceSets.main.compileClasspath + configurations.jdk
+    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
     
     options.windowTitle("ControlsFX Project ${version}")
     options.links("http://download.oracle.com/javase/7/docs/api/");

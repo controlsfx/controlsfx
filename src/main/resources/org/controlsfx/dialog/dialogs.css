@@ -1,12 +1,4 @@
 
-/*
- * FIXME this .root rule allows for dropshadows in heavyweight dialogs, but
- * breaks rendering of the root scene in lightweight dialogs.
- */
-.root {
-    -fx-background-color: inherit;
-}
-
 /*******************************************************************************
  *                                                                             *
  * Lightweight dialog                                                          *
@@ -31,6 +23,14 @@
     -fx-border-radius: 5 5 0 0;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 11, 0.0, 3, 3);
     -fx-border-color: #a3a3a3;
+}
+
+.dialog.heavyweight {
+    /** 
+     * This allows for the drop shadow which otherwise won't appear. We don't
+     * want this in lightweight dialogs as it will overwrite the background.
+     */
+    -fx-background-color: inherit;
 }
 
 .dialog:active {

@@ -56,6 +56,9 @@ public class HelloWorkerProgressPane extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/WorkerProgressPane.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
     
     @Override public Node getPanel(Stage stage) {
         StackPane root = new StackPane();

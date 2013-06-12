@@ -44,5 +44,7 @@ public interface Sample {
     public Node getPanel(final Stage stage);
     
     public String getJavaDocURL();
+    
+    public boolean includeInSamples();
 
 }

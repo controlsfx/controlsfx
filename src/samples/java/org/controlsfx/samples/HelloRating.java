@@ -32,6 +32,10 @@ public class HelloRating extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/Rating.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
+    
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));

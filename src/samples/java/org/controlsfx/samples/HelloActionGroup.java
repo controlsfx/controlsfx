@@ -112,6 +112,10 @@ public class HelloActionGroup extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionGroup.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
+    
     @Override public Node getPanel(final Stage stage) {
         
         VBox root = new VBox(10);

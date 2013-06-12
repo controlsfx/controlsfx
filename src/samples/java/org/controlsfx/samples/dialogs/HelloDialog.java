@@ -1,4 +1,4 @@
-package org.controlsfx.samples;
+package org.controlsfx.samples.dialogs;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +38,7 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
+import org.controlsfx.samples.Utils;
 
 public class HelloDialog extends Application implements Sample {
 
@@ -51,6 +52,10 @@ public class HelloDialog extends Application implements Sample {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
+    }
+    
+    @Override public boolean includeInSamples() {
+        return true;
     }
     
     private static final String WINDOWS = "Windows";

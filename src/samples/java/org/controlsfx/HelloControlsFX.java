@@ -26,27 +26,32 @@
  */
 package org.controlsfx;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.function.Predicate;
+import java.util.Comparators;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -54,33 +59,11 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import org.controlsfx.samples.HelloActionGroup;
-import org.controlsfx.samples.HelloButtonBar;
-import org.controlsfx.samples.HelloDecorationPane;
-import org.controlsfx.samples.HelloDialog;
-import org.controlsfx.samples.HelloGridView;
-import org.controlsfx.samples.HelloPropertySheet;
-import org.controlsfx.samples.HelloRangeSlider;
-import org.controlsfx.samples.HelloRating;
-import org.controlsfx.samples.HelloSegmentedButton;
-import org.controlsfx.samples.HelloWorkerProgressPane;
-
 public class HelloControlsFX extends Application {
+    
+    private static final String SAMPLES_ROOT_PACKAGE = "org.controlsfx.samples";
 
-    // TODO dynamically discover samples
-    private final Class<?>[] samplesArray = new Class<?>[] {
-        HelloButtonBar.class,
-        HelloDialog.class,
-        HelloGridView.class,
-        HelloRangeSlider.class,
-        HelloRating.class,
-        HelloSegmentedButton.class,
-        HelloActionGroup.class,
-        HelloWorkerProgressPane.class,
-        HelloPropertySheet.class,
-        HelloDecorationPane.class
-//        SVGTest.class
-    };
+    private final Map<String, TreeItem<Sample>> packageTreeItemMap = new HashMap<>();
     
     private GridPane grid;
 
@@ -99,61 +82,62 @@ public class HelloControlsFX extends Application {
     @Override public void start(final Stage primaryStage) throws Exception {
         setUserAgentStylesheet(STYLESHEET_MODENA);
         
-        // instantiate the samples into a normal list
-        ObservableList<Sample> samples = FXCollections.observableArrayList();
-        for (Class<?> clazz : samplesArray) {
-            Sample sample = (Sample) clazz.newInstance();
-            samples.add(sample);
+        TreeItem<Sample> root = new TreeItem<Sample>(new EmptySample("ControlsFX"));
+        root.setExpanded(true);
+        
+        Class[] sampleClasses = getClasses(SAMPLES_ROOT_PACKAGE);
+        for (Class sampleClass : sampleClasses) {
+            if (! Sample.class.isAssignableFrom(sampleClass)) continue;
+            
+            final Sample sample = (Sample)sampleClass.newInstance();
+            if (! sample.includeInSamples()) continue;
+
+            final String packageName = sampleClass.getPackage().getName();
+            String displayName = packageName.substring(packageName.lastIndexOf(".") + 1);
+            displayName = displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
+            displayName = displayName.replace("_", " ");
+            
+            if (SAMPLES_ROOT_PACKAGE.equals(packageName)) {
+                root.getChildren().add(new TreeItem<Sample>(sample));
+                continue;
+            }
+            
+            TreeItem<Sample> packageTreeItem;
+            if (packageTreeItemMap.containsKey(displayName)) {
+                packageTreeItem = packageTreeItemMap.get(displayName);
+            } else {
+                packageTreeItem = new TreeItem<Sample>(new EmptySample(displayName));
+                packageTreeItemMap.put(displayName, packageTreeItem);
+            }
+            
+            // now that we have the package TreeItem, we create a child TreeItem
+            // for the actual sample
+            TreeItem<Sample> sampleTreeItem = new TreeItem<Sample>(sample);
+            packageTreeItem.getChildren().add(sampleTreeItem);
+            packageTreeItem.setExpanded(true);
         }
         
-        // then we'll sort that list based on the sample names
-        final SortedList<Sample> sortedSamples = new SortedList<Sample>(samples, new Comparator<Sample>() {
-            @Override public int compare(Sample s1, Sample s2) {
-                return s1.getSampleName().compareTo(s2.getSampleName());
+        root.getChildren().addAll(packageTreeItemMap.values());
+        
+        Collections.sort(root.getChildren(), new Comparator<TreeItem<Sample>>() {
+            @Override public int compare(TreeItem<Sample> o1, TreeItem<Sample> o2) {
+                return o1.getValue().getSampleName().compareTo(o2.getValue().getSampleName());
             }
         });
         
-        final FilteredList<Sample> filteredSamples = new FilteredList<>(sortedSamples, new Predicate<Sample>() {
-            public boolean test(Sample t) {
-                return true;
-            };
-        });
-        
-        
         // simple layout: ListView on left, sample area on right
-        
         grid = new GridPane();
         grid.setPadding(new Insets(5, 10, 10, 10));
         grid.setHgap(10);
         grid.setVgap(10);
         
         // --- left hand side
-        // firstly, we have a search box
-        final TextField searchBox = new TextField();
-        searchBox.setPromptText("Type to filter samples");
-        searchBox.setOnKeyTyped(new EventHandler<KeyEvent>() {
-            @Override public void handle(KeyEvent e) {
-                final String typedInput = searchBox.getText().toUpperCase(); 
-                
-                Predicate<Sample> predicate = new Predicate<Sample>() {
-                    @Override public boolean test(Sample t) {
-                        return t.getSampleName().toUpperCase().contains(typedInput);
-                    }
-                };
-                
-                filteredSamples.setPredicate(predicate);
-            }
-        });
-        GridPane.setMargin(searchBox, new Insets(5, 0, 0, 0));
-        grid.add(searchBox, 0, 0);
-        
-        // then the listview goes beneath the search box
-        ListView<Sample> samplesListView = new ListView<>(filteredSamples);
-        samplesListView.setMinWidth(150);
-        samplesListView.setMaxWidth(150);
-        samplesListView.setCellFactory(new Callback<ListView<Sample>, ListCell<Sample>>() {
-            @Override public ListCell<Sample> call(ListView<Sample> param) {
-                return new ListCell<Sample>() {
+        TreeView<Sample> samplesTreeView = new TreeView<>(root);
+        samplesTreeView.setMinWidth(200);
+        samplesTreeView.setMaxWidth(200);
+        samplesTreeView.setCellFactory(new Callback<TreeView<Sample>, TreeCell<Sample>>() {
+            @Override public TreeCell<Sample> call(TreeView<Sample> param) {
+                return new TreeCell<Sample>() {
                     @Override protected void updateItem(Sample item, boolean empty) {
                         super.updateItem(item, empty);
                         
@@ -166,13 +150,17 @@ public class HelloControlsFX extends Application {
                 };
             }
         });
-        samplesListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Sample>() {
-            @Override public void changed(ObservableValue<? extends Sample> observable, Sample oldValue, Sample newSample) {
-                changeSample(newSample, primaryStage);
+        samplesTreeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Sample>>() {
+            @Override public void changed(ObservableValue<? extends TreeItem<Sample>> observable, TreeItem<Sample> oldValue, TreeItem<Sample> newSample) {
+                if (newSample.getValue() instanceof EmptySample) {
+                    return;
+                }
+                changeSample(newSample.getValue(), primaryStage);
             }
         });
-        GridPane.setVgrow(samplesListView, Priority.ALWAYS);
-        grid.add(samplesListView, 0, 1);
+        GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
+        GridPane.setMargin(samplesTreeView, new Insets(5, 0, 0, 0));
+        grid.add(samplesTreeView, 0, 0);
         
         // right hand side
         tabPane = new TabPane();
@@ -180,7 +168,7 @@ public class HelloControlsFX extends Application {
         tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
         GridPane.setHgrow(tabPane, Priority.ALWAYS);
         GridPane.setVgrow(tabPane, Priority.ALWAYS);
-        grid.add(tabPane, 1, 0, 1, 2);
+        grid.add(tabPane, 1, 0, 1, 1);
         
         sampleTab = new Tab("Sample");
         javadocTab = new Tab("JavaDoc");
@@ -200,7 +188,7 @@ public class HelloControlsFX extends Application {
         primaryStage.setTitle("ControlsFX!");
         primaryStage.show();
         
-        samplesListView.requestFocus();
+        samplesTreeView.requestFocus();
     }
 
     private void changeSample(Sample newSample, final Stage stage) {
@@ -242,5 +230,87 @@ public class HelloControlsFX extends Application {
         welcomeTab.setContent(initialVBox);
         
         tabPane.getTabs().add(welcomeTab);
+    }
+    
+    
+    
+    
+    
+    private static class EmptySample implements Sample {
+        private final String name;
+        
+        public EmptySample(String name) {
+            this.name = name;
+        }
+        
+        @Override public String getSampleName() {
+            return name;
+        }
+
+        @Override public Node getPanel(Stage stage) {
+            return null;
+        }
+
+        @Override public String getJavaDocURL() {
+            return null;
+        }
+        
+        @Override public boolean includeInSamples() {
+            return true;
+        }
+    }
+    
+    
+    
+    
+    // --- Following code taken from http://dzone.com/snippets/get-all-classes-within-package
+    /**
+     * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
+     *
+     * @param packageName The base package
+     * @return The classes
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        assert classLoader != null;
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList<File>();
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            dirs.add(new File(resource.getFile()));
+        }
+        ArrayList<Class> classes = new ArrayList<Class>();
+        for (File directory : dirs) {
+            classes.addAll(findClasses(directory, packageName));
+        }
+        return classes.toArray(new Class[classes.size()]);
+    }
+
+    /**
+     * Recursive method used to find all classes in a given directory and subdirs.
+     *
+     * @param directory   The base directory
+     * @param packageName The package name for classes found inside the base directory
+     * @return The classes
+     * @throws ClassNotFoundException
+     */
+    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class> classes = new ArrayList<Class>();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                assert !file.getName().contains(".");
+                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+            } else if (file.getName().endsWith(".class")) {
+                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+            }
+        }
+        return classes;
     }
 }

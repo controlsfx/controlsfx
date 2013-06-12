@@ -1,4 +1,4 @@
-package org.controlsfx.samples;
+package org.controlsfx.samples.dialogs;
 
 import java.util.Date;
 
@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.samples.Utils;
 
 public class HelloLightweightDialogInTabPane extends Application implements Sample {
 
@@ -31,6 +32,10 @@ public class HelloLightweightDialogInTabPane extends Application implements Samp
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
+    }
+    
+    @Override public boolean includeInSamples() {
+        return true;
     }
     
     private Stage stage;

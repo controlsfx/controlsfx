@@ -29,6 +29,10 @@ public class HelloRangeSlider extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/RangeSlider.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
+    
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(15);
         

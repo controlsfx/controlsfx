@@ -77,6 +77,10 @@ public class HelloButtonBar extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/ButtonBar.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
+    
     private ToggleButton createToggle( final String caption, final ButtonBar buttonBar, final String buttonBarOrder ) {
         final ToggleButton btn = new ToggleButton(caption);
         btn.selectedProperty().addListener(new ChangeListener<Boolean>() {

@@ -52,6 +52,10 @@ public class HelloDecorationPane extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/DecorationPane.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
+    
     @Override public Node getPanel(final Stage stage) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));

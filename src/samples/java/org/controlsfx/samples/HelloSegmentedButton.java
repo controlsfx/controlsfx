@@ -25,6 +25,10 @@ public class HelloSegmentedButton extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/SegmentedButton.html";
     }
     
+    @Override public boolean includeInSamples() {
+        return true;
+    }
+    
     @Override public Node getPanel(Stage stage) {
         GridPane grid = new GridPane();
         grid.setVgap(10);

@@ -67,6 +67,10 @@ public class HelloPropertySheet extends Application implements Sample {
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/PropertySheet.html";
     }
+    
+    @Override public boolean includeInSamples() {
+        return true;
+    }
 
     @Override public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Property Sheet");

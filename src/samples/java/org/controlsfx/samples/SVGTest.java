@@ -34,6 +34,10 @@ public class SVGTest extends Application implements Sample {
         return null;
     }
     
+    @Override public boolean includeInSamples() {
+        return false;
+    }
+    
     @Override public Node getPanel(Stage stage) {
         VBox container = new VBox(IMAGE_SPACING);
         

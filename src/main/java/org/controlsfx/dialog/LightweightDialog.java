@@ -1,5 +1,10 @@
 package org.controlsfx.dialog;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 
 import javafx.beans.property.BooleanProperty;
@@ -7,6 +12,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
@@ -14,6 +20,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Tab;
 import javafx.scene.effect.Effect;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -32,7 +39,12 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
+    // the modal dialog has to be parented to something, which is either a
+    // Parent or a Scene. Which one we use is dependent on what the owner is that
+    // is passed into the constructor
     private Scene scene;
+    private Parent owner;
+    
     private Region opaqueLayer;
     private Pane dialogStack;
     private Parent originalParent;
@@ -52,12 +64,14 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
-    LightweightDialog(String title, Object owner) {
+    LightweightDialog(final String title, final Object incomingOwner) {
         super();
+        
+        Object _owner = incomingOwner;
         
         // we need to determine the type of the owner, so that we can appropriately
         // show the dialog
-        if (owner == null) {
+        if (_owner == null) {
             // lets just get the focused stage and show the dialog in there
             Iterator<Window> windows = Window.impl_getWindows();
             Window window = null;
@@ -67,15 +81,33 @@ class LightweightDialog extends FXDialog {
                     break;
                 }
             }
-            owner = window;
+            _owner = window;
         } 
         
-        if (owner instanceof Scene) {
-            this.scene = (Scene) owner;
-        } else if (owner instanceof Stage) {
-            this.scene = ((Stage) owner).getScene();
+        if (_owner instanceof Scene) {
+            this.scene = (Scene) _owner;
+        } else if (_owner instanceof Stage) {
+            this.scene = ((Stage) _owner).getScene();
+        } else if (_owner instanceof Tab) {
+            // special case for people wanting to show a lightweight dialog inside
+            // one tab whilst the rest of the TabPane remains responsive.
+            // we keep going up until the styleclass is "tab-content-area"
+            Parent _parent = (Parent) ((Tab)_owner).getContent();
+//            while (_parent != null) {
+//                if (_parent.getStyleClass().contains("tab-content-area")) {
+//                    break;
+//                }
+//                _parent = _parent.getParent();
+//            }
+            owner = _parent;
+        } else if (_owner instanceof Node) {
+            owner = getFirstParent((Node)_owner);
         } else {
-            throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
+            throw new IllegalArgumentException("Unknown owner: " + _owner.getClass());
+        }
+        
+        if (scene == null && owner != null) {
+            this.scene = owner.getScene();
         }
         
         
@@ -146,7 +178,7 @@ class LightweightDialog extends FXDialog {
     }
     
     
-    
+
     /**************************************************************************
      * 
      * Public API
@@ -165,74 +197,28 @@ class LightweightDialog extends FXDialog {
     }
     
     @Override public void show() {
-        // install CSS
-        scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
-        
-        // modify scene root to install opaque layer and the dialog
-        originalParent = scene.getRoot();
-        dialogStack = new Pane(originalParent, lightweightDialog) {
-            protected void layoutChildren() {
-                final double w = dialogStack.getWidth();
-                final double h = dialogStack.getHeight();
-                
-                if (opaqueLayer != null) {
-                    opaqueLayer.resizeRelocate(0, 0, w, h);
-                }
-                
-                final double dialogWidth = lightweightDialog.prefWidth(-1);
-                final double dialogHeight = lightweightDialog.prefHeight(-1);
-                
-                double dialogX = lightweightDialog.getLayoutX();
-                dialogX = dialogX == 0.0 ? w/2.0-dialogWidth/2.0 : dialogX;
-                
-                double dialogY = lightweightDialog.getLayoutY();
-                dialogY = dialogY == 0.0 ? h/2.0-dialogHeight/2.0 : dialogY;
-                
-                lightweightDialog.relocate(snapPosition(dialogX), snapPosition(dialogY));
-                lightweightDialog.resize(snapSize(dialogWidth), snapSize(dialogHeight));
-            }
-        };
-        
-        if (effect == null) {
-            // opaque layer
-            opaqueLayer = new Region();
-            opaqueLayer.getStyleClass().add("lightweight-dialog-background");
-            
-            dialogStack.getChildren().add(1, opaqueLayer);
-        } else {
-            tempEffect = originalParent.getEffect();
-            originalParent.setEffect(effect);
-        }
-        
-        
-        lightweightDialog.setVisible(true);
-        scene.setRoot(dialogStack);
+        if (owner != null) {
+            showInParent();
+        } else if (scene != null) {
+            showInScene();
+        } 
         
         // This forces the lightweight dialog to be modal
-        Toolkit.getToolkit().enterNestedEventLoop(this);
+        Object lock = owner != null ? owner : scene; 
+        Toolkit.getToolkit().enterNestedEventLoop(lock);
     }
     
     @Override public void hide() {
-        // remove the opaque layer behind the dialog, if it was used
-        if (opaqueLayer != null) {
-            opaqueLayer.setVisible(false);
-        }
-        
-        // reset the effect on the parent
-        originalParent.setEffect(tempEffect);
-        
-        // hide the dialog
-        lightweightDialog.setVisible(false);
-        
-        // reset the scene root
-        dialogStack.getChildren().remove(originalParent);
-        originalParent.getStyleClass().remove("root");
-        
-        scene.setRoot(originalParent);
+        if (owner != null) {
+            hideInParent();
+        } else if (scene != null) {
+            hideInScene();
+        } 
         
         // stop the lightweight dialog from being modal (i.e. restart the 
         // execution after it paused with the dialog being shown)
-        Toolkit.getToolkit().exitNestedEventLoop(this, null);
+        Object lock = owner != null ? owner : scene;
+        Toolkit.getToolkit().exitNestedEventLoop(lock, null);
     }
 
     @Override BooleanProperty resizableProperty() {
@@ -283,5 +269,208 @@ class LightweightDialog extends FXDialog {
     
     @Override public void setClosable( boolean closable ) {
         closeButton.setVisible( closable );
+    }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Private implementation
+     * 
+     **************************************************************************/
+    
+    private void hideInScene() {
+        // remove the opaque layer behind the dialog, if it was used
+        if (opaqueLayer != null) {
+            opaqueLayer.setVisible(false);
+        }
+        
+        // reset the effect on the parent
+        originalParent.setEffect(tempEffect);
+        
+        // hide the dialog
+        lightweightDialog.setVisible(false);
+        
+        // reset the scene root
+        dialogStack.getChildren().remove(originalParent);
+        originalParent.getStyleClass().remove("root");
+        
+        scene.setRoot(originalParent);
+    }
+    
+    private void hideInParent() {
+        // remove the opaque layer behind the dialog, if it was used
+        if (opaqueLayer != null) {
+            opaqueLayer.setVisible(false);
+        }
+        
+        // reset the effect on the parent
+        if (originalParent != null) {
+            originalParent.setEffect(tempEffect);
+        }
+        
+        // hide the dialog
+        lightweightDialog.setVisible(false);
+        
+        // reset the scenegraph
+        getChildren(owner.getParent()).setAll(owner);
+    }
+    
+    private void showInScene() {
+        installCSSInScene();
+        
+        // modify scene root to install opaque layer and the dialog
+        originalParent = scene.getRoot();
+        buildDialogStack(originalParent);
+        
+        lightweightDialog.setVisible(true);
+        scene.setRoot(dialogStack);
+    }
+    
+    private void showInParent() {
+        installCSSInScene();
+        
+        ObservableList<Node> ownerParentChildren = getChildren(owner.getParent());
+        
+        // we've got the children list, now we need to insert a temporary
+        // layout container holding our dialogs and opaque layer / effect
+        buildDialogStack(owner);
+        ownerParentChildren.add(dialogStack);
+        
+        lightweightDialog.setVisible(true);
+    }
+    
+    private void installCSSInScene() {
+        if (scene != null) {
+            // install CSS
+            scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
+        } else if (owner != null) {
+            Scene _scene = owner.getScene();
+            if (_scene != null) {
+                // install CSS
+                _scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
+            }
+        }
+    }
+    
+    private void buildDialogStack(Node parent) {
+        dialogStack = new Pane(lightweightDialog) {
+            protected void layoutChildren() {
+                final double w = getOverlayWidth();
+                final double h = getOverlayHeight();
+                
+                final double x = getOverlayX();
+                final double y = getOverlayY();
+                
+//                resizeRelocate(x,y,w,h);
+                if (opaqueLayer != null) {
+                    opaqueLayer.resizeRelocate(x, y, w, h);
+                }
+                
+                final double dialogWidth = lightweightDialog.prefWidth(-1);
+                final double dialogHeight = lightweightDialog.prefHeight(-1);
+                
+                double dialogX = lightweightDialog.getLayoutX();
+                dialogX = dialogX == 0.0 ? w/2.0-dialogWidth/2.0 : dialogX;
+                
+                double dialogY = lightweightDialog.getLayoutY();
+                dialogY = dialogY == 0.0 ? h/2.0-dialogHeight/2.0 : dialogY;
+                
+                lightweightDialog.relocate(snapPosition(dialogX), snapPosition(dialogY));
+                lightweightDialog.resize(snapSize(dialogWidth), snapSize(dialogHeight));
+            }
+        };
+        
+        if (parent != null) {
+            Parent parentParent = parent.getParent();
+            if (parentParent != null) {
+                getChildren(parentParent).remove(parent);
+            }
+            dialogStack.getChildren().add(0, parent);
+        }
+        
+        if (effect == null) {
+            // opaque layer
+            opaqueLayer = new Region();
+            opaqueLayer.getStyleClass().add("lightweight-dialog-background");
+            
+            dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
+        } else {
+            if (parent != null) {
+                tempEffect = parent.getEffect();
+                parent.setEffect(effect);
+            }
+        }
+    }
+    
+    private double getOverlayWidth() {
+        if (owner != null) {
+            return owner.getLayoutBounds().getWidth();
+        } else if (scene != null) {
+            return scene.getWidth();
+        } 
+        
+        return 0;
+    }
+    
+    private double getOverlayHeight() {
+        if (owner != null) {
+            return owner.getLayoutBounds().getHeight();
+        } else if (scene != null) {
+            return scene.getHeight();
+        } 
+        
+        return 0;
+    }
+    
+    private double getOverlayX() {
+//        if (owner != null) {
+//            return owner.localToScene(owner.getLayoutBounds()).getMinX();
+//        } 
+        
+        return 0;
+    }
+    
+    private double getOverlayY() {
+//        if (owner != null) {
+//            return owner.localToScene(owner.getLayoutBounds()).getMinY();
+//        } 
+        
+        return 0;
+    }
+    
+    private Parent getFirstParent(Node n) {
+        if (n == null) return null;
+        return n instanceof Parent ? (Parent) n : getFirstParent(n.getParent());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private ObservableList<Node> getChildren(Parent p) {
+        ObservableList<Node> children = null;
+        
+        try {
+            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren");
+            
+            if (getChildrenMethod != null) {
+                if (! getChildrenMethod.isAccessible()) {
+                    getChildrenMethod.setAccessible(true);
+                }
+                children = (ObservableList<Node>) getChildrenMethod.invoke(p);
+            } else {
+                // uh oh, trouble
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        
+        return children;
     }
 }

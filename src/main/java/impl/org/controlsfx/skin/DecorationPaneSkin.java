@@ -39,50 +39,66 @@ public class DecorationPaneSkin  extends BehaviorSkinBase<DecorationPane, Behavi
     }
     
     
-    private void showDecorations(Node root) {
+    private void showDecorations(Node target) {
     	
     	//TODO Respond for component bound changes
     	//TODO Respond for component visibility changes
     	//TODO Respond to  component decoration changes.
     	
-    	
-    	// show root decoration if found
-    	@SuppressWarnings("unchecked")
-		ObservableList<Decoration> decorations = 
-			(ObservableList<Decoration>) root.getProperties().get(DecorationUtils.DECORATIONS_PROPERTY_KEY);
+    	// show target decorations if found 
+		ObservableList<Decoration> decorations = DecorationUtils.getDecorations(target);
 		if ( decorations != null ) {
 			for( Decoration decoration: decorations ) {
-				Bounds bounds = getBounds( root );
-				Node dnode = decoration.getNode();
-				stackPane.getChildren().add(dnode);
-				StackPane.setAlignment(dnode, Pos.TOP_LEFT); // TODO support for all positions.
-				StackPane.setMargin(dnode, new Insets( bounds.getMinY(),0,0,bounds.getMinX()) );
+				addDecoration(target, decoration);
 			}
 		}
     	
-		// recursively show decorations for children
-    	if ( root instanceof Parent ) {
-    		for ( Node n: ((Parent)root).getChildrenUnmodifiable()) {
+		// recursively show decorations for target's children
+    	if ( target instanceof Parent ) {
+    		for ( Node n: ((Parent)target).getChildrenUnmodifiable()) {
     			showDecorations(n);
     		}
     	}
     }
     
+    private void addDecoration( Node target, Decoration decoration ) {
+		Node dnode = decoration.getNode();
+		stackPane.getChildren().add(dnode);
+		StackPane.setAlignment(dnode, Pos.TOP_LEFT); // TODO support for all positions.
+		Bounds targetBounds = getDecorationBounds( target );
+		Bounds dbounds = dnode.getBoundsInLocal();
+		Insets margin = new Insets( targetBounds.getMinY()-dbounds.getHeight()/2 + getVInset(targetBounds,decoration),
+				                    0,0,
+				                    targetBounds.getMinX()-dbounds.getWidth()/2 + getHInset(targetBounds,decoration) );
+		StackPane.setMargin(dnode, margin);
+		
+    }
     
-    private Bounds getBounds( Node node ) {
+    private double getHInset( Bounds targetBounds, Decoration decoration ) {
+		switch( decoration.getPosition().getHpos() ) {
+		    case CENTER: return targetBounds.getWidth()/2;
+		    case RIGHT : return targetBounds.getWidth();
+		    default    : return 0;
+		}
+    }
+    
+    private double getVInset( Bounds targetBounds, Decoration decoration ) {
+		switch( decoration.getPosition().getVpos() ) {
+		    case CENTER: return targetBounds.getHeight()/2;
+		    case BOTTOM: return targetBounds.getHeight();
+		    default    : return 0;
+		}
+    }
+    
+    private Bounds getDecorationBounds( Node node ) {
 
     	if ( node == null ) return null;
-//    	System.out.println(node.getClass());
     	Node parent = node.getParent();
     	Bounds bounds = null;
-//    	System.out.println("----------------------------------------");
     	while ( parent != null && parent != stackPane) {
-//    	   System.out.println("parent: " + parent.getClass());
     	   bounds = bounds == null? node.getBoundsInParent(): parent.localToParent(bounds);
-//   		System.out.println(bounds);
     	   parent = parent.getParent();
     	}
-//    	System.out.println("Parent: " + parent + " "+ bounds);
     	return parent == null? null: parent.localToParent(bounds);
     	
     }   

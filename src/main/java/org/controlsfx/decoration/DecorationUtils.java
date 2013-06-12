@@ -13,22 +13,28 @@ public class DecorationUtils {
 	}
 	
 	public static final void registerDecoration( Node target, Decoration decoration ) {
-		getDecorations(target).add(decoration);
+		getDecorations(target, true).add(decoration);
 	}
 	
 	public static final void unregisterDecoration( Node target, Decoration decoration ) {
-		getDecorations(target).remove(decoration);
+		getDecorations(target, true).remove(decoration);
 	}
 	
-	private static final ObservableList<Decoration> getDecorations(Node target) {
+	
+	
+	public static final ObservableList<Decoration> getDecorations(Node target, boolean createIfAbsent) {
 		@SuppressWarnings("unchecked")
 		ObservableList<Decoration> decorations = 
 				(ObservableList<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
-		if (decorations == null) {
+		if (decorations == null && createIfAbsent ) {
 			decorations = FXCollections.observableArrayList();
 			target.getProperties().put(DECORATIONS_PROPERTY_KEY, decorations);
 		}
 		return decorations;
+	}
+	
+	public static final ObservableList<Decoration> getDecorations(Node target) {
+		return getDecorations(target, false);
 	}
 	
 }

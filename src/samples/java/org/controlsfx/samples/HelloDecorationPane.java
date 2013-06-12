@@ -28,6 +28,7 @@ package org.controlsfx.samples;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -62,14 +63,34 @@ public class HelloDecorationPane extends Application implements Sample {
         root.setMaxHeight(Double.MAX_VALUE);
         
         final TextField field = new TextField();
-        
-        Rectangle decoration = new Rectangle(10,10);
-        decoration.setFill(Color.RED);
-		DecorationUtils.registerDecoration( field, new DefaultDecoration(decoration));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_LEFT));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_CENTER));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_RIGHT));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_LEFT));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_LEFT));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_CENTER));
+		DecorationUtils.registerDecoration( field, 
+				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_RIGHT));
         
         root.getChildren().add(field);
         
         return new DecorationPane(root);
+    }
+    
+    private Node createDecoratorNode(Color color) {
+    	Rectangle d = new Rectangle(10,10);
+        d.setFill(color);
+        return d;
     }
     
     @Override public void start(Stage stage) throws Exception {

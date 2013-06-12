@@ -49,7 +49,9 @@ public class HelloLightweightDialogInTabPane extends Application implements Samp
         buildTab2(tab2);
 
         TabPane tabPane = new TabPane();
+        tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
         tabPane.getTabs().addAll(tab1, tab2);
+        tabPane.setPadding(new Insets(10));
         
         StackPane pane = new StackPane(tabPane);
         return pane;

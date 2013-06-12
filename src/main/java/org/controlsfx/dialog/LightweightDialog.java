@@ -1,8 +1,5 @@
 package org.controlsfx.dialog;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -92,14 +89,7 @@ class LightweightDialog extends FXDialog {
             // special case for people wanting to show a lightweight dialog inside
             // one tab whilst the rest of the TabPane remains responsive.
             // we keep going up until the styleclass is "tab-content-area"
-            Parent _parent = (Parent) ((Tab)_owner).getContent();
-//            while (_parent != null) {
-//                if (_parent.getStyleClass().contains("tab-content-area")) {
-//                    break;
-//                }
-//                _parent = _parent.getParent();
-//            }
-            owner = _parent;
+            owner = (Parent) ((Tab)_owner).getContent();
         } else if (_owner instanceof Node) {
             owner = getFirstParent((Node)_owner);
         } else {
@@ -314,6 +304,8 @@ class LightweightDialog extends FXDialog {
         
         // reset the scenegraph
         getChildren(owner.getParent()).setAll(owner);
+        
+        dialogStack = null;
     }
     
     private void showInScene() {
@@ -334,8 +326,12 @@ class LightweightDialog extends FXDialog {
         
         // we've got the children list, now we need to insert a temporary
         // layout container holding our dialogs and opaque layer / effect
+        // in place of the owner (the owner will become a child of the dialog
+        // stack)
+        int ownerPos = ownerParentChildren.indexOf(owner);
+        ownerParentChildren.remove(ownerPos);
         buildDialogStack(owner);
-        ownerParentChildren.add(dialogStack);
+        ownerParentChildren.add(ownerPos, dialogStack);
         
         lightweightDialog.setVisible(true);
     }
@@ -353,7 +349,7 @@ class LightweightDialog extends FXDialog {
         }
     }
     
-    private void buildDialogStack(Node parent) {
+    private void buildDialogStack(final Node parent) {
         dialogStack = new Pane(lightweightDialog) {
             protected void layoutChildren() {
                 final double w = getOverlayWidth();
@@ -361,6 +357,10 @@ class LightweightDialog extends FXDialog {
                 
                 final double x = getOverlayX();
                 final double y = getOverlayY();
+                
+                if (parent != null) {
+                    parent.resizeRelocate(x, y, w, h);
+                }
                 
 //                resizeRelocate(x,y,w,h);
                 if (opaqueLayer != null) {
@@ -382,11 +382,11 @@ class LightweightDialog extends FXDialog {
         };
         
         if (parent != null) {
-            Parent parentParent = parent.getParent();
-            if (parentParent != null) {
-                getChildren(parentParent).remove(parent);
-            }
             dialogStack.getChildren().add(0, parent);
+            
+            // copy in layout properties, etc, so that the dialogStack displays
+            // properly in (hopefully) whatever layout the owner node is in
+            dialogStack.getProperties().putAll(parent.getProperties());
         }
         
         if (effect == null) {
@@ -424,18 +424,10 @@ class LightweightDialog extends FXDialog {
     }
     
     private double getOverlayX() {
-//        if (owner != null) {
-//            return owner.localToScene(owner.getLayoutBounds()).getMinX();
-//        } 
-        
         return 0;
     }
     
     private double getOverlayY() {
-//        if (owner != null) {
-//            return owner.localToScene(owner.getLayoutBounds()).getMinY();
-//        } 
-        
         return 0;
     }
     

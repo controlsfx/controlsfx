@@ -123,11 +123,15 @@ class LightweightDialog extends FXDialog {
                 final double rightPadding = padding.getRight();
                 final double bottomPadding = padding.getBottom();
                 
+                double minX = 0;
+                double maxX = owner == null ? scene.getWidth() : owner.getLayoutBounds().getWidth();
                 double newX = event.getSceneX() + mouseDragDeltaX;
-                newX = Utils.clamp(0, newX, scene.getWidth() - w + DROP_SHADOW_SIZE + rightPadding);
+                newX = Utils.clamp(minX, newX, maxX - w + DROP_SHADOW_SIZE + rightPadding + minX);
                 
+                double minY = 0;
+                double maxY = owner == null ? scene.getHeight() : owner.getLayoutBounds().getHeight();
                 double newY = event.getSceneY() + mouseDragDeltaY;
-                newY = Utils.clamp(0, newY, scene.getHeight() - h + DROP_SHADOW_SIZE + bottomPadding);
+                newY = Utils.clamp(0, newY, maxY - h + DROP_SHADOW_SIZE + bottomPadding + minY);
                 
                 lightweightDialog.setLayoutX(newX);
                 lightweightDialog.setLayoutY(newY);

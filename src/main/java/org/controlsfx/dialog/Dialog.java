@@ -267,6 +267,8 @@ public class Dialog {
      * @param title The dialog title to be shown at the top of the dialog.
      * @param lightweight If true this dialog will be rendered inside the given
      *      owner, rather than in a separate window (as heavyweight dialogs are).
+     *      Refer to the {@link Dialogs} class documentation for more details on
+     *      the difference between heavyweight and lightweight dialogs.
      */
     public Dialog(Object owner, String title, boolean lightweight) {
         this.dialog = DialogFactory.createDialog(lightweight, title, owner, true);

@@ -56,6 +56,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -172,6 +173,33 @@ import org.controlsfx.dialog.Dialog.Actions;
  *   </tr>
  * </table>
  * 
+ * 
+ * <h3>Heavyweight vs Lightweight Dialogs</h3>
+ * 
+ * <p>The ControlsFX dialogs API supports a distinction between heavyweight and
+ * lightweight dialogs. In short, a heavyweight dialog is rendered in its own
+ * JavaFX window, allowing for it to appear outside the bounds of the application.
+ * This is the most common style of dialog, and is therefore the default behavior
+ * when creating dialogs in ControlsFX. However, in some case, lightweight dialogs
+ * make more sense, so the following paragraphs will detail when you might want
+ * to use lightweight dialogs.
+ * 
+ * <p>Lightweight dialogs are rendered within the scenegraph (and can't leave 
+ * the window). Other than this limitation, lightweight dialogs otherwise render
+ * exactly the same as heavyweight dialogs (except a lightweight dialog normally
+ * inserts an opaque overlay into the scene so that the dialog sticks out 
+ * visually). Lightweight dialogs are commonly useful in environments where a 
+ * windowing system is unavailable (e.g. tablet devices), and also when you only 
+ * want to block execution (and access to) a portion of your user interface. For 
+ * example, you could create a lightweight dialog with an owner of a single 
+ * {@link Tab} in a {@link TabPane}, and this will only block on that one tab - 
+ * all other tabs will continue to be interactive and execute as per usual.
+ * 
+ * <p>To make a dialog lightweight, you simply call {@link #lightweight()} when
+ * constructing the dialog using this Dialogs API. If you are using the 
+ * {@link Dialog} class instead, then the decision between heavyweight and 
+ * lightweight dialogs must be made in the
+ * {@link Dialog#Dialog(Object, String, boolean)} constructor.
  * 
  * <h3>Code Examples</h3>
  * 
@@ -294,6 +322,18 @@ public final class Dialogs {
         return this;
     }
     
+    /**
+     * Specifies that the dialog should become lightweight, which means it is
+     * rendered within the scenegraph (and can't leave the window). This is 
+     * commonly useful in environments where a windowing system is unavailable
+     * (e.g. tablet devices), and also when you only want to block execution
+     * (and access to) a portion of your user interface. For example, you could
+     * create a lightweight dialog with an owner of a single {@link Tab} in a 
+     * {@link TabPane}, and this will only block on that one tab - all other 
+     * tabs will continue to be interactive and execute as per usual.
+     * 
+     * @return dialog instance.
+     */
     public Dialogs lightweight() {
         this.lightweight = true;
         return this;

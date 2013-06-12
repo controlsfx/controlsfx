@@ -58,7 +58,7 @@ public class HelloLightweightDialogInTabPane extends Application implements Samp
     }
     
     private void buildTab1(final Tab tab1) {
-        Button showDialogBtn = new Button("Show lightweight dialog");
+        Button showDialogBtn = new Button("Show lightweight dialog in this Tab");
         showDialogBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent arg0) {
                 Dialogs.create()

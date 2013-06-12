@@ -1,6 +1,6 @@
 package impl.org.controlsfx.skin;
 
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -46,7 +46,7 @@ public class DecorationPaneSkin  extends BehaviorSkinBase<DecorationPane, Behavi
     	//TODO Respond to  component decoration changes.
     	
     	// show target decorations if found 
-		ObservableList<Decoration> decorations = DecorationUtils.getDecorations(target);
+    	ObservableSet<Decoration> decorations = DecorationUtils.getDecorations(target);
 		if ( decorations != null ) {
 			for( Decoration decoration: decorations ) {
 				addDecoration(target, decoration);

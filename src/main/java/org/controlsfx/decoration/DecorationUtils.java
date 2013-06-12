@@ -1,7 +1,7 @@
 package org.controlsfx.decoration;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 
 public class DecorationUtils {
@@ -22,18 +22,18 @@ public class DecorationUtils {
 	
 	
 	
-	public static final ObservableList<Decoration> getDecorations(Node target, boolean createIfAbsent) {
+	public static final ObservableSet<Decoration> getDecorations(Node target, boolean createIfAbsent) {
 		@SuppressWarnings("unchecked")
-		ObservableList<Decoration> decorations = 
-				(ObservableList<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
+		ObservableSet<Decoration> decorations = 
+				(ObservableSet<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
 		if (decorations == null && createIfAbsent ) {
-			decorations = FXCollections.observableArrayList();
+			decorations = FXCollections.observableSet();
 			target.getProperties().put(DECORATIONS_PROPERTY_KEY, decorations);
 		}
 		return decorations;
 	}
 	
-	public static final ObservableList<Decoration> getDecorations(Node target) {
+	public static final ObservableSet<Decoration> getDecorations(Node target) {
 		return getDecorations(target, false);
 	}
 	

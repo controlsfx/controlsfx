@@ -35,13 +35,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.DecorationPane;
-import org.controlsfx.decoration.DecorationUtils;
 import org.controlsfx.decoration.DefaultDecoration;
+import static org.controlsfx.decoration.DecorationUtils.*;
 
 public class HelloDecorationPane extends Application implements Sample {
     
@@ -63,23 +63,23 @@ public class HelloDecorationPane extends Application implements Sample {
         root.setMaxHeight(Double.MAX_VALUE);
         
         final TextField field = new TextField();
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_LEFT));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_CENTER));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_RIGHT));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_LEFT));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_LEFT));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_CENTER));
-		DecorationUtils.registerDecoration( field, 
+		registerDecoration( field, 
 				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_RIGHT));
         
         root.getChildren().add(field);
@@ -88,7 +88,7 @@ public class HelloDecorationPane extends Application implements Sample {
     }
     
     private Node createDecoratorNode(Color color) {
-    	Rectangle d = new Rectangle(10,10);
+    	Circle d = new Circle(5);
         d.setFill(color);
         return d;
     }

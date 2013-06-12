@@ -56,6 +56,7 @@ import javafx.util.Callback;
 
 import org.controlsfx.samples.HelloActionGroup;
 import org.controlsfx.samples.HelloButtonBar;
+import org.controlsfx.samples.HelloDecorationPane;
 import org.controlsfx.samples.HelloDialog;
 import org.controlsfx.samples.HelloGridView;
 import org.controlsfx.samples.HelloPropertySheet;
@@ -76,7 +77,8 @@ public class HelloControlsFX extends Application {
         HelloSegmentedButton.class,
         HelloActionGroup.class,
         HelloWorkerProgressPane.class,
-        HelloPropertySheet.class
+        HelloPropertySheet.class,
+        HelloDecorationPane.class
 //        SVGTest.class
     };
     

@@ -190,7 +190,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  * dialog is closed. Because of this, it is very easy to retrieve the users input:
  * when the user closes the dialog (e.g. by clicking on one of the buttons), the 
  * dialog will be hidden, and their response will be returned from the 
- * {@link #show() show} method that was called to bring the dialog up in the 
+ * show method that was called to bring the dialog up in the 
  * first place. In other words, following on from the code sample above, you 
  * might do the following:
  * 
@@ -256,7 +256,7 @@ public final class Dialogs {
      * or if owner is null, the dialog will block input to the entire application.
      * 
      * @param owner The dialog owner.
-     * @return 
+     * @return dialog instance
      */
     public Dialogs owner(final Object owner) {
         this.owner = owner;

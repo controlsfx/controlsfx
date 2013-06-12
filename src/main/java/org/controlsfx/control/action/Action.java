@@ -33,6 +33,7 @@ import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
 
 /**
  * Common interface for dialog actions, where Actions are converted into buttons 

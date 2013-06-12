@@ -253,9 +253,6 @@ public class RangeSlider extends Control {
     /**
      * Call this when the low value is changing.
      * @param value True if the low value is changing, false otherwise.
-     * @expert This function is intended to be used by experts, primarily
-     *         by those implementing new Skins or Behaviors. It is not common
-     *         for developers or designers to access this function directly.
      */
     public final void setLowValueChanging(boolean value) {
         lowValueChangingProperty().set(value);
@@ -329,9 +326,6 @@ public class RangeSlider extends Control {
     /**
      * Call this when high low value is changing.
      * @param value True if the high value is changing, false otherwise.
-     * @expert This function is intended to be used by experts, primarily
-     *         by those implementing new Skins or Behaviors. It is not common
-     *         for developers or designers to access this function directly.
      */
     public final void setHighValueChanging(boolean value) {
         highValueChangingProperty().set(value);
@@ -395,10 +389,6 @@ public class RangeSlider extends Control {
      * {@link #snapToTicksProperty() snapToTicks}, which is the main difference 
      * between <code>adjustLowValue</code> and 
      * {@link #setLowValue(double) setLowValue}.
-     *
-     * @expert This function is intended to be used by experts, primarily
-     *         by those implementing new Skins or Behaviors. It is not common
-     *         for developers or designers to access this function directly.
      */
     public void adjustLowValue(double newValue) {
         double d1 = getMin();
@@ -420,10 +410,6 @@ public class RangeSlider extends Control {
      * {@link #snapToTicksProperty() snapToTicks}, which is the main difference 
      * between <code>adjustHighValue</code> and 
      * {@link #setHighValue(double) setHighValue}.
-     *
-     * @expert This function is intended to be used by experts, primarily
-     *         by those implementing new Skins or Behaviors. It is not common
-     *         for developers or designers to access this function directly.
      */
     public void adjustHighValue(double newValue) {
         double d1 = getMin();
@@ -948,7 +934,6 @@ public class RangeSlider extends Control {
 
     /**
      * RT-19263
-     * @treatAsPrivate implementation detail
      * @deprecated This is an experimental API that is not intended for general use and is subject to change in future versions
      */
     @Deprecated

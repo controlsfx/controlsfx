@@ -357,7 +357,7 @@ public class Dialog {
     
     /**
      * Sets whether the dialog can be closed
-     * @param iconifiable if dialog should be closable
+     * @param closable if dialog should be closable
      */
     public void setClosable( boolean closable ) {
         dialog.setClosable( closable );

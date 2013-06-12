@@ -355,6 +355,8 @@ class LightweightDialog extends FXDialog {
     
     private void buildDialogStack(final Node parent) {
         dialogStack = new Pane(lightweightDialog) {
+            private boolean isFirstRun = true;
+            
             protected void layoutChildren() {
                 final double w = getOverlayWidth();
                 final double h = getOverlayHeight();
@@ -366,24 +368,31 @@ class LightweightDialog extends FXDialog {
                     parent.resizeRelocate(x, y, w, h);
                 }
                 
-//                resizeRelocate(x,y,w,h);
                 if (opaqueLayer != null) {
                     opaqueLayer.resizeRelocate(x, y, w, h);
                 }
                 
                 final double dialogWidth = lightweightDialog.prefWidth(-1);
                 final double dialogHeight = lightweightDialog.prefHeight(-1);
-                
-                double dialogX = lightweightDialog.getLayoutX();
-                dialogX = dialogX == 0.0 ? w/2.0-dialogWidth/2.0 : dialogX;
-                
-                double dialogY = lightweightDialog.getLayoutY();
-                dialogY = dialogY == 0.0 ? h/2.0-dialogHeight/2.0 : dialogY;
-                
-                lightweightDialog.relocate(snapPosition(dialogX), snapPosition(dialogY));
                 lightweightDialog.resize(snapSize(dialogWidth), snapSize(dialogHeight));
+                
+                // hacky, but we only want to position the dialog the first time 
+                // it is laid out - after that the only way it should move is if
+                // the user moves it.
+                if (isFirstRun) {
+                    isFirstRun = false;
+                    
+                    double dialogX = lightweightDialog.getLayoutX();
+                    dialogX = dialogX == 0.0 ? w / 2.0 - dialogWidth / 2.0 : dialogX;
+                    
+                    double dialogY = lightweightDialog.getLayoutY();
+                    dialogY = dialogY == 0.0 ? h / 2.0 - dialogHeight / 2.0 : dialogY;
+                    
+                    lightweightDialog.relocate(snapPosition(dialogX), snapPosition(dialogY));
+                }
             }
         };
+        dialogStack.setManaged(true);
         
         if (parent != null) {
             dialogStack.getChildren().add(0, parent);

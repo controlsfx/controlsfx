@@ -232,6 +232,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             setVgap(5);
             setHgap(5);
             setPadding(new Insets(5, 15, 5, 15));
+            getStyleClass().add("property-pane");
             setItems(properties);
 //            setGridLinesVisible(true);
         }

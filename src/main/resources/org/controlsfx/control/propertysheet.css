@@ -1,11 +1,11 @@
-
 /* Remove extraneous borders from PropertySheet */
-.property-sheet > .scroll-pane {
+
+.property-sheet > .scroll-pane .property-pane {
     -fx-background-color: -fx-background;
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
 
-.property-sheet > .scroll-pane .accordion {
+.property-sheet .scroll-pane .accordion {
     -fx-padding: -1;
 }

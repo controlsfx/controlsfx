@@ -58,6 +58,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 
+import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.SegmentedButton;
 
 /**
@@ -329,6 +330,33 @@ public class ActionUtils {
         }
         
         return menuBar;
+    }
+    
+    /**
+     * Takes the provided {@link Collection} of {@link Action} (or subclasses,
+     * such as {@link ActionGroup}) instances and returns a {@link ButtonBar} 
+     * populated with appropriate {@link Node nodes} bound to the provided 
+     * {@link Action actions}.
+     * 
+     * @param actions The {@link Action actions} to place on the {@link ButtonBar}.
+     * @return A {@link ButtonBar} that contains {@link Node nodes} which are bound 
+     *      to the state of the provided {@link Action}
+     */
+    public static ButtonBar createButtonBar(Collection<? extends Action> actions) {
+        ButtonBar buttonBar = new ButtonBar();
+        for (Action action : actions) {
+            if ( action instanceof ActionGroup ) {
+                // no-op
+            } else if ( action == ACTION_SEPARATOR ) {
+                // no-op
+            } else if ( action == null ) {
+                // no-op
+            } else {
+                buttonBar.getButtons().add(createButton(action));
+            }
+        }
+        
+        return buttonBar;
     }
     
     /**

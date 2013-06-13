@@ -48,7 +48,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
-import org.controlsfx.control.DecorationPane;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.editor.CheckEditor;
@@ -78,7 +77,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
     
     private final ScrollPane scroller = new ScrollPane();
-    private DecorationPane decorationPane;
     
     /**************************************************************************
      * 
@@ -131,8 +129,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
 
     private void refreshProperties() {
-    	decorationPane = new DecorationPane(buildPropertySheetContainer());
-        scroller.setContent(decorationPane);
+        scroller.setContent(buildPropertySheetContainer());
     }
     
     private Node buildPropertySheetContainer() {

@@ -6,7 +6,7 @@ import javafx.scene.Node;
 
 public class DecorationUtils {
 
-	public final static String DECORATIONS_PROPERTY_KEY = "org.controlsfx.decorations";
+	public final static String DECORATIONS_PROPERTY_KEY = "$org.controlsfx.decorations$";
 	
 	private DecorationUtils() {
 		// no op
@@ -25,7 +25,7 @@ public class DecorationUtils {
 	public static final ObservableSet<Decoration> getDecorations(Node target, boolean createIfAbsent) {
 		@SuppressWarnings("unchecked")
 		ObservableSet<Decoration> decorations = 
-				(ObservableSet<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
+		   (ObservableSet<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
 		if (decorations == null && createIfAbsent ) {
 			decorations = FXCollections.observableSet();
 			target.getProperties().put(DECORATIONS_PROPERTY_KEY, decorations);

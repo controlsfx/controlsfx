@@ -49,7 +49,7 @@ public class DecorationPaneSkin  extends BehaviorSkinBase<DecorationPane, Behavi
     	ObservableSet<Decoration> decorations = DecorationUtils.getDecorations(target);
 		if ( decorations != null ) {
 			for( Decoration decoration: decorations ) {
-				addDecoration(target, decoration);
+				showDecoration(target, decoration);
 			}
 		}
     	
@@ -61,10 +61,12 @@ public class DecorationPaneSkin  extends BehaviorSkinBase<DecorationPane, Behavi
     	}
     }
     
-    private void addDecoration( Node target, Decoration decoration ) {
+    private void showDecoration( Node target, Decoration decoration ) {
 		Node dnode = decoration.getNode();
-		stackPane.getChildren().add(dnode);
-		StackPane.setAlignment(dnode, Pos.TOP_LEFT); // TODO support for all positions.
+		if ( !stackPane.getChildren().contains(dnode)) {
+	   	   stackPane.getChildren().add(dnode);
+		   StackPane.setAlignment(dnode, Pos.TOP_LEFT); // TODO support for all positions.
+		}
 		Bounds targetBounds = getDecorationBounds( target );
 		Bounds dbounds = dnode.getBoundsInLocal();
 		Insets margin = new Insets( targetBounds.getMinY()-dbounds.getHeight()/2 + getVInset(targetBounds,decoration),
@@ -90,6 +92,13 @@ public class DecorationPaneSkin  extends BehaviorSkinBase<DecorationPane, Behavi
 		}
     }
     
+    /**
+     * Computes bounds on decoration pane for any node
+     * as long as the node is a child of decoration pane. 
+     * @param node node to compute bounds for
+     * @return bounds for give node on decoration pane or null
+     *          node is not a child of decoration pane 
+     */
     private Bounds getDecorationBounds( Node node ) {
 
     	if ( node == null ) return null;

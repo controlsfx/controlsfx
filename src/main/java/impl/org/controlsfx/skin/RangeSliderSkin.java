@@ -291,6 +291,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         if (showTickMarks) {
             if (tickLine == null) {
                 tickLine = new NumberAxis();
+                tickLine.setAnimated(false);
                 tickLine.setAutoRanging(false);
                 tickLine.setSide(isHorizontal() ? Side.BOTTOM : Side.RIGHT);
                 tickLine.setUpperBound(rangeSlider.getMax());

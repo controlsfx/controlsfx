@@ -29,6 +29,8 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.NotificationPaneSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -38,11 +40,61 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.web.WebView;
 
+import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 
 /**
+ * The NotificationPane control is a container control that, when prompted by
+ * the {@link #show()} method, will show a non-modal message to the user. The
+ * notification appears as a bar that will slide in to their application window,
+ * either from the top or the bottom of the NotificationPane (based on 
+ * {@link #showFromTopProperty()}) wherever that may be in the scenegraph.
  * 
+ * <h3>Code Examples</h3>
+ * 
+ * <p>NotificationPane is a conceptually very simple control - you simply create
+ * your user interface as you normally would, and then wrap it inside the 
+ * NotificationPane. You can then show a notification bar on top of your content
+ * simply by calling {@link #show()} on the notification bar. Here is an example: 
+ * 
+ * <pre>
+ * {@code
+ * // Create a WebView
+ * WebView webView = new WebView();
+ * 
+ * // Wrap it inside a NotificationPane
+ * NotificationPane notificationPane = new NotificationPane(webView);
+ * 
+ * // and put the NotificationPane inside a Tab
+ * Tab tab1 = new Tab("Tab 1");
+ * tab1.setContent(notificationPane);
+ * 
+ * // and the Tab inside a TabPane. We just have one tab here, but of course 
+ * // you can have more!
+ * TabPane tabPane = new TabPane();
+ * tabPane.getTabs().addAll(tab1);
+ * }</pre>
+ * 
+ * <p>Now that the notification pane is installed inside the tab, at some point
+ * later in you application lifecycle, you can do something like the following
+ * to have the notification bar slide into view:
+ * 
+ * <pre>
+ * {@code 
+ * notificationPane.setText("Do you want to save your password?");
+ * notificationPane.getActions().add(new AbstractAction("Save Password") {
+ *     public void execute(ActionEvent ae) {
+ *         // do save...
+ *           
+ *         // then hide...
+ *         notificationPane.hide();
+ *     }
+ * }}</pre>
+ * 
+ * @see Action
+ * @see AbstractAction
  */
 public class NotificationPane extends Control {
     
@@ -55,10 +107,85 @@ public class NotificationPane extends Control {
      **************************************************************************/
     
     /**
-     * 
+     * Creates an instance of NotificationPane with no 
+     * {@link #contentProperty() content}, {@link #textProperty() text}, 
+     * {@link #graphicProperty() graphic} properties set, and no 
+     * {@link #getActions() actions} specified.
      */
     public NotificationPane() {
+        this(null);
+    }
+    
+    /**
+     * Creates an instance of NotificationPane with the 
+     * {@link #contentProperty() content} property set, but no 
+     * {@link #textProperty() text} or
+     * {@link #graphicProperty() graphic} property set, and no
+     * {@link #getActions() actions} specified.
+     * 
+     * @param content The content to show in the NotificationPane behind where
+     *      the notification bar will appear, that is, the content 
+     *      <strong>will not</strong>appear in the notification bar. 
+     */
+    public NotificationPane(Node content) {
+        this(content, "");
+    }
+    
+    /**
+     * Creates an instance of NotificationPane with the 
+     * {@link #contentProperty() content} and {@link #textProperty() text} 
+     * property set, but no {@link #graphicProperty() graphic} property set, and
+     * no {@link #getActions() actions} specified.
+     * 
+     * @param content The content to show in the NotificationPane behind where
+     *      the notification bar will appear, that is, the content 
+     *      <strong>will not</strong>appear in the notification bar. 
+     * @param text The text to show in the notification pane.
+     */
+    public NotificationPane(Node content, String text) {
+        this(content, text, null);
+    }
+    
+    /**
+     * Creates an instance of NotificationPane with the 
+     * {@link #contentProperty() content}, {@link #textProperty() text} and 
+     * {@link #graphicProperty() graphic} properties set, but no 
+     * {@link #getActions() actions} specified.
+     * 
+     * @param content The content to show in the NotificationPane behind where
+     *      the notification bar will appear, that is, the content 
+     *      <strong>will not</strong>appear in the notification bar. 
+     * @param text The text to show in the notification pane.
+     * @param graphic The node to show in the notification pane.
+     */
+    public NotificationPane(Node content, String text, Node graphic) {
+        this(content, text, graphic, (Action[])null);
+    }
+    
+    /**
+     * Creates an instance of NotificationPane with the 
+     * {@link #contentProperty() content}, {@link #textProperty() text} and 
+     * {@link #graphicProperty() graphic} property set, and the provided actions 
+     * copied into the {@link #getActions() actions} list.
+     * 
+     * @param content The content to show in the NotificationPane behind where
+     *      the notification bar will appear, that is, the content 
+     *      <strong>will not</strong>appear in the notification bar. 
+     * @param text The text to show in the notification pane.
+     * @param graphic The node to show in the notification pane.
+     * @param actions The actions to show in the notification pane.
+     */
+    public NotificationPane(Node content, String text, Node graphic, Action... actions) {
         getStyleClass().add("notification-pane");
+        setContent(content);
+        setText(text);
+        setGraphic(graphic);
+        if (actions != null) {
+            for (Action action : actions) {
+                if (action == null) continue;
+                getActions().add(action);
+            }
+        }
     }
     
     
@@ -89,6 +216,18 @@ public class NotificationPane extends Control {
     
     // --- content
     private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this, "content");
+    
+    /**
+     * The content property represents what is shown in the scene 
+     * <strong>that is not within</strong> the notification bar. In other words,
+     * it is what the notification bar should appear on top of. For example, in
+     * the scenario where you are using a {@link WebView} to show to the user
+     * websites, and you want to popup up a notification bar to save a password,
+     * the content would be the {@link WebView}. Refer to the 
+     * {@link NotificationPane} class documentation for more details.
+     *  
+     * @return A property representing the content of this NotificationPane.
+     */
     public final ObjectProperty<Node> contentProperty() {
         return content;
     }
@@ -102,6 +241,14 @@ public class NotificationPane extends Control {
     
     // --- text
     private StringProperty text = new SimpleStringProperty(this, "text");
+    
+    /**
+     * The text property represents the text to show within the popup 
+     * notification bar that appears on top of the 
+     * {@link #contentProperty() content} that is within the NotificationPane.
+     * 
+     * @return A property representing the text shown in the notification bar.
+     */
     public final StringProperty textProperty() {
         return text;
     }
@@ -115,6 +262,16 @@ public class NotificationPane extends Control {
     
     // --- graphic
     private ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>(this, "graphic");
+    
+    /**
+     * The graphic property represents the {@link Node} to show within the popup 
+     * notification bar that appears on top of the 
+     * {@link #contentProperty() content} that is within the NotificationPane.
+     * Despite the term 'graphic', this can be an arbitrarily complex scenegraph
+     * in its own right.
+     * 
+     * @return A property representing the graphic shown in the notification bar.
+     */
     public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
@@ -127,9 +284,17 @@ public class NotificationPane extends Control {
     
     
     // --- showing
-    private BooleanProperty showing = new SimpleBooleanProperty(this, "showing");
-    public final BooleanProperty showingProperty() {
-        return showing;
+    private ReadOnlyBooleanWrapper showing = new ReadOnlyBooleanWrapper(this, "showing");
+    
+    /**
+     * A read-only property that represents whether the notification bar popup
+     * should be showing to the user or not. To toggle visibility, use the
+     * {@link #show()} and {@link #hide()} methods.
+     * 
+     * @return A property representing whether the notifications bar is currently showing.
+     */
+    public final ReadOnlyBooleanProperty showingProperty() {
+        return showing.getReadOnlyProperty();
     }
     private final void setShowing(boolean value) {
         this.showing.set(value); 
@@ -141,6 +306,14 @@ public class NotificationPane extends Control {
     
     // --- show from top
     private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true);
+    
+    /**
+     * A property representing whether the notification bar should appear from the
+     * top  or the bottom of the NotificationPane area. By default it will appear 
+     * from the top, but this can be changed by setting this property to false.
+     * 
+     * @return A property representing where the notification bar should appear from.
+     */
     public final BooleanProperty showFromTopProperty() {
         return showFromTop;
     }
@@ -172,10 +345,20 @@ public class NotificationPane extends Control {
         return actions;
     }
     
+    /**
+     * Call this to make the notification bar appear on top of the 
+     * {@link #contentProperty() content} of this {@link NotificationPane}.
+     * If the notification bar is already showing this will be a no-op.
+     */
     public void show() {
         setShowing(true);
     }
     
+    /**
+     * Call this to make the notification bar disappear from the 
+     * {@link #contentProperty() content} of this {@link NotificationPane}.
+     * If the notification bar is already hidden this will be a no-op.
+     */
     public void hide() {
         setShowing(false);
     }

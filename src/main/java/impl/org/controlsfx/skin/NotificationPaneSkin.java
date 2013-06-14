@@ -268,6 +268,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
 
             if (timeline != null && (timeline.getStatus() != Status.STOPPED)) {
                 duration = timeline.getCurrentTime();
+                transitionStartValue = transition.get();
                 timeline.stop();
             } else {
                 duration = TRANSITION_DURATION;

@@ -27,6 +27,7 @@
 package org.controlsfx.control.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javafx.beans.binding.ObjectBinding;
@@ -149,12 +150,23 @@ public class ActionUtils {
      * @param actions The {@link Collection} of {@link Action} that the {@link SegmentedButton} should bind to.
      * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
      */
-    public static SegmentedButton createSegmentedButton(Action... actions) {
+    public static SegmentedButton createSegmentedButton(Collection<? extends Action> actions) {
         ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
         for( Action a: actions ) {
             buttons.add( createToggleButton(a));
         }
         return new SegmentedButton( buttons );
+    }
+    
+    /**
+     * Takes the provided varargs array of {@link Action}  and returns a {@link SegmentedButton} instance
+     * with all relevant properties bound to the properties of the actions.
+     * 
+     * @param actions A varargs array of {@link Action} that the {@link SegmentedButton} should bind to.
+     * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
+     */
+    public static SegmentedButton createSegmentedButton(Action... actions) {
+        return createSegmentedButton(Arrays.asList(actions));
     }
     
     

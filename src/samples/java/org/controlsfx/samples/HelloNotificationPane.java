@@ -35,6 +35,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -65,6 +66,11 @@ public class HelloNotificationPane extends Application implements Sample {
     
     @Override public Node getPanel(Stage stage) {
         notificationPane = new NotificationPane();
+        
+        String imagePath = HelloNotificationPane.class.getResource("notification-pane-warning.png").toExternalForm();
+        ImageView image = new ImageView(imagePath);
+        notificationPane.setGraphic(image);
+        
         notificationPane.getActions().addAll(new AbstractAction("Sync") {
             @Override public void execute(ActionEvent ae) {
                 // do sync

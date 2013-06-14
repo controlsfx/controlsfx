@@ -6,7 +6,7 @@
 
 .notification-pane .notification-bar {
     -fx-background-color: linear-gradient(#cccccc, #bababa 37%, #a6a6a6);
-    -fx-padding: 0 7 0 15;
+    -fx-padding: 0 7 0 7;
 }
 
 .notification-pane .notification-bar .label {

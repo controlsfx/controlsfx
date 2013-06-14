@@ -46,6 +46,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import org.controlsfx.control.ButtonBar;
@@ -160,6 +161,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         private final Button closeBtn;
         
         private final GridPane pane;
+        private Rectangle clip;
 
         public NotificationBar(final NotificationPane notificationPane) {
             this.notificationPane = notificationPane;
@@ -169,6 +171,10 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             pane.setAlignment(Pos.BASELINE_LEFT);
             pane.setVisible(notificationPane.isShowing());
             getChildren().setAll(pane);
+            
+            // use a clip so things don't go outside the bar area
+            clip = new Rectangle();
+            pane.setClip(clip);
             
             // initialise label area
             label = new Label();
@@ -228,6 +234,9 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             } else {
                 pane.resizeRelocate(0, h - actualHeight, w, actualHeight);
             }
+            
+            clip.setWidth(w);
+            clip.setHeight(actualHeight);
         }
         
         @Override protected double computeMinHeight(double width) {

@@ -143,6 +143,12 @@ public class HelloPropertySheet extends Application implements Sample {
         infoPane.getChildren().add(button);
         infoPane.getChildren().add(textField);
         
+        TextField searchField = new TextField();
+        searchField.setPromptText("Filter properties");
+        propertySheet.titleFilter().bind(searchField.textProperty());
+        
+        infoPane.getChildren().add(searchField);
+        
         
         SplitPane pane = new SplitPane();
         pane.getItems().addAll( infoPane, propertySheet );

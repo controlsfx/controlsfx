@@ -28,6 +28,7 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
@@ -79,7 +80,11 @@ public class PropertySheet extends Control {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
     
+    private final SimpleStringProperty titleFilter  = new SimpleStringProperty("");
     
+    public final SimpleStringProperty titleFilter() {
+        return titleFilter;
+    }
     
     
     @Override protected String getUserAgentStylesheet() {

@@ -85,6 +85,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         // setup listeners
         registerChangeListener(control.modeProperty(), "MODE");
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
+        registerChangeListener(control.titleFilter(), "FILTER");
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
@@ -105,7 +106,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
 
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
-        if (p == "MODE" || p == "EDITOR-FACTORY") {
+        if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
         }
     }
@@ -181,14 +182,20 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         public void setItems( List<Item> properties ) {
             getChildren().clear();
             int row = 0;
-            for (Item p : getSkinnable().getItems()) {
+            for (Item item : getSkinnable().getItems()) {
+
+                // filter properties
+                String title = item.getName();
+                String filter = getSkinnable().titleFilter().get();
+                filter = filter == null? "": filter.trim();
+                if ( !filter.isEmpty() && title.toLowerCase().indexOf( filter.toLowerCase() ) < 0) continue;
                 
                 // setup property label
-                Label label = new Label(p.getName());
+                Label label = new Label(title);
                 label.setMinWidth(MIN_COLUMN_WIDTH);
                 
                 // show description as a tooltip
-                String description = p.getDescription();
+                String description = item.getDescription();
                 if ( description != null && !description.trim().isEmpty()) {
                     label.setTooltip( new Tooltip(description));
                 }
@@ -196,7 +203,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 add(label, 0, row);
 
              // setup property editor
-                Region editor = getEditor(p);
+                Region editor = getEditor(item);
                 editor.setMinWidth(MIN_COLUMN_WIDTH);
                 editor.setMaxWidth(Double.MAX_VALUE);
                 add(editor, 1, row);

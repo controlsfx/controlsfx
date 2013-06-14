@@ -90,7 +90,9 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
                 notificationBar.hide();
             }
         } else if ("SHOW_FROM_TOP".equals(p)) {
-            getSkinnable().requestLayout();
+            if (getSkinnable().isShowing()) {
+                getSkinnable().requestLayout();
+            }
         }
     }
     
@@ -120,13 +122,29 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         }
     }
     
-    @Override protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return Double.MAX_VALUE;
-    }
+    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return content.minWidth(height);
+    };
     
-    @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return Double.MAX_VALUE;
-    }
+    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return content.minHeight(width);
+    };
+    
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return content.prefWidth(height);
+    };
+    
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return content.prefHeight(width);
+    };
+    
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return content.maxWidth(height);
+    };
+    
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return content.maxHeight(width);
+    };
     
     
     

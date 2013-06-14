@@ -26,7 +26,7 @@
  */
 package org.controlsfx.control;
 
-import impl.org.controlsfx.skin.NotificationBarSkin;
+import impl.org.controlsfx.skin.NotificationPaneSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,9 +44,8 @@ import org.controlsfx.control.action.Action;
 /**
  * 
  */
-public class NotificationBar extends Control {
+public class NotificationPane extends Control {
     
-//    public static final String STYLE_CLASS_LIGHT = "light";
     public static final String STYLE_CLASS_DARK = "dark";
     
     /***************************************************************************
@@ -58,10 +57,8 @@ public class NotificationBar extends Control {
     /**
      * 
      */
-    public NotificationBar(final Object owner) {
-        getStyleClass().add("notification-bar");
-        
-        setOwner(owner);
+    public NotificationPane() {
+        getStyleClass().add("notification-pane");
     }
     
     
@@ -74,12 +71,12 @@ public class NotificationBar extends Control {
     
     /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
-        return new NotificationBarSkin(this);
+        return new NotificationPaneSkin(this);
     }
-
+    
     /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("notificationbar.css").toExternalForm();
+        return NotificationPane.class.getResource("notificationpane.css").toExternalForm();
     }
     
     
@@ -90,16 +87,16 @@ public class NotificationBar extends Control {
      * 
      **************************************************************************/
     
-    // --- owner
-    private ObjectProperty<Object> owner = new SimpleObjectProperty<Object>(this, "owner");
-    public final ObjectProperty<Object> ownerProperty() {
-        return owner;
+    // --- content
+    private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this, "content");
+    public final ObjectProperty<Node> contentProperty() {
+        return content;
     }
-    private final void setOwner(Object value) {
-        this.owner.set(value); 
+    public final void setContent(Node value) {
+        this.content.set(value); 
     }
-    public final Object getOwner() {
-        return owner.get();
+    public final Node getContent() {
+        return content.get();
     }
     
     
@@ -139,6 +136,19 @@ public class NotificationBar extends Control {
     }
     public final boolean isShowing() {
         return showing.get();
+    }
+    
+    
+    // --- show from top
+    private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true);
+    public final BooleanProperty showFromTopProperty() {
+        return showFromTop;
+    }
+    public final void setShowFromTop(boolean value) {
+        this.showFromTop.set(value); 
+    }
+    public final boolean isShowFromTop() {
+        return showFromTop.get();
     }
     
     

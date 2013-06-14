@@ -29,31 +29,31 @@ package org.controlsfx.samples;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.control.NotificationBar;
+import org.controlsfx.control.NotificationPane;
 import org.controlsfx.dialog.Dialog.Actions;
 
-public class HelloNotificationBar extends Application implements Sample {
-    
-    private NotificationBar notificationBar;
+public class HelloNotificationPane extends Application implements Sample {
     
     public static void main(String[] args) {
         launch(args);
     }
     
     @Override public String getSampleName() {
-        return "Notification Bar";
+        return "Notification Pane";
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationBar.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationPane.html";
     }
     
     @Override public boolean includeInSamples() {
@@ -61,42 +61,46 @@ public class HelloNotificationBar extends Application implements Sample {
     }
     
     @Override public Node getPanel(Stage stage) {
-        VBox root = new VBox(20);
-//        root.setPadding(new Insets(30, 30, 30, 30));
-        
-        notificationBar = new NotificationBar(null);
-        notificationBar.getActions().add(Actions.OK);
-        
-        
-        root.getChildren().add(notificationBar);
+        final NotificationPane notificationPane = new NotificationPane();
+        notificationPane.getActions().add(Actions.OK);
+//        notificationPane.setSlideDown(false);
         
         Button showBtn = new Button("Show / Hide");
         showBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent arg0) {
-                if (notificationBar.isShowing()) {
-                    notificationBar.hide();
+                if (notificationPane.isShowing()) {
+                    notificationPane.hide();
                 } else {
-                    boolean useDarkTheme = ! notificationBar.getStyleClass().contains(NotificationBar.STYLE_CLASS_DARK);
+                    boolean useDarkTheme = ! notificationPane.getStyleClass().contains(NotificationPane.STYLE_CLASS_DARK);
                     
                     if (useDarkTheme) {
-                        notificationBar.setText("Hello World! Using the dark theme");
-                        notificationBar.getStyleClass().add(NotificationBar.STYLE_CLASS_DARK);
+                        notificationPane.setText("Hello World! Using the dark theme");
+                        notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
                     } else {
-                        notificationBar.setText("Hello World! Using the light theme");
-                        notificationBar.getStyleClass().remove(NotificationBar.STYLE_CLASS_DARK);
+                        notificationPane.setText("Hello World! Using the light theme");
+                        notificationPane.getStyleClass().remove(NotificationPane.STYLE_CLASS_DARK);
                     }
                     
-                    notificationBar.show();
+                    notificationPane.show();
                 }
             }
         });
-        root.getChildren().add(showBtn);
         
-        return root;
+        CheckBox cbSlideFromTop = new CheckBox("Slide from top");
+        cbSlideFromTop.setSelected(true);
+        notificationPane.showFromTopProperty().bind(cbSlideFromTop.selectedProperty());
+        
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(50, 0, 0, 10));
+        root.getChildren().addAll(showBtn, cbSlideFromTop);
+        
+        notificationPane.setContent(root);
+        
+        return notificationPane;
     }
     
     @Override public void start(Stage stage) {
-        stage.setTitle("NotificationBar Demo");
+        stage.setTitle("NotificationPane Demo");
 
         Scene scene = new Scene((Parent) getPanel(stage), 520, 360);
 

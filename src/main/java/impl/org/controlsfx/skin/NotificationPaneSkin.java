@@ -143,7 +143,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         
         private final GridPane pane;
 
-        public NotificationBar(NotificationPane notificationPane) {
+        public NotificationBar(final NotificationPane notificationPane) {
             this.notificationPane = notificationPane;
             
             pane = new GridPane();
@@ -170,6 +170,11 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             
             // initialise close button area
             closeBtn = new Button();
+            closeBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent arg0) {
+                    notificationPane.hide();
+                }
+            });
             closeBtn.getStyleClass().setAll("close-button");
             StackPane graphic = new StackPane();
             graphic.getStyleClass().setAll("graphic");

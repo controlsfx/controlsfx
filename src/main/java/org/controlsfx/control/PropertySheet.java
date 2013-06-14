@@ -33,6 +33,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
+import org.controlsfx.property.editor.PropertyEditorFactory;
+
 public class PropertySheet extends Control {
     
     private final ObservableList<Item> properties = FXCollections.observableArrayList();
@@ -60,6 +63,24 @@ public class PropertySheet extends Control {
         NAME,
         CATEGORY
     }
+
+    private final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory = 
+            new SimpleObjectProperty<PropertyEditorFactory>( new DefaultPropertyEditorFactory());
+    
+    public final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory() {
+        return propertyEditorFactory;
+    }
+    
+    public final PropertyEditorFactory getPropertyEditorFactory() {
+        return propertyEditorFactory.get();
+    }
+    
+    public final void setPropertyEditorFactory( PropertyEditorFactory factory ) {
+        propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
+    }
+    
+    
+    
     
     @Override protected String getUserAgentStylesheet() {
         return getClass().getResource("propertysheet.css").toExternalForm();

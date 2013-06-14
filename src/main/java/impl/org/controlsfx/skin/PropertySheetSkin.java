@@ -26,10 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,16 +43,10 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
-import org.controlsfx.property.editor.CheckEditor;
-import org.controlsfx.property.editor.ChoiceEditor;
-import org.controlsfx.property.editor.ColorEditor;
-import org.controlsfx.property.editor.NumericEditor;
 import org.controlsfx.property.editor.PropertyEditor;
-import org.controlsfx.property.editor.TextEditor;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -93,12 +84,15 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         // setup listeners
         registerChangeListener(control.modeProperty(), "MODE");
+        registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
                 refreshProperties();
             }
         });
+        
+        
         
     }
 
@@ -111,7 +105,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
 
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
-        if (p == "MODE") {
+        if (p == "MODE" || p == "EDITOR-FACTORY") {
             refreshProperties();
         }
     }
@@ -165,56 +159,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             default: return new PropertyPane(getSkinnable().getItems());
         }
     }
-    
-
-    private Class<?>[] numericTypes = new Class[]{
-            byte.class, Byte.class,
-            short.class, Short.class,
-            int.class, Integer.class,
-            long.class, Long.class,
-            float.class, Float.class,
-            double.class, Double.class,
-            BigInteger.class, BigDecimal.class
-    };
-    
-    // there may be better ways to do this
-    private boolean isNumber( Class<?> type )  {
-        if ( type == null ) return false;
-        for (Class<?> cls : numericTypes) {
-            if ( type == cls ) return true;
-        }
-        return false;
-    }
-    
-    private PropertyEditor createEditor( Item p  ) {
-        
-        Class<?> type = p.getType();
-        
-        //TODO: add support for char and collection editors
-        if ( type != null && type == String.class ) {
-            return new TextEditor(p);
-        }
-
-        if ( type != null && isNumber(type) ) {
-            return new NumericEditor(p);
-        }
-        
-        if ( type != null && ( type == boolean.class || type == Boolean.class) ) {
-            return new CheckEditor(p);
-        }
-
-        if ( type != null && type.isAssignableFrom(Color.class) ) {
-            return new ColorEditor(p);
-        }
-
-        if ( type != null && type.isEnum() ) {
-            return new ChoiceEditor( p, Arrays.<Object>asList( type.getEnumConstants()) );
-        }
-        
-        
-        return null; 
-    }
-
 
 
     /**************************************************************************
@@ -251,32 +195,33 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 
                 add(label, 0, row);
 
-                // setup property editor
-                PropertyEditor editor = createEditor(p);
-                if ( editor != null ) {
-                    
-                    editor.setValue(p.getValue());
-                    
-                    Region control = editor.asNode();
-                    control.setMaxWidth(Double.MAX_VALUE);
-                    control.setMinWidth(MIN_COLUMN_WIDTH);
-                    add(control, 1, row);
-                    GridPane.setHgrow(control, Priority.ALWAYS);
-                } else {
-                    
-                    TextField message = new TextField("No suitable editor found");
-                    message.setEditable(false);
-                    message.setDisable(true);
-                    add( message, 1, row);
-                    message.setMaxWidth(Double.MAX_VALUE);
-                    GridPane.setHgrow(message, Priority.ALWAYS);
-                }
+             // setup property editor
+                Region editor = getEditor(p);
+                editor.setMinWidth(MIN_COLUMN_WIDTH);
+                editor.setMaxWidth(Double.MAX_VALUE);
+                add(editor, 1, row);
+                GridPane.setHgrow(editor, Priority.ALWAYS);
                 
-                //TODO add support for recursive properties
+              //TODO add support for recursive properties
                 
                 row++;
                 
             }
+        }
+        
+        private Region getEditor( Item item ) {
+            
+            PropertyEditor editor = getSkinnable().getPropertyEditorFactory().getEditor(item);
+            if ( editor != null ) {
+                editor.setValue(item.getValue());
+                return editor.asNode();
+            } else {
+                TextField message = new TextField("No suitable editor found");
+                message.setEditable(false);
+                message.setDisable(true);
+                return message;
+            }
+            
         }
         
         

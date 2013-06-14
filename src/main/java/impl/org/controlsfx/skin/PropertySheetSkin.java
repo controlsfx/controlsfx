@@ -181,14 +181,18 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         public void setItems( List<Item> properties ) {
             getChildren().clear();
+            
+            String filter = getSkinnable().titleFilter().get();
+            filter = filter == null? "": filter.trim().toLowerCase();
+
             int row = 0;
+            
             for (Item item : getSkinnable().getItems()) {
 
                 // filter properties
                 String title = item.getName();
-                String filter = getSkinnable().titleFilter().get();
-                filter = filter == null? "": filter.trim();
-                if ( !filter.isEmpty() && title.toLowerCase().indexOf( filter.toLowerCase() ) < 0) continue;
+               
+                if ( !filter.isEmpty() && title.toLowerCase().indexOf( filter ) < 0) continue;
                 
                 // setup property label
                 Label label = new Label(title);

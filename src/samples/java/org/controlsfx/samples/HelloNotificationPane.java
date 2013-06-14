@@ -40,7 +40,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.NotificationPane;
-import org.controlsfx.dialog.Dialog.Actions;
+import org.controlsfx.control.action.AbstractAction;
 
 public class HelloNotificationPane extends Application implements Sample {
     
@@ -62,8 +62,14 @@ public class HelloNotificationPane extends Application implements Sample {
     
     @Override public Node getPanel(Stage stage) {
         final NotificationPane notificationPane = new NotificationPane();
-        notificationPane.getActions().add(Actions.OK);
-//        notificationPane.setSlideDown(false);
+        notificationPane.getActions().addAll(new AbstractAction("Sync") {
+            @Override public void execute(ActionEvent ae) {
+                // do sync
+                
+                // then hide...
+                notificationPane.hide();
+            }
+        });
         
         Button showBtn = new Button("Show / Hide");
         showBtn.setOnAction(new EventHandler<ActionEvent>() {

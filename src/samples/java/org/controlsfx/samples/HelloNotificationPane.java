@@ -44,6 +44,9 @@ import org.controlsfx.control.action.AbstractAction;
 
 public class HelloNotificationPane extends Application implements Sample {
     
+    private NotificationPane notificationPane;
+    private CheckBox cbUseDarkTheme;
+    
     public static void main(String[] args) {
         launch(args);
     }
@@ -61,7 +64,7 @@ public class HelloNotificationPane extends Application implements Sample {
     }
     
     @Override public Node getPanel(Stage stage) {
-        final NotificationPane notificationPane = new NotificationPane();
+        notificationPane = new NotificationPane();
         notificationPane.getActions().addAll(new AbstractAction("Sync") {
             @Override public void execute(ActionEvent ae) {
                 // do sync
@@ -77,16 +80,6 @@ public class HelloNotificationPane extends Application implements Sample {
                 if (notificationPane.isShowing()) {
                     notificationPane.hide();
                 } else {
-                    boolean useDarkTheme = ! notificationPane.getStyleClass().contains(NotificationPane.STYLE_CLASS_DARK);
-                    
-                    if (useDarkTheme) {
-                        notificationPane.setText("Hello World! Using the dark theme");
-                        notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-                    } else {
-                        notificationPane.setText("Hello World! Using the light theme");
-                        notificationPane.getStyleClass().remove(NotificationPane.STYLE_CLASS_DARK);
-                    }
-                    
                     notificationPane.show();
                 }
             }
@@ -96,13 +89,34 @@ public class HelloNotificationPane extends Application implements Sample {
         cbSlideFromTop.setSelected(true);
         notificationPane.showFromTopProperty().bind(cbSlideFromTop.selectedProperty());
         
-        VBox root = new VBox(20);
+        cbUseDarkTheme = new CheckBox("Use dark theme");
+        cbUseDarkTheme.setSelected(true);
+        cbUseDarkTheme.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent arg0) {
+                updateBar();
+            }
+        });
+        
+        VBox root = new VBox(10);
         root.setPadding(new Insets(50, 0, 0, 10));
-        root.getChildren().addAll(showBtn, cbSlideFromTop);
+        root.getChildren().addAll(showBtn, cbSlideFromTop, cbUseDarkTheme);
         
         notificationPane.setContent(root);
+        updateBar();
         
         return notificationPane;
+    }
+    
+    private void updateBar() {
+        boolean useDarkTheme = cbUseDarkTheme.isSelected();
+        
+        if (useDarkTheme) {
+            notificationPane.setText("Hello World! Using the dark theme");
+            notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+        } else {
+            notificationPane.setText("Hello World! Using the light theme");
+            notificationPane.getStyleClass().remove(NotificationPane.STYLE_CLASS_DARK);
+        }
     }
     
     @Override public void start(Stage stage) {

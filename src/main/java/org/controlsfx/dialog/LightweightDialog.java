@@ -26,7 +26,6 @@
  */
 package org.controlsfx.dialog;
 
-import impl.org.controlsfx.utils.ControlsFXUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -87,7 +86,7 @@ class LightweightDialog extends FXDialog {
         
         Object _owner = incomingOwner;
         
-        Pair<Scene, Parent> owners = impl.org.controlsfx.utils.ControlsFXUtils.getOwners(_owner);
+        Pair<Scene, Parent> owners = org.controlsfx.dialog.DialogUtils.getOwners(_owner);
         this.scene = owners.getKey();
         this.owner = owners.getValue();
         
@@ -298,7 +297,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scenegraph
-        ControlsFXUtils.getChildren(owner.getParent()).setAll(owner);
+        DialogUtils.getChildren(owner.getParent()).setAll(owner);
         
         dialogStack = null;
     }
@@ -308,7 +307,7 @@ class LightweightDialog extends FXDialog {
         
         // modify scene root to install opaque layer and the dialog
         originalParent = scene.getRoot();
-        ControlsFXUtils.buildOverlayPane(scene, originalParent, lightweightDialog, true);
+        DialogUtils.buildOverlayPane(scene, originalParent, lightweightDialog, true);
         
         lightweightDialog.setVisible(true);
         scene.setRoot(dialogStack);
@@ -317,9 +316,9 @@ class LightweightDialog extends FXDialog {
     private void showInParent() {
         installCSSInScene();
         
-        ControlsFXUtils.injectIntoParent(owner, new Callback<Void, Node>() {
+        DialogUtils.injectIntoParent(owner, new Callback<Void, Node>() {
             @Override public Node call(Void v) {
-                ControlsFXUtils.buildOverlayPane(scene, owner, lightweightDialog, true);
+                DialogUtils.buildOverlayPane(scene, owner, lightweightDialog, true);
                 return dialogStack;
             }
         });

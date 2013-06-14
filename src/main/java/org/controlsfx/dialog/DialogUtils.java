@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package impl.org.controlsfx.utils;
+package org.controlsfx.dialog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,7 +42,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
-public class ControlsFXUtils {
+class DialogUtils {
 
     public static Pair<Scene, Parent> getOwners(Object _owner) {
         Scene scene = null;
@@ -121,7 +121,7 @@ public class ControlsFXUtils {
     }
     
     public static void injectIntoParent(Parent owner, Callback<Void, Node> buildCallback) {
-        ObservableList<Node> ownerParentChildren = ControlsFXUtils.getChildren(owner.getParent());
+        ObservableList<Node> ownerParentChildren = DialogUtils.getChildren(owner.getParent());
         
         // we've got the children list, now we need to insert a temporary
         // layout container holding our dialogs and opaque layer / effect

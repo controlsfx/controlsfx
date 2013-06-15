@@ -171,9 +171,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     private class PropertyPane extends GridPane {
         
         public PropertyPane( List<Item> properties ) {
+            this( properties, 0 );
+        }
+        
+        public PropertyPane( List<Item> properties, int nestingLevel ) {
             setVgap(5);
             setHgap(5);
-            setPadding(new Insets(5, 15, 5, 15));
+            setPadding(new Insets(5, 15, 5, 15 + nestingLevel*10 ));
             getStyleClass().add("property-pane");
             setItems(properties);
 //            setGridLinesVisible(true);

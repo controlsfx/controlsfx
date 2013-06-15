@@ -26,43 +26,36 @@
  */
 package org.controlsfx.property.editor;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.layout.Region;
+import javafx.scene.text.Font;
 
 import org.controlsfx.control.PropertySheet.Item;
+import org.controlsfx.dialog.Dialogs;
 
-public abstract class AbstractPropertyEditor<C extends Region> implements PropertyEditor {
+public class FontEditor extends AbstractObjectPropertyEditor<Font, FontObjectEditor> {
 
-    protected final Item property;
-    protected final C control;
-    
-    public AbstractPropertyEditor( Item property, C control) {
-        this( property, control, false );
+    public FontEditor( Item property ) {
+        super(property, new FontObjectEditor());
     }
-    
-    public AbstractPropertyEditor( Item property, C control, boolean readonly ) {
-        this.control = control;
-        this.property = property;
-        if ( !readonly ) {
-            getObservableValue().addListener(new ChangeListener<Object>() {
-                @Override public void changed(ObservableValue<? extends Object> o, Object oldValue, Object newValue) {
-                    AbstractPropertyEditor.this.property.setValue(getValue());
-                }
-            });
-        }
-    }
-        
+
+}
+
+class FontObjectEditor extends AbstractObjectField<Font> {
     
     @Override
-    public C asNode() {
-        return control;
+    protected Class<Font> getType() {
+        return Font.class;
     }
     
-    protected abstract ObservableValue<?> getObservableValue();
+    @Override
+    protected String objectToString( Font font ) {
+        return font == null? "": String.format("%s, %.2f", font.getName(), font.getSize());
+    }
 
-    @Override public Object getValue() {
-        return getObservableValue().getValue();
-    }
     
+    @Override
+    protected Font edit( Font font ) {
+        // TODO: Fully working font selection dialog
+        Dialogs.create().title("Select Font").message("Dialog Editor Here").showConfirm();
+        return font;
+    }
 }

@@ -37,7 +37,7 @@ public class DefaultPropertyEditorFactory implements PropertyEditorFactory {
         }
         
         if ( type != null && type == Font.class ) {
-            return new ObjectViewer( item );
+            return new FontEditor( item );
         }
         
         return null; 

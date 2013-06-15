@@ -26,43 +26,25 @@
  */
 package org.controlsfx.property.editor;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.layout.Region;
+import javafx.scene.control.TextField;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public abstract class AbstractPropertyEditor<T extends Region> implements PropertyEditor {
+public class ObjectViewer extends AbstractPropertyEditor<TextField> {
 
-    protected final Item property;
-    protected final T control;
-    
-    public AbstractPropertyEditor( Item property, T control) {
-        this( property, control, false );
+    public ObjectViewer( Item property ) {
+        super(property, new TextField(), true);
+        control.setEditable(false);
+        control.setDisable(true);
     }
     
-    public AbstractPropertyEditor( Item property, T control, boolean readonly ) {
-        this.control = control;
-        this.property = property;
-        if ( !readonly ) {
-            getObservableValue().addListener(new ChangeListener<Object>() {
-                @Override public void changed(ObservableValue<? extends Object> o, Object oldValue, Object newValue) {
-                    AbstractPropertyEditor.this.property.setValue(getValue());
-                }
-            });
-        }
-    }
-        
-    
-    @Override
-    public T asNode() {
-        return control;
+    @Override protected ObservableValue<?> getObservableValue() {
+        return control.textProperty();
     }
     
-    protected abstract ObservableValue<?> getObservableValue();
+    @Override public void setValue(Object value) {
+        control.setText(value == null? "": value.toString());
+    }
 
-    @Override public Object getValue() {
-        return getObservableValue().getValue();
-    }
-    
 }

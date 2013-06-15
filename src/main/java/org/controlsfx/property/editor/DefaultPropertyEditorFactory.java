@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import org.controlsfx.control.PropertySheet.Item;
 
@@ -35,6 +36,9 @@ public class DefaultPropertyEditorFactory implements PropertyEditorFactory {
             return new ChoiceEditor( item, Arrays.<Object>asList( type.getEnumConstants()) );
         }
         
+        if ( type != null && type == Font.class ) {
+            return new ObjectViewer( item );
+        }
         
         return null; 
         

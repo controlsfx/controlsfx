@@ -53,6 +53,7 @@ import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.property.editor.ObjectViewer;
 import org.controlsfx.property.editor.PropertyEditor;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
@@ -278,15 +279,11 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         private Region getEditor( Item item ) {
             
             PropertyEditor editor = getSkinnable().getPropertyEditorFactory().getEditor(item);
-            if ( editor != null ) {
-                editor.setValue(item.getValue());
-                return editor.asNode();
-            } else {
-                TextField message = new TextField("No suitable editor found");
-                message.setEditable(false);
-                message.setDisable(true);
-                return message;
+            if ( editor == null ) {
+                editor = new ObjectViewer(item);
             }
+            editor.setValue(item.getValue());
+            return editor.asNode();
             
         }
         

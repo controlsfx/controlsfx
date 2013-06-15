@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
@@ -39,13 +40,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
+import org.controlsfx.control.PropertySheet.Mode;
+import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.editor.PropertyEditor;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
@@ -67,6 +74,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
+    private final BorderPane content = new BorderPane();
     private final ScrollPane scroller = new ScrollPane();
     
     /**************************************************************************
@@ -79,20 +87,43 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         super(control, new BehaviorBase<>(control));
         
         scroller.setFitToWidth(true);
-        getChildren().add(scroller);
+
+        ToolBar toolbar = new ToolBar();
+        toolbar.managedProperty().bind(toolbar.visibleProperty());
+        
+        // property sheet mode control
+        SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
+                new ActionChangeMode(Mode.NAME),
+                new ActionChangeMode(Mode.CATEGORY)
+        );
+        segmentedButton.getButtons().get(getSkinnable().modeProperty().get().ordinal()).setSelected(true);
+        toolbar.getItems().add(segmentedButton);
+        toolbar.visibleProperty().bind(control.toolbarVisible());
+        
+        // property sheet search
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search");
+        getSkinnable().titleFilter().bind(searchField.textProperty());
+        toolbar.getItems().add(searchField);
+        
+        content.setTop(toolbar);
+        content.setCenter(scroller);
+        
+        getChildren().add(content);
               
         
         // setup listeners
         registerChangeListener(control.modeProperty(), "MODE");
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
+        registerChangeListener(control.toolbarVisible(), "TOOLBAR");
+        
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
                 refreshProperties();
             }
         });
-        
         
         
     }
@@ -109,10 +140,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
         }
+        if (p == "TOOLBAR") {
+            content.requestLayout();
+        }
     }
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {
-        scroller.resizeRelocate(x, y, w, h);
+        content.resizeRelocate(x, y, w, h);
     }
 
 
@@ -159,14 +193,35 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             
             default: return new PropertyPane(getSkinnable().getItems());
         }
+        
     }
 
-
+    private String capitalize( String s ) {
+        return s.substring(0,1).toUpperCase() + s.substring(1).toLowerCase();
+    }
+    
     /**************************************************************************
      * 
      * Support classes / enums
      * 
      **************************************************************************/
+    
+    private class ActionChangeMode extends AbstractAction {
+        
+        private PropertySheet.Mode mode;
+        
+        public ActionChangeMode( PropertySheet.Mode mode ) {
+            super("By " + capitalize(mode.toString()));
+            this.mode = mode;
+        }
+
+        @Override public void execute(ActionEvent ae) {
+            getSkinnable().modeProperty().set(mode);
+        }
+        
+        
+    }
+    
     
     private class PropertyPane extends GridPane {
         

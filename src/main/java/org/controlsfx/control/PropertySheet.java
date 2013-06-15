@@ -27,6 +27,10 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
+
+import java.util.function.Predicate;
+
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -40,6 +44,12 @@ import org.controlsfx.property.editor.PropertyEditorFactory;
 public class PropertySheet extends Control {
     
     private final ObservableList<Item> properties = FXCollections.observableArrayList();
+    
+    public static final Predicate<Item> PREDICATE_ALL = new Predicate<PropertySheet.Item>() {
+        @Override public boolean test(Item t) {
+            return true;
+        }
+    };
     
     public PropertySheet() {
         getStyleClass().add("property-sheet");
@@ -78,6 +88,19 @@ public class PropertySheet extends Control {
     
     public final void setPropertyEditorFactory( PropertyEditorFactory factory ) {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
+    }
+    
+    private final SimpleObjectProperty<Predicate<Item>> filterPredicate = new SimpleObjectProperty<Predicate<Item>>(PREDICATE_ALL);
+    
+    public final SimpleObjectProperty<Predicate<Item>> filterPredicate() {
+        return filterPredicate;
+    }
+    
+    
+    private final SimpleBooleanProperty toolbarVisible = new SimpleBooleanProperty(true);
+    
+    public final SimpleBooleanProperty toolbarVisible() {
+        return toolbarVisible;
     }
     
     private final SimpleStringProperty titleFilter  = new SimpleStringProperty("");

@@ -38,6 +38,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -123,13 +124,6 @@ public class HelloPropertySheet extends Application implements Sample {
         VBox infoPane = new VBox(10);
         infoPane.setPadding( new Insets(20,20,20,20));
         
-        SegmentedButton modeSelector = ActionUtils.createSegmentedButton(
-                new ActionModeChange("Arrange By Name", Mode.NAME),
-                new ActionModeChange("Array By Category", Mode.CATEGORY));
-
-        infoPane.getChildren().add(modeSelector);
-        modeSelector.getButtons().get(0).fire();
-        
         Button button = new Button("Title");
         TextField textField = new TextField();
         SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
@@ -139,15 +133,14 @@ public class HelloPropertySheet extends Application implements Sample {
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();
         
+        CheckBox toolbarVisible = new CheckBox("Toolbar visible");
+        toolbarVisible.selectedProperty().bindBidirectional( propertySheet.toolbarVisible() );
+        
+        infoPane.getChildren().add(toolbarVisible);
         infoPane.getChildren().add(segmentedButton);
         infoPane.getChildren().add(button);
         infoPane.getChildren().add(textField);
         
-        TextField searchField = new TextField();
-        searchField.setPromptText("Filter properties");
-        propertySheet.titleFilter().bind(searchField.textProperty());
-        
-        infoPane.getChildren().add(searchField);
         
         
         SplitPane pane = new SplitPane();

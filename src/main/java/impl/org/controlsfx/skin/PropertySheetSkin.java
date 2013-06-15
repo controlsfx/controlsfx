@@ -116,7 +116,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.modeProperty(), "MODE");
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
-        registerChangeListener(control.toolbarVisible(), "TOOLBAR");
         
         
         control.getItems().addListener( new ListChangeListener<Item>() {
@@ -139,9 +138,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         super.handleControlPropertyChanged(p);
         if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
-        }
-        if (p == "TOOLBAR") {
-            content.requestLayout();
         }
     }
     

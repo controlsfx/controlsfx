@@ -90,13 +90,6 @@ public class PropertySheet extends Control {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
     
-    private final SimpleObjectProperty<Predicate<Item>> filterPredicate = new SimpleObjectProperty<Predicate<Item>>(PREDICATE_ALL);
-    
-    public final SimpleObjectProperty<Predicate<Item>> filterPredicate() {
-        return filterPredicate;
-    }
-    
-    
     private final SimpleBooleanProperty toolbarVisible = new SimpleBooleanProperty(true);
     
     public final SimpleBooleanProperty toolbarVisible() {

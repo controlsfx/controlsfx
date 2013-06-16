@@ -61,6 +61,14 @@ public class PropertySheet extends Control {
     	return modeProperty;
     }
     
+    public Mode getMode() {
+        return modeProperty.get();
+    }
+    
+    public void setMode(Mode mode) {
+        modeProperty.set(mode);
+    }
+    
     public enum Mode {
         NAME,
         CATEGORY
@@ -87,12 +95,27 @@ public class PropertySheet extends Control {
         return toolbarVisible;
     }
     
+    public boolean isToolbarVisible() {
+        return toolbarVisible.get();
+    }
+    
+    public void setToolbarVisible( boolean visible ) {
+        toolbarVisible.set(visible);
+    }
+    
     private final SimpleStringProperty titleFilter  = new SimpleStringProperty("");
     
     public final SimpleStringProperty titleFilter() {
         return titleFilter;
     }
     
+    public String getTitleFilter() {
+        return titleFilter.get();
+    }
+    
+    public void setTitleFilter( String filter ) {
+        titleFilter.set(filter);
+    }
     
     @Override protected String getUserAgentStylesheet() {
         return getClass().getResource("propertysheet.css").toExternalForm();

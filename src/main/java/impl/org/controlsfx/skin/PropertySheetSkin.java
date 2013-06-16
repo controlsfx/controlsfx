@@ -77,6 +77,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private final BorderPane content = new BorderPane();
     private final ScrollPane scroller = new ScrollPane();
+    private final ToolBar toolbar = new ToolBar();
     
     /**************************************************************************
      * 
@@ -88,8 +89,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         super(control, new BehaviorBase<>(control));
         
         scroller.setFitToWidth(true);
-
-        ToolBar toolbar = new ToolBar();
+        
         toolbar.managedProperty().bind(toolbar.visibleProperty());
         
         // property sheet mode control
@@ -99,7 +99,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         );
         segmentedButton.getButtons().get(getSkinnable().modeProperty().get().ordinal()).setSelected(true);
         toolbar.getItems().add(segmentedButton);
-        toolbar.visibleProperty().bind(control.toolbarVisible());
         
         // property sheet search
         TextField searchField = new TextField();
@@ -117,6 +116,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.modeProperty(), "MODE");
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
+        registerChangeListener(control.titleFilter(), "TOOLBAR");
         
         
         control.getItems().addListener( new ListChangeListener<Item>() {
@@ -139,6 +139,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         super.handleControlPropertyChanged(p);
         if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
+        }
+        
+        if (p == "TOOLBAR") {
+            toolbar.visibleProperty().set(getSkinnable().toolbarVisible().get());
         }
     }
     

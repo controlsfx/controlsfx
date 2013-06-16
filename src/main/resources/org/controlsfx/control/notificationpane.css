@@ -56,21 +56,19 @@
  * 
  *****************************************************************************/
 .notification-pane .notification-bar .close-button {
-    -fx-background-color: transparent transparent;
-    -fx-background-insets: 0, 1;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
     -fx-background-radius: 2;
     -fx-padding: 0 0 0 0;
     -fx-alignment: center;
 }
 
 .notification-pane .notification-bar .close-button:hover {
-    -fx-background-color: linear-gradient(#505050,#2d2d2d),
-                          linear-gradient(#a3a3a3, #8b8b8b 34%, #777777 36%, #777777 63%, #8b8b8b 65%, #adadad);
+    -fx-background-color: linear-gradient(#a3a3a3, #8b8b8b 34%, #777777 36%, #777777 63%, #8b8b8b 65%, #adadad);
 }
 
 .notification-pane .notification-bar .close-button:pressed {
-    -fx-background-color: linear-gradient(#515151,#202020),
-                          linear-gradient(#a3a3a3, #8b8b8b 34%, #777777 36%, #777777 63%, #8b8b8b 65%, #adadad);
+    -fx-background-color: linear-gradient(#a3a3a3, #8b8b8b 34%, #777777 36%, #777777 63%, #8b8b8b 65%, #adadad);
 }
 
 .notification-pane .notification-bar .close-button > .graphic {

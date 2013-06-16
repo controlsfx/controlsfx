@@ -78,6 +78,12 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     private final BorderPane content = new BorderPane();
     private final ScrollPane scroller = new ScrollPane();
     private final ToolBar toolbar = new ToolBar();
+    private final SegmentedButton modeButton = ActionUtils.createSegmentedButton(
+        new ActionChangeMode(Mode.NAME),
+        new ActionChangeMode(Mode.CATEGORY)
+    );
+    private final TextField searchField = new TextField();
+    
     
     /**************************************************************************
      * 
@@ -92,17 +98,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         toolbar.managedProperty().bind(toolbar.visibleProperty());
         
-        // property sheet mode control
-        SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
-                new ActionChangeMode(Mode.NAME),
-                new ActionChangeMode(Mode.CATEGORY)
-        );
-        segmentedButton.getButtons().get(getSkinnable().modeProperty().get().ordinal()).setSelected(true);
-        toolbar.getItems().add(segmentedButton);
+       // property sheet mode
+        modeButton.managedProperty().bind(modeButton.visibleProperty());
+        modeButton.getButtons().get(getSkinnable().modeProperty().get().ordinal()).setSelected(true);
+        toolbar.getItems().add(modeButton);
         
         // property sheet search
-        TextField searchField = new TextField();
         searchField.setPromptText("Search");
+        searchField.managedProperty().bind(searchField.visibleProperty());
         getSkinnable().titleFilter().bind(searchField.textProperty());
         toolbar.getItems().add(searchField);
         
@@ -116,7 +119,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.modeProperty(), "MODE");
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
-        registerChangeListener(control.titleFilter(), "TOOLBAR");
+        registerChangeListener(control.toolbarVisibleProperty(), "TOOLBAR");
+        registerChangeListener(control.toolbarModeVisibleProperty(), "TOOLBAR-MODE");
+        registerChangeListener(control.toolbarSearchVisibleProperty(), "TOOLBAR-SEARCH");
         
         
         control.getItems().addListener( new ListChangeListener<Item>() {
@@ -140,9 +145,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
         }
-        
         if (p == "TOOLBAR") {
-            toolbar.visibleProperty().set(getSkinnable().toolbarVisible().get());
+            toolbar.setVisible(getSkinnable().isToolbarVisible());
+        }
+        if (p == "TOOLBAR-MODE") {
+            modeButton.setVisible(getSkinnable().isToolbarModeVisible());
+        }
+        if (p == "TOOLBAR-SEARCH") {
+            searchField.setVisible(getSkinnable().isToolbarSearchVisible());
         }
     }
     

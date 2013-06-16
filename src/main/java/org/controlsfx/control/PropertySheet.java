@@ -55,70 +55,9 @@ public class PropertySheet extends Control {
         return properties;
     }
     
-    private final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
-    
-    public final SimpleObjectProperty<Mode> modeProperty() {
-    	return modeProperty;
-    }
-    
-    public Mode getMode() {
-        return modeProperty.get();
-    }
-    
-    public void setMode(Mode mode) {
-        modeProperty.set(mode);
-    }
-    
     public enum Mode {
         NAME,
         CATEGORY
-    }
-
-    private final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory = 
-            new SimpleObjectProperty<PropertyEditorFactory>( new DefaultPropertyEditorFactory());
-    
-    public final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory() {
-        return propertyEditorFactory;
-    }
-    
-    public final PropertyEditorFactory getPropertyEditorFactory() {
-        return propertyEditorFactory.get();
-    }
-    
-    public final void setPropertyEditorFactory( PropertyEditorFactory factory ) {
-        propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
-    }
-    
-    private final SimpleBooleanProperty toolbarVisible = new SimpleBooleanProperty(true);
-    
-    public final SimpleBooleanProperty toolbarVisible() {
-        return toolbarVisible;
-    }
-    
-    public boolean isToolbarVisible() {
-        return toolbarVisible.get();
-    }
-    
-    public void setToolbarVisible( boolean visible ) {
-        toolbarVisible.set(visible);
-    }
-    
-    private final SimpleStringProperty titleFilter  = new SimpleStringProperty("");
-    
-    public final SimpleStringProperty titleFilter() {
-        return titleFilter;
-    }
-    
-    public String getTitleFilter() {
-        return titleFilter.get();
-    }
-    
-    public void setTitleFilter( String filter ) {
-        titleFilter.set(filter);
-    }
-    
-    @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("propertysheet.css").toExternalForm();
     }
     
     
@@ -137,5 +76,101 @@ public class PropertySheet extends Control {
         void setValue( Object value );
        
    }
+    
+    // modeProperty 
+    private final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
+    
+    public final SimpleObjectProperty<Mode> modeProperty() {
+    	return modeProperty;
+    }
+    
+    public Mode getMode() {
+        return modeProperty.get();
+    }
+    
+    public void setMode(Mode mode) {
+        modeProperty.set(mode);
+    }
+  
+
+    //propertyEditorFactory
+    private final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory = 
+            new SimpleObjectProperty<PropertyEditorFactory>( new DefaultPropertyEditorFactory());
+    
+    public final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory() {
+        return propertyEditorFactory;
+    }
+    
+    public final PropertyEditorFactory getPropertyEditorFactory() {
+        return propertyEditorFactory.get();
+    }
+    
+    public final void setPropertyEditorFactory( PropertyEditorFactory factory ) {
+        propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
+    }
+    
+    //toolbarVisibleProperty
+    private final SimpleBooleanProperty toolbarVisibleProperty = new SimpleBooleanProperty(true);
+    
+    public final SimpleBooleanProperty toolbarVisibleProperty() {
+        return toolbarVisibleProperty;
+    }
+    
+    public boolean isToolbarVisible() {
+        return toolbarVisibleProperty.get();
+    }
+    
+    public void setToolbarVisible( boolean visible ) {
+        toolbarVisibleProperty.set(visible);
+    }
+    
+    //toolbarModeVisibleProperty
+    private final SimpleBooleanProperty toolbarModeVisibleProperty = new SimpleBooleanProperty(true);
+    
+    public final SimpleBooleanProperty toolbarModeVisibleProperty() {
+        return toolbarModeVisibleProperty;
+    }
+    
+    public boolean isToolbarModeVisible() {
+        return toolbarModeVisibleProperty.get();
+    }
+    
+    public void setToolbarModeVisible( boolean visible ) {
+        toolbarModeVisibleProperty.set(visible);
+    }
+    
+    //toolbarSearchVisibleProperty
+    private final SimpleBooleanProperty toolbarSearchVisibleProperty = new SimpleBooleanProperty(true);
+    
+    public final SimpleBooleanProperty toolbarSearchVisibleProperty() {
+        return toolbarSearchVisibleProperty;
+    }
+    
+    public boolean isToolbarSearchVisible() {
+        return toolbarSearchVisibleProperty.get();
+    }
+    
+    public void setToolbarSearchVisible( boolean visible ) {
+        toolbarSearchVisibleProperty.set(visible);
+    }   
+    
+    //titleFilterProperty
+    private final SimpleStringProperty titleFilterProperty  = new SimpleStringProperty("");
+    
+    public final SimpleStringProperty titleFilter() {
+        return titleFilterProperty;
+    }
+    
+    public String getTitleFilter() {
+        return titleFilterProperty.get();
+    }
+    
+    public void setTitleFilter( String filter ) {
+        titleFilterProperty.set(filter);
+    }
+    
+    @Override protected String getUserAgentStylesheet() {
+        return getClass().getResource("propertysheet.css").toExternalForm();
+    }
     
 }

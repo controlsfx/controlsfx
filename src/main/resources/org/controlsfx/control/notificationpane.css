@@ -4,9 +4,15 @@
  * 
  *****************************************************************************/
 
-.notification-pane .notification-bar {
+.notification-pane:top .notification-bar {
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 0 0 0 0, 0 0 1 0, 0 0 2 0;
+    -fx-padding: 0 7 0 7;
+}
+
+.notification-pane:bottom .notification-bar {
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0 0 0 0, 1 0 0 0, 2 0 0 0;
     -fx-padding: 0 7 0 7;
 }
 
@@ -42,11 +48,17 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 0, 3);
 }
 
-/* NotificationPane shows from the bottom, so put shadow at top of bar */
+/* 
+ * We could have a drop shadow at the top of the bar when it appears from the
+ * bottom, but it doesn't look right as the gradient is running in the opposite
+ * direction of the drop shadow. Therefore, the following is commented out,
+ * but it can always be re-enabled in the future if desired.
+ */
+ /*
 .notification-pane:bottom .notification-bar {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 0, -3);
 }
-
+*/
 
 
 

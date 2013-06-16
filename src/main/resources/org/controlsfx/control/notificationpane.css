@@ -5,8 +5,10 @@
  *****************************************************************************/
 
 .notification-pane .notification-bar {
-    -fx-background-color: linear-gradient(#cccccc, #bababa 37%, #a6a6a6);
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0 0 0 0, 0 0 1 0, 0 0 2 0;
     -fx-padding: 0 7 0 7;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 3, 3);
 }
 
 .notification-pane .notification-bar .label {
@@ -29,6 +31,22 @@
     -fx-text-fill: #ebebeb;
 }
 
+
+/******************************************************************************
+ * 
+ * Drop shadow support
+ * 
+ *****************************************************************************/
+
+/* NotificationPane shows from the top, so put shadow at bottom of bar */
+.notification-pane:top .notification-bar {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 0, 3);
+}
+
+/* NotificationPane shows from the bottom, so put shadow at top of bar */
+.notification-pane:bottom .notification-bar {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 0, -3);
+}
 
 
 

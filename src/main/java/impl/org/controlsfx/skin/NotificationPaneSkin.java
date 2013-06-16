@@ -111,7 +111,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         
         if (getSkinnable().isShowFromTop()) {
             // place at top of area
-            notificationBar.resizeRelocate(x, y, w, notificationBarHeight);
+            notificationBar.resizeRelocate(x, y - (1 - notificationBar.transition.get()) * notificationBarHeight, w, notificationBarHeight);
         } else {
             // place at bottom of area
             notificationBar.resizeRelocate(x, h - notificationBarHeight, w, notificationBarHeight);
@@ -161,7 +161,6 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         private final Button closeBtn;
         
         private final GridPane pane;
-        private Rectangle clip;
 
         public NotificationBar(final NotificationPane notificationPane) {
             this.notificationPane = notificationPane;
@@ -172,15 +171,12 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             pane.setVisible(notificationPane.isShowing());
             getChildren().setAll(pane);
             
-            // use a clip so things don't go outside the bar area
-            clip = new Rectangle();
-            pane.setClip(clip);
-            
             // initialise label area
             label = new Label();
             label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             GridPane.setVgrow(label, Priority.ALWAYS);
             GridPane.setHgrow(label, Priority.ALWAYS);
+            
             label.setText(notificationPane.getText());
             label.setGraphic(notificationPane.getGraphic());
             label.opacityProperty().bind(transition);
@@ -225,18 +221,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         @Override protected void layoutChildren() {
             final double w = getWidth();
             final double h = computePrefHeight(-1);
-            
-            final double t = transition.get();
-            double actualHeight = t * h;
-            
-            if (notificationPane.isShowFromTop()) {
-                pane.resizeRelocate(0, 0, w, actualHeight);
-            } else {
-                pane.resizeRelocate(0, h - actualHeight, w, actualHeight);
-            }
-            
-            clip.setWidth(w);
-            clip.setHeight(actualHeight);
+            pane.resize(w, h);
         }
         
         @Override protected double computeMinHeight(double width) {
@@ -244,7 +229,11 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         }
         
         @Override protected double computePrefHeight(double width) {
-            return Math.max(pane.prefHeight(width), MIN_HEIGHT) * transition.get();
+            if (notificationPane.isShowFromTop()) {
+                return MIN_HEIGHT; 
+            } else {
+                return Math.max(pane.prefHeight(width), MIN_HEIGHT) * transition.get();
+            }
         }
         
         private void show() {

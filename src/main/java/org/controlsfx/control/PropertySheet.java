@@ -27,9 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
-
-import java.util.function.Predicate;
-
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -44,12 +41,6 @@ import org.controlsfx.property.editor.PropertyEditorFactory;
 public class PropertySheet extends Control {
     
     private final ObservableList<Item> properties = FXCollections.observableArrayList();
-    
-    public static final Predicate<Item> PREDICATE_ALL = new Predicate<PropertySheet.Item>() {
-        @Override public boolean test(Item t) {
-            return true;
-        }
-    };
     
     public PropertySheet() {
         getStyleClass().add("property-sheet");

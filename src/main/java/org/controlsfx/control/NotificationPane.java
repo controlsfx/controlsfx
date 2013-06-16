@@ -37,6 +37,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -176,7 +177,7 @@ public class NotificationPane extends Control {
      * @param actions The actions to show in the notification pane.
      */
     public NotificationPane(Node content, String text, Node graphic, Action... actions) {
-        getStyleClass().add("notification-pane");
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
         setContent(content);
         setText(text);
         setGraphic(graphic);
@@ -305,7 +306,12 @@ public class NotificationPane extends Control {
     
     
     // --- show from top
-    private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true);
+    private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true) {
+        protected void invalidated() {
+            pseudoClassStateChanged(SHOW_FROM_TOP_PSEUDOCLASS_STATE,      isShowFromTop());
+            pseudoClassStateChanged(SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE, ! isShowFromTop());
+        }
+    };
     
     /**
      * A property representing whether the notification bar should appear from the
@@ -362,4 +368,19 @@ public class NotificationPane extends Control {
     public void hide() {
         setShowing(false);
     }
+    
+    
+    
+    /**************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
+     
+     private static final String DEFAULT_STYLE_CLASS = "notification-pane";
+     
+     private static final PseudoClass SHOW_FROM_TOP_PSEUDOCLASS_STATE =
+             PseudoClass.getPseudoClass("top");
+     private static final PseudoClass SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE =
+             PseudoClass.getPseudoClass("bottom");
 }

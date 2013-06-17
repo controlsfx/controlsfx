@@ -280,6 +280,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 Region editor = getEditor(item);
                 editor.setMinWidth(MIN_COLUMN_WIDTH);
                 editor.setMaxWidth(Double.MAX_VALUE);
+                label.setLabelFor(editor);
                 add(editor, 1, row);
                 GridPane.setHgrow(editor, Priority.ALWAYS);
                 

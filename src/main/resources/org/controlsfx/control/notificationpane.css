@@ -4,16 +4,17 @@
  * 
  *****************************************************************************/
 
-.notification-pane:top .notification-bar {
+.notification-pane .notification-bar {
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
-    -fx-background-insets: 0 0 0 0, 0 0 1 0, 0 0 2 0;
     -fx-padding: 0 7 0 7;
 }
 
+.notification-pane:top .notification-bar {
+    -fx-background-insets: 0 0 0 0, 0 0 1 0, 0 0 2 0;
+}
+
 .notification-pane:bottom .notification-bar {
-    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 0 0 0 0, 1 0 0 0, 2 0 0 0;
-    -fx-padding: 0 7 0 7;
 }
 
 .notification-pane .notification-bar .label {

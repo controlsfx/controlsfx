@@ -53,6 +53,52 @@ import org.controlsfx.control.action.Action;
  * either from the top or the bottom of the NotificationPane (based on 
  * {@link #showFromTopProperty()}) wherever that may be in the scenegraph.
  * 
+ * <h3>Alternative Styling</h3>
+ * <p>As is visible in the screenshots further down this documentation, 
+ * there are two different styles supported by the NotificationPane control.
+ * Firstly, there is the default style based on the JavaFX Modena look. The 
+ * alternative style is what is currently referred to as the 'dark' look. To 
+ * enable this functionality, simply do the following:
+ * 
+ * <pre>
+ * {@code
+ * NotificationPane notificationPane = new NotificationPane();   
+ * notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+ * }</pre>
+ * 
+ * <h3>Screenshots</h3>
+ * <p>To better explain NotificationPane, here is a table showing both the
+ * default and dark look for the NotificationPane on a Windows machine (although
+ * that shouldn't impact the visuals a great deal). Also, to show the difference
+ * between top and bottom placement, these two modes are also captured in the
+ * screenshots below:
+ * 
+ * <br>
+ * <center>
+ * <table style="border: 1px solid gray; max-width:750px">
+ *   <tr>
+ *     <th width="200"><center><h3>Setting</h3></center></th>
+ *     <th width="520"><center><h3>Screenshot</h3></center></th>
+ *   </tr>
+ *   <tr>
+ *     <td valign="top" style="text-align:center;"><strong>Light theme from top:</strong></td>
+ *     <td><center><img src="notication-pane-light-top.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="top" style="text-align:center;"><strong>Light theme from bottom:</strong></td>
+ *     <td><center><img src="notication-pane-light-bottom.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="top" style="text-align:center;"><strong>Dark theme from top:</strong></td>
+ *     <td><center><img src="notication-pane-dark-top.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="top" style="text-align:center;"><strong>Dark theme from bottom:</strong></td>
+ *     <td><center><img src="notication-pane-dark-bottom.png"></center></td>
+ *   </tr>
+ * </table>
+ * </center>
+ * 
  * <h3>Code Examples</h3>
  * 
  * <p>NotificationPane is a conceptually very simple control - you simply create

@@ -201,6 +201,14 @@ import org.controlsfx.dialog.Dialog.Actions;
  * lightweight dialogs must be made in the
  * {@link Dialog#Dialog(Object, String, boolean)} constructor.
  * 
+ * <p>Shown below is a screenshot of a lightweight dialog whose owner is the
+ * Tab. This means that whilst the first tab is blocked for input until the
+ * dialog is dismissed by the user, the rest of the UI (including going to other
+ * tabs) remains interactive):
+ * 
+ * <br>
+ * <center><img src="lightweight.png"></center>
+ * 
  * <h3>Code Examples</h3>
  * 
  * <p>The code below will setup and show a confirmation dialog:

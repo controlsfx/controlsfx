@@ -96,7 +96,7 @@ public class HelloNotificationPane extends Application implements Sample {
         notificationPane.showFromTopProperty().bind(cbSlideFromTop.selectedProperty());
         
         cbUseDarkTheme = new CheckBox("Use dark theme");
-        cbUseDarkTheme.setSelected(true);
+        cbUseDarkTheme.setSelected(false);
         cbUseDarkTheme.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent arg0) {
                 updateBar();

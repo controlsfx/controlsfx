@@ -84,11 +84,11 @@ public class PropertySheet extends Control {
     	return modeProperty;
     }
     
-    public Mode getMode() {
+    public final Mode getMode() {
         return modeProperty.get();
     }
     
-    public void setMode(Mode mode) {
+    public final void setMode(Mode mode) {
         modeProperty.set(mode);
     }
   
@@ -116,11 +116,11 @@ public class PropertySheet extends Control {
         return toolbarVisibleProperty;
     }
     
-    public boolean isToolbarVisible() {
+    public final boolean isToolbarVisible() {
         return toolbarVisibleProperty.get();
     }
     
-    public void setToolbarVisible( boolean visible ) {
+    public final void setToolbarVisible( boolean visible ) {
         toolbarVisibleProperty.set(visible);
     }
     
@@ -131,11 +131,11 @@ public class PropertySheet extends Control {
         return toolbarModeVisibleProperty;
     }
     
-    public boolean isToolbarModeVisible() {
+    public final boolean isToolbarModeVisible() {
         return toolbarModeVisibleProperty.get();
     }
     
-    public void setToolbarModeVisible( boolean visible ) {
+    public final void setToolbarModeVisible( boolean visible ) {
         toolbarModeVisibleProperty.set(visible);
     }
     
@@ -146,11 +146,11 @@ public class PropertySheet extends Control {
         return toolbarSearchVisibleProperty;
     }
     
-    public boolean isToolbarSearchVisible() {
+    public final boolean isToolbarSearchVisible() {
         return toolbarSearchVisibleProperty.get();
     }
     
-    public void setToolbarSearchVisible( boolean visible ) {
+    public final void setToolbarSearchVisible( boolean visible ) {
         toolbarSearchVisibleProperty.set(visible);
     }   
     
@@ -161,11 +161,11 @@ public class PropertySheet extends Control {
         return titleFilterProperty;
     }
     
-    public String getTitleFilter() {
+    public final String getTitleFilter() {
         return titleFilterProperty.get();
     }
     
-    public void setTitleFilter( String filter ) {
+    public final void setTitleFilter( String filter ) {
         titleFilterProperty.set(filter);
     }
     

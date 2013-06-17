@@ -106,12 +106,11 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         // property sheet search
         searchField.setPromptText("Search");
         searchField.managedProperty().bind(searchField.visibleProperty());
-        getSkinnable().titleFilter().bind(searchField.textProperty());
         toolbar.getItems().add(searchField);
         
+        // layout controls
         content.setTop(toolbar);
         content.setCenter(scroller);
-        
         getChildren().add(content);
               
         
@@ -119,10 +118,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.modeProperty(), "MODE");
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
+        registerChangeListener(searchField.textProperty(), "FILTER-UI");
         registerChangeListener(control.toolbarVisibleProperty(), "TOOLBAR");
         registerChangeListener(control.toolbarModeVisibleProperty(), "TOOLBAR-MODE");
         registerChangeListener(control.toolbarSearchVisibleProperty(), "TOOLBAR-SEARCH");
-        
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
@@ -144,6 +143,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         super.handleControlPropertyChanged(p);
         if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
+        }
+        if (p == "FILTER-UI") {
+            getSkinnable().setTitleFilter(searchField.getText());
         }
         if (p == "TOOLBAR") {
             toolbar.setVisible(getSkinnable().isToolbarVisible());

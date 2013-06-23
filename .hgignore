@@ -1,6 +1,5 @@
 syntax: glob
 *.class
-*.jar
 *.iml
 .DS_Store
 build/*

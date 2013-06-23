@@ -82,6 +82,10 @@ task javadocJar(type: Jar) {
     classifier = 'javadoc'
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.6'
+}
+
 artifacts {
     archives sourceJar
     archives javadocJar

@@ -278,33 +278,30 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 
                 add(label, 0, row);
 
-             // setup property editor
-                Region editor = getEditor(item);
-                editor.setMinWidth(MIN_COLUMN_WIDTH);
-                editor.setMaxWidth(Double.MAX_VALUE);
+                // setup property editor
+                Node editor = getEditor(item);
+                
+                if (editor instanceof Region) {
+                    ((Region)editor).setMinWidth(MIN_COLUMN_WIDTH);
+                    ((Region)editor).setMaxWidth(Double.MAX_VALUE);
+                }
                 label.setLabelFor(editor);
                 add(editor, 1, row);
                 GridPane.setHgrow(editor, Priority.ALWAYS);
                 
-              //TODO add support for recursive properties
+                //TODO add support for recursive properties
                 
                 row++;
-                
             }
         }
         
-        private Region getEditor( Item item ) {
-            
+        private Node getEditor( Item item ) {
             PropertyEditor editor = getSkinnable().getPropertyEditorFactory().getEditor(item);
             if ( editor == null ) {
                 editor = new ObjectViewer(item);
             }
             editor.setValue(item.getValue());
             return editor.asNode();
-            
         }
-        
-        
     }
-
 }

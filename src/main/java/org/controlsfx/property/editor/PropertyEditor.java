@@ -26,12 +26,12 @@
  */
 package org.controlsfx.property.editor;
 
-import javafx.scene.layout.Region;
+import javafx.scene.Node;
 
 
 public interface PropertyEditor {
 
-    Region asNode();
+    Node asNode();
     
     Object getValue();
     void setValue( Object value );

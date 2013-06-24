@@ -41,27 +41,32 @@ import org.controlsfx.property.editor.PropertyEditor;
 
 public class PropertySheet extends Control {
     
-    private final ObservableList<Item> properties = FXCollections.observableArrayList();
     
-    public PropertySheet() {
-        getStyleClass().add("property-sheet");
-        modeProperty.set(Mode.NAME);
-    }
+    /**************************************************************************
+     * 
+     * Static fields
+     * 
+     **************************************************************************/
     
-    @Override protected Skin<?> createDefaultSkin() {
-        return new PropertySheetSkin(this);
-    }
     
-    public ObservableList<Item> getItems() {
-        return properties;
-    }
     
-    public enum Mode {
+    /**************************************************************************
+     * 
+     * Static enumerations / interfaces
+     * 
+     **************************************************************************/
+    
+    /**
+     * 
+     */
+    public static enum Mode {
         NAME,
         CATEGORY
     }
     
-    
+    /**
+     * 
+     */
     public static interface Item {
         
         Class<?> getType();
@@ -74,12 +79,70 @@ public class PropertySheet extends Control {
         
         Object getValue();
         
-        void setValue( Object value );
-       
+        void setValue(Object value);
    }
     
-    // modeProperty 
-    private final SimpleObjectProperty<Mode> modeProperty = new SimpleObjectProperty<>();
+    
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
+    
+    private final ObservableList<Item> items = FXCollections.observableArrayList();
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
+    
+    public PropertySheet() {
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
+    }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
+    
+    /**
+     * 
+     * @return
+     */
+    public ObservableList<Item> getItems() {
+        return items;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override protected Skin<?> createDefaultSkin() {
+        return new PropertySheetSkin(this);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override protected String getUserAgentStylesheet() {
+        return PropertySheet.class.getResource("propertysheet.css").toExternalForm();
+    }
+    
+    
+    /**************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
+    
+    // --- modeProperty 
+    private final SimpleObjectProperty<Mode> modeProperty = 
+            new SimpleObjectProperty<>(this, "mode", Mode.NAME);
     
     public final SimpleObjectProperty<Mode> modeProperty() {
     	return modeProperty;
@@ -94,10 +157,9 @@ public class PropertySheet extends Control {
     }
   
 
-    //propertyEditorFactory
-    // PropertyEditor getEditor( Item propertySheetItem  );
+    // --- propertyEditorFactory
     private final SimpleObjectProperty<Callback<Item, PropertyEditor>> propertyEditorFactory = 
-            new SimpleObjectProperty<Callback<Item, PropertyEditor>>( new DefaultPropertyEditorFactory());
+            new SimpleObjectProperty<Callback<Item, PropertyEditor>>(this, "propertyEditor", new DefaultPropertyEditorFactory());
     
     public final SimpleObjectProperty<Callback<Item, PropertyEditor>> propertyEditorFactory() {
         return propertyEditorFactory;
@@ -111,8 +173,10 @@ public class PropertySheet extends Control {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
     
-    //toolbarVisibleProperty
-    private final SimpleBooleanProperty toolbarVisibleProperty = new SimpleBooleanProperty(true);
+    
+    // --- toolbarVisibleProperty
+    private final SimpleBooleanProperty toolbarVisibleProperty = 
+            new SimpleBooleanProperty(this, "toolbarVisible", true);
     
     public final SimpleBooleanProperty toolbarVisibleProperty() {
         return toolbarVisibleProperty;
@@ -126,8 +190,10 @@ public class PropertySheet extends Control {
         toolbarVisibleProperty.set(visible);
     }
     
-    //toolbarModeVisibleProperty
-    private final SimpleBooleanProperty toolbarModeVisibleProperty = new SimpleBooleanProperty(true);
+    
+    // --- toolbarModeVisibleProperty
+    private final SimpleBooleanProperty toolbarModeVisibleProperty = 
+            new SimpleBooleanProperty(this, "toolbarModeVisible",true);
     
     public final SimpleBooleanProperty toolbarModeVisibleProperty() {
         return toolbarModeVisibleProperty;
@@ -141,8 +207,10 @@ public class PropertySheet extends Control {
         toolbarModeVisibleProperty.set(visible);
     }
     
-    //toolbarSearchVisibleProperty
-    private final SimpleBooleanProperty toolbarSearchVisibleProperty = new SimpleBooleanProperty(true);
+    
+    // --- toolbarSearchVisibleProperty
+    private final SimpleBooleanProperty toolbarSearchVisibleProperty = 
+            new SimpleBooleanProperty(this, "toolbarSearchVisible", true);
     
     public final SimpleBooleanProperty toolbarSearchVisibleProperty() {
         return toolbarSearchVisibleProperty;
@@ -156,8 +224,10 @@ public class PropertySheet extends Control {
         toolbarSearchVisibleProperty.set(visible);
     }   
     
-    //titleFilterProperty
-    private final SimpleStringProperty titleFilterProperty  = new SimpleStringProperty("");
+     
+    // --- titleFilterProperty
+    private final SimpleStringProperty titleFilterProperty = 
+            new SimpleStringProperty(this, "titleFilter", "");
     
     public final SimpleStringProperty titleFilter() {
         return titleFilterProperty;
@@ -171,8 +241,15 @@ public class PropertySheet extends Control {
         titleFilterProperty.set(filter);
     }
     
-    @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("propertysheet.css").toExternalForm();
-    }
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
+
+    private static final String DEFAULT_STYLE_CLASS = "property-sheet";
+    
     
 }

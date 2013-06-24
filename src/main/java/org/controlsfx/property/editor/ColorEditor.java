@@ -32,20 +32,29 @@ import javafx.scene.paint.Color;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public class ColorEditor extends AbstractPropertyEditor< ColorPicker> {
+/**
+ * A {@link PropertyEditor} that is suitable for use for editing 
+ * {@link Color} properties.
+ */
+public class ColorEditor extends AbstractPropertyEditor<ColorPicker> {
 
     public ColorEditor( Item property ) {
         super(property, new ColorPicker());
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override protected ObservableValue<?> getObservableValue() {
         return control.valueProperty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override public void setValue(Object value) {
         if ( value instanceof Color ) {
            control.setValue((Color) value);
         }
     }
-
 }

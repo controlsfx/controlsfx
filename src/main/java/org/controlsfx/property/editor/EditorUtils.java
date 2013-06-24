@@ -38,7 +38,6 @@ class EditorUtils {
     }
     
     public static void enableAutoSelectAll(final TextInputControl control) {
-
         control.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override public void changed(ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
@@ -51,5 +50,4 @@ class EditorUtils {
             }
         });
     }
-    
 }

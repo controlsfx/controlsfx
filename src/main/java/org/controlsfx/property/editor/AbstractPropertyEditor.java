@@ -44,7 +44,7 @@ public abstract class AbstractPropertyEditor<C extends Region> implements Proper
     public AbstractPropertyEditor( Item property, C control, boolean readonly ) {
         this.control = control;
         this.property = property;
-        if ( !readonly ) {
+        if (! readonly) {
             getObservableValue().addListener(new ChangeListener<Object>() {
                 @Override public void changed(ObservableValue<? extends Object> o, Object oldValue, Object newValue) {
                     AbstractPropertyEditor.this.property.setValue(getValue());
@@ -52,15 +52,19 @@ public abstract class AbstractPropertyEditor<C extends Region> implements Proper
             });
         }
     }
-        
     
-    @Override
-    public C getEditor() {
+    protected abstract ObservableValue<?> getObservableValue();
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override public C getEditor() {
         return control;
     }
     
-    protected abstract ObservableValue<?> getObservableValue();
-
+    /**
+     * {@inheritDoc}
+     */
     @Override public Object getValue() {
         return getObservableValue().getValue();
     }

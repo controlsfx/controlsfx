@@ -34,6 +34,10 @@ import javafx.scene.control.ComboBox;
 
 import org.controlsfx.control.PropertySheet.Item;
 
+/**
+ * A {@link PropertyEditor} that is suitable for use for selecting from a
+ * limited range of choices.
+ */
 public class ChoiceEditor extends AbstractPropertyEditor<ComboBox<Object>> {
 
     public ChoiceEditor( Item property, Collection<Object> choices ) {
@@ -41,12 +45,17 @@ public class ChoiceEditor extends AbstractPropertyEditor<ComboBox<Object>> {
         control.setItems(FXCollections.observableArrayList(choices));
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override protected ObservableValue<?> getObservableValue() {
         return control.selectionModelProperty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override public void setValue(Object value) {
-          control.getSelectionModel().select(value);
+        control.getSelectionModel().select(value);
     }
-
 }

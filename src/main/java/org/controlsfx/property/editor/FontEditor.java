@@ -31,36 +31,21 @@ import javafx.scene.text.Font;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
 
-public class FontEditor extends AbstractObjectPropertyEditor<Font, FontObjectEditor> {
+public class FontEditor extends AbstractObjectPropertyEditor<Font, AbstractObjectField<Font>> {
 
-    public FontEditor( Item property ) {
-        super(property, new FontObjectEditor());
-    }
+    public FontEditor(Item property) {
+        super(property, new AbstractObjectField<Font>() {
+            @Override protected Class<Font> getType() {
+                return Font.class;
+            }
+            
+            @Override protected String objectToString( Font font ) {
+                return font == null? "": String.format("%s, %.1f", font.getName(), font.getSize());
+            }
 
-}
-
-class FontObjectEditor extends AbstractObjectField<Font> {
-    
-    @Override
-    protected Class<Font> getType() {
-        return Font.class;
+            @Override protected Font edit( Font font ) {
+                return Dialogs.create().owner(this.getScene().getWindow()).showFontSelector(font);
+            }
+        });
     }
-    
-    @Override
-    protected String objectToString( Font font ) {
-        return font == null? "": String.format("%s, %.1f", font.getName(), font.getSize());
-    }
-
-    
-    
-    
-    @Override
-    protected Font edit( Font font ) {
-        return Dialogs.create().owner(this.getScene().getWindow()).showFontSelector(font);
-    }
-    
-    
-    
-    
-    
 }

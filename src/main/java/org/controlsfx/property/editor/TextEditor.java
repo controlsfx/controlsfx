@@ -31,6 +31,9 @@ import javafx.scene.control.TextField;
 
 import org.controlsfx.control.PropertySheet.Item;
 
+/**
+ * A {@link PropertyEditor} that is suitable for use for editing string properties.
+ */
 public class TextEditor extends AbstractPropertyEditor<TextField> {
 
     public TextEditor( Item property ) {
@@ -38,14 +41,19 @@ public class TextEditor extends AbstractPropertyEditor<TextField> {
         EditorUtils.enableAutoSelectAll(control);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override protected StringProperty getObservableValue() {
         return control.textProperty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override public void setValue(Object value) {
         if ( value instanceof String ) {
            control.setText((String)value);
         }
     }
-
 }

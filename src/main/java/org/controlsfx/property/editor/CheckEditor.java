@@ -31,16 +31,25 @@ import javafx.scene.control.CheckBox;
 
 import org.controlsfx.control.PropertySheet.Item;
 
+/**
+ * A {@link PropertyEditor} that is suitable for use for editing boolean properties.
+ */
 public class CheckEditor extends AbstractPropertyEditor<CheckBox> {
 
     public CheckEditor( Item property ) {
         super(property, new CheckBox());
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override protected ObservableValue<?> getObservableValue() {
         return control.selectedProperty();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override public void setValue(Object value) {
         if (value instanceof Boolean ) {
            control.setSelected((Boolean)value);

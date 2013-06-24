@@ -12,6 +12,7 @@ import org.controlsfx.control.PropertySheet.Item;
 
 public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEditor> {
     
+    
     @Override public PropertyEditor call(Item item) {
         Class<?> type = item.getType();
         
@@ -44,7 +45,6 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         
     }
     
-
     private static Class<?>[] numericTypes = new Class[]{
             byte.class, Byte.class,
             short.class, Short.class,

@@ -3,6 +3,10 @@ package org.controlsfx.property.editor;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 
+/*
+ * TODO replace this with proper API when it becomes available:
+ * https://javafx-jira.kenai.com/browse/RT-30881
+ */
 public class NumericField extends TextField {
 
     private static String regex = "[-+]?[0-9]*\\.?[0-9]+";
@@ -23,5 +27,4 @@ public class NumericField extends TextField {
     private Boolean replaceMatches(int start, int end, String fragment) {
         return (getText().substring(0, start) + fragment + getText().substring(end)).matches(regex);
     }
-
 }

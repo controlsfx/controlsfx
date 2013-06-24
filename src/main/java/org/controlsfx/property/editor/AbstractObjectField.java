@@ -29,23 +29,18 @@ public abstract class AbstractObjectField<T> extends HBox {
         
         editButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                
-                T result = edit( objectProperty.get());
+                final T result = edit( objectProperty.get());
                 if ( result != null ) {
                     objectProperty.set(result);
                 }
-                
             }
         });
         
         objectProperty.addListener( new ChangeListener<T>() {
-
             @Override public void changed(ObservableValue<? extends T> o, T oldValue, T newValue ) {
                 textProperty().set( objectToString(newValue));
             }
-            
         });
-        
     }
     
     protected StringProperty textProperty() {

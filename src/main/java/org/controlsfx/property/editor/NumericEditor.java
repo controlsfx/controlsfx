@@ -27,8 +27,6 @@ import javafx.beans.value.ObservableValue;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-
-
 public class NumericEditor extends AbstractPropertyEditor<NumericField> {
 
     private Class<? extends Number> sourceClass = Double.class;
@@ -38,10 +36,16 @@ public class NumericEditor extends AbstractPropertyEditor<NumericField> {
         EditorUtils.enableAutoSelectAll(control);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override protected ObservableValue<?> getObservableValue() {
         return control.textProperty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override public Object getValue() {
         try {
             return sourceClass.getConstructor(String.class).newInstance(control.getText());
@@ -52,12 +56,13 @@ public class NumericEditor extends AbstractPropertyEditor<NumericField> {
         }
     }
 
-    @SuppressWarnings("unchecked") 
-    @Override public void setValue(Object value) {
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked") @Override public void setValue(Object value) {
         if (value instanceof Number) {
             sourceClass = (Class<? extends Number>) value.getClass();
             control.setText(value.toString());
         }
     }
-
 }

@@ -45,20 +45,20 @@ public class TextEditor extends AbstractPropertyEditor<String, TextField> {
      */
     public TextEditor(Item item) {
         super(item, new TextField());
-        EditorUtils.enableAutoSelectAll(control);
+        EditorUtils.enableAutoSelectAll(getEditor());
     }
     
     /**
      * {@inheritDoc}
      */
     @Override protected StringProperty getObservableValue() {
-        return control.textProperty();
+        return getEditor().textProperty();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override public void setValue(String value) {
-        control.setText((String)value);
+        getEditor().setText(value);
     }
 }

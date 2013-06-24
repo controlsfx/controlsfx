@@ -42,17 +42,17 @@ public class ObjectViewer extends AbstractPropertyEditor<Object, TextField> {
      */
     public ObjectViewer(Item item) {
         super(item, new TextField(), true);
-        control.setEditable(false);
-        control.setDisable(true);
+        getEditor().setEditable(false);
+        getEditor().setDisable(true);
     }
     
     @SuppressWarnings("unchecked")
     @Override protected ObservableValue<Object> getObservableValue() {
-        return (ObservableValue<Object>)(Object)control.textProperty();
+        return (ObservableValue<Object>)(Object)getEditor().textProperty();
     }
     
     @Override public void setValue(Object value) {
-        control.setText(value == null? "": value.toString());
+        getEditor().setText(value == null? "": value.toString());
     }
 
 }

@@ -43,14 +43,14 @@ public class NumericEditor extends AbstractPropertyEditor<Number, NumericField> 
      */
     public NumericEditor(Item item) {
         super(item, new NumericField());
-        EditorUtils.enableAutoSelectAll(control);
+        EditorUtils.enableAutoSelectAll(getEditor());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override protected ObservableValue<Number> getObservableValue() {
-        return control.valueProperty();
+        return getEditor().valueProperty();
     }
 
     /**
@@ -58,7 +58,7 @@ public class NumericEditor extends AbstractPropertyEditor<Number, NumericField> 
      */
     @Override public Number getValue() {
         try {
-            return sourceClass.getConstructor(String.class).newInstance(control.getText());
+            return sourceClass.getConstructor(String.class).newInstance(getEditor().getText());
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
@@ -71,6 +71,6 @@ public class NumericEditor extends AbstractPropertyEditor<Number, NumericField> 
      */
     @SuppressWarnings("unchecked") @Override public void setValue(Number value) {
         sourceClass = (Class<? extends Number>) value.getClass();
-        control.setText(value.toString());
+        getEditor().setText(value.toString());
     }
 }

@@ -52,14 +52,14 @@ public class CheckEditor extends AbstractPropertyEditor<Boolean, CheckBox> {
      * {@inheritDoc}
      */
     @Override protected BooleanProperty getObservableValue() {
-        return control.selectedProperty();
+        return getEditor().selectedProperty();
     }
     
     /**
      * {@inheritDoc}
      */
     @Override public void setValue(Boolean value) {
-        control.setSelected((Boolean)value);
+        getEditor().setSelected((Boolean)value);
     }
 
 }

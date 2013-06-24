@@ -32,15 +32,51 @@ import javafx.scene.Node;
 
 import org.controlsfx.control.PropertySheet.Item;
 
+/**
+ * An abstract implementation of the {@link PropertyEditor} interface.
+ *
+ * @param <T> The type of the property being edited.
+ * @param <C> The type of Node that is used to edit this property.
+ */
 public abstract class AbstractPropertyEditor<T, C extends Node> implements PropertyEditor<T> {
-
-    protected final Item property;
-    protected final C control;
     
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
+
+    private final Item property;
+    private final C control;
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
+    
+    /**
+     * Creates an editable AbstractPropertyEditor instance for the given property
+     * using the given editing control.
+     * 
+     * @param property The property that the instance is responsible for editing.
+     * @param control The control that is responsible for editing the property.
+     */
     public AbstractPropertyEditor(Item property, C control) {
         this(property, control, false);
     }
     
+    /**
+     * Creates an AbstractPropertyEditor instance for the given property
+     * using the given editing control. It may be read-only or editable, based
+     * on the readonly boolean parameter being true or false.
+     * 
+     * @param property The property that the instance is responsible for editing.
+     * @param control The control that is responsible for editing the property.
+     * @param readonly Specifies whether the editor should allow input or not.
+     */
     public AbstractPropertyEditor(Item property, C control, boolean readonly) {
         this.control = control;
         this.property = property;
@@ -53,7 +89,26 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
         }
     }
     
+    
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
+    
+    /**
+     * Returns an {@link ObservableValue} of the property that this property
+     * editor is responsible for editing.
+     */
     protected abstract ObservableValue<T> getObservableValue();
+    
+    /**
+     * Returns the property that this property editor is responsible for editing.
+     */
+    public final Item getProperty() {
+        return property;
+    }
         
     /**
      * {@inheritDoc}

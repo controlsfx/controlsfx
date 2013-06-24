@@ -49,20 +49,20 @@ public class ChoiceEditor<T> extends AbstractPropertyEditor<T, ComboBox<T>> {
      */
     public ChoiceEditor( Item property, Collection<T> choices ) {
         super(property, new ComboBox<T>());
-        control.setItems(FXCollections.observableArrayList(choices));
+        getEditor().setItems(FXCollections.observableArrayList(choices));
     }
     
     /**
      * {@inheritDoc}
      */
     @Override protected ObservableValue<T> getObservableValue() {
-        return control.getSelectionModel().selectedItemProperty();
+        return getEditor().getSelectionModel().selectedItemProperty();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override public void setValue(T value) {
-        control.getSelectionModel().select(value);
+        getEditor().getSelectionModel().select(value);
     }
 }

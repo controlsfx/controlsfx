@@ -53,13 +53,13 @@ public class ColorEditor extends AbstractPropertyEditor<Color, ColorPicker> {
      * {@inheritDoc}
      */
     @Override protected ObservableValue<Color> getObservableValue() {
-        return control.valueProperty();
+        return getEditor().valueProperty();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override public void setValue(Color value) {
-       control.setValue((Color) value);
+        getEditor().setValue((Color) value);
     }
 }

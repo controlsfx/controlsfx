@@ -31,9 +31,9 @@ import javafx.scene.Node;
 
 public interface PropertyEditor {
 
-    Node asNode();
+    public Node getEditor();
     
-    Object getValue();
-    void setValue( Object value );
+    public Object getValue();
     
+    public void setValue( Object value );
 }

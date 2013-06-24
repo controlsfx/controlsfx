@@ -34,9 +34,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.util.Callback;
 
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
-import org.controlsfx.property.editor.PropertyEditorFactory;
+import org.controlsfx.property.editor.PropertyEditor;
 
 public class PropertySheet extends Control {
     
@@ -94,18 +95,19 @@ public class PropertySheet extends Control {
   
 
     //propertyEditorFactory
-    private final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory = 
-            new SimpleObjectProperty<PropertyEditorFactory>( new DefaultPropertyEditorFactory());
+    // PropertyEditor getEditor( Item propertySheetItem  );
+    private final SimpleObjectProperty<Callback<Item, PropertyEditor>> propertyEditorFactory = 
+            new SimpleObjectProperty<Callback<Item, PropertyEditor>>( new DefaultPropertyEditorFactory());
     
-    public final SimpleObjectProperty<PropertyEditorFactory> propertyEditorFactory() {
+    public final SimpleObjectProperty<Callback<Item, PropertyEditor>> propertyEditorFactory() {
         return propertyEditorFactory;
     }
     
-    public final PropertyEditorFactory getPropertyEditorFactory() {
+    public final Callback<Item, PropertyEditor> getPropertyEditorFactory() {
         return propertyEditorFactory.get();
     }
     
-    public final void setPropertyEditorFactory( PropertyEditorFactory factory ) {
+    public final void setPropertyEditorFactory( Callback<Item, PropertyEditor> factory ) {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
     

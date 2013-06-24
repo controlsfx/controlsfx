@@ -296,12 +296,12 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         }
         
         private Node getEditor( Item item ) {
-            PropertyEditor editor = getSkinnable().getPropertyEditorFactory().getEditor(item);
+            PropertyEditor editor = getSkinnable().getPropertyEditorFactory().call(item);
             if ( editor == null ) {
                 editor = new ObjectViewer(item);
             }
             editor.setValue(item.getValue());
-            return editor.asNode();
+            return editor.getEditor();
         }
     }
 }

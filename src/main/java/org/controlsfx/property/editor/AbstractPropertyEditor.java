@@ -28,20 +28,20 @@ package org.controlsfx.property.editor;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.layout.Region;
+import javafx.scene.Node;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public abstract class AbstractPropertyEditor<C extends Region> implements PropertyEditor {
+public abstract class AbstractPropertyEditor<T, C extends Node> implements PropertyEditor<T> {
 
     protected final Item property;
     protected final C control;
     
-    public AbstractPropertyEditor( Item property, C control) {
-        this( property, control, false );
+    public AbstractPropertyEditor(Item property, C control) {
+        this(property, control, false);
     }
     
-    public AbstractPropertyEditor( Item property, C control, boolean readonly ) {
+    public AbstractPropertyEditor(Item property, C control, boolean readonly) {
         this.control = control;
         this.property = property;
         if (! readonly) {
@@ -53,7 +53,7 @@ public abstract class AbstractPropertyEditor<C extends Region> implements Proper
         }
     }
     
-    protected abstract ObservableValue<?> getObservableValue();
+    protected abstract ObservableValue<T> getObservableValue();
         
     /**
      * {@inheritDoc}
@@ -65,8 +65,7 @@ public abstract class AbstractPropertyEditor<C extends Region> implements Proper
     /**
      * {@inheritDoc}
      */
-    @Override public Object getValue() {
+    @Override public T getValue() {
         return getObservableValue().getValue();
     }
-    
 }

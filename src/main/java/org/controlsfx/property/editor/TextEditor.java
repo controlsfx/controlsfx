@@ -34,10 +34,17 @@ import org.controlsfx.control.PropertySheet.Item;
 /**
  * A {@link PropertyEditor} that is suitable for use for editing string properties.
  */
-public class TextEditor extends AbstractPropertyEditor<TextField> {
+public class TextEditor extends AbstractPropertyEditor<String, TextField> {
 
-    public TextEditor( Item property ) {
-        super(property, new TextField());
+    /**
+     * Creates a default TextEditor instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
+    public TextEditor(Item item) {
+        super(item, new TextField());
         EditorUtils.enableAutoSelectAll(control);
     }
     
@@ -51,9 +58,7 @@ public class TextEditor extends AbstractPropertyEditor<TextField> {
     /**
      * {@inheritDoc}
      */
-    @Override public void setValue(Object value) {
-        if ( value instanceof String ) {
-           control.setText((String)value);
-        }
+    @Override public void setValue(String value) {
+        control.setText((String)value);
     }
 }

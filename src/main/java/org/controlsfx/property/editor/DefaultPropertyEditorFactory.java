@@ -10,10 +10,9 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEditor> {
+public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEditor<?>> {
     
-    
-    @Override public PropertyEditor call(Item item) {
+    @Override public PropertyEditor<?> call(Item item) {
         Class<?> type = item.getType();
         
         //TODO: add support for char and collection editors
@@ -34,25 +33,24 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         }
 
         if ( type != null && type.isEnum() ) {
-            return new ChoiceEditor( item, Arrays.<Object>asList( type.getEnumConstants()) );
+            return new ChoiceEditor(item, Arrays.<Object>asList( type.getEnumConstants()));
         }
         
         if ( type != null && type == Font.class ) {
-            return new FontEditor( item );
+            return new FontEditor(item);
         }
         
         return null; 
-        
     }
     
     private static Class<?>[] numericTypes = new Class[]{
-            byte.class, Byte.class,
-            short.class, Short.class,
-            int.class, Integer.class,
-            long.class, Long.class,
-            float.class, Float.class,
-            double.class, Double.class,
-            BigInteger.class, BigDecimal.class
+        byte.class, Byte.class,
+        short.class, Short.class,
+        int.class, Integer.class,
+        long.class, Long.class,
+        float.class, Float.class,
+        double.class, Double.class,
+        BigInteger.class, BigDecimal.class
     };    
     
     // there should be better ways to do this
@@ -63,5 +61,4 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         }
         return false;
     }
-
 }

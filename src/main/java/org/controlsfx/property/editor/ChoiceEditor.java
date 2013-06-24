@@ -38,24 +38,31 @@ import org.controlsfx.control.PropertySheet.Item;
  * A {@link PropertyEditor} that is suitable for use for selecting from a
  * limited range of choices.
  */
-public class ChoiceEditor extends AbstractPropertyEditor<ComboBox<Object>> {
+public class ChoiceEditor<T> extends AbstractPropertyEditor<T, ComboBox<T>> {
 
-    public ChoiceEditor( Item property, Collection<Object> choices ) {
-        super(property, new ComboBox<Object>());
+    /**
+     * Creates a default ChoiceEditor instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
+    public ChoiceEditor( Item property, Collection<T> choices ) {
+        super(property, new ComboBox<T>());
         control.setItems(FXCollections.observableArrayList(choices));
     }
     
     /**
      * {@inheritDoc}
      */
-    @Override protected ObservableValue<?> getObservableValue() {
-        return control.selectionModelProperty();
+    @Override protected ObservableValue<T> getObservableValue() {
+        return control.getSelectionModel().selectedItemProperty();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public void setValue(Object value) {
+    @Override public void setValue(T value) {
         control.getSelectionModel().select(value);
     }
 }

@@ -31,16 +31,24 @@ import javafx.scene.control.TextField;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public class ObjectViewer extends AbstractPropertyEditor<TextField> {
+public class ObjectViewer extends AbstractPropertyEditor<Object, TextField> {
 
-    public ObjectViewer( Item property ) {
-        super(property, new TextField(), true);
+    /**
+     * Creates a default ObjectViewer instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
+    public ObjectViewer(Item item) {
+        super(item, new TextField(), true);
         control.setEditable(false);
         control.setDisable(true);
     }
     
-    @Override protected ObservableValue<?> getObservableValue() {
-        return control.textProperty();
+    @SuppressWarnings("unchecked")
+    @Override protected ObservableValue<Object> getObservableValue() {
+        return (ObservableValue<Object>)(Object)control.textProperty();
     }
     
     @Override public void setValue(Object value) {

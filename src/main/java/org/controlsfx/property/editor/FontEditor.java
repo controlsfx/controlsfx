@@ -26,26 +26,47 @@
  */
 package org.controlsfx.property.editor;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.text.Font;
 
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
 
-public class FontEditor extends AbstractObjectPropertyEditor<Font, AbstractObjectField<Font>> {
+/**
+ * A {@link PropertyEditor} that is suitable for use for editing font-related 
+ * properties.
+ */
+public class FontEditor extends AbstractPropertyEditor<Font, AbstractObjectField<Font>> {
 
+    /**
+     * Creates a default FontEditor instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
     public FontEditor(Item property) {
         super(property, new AbstractObjectField<Font>() {
             @Override protected Class<Font> getType() {
                 return Font.class;
             }
             
-            @Override protected String objectToString( Font font ) {
+            @Override protected String objectToString(Font font) {
                 return font == null? "": String.format("%s, %.1f", font.getName(), font.getSize());
             }
 
-            @Override protected Font edit( Font font ) {
+            @Override protected Font edit(Font font) {
                 return Dialogs.create().owner(this.getScene().getWindow()).showFontSelector(font);
             }
         });
+    }
+    
+    protected ObservableValue<Font> getObservableValue() {
+        return getEditor().getObjectProperty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setValue(Font value) {
+        getEditor().getObjectProperty().set(value);
     }
 }

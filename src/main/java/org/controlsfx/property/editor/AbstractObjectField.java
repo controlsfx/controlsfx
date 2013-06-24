@@ -12,7 +12,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-public abstract class AbstractObjectField<T> extends HBox {
+// package-private for now...
+abstract class AbstractObjectField<T> extends HBox {
 
     private final TextField textField = new TextField();
     private final Button editButton = new Button("...");
@@ -58,5 +59,4 @@ public abstract class AbstractObjectField<T> extends HBox {
     protected abstract Class<T> getType();
     
     protected abstract T edit( T object );
-    
 }

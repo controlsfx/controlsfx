@@ -36,8 +36,15 @@ import org.controlsfx.control.PropertySheet.Item;
  * A {@link PropertyEditor} that is suitable for use for editing 
  * {@link Color} properties.
  */
-public class ColorEditor extends AbstractPropertyEditor<ColorPicker> {
+public class ColorEditor extends AbstractPropertyEditor<Color, ColorPicker> {
 
+    /**
+     * Creates a default ColorEditor instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
     public ColorEditor( Item property ) {
         super(property, new ColorPicker());
     }
@@ -45,16 +52,14 @@ public class ColorEditor extends AbstractPropertyEditor<ColorPicker> {
     /**
      * {@inheritDoc}
      */
-    @Override protected ObservableValue<?> getObservableValue() {
+    @Override protected ObservableValue<Color> getObservableValue() {
         return control.valueProperty();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public void setValue(Object value) {
-        if ( value instanceof Color ) {
-           control.setValue((Color) value);
-        }
+    @Override public void setValue(Color value) {
+       control.setValue((Color) value);
     }
 }

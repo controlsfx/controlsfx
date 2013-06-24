@@ -158,18 +158,18 @@ public class PropertySheet extends Control {
   
 
     // --- propertyEditorFactory
-    private final SimpleObjectProperty<Callback<Item, PropertyEditor>> propertyEditorFactory = 
-            new SimpleObjectProperty<Callback<Item, PropertyEditor>>(this, "propertyEditor", new DefaultPropertyEditorFactory());
+    private final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory = 
+            new SimpleObjectProperty<Callback<Item, PropertyEditor<?>>>(this, "propertyEditor", new DefaultPropertyEditorFactory());
     
-    public final SimpleObjectProperty<Callback<Item, PropertyEditor>> propertyEditorFactory() {
+    public final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory() {
         return propertyEditorFactory;
     }
     
-    public final Callback<Item, PropertyEditor> getPropertyEditorFactory() {
+    public final Callback<Item, PropertyEditor<?>> getPropertyEditorFactory() {
         return propertyEditorFactory.get();
     }
     
-    public final void setPropertyEditorFactory( Callback<Item, PropertyEditor> factory ) {
+    public final void setPropertyEditorFactory( Callback<Item, PropertyEditor<?>> factory ) {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
     

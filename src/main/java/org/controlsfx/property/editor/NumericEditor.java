@@ -27,26 +27,36 @@ import javafx.beans.value.ObservableValue;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public class NumericEditor extends AbstractPropertyEditor<NumericField> {
+/**
+ * A {@link PropertyEditor} that is suitable for use for editing numeric properties.
+ */
+public class NumericEditor extends AbstractPropertyEditor<Number, NumericField> {
 
     private Class<? extends Number> sourceClass = Double.class;
 
-    public NumericEditor(Item property) {
-        super(property, new NumericField());
+    /**
+     * Creates a default NumericEditor instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
+    public NumericEditor(Item item) {
+        super(item, new NumericField());
         EditorUtils.enableAutoSelectAll(control);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override protected ObservableValue<?> getObservableValue() {
-        return control.textProperty();
+    @Override protected ObservableValue<Number> getObservableValue() {
+        return control.valueProperty();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override public Object getValue() {
+    @Override public Number getValue() {
         try {
             return sourceClass.getConstructor(String.class).newInstance(control.getText());
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
@@ -59,10 +69,8 @@ public class NumericEditor extends AbstractPropertyEditor<NumericField> {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked") @Override public void setValue(Object value) {
-        if (value instanceof Number) {
-            sourceClass = (Class<? extends Number>) value.getClass();
-            control.setText(value.toString());
-        }
+    @SuppressWarnings("unchecked") @Override public void setValue(Number value) {
+        sourceClass = (Class<? extends Number>) value.getClass();
+        control.setText(value.toString());
     }
 }

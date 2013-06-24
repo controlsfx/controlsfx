@@ -1,7 +1,12 @@
 package org.controlsfx.property.editor;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
+import javafx.util.converter.DoubleStringConverter;
 
 /*
  * TODO replace this with proper API when it becomes available:
@@ -10,6 +15,26 @@ import javafx.scene.control.TextField;
 public class NumericField extends TextField {
 
     private static String regex = "[-+]?[0-9]*\\.?[0-9]+";
+    
+    private final DoubleStringConverter converter = new DoubleStringConverter();
+    private final DoubleProperty value = new SimpleDoubleProperty(this, "value", 0.0) {
+        protected void invalidated() {
+            setText(Double.toString(get()));
+        };
+    };
+    
+    public NumericField() {
+        textProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable arg0) {
+                // TODO handle when the text changes...?
+//                value.set(converter.fromString(getText()));
+            }
+        });
+    }
+    
+    public final DoubleProperty valueProperty() {
+        return value;
+    }
 
     @Override public void replaceText(int start, int end, String text) {
         if (replaceMatches(start, end, text)) {

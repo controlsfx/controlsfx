@@ -26,6 +26,7 @@
  */
 package org.controlsfx.property.editor;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 
@@ -34,8 +35,15 @@ import org.controlsfx.control.PropertySheet.Item;
 /**
  * A {@link PropertyEditor} that is suitable for use for editing boolean properties.
  */
-public class CheckEditor extends AbstractPropertyEditor<CheckBox> {
+public class CheckEditor extends AbstractPropertyEditor<Boolean, CheckBox> {
 
+    /**
+     * Creates a default CheckEditor instance that will edit the given 
+     * {@link item}.
+     * 
+     * @param item The item that this editor instance should be responsible for 
+     *      editing.
+     */
     public CheckEditor( Item property ) {
         super(property, new CheckBox());
     }
@@ -43,17 +51,15 @@ public class CheckEditor extends AbstractPropertyEditor<CheckBox> {
     /**
      * {@inheritDoc}
      */
-    @Override protected ObservableValue<?> getObservableValue() {
+    @Override protected BooleanProperty getObservableValue() {
         return control.selectedProperty();
     }
     
     /**
      * {@inheritDoc}
      */
-    @Override public void setValue(Object value) {
-        if (value instanceof Boolean ) {
-           control.setSelected((Boolean)value);
-        }
+    @Override public void setValue(Boolean value) {
+        control.setSelected((Boolean)value);
     }
 
 }

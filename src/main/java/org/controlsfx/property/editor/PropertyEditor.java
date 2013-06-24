@@ -29,11 +29,11 @@ package org.controlsfx.property.editor;
 import javafx.scene.Node;
 
 
-public interface PropertyEditor {
+public interface PropertyEditor<T> {
 
     public Node getEditor();
     
-    public Object getValue();
+    public T getValue();
     
-    public void setValue( Object value );
+    public void setValue(T value);
 }

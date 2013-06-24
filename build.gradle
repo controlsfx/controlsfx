@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply from: 'mavenPublish.gradle'
 
 group = 'org.controlsfx'
-version = '8.0.0'
+version = '8.0.1-SNAPSHOT'
 
 configurations {
     samples.extendsFrom mainRuntime

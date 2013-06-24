@@ -55,7 +55,7 @@ public abstract class AbstractPropertyEditor<C extends Region> implements Proper
         
     
     @Override
-    public C asNode() {
+    public C getEditor() {
         return control;
     }
     

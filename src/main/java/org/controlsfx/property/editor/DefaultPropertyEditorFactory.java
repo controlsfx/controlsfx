@@ -6,13 +6,13 @@ import java.util.Arrays;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 
 import org.controlsfx.control.PropertySheet.Item;
 
-public class DefaultPropertyEditorFactory implements PropertyEditorFactory {
-
-    @Override public PropertyEditor getEditor(Item item) {
-        
+public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEditor> {
+    
+    @Override public PropertyEditor call(Item item) {
         Class<?> type = item.getType();
         
         //TODO: add support for char and collection editors

@@ -33,16 +33,31 @@ import java.beans.Introspector;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+
+import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 
-public class BeanPropertyUtils {
+/**
+ * Convenience utility class for creating {@link PropertySheet} instances based
+ * on a JavaBean.
+ */
+public final class BeanPropertyUtils {
 
     private BeanPropertyUtils() {
         // no op
     }
 
+    /**
+     * Given a JavaBean, this method will return a list of {@link Item} intances,
+     * which may be directly placed inside a {@link PropertySheet} (via its
+     * {@link PropertySheet#getItems() items list}.
+     * 
+     * @param bean The JavaBean that should be introspected and be editable via
+     *      a {@link PropertySheet}.
+     * @return A list of {@link Item} instances representing the properties of the
+     *      JavaBean.
+     */
     public static ObservableList<Item> getProperties(final Object bean) {
-
         ObservableList<Item> list = FXCollections.observableArrayList();
 
         try {
@@ -64,5 +79,4 @@ public class BeanPropertyUtils {
         return p.getWriteMethod() != null &&
                !p.getPropertyType().isAssignableFrom(EventHandler.class);  
     }
-    
 }

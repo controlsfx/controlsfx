@@ -26,35 +26,51 @@
  */
 package org.controlsfx.property;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 
+/**
+ * A convenience class for creating an {@link Item} for use in the 
+ * {@link PropertySheet} control based on a property belonging to a 
+ * JavaBean - simply provide a {@link PropertyDescriptor} and the rest will be
+ * taken care of automatically.
+ * 
+ * @see Item
+ * @see PropertySheet
+ * @see PropertyDescriptor
+ */
 public class BeanProperty implements Item {
 
     private final Object bean;
-    private final java.beans.PropertyDescriptor beanPropertyDescriptor;
+    private final PropertyDescriptor beanPropertyDescriptor;
     private final Method readMethod;
 
-    public BeanProperty( Object bean, java.beans.PropertyDescriptor propertyDescriptor ) {
+    public BeanProperty(Object bean, PropertyDescriptor propertyDescriptor) {
         this.bean = bean;
         this.beanPropertyDescriptor = propertyDescriptor;
         readMethod = propertyDescriptor.getReadMethod();
     }
     
+    /** {@inheritDoc} */
     @Override public String getName() {
         return beanPropertyDescriptor.getDisplayName();
     }
     
+    /** {@inheritDoc} */
     @Override public String getDescription() {
         return beanPropertyDescriptor.getShortDescription();
     }
     
+    /** {@inheritDoc} */
     @Override public Class<?> getType() {
         return beanPropertyDescriptor.getPropertyType();
     }
 
+    /** {@inheritDoc} */
     @Override public Object getValue() {
         try {
             return readMethod.invoke(bean);
@@ -64,8 +80,8 @@ public class BeanProperty implements Item {
         }
     }
     
+    /** {@inheritDoc} */
     @Override public void setValue(Object value) {
-        
         Method writeMethod = beanPropertyDescriptor.getWriteMethod();
         if ( writeMethod != null ) {
             try {
@@ -74,11 +90,10 @@ public class BeanProperty implements Item {
                 e.printStackTrace();
             }
         }
-        
     }
 
+    /** {@inheritDoc} */
     @Override public String getCategory() {
         return beanPropertyDescriptor.isExpert()? "Expert": "Basic";
     }
-
 }

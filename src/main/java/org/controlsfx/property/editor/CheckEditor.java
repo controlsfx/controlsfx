@@ -27,7 +27,6 @@
 package org.controlsfx.property.editor;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 
 import org.controlsfx.control.PropertySheet.Item;
@@ -61,5 +60,4 @@ public class CheckEditor extends AbstractPropertyEditor<Boolean, CheckBox> {
     @Override public void setValue(Boolean value) {
         getEditor().setSelected((Boolean)value);
     }
-
 }

@@ -57,29 +57,72 @@ public class PropertySheet extends Control {
      **************************************************************************/
     
     /**
-     * 
+     * Specifies how the PropertySheet should be laid out. Refer to the 
+     * enumeration values to learn what each one means.
      */
     public static enum Mode {
+        /**
+         * Simply displays the properties in the 
+         * {@link PropertySheet#getItems() items list} in the order they are 
+         * in the list. 
+         */
         NAME,
+        
+        /**
+         * Groups the properties in the 
+         * {@link PropertySheet#getItems() items list} based on their
+         * {@link Item#getCategory() category}.
+         */
         CATEGORY
     }
     
+    
+    
     /**
-     * 
+     * A wrapper interface for a single property to be displayed in a
+     * {@link PropertySheet} control.
      */
     public static interface Item {
         
-        Class<?> getType();
-        
-        String getCategory();
+        /**
+         * Returns the class type of the property.
+         */
+        public Class<?> getType();
+
+        /**
+         * Returns a String representation of the category of the property. This
+         * is relevant when the {@link PropertySheet} 
+         * {@link PropertySheet#modeProperty() mode property} is set to
+         * {@link Mode#CATEGORY} - as then all properties with the same category
+         * will be grouped together visually. 
+         */
+        public String getCategory();
        
-        String getName();
+        /**
+         * Returns the display name of the property, which should be short (i.e.
+         * less than two wordS). This is used to explain to the end user what the
+         * property represents and is displayed beside the {@link PropertyEditor}.
+         * If you need to explain more detail to the user, consider placing it
+         * in the {@link #getDescription()}.
+         */
+        public String getName();
         
-        String getDescription();
+        /**
+         * A String that will be shown to the user as a tooltip. This allows for
+         * a longer form of detail than what is possible with the {@link #getName()} 
+         * method.
+         */
+        public String getDescription();
         
-        Object getValue();
-        
-        void setValue(Object value);
+        /**
+         * Returns the current value of the property.
+         */
+        public Object getValue();
+
+        /**
+         * Sets the current value of the property.
+         */
+        public void setValue(Object value);
    }
     
     
@@ -112,8 +155,8 @@ public class PropertySheet extends Control {
      **************************************************************************/
     
     /**
-     * 
-     * @return
+     * A list of properties that will be displayed to the user to allow for them
+     * to be edited. 
      */
     public ObservableList<Item> getItems() {
         return items;
@@ -144,14 +187,21 @@ public class PropertySheet extends Control {
     private final SimpleObjectProperty<Mode> modeProperty = 
             new SimpleObjectProperty<>(this, "mode", Mode.NAME);
     
+    /**
+     * A property used to represent how the properties should be laid out in
+     * the PropertySheet. Refer to the {@link Mode} enumeration to better 
+     * understand the available options.
+     */
     public final SimpleObjectProperty<Mode> modeProperty() {
     	return modeProperty;
     }
-    
+
+    // -- JavaDoc auto-generated
     public final Mode getMode() {
         return modeProperty.get();
     }
-    
+
+    // -- JavaDoc auto-generated
     public final void setMode(Mode mode) {
         modeProperty.set(mode);
     }
@@ -161,14 +211,23 @@ public class PropertySheet extends Control {
     private final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory = 
             new SimpleObjectProperty<Callback<Item, PropertyEditor<?>>>(this, "propertyEditor", new DefaultPropertyEditorFactory());
     
+    /**
+     * The property editor factory is used by the PropertySheet to determine which
+     * {@link PropertyEditor} to use for a given {@link Item}. By default the
+     * {@link DefaultPropertyEditorFactory} is used, but this may be replaced
+     * or extended by developers wishing to add in (or substitute) their own
+     * property editors.
+     */
     public final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory() {
         return propertyEditorFactory;
     }
     
+    // -- JavaDoc auto-generated
     public final Callback<Item, PropertyEditor<?>> getPropertyEditorFactory() {
         return propertyEditorFactory.get();
     }
     
+    // -- JavaDoc auto-generated
     public final void setPropertyEditorFactory( Callback<Item, PropertyEditor<?>> factory ) {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
@@ -250,6 +309,5 @@ public class PropertySheet extends Control {
      **************************************************************************/
 
     private static final String DEFAULT_STYLE_CLASS = "property-sheet";
-    
     
 }

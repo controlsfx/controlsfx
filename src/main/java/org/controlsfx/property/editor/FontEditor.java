@@ -61,12 +61,18 @@ public class FontEditor extends AbstractPropertyEditor<Font, AbstractObjectField
         });
     }
     
-    protected ObservableValue<Font> getObservableValue() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override protected ObservableValue<Font> getObservableValue() {
         return getEditor().getObjectProperty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
-    public void setValue(Font value) {
+    @Override public void setValue(Font value) {
         getEditor().getObjectProperty().set(value);
     }
 }

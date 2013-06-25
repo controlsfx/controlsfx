@@ -69,7 +69,8 @@ public class NumericEditor extends AbstractPropertyEditor<Number, NumericField> 
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked") @Override public void setValue(Number value) {
+    @SuppressWarnings("unchecked") 
+    @Override public void setValue(Number value) {
         sourceClass = (Class<? extends Number>) value.getClass();
         getEditor().setText(value.toString());
     }

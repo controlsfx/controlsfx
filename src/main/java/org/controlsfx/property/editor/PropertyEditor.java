@@ -26,14 +26,32 @@
  */
 package org.controlsfx.property.editor;
 
+import org.controlsfx.control.PropertySheet;
+
 import javafx.scene.Node;
 
-
+/**
+ * The base interface for all editors used by the {@link PropertySheet} control. 
+ *
+ * @param <T> The type of the property that the PropertyEditor is responsible
+ *      for editing.
+ */
 public interface PropertyEditor<T> {
 
+    /**
+     * Returns the editor responsible for editing this property.
+     */
     public Node getEditor();
-    
+
+    /**
+     * Returns the current value in the editor - this may not be the value of
+     * the property itself!
+     */
     public T getValue();
-    
+
+    /**
+     * Sets the value to display in the editor - this may not be the value of 
+     * the property itself - and the property value will not change!
+     */
     public void setValue(T value);
 }

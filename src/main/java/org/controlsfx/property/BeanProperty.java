@@ -34,7 +34,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 
 /**
- * A convenience class for creating an {@link Item} for use in the 
+ * A convenience class for creating a {@link Item} for use in the 
  * {@link PropertySheet} control based on a property belonging to a 
  * JavaBean - simply provide a {@link PropertyDescriptor} and the rest will be
  * taken care of automatically.

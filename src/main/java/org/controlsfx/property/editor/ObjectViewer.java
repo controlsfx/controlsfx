@@ -46,13 +46,18 @@ public class ObjectViewer extends AbstractPropertyEditor<Object, TextField> {
         getEditor().setDisable(true);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override protected ObservableValue<Object> getObservableValue() {
         return (ObservableValue<Object>)(Object)getEditor().textProperty();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override public void setValue(Object value) {
         getEditor().setText(value == null? "": value.toString());
     }
-
 }

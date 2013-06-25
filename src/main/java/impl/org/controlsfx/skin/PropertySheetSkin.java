@@ -273,7 +273,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 // show description as a tooltip
                 String description = item.getDescription();
                 if ( description != null && !description.trim().isEmpty()) {
-                    label.setTooltip( new Tooltip(description));
+                    label.setTooltip(new Tooltip(description));
                 }
                 
                 add(label, 0, row);

@@ -314,8 +314,8 @@ public class HelloDialog extends Application implements Sample {
         // Command links
         // *******************************************************************
         
-        grid.add(createLabel("Command Links: "), 0, row);
-        final Button Hyperlink12 = new Button("Show");
+        grid.add(createLabel("Other pre-built dialogs: "), 0, row);
+        final Button Hyperlink12 = new Button("Command Links");
         Hyperlink12.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 
@@ -339,7 +339,18 @@ public class HelloDialog extends Application implements Sample {
             }
         });
         
-        grid.add(new HBox(10, Hyperlink12), 1, row);
+        final Button Hyperlink12a = new Button("Font Chooser");
+        Hyperlink12a.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Font response = configureSampleDialog(
+                        Dialogs.create())
+                    .showFontSelector(null);
+
+                System.out.println("font: " + response);
+            }
+        });
+        
+        grid.add(new HBox(10, Hyperlink12, Hyperlink12a), 1, row);
         row ++;
         
 

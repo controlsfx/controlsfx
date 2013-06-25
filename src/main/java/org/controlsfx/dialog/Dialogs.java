@@ -37,13 +37,18 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -55,6 +60,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -67,10 +73,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
+import javafx.util.Callback;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
@@ -819,105 +829,185 @@ public final class Dialogs {
         return button;
     }
     
-private static class FontPanel extends GridPane {
+    private static class FontPanel extends GridPane {
+        private static final double HGAP = 10;
+        private static final double VGAP = 10;
         
-        private static Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
+        private static final Predicate<Object> MATCH_ALL = new Predicate<Object>() {
+            @Override public boolean test(Object t) {
+                return true;
+            }
+        };
         
-        private TextField fontSearch = new TextField();
-        private TextField postureSearch = new TextField();
-        private NumericField sizeSearch = new NumericField();
+        private static final Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
         
-        private ListView<String> fontList = new ListView<String>( FXCollections.observableArrayList(Font.getFamilies()));
-        private ListView<FontPosture> styleList = new ListView<FontPosture>( FXCollections.observableArrayList(FontPosture.values()));
-        private ListView<Double> sizeList = new ListView<Double>( FXCollections.observableArrayList(fontSizes));
-        private Label sample = new Label("Sample");
+        private final TextField fontSearch = new TextField();
+        private final TextField postureSearch = new TextField();
+        private final NumericField sizeSearch = new NumericField();
+        
+        private final FilteredList<String> filteredFontList = new FilteredList<>(FXCollections.observableArrayList(Font.getFamilies()), MATCH_ALL);
+        private final FilteredList<FontPosture> filteredStyleList = new FilteredList<>(FXCollections.observableArrayList(FontPosture.values()), MATCH_ALL);
+        private final FilteredList<Double> filteredSizeList = new FilteredList<>(FXCollections.observableArrayList(fontSizes), MATCH_ALL);
+        
+        private final ListView<String> fontListView = new ListView<String>(filteredFontList);
+        private final ListView<FontPosture> styleListView = new ListView<FontPosture>(filteredStyleList);
+        private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
+        private final Text sample = new Text("Sample");
         
         public FontPanel() {
-            
-            setHgap(10);
-            setVgap(5);
+            setHgap(HGAP);
+            setVgap(VGAP);
             setPrefSize(500, 300);
             setMinSize(500, 300);
             
+            ColumnConstraints c0 = new ColumnConstraints();
+            c0.setPercentWidth(60);
             ColumnConstraints c1 = new ColumnConstraints();
-            c1.setPercentWidth(60);
+            c1.setPercentWidth(25);
             ColumnConstraints c2 = new ColumnConstraints();
-            c2.setPercentWidth(25);
-            ColumnConstraints c3 = new ColumnConstraints();
-            c3.setPercentWidth(15);
-            getColumnConstraints().addAll(c1, c2, c3);
+            c2.setPercentWidth(15);
+            getColumnConstraints().addAll(c0, c1, c2);
             
+            RowConstraints r0 = new RowConstraints();
+//            r0.setFillHeight(true);
+            r0.setVgrow(Priority.NEVER);
             RowConstraints r1 = new RowConstraints();
-            r1.setFillHeight(true);
+//            r1.setFillHeight(true);
             r1.setVgrow(Priority.NEVER);
             RowConstraints r2 = new RowConstraints();
             r2.setFillHeight(true);
             r2.setVgrow(Priority.NEVER);
             RowConstraints r3 = new RowConstraints();
-            r3.setFillHeight(true);
-            r3.setVgrow(Priority.ALWAYS);
-            RowConstraints r4 = new RowConstraints();
-            r4.setFillHeight(true);
-            r4.setPrefHeight(250);
-            r4.setVgrow(Priority.SOMETIMES);
-            getRowConstraints().addAll(r1, r2, r3, r4);
+//            r3.setFillHeight(true);
+            r3.setPrefHeight(250);
+            r3.setVgrow(Priority.NEVER);
+            getRowConstraints().addAll(r0, r1, r2, r3);
             
+            // set up filtering
+            fontSearch.textProperty().addListener(new InvalidationListener() {
+                @Override public void invalidated(Observable arg0) {
+                    filteredFontList.setPredicate(new Predicate<String>() {
+                        @Override public boolean test(String t) {
+                            return t.isEmpty() || t.toLowerCase().contains(fontSearch.getText().toLowerCase());
+                        }
+                    });
+                }
+            });
+            postureSearch.textProperty().addListener(new InvalidationListener() {
+                @Override public void invalidated(Observable arg0) {
+                    filteredStyleList.setPredicate(new Predicate<FontPosture>() {
+                        @Override public boolean test(FontPosture t) {
+                            return t == null || t.toString().toLowerCase().startsWith(postureSearch.getText().toLowerCase());
+                        }
+                    });
+                }
+            });
+            
+            // FIXME buggy due to use of NumericField
+//            sizeSearch.valueProperty().addListener(new InvalidationListener() {
+//                @Override public void invalidated(Observable arg0) {
+//                    filteredSizeList.setPredicate(new Predicate<Double>() {
+//                        @Override public boolean test(Double t) {
+//                            return t == sizeSearch.valueProperty().get();
+//                        }
+//                    });
+//                }
+//            });
+            
+            // layout dialog
             add( new Label("Font"), 0, 0);
             fontSearch.setMinHeight(Control.USE_PREF_SIZE);
             add( fontSearch, 0, 1);
-            add(fontList, 0, 2);
-            fontList.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<String>() {
+            add(fontListView, 0, 2);
+            fontListView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+                @Override public ListCell<String> call(ListView<String> listview) {
+                    return new ListCell<String>() {
+                        @Override protected void updateItem(String family, boolean empty) {
+                            super.updateItem(family, empty);
+                            
+                            if (! empty) {
+                                setFont(Font.font(family));
+                                setText(family);
+                            } else {
+                                setText(null);
+                            }
+                        }
+                    };
+                }
+            });
+            fontListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<String>() {
                 @Override public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
                     refreshSample();
-                }});
+                }
+            });
 
             add( new Label("Style"), 1, 0);
             postureSearch.setMinHeight(Control.USE_PREF_SIZE);
             add( postureSearch, 1, 1);
-            add(styleList, 1, 2);
-            styleList.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<FontPosture>() {
+            add(styleListView, 1, 2);
+            styleListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<FontPosture>() {
                 @Override public void changed(ObservableValue<? extends FontPosture> arg0, FontPosture arg1, FontPosture arg2) {
                     refreshSample();
-                }});
-            
+                }
+            });
             
             add( new Label("Size"), 2, 0);
             sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
             add( sizeSearch, 2, 1);
-            add(sizeList, 2, 2);
-            sizeList.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<Double>() {
+            add(sizeListView, 2, 2);
+            sizeListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<Double>() {
                 @Override public void changed(ObservableValue<? extends Double> arg0, Double arg1, Double arg2) {
                     refreshSample();
-                }});
+                }
+            });
             
-            
-            sample.setTextAlignment(TextAlignment.CENTER);
-            add(sample, 0, 3, 1, 3);
-            
+            final double height = 45;
+            final DoubleBinding sampleWidth = new DoubleBinding() {
+                {
+                    bind(fontListView.widthProperty(), styleListView.widthProperty(), sizeListView.widthProperty());
+                }
+                
+                @Override protected double computeValue() {
+                    return fontListView.getWidth() + styleListView.getWidth() + sizeListView.getWidth() + 3 * HGAP;
+                }
+            };
+            StackPane sampleStack = new StackPane(sample);
+            sampleStack.setAlignment(Pos.CENTER_LEFT);
+            sampleStack.setMinHeight(height);
+            sampleStack.setPrefHeight(height);
+            sampleStack.setMaxHeight(height);
+            sampleStack.prefWidthProperty().bind(sampleWidth);
+            Rectangle clip = new Rectangle(0, height);
+            clip.widthProperty().bind(sampleWidth);
+            sampleStack.setClip(clip);
+            add(sampleStack, 0, 3, 1, 3);
         }
         
-        public void setFont( Font font ) {
-            selectInList( fontList,  font.getFamily() );
-            selectInList( styleList, FontPosture.findByName(font.getStyle().toUpperCase()) );
-            selectInList( sizeList, font.getSize() );
+        public void setFont(final Font font) {
+            final Font _font = font == null ? Font.getDefault() : font;
+            if (_font != null) {
+                selectInList( fontListView,  _font.getFamily() );
+                selectInList( styleListView, FontPosture.findByName(_font.getStyle().toUpperCase()) );
+                selectInList( sizeListView, _font.getSize() );
+            }
         }
         
         public Font getFont() {
             try {
-                return Font.font( listSelection(fontList),listSelection(styleList),listSelection(sizeList));
+                return Font.font( listSelection(fontListView),listSelection(styleListView),listSelection(sizeListView));
             } catch( Throwable ex ) {
                 return null;
             }
         }
         
         private void refreshSample() {
+            System.out.println(getFont());
             sample.setFont(getFont());
         }
         
         private <T> void selectInList( final ListView<T> listView, final T selection ) {
             Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
+                @Override public void run() {
                     listView.scrollTo(selection);
                     listView.getSelectionModel().select(selection);
                 }
@@ -927,8 +1017,5 @@ private static class FontPanel extends GridPane {
         private <T> T listSelection( final ListView<T> listView) {
             return listView.selectionModelProperty().get().getSelectedItem();
         }
-        
     }    
-    
-    
 }

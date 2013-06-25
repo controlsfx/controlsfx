@@ -132,7 +132,7 @@ public class PropertySheet extends Control {
      * 
      **************************************************************************/
     
-    private final ObservableList<Item> items = FXCollections.observableArrayList();
+    private final ObservableList<Item> items;
     
     
     
@@ -142,8 +142,23 @@ public class PropertySheet extends Control {
      * 
      **************************************************************************/
     
+    /**
+     * Creates a default PropertySheet instance with no properties to edit.
+     */
     public PropertySheet() {
+        this(null);
+    }
+    
+    /**
+     * Creates a PropertySheet instance prepopulated with the items provided
+     * in the items {@link ObservabelList}.
+     * 
+     * @param items The items that should appear within the PropertySheet.
+     */
+    public PropertySheet(ObservableList<Item> items) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+        
+        this.items = items == null ? FXCollections.<Item>observableArrayList() : items;
     }
     
     
@@ -175,6 +190,7 @@ public class PropertySheet extends Control {
     @Override protected String getUserAgentStylesheet() {
         return PropertySheet.class.getResource("propertysheet.css").toExternalForm();
     }
+    
     
     
     /**************************************************************************

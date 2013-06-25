@@ -44,6 +44,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
@@ -98,13 +99,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         toolbar.managedProperty().bind(toolbar.visibleProperty());
         
-       // property sheet mode
+        // property sheet mode
         modeButton.managedProperty().bind(modeButton.visibleProperty());
         modeButton.getButtons().get(getSkinnable().modeProperty().get().ordinal()).setSelected(true);
         toolbar.getItems().add(modeButton);
         
         // property sheet search
         searchField.setPromptText("Search");
+        HBox.setHgrow(searchField, Priority.ALWAYS);
         searchField.managedProperty().bind(searchField.visibleProperty());
         toolbar.getItems().add(searchField);
         
@@ -119,8 +121,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
         registerChangeListener(searchField.textProperty(), "FILTER-UI");
-        registerChangeListener(control.toolbarModeVisibleProperty(), "TOOLBAR-MODE");
-        registerChangeListener(control.toolbarSearchVisibleProperty(), "TOOLBAR-SEARCH");
+        registerChangeListener(control.modeSwitcherVisibleProperty(), "TOOLBAR-MODE");
+        registerChangeListener(control.searchBoxVisibleProperty(), "TOOLBAR-SEARCH");
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
@@ -165,8 +167,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
     
     private void updateToolbar() {
-        modeButton.setVisible(getSkinnable().isToolbarModeVisible());
-        searchField.setVisible(getSkinnable().isToolbarSearchVisible());
+        modeButton.setVisible(getSkinnable().isModeSwitcherVisible());
+        searchField.setVisible(getSkinnable().isSearchBoxVisible());
         
         toolbar.setVisible(modeButton.isVisible() || searchField.isVisible());
     }

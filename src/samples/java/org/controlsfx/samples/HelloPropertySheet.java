@@ -134,11 +134,11 @@ public class HelloPropertySheet extends Application implements Sample {
         segmentedButton.getButtons().get(0).fire();
         
         CheckBox toolbarModeVisible = new CheckBox("Toolbar Mode Visible");
-        toolbarModeVisible.selectedProperty().bindBidirectional( propertySheet.toolbarModeVisibleProperty() );
+        toolbarModeVisible.selectedProperty().bindBidirectional( propertySheet.modeSwitcherVisibleProperty() );
         
 
         CheckBox toolbarSeacrhVisible = new CheckBox("Toolbar Search Visible");
-        toolbarSeacrhVisible.selectedProperty().bindBidirectional( propertySheet.toolbarSearchVisibleProperty() );
+        toolbarSeacrhVisible.selectedProperty().bindBidirectional( propertySheet.searchBoxVisibleProperty() );
         
         infoPane.getChildren().add(toolbarModeVisible);
         infoPane.getChildren().add(toolbarSeacrhVisible);

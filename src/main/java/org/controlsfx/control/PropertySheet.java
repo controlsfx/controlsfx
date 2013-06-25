@@ -249,54 +249,52 @@ public class PropertySheet extends Control {
     }
     
     
-//    // --- toolbarVisibleProperty
-//    private final SimpleBooleanProperty toolbarVisibleProperty = 
-//            new SimpleBooleanProperty(this, "toolbarVisible", true);
-//    
-//    public final SimpleBooleanProperty toolbarVisibleProperty() {
-//        return toolbarVisibleProperty;
-//    }
-//    
-//    public final boolean isToolbarVisible() {
-//        return toolbarVisibleProperty.get();
-//    }
-//    
-//    public final void setToolbarVisible( boolean visible ) {
-//        toolbarVisibleProperty.set(visible);
-//    }
+    // --- modeSwitcherVisible
+    private final SimpleBooleanProperty modeSwitcherVisible = 
+            new SimpleBooleanProperty(this, "modeSwitcherVisible", true);
     
-    
-    // --- toolbarModeVisibleProperty
-    private final SimpleBooleanProperty toolbarModeVisibleProperty = 
-            new SimpleBooleanProperty(this, "toolbarModeVisible",true);
-    
-    public final SimpleBooleanProperty toolbarModeVisibleProperty() {
-        return toolbarModeVisibleProperty;
+    /**
+     * This property represents whether a visual option should be presented to
+     * users to switch between the various {@link Mode modes} available. By
+     * default this is true, so setting it to false will hide these buttons.
+     */
+    public final SimpleBooleanProperty modeSwitcherVisibleProperty() {
+        return modeSwitcherVisible;
     }
     
-    public final boolean isToolbarModeVisible() {
-        return toolbarModeVisibleProperty.get();
+    // -- JavaDoc auto-generated
+    public final boolean isModeSwitcherVisible() {
+        return modeSwitcherVisible.get();
     }
     
-    public final void setToolbarModeVisible( boolean visible ) {
-        toolbarModeVisibleProperty.set(visible);
+    // -- JavaDoc auto-generated
+    public final void setModeSwitcherVisible( boolean visible ) {
+        modeSwitcherVisible.set(visible);
     }
     
     
     // --- toolbarSearchVisibleProperty
-    private final SimpleBooleanProperty toolbarSearchVisibleProperty = 
-            new SimpleBooleanProperty(this, "toolbarSearchVisible", true);
+    private final SimpleBooleanProperty searchBoxVisible = 
+            new SimpleBooleanProperty(this, "searchBoxVisible", true);
     
-    public final SimpleBooleanProperty toolbarSearchVisibleProperty() {
-        return toolbarSearchVisibleProperty;
+    /**
+     * This property represents whether a text field should be presented to
+     * users to allow for them to filter the properties in the property sheet to
+     * only show ones matching the typed input. By default this is true, so 
+     * setting it to false will hide this search field.
+     */
+    public final SimpleBooleanProperty searchBoxVisibleProperty() {
+        return searchBoxVisible;
     }
     
-    public final boolean isToolbarSearchVisible() {
-        return toolbarSearchVisibleProperty.get();
+    // -- JavaDoc auto-generated
+    public final boolean isSearchBoxVisible() {
+        return searchBoxVisible.get();
     }
     
-    public final void setToolbarSearchVisible( boolean visible ) {
-        toolbarSearchVisibleProperty.set(visible);
+    // -- JavaDoc auto-generated
+    public final void setSearchBoxVisible( boolean visible ) {
+        searchBoxVisible.set(visible);
     }   
     
      
@@ -304,14 +302,22 @@ public class PropertySheet extends Control {
     private final SimpleStringProperty titleFilterProperty = 
             new SimpleStringProperty(this, "titleFilter", "");
     
+    /**
+     * Regardless of whether the {@link #searchBoxVisibleProperty() search box}
+     * is visible or not, it is possible to filter the options shown on screen
+     * using this title filter property. If the search box is visible, it will
+     * manipulate this property to contain whatever the user types.
+     */
     public final SimpleStringProperty titleFilter() {
         return titleFilterProperty;
     }
     
+    // -- JavaDoc auto-generated
     public final String getTitleFilter() {
         return titleFilterProperty.get();
     }
     
+    // -- JavaDoc auto-generated
     public final void setTitleFilter( String filter ) {
         titleFilterProperty.set(filter);
     }

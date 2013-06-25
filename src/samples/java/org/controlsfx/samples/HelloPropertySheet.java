@@ -133,9 +133,6 @@ public class HelloPropertySheet extends Application implements Sample {
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();
         
-        CheckBox toolbarVisible = new CheckBox("Toolbar Visible");
-        toolbarVisible.selectedProperty().bindBidirectional( propertySheet.toolbarVisibleProperty() );
-
         CheckBox toolbarModeVisible = new CheckBox("Toolbar Mode Visible");
         toolbarModeVisible.selectedProperty().bindBidirectional( propertySheet.toolbarModeVisibleProperty() );
         
@@ -143,7 +140,6 @@ public class HelloPropertySheet extends Application implements Sample {
         CheckBox toolbarSeacrhVisible = new CheckBox("Toolbar Search Visible");
         toolbarSeacrhVisible.selectedProperty().bindBidirectional( propertySheet.toolbarSearchVisibleProperty() );
         
-        infoPane.getChildren().add(toolbarVisible);
         infoPane.getChildren().add(toolbarModeVisible);
         infoPane.getChildren().add(toolbarSeacrhVisible);
         infoPane.getChildren().add(segmentedButton);

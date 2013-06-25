@@ -249,21 +249,21 @@ public class PropertySheet extends Control {
     }
     
     
-    // --- toolbarVisibleProperty
-    private final SimpleBooleanProperty toolbarVisibleProperty = 
-            new SimpleBooleanProperty(this, "toolbarVisible", true);
-    
-    public final SimpleBooleanProperty toolbarVisibleProperty() {
-        return toolbarVisibleProperty;
-    }
-    
-    public final boolean isToolbarVisible() {
-        return toolbarVisibleProperty.get();
-    }
-    
-    public final void setToolbarVisible( boolean visible ) {
-        toolbarVisibleProperty.set(visible);
-    }
+//    // --- toolbarVisibleProperty
+//    private final SimpleBooleanProperty toolbarVisibleProperty = 
+//            new SimpleBooleanProperty(this, "toolbarVisible", true);
+//    
+//    public final SimpleBooleanProperty toolbarVisibleProperty() {
+//        return toolbarVisibleProperty;
+//    }
+//    
+//    public final boolean isToolbarVisible() {
+//        return toolbarVisibleProperty.get();
+//    }
+//    
+//    public final void setToolbarVisible( boolean visible ) {
+//        toolbarVisibleProperty.set(visible);
+//    }
     
     
     // --- toolbarModeVisibleProperty

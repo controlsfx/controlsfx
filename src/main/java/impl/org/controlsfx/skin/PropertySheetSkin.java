@@ -119,7 +119,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
         registerChangeListener(control.titleFilter(), "FILTER");
         registerChangeListener(searchField.textProperty(), "FILTER-UI");
-        registerChangeListener(control.toolbarVisibleProperty(), "TOOLBAR");
         registerChangeListener(control.toolbarModeVisibleProperty(), "TOOLBAR-MODE");
         registerChangeListener(control.toolbarSearchVisibleProperty(), "TOOLBAR-SEARCH");
         
@@ -141,20 +140,15 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
 
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
+        
         if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
             refreshProperties();
-        }
-        if (p == "FILTER-UI") {
+        } else if (p == "FILTER-UI") {
             getSkinnable().setTitleFilter(searchField.getText());
-        }
-        if (p == "TOOLBAR") {
-            toolbar.setVisible(getSkinnable().isToolbarVisible());
-        }
-        if (p == "TOOLBAR-MODE") {
-            modeButton.setVisible(getSkinnable().isToolbarModeVisible());
-        }
-        if (p == "TOOLBAR-SEARCH") {
-            searchField.setVisible(getSkinnable().isToolbarSearchVisible());
+        } else if (p == "TOOLBAR-MODE") {
+            updateToolbar();
+        } else if (p == "TOOLBAR-SEARCH") {
+            updateToolbar();
         }
     }
     
@@ -169,6 +163,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * Implementation
      * 
      **************************************************************************/
+    
+    private void updateToolbar() {
+        modeButton.setVisible(getSkinnable().isToolbarModeVisible());
+        searchField.setVisible(getSkinnable().isToolbarSearchVisible());
+        
+        toolbar.setVisible(modeButton.isVisible() || searchField.isVisible());
+    }
 
     private void refreshProperties() {
         scroller.setContent(buildPropertySheetContainer());

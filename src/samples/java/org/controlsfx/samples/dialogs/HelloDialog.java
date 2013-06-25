@@ -458,8 +458,7 @@ public class HelloDialog extends Application implements Sample {
 
     private Node createLabel(String text) {
         Label label = new Label(text);
-        label.setFont(Font.font("Amble, Arial", 13));
-        label.setTextFill(Color.BLUE);
+        label.setFont(Font.font(13));
         return label;
     }
 

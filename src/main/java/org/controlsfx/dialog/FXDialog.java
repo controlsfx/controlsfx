@@ -152,6 +152,7 @@ abstract class FXDialog {
         toolBar.setMaxHeight(HEADER_HEIGHT);
         
         titleLabel = new Label();
+        titleLabel.setMaxHeight(Double.MAX_VALUE);
         titleLabel.getStyleClass().add("window-title");
         titleLabel.setText(titleProperty().get());
 

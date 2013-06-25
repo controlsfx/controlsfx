@@ -42,6 +42,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -226,16 +228,28 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         private PropertySheet.Mode mode;
         
-        public ActionChangeMode( PropertySheet.Mode mode ) {
-            super("By " + capitalize(mode.toString()));
+        public ActionChangeMode(PropertySheet.Mode mode) {
+            super("");
             this.mode = mode;
+            
+            final String text = "By " + capitalize(mode.toString());
+            
+            if (mode == Mode.CATEGORY) {
+                Node graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png"));
+                setGraphic(graphic);
+                setLongText(text);
+            } else if (mode == Mode.NAME) {
+                Node graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png"));
+                setGraphic(graphic);
+                setLongText(text);
+            } else {
+                setText(text);
+            }
         }
 
         @Override public void execute(ActionEvent ae) {
             getSkinnable().modeProperty().set(mode);
         }
-        
-        
     }
     
     

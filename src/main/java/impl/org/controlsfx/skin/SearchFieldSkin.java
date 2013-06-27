@@ -32,7 +32,6 @@ import javafx.beans.Observable;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -74,7 +73,6 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
         clearButtonPane = new StackPane(clearButton);
         clearButtonPane.getStyleClass().addAll("clear-button");
         clearButtonPane.setOpacity(0.0);
-//        Tooltip.install(clearButtonPane, new Tooltip("Clear the search text"));
         
         clearButtonPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {

@@ -67,7 +67,7 @@ public class HelloCustomTextField extends Application implements Sample {
         grid.add(customTextField2, 1, 4);
         
         // CustomTextField (w/ left + right node)
-        grid.add(new Label("CustomTextField (w/ right node): "), 0, 5);
+        grid.add(new Label("CustomTextField (w/ left + right node): "), 0, 5);
         CustomTextField customTextField3 = new CustomTextField();
         ImageView imageView = new ImageView(image);
         customTextField3.setLeft(imageView);

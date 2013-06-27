@@ -45,7 +45,7 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         }
 
         if (type != null && type.isEnum()) {
-            return new ChoiceEditor(item, Arrays.<Object>asList(type.getEnumConstants()));
+            return new ChoiceEditor<Object>(item, Arrays.<Object>asList(type.getEnumConstants()));
         }
         
         if (type != null && type == Font.class) {

@@ -340,6 +340,7 @@ public class HelloDialog extends Application implements Sample {
         });
         
         final Button Hyperlink12a = new Button("Font Chooser");
+        
         Hyperlink12a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Font response = configureSampleDialog(

@@ -1,3 +1,9 @@
+/**************************************************************************
+ * 
+ * CustomTextField
+ * 
+ **************************************************************************/
+
 .custom-text-field {
     -fx-text-fill: -fx-text-inner-color;
     -fx-highlight-fill: derive(-fx-control-inner-background,-20%);
@@ -52,4 +58,32 @@
     -fx-background-insets: -0.2, 1, -1.4, 3;
     -fx-background-radius: 3, 2, 4, 0;
     -fx-prompt-text-fill: transparent;
+}
+
+
+
+
+/**************************************************************************
+ * 
+ * Search Field
+ * 
+ **************************************************************************/
+
+.search-field .clear-button {
+    -fx-padding: 0 3 0 0;
+}
+
+.search-field .clear-button > .graphic {
+    -fx-background-color: #949494;
+    -fx-scale-shape: false;
+    -fx-padding: 4.5 4.5 4.5 4.5; /* Graphic is 9x9 px */
+    -fx-shape: "M395.992,296.758l1.794-1.794l7.292,7.292l-1.795,1.794 L395.992,296.758z M403.256,294.992l1.794,1.794l-7.292,7.292l-1.794-1.795 L403.256,294.992z";
+}
+
+.search-field .clear-button:hover > .graphic {
+    -fx-background-color: #ee4444;
+}
+
+.search-field .clear-button:pressed > .graphic {
+    -fx-background-color: #ff1111;
 }

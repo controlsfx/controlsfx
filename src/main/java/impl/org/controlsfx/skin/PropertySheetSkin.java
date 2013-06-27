@@ -53,8 +53,8 @@ import javafx.scene.layout.Region;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
-import org.controlsfx.control.SearchField;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.control.TextFields;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.editor.ObjectViewer;
@@ -86,7 +86,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         new ActionChangeMode(Mode.NAME),
         new ActionChangeMode(Mode.CATEGORY)
     );
-    private final SearchField searchField = new SearchField();
+    private final TextField searchField = TextFields.createSearchField();
     
     
     /**************************************************************************

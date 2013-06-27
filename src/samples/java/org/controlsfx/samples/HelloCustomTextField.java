@@ -17,8 +17,8 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.CustomTextField;
-import org.controlsfx.control.SearchField;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.control.TextFields;
 
 public class HelloCustomTextField extends Application implements Sample {
     
@@ -48,7 +48,7 @@ public class HelloCustomTextField extends Application implements Sample {
         
         // SearchField
         grid.add(new Label("SearchField: "), 0, 1);
-        grid.add(new SearchField(), 1, 1);
+        grid.add(TextFields.createSearchField(), 1, 1);
         
         // CustomTextField
         grid.add(new Label("CustomTextField (no additional nodes): "), 0, 2);

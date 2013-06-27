@@ -26,24 +26,17 @@
  */
 package impl.org.controlsfx.skin;
 
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 
 import org.controlsfx.control.CustomTextField;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
+import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
-public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, BehaviorBase<CustomTextField>> {
-    
-    private static final PseudoClass HAS_FOCUS = PseudoClass.getPseudoClass("text-field-has-focus");
-    
+public class CustomTextFieldSkin extends TextFieldSkin {
     
     private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes");
     private static final PseudoClass HAS_LEFT_NODE = PseudoClass.getPseudoClass("left-node-visible");
@@ -53,22 +46,13 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
     private StackPane leftPane;
     private Node right;
     private StackPane rightPane;
-    private TextField textField;
     
     private final CustomTextField control;
     
     public CustomTextFieldSkin(final CustomTextField control) {
-        super(control, new BehaviorBase<>(control));
+        super(control, new TextFieldBehavior(control));
         
         this.control = control;
-        this.textField = control.getTextField();
-        textField.focusedProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable arg0) {
-                boolean hasFocus = getSkinnable().isFocused() || textField.isFocused();
-                control.pseudoClassStateChanged(HAS_FOCUS, hasFocus);
-            }
-        });
-        
         updateChildren();
         
         registerChangeListener(control.leftProperty(), "LEFT_NODE");
@@ -81,32 +65,28 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         
         if (p == "LEFT_NODE" || p == "RIGHT_NODE") {
             updateChildren();
-        } else if (p == "FOCUSED") {
-            Platform.runLater(new Runnable() {
-                @Override public void run() {
-                    textField.requestFocus();
-                }
-            });
         }
     }
     
     private void updateChildren() {
-        getChildren().setAll(textField);
-        
-        left = control.getLeft();
-        if (left != null) {
-            leftPane = new StackPane(left);
+        Node newLeft = control.getLeft();
+        if (newLeft != null) {
+            leftPane = new StackPane(newLeft);
             leftPane.setAlignment(Pos.CENTER_LEFT);
             leftPane.getStyleClass().add("left-pane");
+            getChildren().remove(left);
             getChildren().add(leftPane);
+            left = newLeft;
         }
         
-        right = control.getRight();
-        if (right != null) {
-            rightPane = new StackPane(right);
+        Node newRight = control.getRight();
+        if (newRight != null) {
+            rightPane = new StackPane(newRight);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
             rightPane.getStyleClass().add("right-pane");
+            getChildren().remove(right);
             getChildren().add(rightPane);
+            right = newRight;
         }
         
         control.pseudoClassStateChanged(HAS_LEFT_NODE, left != null);
@@ -117,13 +97,13 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         final double fullHeight = h + snappedTopInset() + snappedBottomInset();
         
-        final double leftWidth = leftPane == null ? 0.0 : leftPane.prefWidth(fullHeight);
-        final double rightWidth = rightPane == null ? 0.0 : rightPane.prefWidth(fullHeight);
+        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(fullHeight));
+        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(fullHeight));
         
-        final double textFieldStartX = leftWidth;
-        final double textFieldWidth = w - x - leftWidth - rightWidth;
+        final double textFieldStartX = snapPosition(x) + snapSize(leftWidth);
+        final double textFieldWidth = w - snapSize(leftWidth) - snapSize(rightWidth);
         
-        textField.resizeRelocate(textFieldStartX, 0, textFieldWidth, fullHeight);
+        super.layoutChildren(textFieldStartX, 0, textFieldWidth, fullHeight);
         
         if (leftPane != null) {
             final double leftStartX = 0;
@@ -131,17 +111,28 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         }
         
         if (rightPane != null) {
-            final double rightStartX = rightPane == null ? 0.0 : textFieldStartX + textFieldWidth;
+            final double rightStartX = rightPane == null ? 0.0 : w - rightWidth + snappedLeftInset();
             rightPane.resizeRelocate(rightStartX, 0, rightWidth, fullHeight);
         }
     }
     
-    @Override protected double computePrefHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return textField.prefHeight(w) + topInset + bottomInset;
-    }
-    
     @Override
     protected double computePrefWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return textField.prefWidth(h) + leftInset + rightInset;
+        final double pw = super.computePrefWidth(h, topInset, rightInset, bottomInset, leftInset);
+        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
+        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
+        
+//        return textField.prefWidth(h) + leftInset + rightInset;
+        return pw + leftWidth + rightWidth + leftInset + rightInset;
+    }
+    
+//    @Override
+//    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+//        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+//    }
+    
+    @Override
+    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
     }
 }

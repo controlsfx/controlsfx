@@ -27,8 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.SearchFieldSkin;
-import javafx.beans.property.StringProperty;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 
@@ -38,7 +36,7 @@ import javafx.scene.control.TextField;
  * 
  * @see CustomTextField
  */
-public class SearchField extends Control {
+public class SearchField extends CustomTextField {
 
     /**************************************************************************
      * 
@@ -46,7 +44,6 @@ public class SearchField extends Control {
      * 
      **************************************************************************/
     
-    private final CustomTextField customTextField = new CustomTextField();
 
     
     
@@ -83,59 +80,5 @@ public class SearchField extends Control {
      */
     @Override protected String getUserAgentStylesheet() {
         return SearchField.class.getResource("searchfield.css").toExternalForm();
-    }
-    
-    public CustomTextField getCustomTextField() {
-        return customTextField;
-    }
-
-    /**
-     * Returns the wrapped TextField, if the API on the SearchField control
-     * itself is not sufficient.
-     */
-    public TextField getTextField() {
-        return customTextField.getTextField();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#getPromptText()}.
-     */
-    public final String getPromptText() {
-        return customTextField.getPromptText();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#getText()}.
-     */
-    public final String getText() {
-        return customTextField.getText();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#promptTextProperty()}.
-     */
-    public final StringProperty promptTextProperty() {
-        return customTextField.promptTextProperty();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#setPromptText(String)}.
-     */
-    public final void setPromptText(String value) {
-        customTextField.setPromptText(value);
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#setText(String)}.
-     */
-    public final void setText(String value) {
-        customTextField.setText(value);
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#textProperty()}.
-     */
-    public final StringProperty textProperty() {
-        return customTextField.textProperty();
     }
 }

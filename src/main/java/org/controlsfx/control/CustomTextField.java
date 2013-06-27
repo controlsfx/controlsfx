@@ -41,7 +41,7 @@ import javafx.scene.control.TextField;
  * 
  * @see SearchField
  */
-public class CustomTextField extends Control {
+public class CustomTextField extends TextField {
 
     /**************************************************************************
      * 
@@ -49,7 +49,6 @@ public class CustomTextField extends Control {
      * 
      **************************************************************************/
     
-    private final TextField textField = new TextField();
 
     
     
@@ -133,55 +132,5 @@ public class CustomTextField extends Control {
      */
     @Override protected String getUserAgentStylesheet() {
         return CustomTextField.class.getResource("customtextfield.css").toExternalForm();
-    }
-
-    /**
-     * Returns the wrapped TextField, if the API on this control itself is not 
-     * sufficient.
-     */
-    public TextField getTextField() {
-        return textField;
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#getPromptText()}.
-     */
-    public final String getPromptText() {
-        return textField.getPromptText();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#getText()}.
-     */
-    public final String getText() {
-        return textField.getText();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#promptTextProperty()}.
-     */
-    public final StringProperty promptTextProperty() {
-        return textField.promptTextProperty();
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#setPromptText(String)}.
-     */
-    public final void setPromptText(String value) {
-        textField.setPromptText(value);
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#setText(String)}.
-     */
-    public final void setText(String value) {
-        textField.setText(value);
-    }
-
-    /**
-     * Delegate method that forwards on to {@link TextField#textProperty()}.
-     */
-    public final StringProperty textProperty() {
-        return textField.textProperty();
     }
 }

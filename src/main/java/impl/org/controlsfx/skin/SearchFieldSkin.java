@@ -27,82 +27,60 @@
 package impl.org.controlsfx.skin;
 
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.EventHandler;
-import javafx.scene.control.TextField;
+import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
-import org.controlsfx.control.CustomTextField;
 import org.controlsfx.control.SearchField;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
-public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<SearchField>>{
+public class SearchFieldSkin extends CustomTextFieldSkin {
     
     private static final Duration FADE_DURATION = Duration.millis(350);
     private final FadeTransition fader;
     
-    private final CustomTextField customTextField;
-    private final TextField textField;
+    private final SearchField control;
     
     private boolean clearButtonShowing = false;
     private final StackPane clearButtonPane;
     private final Region clearButton;
     
     public SearchFieldSkin(final SearchField control) {
-        super(control, new BehaviorBase<>(control));
+        super(control);
         
-        customTextField = control.getCustomTextField();
-        textField = customTextField.getTextField();
+        this.control = control;
         
         clearButton = new Region();
         clearButton.getStyleClass().addAll("graphic");
         clearButtonPane = new StackPane(clearButton);
         clearButtonPane.getStyleClass().addAll("clear-button");
         clearButtonPane.setOpacity(0.0);
+        clearButtonPane.setCursor(Cursor.DEFAULT);
         
         clearButtonPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
-                textField.clear();
+                control.clear();
             }
         });
         
-        customTextField.setRight(clearButtonPane);
+        control.setRight(clearButtonPane);
         
         fader = new FadeTransition(FADE_DURATION, clearButtonPane);
         fader.setCycleCount(1);
         
-        textField.textProperty().addListener(new InvalidationListener() {
+        control.textProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
                 updateClearButton();
             }
         });
-        
-        getChildren().setAll(customTextField);
-        
-        registerChangeListener(control.focusedProperty(), "FOCUSED");
-    }
-    
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if (p == "FOCUSED") {
-            Platform.runLater(new Runnable() {
-                @Override public void run() {
-                    textField.requestFocus();
-                }
-            });
-        }
     }
     
     private void updateClearButton() {
-        String text = textField.getText();
+        String text = control.getText();
         
         if ((text == null || text.isEmpty()) && clearButtonShowing) {
             // hide clear button
@@ -117,9 +95,5 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
             fader.play();
             clearButtonShowing = true;
         }
-    }
-    
-    @Override protected void layoutChildren(double x, double y, double w, double h) {
-        customTextField.resizeRelocate(x, y, w, h);
     }
 }

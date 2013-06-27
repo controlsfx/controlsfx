@@ -7,32 +7,33 @@
         linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);
     -fx-background-insets: 0, 1;
     -fx-background-radius: 3, 2;
-    -fx-padding: 0.333333em 0 0.333333em 0; 
+    
 }
 
-.custom-text-field .text-field {
+/*
+.custom-text-field {
     -fx-background-color: null;
     -fx-background-insets: 0;
 }
-
-.custom-text-field:no-side-nodes .text-field {
-    -fx-padding: 0 0.583em 0 0.583em; 
+*/
+.custom-text-field:no-side-nodes {
+    -fx-padding: 0.333333em 0.583em 0.333333em 0.583em; 
 }
 
-.custom-text-field:left-node-visible .text-field {
-    -fx-padding: 0 0.583em 0 0; 
+.custom-text-field:left-node-visible {
+    -fx-padding: 0.333333em 0.583em 0.333333em 0; 
 }
 
-.custom-text-field:right-node-visible .text-field {
-    -fx-padding: 0 0 0 0.583em; 
+.custom-text-field:right-node-visible {
+    -fx-padding: 0.333333em 0 0.333333em 0.583em;
 }
 
-.custom-text-field:left-node-visible:right-node-visible .text-field {
-    -fx-padding: 0 0 0 0; 
+.custom-text-field:left-node-visible:right-node-visible {
+    -fx-padding: 0.333333em 0 0.333333em 0; 
 }
 
 .custom-text-field:left-node-visible .left-pane {
-    -fx-padding: 0 3 0 3; 
+    -fx-padding: 0 3 0 3;
 }
 
 .custom-text-field:right-node-visible .right-pane {

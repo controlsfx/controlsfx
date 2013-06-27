@@ -12,6 +12,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import org.controlsfx.control.CustomTextField;
 import org.controlsfx.control.SearchField;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
@@ -24,6 +25,7 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
     
     private static final PseudoClass HAS_FOCUS = PseudoClass.getPseudoClass("text-field-has-focus");
     
+    private final CustomTextField customTextField;
     private final TextField textField;
     
     private boolean clearButtonShowing = false;
@@ -33,11 +35,11 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
     public SearchFieldSkin(final SearchField control) {
         super(control, new BehaviorBase<>(control));
         
-        textField = control.getTextField();
-        textField.getStyleClass().clear();
-        textField.focusedProperty().addListener(new InvalidationListener() {
+        customTextField = new CustomTextField();
+        textField = customTextField.getTextField();
+        customTextField.focusedProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
-                control.pseudoClassStateChanged(HAS_FOCUS, textField.isFocused());
+                control.pseudoClassStateChanged(HAS_FOCUS, customTextField.isFocused());
             }
         });
         
@@ -54,20 +56,22 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
             }
         });
         
+        customTextField.setRight(clearButtonPane);
+        
         fader = new FadeTransition(FADE_DURATION, clearButtonPane);
         fader.setCycleCount(1);
         
-        control.textProperty().addListener(new InvalidationListener() {
+        textField.textProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
                 updateClearButton();
             }
         });
         
-        getChildren().setAll(textField, clearButtonPane);
+        getChildren().setAll(customTextField);
     }
     
     private void updateClearButton() {
-        String text = getSkinnable().getText();
+        String text = textField.getText();
         
         if ((text == null || text.isEmpty()) && clearButtonShowing) {
             // hide clear button
@@ -85,16 +89,11 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
     }
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {
-        double btnWidth = clearButtonPane.prefWidth(h);
-        double btnHeight = clearButtonPane.prefHeight(w);
-        final double btnStartX = w - snappedRightInset() - btnWidth;
-        
-        textField.resizeRelocate(x, y, btnStartX - 11, h);
-        clearButtonPane.resizeRelocate(btnStartX, h / 2.0 - btnHeight / 2.0, btnWidth, btnHeight);
+        customTextField.resizeRelocate(x, y, w, h);
     }
     
     @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return textField.prefWidth(height);
+        return customTextField.prefWidth(height);
     }
 }

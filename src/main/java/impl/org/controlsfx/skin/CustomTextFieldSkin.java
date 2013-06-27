@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.css.PseudoClass;
@@ -63,7 +64,8 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         this.textField = control.getTextField();
         textField.focusedProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
-                control.pseudoClassStateChanged(HAS_FOCUS, textField.isFocused());
+                boolean hasFocus = getSkinnable().isFocused() || textField.isFocused();
+                control.pseudoClassStateChanged(HAS_FOCUS, hasFocus);
             }
         });
         
@@ -71,6 +73,7 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         
         registerChangeListener(control.leftProperty(), "LEFT_NODE");
         registerChangeListener(control.rightProperty(), "RIGHT_NODE");
+        registerChangeListener(control.focusedProperty(), "FOCUSED");
     }
     
     @Override protected void handleControlPropertyChanged(String p) {
@@ -78,6 +81,12 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         
         if (p == "LEFT_NODE" || p == "RIGHT_NODE") {
             updateChildren();
+        } else if (p == "FOCUSED") {
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    textField.requestFocus();
+                }
+            });
         }
     }
     

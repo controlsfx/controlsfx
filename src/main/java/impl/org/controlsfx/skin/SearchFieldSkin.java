@@ -27,6 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.css.PseudoClass;
@@ -48,8 +49,6 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
     private static final Duration FADE_DURATION = Duration.millis(350);
     private final FadeTransition fader;
     
-    private static final PseudoClass HAS_FOCUS = PseudoClass.getPseudoClass("text-field-has-focus");
-    
     private final CustomTextField customTextField;
     private final TextField textField;
     
@@ -62,11 +61,6 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
         
         customTextField = new CustomTextField();
         textField = customTextField.getTextField();
-        customTextField.focusedProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable arg0) {
-                control.pseudoClassStateChanged(HAS_FOCUS, customTextField.isFocused());
-            }
-        });
         
         clearButton = new Region();
         clearButton.getStyleClass().addAll("graphic");
@@ -92,6 +86,20 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
         });
         
         getChildren().setAll(customTextField);
+        
+        registerChangeListener(control.focusedProperty(), "FOCUSED");
+    }
+    
+    @Override protected void handleControlPropertyChanged(String p) {
+        super.handleControlPropertyChanged(p);
+        
+        if (p == "FOCUSED") {
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    textField.requestFocus();
+                }
+            });
+        }
     }
     
     private void updateClearButton() {

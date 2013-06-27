@@ -136,7 +136,12 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         }
     }
     
-    @Override protected double computePrefHeight(double w, double arg1, double arg2, double arg3, double arg4) {
-        return textField.prefHeight(w) + snappedTopInset() + snappedBottomInset();
+    @Override protected double computePrefHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return textField.prefHeight(w) + topInset + bottomInset;
+    }
+    
+    @Override
+    protected double computePrefWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return textField.prefWidth(h) + leftInset + rightInset;
     }
 }

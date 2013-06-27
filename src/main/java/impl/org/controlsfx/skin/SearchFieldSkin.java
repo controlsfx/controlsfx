@@ -30,7 +30,6 @@ import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -123,9 +122,4 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         customTextField.resizeRelocate(x, y, w, h);
     }
-    
-//    @Override
-//    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-//        return customTextField.prefWidth(height);
-//    }
 }

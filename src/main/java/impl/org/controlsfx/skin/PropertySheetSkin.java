@@ -109,7 +109,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
         // property sheet search
         searchField.setPromptText("Search");
-        HBox.setHgrow(searchField, Priority.ALWAYS);
+        searchField.setMinWidth(0);
+        HBox.setHgrow(searchField, Priority.SOMETIMES);
         searchField.managedProperty().bind(searchField.visibleProperty());
         toolbar.getItems().add(searchField);
         

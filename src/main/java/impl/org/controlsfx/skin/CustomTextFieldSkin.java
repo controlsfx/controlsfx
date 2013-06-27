@@ -42,6 +42,9 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, BehaviorBase<CustomTextField>> {
     
     private static final PseudoClass HAS_FOCUS = PseudoClass.getPseudoClass("text-field-has-focus");
+    
+    
+    private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes");
     private static final PseudoClass HAS_LEFT_NODE = PseudoClass.getPseudoClass("left-node-visible");
     private static final PseudoClass HAS_RIGHT_NODE = PseudoClass.getPseudoClass("right-node-visible");
     
@@ -99,6 +102,7 @@ public class CustomTextFieldSkin extends BehaviorSkinBase<CustomTextField, Behav
         
         control.pseudoClassStateChanged(HAS_LEFT_NODE, left != null);
         control.pseudoClassStateChanged(HAS_RIGHT_NODE, right != null);
+        control.pseudoClassStateChanged(HAS_NO_SIDE_NODE, left == null && right == null);
     }
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {

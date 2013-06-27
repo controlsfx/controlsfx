@@ -13,10 +13,21 @@
 .custom-text-field .text-field {
     -fx-background-color: null;
     -fx-background-insets: 0;
-    -fx-padding: 0 0 0 0.583em; 
+}
+
+.custom-text-field:no-side-nodes .text-field {
+    -fx-padding: 0 0.583em 0 0.583em; 
 }
 
 .custom-text-field:left-node-visible .text-field {
+    -fx-padding: 0 0.583em 0 0; 
+}
+
+.custom-text-field:right-node-visible .text-field {
+    -fx-padding: 0 0 0 0.583em; 
+}
+
+.custom-text-field:left-node-visible:right-node-visible .text-field {
     -fx-padding: 0 0 0 0; 
 }
 

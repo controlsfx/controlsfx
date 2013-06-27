@@ -84,6 +84,10 @@ public class SearchField extends Control {
     @Override protected String getUserAgentStylesheet() {
         return SearchField.class.getResource("searchfield.css").toExternalForm();
     }
+    
+    public CustomTextField getCustomTextField() {
+        return customTextField;
+    }
 
     /**
      * Returns the wrapped TextField, if the API on the SearchField control
@@ -97,41 +101,41 @@ public class SearchField extends Control {
      * Delegate method that forwards on to {@link TextField#getPromptText()}.
      */
     public final String getPromptText() {
-        return getTextField().getPromptText();
+        return customTextField.getPromptText();
     }
 
     /**
      * Delegate method that forwards on to {@link TextField#getText()}.
      */
     public final String getText() {
-        return getTextField().getText();
+        return customTextField.getText();
     }
 
     /**
      * Delegate method that forwards on to {@link TextField#promptTextProperty()}.
      */
     public final StringProperty promptTextProperty() {
-        return getTextField().promptTextProperty();
+        return customTextField.promptTextProperty();
     }
 
     /**
      * Delegate method that forwards on to {@link TextField#setPromptText(String)}.
      */
     public final void setPromptText(String value) {
-        getTextField().setPromptText(value);
+        customTextField.setPromptText(value);
     }
 
     /**
      * Delegate method that forwards on to {@link TextField#setText(String)}.
      */
     public final void setText(String value) {
-        getTextField().setText(value);
+        customTextField.setText(value);
     }
 
     /**
      * Delegate method that forwards on to {@link TextField#textProperty()}.
      */
     public final StringProperty textProperty() {
-        return getTextField().textProperty();
+        return customTextField.textProperty();
     }
 }

@@ -59,7 +59,7 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
     public SearchFieldSkin(final SearchField control) {
         super(control, new BehaviorBase<>(control));
         
-        customTextField = new CustomTextField();
+        customTextField = control.getCustomTextField();
         textField = customTextField.getTextField();
         
         clearButton = new Region();
@@ -124,8 +124,8 @@ public class SearchFieldSkin extends BehaviorSkinBase<SearchField, BehaviorBase<
         customTextField.resizeRelocate(x, y, w, h);
     }
     
-    @Override
-    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return customTextField.prefWidth(height);
-    }
+//    @Override
+//    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+//        return customTextField.prefWidth(height);
+//    }
 }

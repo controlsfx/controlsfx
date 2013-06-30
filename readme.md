@@ -40,7 +40,7 @@ Current development snapshots are also available from Maven Central using the fo
 ##### Gradle
     :::groovy
     dependencies {
-       compile 'org.controlsfx:controlsfx:8.0.1-SNAPSHOT'
+       runtime 'org.controlsfx:controlsfx:8.0.1-SNAPSHOT'
     }
 
 ## License

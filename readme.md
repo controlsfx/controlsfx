@@ -24,6 +24,17 @@ ControlsFX has a slightly different approach to version numbers than other proje
 
 In other words, we do not differentiate between bug fix and feature releases we will clarify what the release contains on a per-release basis. Also, we will always aim to require the minimal version of JavaFX possible, but we are also not going to hold back features / bug fixes / etc if we can resolve them by moving to a newer release. Prior to moving up to a new JavaFX version we will always tag the [repository][17] and make available a download of the source and compiled code for the earlier version, for people who are unable to move to the newer JavaFX release.
 
+## Download 
+
+The library can be downloaded from from [ControlsFX website][21]. Current development snapshots are also avalable from Maven Central:
+
+:::xml
+    <dependency>
+        <groupId>org.controlsfx</groupId>
+        <artifactId>controlsfx</artifactId>
+        <version>8.0.1-SNAPSHOT</version>
+    </dependency>
+
 ## License
 
 ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers, but our interpretation of this license suggests to us that it is business friendly, requiring only the redistribution of the [3-clause BSD license we distribute with ControlsFX][19]. As always, I suggest you review the license with the appropriate people, rather than take the advice of software engineers. If this license is not suitable, please contact [Jonathan Giles][20] to discuss an alternative license.
@@ -49,3 +60,4 @@ ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers,
    [18]: http://opensource.org/licenses/BSD-3-Clause
    [19]: https://bitbucket.org/JonathanGiles/controlsfx/src/e01d9073145a352db1562baf6ea7297d5c37d6a1/license.txt?at=default
    [20]: mailto:jonathan%40jonathangiles.net
+   [21]: http://fxexperience.com/downloads/controlsfx-8.0.0.zip

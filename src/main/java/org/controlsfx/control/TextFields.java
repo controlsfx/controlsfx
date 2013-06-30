@@ -41,24 +41,23 @@ public class TextFields {
         fader.setCycleCount(1);
         
         searchField.textProperty().addListener(new InvalidationListener() {
-            private boolean clearButtonShowing = false;
             
             @Override public void invalidated(Observable arg0) {
                 String text = searchField.getText();
+                boolean isTextEmpty = text == null || text.isEmpty();
+                boolean isButtonVisible = fader.getNode().getOpacity() > 0;
                 
-                if ((text == null || text.isEmpty()) && clearButtonShowing) {
-                    // hide clear button
-                    fader.setFromValue(1.0);
-                    fader.setToValue(0.0);
-                    fader.play();
-                    clearButtonShowing = false;
-                } else if ((text != null && ! text.isEmpty()) && ! clearButtonShowing) {
-                    // show clear button
-                    fader.setFromValue(0.0);
-                    fader.setToValue(1.0);
-                    fader.play();
-                    clearButtonShowing = true;
+                if (isTextEmpty && isButtonVisible) {
+                    setButtonVisible(false);
+                } else if (!isTextEmpty && !isButtonVisible) {
+                    setButtonVisible(true);
                 }
+            }
+            
+            private void setButtonVisible( boolean visible ) {
+                fader.setFromValue(visible? 0.0: 1.0);
+                fader.setToValue(visible? 1.0: 0.0);
+                fader.play();
             }
         });
         

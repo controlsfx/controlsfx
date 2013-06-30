@@ -37,6 +37,12 @@ Current development snapshots are also available from Maven Central using the fo
        <version>8.0.1-SNAPSHOT</version>
     </dependency>
 
+##### Gradle
+    :::groovy
+    dependencies {
+       compile 'org.controlsfx:controlsfx:8.0.1-SNAPSHOT'
+    }
+
 ## License
 
 ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers, but our interpretation of this license suggests to us that it is business friendly, requiring only the redistribution of the [3-clause BSD license we distribute with ControlsFX][19]. As always, I suggest you review the license with the appropriate people, rather than take the advice of software engineers. If this license is not suitable, please contact [Jonathan Giles][20] to discuss an alternative license.

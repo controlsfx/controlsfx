@@ -29,11 +29,11 @@ In other words, we do not differentiate between bug fix and feature releases we 
 The library can be downloaded from from [ControlsFX website][21]. Current development snapshots are also avalable from Maven Central:
 
 :::xml
-    <dependency>
-        <groupId>org.controlsfx</groupId>
-        <artifactId>controlsfx</artifactId>
-        <version>8.0.1-SNAPSHOT</version>
-    </dependency>
+<dependency>
+   <groupId>org.controlsfx</groupId>
+   <artifactId>controlsfx</artifactId>
+   <version>8.0.1-SNAPSHOT</version>
+</dependency>
 
 ## License
 

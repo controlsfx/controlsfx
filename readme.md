@@ -24,9 +24,10 @@ ControlsFX has a slightly different approach to version numbers than other proje
 
 In other words, we do not differentiate between bug fix and feature releases we will clarify what the release contains on a per-release basis. Also, we will always aim to require the minimal version of JavaFX possible, but we are also not going to hold back features / bug fixes / etc if we can resolve them by moving to a newer release. Prior to moving up to a new JavaFX version we will always tag the [repository][17] and make available a download of the source and compiled code for the earlier version, for people who are unable to move to the newer JavaFX release.
 
-## Download 
+## Downloads 
 
-The library can be downloaded from from [ControlsFX website][21]. Current development snapshots are also avalable from Maven Central:
+The library can be downloaded from from [ControlsFX website][21]. 
+Current development snapshots are also available from Maven Central using the following dependency settings:
 
     :::html
     <dependency>

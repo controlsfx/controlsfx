@@ -29,7 +29,7 @@ In other words, we do not differentiate between bug fix and feature releases we 
 The library can be downloaded from from [ControlsFX website][21]. 
 Current development snapshots are also available from Maven Central using the following dependency settings:
 
-##### Maven
+###### Maven
     :::html
     <dependency>
        <groupId>org.controlsfx</groupId>
@@ -37,11 +37,19 @@ Current development snapshots are also available from Maven Central using the fo
        <version>8.0.1-SNAPSHOT</version>
     </dependency>
 
-##### Gradle
+###### Gradle
     :::groovy
     dependencies {
        runtime 'org.controlsfx:controlsfx:8.0.1-SNAPSHOT'
     }
+    
+###### Ivy
+    :::html 
+    <dependency org="org.controlsfx" name="controlsfx" rev="8.0.1-SNAPSHOT"/>
+    
+###### Sbt
+    :::scala 
+    libraryDependencies += "org.controlsfx" % "controlsfx" % "8.0.1-SNAPSHOT"   
 
 ## License
 

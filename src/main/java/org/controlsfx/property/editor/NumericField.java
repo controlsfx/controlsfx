@@ -6,7 +6,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
-import javafx.util.converter.DoubleStringConverter;
 
 /*
  * TODO replace this with proper API when it becomes available:
@@ -16,7 +15,7 @@ public class NumericField extends TextField {
 
     private static String regex = "[-+]?[0-9]*\\.?[0-9]+";
     
-    private final DoubleStringConverter converter = new DoubleStringConverter();
+//    private final DoubleStringConverter converter = new DoubleStringConverter();
     private final DoubleProperty value = new SimpleDoubleProperty(this, "value", 0.0) {
         protected void invalidated() {
             setText(Double.toString(get()));

@@ -314,7 +314,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             }
         }
         
+        @SuppressWarnings("unchecked")
         private Node getEditor(Item item) {
+            @SuppressWarnings("rawtypes")
             PropertyEditor editor = getSkinnable().getPropertyEditorFactory().call(item);
             if (editor == null) {
                 editor = new ObjectViewer(item);

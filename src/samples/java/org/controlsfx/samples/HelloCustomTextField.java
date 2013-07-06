@@ -7,17 +7,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.CustomTextField;
-import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.TextFields;
 
 public class HelloCustomTextField extends Application implements Sample {

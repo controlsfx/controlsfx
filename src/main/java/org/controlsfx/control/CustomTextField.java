@@ -29,14 +29,12 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.CustomTextFieldSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
 
 /**
- * A base class for people wanting to customise a {@link TextField} to contain nodes
+ * A base class for people wanting to customize a {@link TextField} to contain nodes
  * inside the text field itself, without being on top of the users typed-in text.
  * 
  * @see SearchField

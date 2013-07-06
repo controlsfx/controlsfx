@@ -71,7 +71,6 @@ public class FontEditor extends AbstractPropertyEditor<Font, AbstractObjectField
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override public void setValue(Font value) {
         getEditor().getObjectProperty().set(value);
     }

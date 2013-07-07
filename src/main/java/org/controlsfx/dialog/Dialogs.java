@@ -37,7 +37,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javafx.application.Platform;
@@ -855,7 +858,101 @@ public final class Dialogs {
         }
     } 
     
-    
+    /**
+     * Font style as combination of font weight and font posture. 
+     * Weight does not have to be there (represented by null)
+     * Posture is required, null posture is converted to REGULAR
+     */
+    private static class FontStyle implements Comparable<FontStyle> {
+        
+        private FontPosture posture; 
+        private FontWeight weight;
+        
+        public FontStyle( FontWeight weight, FontPosture posture ) {
+            this.posture = posture == null? FontPosture.REGULAR: posture;
+            this.weight = weight;
+        }
+        
+        public FontStyle() {
+            this( null, null);
+        }
+        
+        public FontStyle(String styles) {
+            this();
+            String[] fontStyles = (styles == null? "": styles.trim().toUpperCase()).split(" ");
+            for ( String style: fontStyles) {
+                FontWeight w = FontWeight.findByName(style);
+                if ( w != null ) {
+                    weight = w;
+                } else {
+                    FontPosture p = FontPosture.findByName(style);
+                    if ( p != null ) posture = p;
+                }
+            }
+        }
+        
+        public FontStyle(Font font) {
+            this( font.getStyle());
+        }
+        
+        public FontPosture getPosture() {
+            return posture;
+        }
+        
+        public FontWeight getWeight() {
+            return weight;
+        }
+        
+        
+        @Override public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((posture == null) ? 0 : posture.hashCode());
+            result = prime * result + ((weight == null) ? 0 : weight.hashCode());
+            return result;
+        }
+
+        @Override public boolean equals(Object that) {
+            if (this == that)
+                return true;
+            if (that == null)
+                return false;
+            if (getClass() != that.getClass())
+                return false;
+            FontStyle other = (FontStyle) that;
+            if (posture != other.posture)
+                return false;
+            if (weight != other.weight)
+                return false;
+            return true;
+        }
+        
+        private static String makePretty(Object o) {
+            String s = o == null? "": o.toString();
+            if ( !s.isEmpty()) { 
+                s = s.replace("_", " ");
+                s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+            }
+            return s;
+        }
+
+        @Override public String toString() {
+            return String.format("%s %s", makePretty(weight), makePretty(posture) ).trim();
+        }
+        
+        private <T extends Enum<T>> int compareEnums( T e1, T e2) {
+            if ( e1 == e2 ) return 0;
+            if ( e1 == null ) return -1;
+            if ( e2 == null ) return 1;
+            return e1.compareTo(e2);
+        }
+
+        @Override public int compareTo(FontStyle fs) {
+            int result = compareEnums(weight,fs.weight);
+            return ( result != 0 )? result: compareEnums(posture,fs.posture);
+        }
+        
+    }
     
     private static class FontPanel extends GridPane {
         private static final double HGAP = 10;
@@ -869,31 +966,25 @@ public final class Dialogs {
         
         private static final Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
         
-        // combination of FontPosture and FontWeight
-        private static final Object[] fontStyles = new Object[FontPosture.values().length + FontWeight.values().length];
-        {
-            int i = 0;
-            for (FontPosture posture : FontPosture.values()) {
-                fontStyles[i++] = makePretty(posture); 
+        private static List<FontStyle> getFontStyles( String fontFamily ) {
+            Set<FontStyle> set = new HashSet<FontStyle>();
+            for (String f : Font.getFontNames(fontFamily)) {
+                set.add(new FontStyle(f.replace(fontFamily, "")));
             }
-            for (FontWeight weight : FontWeight.values()) {
-                fontStyles[i++] = makePretty(weight); 
-            }
+            
+            List<FontStyle> result =  new ArrayList<FontStyle>(set);
+            Collections.sort(result);
+            return result;
+            
         }
         
-        private static String makePretty(Object o) {
-            String s = o.toString();
-            s = s.replace("_", " ");
-            s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
-            return s;
-        }
         
         private final FilteredList<String> filteredFontList = new FilteredList<>(FXCollections.observableArrayList(Font.getFamilies()), MATCH_ALL);
-        private final FilteredList<Object> filteredStyleList = new FilteredList<>(FXCollections.observableArrayList(fontStyles), MATCH_ALL);
+        private final FilteredList<FontStyle> filteredStyleList = new FilteredList<>(FXCollections.<FontStyle>observableArrayList(), MATCH_ALL);
         private final FilteredList<Double> filteredSizeList = new FilteredList<>(FXCollections.observableArrayList(fontSizes), MATCH_ALL);
         
         private final ListView<String> fontListView = new ListView<String>(filteredFontList);
-        private final ListView<Object> styleListView = new ListView<Object>(filteredStyleList);
+        private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
         private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
         private final Text sample = new Text("Sample");
         
@@ -983,7 +1074,13 @@ public final class Dialogs {
                 }
             };
             
-            fontListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
+            fontListView.selectionModelProperty().get().selectedItemProperty().addListener( new ChangeListener<String>() {
+
+                @Override public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+                    String fontFamily = listSelection(fontListView);
+                    styleListView.setItems(FXCollections.<FontStyle>observableArrayList(getFontStyles(fontFamily)));       
+                    refreshSample();
+                }});
 
             add( new Label("Style"), 1, 0);
 //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
@@ -1023,21 +1120,27 @@ public final class Dialogs {
             final Font _font = font == null ? Font.getDefault() : font;
             if (_font != null) {
                 selectInList( fontListView,  _font.getFamily() );
-                selectInList( styleListView, FontPosture.findByName(_font.getStyle().toUpperCase()) );
+                selectInList( styleListView, new FontStyle(_font));
                 selectInList( sizeListView, _font.getSize() );
             }
         }
         
         public Font getFont() {
             try {
-                Object style = listSelection(styleListView);
-                if (style instanceof FontWeight) {
-                    return Font.font(listSelection(fontListView),(FontWeight)style,listSelection(sizeListView));
-                } else if (style instanceof FontPosture) {
-                    return Font.font(listSelection(fontListView),(FontPosture)style,listSelection(sizeListView));
-                } else {
-                    throw new RuntimeException("Unknown font style: " + style); 
+                FontStyle style = listSelection(styleListView);
+                if ( style == null ) {
+                    return Font.font(
+                            listSelection(fontListView),
+                            listSelection(sizeListView));
+                    
+                } else { 
+                    return Font.font(
+                            listSelection(fontListView),
+                            style.getWeight(),
+                            style.getPosture(),
+                            listSelection(sizeListView));
                 }
+                
             } catch( Throwable ex ) {
                 return null;
             }

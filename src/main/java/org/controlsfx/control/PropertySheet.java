@@ -36,9 +36,49 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
+import org.controlsfx.property.BeanPropertyUtils;
+import org.controlsfx.property.editor.CheckEditor;
+import org.controlsfx.property.editor.ChoiceEditor;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
+import org.controlsfx.property.editor.FontEditor;
 import org.controlsfx.property.editor.PropertyEditor;
+import org.controlsfx.property.editor.TextEditor;
 
+/**
+ * The PropertySheet control is a powerful control designed to make it really
+ * easy for developers to present to end users a list of properties that the 
+ * end user is allowed to manipulate. Commonly a property sheet is used in
+ * visual editors and other tools where a lot of properties exist.
+ * 
+ * <p>To better describe what a property sheet is, please refer to the picture
+ * below:
+ * 
+ * <br>
+ * <center><img src="propertySheet.png" /></center>
+ * 
+ * <p>In this property sheet there exists two columns: the left column shows a 
+ * label describing the property itself, whereas the right column provides a
+ * {@link PropertyEditor} that allows the end user the means to manipulate the
+ * property. In the screenshot you can see {@link CheckEditor}, 
+ * {@link ChoiceEditor}, {@link TextEditor} and {@link FontEditor}, among the
+ * many editors that are available in the {@link org.controlsfx.property.editor}
+ * package.
+ * 
+ * <p>To create a PropertySheet is simple: you firstly instantiate an instance
+ * of PropertySheet, and then you pass in a list of {@link Item} instances,
+ * where each Item represents a single property that is to be editable by the
+ * end user.
+ * 
+ * <h3>Working with JavaBeans</h3>
+ * Because a very common use case for a property sheet is editing properties on
+ * a JavaBean, there is convenience API for making this interaction easier.
+ * Refer to the {@link BeanPropertyUtils class}, in particular the
+ * {@link BeanPropertyUtils#getProperties(Object)} method that will return a 
+ * list of Item instances, one Item instance per property on the given JavaBean.
+ * 
+ * @see Item
+ * @see Mode
+ */
 public class PropertySheet extends Control {
     
     
@@ -57,7 +97,7 @@ public class PropertySheet extends Control {
      **************************************************************************/
     
     /**
-     * Specifies how the PropertySheet should be laid out. Refer to the 
+     * Specifies how the {@link PropertySheet} should be laid out. Refer to the 
      * enumeration values to learn what each one means.
      */
     public static enum Mode {
@@ -81,6 +121,8 @@ public class PropertySheet extends Control {
     /**
      * A wrapper interface for a single property to be displayed in a
      * {@link PropertySheet} control.
+     * 
+     * @see PropertySheet
      */
     public static interface Item {
         

@@ -11,6 +11,11 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+/**
+ * A class containing useful customisations for the JavaFX {@link TextField}.
+ * Note that this class is experimental and the API may change in future 
+ * releases.
+ */
 public class TextFields {
     private static final Duration FADE_DURATION = Duration.millis(350);
     
@@ -18,6 +23,10 @@ public class TextFields {
         // no-op
     }
 
+    /**
+     * Creates a TextField that shows a clear button inside the TextField (on
+     * the right hand side of it) when text is entered by the user.
+     */
     public static TextField createSearchField() {
         final CustomTextField searchField = new CustomTextField();
         searchField.getStyleClass().add("search-field");

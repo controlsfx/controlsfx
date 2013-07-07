@@ -3,14 +3,17 @@ package org.controlsfx.property.editor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -27,7 +30,7 @@ public class Editors {
     
         return new AbstractPropertyEditor<String, TextField>(property, new TextField()) {
 
-            { EditorUtils.enableAutoSelectAll(getEditor()); } 
+            { enableAutoSelectAll(getEditor()); } 
             
             @Override protected StringProperty getObservableValue() {
                 return getEditor().textProperty();
@@ -45,7 +48,7 @@ public class Editors {
 
             private Class<? extends Number> sourceClass = Double.class;
             
-            { EditorUtils.enableAutoSelectAll(getEditor()); }
+            { enableAutoSelectAll(getEditor()); }
 
             @Override protected ObservableValue<Number> getObservableValue() {
                 return getEditor().valueProperty();
@@ -139,4 +142,19 @@ public class Editors {
         };
         
     }    
+    
+    private static void enableAutoSelectAll(final TextInputControl control) {
+        control.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            control.selectAll();
+                        }
+                    });
+                }
+            }
+        });
+    }
+    
 }

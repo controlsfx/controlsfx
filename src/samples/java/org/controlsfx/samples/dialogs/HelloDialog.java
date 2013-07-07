@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -340,7 +341,6 @@ public class HelloDialog extends Application implements Sample {
         });
         
         final Button Hyperlink12a = new Button("Font Chooser");
-        
         Hyperlink12a.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Font response = configureSampleDialog(
@@ -351,7 +351,34 @@ public class HelloDialog extends Application implements Sample {
             }
         });
         
-        grid.add(new HBox(10, Hyperlink12, Hyperlink12a), 1, row);
+        final Button Hyperlink12b = new Button("Progress");
+        Hyperlink12b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Task worker = new Task() {
+                    @Override protected Object call() throws Exception {
+                        for (int i=0; i<100; i++) {
+                            updateProgress(i, 99);
+                            System.out.println("progress: " + i);
+                            Thread.sleep(100);
+                        }
+                        return null;
+                    }
+                };
+                
+                configureSampleDialog(
+                        Dialogs.create()
+                        .title("Progress")
+                        .message("Now Loading..."))
+                    .showWorkerProgress(worker);
+                
+                Thread th = new Thread(worker);
+                th.setDaemon(true);
+                th.start();
+            }
+        });
+
+        
+        grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b), 1, row);
         row ++;
         
 

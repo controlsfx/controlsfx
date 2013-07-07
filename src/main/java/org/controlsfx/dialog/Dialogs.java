@@ -45,10 +45,14 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -62,6 +66,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -72,8 +77,10 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -348,8 +355,8 @@ public final class Dialogs {
     
     /**
      * Specifies that the dialog should become lightweight, which means it is
-     * rendered within the scenegraph (and can't leave the window). This is 
-     * commonly useful in environments where a windowing system is unavailable
+     * rendered within the scenegraph (and can't leave the window). Lightweight 
+     * dialogs are commonly useful in environments where a windowing system is unavailable
      * (e.g. tablet devices), and also when you only want to block execution
      * (and access to) a portion of your user interface. For example, you could
      * create a lightweight dialog with an owner of a single {@link Tab} in a 
@@ -620,41 +627,28 @@ public final class Dialogs {
         return Dialog.Actions.OK == dlg.show() ? fontPanel.getFont(): null;
     }
     
-    
-    
-    /***************************************************************************
-     * 
-     * Support classes
-     * 
-     **************************************************************************/
-    
     /**
-     * Command Link class.
-     * Represents one command link in command links dialog. 
+     * Creates a progress bar dialog which is attached to the given {@link Worker}
+     * instance, so that as the worker starts and completes, so too does the
+     * dialog show and hide automatically. 
+     * 
+     * @param worker The worker that the progress dialog is watching.
      */
-    public static class CommandLink extends AbstractAction {
+    public void showWorkerProgress(final Worker<?> worker) {
+        Dialog dlg = buildDialog(Type.PROGRESS);
+        dlg.setClosable(false);
         
-        public CommandLink( Node graphic, String text, String longText ) {
-            super(text);
-            setLongText(longText);
-            setGraphic(graphic);
-        }
-        
-        public CommandLink( String message, String comment ) {
-            this(null, message, comment);
-        }
+        final WorkerProgressPane content = new WorkerProgressPane(dlg);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setWorker(worker);
 
-        @Override public final void execute(ActionEvent ae) {
-            Dialog dlg = (Dialog)ae.getSource();
-            dlg.result = this;
-            dlg.hide();
-        }
-
-        @Override public String toString() {
-            return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
-        }
+        VBox vbox = new VBox(10, new Label(message == null ? "Progress:" : message), content);
+        vbox.setMaxWidth(Double.MAX_VALUE);
         
-    }    
+        vbox.setPrefSize(300, 100);
+        
+        dlg.setContent(vbox);
+    }
     
     
     
@@ -664,47 +658,6 @@ public final class Dialogs {
      * 
      **************************************************************************/
 
-    private static enum Type {
-        ERROR("error.image", "Error", "Error", OK),
-        INFORMATION("info.image", "Message", "Message", OK),
-        WARNING("warning.image", "Warning", "Warning", OK),
-        CONFIRMATION("confirm.image", "Select an option", "Select an option", YES, NO, CANCEL),
-        INPUT("confirm.image", "Select an option", "Select an option", OK, CANCEL),
-        FONT( null, "Select Font", "Select Font", OK, CANCEL);
-
-        private final String defaultTitle;
-        private final String defaultMasthead;
-        private final Collection<Action> actions;
-        private final String imageResource;
-        private Image image;
-
-        Type(String imageResource, String defaultTitle, String defaultMasthead, Action... actions) {
-            this.actions = Arrays.asList(actions);
-            this.imageResource = imageResource;
-            this.defaultTitle = defaultTitle;
-            this.defaultMasthead = defaultMasthead;
-        }
-
-        public Image getImage() {
-            if (image == null && imageResource != null ) {
-                image = DialogResources.getImage(imageResource);
-            }
-            return image;
-        }
-
-        public String getDefaultMasthead() {
-            return defaultMasthead;
-        }
-
-        public String getDefaultTitle() {
-            return defaultTitle;
-        }
-
-        public Collection<Action> getActions() {
-            return actions;
-        }
-    }
-
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
@@ -712,7 +665,7 @@ public final class Dialogs {
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         Image image = dlgType.getImage();
-        if ( image != null ) {
+        if (image != null) {
             dlg.setGraphic(new ImageView(image));
         }
         dlg.setMasthead(actualMasthead);
@@ -828,6 +781,86 @@ public final class Dialogs {
         
         return button;
     }
+    
+    
+    
+    /***************************************************************************
+     * 
+     * Support classes
+     * 
+     **************************************************************************/
+    
+    private static enum Type {
+        ERROR("error.image", "Error", "Error", OK),
+        INFORMATION("info.image", "Message", "Message", OK),
+        WARNING("warning.image", "Warning", "Warning", OK),
+        CONFIRMATION("confirm.image", "Select an option", "Select an option", YES, NO, CANCEL),
+        INPUT("confirm.image", "Select an option", "Select an option", OK, CANCEL),
+        FONT( null, "Select Font", "Select Font", OK, CANCEL),
+        PROGRESS( null, "Progress", "Progress");
+
+        private final String defaultTitle;
+        private final String defaultMasthead;
+        private final Collection<Action> actions;
+        private final String imageResource;
+        private Image image;
+
+        Type(String imageResource, String defaultTitle, String defaultMasthead, Action... actions) {
+            this.actions = Arrays.asList(actions);
+            this.imageResource = imageResource;
+            this.defaultTitle = defaultTitle;
+            this.defaultMasthead = defaultMasthead;
+        }
+
+        public Image getImage() {
+            if (image == null && imageResource != null ) {
+                image = DialogResources.getImage(imageResource);
+            }
+            return image;
+        }
+
+        public String getDefaultMasthead() {
+            return defaultMasthead;
+        }
+
+        public String getDefaultTitle() {
+            return defaultTitle;
+        }
+
+        public Collection<Action> getActions() {
+            return actions;
+        }
+    }
+    
+    
+    /**
+     * Command Link class.
+     * Represents one command link in command links dialog. 
+     */
+    public static class CommandLink extends AbstractAction {
+        
+        public CommandLink( Node graphic, String text, String longText ) {
+            super(text);
+            setLongText(longText);
+            setGraphic(graphic);
+        }
+        
+        public CommandLink( String message, String comment ) {
+            this(null, message, comment);
+        }
+
+        @Override public final void execute(ActionEvent ae) {
+            Dialog dlg = (Dialog)ae.getSource();
+            dlg.result = this;
+            dlg.hide();
+        }
+
+        @Override public String toString() {
+            return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
+        }
+    } 
+    
+    
     
     private static class FontPanel extends GridPane {
         private static final double HGAP = 10;
@@ -1018,4 +1051,97 @@ public final class Dialogs {
             return listView.selectionModelProperty().get().getSelectedItem();
         }
     }    
+    
+    
+    
+    /**
+     * The WorkerProgressPane is automatically shown or hidden based on the status of the
+     * Worker that is associated with it. You can specify the ProgressIndicator to be used,
+     * as well as what kind of a delay the WorkerProgressPane should have before being shown,
+     * and the speed at which it should be shown / hidden.
+     *
+     * The WorkerProgressPane will listen to the Worker as it changes state. When the Worker enters
+     * the running state, the pane will wait for some short (configurable) period of time to determine
+     * what the rate of progress is, and to figure out whether the task will be complete before the
+     * (configurable) showTime is specified. When it is triggered, it will show the pane (it must have
+     * previously been added to the parent) and when either the worker succeeds, or fails, or is cancelled,
+     * the WorkerProgressPane will hide itself.
+     */
+    private static class WorkerProgressPane extends Region {
+        private Worker<?> worker;
+        
+        private ChangeListener<Worker.State> stateListener = new ChangeListener<Worker.State>() {
+            @Override public void changed(ObservableValue<? extends State> observable, State old, State value) {
+                switch(value) {
+                    case CANCELLED:
+                    case FAILED:
+                    case SUCCEEDED:
+                        end();
+                        break;
+                    case SCHEDULED:
+                        begin();
+                        break;
+                }
+            }
+        };
+
+        public final void setWorker(final Worker<?> newWorker) { 
+            if (newWorker != worker) {
+                if (worker != null) {
+                    worker.stateProperty().removeListener(stateListener);
+                    end();
+                }
+                if (newWorker != null) {
+                    newWorker.stateProperty().addListener(stateListener);
+                    if (newWorker.getState() == Worker.State.RUNNING || newWorker.getState() == Worker.State.SCHEDULED) {
+                        // It is already running
+                        begin();
+                    }
+                }
+                worker = newWorker;
+            }
+        }
+
+        // If the progress indicator changes, then we need to re-initialize
+        // If the worker changes, we need to re-initialize
+
+        private final Dialog dialog;
+        private final ProgressBar progressBar;
+        
+        public WorkerProgressPane(Dialog dialog) {
+            this.dialog = dialog;
+            
+            this.progressBar = new ProgressBar();
+            progressBar.setMaxWidth(Double.MAX_VALUE);
+            getChildren().add(progressBar);
+            
+            if (worker != null) {
+                progressBar.progressProperty().bind(worker.progressProperty());
+            }
+        }
+
+        private void begin() {
+            progressBar.progressProperty().bind(worker.progressProperty());
+            dialog.show();
+        }
+
+        private void end() {
+            progressBar.progressProperty().unbind();
+            dialog.hide();
+        }
+
+        @Override protected void layoutChildren() {
+            if (progressBar != null) {
+                Insets insets = getInsets();
+                double w = getWidth() - insets.getLeft() - insets.getRight();
+                double h = getHeight() - insets.getTop() - insets.getBottom();
+
+                double prefH = progressBar.prefHeight(-1);
+                double x = insets.getLeft() + (w - w) / 2.0;
+                double y = insets.getTop() + (h - prefH) / 2.0;
+
+                progressBar.resizeRelocate(x, y, w, prefH);
+            }
+        }
+    }
 }

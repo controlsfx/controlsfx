@@ -257,6 +257,10 @@ abstract class FXDialog {
      */
     abstract void setClosable( boolean closable );
     
+    abstract void setModal(boolean modal);
+    
+    abstract boolean isModal();
+    
     
     
     /***************************************************************************

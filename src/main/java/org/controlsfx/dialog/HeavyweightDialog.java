@@ -56,6 +56,9 @@ class HeavyweightDialog extends FXDialog {
      **************************************************************************/
     
     private final Stage stage;
+    private final Window owner;
+    
+    private boolean modal;
 
     
     
@@ -71,6 +74,7 @@ class HeavyweightDialog extends FXDialog {
 
     private HeavyweightDialog(String title, Window owner, boolean modal, StageStyle stageStyle) {
         super();
+        this.owner = owner;
         
         stage = new Stage(stageStyle) {
             @Override public void showAndWait() {
@@ -91,13 +95,7 @@ class HeavyweightDialog extends FXDialog {
             stage.initOwner(owner);
         }
 
-        if (modal) {
-            if (owner != null) {
-                stage.initModality(Modality.WINDOW_MODAL);
-            } else {
-                stage.initModality(Modality.APPLICATION_MODAL);
-            }
-        }
+        setModal(modal);
 
         // *** The rest is for adding window decorations ***
         init(title);
@@ -186,6 +184,24 @@ class HeavyweightDialog extends FXDialog {
      * Public API
      * 
      **************************************************************************/
+    
+    @Override public void setModal(boolean modal) {
+        this.modal = modal;
+        
+        if (modal) {
+            if (owner != null) {
+                stage.initModality(Modality.WINDOW_MODAL);
+            } else {
+                stage.initModality(Modality.APPLICATION_MODAL);
+            }
+        } else {
+            stage.initModality(Modality.NONE);
+        }
+    }
+    
+    @Override public boolean isModal() {
+        return modal;
+    }
     
     @Override public void setContentPane(Pane pane) {
         root.setCenter(pane);

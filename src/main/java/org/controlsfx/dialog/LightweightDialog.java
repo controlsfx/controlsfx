@@ -53,6 +53,8 @@ class LightweightDialog extends FXDialog {
     private Effect effect;
     private Effect tempEffect;
     
+    private boolean modal = true;
+    
     
     
     /**************************************************************************
@@ -179,6 +181,14 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
+    @Override public void setModal(boolean modal) {
+        this.modal = modal;
+    }
+    
+    @Override public boolean isModal() {
+        return modal;
+    }
+    
     public void setEffect(Effect e) {
         this.effect = e;
     }
@@ -197,9 +207,11 @@ class LightweightDialog extends FXDialog {
             showInScene();
         } 
         
-        // This forces the lightweight dialog to be modal
-        Object lock = owner != null ? owner : scene; 
-        Toolkit.getToolkit().enterNestedEventLoop(lock);
+        if (isModal()) {
+            // This forces the lightweight dialog to be modal
+            Object lock = owner != null ? owner : scene; 
+            Toolkit.getToolkit().enterNestedEventLoop(lock);
+        }
     }
     
     @Override public void hide() {
@@ -209,10 +221,12 @@ class LightweightDialog extends FXDialog {
             hideInScene();
         } 
         
-        // stop the lightweight dialog from being modal (i.e. restart the 
-        // execution after it paused with the dialog being shown)
-        Object lock = owner != null ? owner : scene;
-        Toolkit.getToolkit().exitNestedEventLoop(lock, null);
+        if (isModal()) {
+            // stop the lightweight dialog from being modal (i.e. restart the 
+            // execution after it paused with the dialog being shown)
+            Object lock = owner != null ? owner : scene;
+            Toolkit.getToolkit().exitNestedEventLoop(lock, null);
+        }
     }
 
     @Override BooleanProperty resizableProperty() {

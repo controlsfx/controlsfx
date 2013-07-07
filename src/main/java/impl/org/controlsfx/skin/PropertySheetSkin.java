@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -57,7 +58,7 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.TextFields;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
-import org.controlsfx.property.editor.ObjectViewer;
+import org.controlsfx.property.editor.AbstractPropertyEditor;
 import org.controlsfx.property.editor.PropertyEditor;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
@@ -319,7 +320,27 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             @SuppressWarnings("rawtypes")
             PropertyEditor editor = getSkinnable().getPropertyEditorFactory().call(item);
             if (editor == null) {
-                editor = new ObjectViewer(item);
+                editor = new AbstractPropertyEditor<Object, TextField>(item, new TextField(), true) {
+                    {
+                        getEditor().setEditable(false);
+                        getEditor().setDisable(true);
+                    }
+                    
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @SuppressWarnings("unchecked")
+                    @Override protected ObservableValue<Object> getObservableValue() {
+                        return (ObservableValue<Object>)(Object)getEditor().textProperty();
+                    }
+                    
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override public void setValue(Object value) {
+                        getEditor().setText(value == null? "": value.toString());
+                    }
+                };
             }
             editor.setValue(item.getValue());
             return editor.getEditor();

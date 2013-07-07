@@ -40,8 +40,6 @@ import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
 import org.controlsfx.property.editor.PropertyEditor;
 
-import com.sun.beans.editors.FontEditor;
-
 /**
  * The PropertySheet control is a powerful control designed to make it really
  * easy for developers to present to end users a list of properties that the 
@@ -57,8 +55,8 @@ import com.sun.beans.editors.FontEditor;
  * <p>In this property sheet there exists two columns: the left column shows a 
  * label describing the property itself, whereas the right column provides a
  * {@link PropertyEditor} that allows the end user the means to manipulate the
- * property. In the screenshot you can see {@link CheckEditor}, 
- * {@link ChoiceEditor}, {@link TextEditor} and {@link FontEditor}, among the
+ * property. In the screenshot you can see CheckEditor, 
+ * ChoiceEditor, TextEditor and FontEditor, among the
  * many editors that are available in the {@link org.controlsfx.property.editor}
  * package.
  * 

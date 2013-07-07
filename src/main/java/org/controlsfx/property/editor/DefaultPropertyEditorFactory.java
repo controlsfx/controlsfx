@@ -29,27 +29,27 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         
         //TODO: add support for char and collection editors
         if (type != null && type == String.class) {
-            return new TextEditor(item);
+            return Editors.createTextEditor(item);  
         }
 
         if (type != null && isNumber(type)) {
-            return new NumericEditor(item);
+            return Editors.createNumericEditor(item);
         }
         
         if (type != null && (type == boolean.class || type == Boolean.class)) {
-            return new CheckEditor(item);
+            return Editors.createCheckEditor(item);
         }
 
         if (type != null && type.isAssignableFrom(Color.class)) {
-            return new ColorEditor(item);
+            return Editors.createColorEditor(item);
         }
 
         if (type != null && type.isEnum()) {
-            return new ChoiceEditor<Object>(item, Arrays.<Object>asList(type.getEnumConstants()));
+            return Editors.createChoiceEditor(item, Arrays.<Object>asList(type.getEnumConstants()));
         }
         
         if (type != null && type == Font.class) {
-            return new FontEditor(item);
+            return Editors.createFontEditor(item);
         }
         
         return null; 

@@ -37,12 +37,10 @@ import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
 import org.controlsfx.property.BeanPropertyUtils;
-import org.controlsfx.property.editor.CheckEditor;
-import org.controlsfx.property.editor.ChoiceEditor;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
-import org.controlsfx.property.editor.FontEditor;
 import org.controlsfx.property.editor.PropertyEditor;
-import org.controlsfx.property.editor.TextEditor;
+
+import com.sun.beans.editors.FontEditor;
 
 /**
  * The PropertySheet control is a powerful control designed to make it really

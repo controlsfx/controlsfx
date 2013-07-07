@@ -84,6 +84,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
@@ -94,7 +95,6 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog.Actions;
-import org.controlsfx.property.editor.NumericField;
 
 
 /**
@@ -864,7 +864,7 @@ public final class Dialogs {
     
     private static class FontPanel extends GridPane {
         private static final double HGAP = 10;
-        private static final double VGAP = 10;
+        private static final double VGAP = 5;
         
         private static final Predicate<Object> MATCH_ALL = new Predicate<Object>() {
             @Override public boolean test(Object t) {
@@ -874,16 +874,31 @@ public final class Dialogs {
         
         private static final Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
         
-        private final TextField fontSearch = new TextField();
-        private final TextField postureSearch = new TextField();
-        private final NumericField sizeSearch = new NumericField();
+        // combination of FontPosture and FontWeight
+        private static final Object[] fontStyles = new Object[FontPosture.values().length + FontWeight.values().length];
+        {
+            int i = 0;
+            for (FontPosture posture : FontPosture.values()) {
+                fontStyles[i++] = makePretty(posture); 
+            }
+            for (FontWeight weight : FontWeight.values()) {
+                fontStyles[i++] = makePretty(weight); 
+            }
+        }
+        
+        private static String makePretty(Object o) {
+            String s = o.toString();
+            s = s.replace("_", " ");
+            s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+            return s;
+        }
         
         private final FilteredList<String> filteredFontList = new FilteredList<>(FXCollections.observableArrayList(Font.getFamilies()), MATCH_ALL);
-        private final FilteredList<FontPosture> filteredStyleList = new FilteredList<>(FXCollections.observableArrayList(FontPosture.values()), MATCH_ALL);
+        private final FilteredList<Object> filteredStyleList = new FilteredList<>(FXCollections.observableArrayList(fontStyles), MATCH_ALL);
         private final FilteredList<Double> filteredSizeList = new FilteredList<>(FXCollections.observableArrayList(fontSizes), MATCH_ALL);
         
         private final ListView<String> fontListView = new ListView<String>(filteredFontList);
-        private final ListView<FontPosture> styleListView = new ListView<FontPosture>(filteredStyleList);
+        private final ListView<Object> styleListView = new ListView<Object>(filteredStyleList);
         private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
         private final Text sample = new Text("Sample");
         
@@ -902,41 +917,38 @@ public final class Dialogs {
             getColumnConstraints().addAll(c0, c1, c2);
             
             RowConstraints r0 = new RowConstraints();
-//            r0.setFillHeight(true);
             r0.setVgrow(Priority.NEVER);
             RowConstraints r1 = new RowConstraints();
-//            r1.setFillHeight(true);
             r1.setVgrow(Priority.NEVER);
             RowConstraints r2 = new RowConstraints();
             r2.setFillHeight(true);
             r2.setVgrow(Priority.NEVER);
             RowConstraints r3 = new RowConstraints();
-//            r3.setFillHeight(true);
             r3.setPrefHeight(250);
             r3.setVgrow(Priority.NEVER);
             getRowConstraints().addAll(r0, r1, r2, r3);
             
-            // set up filtering
-            fontSearch.textProperty().addListener(new InvalidationListener() {
-                @Override public void invalidated(Observable arg0) {
-                    filteredFontList.setPredicate(new Predicate<String>() {
-                        @Override public boolean test(String t) {
-                            return t.isEmpty() || t.toLowerCase().contains(fontSearch.getText().toLowerCase());
-                        }
-                    });
-                }
-            });
-            postureSearch.textProperty().addListener(new InvalidationListener() {
-                @Override public void invalidated(Observable arg0) {
-                    filteredStyleList.setPredicate(new Predicate<FontPosture>() {
-                        @Override public boolean test(FontPosture t) {
-                            return t == null || t.toString().toLowerCase().startsWith(postureSearch.getText().toLowerCase());
-                        }
-                    });
-                }
-            });
-            
-            // FIXME buggy due to use of NumericField
+//            // set up filtering
+//            fontSearch.textProperty().addListener(new InvalidationListener() {
+//                @Override public void invalidated(Observable arg0) {
+//                    filteredFontList.setPredicate(new Predicate<String>() {
+//                        @Override public boolean test(String t) {
+//                            return t.isEmpty() || t.toLowerCase().contains(fontSearch.getText().toLowerCase());
+//                        }
+//                    });
+//                }
+//            });
+//            postureSearch.textProperty().addListener(new InvalidationListener() {
+//                @Override public void invalidated(Observable arg0) {
+//                    filteredStyleList.setPredicate(new Predicate<FontPosture>() {
+//                        @Override public boolean test(FontPosture t) {
+//                            return t == null || t.toString().toLowerCase().startsWith(postureSearch.getText().toLowerCase());
+//                        }
+//                    });
+//                }
+//            });
+//            
+//            // FIXME buggy due to use of NumericField
 //            sizeSearch.valueProperty().addListener(new InvalidationListener() {
 //                @Override public void invalidated(Observable arg0) {
 //                    filteredSizeList.setPredicate(new Predicate<Double>() {
@@ -949,9 +961,9 @@ public final class Dialogs {
             
             // layout dialog
             add( new Label("Font"), 0, 0);
-            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
-            add( fontSearch, 0, 1);
-            add(fontListView, 0, 2);
+//            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
+//            add( fontSearch, 0, 1);
+            add(fontListView, 0, 1);
             fontListView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
                 @Override public ListCell<String> call(ListView<String> listview) {
                     return new ListCell<String>() {
@@ -975,19 +987,19 @@ public final class Dialogs {
             });
 
             add( new Label("Style"), 1, 0);
-            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
-            add( postureSearch, 1, 1);
-            add(styleListView, 1, 2);
-            styleListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<FontPosture>() {
-                @Override public void changed(ObservableValue<? extends FontPosture> arg0, FontPosture arg1, FontPosture arg2) {
+//            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
+//            add( postureSearch, 1, 1);
+            add(styleListView, 1, 1);
+            styleListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<Object>() {
+                @Override public void changed(ObservableValue<? extends Object> arg0, Object arg1, Object arg2) {
                     refreshSample();
                 }
             });
             
             add( new Label("Size"), 2, 0);
-            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
-            add( sizeSearch, 2, 1);
-            add(sizeListView, 2, 2);
+//            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
+//            add( sizeSearch, 2, 1);
+            add(sizeListView, 2, 1);
             sizeListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<Double>() {
                 @Override public void changed(ObservableValue<? extends Double> arg0, Double arg1, Double arg2) {
                     refreshSample();
@@ -1027,7 +1039,14 @@ public final class Dialogs {
         
         public Font getFont() {
             try {
-                return Font.font( listSelection(fontListView),listSelection(styleListView),listSelection(sizeListView));
+                Object style = listSelection(styleListView);
+                if (style instanceof FontWeight) {
+                    return Font.font(listSelection(fontListView),(FontWeight)style,listSelection(sizeListView));
+                } else if (style instanceof FontPosture) {
+                    return Font.font(listSelection(fontListView),(FontPosture)style,listSelection(sizeListView));
+                } else {
+                    throw new RuntimeException("Unknown font style: " + style); 
+                }
             } catch( Throwable ex ) {
                 return null;
             }
@@ -1047,7 +1066,7 @@ public final class Dialogs {
             });
         }
         
-        private <T> T listSelection( final ListView<T> listView) {
+        private <T> T listSelection(final ListView<T> listView) {
             return listView.selectionModelProperty().get().getSelectedItem();
         }
     }    

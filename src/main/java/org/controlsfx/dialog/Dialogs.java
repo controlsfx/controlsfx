@@ -1095,6 +1095,7 @@ public final class Dialogs {
                     case SCHEDULED:
                         begin();
                         break;
+                    default: //no-op     
                 }
             }
         };

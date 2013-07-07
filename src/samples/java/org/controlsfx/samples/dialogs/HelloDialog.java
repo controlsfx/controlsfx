@@ -368,6 +368,7 @@ public class HelloDialog extends Application implements Sample {
                 configureSampleDialog(
                         Dialogs.create()
                         .title("Progress")
+                        .masthead(isMastheadVisible() ? "Please wait whilst the install completes..." : null)
                         .message("Now Loading..."))
                     .showWorkerProgress(worker);
                 

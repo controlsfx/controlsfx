@@ -11,7 +11,7 @@ import javafx.scene.control.TextField;
  * TODO replace this with proper API when it becomes available:
  * https://javafx-jira.kenai.com/browse/RT-30881
  */
-public class NumericField extends TextField {
+class NumericField extends TextField {
 
     private static String regex = "[-+]?[0-9]*\\.?[0-9]+";
     

@@ -797,7 +797,7 @@ public final class Dialogs {
         CONFIRMATION("confirm.image", "Select an option", "Select an option", YES, NO, CANCEL),
         INPUT("confirm.image", "Select an option", "Select an option", OK, CANCEL),
         FONT( null, "Select Font", "Select Font", OK, CANCEL),
-        PROGRESS( null, "Progress", "Progress");
+        PROGRESS("info.image", "Progress", "Progress");
 
         private final String defaultTitle;
         private final String defaultMasthead;

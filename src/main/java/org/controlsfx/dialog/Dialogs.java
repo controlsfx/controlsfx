@@ -37,16 +37,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -86,7 +81,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 import javafx.util.Callback;
 
@@ -613,8 +607,9 @@ public final class Dialogs {
     }
     
     /**
-     * Shows font selection dialog, allowing to manipulate font name, style and size 
-     * @param font default font value 
+     * Show font selection dialog, allowing to manipulate font name, style and size 
+     * 
+     * @param font Default font value 
      * @return selected font or null if the dialog is canceled
      */
     public Font showFontSelector(Font font) {

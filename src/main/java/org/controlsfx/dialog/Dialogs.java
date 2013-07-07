@@ -975,31 +975,27 @@ public final class Dialogs {
                     };
                 }
             });
-            fontListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<String>() {
-                @Override public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+            
+            
+            ChangeListener<Object> sampleRefreshListener = new ChangeListener<Object>() {
+                @Override public void changed(ObservableValue<? extends Object> arg0, Object arg1, Object arg2) {
                     refreshSample();
                 }
-            });
+            };
+            
+            fontListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
 
             add( new Label("Style"), 1, 0);
 //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( postureSearch, 1, 1);
             add(styleListView, 1, 1);
-            styleListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<Object>() {
-                @Override public void changed(ObservableValue<? extends Object> arg0, Object arg1, Object arg2) {
-                    refreshSample();
-                }
-            });
+            styleListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
             
             add( new Label("Size"), 2, 0);
 //            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( sizeSearch, 2, 1);
             add(sizeListView, 2, 1);
-            sizeListView.selectionModelProperty().get().selectedItemProperty().addListener(new ChangeListener<Double>() {
-                @Override public void changed(ObservableValue<? extends Double> arg0, Double arg1, Double arg2) {
-                    refreshSample();
-                }
-            });
+            sizeListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
             
             final double height = 45;
             final DoubleBinding sampleWidth = new DoubleBinding() {

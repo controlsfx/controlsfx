@@ -1,8 +1,8 @@
 [![Build Status](https://drone.io/bitbucket.org/JonathanGiles/controlsfx/status.png)](https://drone.io/bitbucket.org/JonathanGiles/controlsfx/latest)
 
-<a href='http://www.ohloh.net/p/controlsfx?ref=sample' target='_blank'>
-<img alt='Ohloh project report for ControlsFX' border='0' src='https://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif' />
-</a>
+[
+![Ohloh project report for ControlsFX](https://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)
+](http://www.ohloh.net/p/controlsfx?ref=sample)
 
 ControlsFX is an [open source project][1] for JavaFX that aims to provide really high quality UI controls and other tools to complement the core JavaFX distribution. It has been developed for JavaFX 8.0 and beyond, and has a guiding principle of only accepting new controls / features when all existing code is at an acceptably high level, including thankless jobs like having high quality javadoc documentation. This ensure a high quality release is available at all times, with all experimental work being done in branches of the main code base.
 

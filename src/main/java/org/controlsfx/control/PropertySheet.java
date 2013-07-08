@@ -138,7 +138,7 @@ public class PropertySheet extends Control {
        
         /**
          * Returns the display name of the property, which should be short (i.e.
-         * less than two wordS). This is used to explain to the end user what the
+         * less than two words). This is used to explain to the end user what the
          * property represents and is displayed beside the {@link PropertyEditor}.
          * If you need to explain more detail to the user, consider placing it
          * in the {@link #getDescription()}.

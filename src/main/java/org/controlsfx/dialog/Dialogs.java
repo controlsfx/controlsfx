@@ -191,6 +191,14 @@ import org.controlsfx.dialog.Dialog.Actions;
  *     <td><center><img src="dialog-commandlink-no-masthead.png"></center></td>
  *     <td><center><img src="dialog-commandlink-masthead.png"></center></td>
  *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Font Selector</strong></td>
+ *     <td colspan="2"><center><img src="dialog-font-selector.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Progress</strong></td>
+ *     <td colspan="2"><center><img src="dialog-progress.png"></center></td>
+ *   </tr>
  * </table>
  * 
  * 

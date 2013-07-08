@@ -279,7 +279,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
 
             int row = 0;
             
-            for (Item item : getSkinnable().getItems()) {
+            for (Item item : properties) {
 
                 // filter properties
                 String title = item.getName();
@@ -329,7 +329,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                     /**
                      * {@inheritDoc}
                      */
-                    @SuppressWarnings("unchecked")
                     @Override protected ObservableValue<Object> getObservableValue() {
                         return (ObservableValue<Object>)(Object)getEditor().textProperty();
                     }

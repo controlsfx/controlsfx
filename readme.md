@@ -20,6 +20,8 @@ If you think you have a feature **you can contribute**, a bug you want to fix, o
 
 If you **want to use** ControlsFX, then youre probably wondering how to use the API that weve slaved over for hours! In your case, the best and definitive location for help is definitely [our javadocs][13]. Fair not, these are not a barren wasteland of undescribed functionality weve poured our hearts into making these javadocs full to the brim of examples, commentary and explanation. If anything is unclear to you, [file a bug in our issue tracker][12] and well do our best to update the documentation straight away!
 
+If you *have questions*, you should join the the [mailing list][22].
+
 Another great place to explore is our **sample code**, all located in the [src/samples directory][14] of our [code repository][15]. Weve put a bunch of effort into making these examples something you can learn from.
 
 ## Release Versioning
@@ -61,14 +63,7 @@ ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers,
 
 
    [1]: https://bitbucket.org/JonathanGiles/controlsfx
-   [2]: http://cache.fxexperience.com/wp-content/uploads/2013/04/buttonBar.png
-   [3]: http://cache.fxexperience.com/wp-content/uploads/2013/04/dialogs.png
-   [4]: http://cache.fxexperience.com/wp-content/uploads/2013/04/gridView.png
-   [5]: http://cache.fxexperience.com/wp-content/uploads/2013/04/rangeSlider.png
-   [6]: http://cache.fxexperience.com/wp-content/uploads/2013/04/rating.png
-   [7]: http://cache.fxexperience.com/wp-content/uploads/2013/04/segmentedButton.png
    [8]: http://jdk8.java.net/download.html
-   [9]: http://fxexperience.com/downloads/controlsfx-8.0.0-developer-preview-1.zip
    [10]: https://bitbucket.org/JonathanGiles/controlsfx/src/ba2f89a26ff4b87ae04f80135c47d204d82efdee/src/samples/java/org/controlsfx/HelloControlsFX.java?at=default
    [11]: https://bitbucket.org/JonathanGiles/controlsfx/src/ba2f89a26ff4/src/samples/java?at=default
    [12]: https://bitbucket.org/JonathanGiles/controlsfx/issues
@@ -76,8 +71,9 @@ ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers,
    [14]: https://bitbucket.org/JonathanGiles/controlsfx/src/ba2f89a26ff4b87ae04f80135c47d204d82efdee/src/samples/java/org/controlsfx?at=default
    [15]: https://bitbucket.org/JonathanGiles/controlsfx/src/ba2f89a26ff4?at=default
    [16]: http://cache.fxexperience.com/wp-includes/images/smilies/icon_smile.gif
-   [17]: https://bitbucket.org/JonathanGiles/controlsfx (Announcing Scenic View 8.0.0 Developer Preview 3)
+   [17]: https://bitbucket.org/JonathanGiles/controlsfx
    [18]: http://opensource.org/licenses/BSD-3-Clause
    [19]: https://bitbucket.org/JonathanGiles/controlsfx/src/e01d9073145a352db1562baf6ea7297d5c37d6a1/license.txt?at=default
    [20]: mailto:jonathan%40jonathangiles.net
-   [21]: http://fxexperience.com/downloads/controlsfx-8.0.0.zip
+   [21]: http://www.controlsfx.org
+   [22]: https://groups.google.com/forum/?hl=en#!forum/controlsfx-dev

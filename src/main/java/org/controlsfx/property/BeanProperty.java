@@ -43,7 +43,7 @@ import org.controlsfx.control.PropertySheet.Item;
  * @see PropertySheet
  * @see PropertyDescriptor
  */
-public class BeanProperty implements Item {
+public class BeanProperty implements PropertySheet.Item {
 
     private final Object bean;
     private final PropertyDescriptor beanPropertyDescriptor;

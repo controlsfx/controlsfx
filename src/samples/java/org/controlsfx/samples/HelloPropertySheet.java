@@ -26,7 +26,11 @@
  */
 package org.controlsfx.samples;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -55,6 +59,21 @@ import org.controlsfx.property.BeanPropertyUtils;
 
 public class HelloPropertySheet extends Application implements Sample {
 
+    private static Map<String,Object> customDataMap = new LinkedHashMap<>();
+    
+    static {
+        customDataMap.put("1. Name#First Name", "Jonathan");
+        customDataMap.put("1. Name#Last Name", "Giles");
+        customDataMap.put("2. Billing Address#Address 1", "");
+        customDataMap.put("2. Billing Address#Address 2", "");
+        customDataMap.put("2. Billing Address#City", "");
+        customDataMap.put("2. Billing Address#State", "");
+        customDataMap.put("2. Billing Address#Zip", "");
+        customDataMap.put("3. Phone#Home", "123-123-1234");
+        customDataMap.put("3. Phone#Mobile", "234-234-2345");
+        customDataMap.put("3. Phone#Work", "");
+    }
+    
     private PropertySheet propertySheet = new PropertySheet();
     
     public static void main(String[] args) {
@@ -80,6 +99,45 @@ public class HelloPropertySheet extends Application implements Sample {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+    class CustomPropertyItem implements Item {
+
+        private String key;
+        private String category, name;
+        
+        public CustomPropertyItem(String key) {
+            this.key = key;
+            String[] skey = key.split("#");
+            category = skey[0];
+            name  = skey[1];
+        }
+        
+        @Override public Class<?> getType() {
+            return customDataMap.get(key).getClass();
+        }
+
+        @Override public String getCategory() {
+            return category;
+        }
+
+        @Override public String getName() {
+            return name;
+        }
+
+        @Override public String getDescription() {
+            return null;
+        }
+
+        @Override public Object getValue() {
+            return customDataMap.get(key);
+        }
+
+        @Override public void setValue(Object value) {
+            customDataMap.put(key, value);
+        }
+        
+    }
+    
 
     class ActionShowInPropertySheet extends AbstractAction {
         
@@ -89,18 +147,26 @@ public class HelloPropertySheet extends Application implements Sample {
             super(title);
             this.bean = bean;
         }
+        
+        private ObservableList<Item> getCustomModelProperties() {
+            ObservableList<Item> list = FXCollections.observableArrayList();
+            for (String key : customDataMap.keySet() ) {
+                list.add(new CustomPropertyItem(key));
+            }
+            return list;
+        }
 
         @Override public void execute(ActionEvent ae) {
             
             // retrieving bean properties may take some time
-            // so we have to put it on separated thread to keep UI responsive
+            // so we have to put it on separate thread to keep UI responsive
 
             Service<?> service = new Service<ObservableList<Item>>() {
 
                 @Override protected Task<ObservableList<Item>> createTask() {
                     return new Task<ObservableList<Item>>() {
                         @Override protected ObservableList<Item> call() throws Exception {
-                            return BeanPropertyUtils.getProperties(bean);
+                            return bean == null? getCustomModelProperties(): BeanPropertyUtils.getProperties(bean);
                         }
                     };
                 }
@@ -128,7 +194,8 @@ public class HelloPropertySheet extends Application implements Sample {
         TextField textField = new TextField();
         SegmentedButton segmentedButton = ActionUtils.createSegmentedButton(
                 new ActionShowInPropertySheet( "Bean: Button", button ),
-                new ActionShowInPropertySheet( "Bean: TextField", textField )
+                new ActionShowInPropertySheet( "Bean: TextField", textField ),
+                new ActionShowInPropertySheet( "Custom Model", null )
             );
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();

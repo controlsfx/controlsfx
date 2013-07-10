@@ -44,8 +44,17 @@ public class ImageGridCell extends GridCell<Image> {
     
     private final boolean preserveImageProperties;
     
+    
     /**
-     * Creates a default ImageGridCell instance.
+     * Creates a default ImageGridCell instance, which will preserve image properties
+     */
+    public ImageGridCell() {
+        this(true);
+    }
+    
+    /**
+     * Create ImageGridCell instance
+     * @param preserveImageProperties if set to true will preserve image aspect ratio and smoothness
      */
 	public ImageGridCell( boolean preserveImageProperties ) {
 		getStyleClass().add("image-grid-cell");

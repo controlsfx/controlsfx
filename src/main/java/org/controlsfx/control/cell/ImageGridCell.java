@@ -26,12 +26,11 @@
  */
 package org.controlsfx.control.cell;
 
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.ImageViewBuilder;
+
+import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 
 /**
  * A {@link GridCell} that can be used to show images inside the 
@@ -43,13 +42,16 @@ public class ImageGridCell extends GridCell<Image> {
 	
     private final ImageView imageView;
     
+    private final boolean preserveImageProperties;
+    
     /**
      * Creates a default ImageGridCell instance.
      */
-	public ImageGridCell() {
+	public ImageGridCell( boolean preserveImageProperties ) {
 		getStyleClass().add("image-grid-cell");
 		
-		imageView = ImageViewBuilder.create().build();
+		this.preserveImageProperties = preserveImageProperties;
+		imageView = new ImageView();
         imageView.fitHeightProperty().bind(heightProperty());
         imageView.fitWidthProperty().bind(widthProperty());
 	}
@@ -65,6 +67,10 @@ public class ImageGridCell extends GridCell<Image> {
 	    if (empty) {
 	        setGraphic(null);
 	    } else {
+	        if (preserveImageProperties) {
+    	        imageView.setPreserveRatio(item.isPreserveRatio());
+    	        imageView.setSmooth( item.isSmooth());
+	        }
 	        imageView.setImage(item);
 	        setGraphic(imageView);
 	    }

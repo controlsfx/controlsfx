@@ -53,7 +53,6 @@ import org.controlsfx.control.spreadsheet.editor.TextEditor;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
-import org.controlsfx.control.spreadsheet.sponge.SpreadsheetViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
 
 public class SpreadsheetView extends BorderPane{
@@ -454,7 +453,9 @@ public class SpreadsheetView extends BorderPane{
 	 */
 	public void unHoverGridCell() {
 		//If the top of the spanned cell is visible, then no problem
-		lastHover.setHoverPublic(false);
+		if(lastHover != null){
+			lastHover.setHoverPublic(false);
+		}
 	}
 
 	/**

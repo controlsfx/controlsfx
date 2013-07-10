@@ -74,8 +74,8 @@ public class TableHeaderRow extends StackPane {
 	VirtualFlow getVirtualFlow() { return flow; }
 	//    private final TableView<?> table;
 
-	private final SpreadsheetViewSkinBase tableSkin;
-	protected SpreadsheetViewSkinBase getTableSkin() {
+	private final TableViewSkinBase tableSkin;
+	protected TableViewSkinBase getTableSkin() {
 		return this.tableSkin;
 	}
 
@@ -208,7 +208,7 @@ public class TableHeaderRow extends StackPane {
 	 *                                                                         *
 	 **************************************************************************/
 
-	public TableHeaderRow(final SpreadsheetViewSkinBase skin) {
+	public TableHeaderRow(final TableViewSkinBase skin) {
 		//        this.table = table;
 		this.tableSkin = skin;
 		this.flow = skin.flow;

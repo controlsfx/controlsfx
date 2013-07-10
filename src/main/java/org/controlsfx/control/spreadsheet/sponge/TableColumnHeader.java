@@ -84,7 +84,7 @@ public class TableColumnHeader extends Region {
 	 *                                                                         *
 	 **************************************************************************/
 
-	public TableColumnHeader(final SpreadsheetViewSkinBase skin, final TableColumnBase tc) {
+	public TableColumnHeader(final TableViewSkinBase skin, final TableColumnBase tc) {
 		this.skin = skin;
 		this.column = tc;
 
@@ -269,8 +269,8 @@ public class TableColumnHeader extends Region {
 
 	private double dragOffset;
 
-	private final SpreadsheetViewSkinBase skin;
-	protected SpreadsheetViewSkinBase getTableViewSkin() {
+	private final TableViewSkinBase skin;
+	protected TableViewSkinBase getTableViewSkin() {
 		return skin;
 	}
 
@@ -392,7 +392,7 @@ public class TableColumnHeader extends Region {
 	}
 
 	void dispose() {
-		final SpreadsheetViewSkinBase skin = getTableViewSkin();
+		final TableViewSkinBase skin = getTableViewSkin();
 		if (skin != null) {
 			skin.getVisibleLeafColumns().removeListener(weakVisibleLeafColumnsListener);
 			skin.getSortOrder().removeListener(weakSortOrderListener);
@@ -601,7 +601,7 @@ public class TableColumnHeader extends Region {
 
 	private void updateColumnIndex() {
 		//        TableView tv = getTableView();
-		final SpreadsheetViewSkinBase skin = getTableViewSkin();
+		final TableViewSkinBase skin = getTableViewSkin();
 		final TableColumnBase tc = getTableColumn();
 		columnIndex = skin == null || tc == null ? -1 : skin.getVisibleLeafIndex(tc);
 

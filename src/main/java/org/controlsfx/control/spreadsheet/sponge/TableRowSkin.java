@@ -46,7 +46,7 @@ import com.sun.javafx.scene.control.behavior.TableRowBehavior;
 public class TableRowSkin<T extends DataRow> extends TableRowSkinBase<DataRow,TableRow<DataRow>, TableRowBehavior<DataRow>,SpreadsheetCell> {
 
 
-	private SpreadsheetViewSkin<SpreadsheetRow> tableViewSkin;
+	private TableViewSkin<SpreadsheetRow> tableViewSkin;
 
 	public TableRowSkin(TableRow<DataRow> tableRow, final SpreadsheetView spreadsheetView) {
 
@@ -128,8 +128,8 @@ public class TableRowSkin<T extends DataRow> extends TableRowSkinBase<DataRow,Ta
 
 	private void updateTableViewSkin() {
 		final TableView tableView = getSkinnable().getTableView();
-		if (tableView.getSkin() instanceof SpreadsheetViewSkin) {
-			tableViewSkin = (SpreadsheetViewSkin)tableView.getSkin();
+		if (tableView.getSkin() instanceof TableViewSkin) {
+			tableViewSkin = (TableViewSkin)tableView.getSkin();
 		}
 	}
 }

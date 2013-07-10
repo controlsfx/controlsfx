@@ -59,7 +59,7 @@ public class NestedTableColumnHeader extends TableColumnHeader {
 	 *                                                                         *
 	 **************************************************************************/
 
-	public NestedTableColumnHeader(final SpreadsheetViewSkinBase skin, final TableColumnBase tc) {
+	public NestedTableColumnHeader(final TableViewSkinBase skin, final TableColumnBase tc) {
 		super(skin, tc);
 
 		getStyleClass().setAll("nested-column-header");

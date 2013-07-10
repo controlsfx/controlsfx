@@ -25,9 +25,9 @@
 
 package org.controlsfx.control.spreadsheet.sponge;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -53,7 +53,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.control.TableRow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.TouchEvent;
@@ -64,9 +63,9 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
-import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.application.PlatformImpl;
+import com.sun.javafx.collections.annotations.ReturnsUnmodifiableCollection;
 
 
 
@@ -385,8 +384,11 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 * <p>
 	 * This is package private ONLY FOR TESTING
 	 */
-	public final ArrayLinkedList<T> cells = new ArrayLinkedList<T>();
-
+	final ArrayLinkedList<T> cells = new ArrayLinkedList<T>();
+	@ReturnsUnmodifiableCollection
+	protected List<T> getCells() {
+		return Collections.unmodifiableList(cells);
+	}
 
 	/**
 	 * A structure containing cells that can be reused later. These are cells
@@ -428,7 +430,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 */
 	private final VirtualScrollBar hbar = new VirtualScrollBar(this);
 
-	final public VirtualScrollBar getHbar() {
+	protected final VirtualScrollBar getHbar() {
 		return hbar;
 	}
 	/**
@@ -437,7 +439,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 */
 	private final VirtualScrollBar vbar = new VirtualScrollBar(this);
 
-	public final VirtualScrollBar getVbar() {
+	protected final VirtualScrollBar getVbar() {
 		return vbar;
 	}
 
@@ -746,14 +748,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			@Override public void changed(ObservableValue ov, Object t, Object t1) {
 				clipView.setClipY(isVertical() ? 0 : vbar.getValue());
 
-				/*****************************************************************
-				 * 				MODIFIED BY NELLARMONIA
-				 *****************************************************************/
-				layoutTotal();
-				/*****************************************************************
-				 * 				END OF MODIFIED BY NELLARMONIA
-				 *****************************************************************/
-
 			}
 		};
 		vbar.valueProperty().addListener(listenerY);
@@ -836,14 +830,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	}
 
 	@Override protected void layoutChildren() {
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		sortHB();
-		/*****************************************************************
-		 * 				END OF MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-
 		if (needsRecreateCells) {
 			maxPrefBreadth = -1;
 			lastWidth = -1;
@@ -886,14 +872,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				}
 			}
 			needsCellsLayout = false;
-			/*****************************************************************
-			 * 				MODIFIED BY NELLARMONIA
-			 *****************************************************************/
-			layoutFixedRows();
-			/*****************************************************************
-			 * 				END OF MODIFIED BY NELLARMONIA
-			 *****************************************************************/
-
 
 			// yes, we return here - if needsCellsLayout was set to true, we
 			// only did it to do the above - not rerun the entire layout.
@@ -1099,15 +1077,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		updateViewport();
 		updateScrollBarsAndCells();
 
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		layoutTotal();
-		layoutFixedRows();
-		/*****************************************************************
-		 * 				END OF MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-
 		lastWidth = getWidth();
 		lastHeight = getHeight();
 		lastCellCount = getCellCount();
@@ -1166,41 +1135,50 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		cellFixedAdded = 0;
 
 		while (index >= 0 && (offset > 0 || first)) {
-
-			// If the remaining cells to add are in the header
-			if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
-				final int realIndex = fixedRows.get(cellToAdd-1);
-				cell = getAvailableCell(realIndex); // We grab the right one
-				setCellIndex(cell, realIndex); // the index is the real one
-				setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
-				++cellFixedAdded;
+			if(index >= getCellCount()){
+				if (first) {
+					first = false;
+				}else {
+					//					offset -= getCellLength(0);
+				}
+				--index;
+				--cellToAdd;
 			}else{
-				//				System.out.println("JaddC"+index);
-				visibleRows.add(index);
-				cell = getAvailableCell(index);
-				setCellIndex(cell, index);
+				// If the remaining cells to add are in the header
+				if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
+					final int realIndex = fixedRows.get(cellToAdd-1);
+					cell = getAvailableCell(realIndex); // We grab the right one
+					setCellIndex(cell, realIndex); // the index is the real one
+					setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
+					++cellFixedAdded;
+				}else{
+					//				System.out.println("JaddC"+index);
+					visibleRows.add(index);
+					cell = getAvailableCell(index);
+					setCellIndex(cell, index);
+				}
+				resizeCellSize(cell); // resize must be after config
+				cells.addFirst(cell);
+
+
+				// A little gross but better than alternatives because it reduces
+				// the number of times we have to update a cell or compute its
+				// size. The first time into this loop "offset" is actually the
+				// top of the current index. On all subsequent visits, it is the
+				// bottom of the current index.
+				if (first) {
+					first = false;
+				} else {
+					offset -= getCellLength(cell);
+				}
+
+				// Position the cell, and update the maxPrefBreadth variable as we go.
+				positionCell(cell, offset);
+				maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
+				cell.setVisible(true);
+				--index;
+				--cellToAdd;
 			}
-			resizeCellSize(cell); // resize must be after config
-			cells.addFirst(cell);
-
-
-			// A little gross but better than alternatives because it reduces
-			// the number of times we have to update a cell or compute its
-			// size. The first time into this loop "offset" is actually the
-			// top of the current index. On all subsequent visits, it is the
-			// bottom of the current index.
-			if (first) {
-				first = false;
-			} else {
-				offset -= getCellLength(cell);
-			}
-
-			// Position the cell, and update the maxPrefBreadth variable as we go.
-			positionCell(cell, offset);
-			maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
-			cell.setVisible(true);
-			--index;
-			--cellToAdd;
 		}
 
 		// There are times when after laying out the cells we discover that
@@ -1248,7 +1226,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		int index = ((SpreadsheetRow)startCell).getIndexVirtualFlow() + 1;
 		boolean filledWithNonEmpty = index <= cellCount;
 
-		while (offset < viewportLength) {
+		while (offset < viewportLength && index <getCellCount()) {
 			if (index >= cellCount) {
 				if (offset < viewportLength) {
 					filledWithNonEmpty = false;
@@ -2147,15 +2125,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		if (cell != null) {
 			show(cell);
 
-			/*****************************************************************
-			 * 				MODIFIED BY NELLARMONIA
-			 *****************************************************************/
-			layoutTotal();
-			layoutFixedRows();
-			/*****************************************************************
-			 * 				END OF MODIFIED BY NELLARMONIA
-			 *****************************************************************/
-
 		} else {
 			// See if the previous index is a visible cell
 			final T prev = getVisibleCell(index - 1);
@@ -2175,14 +2144,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				cell.setVisible(true);
 				show(cell);
 
-				/*****************************************************************
-				 * 				MODIFIED BY NELLARMONIA
-				 *****************************************************************/
-				layoutTotal();
-				layoutFixedRows();
-				/*****************************************************************
-				 * 				END OF MODIFIED BY NELLARMONIA
-				 *****************************************************************/
 				//                layingOut = false;
 				return;
 			}
@@ -2203,14 +2164,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				cell.setVisible(true);
 				show(cell);
 
-				/*****************************************************************
-				 * 				MODIFIED BY NELLARMONIA
-				 *****************************************************************/
-				layoutTotal();
-				layoutFixedRows();
-				/*****************************************************************
-				 * 				END OF MODIFIED BY NELLARMONIA
-				 *****************************************************************/
 				//                layingOut = false;
 				return;
 			}
@@ -2220,14 +2173,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			addAllToPile();
 			requestLayout();
 
-			/*****************************************************************
-			 * 				MODIFIED BY NELLARMONIA
-			 *****************************************************************/
-			layoutTotal();
-			layoutFixedRows();
-			/*****************************************************************
-			 * 				END OF MODIFIED BY NELLARMONIA
-			 *****************************************************************/
 			//            layingOut = false;
 		}
 	}
@@ -2237,10 +2182,10 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
-		// We add this to handle selection with Row Header
-		if(!visibleRows.isEmpty() && index < visibleRows.first()){
-			index -= visibleRows.size();
-		}
+		//		// We add this to handle selection with Row Header
+		//		if(!visibleRows.isEmpty() && index < visibleRows.first()){
+		//			index -= visibleRows.size();
+		//		}
 		/*****************************************************************
 		 * 				END OF MODIFIED BY NELLARMONIA
 		 *****************************************************************/
@@ -2264,8 +2209,8 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
-		layoutTotal();
-		layoutFixedRows();
+		//		layoutTotal();
+		//		layoutFixedRows();
 		/*****************************************************************
 		 * 				END OF MODIFIED BY NELLARMONIA
 		 *****************************************************************/
@@ -2371,8 +2316,8 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
-		layoutTotal();
-		layoutFixedRows();
+		//		layoutTotal();
+		//		layoutFixedRows();
 		/*****************************************************************
 		 * 				END OF MODIFIED BY NELLARMONIA
 		 *****************************************************************/
@@ -2670,7 +2615,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 * <p>
 	 * This class is package private solely for the sake of testing.
 	 */
-	public static class ArrayLinkedList<T> {
+	static class ArrayLinkedList<T> extends AbstractList<T> {
 		/**
 		 * The array list backing this class. We default the size of the array
 		 * list to be fairly large so as not to require resizing during normal
@@ -2731,14 +2676,17 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			}
 		}
 
+		@Override
 		public int size() {
 			return firstIndex == -1 ? 0 : lastIndex - firstIndex + 1;
 		}
 
+		@Override
 		public boolean isEmpty() {
 			return firstIndex == -1;
 		}
 
+		@Override
 		public T get(int index) {
 			if (index > lastIndex - firstIndex || index < 0) {
 				// Commented out exception due to RT-29111
@@ -2749,6 +2697,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			return array.get(firstIndex + index);
 		}
 
+		@Override
 		public void clear() {
 			for (int i = 0; i < array.size(); i++) {
 				array.set(i, null);
@@ -2771,6 +2720,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			return remove(lastIndex - firstIndex);
 		}
 
+		@Override
 		public T remove(int index) {
 			if (index > lastIndex - firstIndex || index < 0) {
 				throw new java.lang.ArrayIndexOutOfBoundsException();
@@ -2898,166 +2848,5 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 
 	/*****************************************************************
 	 * 				METHOD
-	 *****************************************************************/
-	/**
-	 * Layout the fixed rows to position them correctly
-	 */
-	public void layoutFixedRows(){
-		sortHB();
-		if(!cells.isEmpty() && !fixedRows.isEmpty()){
-			for(int i = fixedRows.size()-1; i>= 0 ;--i){
-				if(cells.get(i) != null && fixedRows.contains(cells.get(i).getIndex())) {
-					//					System.out.println("je demande fixed"+cells.get(i).getIndex());
-					cells.get(i).toFront();
-					cells.get(i).requestLayout();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Layout all the visible rows
-	 */
-	public void layoutTotal(){
-		sortHB();
-		//FIXME When scrolling fast with fixed Rows, cells is empty and not recreated..
-		if(cells.isEmpty()){
-			reconfigureCells();
-			//recreateCells();
-		}
-		for (int i = 0, max = cells.size(); i < max; i++) {
-			final Cell cell = cells.get(i);
-			if (cell != null) {
-				cell.requestLayout();
-			}
-		}
-	}
-	/**
-	 * Sort the rows so that they stay in order for layout
-	 */
-	public void sortHB(){
-		final ObservableList<SpreadsheetRow> temp =
-				(ObservableList<SpreadsheetRow>) (ObservableList<?>) sheet.getChildren();
-		final List<SpreadsheetRow> tset = new ArrayList<>(temp);
-		Collections.sort(tset, new Comparator<SpreadsheetRow>() {
-			@Override
-			public int compare(SpreadsheetRow o1, SpreadsheetRow o2) {
-				final int lhs = o1.getIndex();
-				final int rhs = o2.getIndex();
-				if (lhs < rhs) {
-					return -1;
-				}
-				if (lhs > rhs) {
-					return +1;
-				}
-				return 0;
-
-			}
-		});
-		for (final TableRow<DataRow> r : tset) {
-			r.toFront();
-		}
-		//		System.out.println("je sort");
-	}
-
-	/*****************************************************************
-	 * 		METHOD NO LONGER IN USE BUT MAY BE NEEDED IN FUTURE
-	 *****************************************************************/
-	/**
-	 * The first time "setLayoutFixedColumns" is called but we want
-	 * to layout all the columns so we need that hack to prevent that
-	 */
-	/*private  boolean firstTimeColumns = false;
-
-	 *//**
-	 * Layout the fixed column when Hbar is touched
-	 *//*
-	public void layoutFixedColumn(){
-		// because the first time we want to layout everything
-		//TODO fix this because it's not optimum
-		if(!firstTimeColumns){
-			firstTimeColumns = true;
-			return;
-		}
-		if(firstTimeColumns && !cells.isEmpty() && !fixedColumns.isEmpty()){
-			for(int i = 0; i<cells.size(); ++i){
-				final SpreadsheetRow rows = (SpreadsheetRow) cells.get(i);
-				if(rows != null) {
-					rows.setLayoutFixedColumns(true);
-					rows.requestLayout();
-				}
-			}
-		}
-	}
-
-	  *//**
-	  * Layout the first NON-FIXED row if it needs to span correctly
-	  *//*
-	public void layoutFirstRows(){
-		sortHB();
-		if(!cells.isEmpty()) {
-			final T temp = cells.getNonFixed(0);
-			if(temp != null) {
-				//				System.out.println("je demande:"+temp.getIndex());
-				temp.requestLayout();
-			}
-		}
-	}
-
-	   *//**
-	   * Layout the two first NON-FIXED rows
-	   *//*
-	public void layoutTwoFirstRows(){
-		sortHB();
-		if(!cells.isEmpty()){
-			final T temp = cells.getNonFixed(0);
-
-			if(temp != null) {
-				//				System.out.println("je demande"+temp.getIndex());
-				temp.requestLayout();
-			}
-			//			temp = cells.getNonFixed(1);
-			if(temp != null) {
-				//				System.out.println("je demande"+temp.getIndex());
-				temp.requestLayout();
-			}
-		}
-	}
-
-	public void layoutDeltaFirstRows(double delta){
-		sortHB();
-		if(!cells.isEmpty()){
-			if(delta<0){
-				delta = Math.abs(delta);
-				final int number = (int) Math.ceil(delta/fixedCellSize);
-				final SpreadsheetRow temp;
-				for(int i = number;i>=0;--i){
-					//for(int i = 0;i<number;++i){
-					//					temp = (SpreadsheetRow) cells.getNonFixed(i);
-					if(temp != null) {
-						//						System.out.println("JE demande"+temp.getIndex());
-						temp.requestLayout();
-					}
-				}
-
-			}else{
-				delta = Math.abs(delta);
-				final int number = (int) Math.ceil(delta/fixedCellSize);
-				final SpreadsheetRow temp;
-				for(int i = cells.size()-1;i>=cells.size()-1 - number;--i){
-					//					temp = (SpreadsheetRow) cells.getNonFixed(i);
-					if(temp != null) {
-						//						System.out.println("JE demande"+temp.getIndex());
-						temp.requestLayout();
-					}
-				}
-			}
-		}
-	}*/
-	/*****************************************************************
-	 * 				MODIFIED BY NELLARMONIA
-	 *****************************************************************/
-	/*****************************************************************
-	 * 				END OF MODIFIED BY NELLARMONIA
 	 *****************************************************************/
 }

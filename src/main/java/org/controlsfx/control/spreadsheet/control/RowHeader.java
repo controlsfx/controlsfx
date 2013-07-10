@@ -38,7 +38,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.sponge.SpreadsheetViewSkinBase;
+import org.controlsfx.control.spreadsheet.sponge.TableViewSkinBase;
 
 
 /**
@@ -48,7 +48,7 @@ import org.controlsfx.control.spreadsheet.sponge.SpreadsheetViewSkinBase;
 public class RowHeader  extends StackPane {
 
 
-	private final SpreadsheetViewSkinBase<?, ?, ?, ?> spreadsheetViewSkin;
+	private final TableViewSkinBase<?, ?, ?, ?> spreadsheetViewSkin;
 	private final SpreadsheetView spreadsheetView;
 	private double prefHeight;
 	private double prefWidth;
@@ -76,7 +76,7 @@ public class RowHeader  extends StackPane {
 	 * @param spreadsheetView
 	 * @param rowHeaderWidth
 	 ******************************************************************/
-	public RowHeader(final SpreadsheetViewSkinBase<?, ?, ?, ?> skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
+	public RowHeader(final TableViewSkinBase<?, ?, ?, ?> skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
 		this.spreadsheetViewSkin = skin;
 		this.spreadsheetView = spreadsheetView;
 

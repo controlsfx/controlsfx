@@ -43,7 +43,6 @@ import org.controlsfx.control.spreadsheet.sponge.TableViewSkinBase;
 
 /**
  * Display a rowHeader, aka, the number of the lines displayed on screen.
- *
  */
 public class RowHeader  extends StackPane {
 

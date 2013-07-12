@@ -54,9 +54,9 @@ private configurePOM(def pom) {
         modelVersion '4.0.0'
         packaging 'jar'
         scm {
-            connection 'scm:hg:https://bitbucket.org/JonathanGiles/controlsfx'
-            developerConnection 'scm:hg:ssh://hg@bitbucket.org/JonathanGiles/controlsfx'
-            url 'https://bitbucket.org/JonathanGiles/controlsfx'
+            connection 'scm:hg:https://bitbucket.org/controlsfx/controlsfx'
+            developerConnection 'scm:hg:ssh://hg@bitbucket.org/controlsfx/controlsfx'
+            url 'https://bitbucket.org/controlsfx/controlsfx'
         }
         developers {
             developer {

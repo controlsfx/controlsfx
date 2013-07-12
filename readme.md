@@ -62,18 +62,18 @@ Current development snapshots are also available from Maven Central using the fo
 ControlsFX is licensed under the [3-Clause BSD license][18]. We are not lawyers, but our interpretation of this license suggests to us that it is business friendly, requiring only the redistribution of the [3-clause BSD license we distribute with ControlsFX][19]. As always, I suggest you review the license with the appropriate people, rather than take the advice of software engineers. If this license is not suitable, please contact [Jonathan Giles][20] to discuss an alternative license.
 
 
-   [1]: https://bitbucket.org/controlsfx/controlsfx
+   [1]: http://controlsfx.org
    [8]: http://jdk8.java.net/download.html
-   [10]: https://code.controlsfx.org/src/ba2f89a26ff4b87ae04f80135c47d204d82efdee/src/samples/java/org/controlsfx/HelloControlsFX.java?at=default
-   [11]: https://code.controlsfx.org/src/ba2f89a26ff4/src/samples/java?at=default
-   [12]: https://issues.controlsfx.org
+   [10]: http://code.controlsfx.org/src/ba2f89a26ff4b87ae04f80135c47d204d82efdee/src/samples/java/org/controlsfx/HelloControlsFX.java?at=default
+   [11]: http://code.controlsfx.org/src/ba2f89a26ff4/src/samples/java?at=default
+   [12]: http://issues.controlsfx.org
    [13]: http://docs.controlsfx.org
-   [14]: https://code.controlsfx.org/src/ba2f89a26ff4b87ae04f80135c47d204d82efdee/src/samples/java/org/controlsfx?at=default
-   [15]: https://code.controlsfx.org/src/ba2f89a26ff4?at=default
+   [14]: http://code.controlsfx.org/src/ba2f89a26ff4b87ae04f80135c47d204d82efdee/src/samples/java/org/controlsfx?at=default
+   [15]: http://code.controlsfx.org/src/ba2f89a26ff4?at=default
    [16]: http://cache.fxexperience.com/wp-includes/images/smilies/icon_smile.gif
-   [17]: https://code.controlsfx.org
+   [17]: http://code.controlsfx.org
    [18]: http://opensource.org/licenses/BSD-3-Clause
-   [19]: https://code.controlsfx.org/src/e01d9073145a352db1562baf6ea7297d5c37d6a1/license.txt?at=default
+   [19]: http://code.controlsfx.org/src/e01d9073145a352db1562baf6ea7297d5c37d6a1/license.txt?at=default
    [20]: mailto:jonathan%40jonathangiles.net
    [21]: http://www.controlsfx.org
-   [22]: https://groups.controlsfx.org
+   [22]: http://groups.controlsfx.org

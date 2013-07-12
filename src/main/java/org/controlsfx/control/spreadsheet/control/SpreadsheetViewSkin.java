@@ -34,6 +34,12 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 			public boolean isEmpty() {
 				return ((VirtualFlowSpreadsheet)flow).getCells().isEmpty();
 			}
+
+			@Override
+			public int size() {
+				return ((VirtualFlowSpreadsheet)flow).getCells().size();
+			}
+
 		};
 
 		spreadsheetView.setRows(lcells);

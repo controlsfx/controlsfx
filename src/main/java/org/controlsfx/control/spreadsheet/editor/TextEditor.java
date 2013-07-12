@@ -66,6 +66,12 @@ public class TextEditor extends Editor {
 	public void end() {
 		if(gc != null) {
 			gc.selectedProperty().removeListener(il);
+			/*gc.setTranslateY(0);
+			((SpreadsheetRow) gc.getTableRow()).removeCell(gc);
+			SpreadsheetRow sp;
+			if((sp = spreadsheetView.getRow(gc.getIndex())) != null){
+				sp.addCell(gc);
+			}*/
 		}
 
 		tf.setOnKeyPressed(null);
@@ -130,9 +136,12 @@ public class TextEditor extends Editor {
 		};
 
 		gc.selectedProperty().addListener(il);
-
 		gc.setGraphic(tf);
 
+		/*final double temp = gc.getLocalToSceneTransform().getTy();
+		spreadsheetView.addCell(gc);
+		gc.setTranslateY(temp - gc.getLocalToSceneTransform().getTy());
+		 */
 		final Runnable r = new Runnable() {
 			@Override
 			public void run() {

@@ -1045,7 +1045,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				//                setItemCount(cellCount);
 			} else if (firstCell != null) {
 				final double firstCellOffset = getCellPosition(firstCell);
-				final int firstCellIndex = ((SpreadsheetRow)firstCell).getIndexVirtualFlow();
+				final int firstCellIndex = getCellIndex(firstCell);
 				//                setItemCount(cellCount);
 				adjustPositionToIndex(firstCellIndex);
 				final double viewportTopToCellTop = -computeOffsetForCell(firstCellIndex);
@@ -1187,7 +1187,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		// and reset the mapper position. This might happen when items got
 		// removed at the top or when the viewport size increased.
 		cell = cells.getFirst();
-		final int firstIndex = ((SpreadsheetRow)cell).getIndexVirtualFlow();
+		final int firstIndex = getCellIndex(cell);
 		final double firstCellPos = getCellPosition(cell);
 		if (firstIndex == 0 && firstCellPos > 0) {
 			setPosition(0.0f);
@@ -1223,7 +1223,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		// know we cannot add any more cells.
 		final T startCell = cells.getLast();
 		double offset = getCellPosition(startCell) + getCellLength(startCell);
-		int index = ((SpreadsheetRow)startCell).getIndexVirtualFlow() + 1;
+		int index = getCellIndex(startCell) + 1;
 		boolean filledWithNonEmpty = index <= cellCount;
 
 		while (offset < viewportLength && index <getCellCount()) {
@@ -1280,7 +1280,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		double start = getCellPosition(firstCell);
 		final double end = getCellPosition(lastNonEmptyCell) + getCellLength(lastNonEmptyCell);
 		if ((index != 0 || index == 0 && start < 0) && fillEmptyCells &&
-				lastNonEmptyCell != null &&((SpreadsheetRow)lastNonEmptyCell).getIndexVirtualFlow() == cellCount - 1 && end < viewportLength) {
+				lastNonEmptyCell != null && getCellIndex(lastNonEmptyCell) == cellCount - 1 && end < viewportLength) {
 
 			//Quite impossible to add properly the FixedRows so I choose to rebuild the view
 			if(!fixedRows.isEmpty()){
@@ -1323,7 +1323,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				firstCell = cells.getFirst();
 				start = getCellPosition(firstCell);
 				double delta = viewportLength - end;
-				if (((SpreadsheetRow)firstCell).getIndexVirtualFlow() == 0 && delta > -start) {
+				if (getCellIndex(firstCell) == 0 && delta > -start) {
 					delta = -start;
 				}
 				// Move things
@@ -1336,7 +1336,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				// now index #0 and aligned with the top. If so, change the position
 				// to be at 0 instead of 1.
 				start = getCellPosition(firstCell);
-				if (((SpreadsheetRow)firstCell).getIndexVirtualFlow() == 0 && start == 0) {
+				if (getCellIndex(firstCell) == 0 && start == 0) {
 					setPosition(0);
 				} else if (getPosition() != 1) {
 					setPosition(1);
@@ -1636,6 +1636,14 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	}
 
 	/**
+	 * Return the index for a given cell. This allows subclasses to customise
+	 * how cell indices are retrieved.
+	 */
+	protected int getCellIndex(T cell){
+		return cell.getIndex();
+	}
+
+	/**
 	 * Adjusts the cells location and size if necessary. The breadths of all
 	 * cells will be adjusted to fit the viewportWidth or maxPrefBreadth, and
 	 * the layout position will be updated if necessary based on index and
@@ -1692,7 +1700,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		// check the pile
 		for (int i = 0; i < pile.size(); i++) {
 			final T cell = pile.get(i);
-			if (((SpreadsheetRow)cell).getIndexVirtualFlow() == index) {
+			if (getCellIndex(cell) == index) {
 				// Note that we don't remove from the pile: if we do it leads
 				// to a severe performance decrease. This seems to be OK, as
 				// getCell() is only used for cell measurement purposes.
@@ -1880,7 +1888,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		for (int i = 0, max = pile.size(); i < max; i++) {
 			final T _cell = pile.get(i);
 			assert _cell != null;
-			if ( _cell.getIndex() == prefIndex) {
+			if ( getCellIndex(_cell) == prefIndex) {
 				cell = _cell;
 				pile.remove(i);
 				break;
@@ -1897,7 +1905,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				final boolean prefIndexIsEven = (prefIndex & 1) == 0;
 				for (int i = 0, max = pile.size(); i < max; i++) {
 					final T c = pile.get(i);
-					final int cellIndex = c.getIndex();
+					final int cellIndex = getCellIndex(c);
 
 					if ((cellIndex & 1) == 0 && prefIndexIsEven) {
 						cell = c;
@@ -1913,7 +1921,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				if (cell == null) {
 					cell = pile.removeFirst();
 				}*/
-				cell = prefIndex <  pile.getFirst().getIndex()? pile.removeLast() : pile.removeFirst();
+				cell = prefIndex <  ((SpreadsheetRow) pile.getFirst()).getIndexVirtualFlow()? pile.removeLast() : pile.removeFirst();
 			} else {
 				cell = createCell.call(this);
 				cell.getProperties().put(NEW_CELL, null);
@@ -1971,14 +1979,14 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 
 		// check the last index
 		final T lastCell = cells.getLast();
-		final int lastIndex = ((SpreadsheetRow)lastCell).getIndexVirtualFlow();
+		final int lastIndex = getCellIndex(lastCell);
 		if (index == lastIndex) {
 			return lastCell;
 		}
 
 		// check the first index
 		final T firstCell = cells.getFirst();
-		final int firstIndex = ((SpreadsheetRow)firstCell).getIndexVirtualFlow();
+		final int firstIndex = getCellIndex(firstCell);
 		if (index == firstIndex) {
 			return firstCell;
 		}
@@ -2278,7 +2286,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 
 			// Add any necessary leading cells
 			final T firstCell = cells.getFirst();
-			final int firstIndex = ((SpreadsheetRow)firstCell).getIndex();
+			final int firstIndex = getCellIndex(firstCell);
 			final double prevIndexSize = getCellLength(firstIndex - 1);
 			addLeadingCells(firstIndex - 1, getCellPosition(firstCell) - prevIndexSize);
 

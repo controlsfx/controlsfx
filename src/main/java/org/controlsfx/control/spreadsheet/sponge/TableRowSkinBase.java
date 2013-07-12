@@ -409,9 +409,14 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 			 * FOR FIXED COLUMNS
 			 */
 			double tableCellX = 0;
+			int indexColumn = 0;
+			final double hbarValue = spreadsheetView.getHbar().getValue();
 			//We translate that column by the Hbar Value if it's fixed
-			if(spreadsheetView.getFixedColumns().indexOf(column) != -1){
-				tableCellX = Math.abs(spreadsheetView.getHbar().getValue());
+			if((indexColumn = spreadsheetView.getFixedColumns().indexOf(column)) != -1){
+				/*if(hbarValue - fixedCellSize*(column-indexColumn) >0){
+					tableCellX = Math.abs(hbarValue - tableCell.getWidth()*(column-indexColumn));
+				}*/
+				tableCellX = Math.abs(hbarValue);
 				tableCell.toFront();
 			}
 

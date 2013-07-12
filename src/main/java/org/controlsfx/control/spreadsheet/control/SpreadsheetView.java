@@ -69,6 +69,8 @@ public class SpreadsheetView extends BorderPane{
 		T get(int index);
 
 		boolean isEmpty();
+
+		int size();
 	}
 
 	private final SpreadsheetViewInternal<DataRow> spreadsheetViewInternal;
@@ -337,6 +339,8 @@ public class SpreadsheetView extends BorderPane{
 		}*/
 
 		getFixedColumns().clear();
+		/*getFixedColumns().add(0);
+		getFixedColumns().add(2);*/
 		//		flow.getFixedColumns().ensureCapacity(numberOfFixedColumns);
 		for (int j = 0; j < numberOfFixedColumns; j++) {
 			getFixedColumns().add(j);
@@ -349,6 +353,9 @@ public class SpreadsheetView extends BorderPane{
 		//		fixedColumns.get();// We make fixedColumns valid again for firing InvalidationListener after
 	}
 
+	public void addCell(SpreadsheetCell cell){
+		getRow(cells.size()-1).addCell(cell);
+	}
 	public ObservableList<? extends TableColumnBase> getVisibleLeafColumns() {
 		return spreadsheetViewInternal.getVisibleLeafColumns();
 	}
@@ -1801,7 +1808,9 @@ class SpreadsheetViewInternal<T> extends TableView<DataRow> {
 		return SpreadsheetViewInternal.class.getResource("spreadsheet.css").toExternalForm();
 	}
 
-
+	public void addCell(SpreadsheetCell cell){
+		getChildren().add(cell);
+	}
 
 
 }

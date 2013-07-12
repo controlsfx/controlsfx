@@ -143,4 +143,12 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 		getChildren().setAll(tset);
 	}
 
+	public void addCell(SpreadsheetCell cell){
+		getChildren().add(cell);
+	}
+
+	public void removeCell(SpreadsheetCell gc) {
+		getChildren().remove(gc);
+	}
+
 }

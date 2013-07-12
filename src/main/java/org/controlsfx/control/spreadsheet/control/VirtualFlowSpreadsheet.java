@@ -137,6 +137,15 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		return super.getCells();
 	}
 
+	/**
+	 * Return the index for a given cell. This allows subclasses to customise
+	 * how cell indices are retrieved.
+	 */
+	@Override
+	protected int getCellIndex(T cell){
+		return ((SpreadsheetRow)cell).getIndexVirtualFlow();
+	}
+
 	/*****************************************************************
 	 * 		METHOD NO LONGER IN USE BUT MAY BE NEEDED IN FUTURE
 	 *****************************************************************/

@@ -28,7 +28,6 @@ package org.controlsfx.control.spreadsheet.sponge;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -409,7 +408,7 @@ public class NestedTableColumnHeader extends TableColumnHeader {
 	/* END OF COLUMN RESIZING   */
 	/* **************************/
 
-	void setHeadersNeedUpdate() {
+	public void setHeadersNeedUpdate() {
 		updateColumns = true;
 		// go through children columns - they should update too
 		for (int i = 0; i < getColumnHeaders().size(); i++) {
@@ -533,7 +532,6 @@ public class NestedTableColumnHeader extends TableColumnHeader {
 	 */
 	public void layoutFixedColumns() {
 		double scrollX = getTableViewSkin().flow.getHbar().getValue();
-		final double w = getWidth() - snappedLeftInset() - snappedRightInset();
 		final double h = getHeight() - snappedTopInset() - snappedBottomInset();
 
 		int i = 0;

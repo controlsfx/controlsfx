@@ -59,7 +59,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 
-import org.controlsfx.control.spreadsheet.control.RowHeader;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
@@ -75,8 +74,6 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 
 	public static final String REFRESH = "tableRefreshKey";
 	public static final String RECREATE = "tableRecreateKey";
-
-	protected final SpreadsheetView spreadsheetView;
 
 	//    protected abstract void requestControlFocus(); // spreadsheetView.requestFocus();
 	protected abstract TableSelectionModel getSelectionModel(); // spreadsheetView.getSelectionModel()
@@ -101,7 +98,6 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 
 	public TableViewSkinBase(final C control, final B behavior, final SpreadsheetView spreadsheetView) {
 		super(control, behavior);
-		this.spreadsheetView = spreadsheetView;
 		// init(control) should not be called here - it should be called by the
 		// subclass after initialising itself. This is to prevent NPEs (for
 		// example, getVisibleLeafColumns() throws a NPE as the control itself
@@ -109,7 +105,6 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 	}
 
 	protected void init(final C control) {
-
 		// init the VirtualFlow
 		flow.setPannable(false);
 		flow.setFocusTraversable(control.isFocusTraversable());
@@ -156,12 +151,12 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 		 *****************************************************************/
 		// Need to be put here instead of the end of the function because
 		//rowHeader is added to the children
-		rowHeader =new RowHeader(this,spreadsheetView, rowHeaderWidth);
+//		rowHeader =new RowHeader(this,spreadsheetView, rowHeaderWidth);
 		/*****************************************************************
 		 * 				END MODIFIED BY NELLARMONIA
 		 *****************************************************************/
 
-		getChildren().addAll(tableHeaderRow,rowHeader, flow, columnReorderOverlay, columnReorderLine);
+		getChildren().addAll(tableHeaderRow, flow, columnReorderOverlay, columnReorderLine);
 
 
 		updateVisibleColumnCount();
@@ -343,7 +338,7 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 	 * column reordering and resizing. It also handles the positioning and
 	 * resizing of thte columnReorderLine and columnReorderOverlay.
 	 */
-	private TableHeaderRow tableHeaderRow;
+	protected TableHeaderRow tableHeaderRow;
 
 
 	private Callback<C, I> rowFactory;
@@ -517,25 +512,26 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
 		final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
+		double tableHeaderRowHeight=0;
 		//Nell
-		if(spreadsheetView.getRowHeader().get()){
+		/*if(spreadsheetView.getRowHeader().get()){
 			x+= rowHeaderWidth;
 			w-=rowHeaderWidth;
-		}
-		double tableHeaderRowHeight=0;
+		}*/
+		
 
-		if(spreadsheetView.getColumnHeader().get()){
+//		if(spreadsheetView.getColumnHeader().get()){
 			// position the table header
 			tableHeaderRowHeight = tableHeaderRow.prefHeight(-1);
 			layoutInArea(tableHeaderRow, x, y, w, tableHeaderRowHeight, baselineOffset,
 					HPos.CENTER, VPos.CENTER);
 			y += tableHeaderRowHeight;
-		}
+//		}
 
-		if(spreadsheetView.getRowHeader().get()){
+		/*if(spreadsheetView.getRowHeader().get()){
 			layoutInArea(rowHeader, x-rowHeaderWidth, y-tableHeaderRowHeight, w, h, baselineOffset,
 					HPos.CENTER, VPos.CENTER);
-		}
+		}*/
 
 		/*****************************************************************
 		 * 				END OF MODIFIED BY NELLARMONIA
@@ -930,8 +926,7 @@ public abstract class TableViewSkinBase<S, C extends Control, B extends Behavior
 	/*****************************************************************
 	 * 				NELLARMONIA CODE
 	 *****************************************************************/
-	protected RowHeader rowHeader;
-	protected final double rowHeaderWidth = 50;
+	
 
 
 	/**

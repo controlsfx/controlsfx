@@ -38,7 +38,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.sponge.TableViewSkinBase;
 
 
 /**
@@ -47,7 +46,7 @@ import org.controlsfx.control.spreadsheet.sponge.TableViewSkinBase;
 public class RowHeader  extends StackPane {
 
 
-	private final TableViewSkinBase<?, ?, ?, ?> spreadsheetViewSkin;
+	private final SpreadsheetViewSkin<?> spreadsheetViewSkin;
 	private final SpreadsheetView spreadsheetView;
 	private double prefHeight;
 	private double prefWidth;
@@ -75,22 +74,22 @@ public class RowHeader  extends StackPane {
 	 * @param spreadsheetView
 	 * @param rowHeaderWidth
 	 ******************************************************************/
-	public RowHeader(final TableViewSkinBase<?, ?, ?, ?> skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
+	public RowHeader(final SpreadsheetViewSkin<?> skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
 		this.spreadsheetViewSkin = skin;
 		this.spreadsheetView = spreadsheetView;
-
-		final Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				prefHeight = spreadsheetView.getDefaultCellSize();
-				prefWidth = rowHeaderWidth;
+		prefWidth = rowHeaderWidth;
+	}
+	
+	public void init(){
+		
+				prefHeight = spreadsheetViewSkin.spreadsheetView.getDefaultCellSize();
 				selectionModel = spreadsheetView.getSelectionModel();
 
 				//Clip property to stay within bounds
-				clip = new Rectangle(prefWidth, snapSize(skin.getSkinnable().getHeight()));
+				clip = new Rectangle(prefWidth, snapSize(spreadsheetViewSkin.getSkinnable().getHeight()));
 				clip.relocate(snappedTopInset(), snappedLeftInset());
 				clip.setSmooth(false);
-				clip.heightProperty().bind(skin.getSkinnable().heightProperty());
+				clip.heightProperty().bind(spreadsheetViewSkin.getSkinnable().heightProperty());
 				RowHeader.this.setClip(clip);
 
 				// We desactivate and activate the rowheader upon request
@@ -112,13 +111,11 @@ public class RowHeader  extends StackPane {
 				// For layout properly the rowHeader when there are some selected items
 				selectionModel.getSelectedRows().addListener(layout);
 				requestLayout();
-			}
-		};
-		Platform.runLater(r);
+			
 	}
 
 	@Override protected void layoutChildren() {
-		if(working) {
+		if(working && spreadsheetView != null) {
 
 			final double x =snappedLeftInset();
 			//We add prefHeight because we need to take the other header into account

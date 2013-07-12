@@ -2,20 +2,30 @@ package org.controlsfx.control.spreadsheet.control;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
+import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
 import org.controlsfx.control.spreadsheet.sponge.TableViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 
 public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
+	protected RowHeader rowHeader;
+	//TODO reduce visibility
+	public final double rowHeaderWidth = 50;
+	//TODO reduce visibility
+	public SpreadsheetView spreadsheetView;
+	
 	public SpreadsheetViewSkin(TableView tableView,
 			SpreadsheetView spreadsheetView) {
 		super(tableView, spreadsheetView);
-
+this.spreadsheetView = spreadsheetView;
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
@@ -51,8 +61,41 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
 	protected void init() {
 		((VirtualFlowSpreadsheet)flow).getVerticalBar().valueProperty().addListener(vbarValueListener);
+		rowHeader =new RowHeader(this,spreadsheetView, rowHeaderWidth);
+		getChildren().addAll(rowHeader);
+		
+		rowHeader.init();
+		((SpreadsheetHeaderRow)getTableHeaderRow()).init();
 	}
 
+	@Override protected void layoutChildren( double x, double y,
+			double w, final double h) {
+		if(spreadsheetView == null)
+			return;
+		if(spreadsheetView.getRowHeader().get()){
+			x+= rowHeaderWidth;
+			w-=rowHeaderWidth;
+		}
+		super.layoutChildren(x, y, w, h);
+		
+		final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
+		double tableHeaderRowHeight=0;
+
+		if(spreadsheetView.getColumnHeader().get()){
+			// position the table header
+			tableHeaderRowHeight = tableHeaderRow.prefHeight(-1);
+			layoutInArea(tableHeaderRow, x, y, w, tableHeaderRowHeight, baselineOffset,
+					HPos.CENTER, VPos.CENTER);
+			y += tableHeaderRowHeight;
+		}else{
+			//TODO try to hide the columnHeader
+		}
+
+		if(spreadsheetView.getRowHeader().get()){
+			layoutInArea(rowHeader, x-rowHeaderWidth, y-tableHeaderRowHeight, w, h, baselineOffset,
+					HPos.CENTER, VPos.CENTER);
+		}
+	}
 	final InvalidationListener vbarValueListener = new InvalidationListener() {
 		@Override public void invalidated(Observable valueModel) {
 			verticalScroll();
@@ -167,6 +210,14 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	@Override
 	protected VirtualFlow<TableRow<T>> createVirtualFlow() {
 		return new VirtualFlowSpreadsheet<TableRow<T>>();
+	}
+	
+	protected TableHeaderRow createTableHeaderRow() {
+		return new SpreadsheetHeaderRow(this);
+	}
+	
+	BooleanProperty getTableMenuButtonVisibleProperty(){
+		return tableMenuButtonVisibleProperty();
 	}
 
 }

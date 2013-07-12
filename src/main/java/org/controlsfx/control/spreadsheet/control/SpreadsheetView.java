@@ -169,8 +169,9 @@ public class SpreadsheetView extends BorderPane{
 		this.setCenter(spreadsheetViewInternal);
 
 		this.setLeft(buildCommonControlGrid());
-
 	}
+	
+	
 
 	private void buildSpreadsheetView(Grid.GridSpanType type) {
 		setGrid(new Grid(type));

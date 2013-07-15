@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control.spreadsheet.skin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,7 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 
+import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;

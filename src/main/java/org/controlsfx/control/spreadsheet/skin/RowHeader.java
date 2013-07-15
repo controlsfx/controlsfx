@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control.spreadsheet.skin;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -37,6 +37,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
+import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 
 

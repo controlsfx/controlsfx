@@ -53,6 +53,7 @@ import org.controlsfx.control.spreadsheet.editor.TextEditor;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
+import org.controlsfx.control.spreadsheet.skin.SpreadsheetViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
 
 public class SpreadsheetView extends BorderPane{
@@ -187,7 +188,9 @@ public class SpreadsheetView extends BorderPane{
 			column.setEditable(true);
 			// We don't want to sort the column
 			column.setSortable(false);
-
+			
+			column.impl_setReorderable(false);
+			
 			column.setPrefWidth(getCellPrefWidth());
 
 

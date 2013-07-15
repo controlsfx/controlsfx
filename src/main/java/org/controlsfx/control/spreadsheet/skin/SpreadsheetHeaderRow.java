@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control.spreadsheet.skin;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
+import org.controlsfx.control.spreadsheet.sponge.NestedTableColumnHeader;
 import org.controlsfx.control.spreadsheet.sponge.TableColumnHeader;
 import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
 
@@ -18,7 +19,6 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 	public SpreadsheetHeaderRow(final SpreadsheetViewSkin skin) {
 		super(skin);
 		spreadsheetViewSkin = skin;
-		
 	}
 	public void init(){
 		final Runnable r = new Runnable() {
@@ -69,7 +69,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
 		if(spreadsheetViewSkin != null && spreadsheetViewSkin.spreadsheetView != null && spreadsheetViewSkin.spreadsheetView.getRowHeader().get()){
-			padding += spreadsheetViewSkin.rowHeaderWidth;
+			padding += spreadsheetViewSkin.getRowHeaderWidth();
 		}
 
 		/*****************************************************************
@@ -143,5 +143,13 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 				updateHighlighSelection();
 			}
 		};
+		
+		protected NestedTableColumnHeader createRootHeader() {
+	        return new SpreadsheetNestedTableColumnHeader(getTableSkin(), null);
+	    } 
+		
+		public SpreadsheetNestedTableColumnHeader getRootHeader() {
+	        return (SpreadsheetNestedTableColumnHeader) super.getRootHeader();
+	    }
 
 }

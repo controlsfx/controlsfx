@@ -218,7 +218,7 @@ public class NestedTableColumnHeader extends TableColumnHeader {
 		changeListenerHandler.dispose();
 	}
 
-	private final TableColumnHeader label;
+	protected final TableColumnHeader label;
 
 	private ObservableList<TableColumnHeader> columnHeaders;
 	public ObservableList<TableColumnHeader> getColumnHeaders() {
@@ -473,13 +473,6 @@ public class NestedTableColumnHeader extends TableColumnHeader {
 				dragRect.relocate(x - DRAG_RECT_WIDTH / 2, snappedTopInset() + labelHeight);
 			}
 		}
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		layoutFixedColumns();
-		/*****************************************************************
-		 * 				END OF MODIFIED BY NELLARMONIA
-		 *****************************************************************/
 	}
 
 	// sum up all children columns
@@ -520,43 +513,5 @@ public class NestedTableColumnHeader extends TableColumnHeader {
 		return col.getColumns().isEmpty() ?
 				new TableColumnHeader(getTableViewSkin(), col) :
 					new NestedTableColumnHeader(getTableViewSkin(), col);
-	}
-
-
-	/*****************************************************************
-	 * 				MODIFIED BY NELLARMONIA
-	 *****************************************************************/
-	/**
-	 * We want ColumnHeader to be fixed when we freeze some columns
-	 * @param scrollX
-	 */
-	public void layoutFixedColumns() {
-		double scrollX = getTableViewSkin().flow.getHbar().getValue();
-		final double h = getHeight() - snappedTopInset() - snappedBottomInset();
-
-		int i = 0;
-		final int labelHeight = (int) label.prefHeight(-1);
-		for(int j =0; j< getTableViewSkin().flow.getFixedColumns().size();++j){
-			final TableColumnHeader n = getColumnHeaders().get(j);
-			n.toFront();
-			final double prefWidth = snapSize(n.prefWidth(-1));
-			//            double prefHeight = n.prefHeight(-1);
-
-			// position the column header in the default location...
-			n.resize(prefWidth, snapSize(h - labelHeight));
-			n.relocate(scrollX, labelHeight + snappedTopInset());
-
-
-			// shuffle along the x-axis appropriately
-			scrollX += prefWidth;
-
-			// position drag overlay to intercept column resize requests
-			if (dragRects != null && i < dragRects.size()) {
-				final Rectangle dragRect = dragRects.get(i++);
-				dragRect.setHeight(getHeight() - label.getHeight());
-				dragRect.relocate(scrollX - DRAG_RECT_WIDTH / 2, snappedTopInset() + labelHeight);
-			}
-		}
-
 	}
 }

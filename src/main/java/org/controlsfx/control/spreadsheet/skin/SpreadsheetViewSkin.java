@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control.spreadsheet.skin;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -10,6 +10,8 @@ import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
+import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
+import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
 import org.controlsfx.control.spreadsheet.sponge.TableViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
@@ -17,15 +19,17 @@ import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
 	protected RowHeader rowHeader;
-	//TODO reduce visibility
-	public final double rowHeaderWidth = 50;
-	//TODO reduce visibility
-	public SpreadsheetView spreadsheetView;
+	private final double rowHeaderWidth = 50;
+	public double getRowHeaderWidth() {
+		return rowHeaderWidth;
+	}
+	
+	protected SpreadsheetView spreadsheetView;
 	
 	public SpreadsheetViewSkin(TableView tableView,
 			SpreadsheetView spreadsheetView) {
 		super(tableView, spreadsheetView);
-this.spreadsheetView = spreadsheetView;
+		this.spreadsheetView = spreadsheetView;
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/

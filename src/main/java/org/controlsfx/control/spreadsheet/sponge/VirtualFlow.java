@@ -65,10 +65,6 @@ import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 
 import com.sun.javafx.application.PlatformImpl;
-import com.sun.javafx.collections.annotations.ReturnsUnmodifiableCollection;
-
-
-
 
 
 /**
@@ -385,7 +381,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 * This is package private ONLY FOR TESTING
 	 */
 	final ArrayLinkedList<T> cells = new ArrayLinkedList<T>();
-	@ReturnsUnmodifiableCollection
 	protected List<T> getCells() {
 		return Collections.unmodifiableList(cells);
 	}

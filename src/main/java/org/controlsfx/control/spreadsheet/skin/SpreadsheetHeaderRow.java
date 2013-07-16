@@ -7,6 +7,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.sponge.NestedTableColumnHeader;
@@ -75,7 +76,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 		/*****************************************************************
 		 * 				END OF MODIFIED BY NELLARMONIA
 		 *****************************************************************/
-		clip.setWidth(getTableWidth() == 0? 0 :getTableWidth() - padding );
+		((Rectangle)getClip()).setWidth(getTableWidth() == 0? 0 :getTableWidth() - padding );
 	}
 	
 	protected void updateScrollX() {

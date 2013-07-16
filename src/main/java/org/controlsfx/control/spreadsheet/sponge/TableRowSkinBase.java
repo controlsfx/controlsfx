@@ -392,7 +392,7 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 
 		//		System.out.println("Je layout"+index+"/"+((SpreadsheetRow)getSkinnable()).getIndexVirtualFlow() );
 		for (int column = 0; column < max; column++) {
-			//			System.out.println("Je layout"+index+"/"+column );
+						
 			final SpreadsheetCell tableCell = cells.get(column);
 			final TableColumnBase<DataRow, ?> tableColumn = getTableColumnBase(tableCell);
 
@@ -440,6 +440,7 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 				if (fixedCellSizeEnabled && tableCell.getParent() == null) {
 					getChildren().add(tableCell);
 				}
+//				System.out.println("Je layout"+index+"/"+column );
 
 
 

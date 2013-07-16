@@ -104,7 +104,8 @@ public class TableRowSkin<T extends DataRow> extends TableRowSkinBase<DataRow,Ta
 
 	@Override
 	protected boolean isColumnPartiallyOrFullyVisible(TableColumnBase tc) {
-		return tableViewSkin == null ? false : true;//tableViewSkin.((TableColumn)tc);
+		//Virtualization of the columns is too complex for now
+		return tableViewSkin == null ? false : true;//tableViewSkin.isColumnPartiallyOrFullyVisible(tc);
 	}
 
 	@Override

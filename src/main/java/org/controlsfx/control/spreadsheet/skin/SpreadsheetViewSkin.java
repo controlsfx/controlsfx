@@ -6,12 +6,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
 import org.controlsfx.control.spreadsheet.sponge.TableViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
@@ -28,7 +30,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	
 	public SpreadsheetViewSkin(TableView tableView,
 			SpreadsheetView spreadsheetView) {
-		super(tableView, spreadsheetView);
+		super(tableView);
 		this.spreadsheetView = spreadsheetView;
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
@@ -87,8 +89,8 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
 		if(spreadsheetView.getColumnHeader().get()){
 			// position the table header
-			tableHeaderRowHeight = tableHeaderRow.prefHeight(-1);
-			layoutInArea(tableHeaderRow, x, y, w, tableHeaderRowHeight, baselineOffset,
+			tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
+			layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight, baselineOffset,
 					HPos.CENTER, VPos.CENTER);
 			y += tableHeaderRowHeight;
 		}else{
@@ -222,6 +224,82 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	
 	BooleanProperty getTableMenuButtonVisibleProperty(){
 		return tableMenuButtonVisibleProperty();
+	}
+	protected void scrollHorizontally(TableColumnBase col) {
+
+		if (col == null || !col.isVisible()) {
+			return;
+		}
+
+		// work out where this column header is, and it's width (start -> end)
+		double start = 0;//scrollX;
+		for (TableColumnBase c : getVisibleLeafColumns()) {
+            if (c.equals(col)) break;
+            start += c.getWidth();
+        }
+
+		/*****************************************************************
+		 * 				MODIFIED BY NELLARMONIA
+		 * We modifed this function so that we ensure that any selected cells
+		 * will not be below a fixed column. Because when there's some fixed columns,
+		 * the "left border" is not the table anymore, but the right side of the last
+		 * fixed columns.
+		 *****************************************************************/
+		// We add the fixed columns width
+		final double fixedColumnWidth = getFixedColumnWidth();
+
+		/*****************************************************************
+		 * 				END OF MODIFIED BY NELLARMONIA
+		 *****************************************************************/
+		final double end = start + col.getWidth();
+
+		// determine the visible width of the table
+		final double headerWidth = getSkinnable().getWidth() - snappedLeftInset() - snappedRightInset();
+
+		// determine by how much we need to translate the table to ensure that
+		// the start position of this column lines up with the left edge of the
+		// tableview, and also that the columns don't become detached from the
+		// right edge of the table
+		final double pos = ((VirtualFlowSpreadsheet)flow).getHorizontalBar().getValue();
+		final double max = ((VirtualFlowSpreadsheet)flow).getHorizontalBar().getMax();
+		double newPos;
+
+		/*****************************************************************
+		 * 				MODIFIED BY NELLARMONIA
+		 *****************************************************************/
+		if (start < pos+fixedColumnWidth && start >= 0 && start >= fixedColumnWidth) {
+			newPos = start- fixedColumnWidth <0 ? start: start- fixedColumnWidth ;
+		} else {
+			final double delta = start < 0 || end > headerWidth ? start - pos -fixedColumnWidth : 0;
+			newPos = pos + delta > max ? max : pos + delta ;
+		}
+
+		/*****************************************************************
+		 * 				END OF MODIFIED BY NELLARMONIA
+		 *****************************************************************/
+
+
+		// FIXME we should add API in VirtualFlow so we don't end up going
+		// direct to the hbar.
+		// actually shift the flow - this will result in the header moving
+		// as well
+		((VirtualFlowSpreadsheet)flow).getHorizontalBar().setValue(newPos);
+	}
+
+	/**
+	 * Calc the width of the fixed columns in order not to select
+	 * cells that are hidden by the fixed columns
+	 * @return
+	 */
+	private double getFixedColumnWidth() {
+		double fixedColumnWidth = 0;
+		if(!flow.getFixedColumns().isEmpty()){
+			for (int i = 0, max = flow.getFixedColumns().size(); i < max; ++i){
+				final TableColumnBase<DataRow,?> c = getVisibleLeafColumn(i);
+				fixedColumnWidth += c.getWidth();
+			}
+		}
+		return fixedColumnWidth;
 	}
 
 }

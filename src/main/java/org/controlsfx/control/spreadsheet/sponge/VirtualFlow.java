@@ -1883,7 +1883,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		for (int i = 0, max = pile.size(); i < max; i++) {
 			final T _cell = pile.get(i);
 			assert _cell != null;
-			if ( getCellIndex(_cell) == prefIndex) {
+			if ( _cell.getIndex() == prefIndex) {
 				cell = _cell;
 				pile.remove(i);
 				break;
@@ -1916,7 +1916,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				if (cell == null) {
 					cell = pile.removeFirst();
 				}*/
-				cell = prefIndex <  ((SpreadsheetRow) pile.getFirst()).getIndexVirtualFlow()? pile.removeLast() : pile.removeFirst();
+				cell = prefIndex <   pile.getFirst().getIndex()? pile.removeLast() : pile.removeFirst();
 			} else {
 				cell = createCell.call(this);
 				cell.getProperties().put(NEW_CELL, null);

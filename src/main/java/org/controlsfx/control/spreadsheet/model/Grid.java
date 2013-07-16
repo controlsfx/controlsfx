@@ -105,13 +105,13 @@ public class Grid {
 	private DataCell<?> generateCell(int row, int column, int rowSpan, int colSpan) {
 		DataCell<?> temp;
 		final double random = Math.random();
-		if (random < 0.5) {
+		if (random < 0.3) {
 			temp = new ListCell(row, column, rowSpan, colSpan);
-		} else{
+		} else if (random >= 0.3 && random < 0.8) {
 			temp = new TextCell(row, column, rowSpan, colSpan);
-		}/*else{
+		}else{
 			temp = new DateCell(row, column, rowSpan, colSpan);
-		}*/
+		}
 
 		// Styling for preview
 		if(row%5 ==0){

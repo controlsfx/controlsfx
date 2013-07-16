@@ -43,6 +43,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 
 
@@ -56,6 +57,7 @@ public class ListEditor extends Editor {
 	private final ComboBox<String> cb;
 	private ChangeListener<Number> cl;
 	private InvalidationListener cl2;
+	private SpreadsheetRow original;
 
 	public ListEditor() {
 		cb = new ComboBox<String>();
@@ -101,9 +103,12 @@ public class ListEditor extends Editor {
 
 	@Override
 	public void end() {
+		super.end();
+		
 		cb.getSelectionModel().selectedIndexProperty().removeListener(cl);
 		cb.setOnKeyPressed(null);
 		gc.selectedProperty().removeListener(cl2);
+		
 		this.cell = null;
 		this.gc = null;
 		cl = null;
@@ -163,11 +168,15 @@ public class ListEditor extends Editor {
 
 	@Override
 	public void startEdit() {
+		super.startEdit();
+		
 		gc.setGraphic(cb);
-		if (spreadsheetView.isEdit()) {
+		
+		/*if (spreadsheetView.isEdit()) {
 			cb.show();
 			spreadsheetView.setEdit(false);
-		}
+		}*/
+		
 		final Runnable r = new Runnable() {
 			@Override
 			public void run() {

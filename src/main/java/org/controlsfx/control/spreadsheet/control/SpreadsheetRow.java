@@ -120,7 +120,7 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 	 * @param size
 	 */
 	public void putFixedColumnToBack() {
-		final List<Node> tset = new ArrayList<>(getChildrenUnmodifiable());
+		final List<Node> tset = new ArrayList<>(getChildren());
 		tset.sort( new Comparator<Node>() {
 			@Override
 			public int compare(Node o1, Node o2) {
@@ -128,8 +128,8 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 				if(((SpreadsheetCell)o1).getItem() == null || ((SpreadsheetCell)o2).getItem() == null){
 					return -1;
 				}
-				final int lhs = ((SpreadsheetCell)o1).getItem().getColumn();
-				final int rhs = ((SpreadsheetCell)o2).getItem().getColumn();
+				final int lhs = getTableView().getColumns().indexOf(((SpreadsheetCell) o1).getTableColumn());
+				final int rhs = getTableView().getColumns().indexOf(((SpreadsheetCell) o2).getTableColumn());
 				if (lhs < rhs) {
 					return -1;
 				}

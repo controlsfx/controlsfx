@@ -47,6 +47,7 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+import org.controlsfx.control.spreadsheet.editor.DateEditor;
 import org.controlsfx.control.spreadsheet.editor.Editor;
 import org.controlsfx.control.spreadsheet.editor.ListEditor;
 import org.controlsfx.control.spreadsheet.editor.TextEditor;
@@ -79,7 +80,6 @@ public class SpreadsheetView extends BorderPane{
 	private final double DEFAULT_CELL_SIZE = 24.0; 	// Height of a cell
 	private DataCell<?> lastEdit = null;
 	private SpreadsheetCell lastHover = null;
-	private boolean edit = false;
 	private Grid grid;
 	private final double cellPrefWidth = 100;			// Width of a cell
 	private final Map<DataCell.CellType, Editor> editors = FXCollections.observableHashMap();
@@ -132,6 +132,9 @@ public class SpreadsheetView extends BorderPane{
 
 	public void setRows(RowAccessor<?> cells) {
 		this.cells = (RowAccessor<SpreadsheetRow>) cells;
+	}
+	public int getVirtualFlowCellSize(){
+		return cells.size();
 	}
 
 
@@ -279,7 +282,7 @@ public class SpreadsheetView extends BorderPane{
 	}
 
 	/**
-	 * Activate and desactivate the Column Header
+	 * Activate and deactivate the Column Header
 	 * @param b
 	 */
 	public void setColumnHeader(final boolean b){
@@ -295,15 +298,8 @@ public class SpreadsheetView extends BorderPane{
 	 * @param b
 	 */
 	public void setRowHeader(final boolean b){
-		//requestLayout() not responding immediately..
-		//TODO do that in skin
-		//flow.layoutTotal();
-
-
 		rowHeader.setValue(b);
 		rowHeader.get();//For invalidation Listener to react again
-		//TODO do that in skin
-		//flow.layoutFixedRows();
 	}
 	public BooleanProperty getRowHeader() {
 		return rowHeader;
@@ -334,31 +330,21 @@ public class SpreadsheetView extends BorderPane{
 	 * @param numberOfFixedColumns
 	 */
 	public void fixColumns(int numberOfFixedColumns){
-		// If we are reducing the number of fixed columns, we need to sort the children list of the Gridrow
-		// for the hover property.
-		/*if(getFixedColumns().size() > numberOfFixedColumns){
-			for(int i=0;i<flow.cells.size();++i){
-				flow.cells.get(i).putFixedColumnToBack();
-			}
-		}*/
 
 		getFixedColumns().clear();
-		/*getFixedColumns().add(0);
-		getFixedColumns().add(2);*/
-		//		flow.getFixedColumns().ensureCapacity(numberOfFixedColumns);
 		for (int j = 0; j < numberOfFixedColumns; j++) {
 			getFixedColumns().add(j);
 		}
-
-		//requestLayout() not responding immediately..
-		//		flow.layoutTotal();
-
-		//		fixedColumns.set(numberOfFixedColumns);
-		//		fixedColumns.get();// We make fixedColumns valid again for firing InvalidationListener after
 	}
 
-	public void addCell(SpreadsheetCell cell){
-		getRow(cells.size()-1).addCell(cell);
+	public boolean addCell(SpreadsheetCell cell){
+		SpreadsheetRow temp = getRow(cells.size()-1-fixedRows.size());
+		if(temp != null){
+			temp.addCell(cell);
+			return true;
+		}
+		return false;
+		
 	}
 	public ObservableList<? extends TableColumnBase> getVisibleLeafColumns() {
 		return spreadsheetViewInternal.getVisibleLeafColumns();
@@ -453,7 +439,6 @@ public class SpreadsheetView extends BorderPane{
 		} else { // If it's not, then it's the firstkey
 			gridCell = getNonFixed(0).getGridCell(cell.getColumn());
 		}
-
 		gridCell.setHoverPublic(true);
 		lastHover = gridCell;
 
@@ -492,11 +477,11 @@ public class SpreadsheetView extends BorderPane{
 				editors.put(cell.getCellType(), le);
 				editor = le;
 				break;
-				/*case DATE:
+			case DATE:
 				final DateEditor de = new DateEditor();
-				editors.put(cell.getType(), de);
+				editors.put(cell.getCellType(), de);
 				editor = de;
-				break;*/
+				break;
 			default:
 				return null;
 			}
@@ -505,20 +490,6 @@ public class SpreadsheetView extends BorderPane{
 		// We store the lastEditing cell
 		setLastEdit(((DataRow)this.getItems().get(cell.getRow())).getCell(cell.getColumn()));
 		return editor;
-	}
-
-	public boolean isEdit() {
-		return edit;
-	}
-
-	/**
-	 * Specify that we want to display the list of the ListEditor right when we
-	 * go on edition
-	 *
-	 * @param edit
-	 */
-	public void setEdit(boolean edit) {
-		this.edit = edit;
 	}
 
 	public Grid getGrid(){
@@ -1250,10 +1221,6 @@ public class SpreadsheetView extends BorderPane{
 
 			//This is to handle edition
 			if (posFinal.equals(old) && !ctrl && !shift && !drag) {
-				// If we were on edition on that cell (to display the list for the listEditor)
-				if (tableView.getItems().get(posFinal.getRow()).getCell(posFinal.getColumn()).equals(spreadsheetView.getLastEdit())) {
-					spreadsheetView.setEdit(true);
-				}
 				// If we are on an Invisible row or both (in diagonal), we need to force the edition
 				if (spanType == SpreadsheetView.SpanType.ROW_INVISIBLE || spanType == SpreadsheetView.SpanType.BOTH_INVISIBLE) {
 					final TablePosition<DataRow, ?> FinalPos = new TablePosition<>(tableView, posFinal.getRow(), posFinal.getTableColumn());

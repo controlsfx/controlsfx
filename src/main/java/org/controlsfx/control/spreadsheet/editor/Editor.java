@@ -30,6 +30,7 @@ package org.controlsfx.control.spreadsheet.editor;
 import javafx.scene.control.Control;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 
@@ -44,6 +45,8 @@ public abstract class Editor{
 	protected DataCell<?> cell;
 	protected SpreadsheetCell gc;
 	protected SpreadsheetView spreadsheetView;
+	private SpreadsheetRow original;
+	private boolean isMoved;
 
 	public abstract void attachEnterEscapeEventHandler();
 
@@ -58,10 +61,39 @@ public abstract class Editor{
 
 	public abstract DataCell<?> commitEdit();
 
-	public abstract void end();
+	/**
+	 * When we have finish editing. We put the cell back to its right TableRow.
+	 */
+	public void end(){
+		if(cell.getRowSpan() >1){
+			gc.setTranslateY(0);
+			if(isMoved){
+				original.addCell(gc);
+				original.putFixedColumnToBack();
+			}
+		}
+	}
 
 	public abstract Control getControl();
 
-	public abstract void startEdit();
+	/**
+	 * In case the cell is spanning in rows.
+	 * We want the cell to be fully accessible so we need to remove it from its tableRow
+	 * and add it to the last row possible. Then we translate the cell so that it's invisible for
+	 * the user.
+	 */
+	public void startEdit(){
+		//Case when RowSpan if larger and we're not on the last row
+		if(cell.getRowSpan()>1 && cell.getRow() != spreadsheetView.getVirtualFlowCellSize()-1){
+			original = (SpreadsheetRow) gc.getTableRow();
+			
+			final double temp = gc.getLocalToSceneTransform().getTy();
+			isMoved = spreadsheetView.addCell(gc);
+			if(isMoved){
+				gc.setTranslateY(temp - gc.getLocalToSceneTransform().getTy());
+				original.putFixedColumnToBack();
+			}
+		}
+	}
 
 }

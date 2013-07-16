@@ -103,7 +103,12 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         }
         
         content = getSkinnable().getContent();
-        getChildren().setAll(content, notificationBar);
+        
+        if (content == null) {
+            getChildren().setAll(notificationBar);
+        } else {
+            getChildren().setAll(content, notificationBar);
+        }
     }
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {
@@ -124,27 +129,27 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     }
     
     protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.minWidth(height);
+        return content == null ? 0 : content.minWidth(height);
     };
     
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.minHeight(width);
+        return content == null ? 0 : content.minHeight(width);
     };
     
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.prefWidth(height);
+        return content == null ? 0 : content.prefWidth(height);
     };
     
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.prefHeight(width);
+        return content == null ? 0 : content.prefHeight(width);
     };
     
     protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.maxWidth(height);
+        return content == null ? 0 : content.maxWidth(height);
     };
     
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return content.maxHeight(width);
+        return content == null ? 0 : content.maxHeight(width);
     };
     
     

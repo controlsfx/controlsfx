@@ -186,7 +186,7 @@ public class SpreadsheetView extends BorderPane{
 		for (int i = 0; i < getGrid().getColumncount(); ++i) {
 			final int col = i;
 
-			final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(String.valueOf(col));//getEquivColumn(col));
+			final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
 
 			column.setEditable(true);
 			// We don't want to sort the column

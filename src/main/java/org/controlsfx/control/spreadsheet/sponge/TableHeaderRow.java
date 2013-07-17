@@ -96,10 +96,6 @@ public class TableHeaderRow extends StackPane {
 
     private Rectangle clip;
     
-    protected double getTableWidth(){
-    	return tableWidth;
-    }
-
     private TableColumnHeader reorderingRegion;
 
     /**

@@ -76,7 +76,8 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 		/*****************************************************************
 		 * 				END OF MODIFIED BY NELLARMONIA
 		 *****************************************************************/
-		((Rectangle)getClip()).setWidth(getTableWidth() == 0? 0 :getTableWidth() - padding );
+		Rectangle clip = ((Rectangle)getClip());
+		clip.setWidth(clip.getWidth() == 0? 0 :clip.getWidth() - padding );
 	}
 	
 	protected void updateScrollX() {
@@ -111,7 +112,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 		 */
 		private final InvalidationListener fixedColumnsListener = new InvalidationListener() {
 			@Override public void invalidated(Observable valueModel) {
-				getRootHeader().setHeadersNeedUpdate();
+				getRootHeader().updateHeader();
 				getRootHeader().layoutFixedColumns();
 				final Runnable r = new Runnable() {
 					@Override

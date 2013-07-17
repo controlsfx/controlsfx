@@ -39,8 +39,7 @@ public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader{
 		double scrollX = ((SpreadsheetViewSkin)getTableViewSkin()).spreadsheetView.getHbar().getValue();
 		final double h = getHeight() - snappedTopInset() - snappedBottomInset();
 
-		int i = 0;
-		final int labelHeight = (int) label.prefHeight(-1);
+		final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
 		for(int j =0; j< ((SpreadsheetViewSkin)getTableViewSkin()).spreadsheetView.getFixedColumns().size();++j){
 			final TableColumnHeader n = getColumnHeaders().get(j);
 			n.toFront();
@@ -56,6 +55,10 @@ public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader{
 			scrollX += prefWidth;
 		}
 
+	}
+	
+	public void updateHeader(){
+		setHeadersNeedUpdate();
 	}
 
 }

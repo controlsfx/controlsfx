@@ -77,7 +77,7 @@ public class NestedTableColumnHeader extends TableColumnHeader {
      */
     private ObservableList<? extends TableColumnBase> columns;
 
-    protected TableColumnHeader label;
+    private TableColumnHeader label;
 
     private ObservableList<TableColumnHeader> columnHeaders;
 
@@ -480,7 +480,7 @@ public class NestedTableColumnHeader extends TableColumnHeader {
         }
     }
 
-    public void setHeadersNeedUpdate() {
+    protected void setHeadersNeedUpdate() {
         updateColumns = true;
 
         // go through children columns - they should update too

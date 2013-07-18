@@ -268,7 +268,28 @@ public class Dialog {
      *      the difference between heavyweight and lightweight dialogs.
      */
     public Dialog(Object owner, String title, boolean lightweight) {
-        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true);
+        this(owner, title, lightweight, false);
+    }
+    
+    /**
+     * Creates a dialog using specified owner and title, which may be rendered
+     * in either a heavyweight or lightweight fashion.
+     * 
+     * @param owner The dialog window owner - if specified the dialog will be
+     *      centered over the owner, otherwise the dialog will be shown in the 
+     *      middle of the screen.
+     * @param title The dialog title to be shown at the top of the dialog.
+     * @param lightweight If true this dialog will be rendered inside the given
+     *      owner, rather than in a separate window (as heavyweight dialogs are).
+     *      Refer to the {@link Dialogs} class documentation for more details on
+     *      the difference between heavyweight and lightweight dialogs.
+     * @param nativeChrome Specifies that the dialog should use the native 
+     *      'chrome' of the users operating system rather than the custom 
+     *      cross-platform rendering used by default. Refer to the 
+     *      {@link Dialogs} class javadoc for more information.
+     */
+    public Dialog(Object owner, String title, boolean lightweight, boolean nativeChrome) {
+        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, nativeChrome);
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane");

@@ -104,8 +104,8 @@ class LightweightDialog extends FXDialog {
         
         
         // *** The rest is for adding window decorations ***
-        init(title);
-        lightweightDialog.getStyleClass().add("lightweight");
+        init(title, true);
+        lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome");
         
         // add window dragging
         toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {

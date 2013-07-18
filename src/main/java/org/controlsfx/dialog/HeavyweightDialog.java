@@ -69,14 +69,14 @@ class HeavyweightDialog extends FXDialog {
      **************************************************************************/
     
     HeavyweightDialog(String title, Window owner, boolean modal) {
-        this(title, owner, modal, StageStyle.TRANSPARENT);
+        this(title, owner, modal, false);
     }
 
-    private HeavyweightDialog(String title, Window owner, boolean modal, StageStyle stageStyle) {
+    HeavyweightDialog(String title, Window owner, boolean modal, boolean nativeChrome) {
         super();
         this.owner = owner;
         
-        stage = new Stage(stageStyle) {
+        stage = new Stage(nativeChrome ? StageStyle.UTILITY : StageStyle.TRANSPARENT) {
             @Override public void showAndWait() {
                 Window owner = getOwner();
                 if (owner != null) {
@@ -96,10 +96,13 @@ class HeavyweightDialog extends FXDialog {
         }
 
         setModal(modal);
+        
+        boolean useCustomChrome = ! nativeChrome;
 
         // *** The rest is for adding window decorations ***
-        init(title);
+        init(title, useCustomChrome);
         lightweightDialog.getStyleClass().add("heavyweight");
+        lightweightDialog.getStyleClass().add(useCustomChrome ? "custom-chrome" : "native-chrome");
 
         Scene scene = new Scene(lightweightDialog);
         scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
@@ -107,74 +110,75 @@ class HeavyweightDialog extends FXDialog {
         stage.setScene(scene);
 
         
-
-        // add window dragging
-        toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                mouseDragDeltaX = event.getSceneX();
-                mouseDragDeltaY = event.getSceneY();
-            }
-        });
-        toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                stage.setX(event.getScreenX() - mouseDragDeltaX);
-                stage.setY(event.getScreenY() - mouseDragDeltaY);
-            }
-        });
-
-        // support maximising the dialog
-        maxButton.setOnAction(new EventHandler<ActionEvent>() {
-            private double restoreX;
-            private double restoreY;
-            private double restoreW;
-            private double restoreH;
-
-            @Override public void handle(ActionEvent event) {
-                Screen screen = Screen.getPrimary(); // todo something more sensible
-                double minX = screen.getVisualBounds().getMinX();
-                double minY = screen.getVisualBounds().getMinY();
-                double maxW = screen.getVisualBounds().getWidth();
-                double maxH = screen.getVisualBounds().getHeight();
-
-                if (restoreW == 0 || stage.getX() != minX || stage.getY() != minY || stage.getWidth() != maxW || stage.getHeight() != maxH) {
-                    restoreX = stage.getX();
-                    restoreY = stage.getY();
-                    restoreW = stage.getWidth();
-                    restoreH = stage.getHeight();
-                    stage.setX(minX);
-                    stage.setY(minY);
-                    stage.setWidth(maxW);
-                    stage.setHeight(maxH);
-                } else {
-                    stage.setX(restoreX);
-                    stage.setY(restoreY);
-                    stage.setWidth(restoreW);
-                    stage.setHeight(restoreH);
+        if (useCustomChrome) {
+            // add window dragging
+            toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override public void handle(MouseEvent event) {
+                    mouseDragDeltaX = event.getSceneX();
+                    mouseDragDeltaY = event.getSceneY();
                 }
-            }
-        });
-
-        // add window resizing
-        EventHandler<MouseEvent> resizeHandler = new EventHandler<MouseEvent>() {
-            private double width;
-            private double height;
-            private Point2D dragAnchor;
-
-            @Override public void handle(MouseEvent event) {
-                EventType<? extends MouseEvent> type = event.getEventType();
-
-                if (type == MouseEvent.MOUSE_PRESSED) {
-                    width = stage.getWidth();
-                    height = stage.getHeight();
-                    dragAnchor = new Point2D(event.getSceneX(), event.getSceneY());
-                } else if (type == MouseEvent.MOUSE_DRAGGED) {
-                    stage.setWidth(Math.max(lightweightDialog.minWidth(-1),   width  + (event.getSceneX() - dragAnchor.getX())));
-                    stage.setHeight(Math.max(lightweightDialog.minHeight(-1), height + (event.getSceneY() - dragAnchor.getY())));
+            });
+            toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                @Override public void handle(MouseEvent event) {
+                    stage.setX(event.getScreenX() - mouseDragDeltaX);
+                    stage.setY(event.getScreenY() - mouseDragDeltaY);
                 }
-            }
-        };
-        resizeCorner.setOnMousePressed(resizeHandler);
-        resizeCorner.setOnMouseDragged(resizeHandler);
+            });
+    
+            // support maximising the dialog
+            maxButton.setOnAction(new EventHandler<ActionEvent>() {
+                private double restoreX;
+                private double restoreY;
+                private double restoreW;
+                private double restoreH;
+    
+                @Override public void handle(ActionEvent event) {
+                    Screen screen = Screen.getPrimary(); // todo something more sensible
+                    double minX = screen.getVisualBounds().getMinX();
+                    double minY = screen.getVisualBounds().getMinY();
+                    double maxW = screen.getVisualBounds().getWidth();
+                    double maxH = screen.getVisualBounds().getHeight();
+    
+                    if (restoreW == 0 || stage.getX() != minX || stage.getY() != minY || stage.getWidth() != maxW || stage.getHeight() != maxH) {
+                        restoreX = stage.getX();
+                        restoreY = stage.getY();
+                        restoreW = stage.getWidth();
+                        restoreH = stage.getHeight();
+                        stage.setX(minX);
+                        stage.setY(minY);
+                        stage.setWidth(maxW);
+                        stage.setHeight(maxH);
+                    } else {
+                        stage.setX(restoreX);
+                        stage.setY(restoreY);
+                        stage.setWidth(restoreW);
+                        stage.setHeight(restoreH);
+                    }
+                }
+            });
+    
+            // add window resizing
+            EventHandler<MouseEvent> resizeHandler = new EventHandler<MouseEvent>() {
+                private double width;
+                private double height;
+                private Point2D dragAnchor;
+    
+                @Override public void handle(MouseEvent event) {
+                    EventType<? extends MouseEvent> type = event.getEventType();
+    
+                    if (type == MouseEvent.MOUSE_PRESSED) {
+                        width = stage.getWidth();
+                        height = stage.getHeight();
+                        dragAnchor = new Point2D(event.getSceneX(), event.getSceneY());
+                    } else if (type == MouseEvent.MOUSE_DRAGGED) {
+                        stage.setWidth(Math.max(lightweightDialog.minWidth(-1),   width  + (event.getSceneX() - dragAnchor.getX())));
+                        stage.setHeight(Math.max(lightweightDialog.minHeight(-1), height + (event.getSceneY() - dragAnchor.getY())));
+                    }
+                }
+            };
+            resizeCorner.setOnMousePressed(resizeHandler);
+            resizeCorner.setOnMouseDragged(resizeHandler);
+        }
     }
     
     
@@ -208,11 +212,15 @@ class HeavyweightDialog extends FXDialog {
     }
 
     @Override public void setIconifiable(boolean iconifiable) {
-        minButton.setVisible(iconifiable);
+        if (minButton != null) {
+            minButton.setVisible(iconifiable);
+        }
     }
     
     @Override public void setClosable(boolean closable) {
-        closeButton.setVisible( closable );
+        if (closeButton != null) {
+            closeButton.setVisible(closable);
+        }
     }
     
     @Override public void show() {

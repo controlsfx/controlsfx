@@ -102,7 +102,7 @@ abstract class FXDialog {
      * 
      **************************************************************************/
     
-    protected final void init(String title) {
+    protected final void init(String title, boolean useCustomChrome) {
         titleProperty().set(title);
         
         resizableProperty().addListener(new InvalidationListener() {
@@ -126,7 +126,6 @@ abstract class FXDialog {
         root = new BorderPane();
         
         // *** The rest is for adding window decorations ***
-
         lightweightDialog = new StackPane() {
             @Override protected void layoutChildren() {
                 super.layoutChildren();
@@ -137,6 +136,16 @@ abstract class FXDialog {
         };
         lightweightDialog.getChildren().add(root);
         lightweightDialog.getStyleClass().addAll("dialog", "decorated-root");
+        
+        resizeCorner = new Rectangle(10, 10);
+        resizeCorner.getStyleClass().add("window-resize-corner");
+        resizeCorner.setManaged(false);
+        
+        
+        if (! useCustomChrome) {
+            return;
+        }
+        
         
         focusedProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable valueModel) {                
@@ -188,10 +197,6 @@ abstract class FXDialog {
         toolBar.getItems().addAll(titleLabel, spacer, windowBtns);
         root.setTop(toolBar);
 
-        resizeCorner = new Rectangle(10, 10);
-        resizeCorner.getStyleClass().add("window-resize-corner");
-        
-        resizeCorner.setManaged(false);
         lightweightDialog.getChildren().add(resizeCorner);
     }
     

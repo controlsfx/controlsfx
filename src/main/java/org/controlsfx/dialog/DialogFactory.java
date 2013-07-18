@@ -26,6 +26,7 @@
  */
 package org.controlsfx.dialog;
 
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 class DialogFactory {
@@ -39,10 +40,14 @@ class DialogFactory {
     }
 
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
+        return createDialog(useLightweight, title, owner, modal, false);
+    }
+    
+    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, boolean nativeChrome) {
         if (useLightweight) {
             return new LightweightDialog(title, owner);
         } else {
-            return new HeavyweightDialog(title, (Window) owner, modal);
+            return new HeavyweightDialog(title, (Window) owner, modal, nativeChrome);
         }
     }
 }

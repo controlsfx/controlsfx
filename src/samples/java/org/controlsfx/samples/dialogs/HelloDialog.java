@@ -44,6 +44,7 @@ import org.controlsfx.samples.Utils;
 public class HelloDialog extends Application implements Sample {
 
     private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
+    private final CheckBox cbUseNativeChrome = new CheckBox("Use Native Chrome");
     private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
     private final CheckBox cbSetOwner = new CheckBox("Set Owner");
     
@@ -115,7 +116,7 @@ public class HelloDialog extends Application implements Sample {
 
         row++;
         grid.add(createLabel("Common Dialog attributes: "), 0, 1);
-        grid.add(new HBox(10, cbUseLightweightDialog, cbShowMasthead, cbSetOwner), 1, row);
+        grid.add(new HBox(10, cbUseLightweightDialog, cbUseNativeChrome, cbShowMasthead, cbSetOwner), 1, row);
 
         row++;
 
@@ -412,7 +413,7 @@ public class HelloDialog extends Application implements Sample {
             }
             
             @Override public void handle(ActionEvent arg0) {
-                Dialog dlg = new Dialog(includeOwner() ? stage : null, "Login Dialog", cbUseLightweightDialog.isSelected());
+                Dialog dlg = new Dialog(includeOwner() ? stage : null, "Login Dialog", cbUseLightweightDialog.isSelected(), cbUseNativeChrome.isSelected());
                 if (cbShowMasthead.isSelected()) {
                     dlg.setMasthead("Login to ControlsFX");
                 }
@@ -470,6 +471,10 @@ public class HelloDialog extends Application implements Sample {
         
         if (cbUseLightweightDialog.isSelected()) {
             dialog.lightweight();
+        }
+        
+        if (cbUseNativeChrome.isSelected()) {
+            dialog.nativeChrome();
         }
         
         return dialog;

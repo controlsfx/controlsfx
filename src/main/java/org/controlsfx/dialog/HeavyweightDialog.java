@@ -45,6 +45,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import com.sun.javafx.Utils;
 
 // Not public API (class is package-protected), so no JavaDoc is required.
 class HeavyweightDialog extends FXDialog {
@@ -76,7 +77,10 @@ class HeavyweightDialog extends FXDialog {
         super();
         this.owner = owner;
         
-        stage = new Stage(nativeChrome ? StageStyle.UTILITY : StageStyle.TRANSPARENT) {
+        final StageStyle style = ! nativeChrome ? StageStyle.TRANSPARENT :
+            (Utils.isMac() ? StageStyle.DECORATED : StageStyle.UTILITY);
+        
+        stage = new Stage(style) {
             @Override public void showAndWait() {
                 Window owner = getOwner();
                 if (owner != null) {

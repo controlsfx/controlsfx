@@ -98,14 +98,6 @@ public class SpreadsheetView extends BorderPane{
 		return cells.get(fixedRows.size()+index);
 	}
 
-	public TreeSet<Integer> getVisibleRows() {
-		return visibleRows;
-	}
-
-	public void setVisibleRows(TreeSet<Integer> visibleRows) {
-		this.visibleRows = visibleRows;
-	}
-
 	public VirtualScrollBar getHbar() {
 		return hbar;
 	}
@@ -124,6 +116,14 @@ public class SpreadsheetView extends BorderPane{
 
 	public SpreadsheetRow getRow(int index) {
 		return cells.get(index);
+	}
+	
+	private boolean containsRow(int index){
+		for (int i =0 ;i<cells.size();++i) {
+			if(cells.get(i).getIndex() == index)
+				return true;
+		}
+		return false;
 	}
 
 	public boolean isEmptyCells() {
@@ -369,8 +369,8 @@ public class SpreadsheetView extends BorderPane{
 	 * @return
 	 */
 	public SpanType getSpanType(final int row, final int column) {
-
-		if (row < 0 || column < 0 || !getVisibleRows().contains(row)) {
+		
+		if (row < 0 || column < 0 || !containsRow(row)) {
 			return SpanType.NORMAL_CELL;
 		}
 		final DataCell<?> cellSpan = ((DataRow)this.getItems().get(row)).getCell(column);
@@ -378,7 +378,7 @@ public class SpreadsheetView extends BorderPane{
 				&& cellSpan.getRow() == row
 				&& cellSpan.getRowSpan() == 1) {
 			return SpanType.NORMAL_CELL;
-		} else if (getVisibleRows().contains(row-1)
+		} else if (containsRow(row-1)
 				&& cellSpan.getColumnSpan() > 1
 				&& cellSpan.getColumn() != column
 				&& cellSpan.getRowSpan() > 1
@@ -386,14 +386,14 @@ public class SpreadsheetView extends BorderPane{
 			return SpanType.BOTH_INVISIBLE;
 		} else if (cellSpan.getRowSpan() > 1
 				&& cellSpan.getColumn() == column) {
-			if (cellSpan.getRow() == row || !getVisibleRows().contains(row-1)) {
+			if (cellSpan.getRow() == row || !containsRow(row-1)) {
 				return SpanType.ROW_VISIBLE;
 			} else {
 				return SpanType.ROW_INVISIBLE;
 			}
 		} else if (cellSpan.getColumnSpan() > 1
 				&& cellSpan.getColumn() != column
-				&& (cellSpan.getRow() == row || !getVisibleRows().contains(row-1))) {
+				&& (cellSpan.getRow() == row || !containsRow(row-1))) {
 			return SpanType.COLUMN_INVISIBLE;
 		} else {
 			return SpanType.NORMAL_CELL;
@@ -432,11 +432,11 @@ public class SpreadsheetView extends BorderPane{
 	void hoverGridCell(DataCell<?> cell) {
 		//If the top of the spanned cell is visible, then no problem
 		SpreadsheetCell gridCell;
-		if (!getVisibleRows().isEmpty() && getVisibleRows().first() <= cell.getRow()) {
+		if (!isEmptyCells() && getNonFixed(0).getIndex() <= cell.getRow()) {
 			// We want to get the top of the spanned cell, so we need
 			// to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
-			if(getRow(getFixedRows().size()+cell.getRow()-getVisibleRows().first()) != null) {// Sometime when scrolling fast it's null so..
-				gridCell = getRow(getFixedRows().size()+cell.getRow()-getVisibleRows().first()).getGridCell(cell.getColumn());
+			if(getRow(getFixedRows().size()+cell.getRow()-getNonFixed(0).getIndex()) != null) {// Sometime when scrolling fast it's null so..
+				gridCell = getRow(getFixedRows().size()+cell.getRow()-getNonFixed(0).getIndex()).getGridCell(cell.getColumn());
 			} else {
 				gridCell = getNonFixed(0).getGridCell(cell.getColumn());
 			}
@@ -805,11 +805,11 @@ public class SpreadsheetView extends BorderPane{
 		case ROW_INVISIBLE:
 		default:
 			final DataCell<?> cellSpan = spreadsheetViewInternal.getItems().get(row).getCell(col);
-			if (!getVisibleRows().isEmpty() && getVisibleRows().first() <= cellSpan.getRow()) {
+			if (!isEmptyCells() && getNonFixed(0).getIndex() <= cellSpan.getRow()) {
 				return new TablePosition<>(spreadsheetViewInternal, cellSpan.getRow(), spreadsheetViewInternal.getColumns().get(cellSpan.getColumn()));
 
 			} else { // If it's not, then it's the firstkey
-				return new TablePosition<>(spreadsheetViewInternal, getVisibleRows().first(),spreadsheetViewInternal.getColumns().get(cellSpan.getColumn()));
+				return new TablePosition<>(spreadsheetViewInternal, getNonFixed(0).getIndex(),spreadsheetViewInternal.getColumns().get(cellSpan.getColumn()));
 			}
 		}
 	}
@@ -1257,7 +1257,7 @@ public class SpreadsheetView extends BorderPane{
 
 			//We try to make visible the rows that may be hiden by Fixed rows
 			// We don't want to do any scroll behavior when dragging
-			if(!drag && !spreadsheetView.getVisibleRows().isEmpty() && spreadsheetView.getVisibleRows().first()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
+			if(!drag && !spreadsheetView.isEmptyCells() && spreadsheetView.getNonFixed(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
 				tableView.scrollTo(posFinal.getRow());
 			}
 

@@ -32,10 +32,17 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TablePositionBase;
+import javafx.scene.control.TableSelectionModel;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
+import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpanType;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.TableCellSkin;
@@ -66,14 +73,19 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 				}
 			}
 		});
-
-		// Drag
+		//When we detect a drag, we start the Full Drag so that other event will be fired
 		this.addEventHandler(MouseEvent.DRAG_DETECTED,new EventHandler<MouseEvent>() {
-
 			@Override
 			public void handle(MouseEvent arg0) {
 				startFullDrag();
-			}});
+		}});
+		
+		
+		setOnMouseDragEntered(new EventHandler<MouseEvent>(){
+			@Override
+			public void handle(MouseEvent arg0) {
+				dragSelect(arg0);
+		}});
 
 	}
 	@Override
@@ -86,12 +98,13 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		if(!isEditable()) {
 			return;
 		}
+
 		final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
 		final int row = getIndex();
 		//We start to edit only if the Cell is a normal Cell (aka visible).
 		final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
-		if (spv.getSpanType(row, column) == SpreadsheetView.SpanType.NORMAL_CELL
-				|| spv.getSpanType(row, column) == SpreadsheetView.SpanType.ROW_VISIBLE) {
+		final SpanType type = spv.getSpanType(row, column);
+		if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
 			super.startEdit();
 			setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 			spv.getEditor(getItem(), this).startEdit();
@@ -107,15 +120,6 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 
 		setContentDisplay(ContentDisplay.TEXT_ONLY);
 
-		// TODO Modify because this CSS property is not in the model
-		/*if(!getText().equals(newValue.getStr())){
-			pseudoClassStateChanged(new PseudoClass() {
-				@Override
-				public String getPseudoClassName() {
-					return "modified";
-				}
-			}, true);
-		}*/
 		updateItem(newValue, false);
 
 
@@ -128,6 +132,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		}
 
 		super.cancelEdit();
+		
 		setContentDisplay(ContentDisplay.TEXT_ONLY);
 		final Runnable r = new Runnable() {
 			@Override
@@ -209,6 +214,85 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		if (getItem() != null){
 			show(getItem());
 		}
+	}
+	
+	/**
+	 * Method that will select all the cells between the drag place and that cell.
+	 * @param e
+	 */
+	protected void dragSelect(MouseEvent e) {
+
+		// If the mouse event is not contained within this tableCell, then
+		// we don't want to react to it.
+		if (! this.contains(e.getX(), e.getY())) {
+			return;
+		}
+
+		final TableView tableView = getTableView();
+		if (tableView == null) {
+			return;
+		}
+
+		final int count = tableView.getItems().size();
+		if (getIndex() >= count) {
+			return;
+		}
+
+		final TableSelectionModel sm = tableView.getSelectionModel();
+		if (sm == null) {
+			return;
+		}
+
+		final int row = getIndex();
+		final int column = tableView.getVisibleLeafIndex(getTableColumn());
+		// For spanned Cells
+		final DataCell<?> cell = (DataCell<?>) getItem();
+		final int rowCell = cell.getRow()+cell.getRowSpan()-1;
+		final int columnCell = cell.getColumn()+cell.getColumnSpan()-1;
+
+		final TableViewFocusModel<?> fm = tableView.getFocusModel();
+		if (fm == null) {
+			return;
+		}
+
+		final TablePositionBase<?> focusedCell = fm.getFocusedCell();
+		final MouseButton button = e.getButton();
+		if (button == MouseButton.PRIMARY) {
+			// we add all cells/rows between the current selection focus and
+			// this cell/row (inclusive) to the current selection.
+			final TablePositionBase<?> anchor = getAnchor(tableView, focusedCell);
+
+			// and then determine all row and columns which must be selected
+			int minRow = Math.min(anchor.getRow(), row);
+			minRow = Math.min(minRow, rowCell);
+			int maxRow = Math.max(anchor.getRow(), row);
+			maxRow = Math.max(maxRow, rowCell);
+			int minColumn = Math.min(anchor.getColumn(), column);
+			minColumn = Math.min(minColumn, columnCell);
+			int maxColumn = Math.max(anchor.getColumn(), column);
+			maxColumn = Math.max(maxColumn, columnCell);
+
+			// clear selection, but maintain the anchor
+			sm.clearSelection();
+
+			// and then perform the selection
+			for (int _row = minRow; _row <= maxRow; _row++) {
+				for (int _col = minColumn; _col <= maxColumn; _col++) {
+					sm.select(_row, tableView.getVisibleLeafColumn(_col));
+				}
+			}
+		}
+
+	}
+	private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
+
+	static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
+		return hasAnchor(table) ?
+				(TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) :
+					focusedCell;
+	}
+	static boolean hasAnchor(Control table) {
+		return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
 	}
 
 }

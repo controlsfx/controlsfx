@@ -153,7 +153,7 @@ public class RowHeader  extends StackPane {
 			}
 
 			// Then we iterate over the FixedRows if any
-			if(!spreadsheetView.getFixedRows().isEmpty() && !spreadsheetView.getVisibleRows().isEmpty() && !spreadsheetView.isEmptyCells()){
+			if(!spreadsheetView.getFixedRows().isEmpty() && !spreadsheetView.isEmptyCells()){
 				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
 					label = getLabel(rowCount++);
 					label.setText(String.valueOf(i));
@@ -184,13 +184,14 @@ public class RowHeader  extends StackPane {
 				label.getStyleClass().clear();
 			}
 
-			//Last one blank and on top (z-order) of the others
-			label = getLabel(rowCount++);
-			label.setText("");
-			label.resize(prefWidth,spreadsheetView.getHbar().getHeight());
-			label.relocate(snappedLeftInset(), getHeight()-spreadsheetView.getHbar().getHeight());
-			label.getStyleClass().clear();
-
+			if(spreadsheetView.getHbar().isVisible()){
+				//Last one blank and on top (z-order) of the others
+				label = getLabel(rowCount++);
+				label.setText("");
+				label.resize(prefWidth,spreadsheetView.getHbar().getHeight());
+				label.relocate(snappedLeftInset(), getHeight()-spreadsheetView.getHbar().getHeight());
+				label.getStyleClass().clear();
+			}
 			//Flush the rest of the children if any
 			while(getChildren().size() > rowCount){
 				getChildren().remove(rowCount);

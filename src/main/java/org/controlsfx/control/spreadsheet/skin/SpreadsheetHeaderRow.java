@@ -70,7 +70,8 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
 		if(spreadsheetViewSkin != null && spreadsheetViewSkin.spreadsheetView != null && spreadsheetViewSkin.spreadsheetView.getRowHeader().get()){
-			padding += spreadsheetViewSkin.getRowHeaderWidth();
+			//TODO ugly "2" here, needs to be removed, but without, a blank is observed at the top-right
+			padding += spreadsheetViewSkin.getRowHeaderWidth()-2;
 		}
 
 		/*****************************************************************

@@ -27,6 +27,8 @@
 
 package org.controlsfx.control.spreadsheet.editor;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.scene.control.Control;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
@@ -47,6 +49,7 @@ public abstract class Editor{
 	protected SpreadsheetView spreadsheetView;
 	private SpreadsheetRow original;
 	private boolean isMoved;
+	private InvalidationListener il;
 
 	public abstract void attachEnterEscapeEventHandler();
 
@@ -72,6 +75,9 @@ public abstract class Editor{
 				original.putFixedColumnToBack();
 			}
 		}
+		spreadsheetView.getVbar().valueProperty().removeListener(il);
+		il = null;
+		
 	}
 
 	public abstract Control getControl();
@@ -94,6 +100,17 @@ public abstract class Editor{
 				original.putFixedColumnToBack();
 			}
 		}
+		
+		//In ANY case, we stop when something move in scrollBar Vertical
+		il = new InvalidationListener() {
+			@Override
+			public void invalidated(Observable arg0) {
+				commitEdit();
+				gc.commitEdit(cell);
+				end();
+			}
+		};
+		spreadsheetView.getVbar().valueProperty().addListener(il);
 	}
 
 }

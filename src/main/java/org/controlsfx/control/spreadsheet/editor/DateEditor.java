@@ -60,6 +60,11 @@ public class DateEditor extends Editor {
 		if(gc != null) {
 			gc.selectedProperty().removeListener(il);
 		}
+		
+		if(datePicker.isShowing()){
+			datePicker.hide();
+		}
+		
 		datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
 		this.cell = null;
 		this.gc = null;

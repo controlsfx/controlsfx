@@ -35,7 +35,7 @@ public class DateCell extends DataCell<LocalDate> {
 	public DateCell(int r, int c, int rs, int cs) {
 		super(r, c, rs, cs);
 		this.type = CellType.DATE;
-		this.setCellValue(LocalDate.now());
+		this.setCellValue(LocalDate.now().plusDays((int)(Math.random()*10)));
 	}
 
 	@Override
@@ -51,7 +51,12 @@ public class DateCell extends DataCell<LocalDate> {
 
 	@Override
 	public void match(DataCell<?> cell) {
-		setStr(cell.getStr());
+		try {
+			LocalDate temp = LocalDate.parse(cell.getStr().subSequence(0, cell.getStr().length()), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+			setCellValue(temp);
+	      }
+	      catch (Exception e) {
+	      }
 	}
 
 }

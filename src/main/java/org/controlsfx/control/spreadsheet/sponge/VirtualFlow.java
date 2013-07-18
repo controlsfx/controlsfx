@@ -29,7 +29,6 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -149,7 +148,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 					pile.clear();
 					sheetChildren.clear();
 					cells.clear();
-					visibleRows.clear();
 					numCellsVisibleOnScreen = -1;
 					lastWidth = lastHeight = maxPrefBreadth = -1;
 					viewportBreadth = viewportLength = lastPosition = 0;
@@ -835,7 +833,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				cells.get(i).updateIndex(-1);
 			}
 			cells.clear();
-			visibleRows.clear();
 			pile.clear();
 		} else if (needsRebuildCells) {
 			maxPrefBreadth = -1;
@@ -1087,110 +1084,109 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 * indicates the distance from the leading edge (top) of the viewport to
 	 * the leading edge (top) of the currentIndex.
 	 */
-	int cellToAdd = 0;
 	private void addLeadingCells(int currentIndex, double startOffset) {
 		// The offset will keep track of the distance from the top of the
-        // viewport to the top of the current index. We will increment it
-        // as we lay out leading cells.
-        double offset = startOffset;
-        // The index is the absolute index of the cell being laid out
-        int index = currentIndex;
+		// viewport to the top of the current index. We will increment it
+		// as we lay out leading cells.
+		double offset = startOffset;
+		// The index is the absolute index of the cell being laid out
+		int index = currentIndex;
 
-        // Offset should really be the bottom of the current index
-        boolean first = true; // first time in, we just fudge the offset and let
-                              // it be the top of the current index then redefine
-                              // it as the bottom of the current index thereafter
-        // while we have not yet laid out so many cells that they would fall
-        // off the flow, we will continue to create and add cells. The
-        // offset is our indication of whether we can lay out additional
-        // cells. If the offset is ever < 0, except in the case of the very
-        // first cell, then we must quit.
-        T cell = null;
-        
-      //First pass to know how many cells we will add
-      		int cellToAdd = 0;
-      		while (index >= 0 && (offset > 0 || first)) {
-      			if (first) {
-      				first = false;
-      			} else {
-      				// Careful here because I've seen that it could mess things up a bit
-      				// Maybe use directly "fixedCellSize" if we're sure..
-      				offset -= getCellLength(0);
-      			}
-      			--index;
-      			++cellToAdd;
-      		}
+		// Offset should really be the bottom of the current index
+		boolean first = true; // first time in, we just fudge the offset and let
+		// it be the top of the current index then redefine
+		// it as the bottom of the current index thereafter
+		// while we have not yet laid out so many cells that they would fall
+		// off the flow, we will continue to create and add cells. The
+		// offset is our indication of whether we can lay out additional
+		// cells. If the offset is ever < 0, except in the case of the very
+		// first cell, then we must quit.
+		T cell = null;
 
-      		//Now that we know how many cells we will add, we reset the variable
-      		offset = startOffset;
-      		index = currentIndex;
-      		first = true;
-      		cellFixedAdded = 0;
-      		
-        while (index >= 0 && (offset > 0 || first)) {
-        	/*if(index >= getCellCount()){
-			if (first) {
-				first = false;
-			}else {
-				//					offset -= getCellLength(0);
-			}
-			--index;
-			--cellToAdd;
-		}else{*/
-			// If the remaining cells to add are in the header
-			if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
-				final int realIndex = fixedRows.get(cellToAdd-1);
-				cell = getAvailableCell(realIndex); // We grab the right one
-				setCellIndex(cell, realIndex); // the index is the real one
-				setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
-				++cellFixedAdded;
-			}else{
-				//				System.out.println("JaddC"+index);
-				visibleRows.add(index);
-				cell = getAvailableCell(index);
-				setCellIndex(cell, index);
-			}
-			resizeCellSize(cell); // resize must be after config
-			cells.addFirst(cell);
-
-
-			// A little gross but better than alternatives because it reduces
-			// the number of times we have to update a cell or compute its
-			// size. The first time into this loop "offset" is actually the
-			// top of the current index. On all subsequent visits, it is the
-			// bottom of the current index.
+		//First pass to know how many cells we will add
+		int cellToAdd = 0;
+		while (index >= 0 && (offset > 0 || first)) {
 			if (first) {
 				first = false;
 			} else {
-				offset -= getCellLength(cell);
+				// Careful here because I've seen that it could mess things up a bit
+				// Maybe use directly "fixedCellSize" if we're sure..
+				offset -= getCellLength(0);
 			}
-
-			// Position the cell, and update the maxPrefBreadth variable as we go.
-			positionCell(cell, offset);
-			maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
-			cell.setVisible(true);
 			--index;
-			--cellToAdd;
-//		}
-        }
+			++cellToAdd;
+		}
 
-        // There are times when after laying out the cells we discover that
-        // the top of the first cell which represents index 0 is below the top
-        // of the viewport. In these cases, we have to adjust the cells up
-        // and reset the mapper position. This might happen when items got
-        // removed at the top or when the viewport size increased.
-        cell = cells.getFirst();
-        int firstIndex = getCellIndex(cell);
-        double firstCellPos = getCellPosition(cell);
-        if (firstIndex == 0 && firstCellPos > 0) {
-            setPosition(0.0f);
-            offset = 0;
-            for (int i = 0; i < cells.size(); i++) {
-                cell = cells.get(i);
-                positionCell(cell, offset);
-                offset += getCellLength(cell);
-            }
-        }
+		//Now that we know how many cells we will add, we reset the variable
+		offset = startOffset;
+		index = currentIndex;
+		first = true;
+		cellFixedAdded = 0;
+
+		while (index >= 0 && (offset > 0 || first)) {
+			/*if(index >= getCellCount()){
+				if (first) {
+					first = false;
+				}else {
+					//					offset -= getCellLength(0);
+				}
+				--index;
+				--cellToAdd;
+			}else{*/
+				// If the remaining cells to add are in the header
+				if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
+					final int realIndex = fixedRows.get(cellToAdd-1);
+//					System.out.println("JaddC"+realIndex);
+					cell = getAvailableCell(realIndex); // We grab the right one
+					setCellIndex(cell, realIndex); // the index is the real one
+					setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
+					++cellFixedAdded;
+				}else{
+//									System.out.println("JaddC"+index);
+					cell = getAvailableCell(index);
+					setCellIndex(cell, index);
+				}
+				resizeCellSize(cell); // resize must be after config
+				cells.addFirst(cell);
+
+
+				// A little gross but better than alternatives because it reduces
+				// the number of times we have to update a cell or compute its
+				// size. The first time into this loop "offset" is actually the
+				// top of the current index. On all subsequent visits, it is the
+				// bottom of the current index.
+				if (first) {
+					first = false;
+				} else {
+					offset -= getCellLength(cell);
+				}
+
+				// Position the cell, and update the maxPrefBreadth variable as we go.
+				positionCell(cell, offset);
+				maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
+				cell.setVisible(true);
+				--index;
+				--cellToAdd;
+//			}
+		}
+
+		// There are times when after laying out the cells we discover that
+		// the top of the first cell which represents index 0 is below the top
+		// of the viewport. In these cases, we have to adjust the cells up
+		// and reset the mapper position. This might happen when items got
+		// removed at the top or when the viewport size increased.
+		cell = cells.getFirst();
+		final int firstIndex = getCellIndex(cell);
+		final double firstCellPos = getCellPosition(cell);
+		if (firstIndex == 0 && firstCellPos > 0) {
+			setPosition(0.0f);
+			offset = 0;
+			for (int i = 0; i < cells.size(); i++) {
+				cell = cells.get(i);
+				positionCell(cell, offset);
+				offset += getCellLength(cell);
+			}
+		}
 	}
 	
 	/*T getLeadingAvailableCell(int index, double offset){
@@ -1285,15 +1281,17 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			}
 			T cell = null;
 			// If we have a lot of rows in header, we need to add the remaining in the trailingCells
-			if(!fixedRows.isEmpty() && cellFixedAdded < fixedRows.size()){
+			//I Added fillEmptyCells because it appears that when AddtrailingCells is called from
+			// adjustPixel, we add several time the rows in fixedHeader...
+			if(!fixedRows.isEmpty() && cellFixedAdded < fixedRows.size() && fillEmptyCells){
 				final int realIndex = fixedRows.get(cellFixedAdded);
+//				System.out.println("JaddD"+realIndex);
 				cell = getAvailableCell(realIndex); // We grab the right one
 				setCellIndex(cell, realIndex); // the index is the real one
 				setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
 				++cellFixedAdded;
 			}else{
-				//				System.out.println("JaddD"+index);
-				visibleRows.add(index);
+//								System.out.println("JaddD"+index);
 				cell = getAvailableCell(index);
 				setCellIndex(cell, index);
 			}
@@ -1348,10 +1346,10 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				while (prospectiveEnd < viewportLength && index != 0 && -start < distance) {
 					index--;
 					//				System.out.println("JaddE"+realIndex);
-					visibleRows.add(realIndex);
 					final T cell = getAvailableCell(realIndex);
 					setCellIndex(cell, index);
 					resizeCellSize(cell); // resize must be after config
+//					System.out.println("JaddC"+realIndex);
 					cells.addFirst(cell);
 
 
@@ -1946,7 +1944,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				// as the prefIndex. This saves us from having to run so much
 				// css on the cell as it will not change from even to odd, or
 				// vice versa
-				final boolean prefIndexIsEven = (prefIndex & 1) == 0;
+				/*final boolean prefIndexIsEven = (prefIndex & 1) == 0;
 				for (int i = 0, max = pile.size(); i < max; i++) {
 					final T c = pile.get(i);
 					final int cellIndex = getCellIndex(c);
@@ -1964,8 +1962,8 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 
 				if (cell == null) {
 					cell = pile.removeFirst();
-				}
-//				cell = prefIndex <   pile.getFirst().getIndex()? pile.removeLast() : pile.removeFirst();
+				}*/
+				cell = prefIndex <   pile.getFirst().getIndex()? pile.removeLast() : pile.removeFirst();
 			} else {
 				cell = createCell.call(this);
 				cell.getProperties().put(NEW_CELL, null);
@@ -1981,13 +1979,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	}
 
 	private void addAllToPile() {
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		visibleRows.clear();
-		/*****************************************************************
-		 * 				END OF MODIFIED BY NELLARMONIA
-		 *****************************************************************/
 		for (int i = 0, max = cells.size(); i < max; i++) {
 			addToPile(cells.removeFirst());
 		}
@@ -2164,10 +2155,10 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				// Need to add a new cell and then we can show it
 				//                layingOut = true;
 				//				System.out.println("JaddB"+index);
-				visibleRows.add(index);
 				cell = getAvailableCell(index);
 				setCellIndex(cell, index);
 				resizeCellSize(cell); // resize must be after config
+//				System.out.println("JaddC"+index);
 				cells.addLast(cell);
 
 
@@ -2183,11 +2174,11 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			final T next = getVisibleCell(index + 1);
 			if (next != null) {
 				//                layingOut = true;
-				//				System.out.println("JaddA"+index);
-				visibleRows.add(index);
+//								System.out.println("JaddA"+index);
 				cell = getAvailableCell(index);
 				setCellIndex(cell, index);
 				resizeCellSize(cell); // resize must be after config
+//				System.out.println("JaddC"+index);
 				cells.addFirst(cell);
 
 
@@ -2310,7 +2301,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 
 			// Add any necessary leading cells
 			final T firstCell = cells.getFirst();
-			final int firstIndex = getCellIndex(firstCell);
+			final int firstIndex = firstCell.getIndex(); // It must getIndex() here otherwise we're adding two time the fixedRows
 			final double prevIndexSize = getCellLength(firstIndex - 1);
 			addLeadingCells(firstIndex - 1, getCellPosition(firstCell) - prevIndexSize);
 
@@ -2834,15 +2825,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	/*****************************************************************
 	 * 				VARIABLE
 	 *****************************************************************/
-	/**
-	 * The list of Rows actually visible on the ViewPort. It only contains the
-	 * number of the rows, sorted.
-	 */
-	private final TreeSet<Integer> visibleRows = new TreeSet<Integer>();
-	public TreeSet<Integer> getVisibleRows(){
-		return visibleRows;
-	}
-
 	/**
 	 * The list of Rows fixed. It only contains the
 	 * number of the rows, sorted.

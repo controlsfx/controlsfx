@@ -37,7 +37,6 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		 *****************************************************************/
 		spreadsheetView.getFixedRows().addListener(fixedRowsListener);
 		spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
-		spreadsheetView.setVisibleRows(flow.getVisibleRows());
 		spreadsheetView.setHbar(getFlow().getHorizontalBar());
 		spreadsheetView.setVbar(getFlow().getVerticalBar());
 		final SpreadsheetView.RowAccessor<TableRow<T>> lcells = new SpreadsheetView.RowAccessor<TableRow<T>>() {

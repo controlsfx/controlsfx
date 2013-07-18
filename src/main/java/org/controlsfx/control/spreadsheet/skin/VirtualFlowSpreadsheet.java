@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,6 +31,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 			}
 		};
 		getVbar().valueProperty().addListener(listenerY);
+		
 	}
 	public void init(SpreadsheetView spv){
 		this.spv = spv;
@@ -61,7 +63,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 	@Override
 	public void scrollTo(int index) {
-		if(!getCells().isEmpty() && index < getCells().get(index+getFixedRows().size()).getIndex()){
+		if(!getCells().isEmpty() && index < getCells().get(0+getFixedRows().size()).getIndex()){
 			index -= getCells().size()-getFixedRows().size();
 		}
 		super.scrollTo(index);
@@ -187,6 +189,10 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
         return null;
 	}
 	
+	private final TreeSet<Integer> visibleRows = new TreeSet<Integer>();
+	public TreeSet<Integer> getVisibleRows(){
+		return visibleRows;
+	}
 	/*****************************************************************
 	 * 		METHOD NO LONGER IN USE BUT MAY BE NEEDED IN FUTURE
 	 *****************************************************************/

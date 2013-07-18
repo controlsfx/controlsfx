@@ -414,11 +414,8 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	 */
 	final Group sheet;
 
-	ObservableList<Node> sheetChildren;
+	final ObservableList<Node> sheetChildren;
 
-	public ObservableList<Node> getSheetChildren(){
-		return sheetChildren;
-	}
 	/**
 	 * The scroll bar used for scrolling horizontally. This has package access
 	 * ONLY for testing.
@@ -1109,30 +1106,72 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
         // cells. If the offset is ever < 0, except in the case of the very
         // first cell, then we must quit.
         T cell = null;
+        
+      //First pass to know how many cells we will add
+      		int cellToAdd = 0;
+      		while (index >= 0 && (offset > 0 || first)) {
+      			if (first) {
+      				first = false;
+      			} else {
+      				// Careful here because I've seen that it could mess things up a bit
+      				// Maybe use directly "fixedCellSize" if we're sure..
+      				offset -= getCellLength(0);
+      			}
+      			--index;
+      			++cellToAdd;
+      		}
 
+      		//Now that we know how many cells we will add, we reset the variable
+      		offset = startOffset;
+      		index = currentIndex;
+      		first = true;
+      		cellFixedAdded = 0;
+      		
         while (index >= 0 && (offset > 0 || first)) {
-           /* cell = getAvailableCell(index);
-            setCellIndex(cell, index);*/
-        	cell = getLeadingAvailableCell(index, offset);
-            resizeCellSize(cell); // resize must be after config
-            cells.addFirst(cell);
+        	/*if(index >= getCellCount()){
+			if (first) {
+				first = false;
+			}else {
+				//					offset -= getCellLength(0);
+			}
+			--index;
+			--cellToAdd;
+		}else{*/
+			// If the remaining cells to add are in the header
+			if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
+				final int realIndex = fixedRows.get(cellToAdd-1);
+				cell = getAvailableCell(realIndex); // We grab the right one
+				setCellIndex(cell, realIndex); // the index is the real one
+				setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
+				++cellFixedAdded;
+			}else{
+				//				System.out.println("JaddC"+index);
+				visibleRows.add(index);
+				cell = getAvailableCell(index);
+				setCellIndex(cell, index);
+			}
+			resizeCellSize(cell); // resize must be after config
+			cells.addFirst(cell);
 
-            // A little gross but better than alternatives because it reduces
-            // the number of times we have to update a cell or compute its
-            // size. The first time into this loop "offset" is actually the
-            // top of the current index. On all subsequent visits, it is the
-            // bottom of the current index.
-            if (first) {
-                first = false;
-            } else {
-                offset -= getCellLength(cell);
-            }
 
-            // Position the cell, and update the maxPrefBreadth variable as we go.
-            positionCell(cell, offset);
-            maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
-            cell.setVisible(true);
-            --index;
+			// A little gross but better than alternatives because it reduces
+			// the number of times we have to update a cell or compute its
+			// size. The first time into this loop "offset" is actually the
+			// top of the current index. On all subsequent visits, it is the
+			// bottom of the current index.
+			if (first) {
+				first = false;
+			} else {
+				offset -= getCellLength(cell);
+			}
+
+			// Position the cell, and update the maxPrefBreadth variable as we go.
+			positionCell(cell, offset);
+			maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
+			cell.setVisible(true);
+			--index;
+			--cellToAdd;
+//		}
         }
 
         // There are times when after laying out the cells we discover that
@@ -1154,7 +1193,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
         }
 	}
 	
-	T getLeadingAvailableCell(int index, double offset){
+	/*T getLeadingAvailableCell(int index, double offset){
 		if(cellToAdd <= 0 && !fixedRows.isEmpty()){
 			cellToAdd = 0;
 			int currentIndex = index;
@@ -1207,7 +1246,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 			setCellIndex(cell, index);
 		}
 		return cell;
-	}
+	}*/
 	/*****************************************************************
 	 * 				END OF MODIFIED BY NELLARMONIA
 	 *****************************************************************/
@@ -1235,7 +1274,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		int index = getCellIndex(startCell) + 1;
 		boolean filledWithNonEmpty = index <= cellCount;
 
-		while (offset < viewportLength && index <getCellCount()) {
+		while (offset < viewportLength){// && index <getCellCount()) {
 			if (index >= cellCount) {
 				if (offset < viewportLength) {
 					filledWithNonEmpty = false;
@@ -1244,9 +1283,9 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 					return filledWithNonEmpty;
 				}
 			}
-			T cell = getTrailingAvailableCell(index);
+			T cell = null;
 			// If we have a lot of rows in header, we need to add the remaining in the trailingCells
-			/*if(!fixedRows.isEmpty() && cellFixedAdded < fixedRows.size()){
+			if(!fixedRows.isEmpty() && cellFixedAdded < fixedRows.size()){
 				final int realIndex = fixedRows.get(cellFixedAdded);
 				cell = getAvailableCell(realIndex); // We grab the right one
 				setCellIndex(cell, realIndex); // the index is the real one
@@ -1257,11 +1296,7 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 				visibleRows.add(index);
 				cell = getAvailableCell(index);
 				setCellIndex(cell, index);
-			}*/
-
-
-			//final T cell = getAvailableCell(index);
-			//setCellIndex(cell, index);
+			}
 			resizeCellSize(cell); // resize happens after config!
 			cells.addLast(cell);
 
@@ -2044,58 +2079,38 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 	}
 
 	public T getLastVisibleCellWithinViewPort() {
-		if (cells.isEmpty() || viewportLength <= 0) {
-			return null;
-		}
+		 if (cells.isEmpty() || viewportLength <= 0) return null;
 
-		T cell;
-		for (int i = cells.size() - 1; i >= 0; i--) {
-			cell = cells.get(i);
-			if (cell.isEmpty()) {
-				continue;
-			}
+	        T cell;
+	        for (int i = cells.size() - 1; i >= 0; i--) {
+	            cell = cells.get(i);
+	            if (cell.isEmpty()) continue;
 
-			if (cell.getLayoutY() < getHeight()) {
-				return cell;
-			}
-		}
+	            if (cell.getLayoutY() < getHeight()) {
+	                return cell;
+	            }
+	        }
 
-		return null;
+	        return null;
 	}
 
 	public T getFirstVisibleCellWithinViewPort() {
-		if (cells.isEmpty() || viewportLength <= 0) {
-			return null;
-		}
+		if (cells.isEmpty() || viewportLength <= 0) return null;
 
+        final boolean isVertical = isVertical();
+        T cell;
+        for (int i = 0; i < cells.size(); i++) {
+            cell = cells.get(i);
+            if (cell.isEmpty()) continue;
 
-		final boolean isVertical = isVertical();
-		T cell;
+            if (isVertical && cell.getLayoutY() + cell.getHeight() > 0) {
+                return cell;
+            } else if (! isVertical && cell.getLayoutX() + cell.getWidth() > 0) {
+                return cell;
+            }
+        }
 
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		cell = cells.get(0+fixedRows.size());
-		if( cell != null){
-			return cell;
-		}
-		/*****************************************************************
-		 * 				END OF MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		for (int i = 0; i < cells.size(); i++) {
-			cell = cells.get(i);
-			if (cell.isEmpty()) {
-				continue;
-			}
-
-			if (isVertical && cell.getLayoutY() + cell.getHeight() > 0) {
-				return cell;
-			} else if (! isVertical && cell.getLayoutX() + cell.getWidth() > 0) {
-				return cell;
-			}
-		}
-
-		return null;
+        return null;
 	}
 
 	/**
@@ -2329,15 +2344,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		// Finally, update the scroll bars
 		updateScrollBarsAndCells();
 		lastPosition = getPosition();
-
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
-		//		layoutTotal();
-		//		layoutFixedRows();
-		/*****************************************************************
-		 * 				END OF MODIFIED BY NELLARMONIA
-		 *****************************************************************/
 
 		// notify
 		return delta; // TODO fake
@@ -2847,15 +2853,6 @@ public class VirtualFlow<T extends IndexedCell> extends Region {
 		return fixedRows;
 	}
 
-	/**
-	 * The list of Columns fixed.It only contains the
-	 * number of the colums, sorted.
-	 */
-	private final ArrayList<Integer> fixedColumns = new ArrayList<Integer>();
-
-	public ArrayList<Integer> getFixedColumns(){
-		return fixedColumns;
-	}
 	/**
 	 * Count the number of fixed Cell added to the viewport
 	 * If we added just a few cells in the addLeadingCell

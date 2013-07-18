@@ -136,6 +136,10 @@ public class SpreadsheetView extends BorderPane{
 	public int getVirtualFlowCellSize(){
 		return cells.size();
 	}
+	
+	public TablePosition<DataRow, ?> getEditingCell(){
+		return spreadsheetViewInternal.getEditingCell();
+	}
 
 
 

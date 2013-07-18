@@ -38,22 +38,22 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		spreadsheetView.getFixedRows().addListener(fixedRowsListener);
 		spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 		spreadsheetView.setVisibleRows(flow.getVisibleRows());
-		spreadsheetView.setHbar(((VirtualFlowSpreadsheet)flow).getHorizontalBar());
-		spreadsheetView.setVbar(((VirtualFlowSpreadsheet)flow).getVerticalBar());
+		spreadsheetView.setHbar(getFlow().getHorizontalBar());
+		spreadsheetView.setVbar(getFlow().getVerticalBar());
 		final SpreadsheetView.RowAccessor<TableRow<T>> lcells = new SpreadsheetView.RowAccessor<TableRow<T>>() {
 			@Override
 			public TableRow<T> get(int index) {
-				return (TableRow<T>) ((VirtualFlowSpreadsheet)flow).getCells().get(index);
+				return (TableRow<T>) getFlow().getCells().get(index);
 			}
 
 			@Override
 			public boolean isEmpty() {
-				return ((VirtualFlowSpreadsheet)flow).getCells().isEmpty();
+				return getFlow().getCells().isEmpty();
 			}
 
 			@Override
 			public int size() {
-				return ((VirtualFlowSpreadsheet)flow).getCells().size();
+				return getFlow().getCells().size();
 			}
 
 		};
@@ -66,12 +66,13 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	}
 
 	protected void init() {
-		((VirtualFlowSpreadsheet)flow).getVerticalBar().valueProperty().addListener(vbarValueListener);
+		getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
 		rowHeader =new RowHeader(this,spreadsheetView, rowHeaderWidth);
 		getChildren().addAll(rowHeader);
 		
 		rowHeader.init();
 		((SpreadsheetHeaderRow)getTableHeaderRow()).init();
+		getFlow().init(spreadsheetView);
 	}
 
 	@Override protected void layoutChildren( double x, double y,
@@ -123,7 +124,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		 *****************************************************************/
 		final int row = fm.getFocusedIndex();
 		//We try to make visible the rows that may be hiden by Fixed rows
-		if(!flow.getVisibleRows().isEmpty() && flow.getVisibleRows().first()> row && !flow.getFixedRows().contains(row)) {
+		if(!getFlow().getCells().isEmpty() && getFlow().getCell(0+getFlow().getFixedRows().size()).getIndex()> row && !getFlow().getFixedRows().contains(row)) {
 			flow.scrollTo(row);
 		}else{
 			flow.show(row);
@@ -145,7 +146,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		 *****************************************************************/
 		final int row = fm.getFocusedIndex();
 		//We try to make visible the rows that may be hiden by Fixed rows
-		if(!flow.getVisibleRows().isEmpty() && flow.getVisibleRows().first()> row && !flow.getFixedRows().contains(row)) {
+		if(!getFlow().getCells().isEmpty() && getFlow().getCell(0+getFlow().getFixedRows().size()).getIndex()> row && !getFlow().getFixedRows().contains(row)) {
 			flow.scrollTo(row);
 		}else{
 			flow.show(row);
@@ -175,14 +176,14 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		public void onChanged(Change<? extends Integer> c) {
 			while (c.next()) {
 				for (final Integer remitem : c.getRemoved()) {
-					flow.getFixedRows().remove(remitem);
+					getFlow().getFixedRows().remove(remitem);
 				}
 				for (final Integer additem : c.getAddedSubList()) {
-					flow.getFixedRows().add(additem);
+					getFlow().getFixedRows().add(additem);
 				}
 			}
 			//requestLayout() not responding immediately..
-			((VirtualFlowSpreadsheet)flow).layoutTotal();
+			getFlow().layoutTotal();
 		}
 
 	};
@@ -193,22 +194,22 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
 		@Override
 		public void onChanged(Change<? extends Integer> c) {
-			if(flow.getFixedColumns().size() > c.getList().size()){
-				for(int i=0;i<((VirtualFlowSpreadsheet)flow).getCells().size();++i){
-					((SpreadsheetRow) ((VirtualFlowSpreadsheet)flow).getCells().get(i)).putFixedColumnToBack();
+			if(getFlow().getFixedColumns().size() > c.getList().size()){
+				for(int i=0;i<getFlow().getCells().size();++i){
+					((SpreadsheetRow) getFlow().getCells().get(i)).putFixedColumnToBack();
 				}
 			}
 
 			while (c.next()) {
 				for (final Integer remitem : c.getRemoved()) {
-					flow.getFixedColumns().remove(remitem);
+					getFlow().getFixedColumns().remove(remitem);
 				}
 				for (final Integer additem : c.getAddedSubList()) {
-					flow.getFixedColumns().add(additem);
+					getFlow().getFixedColumns().add(additem);
 				}
 			}
 			//requestLayout() not responding immediately..
-			((VirtualFlowSpreadsheet)flow).layoutTotal();
+			getFlow().layoutTotal();
 		}
 
 	};
@@ -260,8 +261,8 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		// the start position of this column lines up with the left edge of the
 		// tableview, and also that the columns don't become detached from the
 		// right edge of the table
-		final double pos = ((VirtualFlowSpreadsheet)flow).getHorizontalBar().getValue();
-		final double max = ((VirtualFlowSpreadsheet)flow).getHorizontalBar().getMax();
+		final double pos = getFlow().getHorizontalBar().getValue();
+		final double max = getFlow().getHorizontalBar().getMax();
 		double newPos;
 
 		/*****************************************************************
@@ -283,7 +284,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		// direct to the hbar.
 		// actually shift the flow - this will result in the header moving
 		// as well
-		((VirtualFlowSpreadsheet)flow).getHorizontalBar().setValue(newPos);
+		getFlow().getHorizontalBar().setValue(newPos);
 	}
 
 	/**
@@ -293,13 +294,17 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	 */
 	private double getFixedColumnWidth() {
 		double fixedColumnWidth = 0;
-		if(!flow.getFixedColumns().isEmpty()){
-			for (int i = 0, max = flow.getFixedColumns().size(); i < max; ++i){
+		if(!getFlow().getFixedColumns().isEmpty()){
+			for (int i = 0, max = getFlow().getFixedColumns().size(); i < max; ++i){
 				final TableColumnBase<DataRow,?> c = getVisibleLeafColumn(i);
 				fixedColumnWidth += c.getWidth();
 			}
 		}
 		return fixedColumnWidth;
+	}
+	
+	private VirtualFlowSpreadsheet getFlow(){
+		return (VirtualFlowSpreadsheet) flow;
 	}
 
 }

@@ -7,12 +7,12 @@ import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
+import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
@@ -20,22 +20,36 @@ import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
 
 public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T>{
 
-
+	SpreadsheetView spv;
+//	double scrollY = 0;
 	public VirtualFlowSpreadsheet(){
 		super();
-		final ChangeListener listenerY = new ChangeListener() {
-			@Override public void changed(ObservableValue ov, Object t, Object t1) {
+		final ChangeListener<Number> listenerY = new ChangeListener<Number>() {
+			@Override public void changed(ObservableValue ov, Number t, Number t1) {
 				layoutTotal();
 			}
 		};
 		getVbar().valueProperty().addListener(listenerY);
 	}
+	public void init(SpreadsheetView spv){
+		this.spv = spv;
+	}
 	@Override protected void layoutChildren() {
-		sortHB();
-		super.layoutChildren();
-
-		layoutTotal();
-		layoutFixedRows();
+		/*int diff = (int) Math.ceil(Math.abs((scrollY - getVbar().getValue()))*getCellCount());
+		scrollY = getVbar().getValue();*/
+		
+		//We don't want to layout everything in case we're editing because it has no sense
+		if(spv != null && (spv.getEditingCell() == null || spv.getEditingCell().getRow() == -1)){
+			sortHB();
+			super.layoutChildren();
+			layoutTotal();
+			/*if(diff>10){
+				layoutTotal();
+			}else{
+				layoutFirstRows(diff<2? 2:diff);
+			}*/
+			layoutFixedRows();
+		}
 
 	}
 	@Override
@@ -47,8 +61,8 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 	@Override
 	public void scrollTo(int index) {
-		if(!getVisibleRows().isEmpty() && index < getVisibleRows().first()){
-			index -= getVisibleRows().size();
+		if(!getCells().isEmpty() && index < getCells().get(index+getFixedRows().size()).getIndex()){
+			index -= getCells().size()-getFixedRows().size();
 		}
 		super.scrollTo(index);
 
@@ -59,6 +73,13 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 	@Override
 	public double adjustPixels(final double delta) {
 		final double returnValue = super.adjustPixels(delta);
+		/*int diff = (int) Math.ceil(Math.abs((scrollY - getVbar().getValue()))*getCellCount());
+		scrollY = getVbar().getValue();
+		if(diff>10){
+			layoutTotal();
+		}else{
+			layoutFirstRows(diff<2? 2:diff);
+		}*/
 		layoutTotal();
 		layoutFixedRows();
 
@@ -72,10 +93,10 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		sortHB();
 		if(!getCells().isEmpty() && !getFixedRows().isEmpty()){
 			for(int i = getFixedRows().size()-1; i>= 0 ;--i){
-				if(getCells().get(i) != null && getFixedRows().contains(getCells().get(i).getIndex())) {
-					//					System.out.println("je demande fixed"+cells.get(i).getIndex());
-					getCells().get(i).toFront();
-					getCells().get(i).requestLayout();
+				SpreadsheetRow cell = (SpreadsheetRow) getCells().get(i);
+				if( cell != null && getFixedRows().contains(cell.getIndex())) {
+					cell.toFront();
+					cell.requestLayout();
 				}
 			}
 		}
@@ -90,8 +111,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 			reconfigureCells();
 			//recreateCells();
 		}
-		for (int i = 0, max = getCells().size(); i < max; i++) {
-			final Cell cell = getCells().get(i);
+		for (Cell cell : getCells()) {
 			if (cell != null) {
 				cell.requestLayout();
 			}
@@ -102,28 +122,19 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 	 * Sort the rows so that they stay in order for layout
 	 */
 	public void sortHB(){
-		final ObservableList<SpreadsheetRow> temp =
-				(ObservableList<SpreadsheetRow>) (ObservableList<?>) getSheetChildren();
+		final List<SpreadsheetRow> temp = (List<SpreadsheetRow>) getCells();
 		final List<SpreadsheetRow> tset = new ArrayList<>(temp);
 		Collections.sort(tset, new Comparator<SpreadsheetRow>() {
 			@Override
 			public int compare(SpreadsheetRow o1, SpreadsheetRow o2) {
 				final int lhs = o1.getIndex();
 				final int rhs = o2.getIndex();
-				if (lhs < rhs) {
-					return -1;
-				}
-				if (lhs > rhs) {
-					return +1;
-				}
-				return 0;
-
+				return lhs < rhs ? -1  : +1;
 			}
 		});
 		for (final TableRow<DataRow> r : tset) {
 			r.toFront();
 		}
-		//		System.out.println("je sort");
 	}
 
 	public VirtualScrollBar getVerticalBar(){
@@ -147,6 +158,35 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		return ((SpreadsheetRow)cell).getIndexVirtualFlow();
 	}
 
+	/**
+	 * The list of Columns fixed.It only contains the
+	 * number of the colums, sorted.
+	 */
+	private final ArrayList<Integer> fixedColumns = new ArrayList<Integer>();
+
+	public ArrayList<Integer> getFixedColumns(){
+		return fixedColumns;
+	}
+	
+	public T getFirstVisibleCellWithinViewPort() {
+		if (getCells().isEmpty() || getHeight() <= 0) return null;
+
+        final boolean isVertical = isVertical();
+        T cell;
+        for (int i = 0+getFixedRows().size(); i < getCells().size(); i++) {
+            cell = getCells().get(i);
+            if (cell.isEmpty()) continue;
+
+            if (isVertical && cell.getLayoutY() + cell.getHeight() > 0) {
+                return cell;
+            } else if (! isVertical && cell.getLayoutX() + cell.getWidth() > 0) {
+                return cell;
+            }
+        }
+
+        return null;
+	}
+	
 	/*****************************************************************
 	 * 		METHOD NO LONGER IN USE BUT MAY BE NEEDED IN FUTURE
 	 *****************************************************************/
@@ -179,18 +219,21 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 	  *//**
 	  * Layout the first NON-FIXED row if it needs to span correctly
-	  *//*
-	public void layoutFirstRows(){
+	  */
+	public void layoutFirstRows(int number){
 		sortHB();
-		if(!cells.isEmpty()) {
-			final T temp = cells.getNonFixed(0);
-			if(temp != null) {
-				//				System.out.println("je demande:"+temp.getIndex());
-				temp.requestLayout();
+		if(!getCells().isEmpty()) {
+			int beginning = getFirstVisibleCell().getIndex();
+			for(int i = beginning ; i<=(number+beginning); ++i){
+				final SpreadsheetRow rows = (SpreadsheetRow) getCell(i);
+				if(rows != null) {
+					System.out.println("je demande"+i);
+					rows.requestLayout();
+				}
 			}
 		}
 	}
-
+/*
 	   *//**
 	   * Layout the two first NON-FIXED rows
 	   *//*

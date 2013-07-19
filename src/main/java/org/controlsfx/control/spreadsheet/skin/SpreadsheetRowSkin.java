@@ -37,9 +37,10 @@ SpreadsheetView spreadsheetView;
 		final TableRow<DataRow> control = (TableRow<DataRow>) getSkinnable();
 		final int index = control.getIndex();
 		if (index < 0 || index >= spreadsheetView.getItems().size()) {
+			control.setOpacity(0);
 			return;
 		}
-		
+		control.setOpacity(1);
 		checkState(true);
 		if (cellsMap.isEmpty()) {
 			return;
@@ -96,7 +97,7 @@ SpreadsheetView spreadsheetView;
 			//show(tableCell);
 
 			//In case the node was treated previously
-			tableCell.setOpacity(100);
+			tableCell.setOpacity(1);
 
 			width = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
 			height = Math.max(controlHeight, tableCell.prefHeight(-1));

@@ -78,7 +78,7 @@ class HeavyweightDialog extends FXDialog {
         this.owner = owner;
         
         final StageStyle style = ! nativeChrome ? StageStyle.TRANSPARENT :
-            (Utils.isMac() ? StageStyle.DECORATED : StageStyle.UTILITY);
+            (Utils.isMac() || Utils.isUnix() ? StageStyle.DECORATED : StageStyle.UTILITY);
         
         stage = new Stage(style) {
             @Override public void showAndWait() {

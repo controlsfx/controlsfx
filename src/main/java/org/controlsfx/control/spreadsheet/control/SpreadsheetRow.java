@@ -35,7 +35,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.sponge.TableRowSkin;
+import org.controlsfx.control.spreadsheet.skin.SpreadsheetRowSkin;
 
 
 /**
@@ -57,7 +57,7 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new TableRowSkin(this,spreadsheetView);
+		return new SpreadsheetRowSkin<>(this,spreadsheetView);
 	}
 	/**
 	 * This is the index used by the VirtualFlow

@@ -41,31 +41,39 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.IndexedCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.util.Duration;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataRow;
-
+import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
-import com.sun.javafx.scene.control.behavior.TableRowBehavior;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
 import com.sun.javafx.tk.Toolkit;
 
 public abstract class TableRowSkinBase<T,
 C extends IndexedCell/*<T>*/,
 B extends CellBehaviorBase<C>,
-R extends IndexedCell>
-extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
+R extends IndexedCell> extends CellSkinBase<C,B> {
+	
+	
 
-	static final double DEFAULT_CELL_SIZE = 24.0;
+	/***************************************************************************
+	 *                                                                         *
+	 * Static Fields                                                           *
+	 *                                                                         *
+	 **************************************************************************/
+	
+	protected static final double DEFAULT_CELL_SIZE = 24.0;
+
+	// There appears to be a memory leak when using the stub toolkit. Therefore,
+	// to prevent tests from failing we disable the animations below when the
+	// stub toolkit is being used.
+	// Filed as RT-29163.
+	private static boolean IS_STUB_TOOLKIT = Toolkit.getToolkit().toString().contains("StubToolkit");
+
+	// lets save the CPU and not do animations when on embedded platforms
+	private static boolean DO_ANIMATIONS = ! IS_STUB_TOOLKIT && ! PlatformUtil.isEmbedded();
+
+	private static final Duration FADE_DURATION = Duration.millis(200);
 
 	/*
 	 * This is rather hacky - but it is a quick workaround to resolve the
@@ -79,88 +87,20 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 	 */
 	static final Map<Control, Double> maxDisclosureWidthMap = new WeakHashMap<Control, Double>();
 
-	protected SpreadsheetView spreadsheetView;
-	private double prefWidth = -1;
-
-	protected int getIndentationLevel(TableRow<DataRow> control) {
-		// TreeTableView.getNodeLevel(control.getTreeTable)
-		return 0;
-	}
-
-	protected double getIndentationPerLevel() {
-		return 0;
-	}
-
-	/**
-	 * Used to represent whether the current virtual flow owner is wanting
-	 * indentation to be used in this table row.
-	 */
-	protected boolean isIndentationRequired() {
-		return false;
-	}
-
-	/**
-	 * Returns the table column that should show the disclosure nodes and / or
-	 * a graphic. By default this is the left-most column.
-	 */
-	protected TableColumnBase getTreeColumn() {
-		return null;
-	}
-
-	protected Node getDisclosureNode() {
-		return null;
-	}
-
-	/**
-	 * Used to represent whether a disclosure node is visible for _this_
-	 * table row. Not to be confused with isIndentationRequired(), which is the
-	 * more general API.
-	 */
-	protected boolean isDisclosureNodeVisible() {
-		//		return disclosureNode != null && treeItem != null && ! treeItem.isLeaf();
-		return false;
-	}
-
-	protected boolean isShowRoot() {
-		return true;
-	}
-
-	/**
-	 * Returns the graphic to draw on the inside of the disclosure node. Null
-	 * is acceptable when no graphic should be shown. Commonly this is the
-	 * graphic associated with a TreeItem (i.e. treeItem.getGraphic()), rather
-	 * than a graphic associated with a cell.
-	 */
-	//    protected abstract Node getGraphic();
-	protected abstract ObjectProperty<Node> graphicProperty();
-
-	protected abstract Control getVirtualFlowOwner(); // return TableView / TreeTableView
-
-	protected abstract ObservableList<? extends TableColumnBase/*<DataRow,?>*/> getVisibleLeafColumns();
-	//    protected abstract ObjectProperty<SpanModel<DataRow>> spanModelProperty();
-
-	protected abstract void updateCell(SpreadsheetCell cell, TableRow<DataRow> row);  // cell.updateTableRow(skinnable); (i.e cell.updateTableRow(row))
-
-	protected abstract DoubleProperty fixedCellSizeProperty();
-
-	protected abstract boolean isColumnPartiallyOrFullyVisible(TableColumnBase tc); // tableViewSkin.isColumnPartiallyOrFullyVisible(tc)
-
-	protected abstract SpreadsheetCell getCell(TableColumnBase tc);
-
-	protected abstract TableColumnBase<DataRow,?> getTableColumnBase(SpreadsheetCell cell);
-
-	protected TableColumnBase<DataRow,?> getVisibleLeafColumn(int column) {
-		final List<? extends TableColumnBase/*<DataRow,?>*/> visibleLeafColumns = getVisibleLeafColumns();
-		if (column < 0 || column >= visibleLeafColumns.size()) {
-			return null;
-		}
-		return visibleLeafColumns.get(column);
-	}
-
 	// Specifies the number of times we will call 'recreateCells()' before we blow
 	// out the cellsMap structure and rebuild all cells. This helps to prevent
 	// against memory leaks in certain extreme circumstances.
 	private static final int DEFAULT_FULL_REFRESH_COUNTER = 100;
+
+
+
+	/***************************************************************************
+	 *                                                                         *
+	 * Private Fields                                                          *
+	 *                                                                         *
+	 **************************************************************************/
+
+	private double prefWidth = -1;
 
 	/*
 	 * A map that maps from TableColumn to TableCell (i.e. model to view).
@@ -174,10 +114,10 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 	 * a large number of tableColumns. This is mitigated in the recreateCells()
 	 * function below - refer to that to learn more.
 	 */
-	protected WeakHashMap<TableColumnBase, SpreadsheetCell> cellsMap;
+	protected WeakHashMap<TableColumnBase, R> cellsMap;
 
 	// This observableArrayList contains the currently visible table cells for this row.
-	protected final List<SpreadsheetCell> cells = new ArrayList<SpreadsheetCell>();
+	protected final List<R> cells = new ArrayList<R>();
 
 	private int fullRefreshCounter = DEFAULT_FULL_REFRESH_COUNTER;
 
@@ -187,51 +127,31 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 	private double fixedCellSize;
 	private boolean fixedCellSizeEnabled;
 
-	public void requestLayout(){
-		getSkinnable().requestLayout();
-	}
-	private final ListChangeListener<TableColumnBase> visibleLeafColumnsListener = new ListChangeListener<TableColumnBase>() {
-		@Override public void onChanged(Change<? extends TableColumnBase> c) {
-			isDirty = true;
-			getSkinnable().requestLayout();
-		}
-	};
-
-	private final WeakListChangeListener<TableColumnBase> weakVisibleLeafColumnsListener =
-			new WeakListChangeListener<TableColumnBase>(visibleLeafColumnsListener);
+	private int columnCount = 0;
 
 
-	public TableRowSkinBase(TableRow<DataRow> tableRow, TableRowBehavior<DataRow> tableRowBehavior,SpreadsheetView spreadsheetView) {
-		super(tableRow, tableRowBehavior);
-		this.spreadsheetView = spreadsheetView;
+
+	/***************************************************************************
+	 *                                                                         *
+	 * Constructors                                                            *
+	 *                                                                         *
+	 **************************************************************************/
+
+	public TableRowSkinBase(C control, B behavior) {
+		super(control, behavior);
+
 		// init(control) should not be called here - it should be called by the
 		// subclass after initialising itself. This is to prevent NPEs (for
 		// example, getVisibleLeafColumns() throws a NPE as the control itself
 		// is not yet set in subclasses).
 	}
 
-	protected void init(TableRow<DataRow> tableRow) {
+	// init isn't a constructor, but it is part of the initialisation routine
+	protected void init(C control) {
 		getSkinnable().setPickOnBounds(false);
 
 		recreateCells();
 		updateCells(true);
-
-		/**
-		 * NOT NEEDED BECAUSE THEN RE LAYOUT ON EVERY MOVE OF
-		 * THE HORIZONTAL SCROLL BAR BUT MAY SERVE AGAIN
-		 */
-		// We listen to the Hbar Value change and then re-layout
-		/*if(!spreadsheetView.getFlow().getFixedColumns().isEmpty()){
-			spreadsheetView.getFlow().getHbar().valueProperty().addListener(new ChangeListener<Number>(){
-				@Override
-				public void changed(ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					((SpreadsheetRow)getSkinnable()).setLayoutFixedColumns(true);
-					getSkinnable().requestLayout();
-				}
-			});
-		}*/
-
 
 		// init bindings
 		// watches for any change in the leaf columns observableArrayList - this will indicate
@@ -240,62 +160,96 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		getVisibleLeafColumns().addListener(weakVisibleLeafColumnsListener);
 		// --- end init bindings
 
-		//        registerChangeListener(control.textProperty(), "TEXT");
-		//        registerChangeListener(control.graphicProperty(), "GRAPHIC");
-		//        registerChangeListener(control.editingProperty(), "EDITING");
-		registerChangeListener(tableRow.itemProperty(), "ITEM");
+		registerChangeListener(control.itemProperty(), "ITEM");
 
 		if (fixedCellSizeProperty() != null) {
 			registerChangeListener(fixedCellSizeProperty(), "FIXED_CELL_SIZE");
 			fixedCellSize = fixedCellSizeProperty().get();
 			fixedCellSizeEnabled = fixedCellSize > 0;
 		}
-
-		//        // add listener to cell span model
-		//        spanModel = spanModelProperty().get();
-		//        registerChangeListener(spanModelProperty(), "SPAN_MODEL");
 	}
 
-	@Override protected void handleControlPropertyChanged(String p) {
-		//        // we run this before the super call because we want to update whether
-		//        // we are showing columns or the node (if it isn't null) before the
-		//        // parent class updates the content
-		//        if ("TEXT".equals(p) || "GRAPHIC".equals(p) || "EDITING".equals(p)) {
-		//            updateShowColumns();
-		//        }
 
+
+	/***************************************************************************
+	 *                                                                         *
+	 * Listeners                                                               *
+	 *                                                                         *
+	 **************************************************************************/
+
+	private ListChangeListener<TableColumnBase> visibleLeafColumnsListener = new ListChangeListener<TableColumnBase>() {
+		@Override public void onChanged(Change<? extends TableColumnBase> c) {
+			isDirty = true;
+			getSkinnable().requestLayout();
+		}
+	};
+
+	private WeakListChangeListener<TableColumnBase> weakVisibleLeafColumnsListener =
+			new WeakListChangeListener<TableColumnBase>(visibleLeafColumnsListener);
+
+
+
+	/***************************************************************************
+	 *                                                                         *
+	 * Abstract Methods                                                        *
+	 *                                                                         *
+	 **************************************************************************/
+
+	/**
+	 * Returns the graphic to draw on the inside of the disclosure node. Null
+	 * is acceptable when no graphic should be shown. Commonly this is the
+	 * graphic associated with a TreeItem (i.e. treeItem.getGraphic()), rather
+	 * than a graphic associated with a cell.
+	 */
+	protected abstract ObjectProperty<Node> graphicProperty();
+
+	// return TableView / TreeTableView / etc
+	protected abstract Control getVirtualFlowOwner();
+
+	protected abstract ObservableList<? extends TableColumnBase/*<T,?>*/> getVisibleLeafColumns();
+
+	// cell.updateTableRow(skinnable); (i.e cell.updateTableRow(row))
+	protected abstract void updateCell(R cell, C row);
+
+	protected abstract DoubleProperty fixedCellSizeProperty();
+
+	protected abstract boolean isColumnPartiallyOrFullyVisible(TableColumnBase tc);
+
+	protected abstract R getCell(TableColumnBase tc);
+
+	protected abstract TableColumnBase<T,?> getTableColumnBase(R cell);
+
+
+
+	/***************************************************************************
+	 *                                                                         *
+	 * Public Methods                                                          *
+	 *                                                                         *
+	 **************************************************************************/
+
+	@Override protected void handleControlPropertyChanged(String p) {
 		super.handleControlPropertyChanged(p);
 
 		if ("ITEM".equals(p)) {
 			updateCells = true;
 			getSkinnable().requestLayout();
-			//        } else if (p == "SPAN_MODEL") {
-			//            // TODO update layout based on changes to span model
-			//            spanModel = spanModelProperty().get();
-			//            getSkinnable().requestLayout();
 		} else if ("FIXED_CELL_SIZE".equals(p)) {
 			fixedCellSize = fixedCellSizeProperty().get();
 			fixedCellSizeEnabled = fixedCellSize > 0;
-
 		}
 	}
 
-	@Override protected void layoutChildren(double x, final double y,
-			final double w, final double h) {
-
-
+	@Override protected void layoutChildren(double x, final double y, final double w, final double h) {
 		checkState(true);
-		if (cellsMap.isEmpty()) {
-			return;
-		}
+		if (cellsMap.isEmpty()) return;
 
-		final ObservableList<? extends TableColumnBase> visibleLeafColumns = getVisibleLeafColumns();
+		ObservableList<? extends TableColumnBase> visibleLeafColumns = getVisibleLeafColumns();
 		if (visibleLeafColumns.isEmpty()) {
 			super.layoutChildren(x,y,w,h);
 			return;
 		}
 
-		final TableRow<DataRow> control = getSkinnable();
+		C control = getSkinnable();
 
 		///////////////////////////////////////////
 		// indentation code starts here
@@ -303,27 +257,25 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		double leftMargin = 0;
 		double disclosureWidth = 0;
 		double graphicWidth = 0;
-		final boolean indentationRequired = isIndentationRequired();
-		final boolean disclosureVisible = isDisclosureNodeVisible();
+		boolean indentationRequired = isIndentationRequired();
+		boolean disclosureVisible = isDisclosureNodeVisible();
 		int indentationColumnIndex = 0;
 		Node disclosureNode = null;
 		if (indentationRequired) {
 			// Determine the column in which we want to put the disclosure node.
 			// By default it is null, which means the 0th column should be
 			// where the indentation occurs.
-			final TableColumnBase<?,?> treeColumn = getTreeColumn();
+			TableColumnBase<?,?> treeColumn = getTreeColumn();
 			indentationColumnIndex = treeColumn == null ? 0 : visibleLeafColumns.indexOf(treeColumn);
 			indentationColumnIndex = indentationColumnIndex < 0 ? 0 : indentationColumnIndex;
 
 			int indentationLevel = getIndentationLevel(control);
-			if (! isShowRoot()) {
-				indentationLevel--;
-			}
+			if (! isShowRoot()) indentationLevel--;
 			final double indentationPerLevel = getIndentationPerLevel();
 			leftMargin = indentationLevel * indentationPerLevel;
 
 			// position the disclosure node so that it is at the proper indent
-			final Control c = getVirtualFlowOwner();
+			Control c = getVirtualFlowOwner();
 			final double defaultDisclosureWidth = maxDisclosureWidthMap.containsKey(c) ?
 					maxDisclosureWidthMap.get(c) : 0;
 					disclosureWidth = defaultDisclosureWidth;
@@ -359,68 +311,16 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		 * where expected in cases where the vertical height exceeds the
 		 * number of items.
 		 */
-		final int index = control.getIndex();
-		if (index < 0 || index >= spreadsheetView.getItems().size()) {
-			return;
-		}
+		int index = control.getIndex();
+		if (index < 0/* || row >= itemsProperty().get().size()*/) return;
 
-		/**
-		 * FOR FIXED ROWS
-		 */
-		double tableCellY = 0;
-		int positionY;
-		if((positionY = spreadsheetView.getFixedRows().indexOf(index)) != -1 ){// if true, this row is fixed
-			if(getSkinnable().getLocalToParentTransform().getTy() <0){ // this rows is a bit hidden on top
-				// We translate then for it to be fully visible
-				tableCellY = Math.abs(getSkinnable().getLocalToParentTransform().getTy());
-			}else{
-				//The rows is not hidden but we need to translate it anyways because it will be covered
-				// by the previous fixed rows otherwise
-				tableCellY = positionY*DEFAULT_CELL_SIZE - getSkinnable().getLocalToParentTransform().getTy() ;
-			}
-		}
-
-
-		/**
-		 * FOR FIXED COLUMN
-		 */
-		//If we called layoutChildren just to re-layout the fixed columns
-		final int max = ((SpreadsheetRow)getSkinnable()).getLayoutFixedColumns()? spreadsheetView.getFixedColumns().size(): cells.size();
-
-		//In case we were doing layout only of the fixed columns
-		((SpreadsheetRow)getSkinnable()).setLayoutFixedColumns(false);
-
-		//		System.out.println("Je layout"+index+"/"+((SpreadsheetRow)getSkinnable()).getIndexVirtualFlow() );
-		for (int column = 0; column < max; column++) {
-						
-			final SpreadsheetCell tableCell = cells.get(column);
-			final TableColumnBase<DataRow, ?> tableColumn = getTableColumnBase(tableCell);
-
-			//show(tableCell);
-
-			//In case the node was treated previously
-			tableCell.setOpacity(100);
+		for (int column = 0, max = cells.size(); column < max; column++) {
+			R tableCell = cells.get(column);
+			TableColumnBase<T, ?> tableColumn = getTableColumnBase(tableCell);
 
 			width = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
 			height = Math.max(controlHeight, tableCell.prefHeight(-1));
 			height = snapSize(height) - snapSize(verticalPadding);
-
-			/**
-			 * FOR FIXED COLUMNS
-			 */
-			double tableCellX = 0;
-			int indexColumn = 0;
-			final double hbarValue = spreadsheetView.getHbar().getValue();
-			//We translate that column by the Hbar Value if it's fixed
-			if((indexColumn = spreadsheetView.getFixedColumns().indexOf(column)) != -1){
-				/*if(hbarValue - fixedCellSize*(column-indexColumn) >0){
-					tableCellX = Math.abs(hbarValue - tableCell.getWidth()*(column-indexColumn));
-				}*/
-				tableCellX = Math.abs(hbarValue);
-				tableCell.toFront();
-			}
-
-
 
 			boolean isVisible = true;
 			if (fixedCellSizeEnabled) {
@@ -440,7 +340,6 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 				if (fixedCellSizeEnabled && tableCell.getParent() == null) {
 					getChildren().add(tableCell);
 				}
-//				System.out.println("Je layout"+index+"/"+column );
 
 
 
@@ -449,9 +348,9 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 				///////////////////////////////////////////
 				if (indentationRequired && column == indentationColumnIndex) {
 					if (disclosureVisible) {
-						final double ph = disclosureNode.prefHeight(disclosureWidth);
+						double ph = disclosureNode.prefHeight(disclosureWidth);
 
-						if (width < disclosureWidth + leftMargin) {
+						if (width < (disclosureWidth + leftMargin)) {
 							fadeOut(disclosureNode);
 						} else {
 							fadeIn(disclosureNode);
@@ -465,8 +364,8 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 
 					// determine starting point of the graphic or cell node, and the
 					// remaining width available to them
-					final ObjectProperty<Node> graphicProperty = graphicProperty();
-					final Node graphic = graphicProperty == null ? null : graphicProperty.get();
+					ObjectProperty<Node> graphicProperty = graphicProperty();
+					Node graphic = graphicProperty == null ? null : graphicProperty.get();
 
 					if (graphic != null) {
 						graphicWidth = graphic.prefWidth(-1) + 3;
@@ -486,76 +385,12 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 				// further indentation code ends here
 				///////////////////////////////////////////
 
-				final DataCell cellSpan = ((DataRow)spreadsheetView.getItems().get(index)).getCell(column);
-				final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(index, column);
-
-				switch (spanType) {
-				case ROW_INVISIBLE:
-				case BOTH_INVISIBLE:
-					tableCell.setOpacity(0);
-					tableCell.resize(width, height);
-					tableCell.relocate(x+tableCellX, snappedTopInset()+ tableCellY);
-
-					x += width;
-					continue;       // we don't want to fall through
-				case COLUMN_INVISIBLE:
-					tableCell.setOpacity(0);
-					tableCell.resize(width, height);
-					tableCell.relocate(x+tableCellX, snappedTopInset()+ tableCellY);
-					continue;          // we don't want to fall through
-					// infact, we return to the loop here
-				case ROW_VISIBLE:
-					// To be sure that the text is the same
-					//in case we modified the DataCell after that SpreadsheetCell was created
-					final SpreadsheetViewSelectionModel sm = spreadsheetView.getSelectionModel();
-					final TableColumn col = spreadsheetView.getColumns().get(column);
-
-					//In case this cell was selected before but we scroll up/down and it's invisible now.
-					// It has to pass his "selected property" to the new Cell in charge of spanning
-					final TablePosition selectedPosition = sm.isSelectedRange(index, col, column);
-					if (selectedPosition != null && selectedPosition.getRow() != index) { // If the selected cell is in the same row, no need to re-select it
-						sm.clearSelection(selectedPosition.getRow(), selectedPosition.getTableColumn());
-						sm.select(index, col);
-					}
-				case NORMAL_CELL:  // fall through and carry on
-					tableCell.show();
-				}
-
-
-				if (cellSpan != null) {
-					if (cellSpan.getColumnSpan() > 1) {
-						// we need to span multiple columns, so we sum up
-						// the width of the additional columns, adding it
-						// to the width variable
-						for (int i = 1,
-								colSpan = cellSpan.getColumnSpan(),
-								max1 = getChildren().size() - column;
-								i < colSpan && i < max1; i++) {
-							// calculate the width
-							final Node adjacentNode = getChildren().get(column + i);
-							width += snapSize(adjacentNode.prefWidth(-1));
-						}
-					}
-
-					if (cellSpan.getRowSpan() > 1) {
-						// we need to span multiple rows, so we sum up
-						// the height of the additional rows, adding it
-						// to the height variable
-						for (int i = 1; i < cellSpan.getRowSpan(); i++) {
-							// calculate the height
-							final double rowHeight = DEFAULT_CELL_SIZE;//getTableRowHeight(index + i, getSkinnable());
-							height += snapSize(rowHeight);
-						}
-					}
-				}
-
 				tableCell.resize(width, height);
-				// We want to place the layout always at the starting cell.
-				final double spaceBetweenTopAndMe = (index - cellSpan.getRow()) * DEFAULT_CELL_SIZE;
-				tableCell.relocate(x+tableCellX,snappedTopInset() - spaceBetweenTopAndMe + tableCellY);
+				tableCell.relocate(x, snappedTopInset());
 
-				// Request layout is here as (partial) fix for RT-28684
-				//tableCell.requestLayout();
+				// Request layout is here as (partial) fix for RT-28684.
+				// This does not appear to impact performance...
+				tableCell.requestLayout();
 			} else {
 				if (fixedCellSizeEnabled) {
 					// we only add/remove to the scenegraph if the fixed cell
@@ -566,59 +401,54 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 			}
 
 			x += width;
-
 		}
 	}
 
+	protected int getIndentationLevel(C control) {
+		return 0;
+	}
 
-	private int columnCount = 0;
+	protected double getIndentationPerLevel() {
+		return 0;
+	}
 
-	private void recreateCells() {
-		// This function is smart in the sense that we don't recreate all
-		// TableCell instances every time this function is called. Instead we
-		// only create TableCells for TableColumns we haven't already encountered.
-		// To avoid a potential memory leak (when the TableColumns in the
-		// TableView are created/inserted/removed/deleted, we have a 'refresh
-		// counter' that when we reach 0 will delete all cells in this row
-		// and recreate all of them.
+	/**
+	 * Used to represent whether the current virtual flow owner is wanting
+	 * indentation to be used in this table row.
+	 */
+	protected boolean isIndentationRequired() {
+		return false;
+	}
 
-		//        TableView<DataRow> table = getSkinnable().getTableView();
-		//        if (table == null) {
-		if (cellsMap != null) {
+	/**
+	 * Returns the table column that should show the disclosure nodes and / or
+	 * a graphic. By default this is the left-most column.
+	 */
+	protected TableColumnBase getTreeColumn() {
+		return null;
+	}
 
-			//            Set<Entry<TableColumnBase, SpreadsheetCell>> cells = cellsMap.entrySet();
-			//            for (Entry<TableColumnBase, SpreadsheetCell> entry : cells) {
-			//                SpreadsheetCell cell = entry.getValue();
-			//                cell.dispose();
-			//            }
+	protected Node getDisclosureNode() {
+		return null;
+	}
 
-			cellsMap.clear();
-		}
-		//        return;
-		//        }
+	/**
+	 * Used to represent whether a disclosure node is visible for _this_
+	 * table row. Not to be confused with isIndentationRequired(), which is the
+	 * more general API.
+	 */
+	protected boolean isDisclosureNodeVisible() {
+		return false;
+	}
 
-		final ObservableList<? extends TableColumnBase/*<DataRow,?>*/> columns = getVisibleLeafColumns();
+	protected boolean isShowRoot() {
+		return true;
+	}
 
-		if (columns.size() != columnCount || fullRefreshCounter == 0 || cellsMap == null) {
-			if (cellsMap != null) {
-				cellsMap.clear();
-			}
-			cellsMap = new WeakHashMap<TableColumnBase, SpreadsheetCell>(columns.size());
-			fullRefreshCounter = DEFAULT_FULL_REFRESH_COUNTER;
-			getChildren().clear();
-		}
-		columnCount = columns.size();
-		fullRefreshCounter--;
-
-		for (final TableColumnBase col : columns) {
-			if (cellsMap.containsKey(col)) {
-				continue;
-			}
-
-			// create a TableCell for this column and store it in the cellsMap
-			// for future use
-			createCell(col);
-		}
+	protected TableColumnBase<T,?> getVisibleLeafColumn(int column) {
+		final List<? extends TableColumnBase/*<T,?>*/> visibleLeafColumns = getVisibleLeafColumns();
+		if (column < 0 || column >= visibleLeafColumns.size()) return null;
+		return visibleLeafColumns.get(column);
 	}
 
 	protected void updateCells(boolean resetChildren) {
@@ -629,24 +459,16 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 
 		prefWidth = 0;
 
-		final TableRow<DataRow> skinnable = getSkinnable();
-
-		// We want to get the REAL index, aka the Datarow behind
-		final int skinnableIndex;
-		if(skinnable.getItem() == null){
-			skinnableIndex = skinnable.getIndex();
-		}else{
-			skinnableIndex = skinnable.getItem().getRowNumber();
-		}
-		//final int skinnableIndex = skinnable.getItem().getRowNumber();//skinnable.getIndex();
-		final List<? extends TableColumnBase/*<DataRow,?>*/> visibleLeafColumns = getVisibleLeafColumns();
+		final C skinnable = getSkinnable();
+		final int skinnableIndex = skinnable.getIndex();
+		final List<? extends TableColumnBase/*<T,?>*/> visibleLeafColumns = getVisibleLeafColumns();
 
 		for (int i = 0, max = visibleLeafColumns.size(); i < max; i++) {
-			final TableColumnBase<DataRow,?> col = visibleLeafColumns.get(i);
+			TableColumnBase<T,?> col = visibleLeafColumns.get(i);
 
 			prefWidth += col.getWidth();
 
-			SpreadsheetCell cell = cellsMap.get(col);
+			R cell = cellsMap.get(col);
 			if (cell == null) {
 				// if the cell is null it means we don't have it in cache and
 				// need to create it
@@ -662,16 +484,6 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		if (!fixedCellSizeEnabled && (resetChildren || cellsEmpty)) {
 			getChildren().setAll(cells);
 		}
-	}
-
-	private SpreadsheetCell createCell(TableColumnBase col) {
-		// we must create a TableCell for this table column
-		final SpreadsheetCell cell = getCell(col);
-
-		// and store this in our HashMap until needed
-		cellsMap.put(col, cell);
-
-		return cell;
 	}
 
 	@Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
@@ -699,10 +511,10 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		double prefHeight = 0.0f;
 		final int count = cells.size();
 		for (int i=0; i<count; i++) {
-			final SpreadsheetCell tableCell = cells.get(i);
+			final R tableCell = cells.get(i);
 			prefHeight = Math.max(prefHeight, tableCell.prefHeight(-1));
 		}
-		final double ph = Math.max(prefHeight, Math.max(getCellSize(), getSkinnable().minHeight(-1)));
+		double ph = Math.max(prefHeight, Math.max(getCellSize(), getSkinnable().minHeight(-1)));
 
 		return ph;
 	}
@@ -728,7 +540,7 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		double minHeight = 0.0f;
 		final int count = cells.size();
 		for (int i = 0; i < count; i++) {
-			final SpreadsheetCell tableCell = cells.get(i);
+			final R tableCell = cells.get(i);
 			minHeight = Math.max(minHeight, tableCell.minHeight(-1));
 		}
 		return minHeight;
@@ -741,7 +553,62 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		return super.computeMaxHeight(width, topInset, rightInset, bottomInset, leftInset);
 	}
 
-	private void checkState(boolean doRecreateIfNecessary) {
+
+
+	/***************************************************************************
+	 *                                                                         *
+	 * Private Implementation                                                  *
+	 *                                                                         *
+	 **************************************************************************/
+
+	private void recreateCells() {
+		// This function is smart in the sense that we don't recreate all
+		// TableCell instances every time this function is called. Instead we
+		// only create TableCells for TableColumns we haven't already encountered.
+		// To avoid a potential memory leak (when the TableColumns in the
+		// TableView are created/inserted/removed/deleted, we have a 'refresh
+		// counter' that when we reach 0 will delete all cells in this row
+		// and recreate all of them.
+
+		if (cellsMap != null) {
+			cellsMap.clear();
+		}
+
+		ObservableList<? extends TableColumnBase/*<T,?>*/> columns = getVisibleLeafColumns();
+
+		if (columns.size() != columnCount || fullRefreshCounter == 0 || cellsMap == null) {
+			if (cellsMap != null) {
+				cellsMap.clear();
+			}
+			cellsMap = new WeakHashMap<TableColumnBase, R>(columns.size());
+			fullRefreshCounter = DEFAULT_FULL_REFRESH_COUNTER;
+			getChildren().clear();
+		}
+		columnCount = columns.size();
+		fullRefreshCounter--;
+
+		for (TableColumnBase col : columns) {
+			if (cellsMap.containsKey(col)) {
+				continue;
+			}
+
+			// create a TableCell for this column and store it in the cellsMap
+			// for future use
+			createCell(col);
+		}
+	}
+
+	private R createCell(TableColumnBase col) {
+		// we must create a TableCell for this table column
+		R cell = getCell(col);
+
+		// and store this in our HashMap until needed
+		cellsMap.put(col, cell);
+
+		return cell;
+	}
+
+	protected void checkState(boolean doRecreateIfNecessary) {
 		if (isDirty) {
 			// doRecreateIfNecessary was added to resolve RT-29382, which was
 			// introduced by the fix for RT-29080 above in computePrefHeight
@@ -756,20 +623,10 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 		}
 	}
 
-	private static final Duration FADE_DURATION = Duration.millis(200);
-
-	// There appears to be a memory leak when using the stub toolkit. Therefore,
-	// to prevent tests from failing we disable the animations below when the
-	// stub toolkit is being used.
-	// Filed as RT-29163.
-	private static boolean IS_STUB_TOOLKIT = Toolkit.getToolkit().toString().contains("StubToolkit");
-
 	private void fadeOut(final Node node) {
-		if (node.getOpacity() < 1.0) {
-			return;
-		}
+		if (node.getOpacity() < 1.0) return;
 
-		if (IS_STUB_TOOLKIT) {
+		if (! DO_ANIMATIONS) {
 			node.setOpacity(0);
 			return;
 		}
@@ -780,11 +637,9 @@ extends CellSkinBase<TableRow<DataRow>,TableRowBehavior<DataRow>> {
 	}
 
 	private void fadeIn(final Node node) {
-		if (node.getOpacity() > 0.0) {
-			return;
-		}
+		if (node.getOpacity() > 0.0) return;
 
-		if (IS_STUB_TOOLKIT) {
+		if (! DO_ANIMATIONS) {
 			node.setOpacity(1);
 			return;
 		}

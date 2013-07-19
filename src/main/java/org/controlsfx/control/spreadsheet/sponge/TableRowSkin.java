@@ -29,108 +29,93 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.DataRow;
-
+import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
 import com.sun.javafx.scene.control.behavior.TableRowBehavior;
 
 /**
  */
-public class TableRowSkin<T extends DataRow> extends TableRowSkinBase<DataRow,TableRow<DataRow>, TableRowBehavior<DataRow>,SpreadsheetCell> {
+public class TableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehaviorBase<TableRow<T>>, TableCell<T,?>> {
 
+    private TableView<T> tableView;
+    private TableViewSkin tableViewSkin;
+    
+    public TableRowSkin(TableRow<T> tableRow) {
+        super(tableRow, new TableRowBehavior<T>(tableRow));
+        
+        this.tableView = tableRow.getTableView();
+        updateTableViewSkin();
+        
+        super.init(tableRow);
 
-	private TableViewSkin<SpreadsheetRow> tableViewSkin;
+        registerChangeListener(tableRow.tableViewProperty(), "TABLE_VIEW");
+    }
 
-	public TableRowSkin(TableRow<DataRow> tableRow, final SpreadsheetView spreadsheetView) {
+    @Override protected void handleControlPropertyChanged(String p) {
+        super.handleControlPropertyChanged(p);
+        if ("TABLE_VIEW".equals(p)) {
+            updateTableViewSkin();
+            
+            for (int i = 0, max = cells.size(); i < max; i++) {
+                Node n = cells.get(i);
+                if (n instanceof TableCell) {
+                    ((TableCell)n).updateTableView(getSkinnable().getTableView());
+                }
+            }
+            
+            this.tableView = getSkinnable().getTableView();
+        }
+    }
+    
+    @Override protected TableCell<T, ?> getCell(TableColumnBase tcb) {
+        TableColumn tableColumn = (TableColumn<T,?>) tcb;
+        TableCell cell = (TableCell) tableColumn.getCellFactory().call(tableColumn);
 
-		super(tableRow, new TableRowBehavior<DataRow>(tableRow),spreadsheetView);
+        // we set it's TableColumn, TableView and TableRow
+        cell.updateTableColumn(tableColumn);
+        cell.updateTableView(tableColumn.getTableView());
+        cell.updateTableRow(getSkinnable());
+        
+        return cell;
+    }
 
-		updateTableViewSkin();
+    @Override protected ObservableList<TableColumn<T, ?>> getVisibleLeafColumns() {
+        return tableView.getVisibleLeafColumns();
+    }
 
-		super.init(tableRow);
+    @Override protected void updateCell(TableCell<T, ?> cell, TableRow<T> row) {
+        cell.updateTableRow(row);
+    }
 
-		registerChangeListener(tableRow.tableViewProperty(), "TABLE_VIEW");
-	}
+    @Override protected DoubleProperty fixedCellSizeProperty() {
+        return tableView.fixedCellSizeProperty();
+    }
 
-	@Override protected void handleControlPropertyChanged(String p) {
-		super.handleControlPropertyChanged(p);
-		if ("TABLE_VIEW".equals(p)) {
-			updateTableViewSkin();
+    @Override protected boolean isColumnPartiallyOrFullyVisible(TableColumnBase tc) {
+        return tableViewSkin == null ? false : tableViewSkin.isColumnPartiallyOrFullyVisible((TableColumn)tc);
+    }
 
-			for (int i = 0, max = cells.size(); i < max; i++) {
-				final Node n = cells.get(i);
-				if (n instanceof SpreadsheetCell) {
-					((SpreadsheetCell)n).updateTableView(getSkinnable().getTableView());
-				}
-			}
+    @Override protected TableColumn<T, ?> getTableColumnBase(TableCell<T, ?> cell) {
+        return cell.getTableColumn();
+    }
 
-			//			this.spreadsheetView = (SpreadsheetViewInternal<DataRow>) getSkinnable().getTableView();
-			//            spanModel = spreadsheetView.getSpanModel();
-			//            registerChangeListener(spreadsheetView.spanModelProperty(), "SPAN_MODEL");
-		}
-	}
+    @Override protected ObjectProperty<Node> graphicProperty() {
+        return null;
+    }
 
-	@Override
-	protected ObjectProperty<Node> graphicProperty() {
-		return null;
-	}
-
-	@Override
-	protected Control getVirtualFlowOwner() {
-		return getSkinnable().getTableView();
-	}
-
-	@Override
-	protected ObservableList<? extends TableColumnBase> getVisibleLeafColumns() {
-		return spreadsheetView.getVisibleLeafColumns();
-	}
-
-	@Override
-	protected void updateCell(SpreadsheetCell cell,
-			TableRow<DataRow> row) {
-		cell.updateTableRow(row);
-	}
-
-	@Override protected DoubleProperty fixedCellSizeProperty() {
-		return spreadsheetView.fixedCellSizeProperty();
-	}
-
-	@Override
-	protected boolean isColumnPartiallyOrFullyVisible(TableColumnBase tc) {
-		//Virtualization of the columns is too complex for now
-		return tableViewSkin == null ? false : true;//tableViewSkin.isColumnPartiallyOrFullyVisible(tc);
-	}
-
-	@Override
-	protected SpreadsheetCell getCell(TableColumnBase tc) {
-		final TableColumn tableColumn = (TableColumn<T,?>) tc;
-		final SpreadsheetCell cell = (SpreadsheetCell) tableColumn.getCellFactory().call(tableColumn);
-
-		// we set it's TableColumn, TableView and TableRow
-		cell.updateTableColumn(tableColumn);
-		cell.updateTableView(tableColumn.getTableView());
-		cell.updateTableRow(getSkinnable());
-
-		return cell;
-	}
-
-	@Override
-	protected TableColumnBase<DataRow, ?> getTableColumnBase(
-			SpreadsheetCell cell) {
-		return cell.getTableColumn();
-	}
-
-	private void updateTableViewSkin() {
-		final TableView tableView = getSkinnable().getTableView();
-		if (tableView.getSkin() instanceof TableViewSkin) {
-			tableViewSkin = (TableViewSkin)tableView.getSkin();
-		}
-	}
+    @Override protected Control getVirtualFlowOwner() {
+        return getSkinnable().getTableView();
+    }
+    
+    private void updateTableViewSkin() {
+        TableView tableView = getSkinnable().getTableView();
+        if (tableView.getSkin() instanceof TableViewSkin) {
+            tableViewSkin = (TableViewSkin)tableView.getSkin();
+        }
+    }
 }

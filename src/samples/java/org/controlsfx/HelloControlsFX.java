@@ -39,9 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.controlsfx.control.HyperlinkLabel;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -216,7 +220,8 @@ public class HelloControlsFX extends Application {
         welcomeLabel1.setStyle("-fx-font-size: 2em; -fx-padding: 0 0 0 5;");
         
         // line 2
-        Label welcomeLabel2 = new Label("Explore the available UI controls by clicking on the options to the left.\n\n" +
+        HyperlinkLabel welcomeLabel2 = new HyperlinkLabel(
+                "Explore the available UI controls by clicking on the options to the left.\n\n" +
                 "There have been many contributors to this project, including:\n" +
                 "   Jonathan Giles\n" +
                 "   Eugene Ryzhikov\n" +
@@ -224,9 +229,15 @@ public class HelloControlsFX extends Application {
                 "   Danno Ferrin\n" +
                 "   Paru Somashekar\n\n" +
                 "If you ever meet any of these wonderful contributors, tell them how great they are! :-)\n\n" +
-                "To keep up to date with the ControlsFX project, visit the website at http://www.controlsfx.org");
+                "To keep up to date with the ControlsFX project, visit the website at [http://www.controlsfx.org]");
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
-        welcomeLabel2.setWrapText(true);
+//        welcomeLabel2.setWrapText(true);
+        welcomeLabel2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent event) {
+                // TODO could open up the ControlsFX website in a tab
+                System.out.println(event);
+            }
+        });
         
         VBox initialVBox = new VBox(5, welcomeLabel1, welcomeLabel2);
         

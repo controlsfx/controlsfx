@@ -14,6 +14,7 @@ import org.controlsfx.control.spreadsheet.sponge.NestedTableColumnHeader;
 import org.controlsfx.control.spreadsheet.sponge.TableColumnHeader;
 import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
 
+
 public class SpreadsheetHeaderRow extends TableHeaderRow{
 
 	SpreadsheetViewSkin spreadsheetViewSkin;
@@ -65,13 +66,12 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 	protected void updateTableWidth() {
 		super.updateTableWidth();
 		// snapping added for RT-19428
-		double padding = snapSize(getTablePadding().getLeft()) + snapSize(getTablePadding().getRight());
+		double padding = 0;
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
 		if(spreadsheetViewSkin != null && spreadsheetViewSkin.spreadsheetView != null && spreadsheetViewSkin.spreadsheetView.getRowHeader().get()){
-			//TODO ugly "2" here, needs to be removed, but without, a blank is observed at the top-right
-			padding += spreadsheetViewSkin.getRowHeaderWidth()-2;
+			padding += spreadsheetViewSkin.getRowHeaderWidth();
 		}
 
 		/*****************************************************************

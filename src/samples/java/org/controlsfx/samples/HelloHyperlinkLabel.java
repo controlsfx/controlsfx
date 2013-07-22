@@ -27,25 +27,24 @@
 package org.controlsfx.samples;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
+import javafx.beans.binding.StringBinding;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.HyperlinkLabel;
-import org.controlsfx.control.Rating;
 
 public class HelloHyperlinkLabel extends Application implements Sample {
+    
+    private HyperlinkLabel label;
     
     public static void main(String[] args) {
         launch(args);
@@ -67,9 +66,38 @@ public class HelloHyperlinkLabel extends Application implements Sample {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));
         
-        String text = "Hello [world] it's [Jonathan]";
+        final TextField textToShowField = new TextField();
+        textToShowField.setMaxWidth(Double.MAX_VALUE);
+        textToShowField.setPromptText("Type text in here to display - use [] to indicate a hyperlink - e.g. [hello]");
+        root.getChildren().add(textToShowField);
         
-        HyperlinkLabel label = new HyperlinkLabel(text);
+        final TextField selectedLinkField = new TextField();
+        selectedLinkField.setMaxWidth(Double.MAX_VALUE);
+        selectedLinkField.setEditable(false);
+        selectedLinkField.setPromptText("Click a link - I'll show you which one you clicked :-)");
+        root.getChildren().add(selectedLinkField);
+        
+        label = new HyperlinkLabel();
+        label.textProperty().bind(new StringBinding() {
+            {
+                bind(textToShowField.textProperty());
+            }
+            
+            @Override protected String computeValue() {
+                final String str = textToShowField.getText();
+                if (str == null || str.isEmpty()) {
+                    return "Hello [world]! I [wonder] what hyperlink [you] [will] [click]";
+                }
+                return str;
+            }
+        });
+        label.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent event) {
+                Hyperlink link = (Hyperlink)event.getSource();
+                final String str = link == null ? "" : "You clicked on '" + link.getText() + "'";
+                selectedLinkField.setText(str);
+            }
+        });
         root.getChildren().add(label);
         
         return root;
@@ -82,5 +110,7 @@ public class HelloHyperlinkLabel extends Application implements Sample {
 
         stage.setScene(scene);
         stage.show();
+        
+        label.requestFocus();
     }
 }

@@ -122,7 +122,7 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
             int endPos = text.indexOf(HYPERLINK_END, startPos);
             
             // if the startPos is -1, there are no more hyperlinks...
-            if (startPos == -1) {
+            if (startPos == -1 || endPos == -1) {
                 if (textLength > start) {
                     // ...but there is still text to turn into one last label
                     Label label = new Label(text.substring(start));

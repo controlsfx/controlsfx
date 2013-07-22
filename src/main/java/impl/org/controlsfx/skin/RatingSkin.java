@@ -49,7 +49,6 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
  *
- * @author Jonathan Giles
  */
 public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     

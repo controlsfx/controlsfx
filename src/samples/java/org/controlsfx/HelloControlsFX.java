@@ -39,9 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.controlsfx.control.HyperlinkLabel;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -82,7 +86,7 @@ public class HelloControlsFX extends Application {
     @Override public void start(final Stage primaryStage) throws Exception {
         setUserAgentStylesheet(STYLESHEET_MODENA);
         
-        TreeItem<Sample> root = new TreeItem<Sample>(new EmptySample("ControlsFX"));
+        final TreeItem<Sample> root = new TreeItem<Sample>(new EmptySample("ControlsFX"));
         root.setExpanded(true);
         
         Class[] sampleClasses = getClasses(SAMPLES_ROOT_PACKAGE);
@@ -152,7 +156,10 @@ public class HelloControlsFX extends Application {
         });
         samplesTreeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Sample>>() {
             @Override public void changed(ObservableValue<? extends TreeItem<Sample>> observable, TreeItem<Sample> oldValue, TreeItem<Sample> newSample) {
-                if (newSample.getValue() instanceof EmptySample) {
+                if (newSample == root) {
+                    changeToWelcomeTab();
+                    return;
+                } else if (newSample.getValue() instanceof EmptySample) {
                     return;
                 }
                 changeSample(newSample.getValue(), primaryStage);
@@ -176,7 +183,7 @@ public class HelloControlsFX extends Application {
     	javadocTab.setContent(webview);
         
         // by default we'll have a welcome message in the right-hand side
-        buildInitialVBox();
+        changeToWelcomeTab();
         
         // put it all together
         Scene scene = new Scene(grid);
@@ -207,13 +214,14 @@ public class HelloControlsFX extends Application {
     	webview.getEngine().load(newSample.getJavaDocURL());
     }
     
-    private void buildInitialVBox() {
+    private void changeToWelcomeTab() {
         // line 1
         Label welcomeLabel1 = new Label("Welcome to ControlsFX!");
         welcomeLabel1.setStyle("-fx-font-size: 2em; -fx-padding: 0 0 0 5;");
         
         // line 2
-        Label welcomeLabel2 = new Label("Explore the available UI controls by clicking on the options to the left.\n\n" +
+        HyperlinkLabel welcomeLabel2 = new HyperlinkLabel(
+                "Explore the available UI controls by clicking on the options to the left.\n\n" +
                 "There have been many contributors to this project, including:\n" +
                 "   Jonathan Giles\n" +
                 "   Eugene Ryzhikov\n" +
@@ -221,15 +229,22 @@ public class HelloControlsFX extends Application {
                 "   Danno Ferrin\n" +
                 "   Paru Somashekar\n\n" +
                 "If you ever meet any of these wonderful contributors, tell them how great they are! :-)\n\n" +
-                "To keep up to date with the ControlsFX project, visit the website at http://www.fxexperience.com/controlsfx");
+                "To keep up to date with the ControlsFX project, visit the website at [http://www.controlsfx.org]");
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
+//        welcomeLabel2.setWrapText(true);
+        welcomeLabel2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent event) {
+                // TODO could open up the ControlsFX website in a tab
+                System.out.println(event);
+            }
+        });
         
         VBox initialVBox = new VBox(5, welcomeLabel1, welcomeLabel2);
         
         welcomeTab = new Tab("Welcome to ControlsFX!");
         welcomeTab.setContent(initialVBox);
         
-        tabPane.getTabs().add(welcomeTab);
+        tabPane.getTabs().setAll(welcomeTab);
     }
     
     

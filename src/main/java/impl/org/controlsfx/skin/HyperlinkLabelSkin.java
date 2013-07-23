@@ -43,19 +43,25 @@ import org.controlsfx.control.HyperlinkLabel;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
-/**
- *
- */
 public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, BehaviorBase<HyperlinkLabel>> {
+    
+    /***************************************************************************
+     * 
+     * Static fields
+     * 
+     **************************************************************************/
+    
+    // The strings used to delimit the hyperlinks
+    private static final String HYPERLINK_START = "[";
+    private static final String HYPERLINK_END = "]";
+    
+    
     
     /***************************************************************************
      * 
      * Private fields
      * 
      **************************************************************************/
-    
-    private static final String HYPERLINK_START = "[";
-    private static final String HYPERLINK_END = "]";
     
     private final TextFlow textFlow;
     private final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
@@ -66,9 +72,6 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
             }
         }
     };
-    
-    
-    
     
     
 
@@ -104,6 +107,8 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
         }
     }
     
+    // splits up the string into Text and Hyperlink nodes, and places them
+    // into a TextFlow instance
     private void updateText() {
         final String text = getSkinnable().getText();
         

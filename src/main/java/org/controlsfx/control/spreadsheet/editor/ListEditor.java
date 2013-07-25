@@ -161,9 +161,6 @@ public class ListEditor extends Editor {
 				end();
 			}
 		};
-		if(gc == null){
-			System.out.println("merde");
-		}
 		gc.selectedProperty().addListener(cl2);
 	}
 

@@ -28,8 +28,6 @@ package org.controlsfx.dialog;
 
 import java.net.URL;
 
-import com.sun.javafx.Utils;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -50,6 +48,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+
+import org.controlsfx.tools.Platform;
 
 abstract class FXDialog {
     
@@ -127,11 +127,11 @@ abstract class FXDialog {
         
         root = new BorderPane();
         
-        // we use different CSS to more closely mimic the underlying platform
-        final String platform = Utils.isMac()     ? "mac"     : 
-                                Utils.isUnix()    ? "unix"    :
-                                Utils.isWindows() ? "windows" :
-                                "";
+//        // we use different CSS to more closely mimic the underlying platform
+//        final String platform = Utils.isMac()     ? "mac"     : 
+//                                Utils.isUnix()    ? "unix"    :
+//                                Utils.isWindows() ? "windows" :
+//                                "";
         
         // *** The rest is for adding window decorations ***
         lightweightDialog = new StackPane() {
@@ -143,7 +143,8 @@ abstract class FXDialog {
             }
         };
         lightweightDialog.getChildren().add(root);
-        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root", platform);
+        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root", 
+                       Platform.getCurrent().getPlatformId());
         
         resizeCorner = new Rectangle(10, 10);
         resizeCorner.getStyleClass().add("window-resize-corner");

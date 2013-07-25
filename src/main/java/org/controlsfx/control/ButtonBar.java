@@ -42,8 +42,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.layout.HBox;
 
 import org.controlsfx.control.action.Action;
-
-import com.sun.javafx.Utils;
+import org.controlsfx.tools.Platform;
 
 /**
  * A ButtonBar is essentially an {@link HBox} for controls extending
@@ -358,18 +357,25 @@ public final class ButtonBar extends Control {
         
         final boolean buttonOrderEmpty = buttonOrder == null || buttonOrder.isEmpty();
         
-        // set the default values 
-        if (Utils.isMac()) {
-            setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_MAC_OS : buttonOrder);
-            setButtonMinWidth(70);
-        } else if (Utils.isUnix()) {
-            setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_LINUX : buttonOrder);
-            setButtonMinWidth(85);
-        } else {
-            // windows by default
-            setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_WINDOWS : buttonOrder);
-            setButtonMinWidth(75);
+        switch (Platform.getCurrent()) {
+            case OSX: {
+                setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_MAC_OS : buttonOrder);
+                setButtonMinWidth(70);
+                break;
+            }
+            case UNIX: {
+                setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_LINUX : buttonOrder);
+                setButtonMinWidth(85);
+                break;
+            }
+            default: {
+             // windows by default
+                setButtonOrder(buttonOrderEmpty ? BUTTON_ORDER_WINDOWS : buttonOrder);
+                setButtonMinWidth(75); 
+                break;
+            }
         }
+
     }
     
     

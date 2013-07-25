@@ -26,6 +26,11 @@
  */
 package org.controlsfx.dialog;
 
+import static org.controlsfx.tools.Platform.OSX;
+import static org.controlsfx.tools.Platform.UNIX;
+
+import java.util.EnumSet;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -45,7 +50,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import com.sun.javafx.Utils;
+
+import org.controlsfx.tools.Platform;
 
 // Not public API (class is package-protected), so no JavaDoc is required.
 class HeavyweightDialog extends FXDialog {
@@ -60,6 +66,8 @@ class HeavyweightDialog extends FXDialog {
     private final Window owner;
     
     private boolean modal;
+    
+    private static EnumSet<Platform> DECORATED_STAGE_PLATFORMS = EnumSet.of(OSX, UNIX);
 
     
     
@@ -78,7 +86,8 @@ class HeavyweightDialog extends FXDialog {
         this.owner = owner;
         
         final StageStyle style = ! nativeChrome ? StageStyle.TRANSPARENT :
-            (Utils.isMac() || Utils.isUnix() ? StageStyle.DECORATED : StageStyle.UTILITY);
+            (DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
+                     StageStyle.DECORATED : StageStyle.UTILITY);
         
         stage = new Stage(style) {
             @Override public void showAndWait() {

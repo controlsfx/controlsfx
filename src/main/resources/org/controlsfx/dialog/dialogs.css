@@ -54,7 +54,7 @@
 .dialog > * > .window-header > * > .window-title {
     -fx-padding: 0 0 0 0;
     -fx-alignment: center;
-    -fx-font-size: 1.083333em;
+    -fx-font-size: 1.166667em; /*15px;*/
     -fx-text-fill: #808080;
 }
 
@@ -129,7 +129,7 @@
 }
 
 .dialog:masthead .masthead-panel .label {
-    -fx-font-size: 1.167em;
+    -fx-font-size: 1.249999em; 
     -fx-wrap-text: true;
 }
 
@@ -148,7 +148,7 @@
     -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
     -fx-border-width: 1 1 1 1;
     -fx-border-color: #b4b4b4 transparent #b4b4b4 transparent;
-    -fx-font-size: 1em;
+    -fx-font-size: 1.083333em; /*13px;*/
     -fx-text-fill: #292929;
 }
 
@@ -198,7 +198,7 @@
 }
 
 .dialog .more-info-dialog .label {
-    -fx-font-size: 1em;
+    -fx-font-size: 1.083333em;
 }
 
 .dialog .more-info-dialog > .button-bar {
@@ -234,7 +234,7 @@
  ******************************************************************************/
  /* For the text displayed above command-link buttons (but below the masthead) */
 .dialog > * > .content-pane .command-link-message {
-    -fx-font-size: 1.167em;
+    -fx-font-size: 1.25em; 
 }
 
 .dialog .command-link-button {
@@ -286,7 +286,7 @@
 }
 
 .dialog .command-link-button > .container > .line-1 {
-    -fx-font-size: 1.167em;
+    -fx-font-size: 1.25em;
     -fx-padding: -5 0 0 5;
 }
 
@@ -297,4 +297,34 @@
 
 .dialog .command-link-button > .container > .graphic-container {
     -fx-padding: 10 10 0 0
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * OS-Specific modifications                                                   *
+ *                                                                             *
+ ******************************************************************************/
+.dialog.mac > * > .window-header > * > .window-title {
+    -fx-font-size: 1.083333em;
+}
+
+.dialog.mac:masthead .masthead-panel .label {
+    -fx-font-size: 1.167em;
+}
+
+.dialog.mac > * > .content-pane {
+    -fx-font-size: 1em;
+}
+
+.dialog.mac .more-info-dialog .label {
+    -fx-font-size: 1em;
+}
+
+.dialog.mac > * > .content-pane .command-link-message {
+    -fx-font-size: 1.167em;
+}
+
+.dialog.mac .command-link-button > .container > .line-1 {
+    -fx-font-size: 1.167em;
 }

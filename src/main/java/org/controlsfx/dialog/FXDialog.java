@@ -28,6 +28,8 @@ package org.controlsfx.dialog;
 
 import java.net.URL;
 
+import com.sun.javafx.Utils;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -125,6 +127,12 @@ abstract class FXDialog {
         
         root = new BorderPane();
         
+        // we use different CSS to more closely mimic the underlying platform
+        final String platform = Utils.isMac()     ? "mac"     : 
+                                Utils.isUnix()    ? "unix"    :
+                                Utils.isWindows() ? "windows" :
+                                "";
+        
         // *** The rest is for adding window decorations ***
         lightweightDialog = new StackPane() {
             @Override protected void layoutChildren() {
@@ -135,7 +143,7 @@ abstract class FXDialog {
             }
         };
         lightweightDialog.getChildren().add(root);
-        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root");
+        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root", platform);
         
         resizeCorner = new Rectangle(10, 10);
         resizeCorner.getStyleClass().add("window-resize-corner");

@@ -756,7 +756,7 @@ public class Dialog {
     /**
      * TODO delete me - this is just for testing!!
      */
-    static String buttonBarOrder = ButtonBar.BUTTON_ORDER_WINDOWS;
+    static String buttonBarOrder = null;
 
     static void setMacOS(boolean b) {
         if (b) {
@@ -884,7 +884,9 @@ public class Dialog {
 
     private void createButtonPanel(final int startRow) {
         ButtonBar buttonBar = new ButtonBar();
-        buttonBar.setButtonOrder(buttonBarOrder);
+        if (buttonBarOrder != null) {
+            buttonBar.setButtonOrder(buttonBarOrder);
+        }
         
         // show details button if expandable content is present
         if (hasExpandableContent()) {

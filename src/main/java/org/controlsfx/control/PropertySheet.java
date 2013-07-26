@@ -50,7 +50,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * below:
  * 
  * <br>
- * <center><img src="propertySheet.png" /></center>
+ * <center><img src="propertySheet.PNG" /></center>
  * 
  * <p>In this property sheet there exists two columns: the left column shows a 
  * label describing the property itself, whereas the right column provides a

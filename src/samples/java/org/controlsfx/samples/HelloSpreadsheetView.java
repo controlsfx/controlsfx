@@ -54,7 +54,6 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	@Override
 	public Node getPanel(Stage stage) {
 		return new SpreadsheetView();
-
 	}
 
 	@Override

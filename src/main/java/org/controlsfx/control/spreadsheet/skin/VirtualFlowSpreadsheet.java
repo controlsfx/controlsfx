@@ -164,6 +164,17 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 	 */
 	@Override
 	protected int getCellIndex(T cell){
+		// We need to act differently upon cases, so this is BAD programming
+		// But it's the only option right now
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		if(stackTraceElements.length >= 3 && 
+				(stackTraceElements[2].getMethodName().equals("getAvailableCell")
+						|| stackTraceElements[2].getMethodName().contains("adjustPixels")) ){
+			return cell.getIndex();
+		}
+		
+		
+		
 		return ((SpreadsheetRow)cell).getIndexVirtualFlow();
 	}
 
@@ -275,7 +286,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 				// Position the cell, and update the maxPrefBreadth variable as we go.
 				positionCell(cell, offset);
-				maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
+				setMaxPrefBreadth(Math.max(getMaxPrefBreadth(), getCellBreadth(cell)));
 				cell.setVisible(true);
 				--index;
 				--cellToAdd;
@@ -293,18 +304,19 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		if (firstIndex == 0 && firstCellPos > 0) {
 			setPosition(0.0f);
 			offset = 0;
-			for (int i = 0; i < cells.size(); i++) {
-				cell = cells.get(i);
+			for (int i = 0; i < getCells().size(); i++) {
+				cell = getCells().get(i);
 				positionCell(cell, offset);
 				offset += getCellLength(cell);
 			}
 		}
 	}
+	
 	@Override
 	protected boolean addTrailingCells(boolean fillEmptyCells) {
 		// If cells is empty then addLeadingCells bailed for some reason and
 		// we're hosed, so just punt
-		if (cells.isEmpty()) {
+		if (getCells().isEmpty()) {
 			return false;
 		}
 
@@ -317,6 +329,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		int index = getCellIndex(startCell) + 1;
 		boolean filledWithNonEmpty = index <= getCellCount();
 
+		final double viewportLength = getViewportLength();
 		while (offset < viewportLength){// && index <getCellCount()) {
 			if (index >= getCellCount()) {
 				if (offset < viewportLength) {
@@ -348,7 +361,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 			// Position the cell and update the max pref
 			positionCell(cell, offset);
-			maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
+			 setMaxPrefBreadth(Math.max(getMaxPrefBreadth(), getCellBreadth(cell)));
 
 			offset += getCellLength(cell);
 			cell.setVisible(true);
@@ -363,8 +376,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		// with the bottom OR we have laid out cell index #0 at the first
 		// position.
 		T firstCell = cells.getFirst();
-		index = ((SpreadsheetRow)firstCell).getIndexVirtualFlow();
-		final int realIndex = firstCell.getIndex();
+		index = getCellIndex(firstCell);
 		final T lastNonEmptyCell = getLastVisibleCell();
 		double start = getCellPosition(firstCell);
 		final double end = getCellPosition(lastNonEmptyCell) + getCellLength(lastNonEmptyCell);
@@ -373,64 +385,68 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 			//Quite impossible to add properly the FixedRows so I choose to rebuild the view
 			if(!fixedRows.isEmpty()){
-				final int currentIndex = computeCurrentIndex();
+				final int currentIndex = (int) (getPosition() * getCellCount());
 				addAllToPile();
 
 				// The distance from the top of the viewport to the top of the
 				// cell for the current index.
-				final double offset2 = -computeViewportOffset(getPosition());
+				 final double p = com.sun.javafx.Utils.clamp(0, getPosition(), 1);
+				 final double fractionalPosition = p * getCellCount();
+				 final int cellIndex = (int) fractionalPosition;
+				 final double fraction = fractionalPosition - cellIndex;
+				 final double cellSize = getCellLength(cellIndex);
+				 final double pixelOffset = cellSize * fraction;
+				 final double viewportOffset = getViewportLength() * p;
+			      
+				final double offset2 =  pixelOffset - viewportOffset;//-computeViewportOffset(getPosition());
 				// Add all the leading and trailing cells (the call to add leading
 				// cells will add the current cell as well -- that is, the one that
 				// represents the current position on the mapper).
-				addLeadingCells(currentIndex, offset2);
+				addLeadingCells(currentIndex, -offset2);
 				// Force filling of space with empty cells if necessary
 				addTrailingCells(true);
 			}else{
 
 
-				double prospectiveEnd = end;
-				final double distance = viewportLength - end;
-				while (prospectiveEnd < viewportLength && index != 0 && -start < distance) {
-					index--;
-					//				System.out.println("JaddE"+realIndex);
-					final T cell = getAvailableCell(realIndex);
-					setCellIndex(cell, index);
-					resizeCellSize(cell); // resize must be after config
-//					System.out.println("JaddC"+realIndex);
-					cells.addFirst(cell);
+				 double prospectiveEnd = end;
+		            double distance = viewportLength - end;
+		            while (prospectiveEnd < viewportLength && index != 0 && (-start) < distance) {
+		                index--;
+		                T cell = getAvailableCell(index);
+		                setCellIndex(cell, index);
+		                resizeCellSize(cell); // resize must be after config
+		                cells.addFirst(cell);
+		                double cellLength = getCellLength(cell);
+		                start -= cellLength;
+		                prospectiveEnd += cellLength;
+		                positionCell(cell, start);
+		                setMaxPrefBreadth(Math.max(getMaxPrefBreadth(), getCellBreadth(cell)));
+		                cell.setVisible(true);
+		            }
 
+		            // The amount by which to translate the cells down
+		            firstCell = cells.getFirst();
+		            start = getCellPosition(firstCell);
+		            double delta = viewportLength - end;
+		            if (getCellIndex(firstCell) == 0 && delta > (-start)) {
+		                delta = (-start);
+		            }
+		            // Move things
+		            for (int i = 0; i < cells.size(); i++) {
+		                T cell = cells.get(i);
+		                positionCell(cell, getCellPosition(cell) + delta);
+		            }
 
-					final double cellLength = getCellLength(cell);
-					start -= cellLength;
-					prospectiveEnd += cellLength;
-					positionCell(cell, start);
-					maxPrefBreadth = Math.max(maxPrefBreadth, getCellBreadth(cell));
-					cell.setVisible(true);
-				}
-
-				// The amount by which to translate the cells down
-				firstCell = cells.getFirst();
-				start = getCellPosition(firstCell);
-				double delta = viewportLength - end;
-				if (getCellIndex(firstCell) == 0 && delta > -start) {
-					delta = -start;
-				}
-				// Move things
-				for (int i = 0; i < cells.size(); i++) {
-					final T cell = cells.get(i);
-					positionCell(cell, getCellPosition(cell) + delta);
-				}
-
-				// Check whether the first cell, subsequent to our adjustments, is
-				// now index #0 and aligned with the top. If so, change the position
-				// to be at 0 instead of 1.
-				start = getCellPosition(firstCell);
-				if (getCellIndex(firstCell) == 0 && start == 0) {
-					setPosition(0);
-				} else if (getPosition() != 1) {
-					setPosition(1);
-				}
-			}
+		            // Check whether the first cell, subsequent to our adjustments, is
+		            // now index #0 and aligned with the top. If so, change the position
+		            // to be at 0 instead of 1.
+		            start = getCellPosition(firstCell);
+		            if (getCellIndex(firstCell) == 0 && start == 0) {
+		                setPosition(0);
+		            } else if (getPosition() != 1) {
+		                setPosition(1);
+		            }
+	        }
 
 		}
 

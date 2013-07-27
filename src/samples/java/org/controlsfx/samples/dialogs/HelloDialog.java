@@ -1,7 +1,9 @@
 package org.controlsfx.samples.dialogs;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,6 +38,7 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
@@ -147,20 +150,26 @@ public class HelloDialog extends Application implements Sample {
 
         grid.add(createLabel("Confirmation Dialog: "), 0, row);
 
+        final CheckBox cbShowCancel = new CheckBox("Show Cancel Button");
+        cbShowCancel.setSelected(true);
+        
         final Button Hyperlink3 = new Button("Show");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
+                Set<Action> excludedActions = new HashSet<>();
+                if (!cbShowCancel.isSelected()) excludedActions.add(Actions.CANCEL);
                 Action response = configureSampleDialog(
-                    Dialogs.create()
+                     Dialogs.create()
                         .title("You do want dialogs right?")
                         .masthead(isMastheadVisible() ? "Just Checkin'" : null)
                         .message( "I was a bit worried that you might not want them, so I wanted to double check."))
+                        .excludeActions(excludedActions)
                     .showConfirm();
 
                 System.out.println("response: " + response);
             }
         });
-        grid.add(new HBox(10, Hyperlink3), 1, row);
+        grid.add(new HBox(10, Hyperlink3, cbShowCancel), 1, row);
 
         row++;
 

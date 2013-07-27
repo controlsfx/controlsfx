@@ -304,6 +304,7 @@ public final class Dialogs {
     private String masthead;
     private boolean lightweight;
     private boolean nativeChrome;
+    private Set<Action> excludedActions = new HashSet<>();
 
     /**
      * Creates the initial dialog
@@ -359,9 +360,21 @@ public final class Dialogs {
         return this;
     }
     
+
+    /**
+     * Allows for exclusion of a set of dialog actions.
+     * For example, can be used to exclude CANCEL action on confirmation dialog
+     * @param excludedActions
+     * @return dialog instance
+     */
+    public Dialogs excludeActions( Set<Action> excludedActions) {
+        this.excludedActions.addAll(excludedActions);
+        return this;
+    }
+    
     /**
      * Specifies that the dialog should become lightweight, which means it is
-     * rendered within the scenegraph (and can't leave the window). Lightweight 
+     * rendered within the scene graph (and can't leave the window). Lightweight 
      * dialogs are commonly useful in environments where a windowing system is unavailable
      * (e.g. tablet devices), and also when you only want to block execution
      * (and access to) a portion of your user interface. For example, you could
@@ -379,7 +392,7 @@ public final class Dialogs {
     /**
      * Specifies that the dialog should use the native 'chrome' of the users 
      * operating system rather than the custom cross-platform rendering used by 
-     * default. Refer to the Dialogs class javadoc for more information.
+     * default. Refer to the Dialogs class JavaDoc for more information.
      * 
      * @return Dialog instance.
      */
@@ -694,6 +707,7 @@ public final class Dialogs {
 
     private Action showSimpleContentDialog(final Type dlgType) {
         Dialog dlg = buildDialog(dlgType);
+        dlg.getActions().removeAll(excludedActions);
         dlg.setContent(message);
         return dlg.show();
     }

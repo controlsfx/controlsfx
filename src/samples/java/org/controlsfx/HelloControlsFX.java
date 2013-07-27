@@ -37,8 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.controlsfx.control.HyperlinkLabel;
-
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -54,12 +52,15 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
+import org.controlsfx.control.HyperlinkLabel;
 
 public class HelloControlsFX extends Application {
     
@@ -84,11 +85,13 @@ public class HelloControlsFX extends Application {
     @Override public void start(final Stage primaryStage) throws Exception {
         setUserAgentStylesheet(STYLESHEET_MODENA);
         
+        primaryStage.getIcons().add(new Image("/org/controlsfx/samples/controlsfx-logo.png"));
+        
         final TreeItem<Sample> root = new TreeItem<Sample>(new EmptySample("ControlsFX"));
         root.setExpanded(true);
         
-        Class[] sampleClasses = getClasses(SAMPLES_ROOT_PACKAGE);
-        for (Class sampleClass : sampleClasses) {
+        Class<?>[] sampleClasses = getClasses(SAMPLES_ROOT_PACKAGE);
+        for (Class<?> sampleClass : sampleClasses) {
             if (! Sample.class.isAssignableFrom(sampleClass)) continue;
             
             final Sample sample = (Sample)sampleClass.newInstance();
@@ -285,7 +288,7 @@ public class HelloControlsFX extends Application {
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+    private static Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
         String path = packageName.replace('.', '/');
@@ -295,7 +298,7 @@ public class HelloControlsFX extends Application {
             URL resource = resources.nextElement();
             dirs.add(new File(resource.getFile()));
         }
-        ArrayList<Class> classes = new ArrayList<Class>();
+        ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
         for (File directory : dirs) {
             classes.addAll(findClasses(directory, packageName));
         }
@@ -310,8 +313,8 @@ public class HelloControlsFX extends Application {
      * @return The classes
      * @throws ClassNotFoundException
      */
-    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-        List<Class> classes = new ArrayList<Class>();
+    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<Class<?>>();
         if (!directory.exists()) {
             return classes;
         }

@@ -1,9 +1,10 @@
 package org.controlsfx.samples.dialogs;
 
+import static org.controlsfx.dialog.Dialog.Actions.NO;
+import static org.controlsfx.dialog.Dialog.Actions.YES;
+
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -38,7 +39,6 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
@@ -156,14 +156,12 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink3 = new Button("Show");
         Hyperlink3.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Set<Action> excludedActions = new HashSet<>();
-                if (!cbShowCancel.isSelected()) excludedActions.add(Actions.CANCEL);
                 Action response = configureSampleDialog(
                      Dialogs.create()
                         .title("You do want dialogs right?")
                         .masthead(isMastheadVisible() ? "Just Checkin'" : null)
                         .message( "I was a bit worried that you might not want them, so I wanted to double check."))
-                        .excludeActions(excludedActions)
+                        .actions( !cbShowCancel.isSelected()? new Action[]{YES, NO}: new Action[0])
                     .showConfirm();
 
                 System.out.println("response: " + response);

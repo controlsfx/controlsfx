@@ -304,7 +304,7 @@ public final class Dialogs {
     private String masthead;
     private boolean lightweight;
     private boolean nativeChrome;
-    private Set<Action> excludedActions = new HashSet<>();
+    private Set<Action> actions = new HashSet<>();
 
     /**
      * Creates the initial dialog
@@ -360,16 +360,24 @@ public final class Dialogs {
         return this;
     }
     
-
     /**
-     * Allows for exclusion of a set of dialog actions.
-     * For example, can be used to exclude CANCEL action on confirmation dialog
-     * @param excludedActions
+     * Completely replaces standard actions with provided ones.
+     * @param actions new dialog actions
      * @return dialog instance
      */
-    public Dialogs excludeActions( Set<Action> excludedActions) {
-        this.excludedActions.addAll(excludedActions);
+    public Dialogs actions( Collection<? extends Action> actions) {
+        this.actions.clear();
+        this.actions.addAll(actions);
         return this;
+    }
+    
+    /**
+     * Completely replaces standard actions with provided ones.  
+     * @param actions new dialog actions
+     * @return dialog instance
+     */
+    public Dialogs actions( Action... actions) {
+        return actions( Arrays.asList(actions));
     }
     
     /**
@@ -707,7 +715,10 @@ public final class Dialogs {
 
     private Action showSimpleContentDialog(final Type dlgType) {
         Dialog dlg = buildDialog(dlgType);
-        dlg.getActions().removeAll(excludedActions);
+        if ( !actions.isEmpty()) {
+            dlg.getActions().clear();
+            dlg.getActions().addAll(actions);
+        }
         dlg.setContent(message);
         return dlg.show();
     }

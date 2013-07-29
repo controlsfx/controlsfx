@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,15 +24,11 @@ import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -42,8 +37,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
@@ -56,31 +50,51 @@ import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.skin.SpreadsheetViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
-
-public class SpreadsheetView extends BorderPane{
+/**
+ *
+ *
+ */
+public class SpreadsheetView extends StackPane{
+	
+	/***************************************************************************
+     *                                                                         *
+     * Static Fields                                                           *
+     *                                                                         *
+     **************************************************************************/
+	/**
+	 * Define how this cell is spanning.
+	 */
 	public static enum SpanType {
 
-		NORMAL_CELL, // Normal Cell (visible)
-		COLUMN_INVISIBLE, //Invisible cell spanned in column
-		ROW_INVISIBLE, //Invisible cell spanned in row
-		ROW_VISIBLE,//Visible Cell but has invisible cell below
-		BOTH_INVISIBLE;   //Invisible cell, span in diagonal
+		NORMAL_CELL, 		// Normal Cell (visible)
+		COLUMN_INVISIBLE, 	//Invisible cell spanned in column
+		ROW_INVISIBLE, 		//Invisible cell spanned in row
+		ROW_VISIBLE,		//Visible Cell but has invisible cell below
+		BOTH_INVISIBLE;   	//Invisible cell, span in diagonal
 	}
 
+	/**
+	 * A interface to grant access to some {@link SpreadsheetRow}
+	 * @param <T>
+	 */
 	public static interface RowAccessor<T> {
 		T get(int index);
-
 		boolean isEmpty();
-
 		int size();
 	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 
 	private final SpreadsheetViewInternal<DataRow> spreadsheetViewInternal;
 	private static final String DEFAULT_STYLE_CLASS = "cell-spreadsheet";
 	private final double DEFAULT_CELL_SIZE = 24.0; 	// Height of a cell
-	private DataCell<?> lastEdit = null;
 	private SpreadsheetCell lastHover = null;
 	private Grid grid;
+	private DataFormat fmt;
 	private final double cellPrefWidth = 100;			// Width of a cell
 	private final Map<DataCell.CellType, Editor> editors = FXCollections.observableHashMap();
 	private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
@@ -89,15 +103,101 @@ public class SpreadsheetView extends BorderPane{
 	private final BooleanProperty rowHeader = new SimpleBooleanProperty(true);
 
 	//Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
-	private TreeSet<Integer> visibleRows=null;
 	private VirtualScrollBar hbar=null;
 	private VirtualScrollBar vbar=null;
 	private RowAccessor<SpreadsheetRow> cells=null;
 
-	public SpreadsheetRow getNonFixed(int index){
-		return cells.get(fixedRows.size()+index);
-	}
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	public SpreadsheetView(){
+		super();
+		this.setPadding(new Insets(10, 10, 10, 10));
+		spreadsheetViewInternal = new SpreadsheetViewInternal<>();
 
+		//Add a listener to the selection model in order to edit the spanned cells when clicked
+		setSelectionModel();
+
+		spreadsheetViewInternal.setEditable(true);
+
+		// For keyboard catch
+		setFocusModel();
+
+		// TODO conflict of menu when right-clicking on editor textfield
+		spreadsheetViewInternal.setContextMenu(getSpreadsheetViewContextMenu());
+
+		//Do nothing basically but give access to the Hover Property.
+		spreadsheetViewInternal.setRowFactory(new Callback<TableView<DataRow>, TableRow<DataRow>>() {
+			@Override
+			public TableRow<DataRow> call(TableView<DataRow> p) {
+				return new SpreadsheetRow(SpreadsheetView.this);
+			}
+		});
+
+		
+
+		spreadsheetViewInternal.setFixedCellSize(getDefaultCellSize());
+
+		spreadsheetViewInternal.getStyleClass().add(DEFAULT_STYLE_CLASS);
+		
+		getChildren().add(spreadsheetViewInternal);
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	
+	public void buildSpreadsheetView(Grid grid) {
+		setGrid(grid);
+		
+		if(grid.getRows() != null){
+			final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(grid.getRows());
+			spreadsheetViewInternal.setItems(observableRows);
+	
+	
+			for (int i = 0; i < grid.getColumnCount(); ++i) {
+				final int col = i;
+	
+				final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
+	
+				column.setEditable(true);
+				// We don't want to sort the column
+				column.setSortable(false);
+				
+				column.impl_setReorderable(false);
+				
+				column.setPrefWidth(getCellPrefWidth());
+	
+	
+				// We assign a DataCell for each Cell needed (MODEL).
+				column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
+					@Override
+					public ObservableValue<DataCell<?>> call(TableColumn.CellDataFeatures<DataRow, DataCell<?>> p) {
+						return new ReadOnlyObjectWrapper(p.getValue().getCell(col));
+					}
+				});
+				// We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
+				column.setCellFactory(new Callback<TableColumn<DataRow, DataCell<?>>, TableCell<DataRow, DataCell<?>>>() {
+					@Override
+					public TableCell<DataRow, DataCell<?>> call(TableColumn<DataRow, DataCell<?>> p) {
+						return new SpreadsheetCell();
+					}
+				});
+				getColumns().add(column);
+			}
+		}
+		
+		/** Set the skin in place and give access to the VirtualFlow
+		*   It has to be placed at the end because otherwise UI is responding weirdly 
+		*   (horizontal scrollBar replace at initial position when resizing width
+		*/
+		spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin<>(spreadsheetViewInternal,this));
+	}
+	
 	public VirtualScrollBar getHbar() {
 		return hbar;
 	}
@@ -118,14 +218,6 @@ public class SpreadsheetView extends BorderPane{
 		return cells.get(index);
 	}
 	
-	private boolean containsRow(int index){
-		for (int i =0 ;i<cells.size();++i) {
-			if(cells.get(i).getIndex() == index)
-				return true;
-		}
-		return false;
-	}
-
 	public boolean isEmptyCells() {
 		return cells.isEmpty();
 	}
@@ -141,146 +233,6 @@ public class SpreadsheetView extends BorderPane{
 		return spreadsheetViewInternal.getEditingCell();
 	}
 
-
-
-	public SpreadsheetView(){
-		super();
-		this.setPadding(new Insets(10, 10, 10, 10));
-		spreadsheetViewInternal = new SpreadsheetViewInternal<>();
-
-		buildSpreadsheetView(Grid.GridSpanType.BOTH);
-
-		//Add a listener to the selection model in order to edit the spanned cells when clicked
-		setSelectionModel();
-
-		spreadsheetViewInternal.setEditable(true);
-
-		// For keyboard catch
-		setFocusModel();
-
-		spreadsheetViewInternal.setContextMenu(getSpreadsheetViewContextMenu());
-
-		//Do nothing basically but give access to the Hover Property.
-		spreadsheetViewInternal.setRowFactory(new Callback<TableView<DataRow>, TableRow<DataRow>>() {
-			@Override
-			public TableRow<DataRow> call(TableView<DataRow> p) {
-				return new SpreadsheetRow(SpreadsheetView.this);
-			}
-		});
-
-		// Set the skin in place and give access to the VirtualFlow
-		spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin<>(spreadsheetViewInternal,this));
-
-		spreadsheetViewInternal.setFixedCellSize(getDefaultCellSize());
-
-		spreadsheetViewInternal.getStyleClass().add(DEFAULT_STYLE_CLASS);
-		this.setCenter(spreadsheetViewInternal);
-
-		this.setLeft(buildCommonControlGrid());
-	}
-	
-	
-
-	private void buildSpreadsheetView(Grid.GridSpanType type) {
-		setGrid(new Grid(type));
-		final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(getGrid().getRows());
-		spreadsheetViewInternal.setItems(observableRows);
-
-
-		for (int i = 0; i < getGrid().getColumncount(); ++i) {
-			final int col = i;
-
-			final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
-
-			column.setEditable(true);
-			// We don't want to sort the column
-			column.setSortable(false);
-			
-			column.impl_setReorderable(false);
-			
-			column.setPrefWidth(getCellPrefWidth());
-
-
-			// We assign a DataCell for each Cell needed (MODEL).
-			column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
-				@Override
-				public ObservableValue<DataCell<?>> call(TableColumn.CellDataFeatures<DataRow, DataCell<?>> p) {
-					return new ReadOnlyObjectWrapper(p.getValue().getCell(col));
-				}
-			});
-			// We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
-			column.setCellFactory(new Callback<TableColumn<DataRow, DataCell<?>>, TableCell<DataRow, DataCell<?>>>() {
-				@Override
-				public TableCell<DataRow, DataCell<?>> call(TableColumn<DataRow, DataCell<?>> p) {
-					return new SpreadsheetCell();
-				}
-			});
-			getColumns().add(column);
-		}
-	}
-
-	/**
-	 * Build a common control Grid with some options on the left to control the
-	 * SpreadsheetViewInternal
-	 *
-	 * @param spreadsheetView
-	 * @return
-	 */
-	public GridPane buildCommonControlGrid() {
-		final GridPane grid = new GridPane();
-		grid.setHgap(5);
-		grid.setVgap(5);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-
-		final ChoiceBox<Integer> fixedRows = new ChoiceBox<>(FXCollections.observableArrayList(0, 1, 2));
-		fixedRows.getSelectionModel().select(0);
-		fixedRows.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0,
-					Number arg1, Number arg2) {
-				fixRows(arg2.intValue());
-			}
-		});
-
-		final ChoiceBox<Integer> fixedColumns = new ChoiceBox<>(FXCollections.observableArrayList(0, 1, 2));
-		fixedColumns.getSelectionModel().select(0);
-		fixedColumns.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				fixColumns(arg2.intValue());
-			}
-		});
-
-		final CheckBox rowHeader = new CheckBox("Row Header");
-		rowHeader.setSelected(true);
-		rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0,
-					Boolean arg1, Boolean arg2) {
-				setRowHeader(arg2);
-			}
-		});
-
-		final CheckBox columnHeader = new CheckBox("Column Header");
-		columnHeader.setSelected(true);
-		columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
-
-			@Override
-			public void changed(
-					ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				setColumnHeader(arg2);
-			}
-		});
-		grid.add(new Label("Freeze Rows:"), 1, 1);
-		grid.add(fixedRows, 1, 2);
-		grid.add(new Label("Freeze Columns:"), 1, 3);
-		grid.add(fixedColumns, 1, 4);
-		grid.add(rowHeader, 1, 5);
-		grid.add(columnHeader, 1, 6);
-
-		return grid;
-	}
 	public double getCellPrefWidth() {
 		return cellPrefWidth;
 	}
@@ -296,6 +248,10 @@ public class SpreadsheetView extends BorderPane{
 		columnHeader.setValue(b);
 		columnHeader.get();//For invalidation Listener to react again
 	}
+	
+	public BooleanProperty getColumnHeader() {
+		return columnHeader;
+	}
 
 	/**
 	 * Activate and desactivate the Column Header
@@ -308,15 +264,7 @@ public class SpreadsheetView extends BorderPane{
 	public BooleanProperty getRowHeader() {
 		return rowHeader;
 	}
-	public BooleanProperty getColumnHeader() {
-		return columnHeader;
-	}
-	public ObservableList<Integer> getFixedRows() {
-		return fixedRows;
-	}
-	public ObservableList<Integer> getFixedColumns() {
-		return fixedColumns;
-	}
+	
 	/**
 	 * Fix the first "numberOfFixedRows" at the top.
 	 * @param numberOfFixedRows
@@ -328,7 +276,11 @@ public class SpreadsheetView extends BorderPane{
 			getFixedRows().add(j);
 		}
 	}
-
+	
+	public ObservableList<Integer> getFixedRows() {
+		return fixedRows;
+	}
+	
 	/**
 	 * Fix the first "numberOfFixedRows" on the left.
 	 * @param numberOfFixedColumns
@@ -340,6 +292,10 @@ public class SpreadsheetView extends BorderPane{
 			getFixedColumns().add(j);
 		}
 	}
+	
+	public ObservableList<Integer> getFixedColumns() {
+		return fixedColumns;
+	}
 
 	public boolean addCell(SpreadsheetCell cell){
 		SpreadsheetRow temp = getRow(cells.size()-1-fixedRows.size());
@@ -350,20 +306,17 @@ public class SpreadsheetView extends BorderPane{
 		return false;
 		
 	}
-	public ObservableList<? extends TableColumnBase> getVisibleLeafColumns() {
-		return spreadsheetViewInternal.getVisibleLeafColumns();
-	}
 
 	public DoubleProperty fixedCellSizeProperty() {
 		return spreadsheetViewInternal.fixedCellSizeProperty();
 	}
 
-	public ObservableList getItems() {
+	public ObservableList<DataRow> getItems() {
 		return spreadsheetViewInternal.getItems();
 	}
 
 	/**
-	 * Return the SpanType of a cell.
+	 * Return the {@link SpanType} of a cell.
 	 * @param row
 	 * @param column
 	 * @return
@@ -400,8 +353,8 @@ public class SpreadsheetView extends BorderPane{
 		}
 	}
 
-	public SpreadsheetViewSelectionModel getSelectionModel() {
-		return (SpreadsheetViewSelectionModel) spreadsheetViewInternal.getSelectionModel();
+	public SpreadsheetViewSelectionModel<DataRow> getSelectionModel() {
+		return (SpreadsheetViewSelectionModel<DataRow>) spreadsheetViewInternal.getSelectionModel();
 	}
 
 	public ObservableList<TableColumn<DataRow,?>> getColumns() {
@@ -415,14 +368,24 @@ public class SpreadsheetView extends BorderPane{
 		return DEFAULT_CELL_SIZE;
 	}
 
-	DataCell<?> getLastEdit() {
-		return lastEdit;
+	/***************************************************************************
+     *                                                                         *
+     * Private/Protected Implementation                                                  *
+     *                                                                         *
+     **************************************************************************/   
+	
+	private SpreadsheetRow getNonFixed(int index){
+		return cells.get(fixedRows.size()+index);
 	}
 
-	void setLastEdit( DataCell<?> cell){
-		lastEdit = cell;
+	private boolean containsRow(int index){
+		for (int i =0 ;i<cells.size();++i) {
+			if(cells.get(i).getIndex() == index)
+				return true;
+		}
+		return false;
 	}
-
+	
 	/**
 	 * A SpreadsheetCell is being hovered and we need to re-route the signal.
 	 *
@@ -451,7 +414,7 @@ public class SpreadsheetView extends BorderPane{
 	/**
 	 * Set Hover to false to the previous Cell we force to be hovered
 	 */
-	public void unHoverGridCell() {
+	void unHoverGridCell() {
 		//If the top of the spanned cell is visible, then no problem
 		if(lastHover != null){
 			lastHover.setHoverPublic(false);
@@ -467,7 +430,7 @@ public class SpreadsheetView extends BorderPane{
 	 * @param bc The SpreadsheetCell
 	 * @return
 	 */
-	public Editor getEditor(DataCell<?> cell, SpreadsheetCell bc) {
+	Editor getEditor(DataCell<?> cell, SpreadsheetCell bc) {
 		Editor editor = editors.get(cell.getCellType());
 		if (editor == null) {
 			switch (cell.getCellType()) {
@@ -491,16 +454,14 @@ public class SpreadsheetView extends BorderPane{
 			}
 		}
 		editor.begin(cell, bc, this);
-		// We store the lastEditing cell
-		setLastEdit(((DataRow)this.getItems().get(cell.getRow())).getCell(cell.getColumn()));
 		return editor;
 	}
 
-	public Grid getGrid(){
+	private Grid getGrid(){
 		return grid;
 	}
 
-	public void setGrid(Grid grid) {
+	private void setGrid(Grid grid) {
 		this.grid = grid;
 
 	}
@@ -510,7 +471,7 @@ public class SpreadsheetView extends BorderPane{
 	 * @param number
 	 * @return
 	 */
-	public String getEquivColumn(int number){
+	private String getEquivColumn(int number){
 		String converted = "";
 		// Repeatedly divide the number by 26 and convert the
 		// remainder into the appropriate letter.
@@ -523,12 +484,12 @@ public class SpreadsheetView extends BorderPane{
 
 		return converted;
 	}
+	
 	/***************************************************************************
 	 * 						COPY PASTE METHODS
 	 **************************************************************************/
-	DataFormat fmt;
 
-	public void checkFormat(){
+	private void checkFormat(){
 		if((fmt = DataFormat.lookupMimeType("shuttle"))== null){
 			fmt = new DataFormat("shuttle");
 		}
@@ -589,7 +550,7 @@ public class SpreadsheetView extends BorderPane{
 			final ArrayList<DataCell<?>> list = (ArrayList<DataCell<?>>) clipboard.getContent(fmt);
 			//TODO algorithm very bad
 			int minRow=grid.getRowCount();
-			int minCol=grid.getColumncount();
+			int minCol=grid.getColumnCount();
 			int maxRow=0;
 			int maxCol=0;
 			for (final DataCell<?> p : list) {
@@ -620,7 +581,7 @@ public class SpreadsheetView extends BorderPane{
 			for (final DataCell<?> row1 : list) {
 				row = row1.getRow();
 				column = row1.getColumn();
-				if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumncount()
+				if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()
 						&& row+offsetRow >= 0 && column+offsetCol >=0 ){
 					final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
 					if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
@@ -1723,9 +1684,7 @@ public class SpreadsheetView extends BorderPane{
 				itemCount = items == null ? -1 : items.size();
 			}
 		}
-		/*****************************************************************
-		 * 				MODIFIED BY NELLARMONIA
-		 *****************************************************************/
+
 		/**
 		 * A list of Integer with the current selected Rows. This is useful for columnheader and
 		 * RowHeader because they need to highligh when a selection is made.

@@ -44,45 +44,44 @@ import org.controlsfx.control.spreadsheet.skin.SpreadsheetRowSkin;
  */
 public class SpreadsheetRow extends TableRow<DataRow>{
 
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private final SpreadsheetView spreadsheetView;
-
-	public SpreadsheetView getSpreadsheetView() {
-		return spreadsheetView;
-	}
-
-	public SpreadsheetRow(SpreadsheetView spreadsheetView) {
-		super();
-		this.spreadsheetView = spreadsheetView;
-	}
-
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new SpreadsheetRowSkin<>(this,spreadsheetView);
-	}
 	/**
 	 * This is the index used by the VirtualFlow
 	 * So the row can be with indexVirtualFlow at 32
 	 * But if it is situated in the header, his index will be 0 (or the row in the header)
 	 */
 	private Integer indexVirtualFlow = null;
-
 	private boolean layoutFixedColumns = false;
 
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	public SpreadsheetRow(SpreadsheetView spreadsheetView) {
+		super();
+		this.spreadsheetView = spreadsheetView;
+	}
 
-
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	
 	public int getIndexVirtualFlow(){
 		return indexVirtualFlow == null?getIndex():indexVirtualFlow;
 	}
+	
 	public void setIndexVirtualFlow(int i){
 		indexVirtualFlow = i;
 	}
-	/**
-	 * Set this SpreadsheetRow hoverProperty
-	 * @param hover
-	 */
-	public void setHoverPublic(boolean hover) {
-		this.setHover(hover);
-	}
+	
 	/**
 	 * For the fixed columns in order to just re-layout the fixed columns
 	 * @param b
@@ -95,25 +94,6 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 		return layoutFixedColumns;
 	}
 
-	/**
-	 * Return the SpreadsheetCell at the specified column.
-	 * We have to be careful because if we have fixedColumns
-	 * then the fixedColumns cells will be at the end of the Children's List
-	 * @param col
-	 * @return the corresponding SpreadsheetCell
-	 */
-	public SpreadsheetCell getGridCell(int col){
-		int fixedColSize;
-		if((fixedColSize =spreadsheetView.getFixedColumns().size() ) != 0){
-			if(col < fixedColSize){
-				return (SpreadsheetCell) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - fixedColSize + col);
-			} else {
-				return (SpreadsheetCell) getChildrenUnmodifiable().get( col- fixedColSize );
-			}
-		}else{
-			return (SpreadsheetCell) getChildrenUnmodifiable().get(col);
-		}
-	}
 	/**
 	 * When unfixing some Columns, we need to put the previously FixedColumns back
 	 * if we want the hover to be dealt correctly
@@ -143,12 +123,56 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 		getChildren().setAll(tset);
 	}
 
+	
 	public void addCell(SpreadsheetCell cell){
 		getChildren().add(cell);
 	}
 
 	public void removeCell(SpreadsheetCell gc) {
 		getChildren().remove(gc);
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Protected Methods                                                       *
+     *                                                                         *
+     **************************************************************************/
+	
+	SpreadsheetView getSpreadsheetView() {
+		return spreadsheetView;
+	}
+	
+	/**
+	 * Set this SpreadsheetRow hoverProperty
+	 * @param hover
+	 */
+	protected void setHoverPublic(boolean hover) {
+		this.setHover(hover);
+	}
+	
+	/**
+	 * Return the SpreadsheetCell at the specified column.
+	 * We have to be careful because if we have fixedColumns
+	 * then the fixedColumns cells will be at the end of the Children's List
+	 * @param col
+	 * @return the corresponding SpreadsheetCell
+	 */
+	SpreadsheetCell getGridCell(int col){
+		int fixedColSize;
+		if((fixedColSize =spreadsheetView.getFixedColumns().size() ) != 0){
+			if(col < fixedColSize){
+				return (SpreadsheetCell) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - fixedColSize + col);
+			} else {
+				return (SpreadsheetCell) getChildrenUnmodifiable().get( col- fixedColSize );
+			}
+		}else{
+			return (SpreadsheetCell) getChildrenUnmodifiable().get(col);
+		}
+	}
+	
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new SpreadsheetRowSkin<>(this,spreadsheetView);
 	}
 
 }

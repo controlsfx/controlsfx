@@ -48,15 +48,24 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 
 /**
  *
- * Specialization of the Editor Class.
- * It displays a comboBox (list) where the user can choose a value.
+ * Specialization of the {@link Editor} Class.
+ * It displays a {@link ComboBox} where the user can choose a value.
  */
 public class ListEditor extends Editor {
 
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private final ComboBox<String> cb;
 	private ChangeListener<Number> cl;
-	private InvalidationListener cl2;
 
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
 	public ListEditor() {
 		cb = new ComboBox<String>();
 		cb.setVisibleRowCount(3);
@@ -82,11 +91,38 @@ public class ListEditor extends Editor {
 		});
 	}
 
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	
 	@Override
-	public void begin(DataCell<?> cell, SpreadsheetCell gc) {
+	public void startEdit() {
+		super.startEdit();
+		
+		gc.setGraphic(cb);
+		
+		final Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				cb.requestFocus();
+			}
+		};
+		Platform.runLater(r);
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Protected Methods                                                       *
+     *                                                                         *
+     **************************************************************************/
+	@Override
+	protected void begin(DataCell<?> cell, SpreadsheetCell gc) {
 		if (gc != null) {
 			this.cell = cell;
 			this.gc = gc;
+			@SuppressWarnings("unchecked")
 			final List<String> temp = (List<String>) cell.getCellValue();
 			final ObservableList<String> temp2 = FXCollections.observableList(temp);
 			cb.setItems(temp2);
@@ -100,21 +136,21 @@ public class ListEditor extends Editor {
 	}
 
 	@Override
-	public void end() {
+	protected void end() {
 		super.end();
 		
 		cb.getSelectionModel().selectedIndexProperty().removeListener(cl);
 		cb.setOnKeyPressed(null);
-		gc.selectedProperty().removeListener(cl2);
+		gc.selectedProperty().removeListener(il);
 		
 		this.cell = null;
 		this.gc = null;
 		cl = null;
-		cl2 = null;
+		il = null;
 	}
 
 	@Override
-	public DataCell<?> commitEdit() {
+	protected DataCell<?> commitEdit() {
 		if (cb.getSelectionModel().getSelectedIndex() != -1) {
 			this.cell.setStr(cb.getItems().get(cb.getSelectionModel().getSelectedIndex()));
 		}
@@ -122,17 +158,17 @@ public class ListEditor extends Editor {
 	}
 
 	@Override
-	public void cancelEdit() {
+	protected void cancelEdit() {
 		end();
 	}
 
 	@Override
-	public Control getControl() {
+	protected Control getControl() {
 		return cb;
 	}
 
 	@Override
-	public void attachEnterEscapeEventHandler() {
+	protected void attachEnterEscapeEventHandler() {
 		cl = new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
@@ -151,7 +187,7 @@ public class ListEditor extends Editor {
 				}
 			}
 		});
-		cl2 = new InvalidationListener() {
+		il = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable observable) {
 				if (gc != null && gc.isEditing()) {
@@ -161,25 +197,6 @@ public class ListEditor extends Editor {
 				end();
 			}
 		};
-		gc.selectedProperty().addListener(cl2);
-	}
-
-	@Override
-	public void startEdit() {
-		super.startEdit();
-		
-		gc.setGraphic(cb);
-		
-		final Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				cb.requestFocus();
-			}
-		};
-		Platform.runLater(r);
-	}
-
-	public void show() {
-		cb.show();
+		gc.selectedProperty().addListener(il);
 	}
 }

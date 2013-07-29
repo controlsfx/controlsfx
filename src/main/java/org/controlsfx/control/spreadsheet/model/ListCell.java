@@ -26,31 +26,47 @@
  */
 package org.controlsfx.control.spreadsheet.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * Specialization of the DataCell class.
- * It holds a list of value.
+ * Specialization of the {@link DataCell} class.
+ * It holds a list of {@link String}.
  */
 public final class ListCell extends DataCell<List<String>>{
-	/**
-	 * 
-	 */
+	
+	/***************************************************************************
+     *                                                                         *
+     * Static Fields                                                           *
+     *                                                                         *
+     **************************************************************************/
 	private static final long serialVersionUID = -1003136076165430609L;
+	
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private List<String> value;
-	public ListCell(int r, int c, int rs, int cs){
+	
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	public ListCell(int r, int c, int rs, int cs,List<String> value ){
 		super(r, c, rs, cs);
 		this.type= CellType.ENUM;
-		final ArrayList<String> temp = new ArrayList<>();
-		temp.add("temp");
-		temp.add("temp2");
-		temp.add("temp3");
-		this.value = temp;
-		str = this.value.get(0);
+		this.value = value;
+		
+		str = value.size() > 0 ? this.value.get((int) (Math.random() * value.size())) : "";
 	}
 
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 	@Override
 	public void setCellValue(List<String> value) {
 		this.value = value;

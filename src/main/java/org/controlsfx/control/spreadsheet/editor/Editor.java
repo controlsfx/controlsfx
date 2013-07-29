@@ -39,49 +39,40 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 
 /**
  *
- * Mother Class for all the possible editors displayed in the Cells.
+ * Mother Class for all the possible editors displayed in the {@link SpreadsheetCell}.
  * It reacts to all the possible events in order to submit or cancel the
  * displayed editor or the value entered.
  */
 public abstract class Editor{
+	/***************************************************************************
+     *                                                                         *
+     * Protected/Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	protected DataCell<?> cell;
 	protected SpreadsheetCell gc;
 	protected SpreadsheetView spreadsheetView;
 	private SpreadsheetRow original;
 	private boolean isMoved;
-	private InvalidationListener il;
+	private InvalidationListener editorListener;
+	protected InvalidationListener il;
 
-	public abstract void attachEnterEscapeEventHandler();
-
-	public abstract void begin(DataCell<?> cell, SpreadsheetCell bc);
-
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	/**
+	 * Initialization of the Editor
+	 * @param cell
+	 * @param bc
+	 * @param t
+	 */
 	public void begin(DataCell<?> cell, SpreadsheetCell bc, SpreadsheetView t){
 		this.spreadsheetView = t;
 		begin(cell, bc);
 	}
-
-	public abstract void cancelEdit();
-
-	public abstract DataCell<?> commitEdit();
-
-	/**
-	 * When we have finish editing. We put the cell back to its right TableRow.
-	 */
-	public void end(){
-		if(cell.getRowSpan() >1){
-			gc.setTranslateY(0);
-			if(isMoved){
-				original.addCell(gc);
-				original.putFixedColumnToBack();
-			}
-		}
-		spreadsheetView.getVbar().valueProperty().removeListener(il);
-		il = null;
-		
-	}
-
-	public abstract Control getControl();
-
+	
 	/**
 	 * In case the cell is spanning in rows.
 	 * We want the cell to be fully accessible so we need to remove it from its tableRow
@@ -102,7 +93,7 @@ public abstract class Editor{
 		}
 		
 		//In ANY case, we stop when something move in scrollBar Vertical
-		il = new InvalidationListener() {
+		editorListener = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable arg0) {
 				commitEdit();
@@ -110,7 +101,41 @@ public abstract class Editor{
 				end();
 			}
 		};
-		spreadsheetView.getVbar().valueProperty().addListener(il);
+		spreadsheetView.getVbar().valueProperty().addListener(editorListener);
+	}
+	/***************************************************************************
+     *                                                                         *
+     * Protected Methods                                                       *
+     *                                                                         *
+     **************************************************************************/
+	/**
+	 * When we have finish editing. We put the cell back to its right TableRow.
+	 */
+	protected void end(){
+		if(cell.getRowSpan() >1){
+			gc.setTranslateY(0);
+			if(isMoved){
+				original.addCell(gc);
+				original.putFixedColumnToBack();
+			}
+		}
+		spreadsheetView.getVbar().valueProperty().removeListener(editorListener);
+		editorListener = null;
+		
 	}
 
+	/***************************************************************************
+     *                                                                         *
+     * Protected Abstract Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	protected abstract void attachEnterEscapeEventHandler();
+
+	protected abstract void begin(DataCell<?> cell, SpreadsheetCell bc);
+
+	protected abstract void cancelEdit();
+
+	protected abstract DataCell<?> commitEdit();
+
+	protected abstract Control getControl();
 }

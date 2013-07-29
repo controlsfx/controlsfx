@@ -42,18 +42,28 @@ import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetVie
 
 
 /**
- * Display a rowHeader, aka, the number of the lines displayed on screen.
+ * Display a rowHeader, the index of the lines displayed on screen.
  */
 public class RowHeader  extends StackPane {
 
-
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private final SpreadsheetViewSkin<?> spreadsheetViewSkin;
 	private final SpreadsheetView spreadsheetView;
 	private double prefHeight;
 	private double prefWidth;
-	private   Boolean working = true; // Whether or not we are showing the RowHeader
+	private Boolean working = true; // Whether or not we are showing the RowHeader
 	private SpreadsheetViewSelectionModel<?> selectionModel;
-
+	private Rectangle clip; // Ensure that children do not go out of bounds
+	
+	/***************************************************************************
+     *                                                                         *
+     * Listeners                                                          	   *
+     *                                                                         *
+     **************************************************************************/
 	private final InvalidationListener layout =  new InvalidationListener() {
 		@Override
 		public void invalidated(Observable arg0) {
@@ -67,7 +77,7 @@ public class RowHeader  extends StackPane {
 		}
 	};
 
-	Rectangle clip; // Ensure that children do not go out of bounds
+	
 
 	/******************************************************************
 	 * 								CONSTRUCTOR
@@ -81,37 +91,41 @@ public class RowHeader  extends StackPane {
 		prefWidth = rowHeaderWidth;
 	}
 	
-	public void init(){
-		
-				prefHeight = spreadsheetViewSkin.spreadsheetView.getDefaultCellSize();
-				selectionModel = spreadsheetView.getSelectionModel();
+	/***************************************************************************
+     *                                                                         *
+     * Private/Protected Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	void init(){
+		prefHeight = spreadsheetViewSkin.spreadsheetView.getDefaultCellSize();
+		selectionModel = spreadsheetView.getSelectionModel();
 
-				//Clip property to stay within bounds
-				clip = new Rectangle(prefWidth, snapSize(spreadsheetViewSkin.getSkinnable().getHeight()));
-				clip.relocate(snappedTopInset(), snappedLeftInset());
-				clip.setSmooth(false);
-				clip.heightProperty().bind(spreadsheetViewSkin.getSkinnable().heightProperty());
-				RowHeader.this.setClip(clip);
+		//Clip property to stay within bounds
+		clip = new Rectangle(prefWidth, snapSize(spreadsheetViewSkin.getSkinnable().getHeight()));
+		clip.relocate(snappedTopInset(), snappedLeftInset());
+		clip.setSmooth(false);
+		clip.heightProperty().bind(spreadsheetViewSkin.getSkinnable().heightProperty());
+		RowHeader.this.setClip(clip);
 
-				// We desactivate and activate the rowheader upon request
-				spreadsheetView.getRowHeader().addListener(new ChangeListener<Boolean>(){
-					@Override
-					public void changed(ObservableValue<? extends Boolean> arg0,
-							Boolean arg1, Boolean arg2) {
-						working = arg2;
-						requestLayout();
-					}});
-
-				// When the Column header is showing or not, we need to update the position of the rowHeader
-				spreadsheetView.getColumnHeader().addListener(layout);
-
-				spreadsheetView.getFixedRows().addListener(layout);
-				//In case we resize the view in any manners
-				spreadsheetView.heightProperty().addListener(layout);
-
-				// For layout properly the rowHeader when there are some selected items
-				selectionModel.getSelectedRows().addListener(layout);
+		// We desactivate and activate the rowheader upon request
+		spreadsheetView.getRowHeader().addListener(new ChangeListener<Boolean>(){
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0,
+					Boolean arg1, Boolean arg2) {
+				working = arg2;
 				requestLayout();
+			}});
+
+		// When the Column header is showing or not, we need to update the position of the rowHeader
+		spreadsheetView.getColumnHeader().addListener(layout);
+
+		spreadsheetView.getFixedRows().addListener(layout);
+		//In case we resize the view in any manners
+		spreadsheetView.heightProperty().addListener(layout);
+
+		// For layout properly the rowHeader when there are some selected items
+		selectionModel.getSelectedRows().addListener(layout);
+		requestLayout();
 			
 	}
 
@@ -204,7 +218,7 @@ public class RowHeader  extends StackPane {
 	/**
 	 * Called when value of vertical scrollbar change
 	 */
-	public void updateScrollY() {
+	void updateScrollY() {
 		if(working) {
 			requestLayout();
 		}
@@ -217,15 +231,13 @@ public class RowHeader  extends StackPane {
 	 * @return
 	 */
 	private Label getLabel(int rowNumber){
-		if(getChildren().isEmpty() || getChildren().size()<=rowNumber){//pile.isEmpty() || pile.size() <= rowNumber){
+		if(getChildren().isEmpty() || getChildren().size()<=rowNumber){
 			final Label label = new Label();
 			label.resize(prefWidth,prefHeight);
-			//pile.add(label);
 			getChildren().add(label);
 			return label;
 		}else{
 			return (Label) getChildren().get(rowNumber);
-			//return pile.get(rowNumber);
 		}
 	}
 

@@ -32,94 +32,33 @@ import org.controlsfx.control.spreadsheet.model.DateCell;
 
 /**
  *
- * Specialization of the Editor Class.
- * It displays a textEditor (textField) where the user can type a different value.
+ * Specialization of the {@link Editor} Class.
+ * It displays a {@link DatePicker}.
  */
 public class DateEditor extends Editor {
 
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private final DatePicker datePicker;
-	protected InvalidationListener il;
-	protected EventHandler<KeyEvent> eh;
+	private EventHandler<KeyEvent> eh;
 
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
 	public DateEditor() {
 		datePicker = new DatePicker();
 	}
 
-	@Override
-	public void begin(DataCell<?> cell, SpreadsheetCell bc) {
-		this.cell = cell;
-		this.gc = bc;
-		final DateCell dc = (DateCell) cell;
-		datePicker.setValue(dc.getCellValue());
-	}
-
-	@Override
-	public void end() {
-		super.end();
-		
-		if(gc != null) {
-			gc.selectedProperty().removeListener(il);
-		}
-		
-		if(datePicker.isShowing()){
-			datePicker.hide();
-		}
-		
-		datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
-		this.cell = null;
-		this.gc = null;
-		il = null;
-	}
-
-	@Override
-	public DataCell<?> commitEdit() {
-		final DateCell temp = (DateCell) this.cell;
-
-		temp.setCellValue(datePicker.getValue());
-		return cell;
-	}
-
-	@Override
-	public void cancelEdit() {
-		end();
-	}
-
-	@Override
-	public Control getControl() {
-		return datePicker;
-	}
-
-	@Override
-	public void attachEnterEscapeEventHandler() {
-		/**
-		 * We need to add an EventFilter because otherwise the DatePicker
-		 * will block "escape" and "enter".
-		 * But when "enter" is hit, we need to runLater the commit because
-		 * the value has not yet hit the DatePicker itself.
-		 */
-		eh = new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent t) {
-				if (t.getCode() == KeyCode.ENTER) {
-					final Runnable r = new Runnable() {
-						@Override
-						public void run() {
-							commitEdit();
-							gc.commitEdit(cell);
-							end();
-						}
-					};
-					Platform.runLater(r);
-				} else if (t.getCode() == KeyCode.ESCAPE) {
-					gc.cancelEdit();
-					cancelEdit();
-				}
-			}
-		};
-
-		datePicker.addEventFilter(KeyEvent.KEY_PRESSED,eh);
-	}
-
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 	@Override
 	public void startEdit() {
 		super.startEdit();
@@ -152,5 +91,85 @@ public class DateEditor extends Editor {
 			}
 		};
 		Platform.runLater(r);
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Protected Methods                                                       *
+     *                                                                         *
+     **************************************************************************/
+	@Override
+	protected void begin(DataCell<?> cell, SpreadsheetCell bc) {
+		this.cell = cell;
+		this.gc = bc;
+		final DateCell dc = (DateCell) cell;
+		datePicker.setValue(dc.getCellValue());
+	}
+
+	@Override
+	protected void end() {
+		super.end();
+		
+		if(gc != null) {
+			gc.selectedProperty().removeListener(il);
+		}
+		
+		if(datePicker.isShowing()){
+			datePicker.hide();
+		}
+		
+		datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
+		this.cell = null;
+		this.gc = null;
+		il = null;
+	}
+
+	@Override
+	protected DataCell<?> commitEdit() {
+		final DateCell temp = (DateCell) this.cell;
+
+		temp.setCellValue(datePicker.getValue());
+		return cell;
+	}
+
+	@Override
+	protected void cancelEdit() {
+		end();
+	}
+
+	@Override
+	protected Control getControl() {
+		return datePicker;
+	}
+
+	@Override
+	protected void attachEnterEscapeEventHandler() {
+		/**
+		 * We need to add an EventFilter because otherwise the DatePicker
+		 * will block "escape" and "enter".
+		 * But when "enter" is hit, we need to runLater the commit because
+		 * the value has not yet hit the DatePicker itself.
+		 */
+		eh = new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent t) {
+				if (t.getCode() == KeyCode.ENTER) {
+					final Runnable r = new Runnable() {
+						@Override
+						public void run() {
+							commitEdit();
+							gc.commitEdit(cell);
+							end();
+						}
+					};
+					Platform.runLater(r);
+				} else if (t.getCode() == KeyCode.ESCAPE) {
+					gc.cancelEdit();
+					cancelEdit();
+				}
+			}
+		};
+
+		datePicker.addEventFilter(KeyEvent.KEY_PRESSED,eh);
 	}
 }

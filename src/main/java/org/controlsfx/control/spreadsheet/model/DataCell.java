@@ -37,9 +37,11 @@ import java.io.Serializable;
  */
 public abstract class DataCell<T> implements Serializable{
 
-	/**
-	 * 
-	 */
+	/***************************************************************************
+     *                                                                         *
+     * Static Fields                                                           *
+     *                                                                         *
+     **************************************************************************/
 	private static final long serialVersionUID = -7648169794403402662L;
 
 	public static enum CellType {
@@ -50,48 +52,51 @@ public abstract class DataCell<T> implements Serializable{
 		DATE,
 		SPLITTER;
 	}
-	protected String styleCss;
-
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
+	private String styleCss;
 
 	protected CellType type;
 	protected String str;
-
+	private int row, column, rowSpan, columnSpan;
+	
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	
+	public DataCell(int r, int c, int rs, int cs) {
+		row = r;
+		column = c;
+		rowSpan = rs;
+		columnSpan = cs;
+		str="";
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	
 	public void setStr(String str) {
 		this.str = str;
-		//		setStyleCss("cell_modified");
 	}
 
 	public String getStr() {
 		return str;
 	}
-	private int row, column, rowSpan, columnSpan;
-
+	
 	public abstract void setCellValue(T value);
 
 	public abstract T getCellValue();
 
 	public CellType getCellType() {
 		return type;
-	}
-
-	public void setCellType(CellType type) {
-		if(this.type != null && !this.type.equals(CellType.SPLITTER)){
-			if(type.equals(CellType.READ_ONLY)){
-				this.setStyleCss("fixed");
-			}else if(type.equals(CellType.SPLITTER)){
-				this.setStyleCss("splitter");
-			}
-			this.type = type;
-		}
-	}
-
-	public DataCell(int r, int c, int rs, int cs) {
-		super();
-		row = r;
-		column = c;
-		rowSpan = rs;
-		columnSpan = cs;
-		str="";
 	}
 
 	@Override
@@ -103,16 +108,8 @@ public abstract class DataCell<T> implements Serializable{
 		return row;
 	}
 
-	public void setRow(int row) {
-		this.row = row;
-	}
-
 	public int getColumn() {
 		return column;
-	}
-
-	public void setColumn(int column) {
-		this.column = column;
 	}
 
 	public int getRowSpan() {
@@ -130,6 +127,7 @@ public abstract class DataCell<T> implements Serializable{
 	public void setColumnSpan(int columnSpan) {
 		this.columnSpan = columnSpan;
 	}
+	
 	public String getStyleCss() {
 		return styleCss;
 	}
@@ -138,6 +136,10 @@ public abstract class DataCell<T> implements Serializable{
 		this.styleCss = style;
 	}
 
+	/**
+	 * @param cell
+	 * @return
+	 */
 	public boolean equals(DataCell<?> cell){
 		if(cell != null && cell.getRow() == row && cell.getColumn() == column && cell.getStr().equals(str)) {
 			return true;

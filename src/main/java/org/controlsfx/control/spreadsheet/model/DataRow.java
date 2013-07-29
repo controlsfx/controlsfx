@@ -31,22 +31,37 @@ import java.util.ArrayList;
 
 /**
  *
- * The model row that holds the model cells. It is used by the view
- * to get access to the different cells.
+ * The model row that holds the {@link DataCell}. It is used by the view
+ * to get access to the different {@link DataCell}.
  */
 public class DataRow {
+	
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private final int rowNumber;
 	private final ArrayList<DataCell<?>> list;
 
-	public int getRowNumber() {
-		return rowNumber;
-	}
-
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
 	public DataRow(int rowNumber, int columnCount) {
 		this.rowNumber = rowNumber;
 		list = new ArrayList<>(columnCount);
 	}
 
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	public int getRowNumber() {
+		return rowNumber;
+	}
 	public void add(DataCell<?> cell){
 		list.add(cell);
 	}

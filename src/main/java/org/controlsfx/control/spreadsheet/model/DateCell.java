@@ -21,23 +21,42 @@ import java.time.format.DateTimeFormatter;
 
 /**
  *
- * Specialization of the DataCell class.
- * It holds a String.
+ * Specialization of the {@link DataCell} class.
+ * It holds a {@link LocalDate}
  */
 public class DateCell extends DataCell<LocalDate> {
-	/**
-	 * 
-	 */
+	
+	/***************************************************************************
+     *                                                                         *
+     * Static Fields                                                           *
+     *                                                                         *
+     **************************************************************************/
 	private static final long serialVersionUID = -1711498694430990374L;
 
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private LocalDate value;
 
-	public DateCell(int r, int c, int rs, int cs) {
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	public DateCell(int r, int c, int rs, int cs, LocalDate value) {
 		super(r, c, rs, cs);
 		this.type = CellType.DATE;
-		this.setCellValue(LocalDate.now().plusDays((int)(Math.random()*10)));
+		this.setCellValue(value);
 	}
 
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	
 	@Override
 	public void setCellValue(LocalDate value) {
 		this.value = value;

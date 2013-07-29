@@ -28,6 +28,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 	 * We need to add the remaining in the addTrailingCell
 	 */
 	private int cellFixedAdded;
+	boolean cellIndexCall = false;
 	
 //	double scrollY = 0;
 	public VirtualFlowSpreadsheet(){
@@ -81,7 +82,9 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 
 	@Override
 	public double adjustPixels(final double delta) {
+		 cellIndexCall = true;
 		final double returnValue = super.adjustPixels(delta);
+		 cellIndexCall = false;
 		/*int diff = (int) Math.ceil(Math.abs((scrollY - getVbar().getValue()))*getCellCount());
 		scrollY = getVbar().getValue();
 		if(diff>10){
@@ -91,10 +94,16 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 		}*/
 		layoutTotal();
 		layoutFixedRows();
-
+		
 		return returnValue;
 	}
 
+	 protected T getAvailableCell(int prefIndex) {
+		 cellIndexCall = true;
+		 T tmp = super.getAvailableCell(prefIndex);
+		 cellIndexCall = false;
+		 return tmp;
+	 }
 	/**
 	 * Layout the fixed rows to position them correctly
 	 */
@@ -166,18 +175,17 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 	protected int getCellIndex(T cell){
 		// We need to act differently upon cases, so this is BAD programming
 		// But it's the only option right now
-		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		if(cellIndexCall){
+		/*StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 		if(stackTraceElements.length >= 3 && 
-				(stackTraceElements[2].getMethodName().equals("getAvailableCell")
-						|| stackTraceElements[2].getMethodName().contains("adjustPixels")) ){
+				("getAvailableCell".equals(stackTraceElements[2].getMethodName())
+						|| stackTraceElements[2].getMethodName().contains("adjustPixels")) ){*/
 			return cell.getIndex();
+		}else{
+			return ((SpreadsheetRow)cell).getIndexVirtualFlow();
 		}
-		
-		
-		
-		return ((SpreadsheetRow)cell).getIndexVirtualFlow();
 	}
-
+	
 	/**
 	 * The list of Columns fixed.It only contains the
 	 * number of the colums, sorted.

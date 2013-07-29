@@ -41,74 +41,33 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 
 /**
  *
- * Specialization of the Editor Class.
- * It displays a textEditor (textField) where the user can type a different value.
+ * Specialization of the {@link Editor} Class.
+ * It displays a {@link TextField} where the user can type a different value.
  */
 public class TextEditor extends Editor {
 
+	/***************************************************************************
+     *                                                                         *
+     * Private Fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	private final TextField tf;
-	protected InvalidationListener il;
-	
 
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
 	public TextEditor() {
 		tf = new TextField();
 		tf.setPrefHeight(20);
 	}
 
-	@Override
-	public void begin(DataCell<?> cell, SpreadsheetCell bc) {
-		this.cell = cell;
-		this.gc = bc;
-		tf.setText(cell.getStr());
-
-	}
-
-	@Override
-	public void end() {
-		super.end();
-		if(gc != null) {
-			gc.selectedProperty().removeListener(il);
-		}
-
-		tf.setOnKeyPressed(null);
-		this.cell = null;
-		this.gc = null;
-		il = null;
-	}
-
-	@Override
-	public DataCell<?> commitEdit() {
-		this.cell.setStr(tf.getText());
-		return cell;
-	}
-
-	@Override
-	public void cancelEdit() {
-		end();
-	}
-
-	@Override
-	public Control getControl() {
-		return tf;
-	}
-
-	@Override
-	public void attachEnterEscapeEventHandler() {
-		tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent t) {
-				if (t.getCode() == KeyCode.ENTER) {
-					commitEdit();
-					gc.commitEdit(cell);
-					end();
-				} else if (t.getCode() == KeyCode.ESCAPE) {
-					gc.cancelEdit();
-					cancelEdit();
-				}
-			}
-		});
-	}
-
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 	@Override
 	public void startEdit() {
 		super.startEdit();
@@ -144,5 +103,64 @@ public class TextEditor extends Editor {
 			}
 		};
 		Platform.runLater(r);
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Protected Methods                                                       *
+     *                                                                         *
+     **************************************************************************/
+	@Override
+	protected void begin(DataCell<?> cell, SpreadsheetCell bc) {
+		this.cell = cell;
+		this.gc = bc;
+		tf.setText(cell.getStr());
+
+	}
+
+	@Override
+	protected void end() {
+		super.end();
+		if(gc != null) {
+			gc.selectedProperty().removeListener(il);
+		}
+
+		tf.setOnKeyPressed(null);
+		this.cell = null;
+		this.gc = null;
+		il = null;
+	}
+
+	@Override
+	protected DataCell<?> commitEdit() {
+		this.cell.setStr(tf.getText());
+		return cell;
+	}
+
+	@Override
+	protected void cancelEdit() {
+		end();
+	}
+
+	@Override
+	protected Control getControl() {
+		return tf;
+	}
+
+	@Override
+	protected void attachEnterEscapeEventHandler() {
+		tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent t) {
+				if (t.getCode() == KeyCode.ENTER) {
+					commitEdit();
+					gc.commitEdit(cell);
+					end();
+				} else if (t.getCode() == KeyCode.ESCAPE) {
+					gc.cancelEdit();
+					cancelEdit();
+				}
+			}
+		});
 	}
 }

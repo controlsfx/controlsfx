@@ -51,10 +51,31 @@ import org.controlsfx.control.spreadsheet.sponge.TableCellSkin;
 /**
  *
  * The View cell that will be visible on screen.
- * It holds the DataRow and the DataCell.
+ * It holds the {@link DataRow} and the {@link DataCell}.
  */
 public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 
+	/***************************************************************************
+     *                                                                         *
+     * Static Fields                                                           *
+     *                                                                         *
+     **************************************************************************/
+	private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
+
+	static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
+		return hasAnchor(table) ?
+				(TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) :
+					focusedCell;
+	}
+	static boolean hasAnchor(Control table) {
+		return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
 	public SpreadsheetCell() {
 
 		hoverProperty().addListener(new ChangeListener<Boolean>() {
@@ -88,11 +109,12 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		}});
 
 	}
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new TableCellSkin<>(this);
-	}
-
+	
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 	@Override
 	public void startEdit() {
 		if(!isEditable()) {
@@ -181,6 +203,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		//Otherwise it's will not be visible
 		((SpreadsheetRow) this.getTableRow()).setHoverPublic(hover);
 	}
+	
 	@Override
 	public String toString(){
 		return getItem().getRow()+"/"+getItem().getColumn();
@@ -216,11 +239,26 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		}
 	}
 	
+	/***************************************************************************
+     *                                                                         *
+     * Protected Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new TableCellSkin<>(this);
+	}
+	
+	/***************************************************************************
+     *                                                                         *
+     * Private Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 	/**
 	 * Method that will select all the cells between the drag place and that cell.
 	 * @param e
 	 */
-	protected void dragSelect(MouseEvent e) {
+	private void dragSelect(MouseEvent e) {
 
 		// If the mouse event is not contained within this tableCell, then
 		// we don't want to react to it.
@@ -228,7 +266,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 			return;
 		}
 
-		final TableView tableView = getTableView();
+		final TableView<DataRow> tableView = getTableView();
 		if (tableView == null) {
 			return;
 		}
@@ -238,7 +276,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 			return;
 		}
 
-		final TableSelectionModel sm = tableView.getSelectionModel();
+		final TableSelectionModel<DataRow> sm = tableView.getSelectionModel();
 		if (sm == null) {
 			return;
 		}
@@ -284,15 +322,4 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		}
 
 	}
-	private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
-
-	static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
-		return hasAnchor(table) ?
-				(TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) :
-					focusedCell;
-	}
-	static boolean hasAnchor(Control table) {
-		return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
-	}
-
 }

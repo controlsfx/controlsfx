@@ -29,22 +29,35 @@ package org.controlsfx.control.spreadsheet.model;
 
 /**
  *
- * Specialization of the DataCell class.
- * It holds a String.
+ * Specialization of the {@link DataCell}.
+ * It holds a {@link String}.
  */
 public class TextCell extends DataCell<String> {
-	/**
-	 * 
-	 */
+	
+	/***************************************************************************
+     *                                                                         *
+     * Static Fields                                                           *
+     *                                                                         *
+     **************************************************************************/
 	private static final long serialVersionUID = -1711498694430990374L;
 
-	public TextCell(int r, int c, int rs, int cs) {
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	public TextCell(int r, int c, int rs, int cs, String value) {
 		super(r, c, rs, cs);
 		this.type = CellType.STRING;
-
-		this.setCellValue(Integer.toString((int)(Math.random()*100)));
+		
+		this.setCellValue(value);
 	}
 
+	/***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 	@Override
 	public void setCellValue(String value) {
 		this.str = value;

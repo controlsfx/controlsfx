@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
+import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.NestedTableColumnHeader;
 import org.controlsfx.control.spreadsheet.sponge.TableColumnHeader;
 import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
@@ -125,7 +126,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow{
 			}
 		};
 
-		private SpreadsheetViewSelectionModel selectionModel;
+		private SpreadsheetViewSelectionModel<DataRow> selectionModel;
 		private void updateHighlighSelection(){
 			for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
 				i.getChildrenUnmodifiable().get(0).getStyleClass().clear();

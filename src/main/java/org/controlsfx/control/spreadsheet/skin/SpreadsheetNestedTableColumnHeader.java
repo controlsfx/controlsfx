@@ -8,8 +8,8 @@ import org.controlsfx.control.spreadsheet.sponge.TableViewSkinBase;
 
 public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader{
 
-	public SpreadsheetNestedTableColumnHeader(TableViewSkinBase skin,
-			TableColumnBase tc) {
+	public SpreadsheetNestedTableColumnHeader(TableViewSkinBase<?, ?, ?, ?> skin,
+			TableColumnBase<?, ?> tc) {
 		super(skin, tc);
 	}
 

@@ -51,7 +51,7 @@ public class RowHeader  extends StackPane {
      * Private Fields                                                          *
      *                                                                         *
      **************************************************************************/
-	private final SpreadsheetViewSkin<?> spreadsheetViewSkin;
+	private final SpreadsheetViewSkin spreadsheetViewSkin;
 	private final SpreadsheetView spreadsheetView;
 	private double prefHeight;
 	private double prefWidth;
@@ -85,7 +85,7 @@ public class RowHeader  extends StackPane {
 	 * @param spreadsheetView
 	 * @param rowHeaderWidth
 	 ******************************************************************/
-	public RowHeader(final SpreadsheetViewSkin<?> skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
+	public RowHeader(final SpreadsheetViewSkin skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
 		this.spreadsheetViewSkin = skin;
 		this.spreadsheetView = spreadsheetView;
 		prefWidth = rowHeaderWidth;

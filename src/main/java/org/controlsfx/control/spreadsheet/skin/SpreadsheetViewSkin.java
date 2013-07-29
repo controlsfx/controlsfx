@@ -18,7 +18,7 @@ import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
 import org.controlsfx.control.spreadsheet.sponge.TableViewSkin;
 import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 
-public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
+public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 
 	protected RowHeader rowHeader;
 	private final double rowHeaderWidth = 50;
@@ -28,7 +28,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	
 	protected SpreadsheetView spreadsheetView;
 	
-	public SpreadsheetViewSkin(TableView tableView,
+	public SpreadsheetViewSkin(TableView<DataRow> tableView,
 			SpreadsheetView spreadsheetView) {
 		super(tableView);
 		this.spreadsheetView = spreadsheetView;
@@ -39,10 +39,10 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 		spreadsheetView.setHbar(getFlow().getHorizontalBar());
 		spreadsheetView.setVbar(getFlow().getVerticalBar());
-		final SpreadsheetView.RowAccessor<TableRow<T>> lcells = new SpreadsheetView.RowAccessor<TableRow<T>>() {
+		final SpreadsheetView.RowAccessor<TableRow<DataRow>> lcells = new SpreadsheetView.RowAccessor<TableRow<DataRow>>() {
 			@Override
-			public TableRow<T> get(int index) {
-				return (TableRow<T>) getFlow().getCells().get(index);
+			public TableRow<DataRow> get(int index) {
+				return (TableRow<DataRow>) getFlow().getCells().get(index);
 			}
 
 			@Override
@@ -114,7 +114,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
 	@Override
 	protected void onFocusPreviousCell() {
-		final TableFocusModel fm = getFocusModel();
+		final TableFocusModel<?, ?> fm = getFocusModel();
 		if (fm == null) {
 			return;
 		}
@@ -136,7 +136,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
 	@Override
 	protected void onFocusNextCell() {
-		final TableFocusModel fm = getFocusModel();
+		final TableFocusModel<?, ?> fm = getFocusModel();
 		if (fm == null) {
 			return;
 		}
@@ -214,8 +214,8 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	};
 
 	@Override
-	protected VirtualFlow<TableRow<T>> createVirtualFlow() {
-		return new VirtualFlowSpreadsheet<TableRow<T>>();
+	protected VirtualFlow<TableRow<DataRow>> createVirtualFlow() {
+		return new VirtualFlowSpreadsheet<TableRow<DataRow>>();
 	}
 	
 	protected TableHeaderRow createTableHeaderRow() {
@@ -225,6 +225,8 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 	BooleanProperty getTableMenuButtonVisibleProperty(){
 		return tableMenuButtonVisibleProperty();
 	}
+	
+	@Override
 	protected void scrollHorizontally(TableColumnBase col) {
 
 		if (col == null || !col.isVisible()) {
@@ -233,7 +235,7 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 
 		// work out where this column header is, and it's width (start -> end)
 		double start = 0;//scrollX;
-		for (TableColumnBase c : getVisibleLeafColumns()) {
+		for (TableColumnBase<?, ?> c : getVisibleLeafColumns()) {
             if (c.equals(col)) break;
             start += c.getWidth();
         }
@@ -302,8 +304,8 @@ public class SpreadsheetViewSkin<T> extends TableViewSkin<T> {
 		return fixedColumnWidth;
 	}
 	
-	private VirtualFlowSpreadsheet getFlow(){
-		return (VirtualFlowSpreadsheet) flow;
+	private VirtualFlowSpreadsheet<?> getFlow(){
+		return (VirtualFlowSpreadsheet<?>) flow;
 	}
 
 }

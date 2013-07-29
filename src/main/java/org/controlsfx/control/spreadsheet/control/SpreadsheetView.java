@@ -195,7 +195,7 @@ public class SpreadsheetView extends StackPane{
 		*   It has to be placed at the end because otherwise UI is responding weirdly 
 		*   (horizontal scrollBar replace at initial position when resizing width
 		*/
-		spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin<>(spreadsheetViewInternal,this));
+		spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin(spreadsheetViewInternal,this));
 	}
 	
 	public VirtualScrollBar getHbar() {

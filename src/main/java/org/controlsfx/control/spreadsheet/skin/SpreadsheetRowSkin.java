@@ -15,9 +15,9 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.TableRowSkin;
 
-public class SpreadsheetRowSkin<T extends DataRow> extends TableRowSkin{
+public class SpreadsheetRowSkin<T extends DataRow> extends TableRowSkin<DataRow>{
 SpreadsheetView spreadsheetView;
-	public SpreadsheetRowSkin(TableRow tableRow, SpreadsheetView spreadsheetView) {
+	public SpreadsheetRowSkin(TableRow<DataRow> tableRow, SpreadsheetView spreadsheetView) {
 		super(tableRow);
 		this.spreadsheetView = spreadsheetView;
 	}
@@ -46,7 +46,7 @@ SpreadsheetView spreadsheetView;
 			return;
 		}
 
-		final ObservableList<? extends TableColumnBase> visibleLeafColumns = getVisibleLeafColumns();
+		final ObservableList<? extends TableColumnBase<?,?>> visibleLeafColumns = getVisibleLeafColumns();
 		if (visibleLeafColumns.isEmpty()) {
 			super.layoutChildren(x,y,w,h);
 			return;
@@ -140,7 +140,7 @@ SpreadsheetView spreadsheetView;
 				}
 //				System.out.println("Je layout"+index+"/"+column );
 
-				final DataCell cellSpan = ((DataRow)spreadsheetView.getItems().get(index)).getCell(column);
+				final DataCell<?> cellSpan = ((DataRow)spreadsheetView.getItems().get(index)).getCell(column);
 				final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(index, column);
 
 				switch (spanType) {
@@ -161,12 +161,12 @@ SpreadsheetView spreadsheetView;
 				case ROW_VISIBLE:
 					// To be sure that the text is the same
 					//in case we modified the DataCell after that SpreadsheetCell was created
-					final SpreadsheetViewSelectionModel sm = spreadsheetView.getSelectionModel();
-					final TableColumn col = spreadsheetView.getColumns().get(column);
+					final SpreadsheetViewSelectionModel<DataRow> sm = spreadsheetView.getSelectionModel();
+					final TableColumn<DataRow,?> col = spreadsheetView.getColumns().get(column);
 
 					//In case this cell was selected before but we scroll up/down and it's invisible now.
 					// It has to pass his "selected property" to the new Cell in charge of spanning
-					final TablePosition selectedPosition = sm.isSelectedRange(index, col, column);
+					final TablePosition<DataRow,?> selectedPosition = sm.isSelectedRange(index, col, column);
 					if (selectedPosition != null && selectedPosition.getRow() != index) { // If the selected cell is in the same row, no need to re-select it
 						sm.clearSelection(selectedPosition.getRow(), selectedPosition.getTableColumn());
 						sm.select(index, col);

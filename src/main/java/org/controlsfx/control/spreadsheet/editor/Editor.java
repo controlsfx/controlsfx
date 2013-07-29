@@ -112,7 +112,7 @@ public abstract class Editor{
 	 * When we have finish editing. We put the cell back to its right TableRow.
 	 */
 	protected void end(){
-		if(cell.getRowSpan() >1){
+		if(cell != null && cell.getRowSpan() >1){
 			gc.setTranslateY(0);
 			if(isMoved){
 				original.addCell(gc);

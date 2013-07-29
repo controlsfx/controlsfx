@@ -19,7 +19,7 @@ import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
 
 
-public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T>{
+public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow<T>{
 
 	SpreadsheetView spv;
 	/**
@@ -173,13 +173,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell> extends VirtualFlow<T
 	 */
 	@Override
 	protected int getCellIndex(T cell){
-		// We need to act differently upon cases, so this is BAD programming
-		// But it's the only option right now
 		if(cellIndexCall){
-		/*StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-		if(stackTraceElements.length >= 3 && 
-				("getAvailableCell".equals(stackTraceElements[2].getMethodName())
-						|| stackTraceElements[2].getMethodName().contains("adjustPixels")) ){*/
 			return cell.getIndex();
 		}else{
 			return ((SpreadsheetRow)cell).getIndexVirtualFlow();

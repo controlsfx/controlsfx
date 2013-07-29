@@ -39,10 +39,10 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 		spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 		spreadsheetView.setHbar(getFlow().getHorizontalBar());
 		spreadsheetView.setVbar(getFlow().getVerticalBar());
-		final SpreadsheetView.RowAccessor<TableRow<DataRow>> lcells = new SpreadsheetView.RowAccessor<TableRow<DataRow>>() {
+		final SpreadsheetView.RowAccessor<SpreadsheetRow> lcells = new SpreadsheetView.RowAccessor<SpreadsheetRow>() {
 			@Override
-			public TableRow<DataRow> get(int index) {
-				return (TableRow<DataRow>) getFlow().getCells().get(index);
+			public SpreadsheetRow get(int index) {
+				return (SpreadsheetRow) getFlow().getCells().get(index);
 			}
 
 			@Override

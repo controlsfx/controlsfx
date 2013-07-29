@@ -177,7 +177,7 @@ public class SpreadsheetView extends StackPane{
 				column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
 					@Override
 					public ObservableValue<DataCell<?>> call(TableColumn.CellDataFeatures<DataRow, DataCell<?>> p) {
-						return new ReadOnlyObjectWrapper(p.getValue().getCell(col));
+						return new ReadOnlyObjectWrapper<DataCell<?>>(p.getValue().getCell(col));
 					}
 				});
 				// We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
@@ -222,7 +222,7 @@ public class SpreadsheetView extends StackPane{
 		return cells.isEmpty();
 	}
 
-	public void setRows(RowAccessor<?> cells) {
+	public void setRows(RowAccessor<SpreadsheetRow> cells) {
 		this.cells = (RowAccessor<SpreadsheetRow>) cells;
 	}
 	public int getVirtualFlowCellSize(){
@@ -614,11 +614,9 @@ public class SpreadsheetView extends StackPane{
 	}
 	class FocusModelListener implements ChangeListener<TablePosition<DataRow,?>> {
 
-		private final SpreadsheetView spreadsheetView;
 		private final TableView.TableViewFocusModel<DataRow> tfm;
 
 		public FocusModelListener(SpreadsheetView spreadsheetView) {
-			this.spreadsheetView = spreadsheetView;
 			tfm = spreadsheetViewInternal.getFocusModel();
 		}
 
@@ -934,7 +932,7 @@ public class SpreadsheetView extends StackPane{
 			}
 		};
 
-		final WeakListChangeListener weakItemsContentListener = new WeakListChangeListener(itemsContentListener);
+		final WeakListChangeListener<DataRow> weakItemsContentListener = new WeakListChangeListener<DataRow>(itemsContentListener);
 
 		private void updateItemsObserver(ObservableList<DataRow> oldList, ObservableList<DataRow> newList) {
 			// the listview items list has changed, we need to observe

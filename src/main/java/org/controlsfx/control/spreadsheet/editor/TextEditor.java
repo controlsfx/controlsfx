@@ -59,6 +59,7 @@ public class TextEditor extends Editor {
      *                                                                         *
      **************************************************************************/
 	public TextEditor() {
+		super();
 		tf = new TextField();
 		tf.setPrefHeight(20);
 	}
@@ -81,9 +82,9 @@ public class TextEditor extends Editor {
 			@Override
 			public void invalidated(Observable observable) {
 
-				if (gc != null && gc.isEditing()) {
+				if (spreadsheetCell != null && spreadsheetCell.isEditing()) {
 					commitEdit();
-					gc.commitEdit(cell);
+					spreadsheetCell.commitEdit(cell);
 				}
 				end();
 
@@ -91,8 +92,8 @@ public class TextEditor extends Editor {
 			}
 		};
 
-		gc.selectedProperty().addListener(il);
-		gc.setGraphic(tf);
+		spreadsheetCell.selectedProperty().addListener(il);
+		spreadsheetCell.setGraphic(tf);
 		
 		
 		 
@@ -113,7 +114,7 @@ public class TextEditor extends Editor {
 	@Override
 	protected void begin(DataCell<?> cell, SpreadsheetCell bc) {
 		this.cell = cell;
-		this.gc = bc;
+		this.spreadsheetCell = bc;
 		tf.setText(cell.getStr());
 
 	}
@@ -121,13 +122,13 @@ public class TextEditor extends Editor {
 	@Override
 	protected void end() {
 		super.end();
-		if(gc != null) {
-			gc.selectedProperty().removeListener(il);
+		if(spreadsheetCell != null) {
+			spreadsheetCell.selectedProperty().removeListener(il);
 		}
 
 		tf.setOnKeyPressed(null);
 		this.cell = null;
-		this.gc = null;
+		this.spreadsheetCell = null;
 		il = null;
 	}
 
@@ -154,10 +155,10 @@ public class TextEditor extends Editor {
 			public void handle(KeyEvent t) {
 				if (t.getCode() == KeyCode.ENTER) {
 					commitEdit();
-					gc.commitEdit(cell);
+					spreadsheetCell.commitEdit(cell);
 					end();
 				} else if (t.getCode() == KeyCode.ESCAPE) {
-					gc.cancelEdit();
+					spreadsheetCell.cancelEdit();
 					cancelEdit();
 				}
 			}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -19,7 +18,15 @@ import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
 import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
 
 
-public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow<T>{
+final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow<T> {
+	private static final  Comparator<SpreadsheetRow> ROWCMP = new Comparator<SpreadsheetRow>() {
+		@Override
+		public int compare(SpreadsheetRow o1, SpreadsheetRow o2) {
+			final int lhs = o1.getIndex();
+			final int rhs = o2.getIndex();
+			return lhs < rhs ? -1  : +1;
+		}
+	};
 
 	/***************************************************************************
      *                                                                         *
@@ -32,7 +39,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	 * If we added just a few cells in the addLeadingCell
 	 * We need to add the remaining in the addTrailingCell
 	 */
-	private int cellFixedAdded;
+	private int cellFixedAdded = 0;
 	private boolean cellIndexCall = false;
 	/**
 	 * The list of Columns fixed.It only contains the
@@ -43,8 +50,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	 * The list of Rows fixed. It only contains the
 	 * number of the rows, sorted.
 	 */
-	private final static ArrayList<Integer> fixedRows = new ArrayList<Integer>();
-	private final TreeSet<Integer> visibleRows = new TreeSet<Integer>();
+	private final ArrayList<Integer> fixedRows = new ArrayList<Integer>();
 //	private double scrollY = 0;
 
 	/***************************************************************************
@@ -92,9 +98,9 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 
 	@Override
 	public double adjustPixels(final double delta) {
-		 cellIndexCall = true;
+		cellIndexCall = true;
 		final double returnValue = super.adjustPixels(delta);
-		 cellIndexCall = false;
+		 
 		/*int diff = (int) Math.ceil(Math.abs((scrollY - getVbar().getValue()))*getCellCount());
 		scrollY = getVbar().getValue();
 		if(diff>10){
@@ -114,14 +120,6 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	
 	public ArrayList<Integer> getFixedRows(){
 		return fixedRows;
-	}
-	
-	/**
-	 * The Visible Rows
-	 * @return a TreeSet of Integer, sorted.
-	 */
-	public TreeSet<Integer> getVisibleRows(){
-		return visibleRows;
 	}
 	
 	public T getFirstVisibleCellWithinViewPort() {
@@ -155,7 +153,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 		
 		//We don't want to layout everything in case we're editing because it has no sense
 		if(spreadSheetView != null && (spreadSheetView.getEditingCell() == null || spreadSheetView.getEditingCell().getRow() == -1)){
-			sortHB();
+			sortRows();
 			super.layoutChildren();
 			layoutTotal();
 			/*if(diff>10){
@@ -171,7 +169,6 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	 protected T getAvailableCell(int prefIndex) {
 		 cellIndexCall = true;
 		 T tmp = super.getAvailableCell(prefIndex);
-		 cellIndexCall = false;
 		 return tmp;
 	 }
 	
@@ -179,7 +176,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	 * Layout all the visible rows
 	 */
 	protected void layoutTotal(){
-		sortHB();
+		sortRows();
 		//FIXME When scrolling fast with fixed Rows, cells is empty and not recreated..
 		if(getCells().isEmpty()){
 			reconfigureCells();
@@ -211,6 +208,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	@Override
 	protected int getCellIndex(T cell){
 		if(cellIndexCall){
+			cellIndexCall = false;
 			return cell.getIndex();
 		}else{
 			return ((SpreadsheetRow)cell).getIndexVirtualFlow();
@@ -226,7 +224,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 		double offset = startOffset;
 		// The index is the absolute index of the cell being laid out
 		int index = currentIndex;
-
+		
 		// Offset should really be the bottom of the current index
 		boolean first = true; // first time in, we just fudge the offset and let
 		// it be the top of the current index then redefine
@@ -271,7 +269,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 				// If the remaining cells to add are in the header
 				if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
 					final int realIndex = fixedRows.get(cellToAdd-1);
-//					System.out.println("JaddC"+realIndex);
+//					System.out.println("JaddC"+realIndex+"/"+index);
 					cell = getAvailableCell(realIndex); // We grab the right one
 					setCellIndex(cell, realIndex); // the index is the real one
 					setCellIndexVirtualFlow(cell, index); // But the index for the Virtual Flow remain his (not the real one)
@@ -488,7 +486,7 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	 * Layout the fixed rows to position them correctly
 	 */
 	private void layoutFixedRows(){
-		sortHB();
+		sortRows();
 		if(!getCells().isEmpty() && !getFixedRows().isEmpty()){
 			for(int i = getFixedRows().size()-1; i>= 0 ;--i){
 				SpreadsheetRow cell = (SpreadsheetRow) getCells().get(i);
@@ -503,17 +501,10 @@ public class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlo
 	/**
 	 * Sort the rows so that they stay in order for layout
 	 */
-	private void sortHB(){
+	private void sortRows(){
 		final List<SpreadsheetRow> temp = (List<SpreadsheetRow>) getCells();
 		final List<SpreadsheetRow> tset = new ArrayList<>(temp);
-		Collections.sort(tset, new Comparator<SpreadsheetRow>() {
-			@Override
-			public int compare(SpreadsheetRow o1, SpreadsheetRow o2) {
-				final int lhs = o1.getIndex();
-				final int rhs = o2.getIndex();
-				return lhs < rhs ? -1  : +1;
-			}
-		});
+		Collections.sort(tset, ROWCMP);
 		for (final TableRow<DataRow> r : tset) {
 			r.toFront();
 		}

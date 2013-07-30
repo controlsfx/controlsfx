@@ -77,8 +77,21 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 	public int getIndexVirtualFlow(){
 		return indexVirtualFlow == null?getIndex():indexVirtualFlow;
 	}
-	
+	@Override
+	public void updateIndex(int i){
+		
+		for (int j = 0; j<spreadsheetView.getVirtualFlowCellSize();j++ ) {
+			if(spreadsheetView.getRow(j) != null){
+				if(spreadsheetView.getRow(j).getIndexVirtualFlow() == i){
+					
+					System.out.println("PROBLEM2");
+				}
+			}
+		}
+		super.updateIndex(i);
+	}
 	public void setIndexVirtualFlow(int i){
+		
 		indexVirtualFlow = i;
 	}
 	

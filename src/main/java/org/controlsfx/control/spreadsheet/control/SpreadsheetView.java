@@ -225,9 +225,6 @@ public class SpreadsheetView extends StackPane{
 	public void setRows(RowAccessor<SpreadsheetRow> cells) {
 		this.cells = (RowAccessor<SpreadsheetRow>) cells;
 	}
-	public int getVirtualFlowCellSize(){
-		return cells.size();
-	}
 	
 	public TablePosition<DataRow, ?> getEditingCell(){
 		return spreadsheetViewInternal.getEditingCell();
@@ -297,16 +294,6 @@ public class SpreadsheetView extends StackPane{
 		return fixedColumns;
 	}
 
-	public boolean addCell(SpreadsheetCell cell){
-		SpreadsheetRow temp = getRow(cells.size()-1-fixedRows.size());
-		if(temp != null){
-			temp.addCell(cell);
-			return true;
-		}
-		return false;
-		
-	}
-
 	public DoubleProperty fixedCellSizeProperty() {
 		return spreadsheetViewInternal.fixedCellSizeProperty();
 	}
@@ -373,6 +360,19 @@ public class SpreadsheetView extends StackPane{
      * Private/Protected Implementation                                                  *
      *                                                                         *
      **************************************************************************/   
+	boolean addCell(SpreadsheetCell cell){
+		SpreadsheetRow temp = getRow(cells.size()-1-fixedRows.size());
+		if(temp != null){
+			temp.addCell(cell);
+			return true;
+		}
+		return false;
+		
+	}
+	
+	int getVirtualFlowCellSize(){
+		return cells.size();
+	}
 	
 	private SpreadsheetRow getNonFixed(int index){
 		return cells.get(fixedRows.size()+index);
@@ -453,8 +453,12 @@ public class SpreadsheetView extends StackPane{
 				return null;
 			}
 		}
-		editor.begin(cell, bc, this);
-		return editor;
+		if(editor.isWorking()){
+			return null;
+		}else{
+			editor.begin(cell, bc, this);
+			return editor;
+		}
 	}
 
 	private Grid getGrid(){

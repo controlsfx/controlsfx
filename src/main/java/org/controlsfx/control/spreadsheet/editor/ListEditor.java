@@ -67,6 +67,7 @@ public class ListEditor extends Editor {
      *                                                                         *
      **************************************************************************/
 	public ListEditor() {
+		super();
 		cb = new ComboBox<String>();
 		cb.setVisibleRowCount(3);
 
@@ -101,15 +102,18 @@ public class ListEditor extends Editor {
 	public void startEdit() {
 		super.startEdit();
 		
-		gc.setGraphic(cb);
-		
-		final Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				cb.requestFocus();
-			}
-		};
-		Platform.runLater(r);
+		attachEnterEscapeEventHandler();
+		if(spreadsheetCell != null){
+			spreadsheetCell.setGraphic(cb);
+			
+			final Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					cb.requestFocus();
+				}
+			};
+			Platform.runLater(r);
+		}
 	}
 	
 	/***************************************************************************
@@ -121,7 +125,7 @@ public class ListEditor extends Editor {
 	protected void begin(DataCell<?> cell, SpreadsheetCell gc) {
 		if (gc != null) {
 			this.cell = cell;
-			this.gc = gc;
+			this.spreadsheetCell = gc;
 			@SuppressWarnings("unchecked")
 			final List<String> temp = (List<String>) cell.getCellValue();
 			final ObservableList<String> temp2 = FXCollections.observableList(temp);
@@ -130,8 +134,6 @@ public class ListEditor extends Editor {
 
 			cb.setPrefWidth(spreadsheetView.getCellPrefWidth());
 			cb.setMinWidth(spreadsheetView.getCellPrefWidth());
-
-			attachEnterEscapeEventHandler();
 		}
 	}
 
@@ -141,10 +143,11 @@ public class ListEditor extends Editor {
 		
 		cb.getSelectionModel().selectedIndexProperty().removeListener(cl);
 		cb.setOnKeyPressed(null);
-		gc.selectedProperty().removeListener(il);
+		if(spreadsheetCell != null)
+			spreadsheetCell.selectedProperty().removeListener(il);
 		
 		this.cell = null;
-		this.gc = null;
+		this.spreadsheetCell = null;
 		cl = null;
 		il = null;
 	}
@@ -173,7 +176,7 @@ public class ListEditor extends Editor {
 			@Override
 			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
 				commitEdit();
-				gc.commitEdit(cell);
+				spreadsheetCell.commitEdit(cell);
 				end();
 			}
 		};
@@ -182,7 +185,7 @@ public class ListEditor extends Editor {
 			@Override
 			public void handle(KeyEvent t) {
 				if (t.getCode() == KeyCode.ESCAPE) {
-					gc.cancelEdit();
+					spreadsheetCell.cancelEdit();
 					cancelEdit();
 				}
 			}
@@ -190,13 +193,17 @@ public class ListEditor extends Editor {
 		il = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable observable) {
-				if (gc != null && gc.isEditing()) {
+				if (spreadsheetCell != null && spreadsheetCell.isEditing()) {
 					commitEdit();
-					gc.commitEdit(cell);
+					spreadsheetCell.commitEdit(cell);
 				}
 				end();
 			}
 		};
-		gc.selectedProperty().addListener(il);
+		if(spreadsheetCell == null){
+			end();
+		}else{
+			spreadsheetCell.selectedProperty().addListener(il);
+		}
 	}
 }

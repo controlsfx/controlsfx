@@ -32,7 +32,7 @@ import javafx.beans.Observable;
 import javafx.scene.control.Control;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
+import org.controlsfx.control.spreadsheet.control.SpreadsheetEditor;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 
@@ -50,12 +50,24 @@ public abstract class Editor{
      *                                                                         *
      **************************************************************************/
 	protected DataCell<?> cell;
-	protected SpreadsheetCell gc;
+	protected SpreadsheetCell spreadsheetCell;
 	protected SpreadsheetView spreadsheetView;
-	private SpreadsheetRow original;
-	private boolean isMoved;
+	private SpreadsheetEditor spreadsheetEditor;
 	private InvalidationListener editorListener;
+	private boolean working = false;
+	
+	
 	protected InvalidationListener il;
+	
+	/***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+	
+	public Editor(){
+		this.spreadsheetEditor = new SpreadsheetEditor();
+	}
 
 	/***************************************************************************
      *                                                                         *
@@ -63,12 +75,14 @@ public abstract class Editor{
      *                                                                         *
      **************************************************************************/
 	/**
-	 * Initialization of the Editor
+	 * Initialization of the Editor, called by SpreadsheetView.
 	 * @param cell
 	 * @param bc
 	 * @param t
 	 */
 	public void begin(DataCell<?> cell, SpreadsheetCell bc, SpreadsheetView t){
+		working = true;
+		spreadsheetEditor.begin(cell, bc, t);
 		this.spreadsheetView = t;
 		begin(cell, bc);
 	}
@@ -80,28 +94,18 @@ public abstract class Editor{
 	 * the user.
 	 */
 	public void startEdit(){
-		//Case when RowSpan if larger and we're not on the last row
-		if(cell.getRowSpan()>1 && cell.getRow() != spreadsheetView.getVirtualFlowCellSize()-1){
-			original = (SpreadsheetRow) gc.getTableRow();
-			
-			final double temp = gc.getLocalToSceneTransform().getTy();
-			isMoved = spreadsheetView.addCell(gc);
-			if(isMoved){
-				gc.setTranslateY(temp - gc.getLocalToSceneTransform().getTy());
-				original.putFixedColumnToBack();
-			}
-		}
-		
+		spreadsheetEditor.startEdit();
 		//In ANY case, we stop when something move in scrollBar Vertical
 		editorListener = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable arg0) {
 				commitEdit();
-				gc.commitEdit(cell);
+				spreadsheetCell.commitEdit(cell);
 				end();
 			}
 		};
 		spreadsheetView.getVbar().valueProperty().addListener(editorListener);
+		
 	}
 	/***************************************************************************
      *                                                                         *
@@ -112,18 +116,16 @@ public abstract class Editor{
 	 * When we have finish editing. We put the cell back to its right TableRow.
 	 */
 	protected void end(){
-		if(cell != null && cell.getRowSpan() >1){
-			gc.setTranslateY(0);
-			if(isMoved){
-				original.addCell(gc);
-				original.putFixedColumnToBack();
-			}
-		}
+		working = false;
+		spreadsheetEditor.end();
+		
 		spreadsheetView.getVbar().valueProperty().removeListener(editorListener);
 		editorListener = null;
-		
 	}
 
+	public boolean isWorking(){
+		return working;
+	}
 	/***************************************************************************
      *                                                                         *
      * Protected Abstract Methods                                                          *

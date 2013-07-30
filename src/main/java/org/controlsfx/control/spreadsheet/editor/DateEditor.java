@@ -51,6 +51,7 @@ public class DateEditor extends Editor {
      *                                                                         *
      **************************************************************************/
 	public DateEditor() {
+		super();
 		datePicker = new DatePicker();
 	}
 
@@ -72,17 +73,17 @@ public class DateEditor extends Editor {
 			@Override
 			public void invalidated(Observable observable) {
 
-				if (gc != null && gc.isEditing()) {
+				if (spreadsheetCell != null && spreadsheetCell.isEditing()) {
 					commitEdit();
-					gc.commitEdit(cell);
+					spreadsheetCell.commitEdit(cell);
 				}
 				end();
 			}
 		};
 
-		gc.selectedProperty().addListener(il);
+		spreadsheetCell.selectedProperty().addListener(il);
 
-		gc.setGraphic(datePicker);
+		spreadsheetCell.setGraphic(datePicker);
 
 		final Runnable r = new Runnable() {
 			@Override
@@ -101,7 +102,7 @@ public class DateEditor extends Editor {
 	@Override
 	protected void begin(DataCell<?> cell, SpreadsheetCell bc) {
 		this.cell = cell;
-		this.gc = bc;
+		this.spreadsheetCell = bc;
 		final DateCell dc = (DateCell) cell;
 		datePicker.setValue(dc.getCellValue());
 	}
@@ -110,8 +111,8 @@ public class DateEditor extends Editor {
 	protected void end() {
 		super.end();
 		
-		if(gc != null) {
-			gc.selectedProperty().removeListener(il);
+		if(spreadsheetCell != null) {
+			spreadsheetCell.selectedProperty().removeListener(il);
 		}
 		
 		if(datePicker.isShowing()){
@@ -120,7 +121,7 @@ public class DateEditor extends Editor {
 		
 		datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
 		this.cell = null;
-		this.gc = null;
+		this.spreadsheetCell = null;
 		il = null;
 	}
 
@@ -158,13 +159,13 @@ public class DateEditor extends Editor {
 						@Override
 						public void run() {
 							commitEdit();
-							gc.commitEdit(cell);
+							spreadsheetCell.commitEdit(cell);
 							end();
 						}
 					};
 					Platform.runLater(r);
 				} else if (t.getCode() == KeyCode.ESCAPE) {
-					gc.cancelEdit();
+					spreadsheetCell.cancelEdit();
 					cancelEdit();
 				}
 			}

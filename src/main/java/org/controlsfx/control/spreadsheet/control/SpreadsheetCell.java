@@ -43,6 +43,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpanType;
+import org.controlsfx.control.spreadsheet.editor.Editor;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.sponge.TableCellSkin;
@@ -127,9 +128,15 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
 		final SpanType type = spv.getSpanType(row, column);
 		if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
-			super.startEdit();
-			setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-			spv.getEditor(getItem(), this).startEdit();
+			Editor editor = spv.getEditor(getItem(), this);
+			if(editor != null){
+				super.startEdit();
+//				System.out.println("je start"+row+"/"+((SpreadsheetRow) getTableRow()).getIndexVirtualFlow()+"/"+column);
+				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+				editor.startEdit();
+			}else{
+				//TODO We got a problem right now because two lines are added.
+			}
 		}
 	}
 

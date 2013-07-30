@@ -44,20 +44,14 @@ public class Grid {
      *                                                                         *
      **************************************************************************/
 	private ArrayList<DataRow> rows;
-	private int rowCount = 50;
-	private int columnCount = 10;
+	private int rowCount;
+	private int columnCount;
 
 	/***************************************************************************
      *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-	/**
-	 * Default constructor
-	 */
-	public Grid() {
-	}
-
 	public Grid(int rowCount, int columnCount, ArrayList<DataRow> rows) {
 		this.rowCount = rowCount;
 		this.columnCount = columnCount;

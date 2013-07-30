@@ -303,7 +303,7 @@ public final class Dialogs {
     private String message;
     private String masthead;
     private boolean lightweight;
-    private boolean nativeChrome;
+    private boolean nativeTitleBar;
     private Set<Action> actions = new HashSet<>();
 
     /**
@@ -398,14 +398,14 @@ public final class Dialogs {
     }
     
     /**
-     * Specifies that the dialog should use the native 'chrome' of the users 
+     * Specifies that the dialog should use the native title bar of the users 
      * operating system rather than the custom cross-platform rendering used by 
      * default. Refer to the Dialogs class JavaDoc for more information.
      * 
      * @return Dialog instance.
      */
-    public Dialogs nativeChrome() {
-        this.nativeChrome = true;
+    public Dialogs nativeTitleBar() {
+        this.nativeTitleBar = true;
         return this;
     }
     
@@ -468,7 +468,7 @@ public final class Dialogs {
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
                 String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails, nativeChrome).show();
+                new ExceptionDialog((Window)owner, moreDetails, nativeTitleBar).show();
             }
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
@@ -701,7 +701,7 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeChrome);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         Image image = dlgType.getImage();

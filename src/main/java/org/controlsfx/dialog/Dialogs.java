@@ -202,6 +202,45 @@ import org.controlsfx.dialog.Dialog.Actions;
  * </table>
  * 
  * 
+ * <h3>Native and Cross-Platform Dialogs</h3>
+ * 
+ * <p>The ControlsFX dialogs API supports displaying dialogs with either a
+ * consistent cross-platform titlebar area, or by using the titlebar of the users
+ * operating system. All of the screenshots above are taken using the cross-platform
+ * style, whereas the screenshots below are the same dialog code being rendered
+ * using the users native platform titlebar. To enable this in the Dialogs
+ * fluent API, simply call {@link #nativeTitleBar()} when creating the dialog.
+ * If you're using the {@link Dialog} class, you can specify that you want to
+ * use the native titlebar as part of the 
+ * {@link Dialog#Dialog(Object, String, boolean, boolean)} constructor (where the
+ * fourth parameter is used to represent whether to use the native titlebar or not).
+ * 
+ * <p>Here are the screenshots of dialogs with their native title bars:
+ * 
+ * <br/>
+ * <table style="border: 1px solid gray;">
+ *   <tr>
+ *     <th><center><h3>Platform</h3></center></th>
+ *     <th><center><h3>Screenshot</h3></center></th>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Cross-Platform (default)</strong></td>
+ *     <td><center><img src="native-titlebar/cross-platform.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Mac OS X</strong></td>
+ *     <td><center><img src="native-titlebar/mac-native-titlebar.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Windows 8</strong></td>
+ *     <td><center><img src="native-titlebar/windows-8-native-titlebar.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Linux (Ubuntu)</strong></td>
+ *     <td><center><img src="native-titlebar/linux-native-titlebar.png"></center></td>
+ *   </tr>
+ * </table>
+ * 
  * <h3>Heavyweight vs Lightweight Dialogs</h3>
  * 
  * <p>The ControlsFX dialogs API supports a distinction between heavyweight and
@@ -222,6 +261,13 @@ import org.controlsfx.dialog.Dialog.Actions;
  * example, you could create a lightweight dialog with an owner of a single 
  * {@link Tab} in a {@link TabPane}, and this will only block on that one tab - 
  * all other tabs will continue to be interactive and execute as per usual.
+ * 
+ * <p>One limitation of lightweight dialogs is that it is not possible to use
+ * the native titlebar feature. If you call both {@link #lightweight()} and
+ * {@link #nativeTitleBar()}, the call to enable lightweight takes precedence
+ * over the use of the native titlebar, so you will end up seeing what is shown
+ * in the screenshot below (that is, a cross-platform-looking dialog that is 
+ * lightweight).
  * 
  * <p>To make a dialog lightweight, you simply call {@link #lightweight()} when
  * constructing the dialog using this Dialogs API. If you are using the 

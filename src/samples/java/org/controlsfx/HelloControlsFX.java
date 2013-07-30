@@ -73,7 +73,7 @@ public class HelloControlsFX extends Application {
     private TabPane tabPane;
     private Tab welcomeTab;
     private Tab sampleTab;
-    private Tab javadocTab;
+    private Tab webViewTab;
     
     private WebView webview;
     
@@ -179,9 +179,9 @@ public class HelloControlsFX extends Application {
         grid.add(tabPane, 1, 0, 1, 1);
         
         sampleTab = new Tab("Sample");
-        javadocTab = new Tab("JavaDoc");
+        webViewTab = new Tab("JavaDoc");
         webview = new WebView();
-    	javadocTab.setContent(webview);
+    	webViewTab.setContent(webview);
         
         // by default we'll have a welcome message in the right-hand side
         changeToWelcomeTab();
@@ -205,7 +205,7 @@ public class HelloControlsFX extends Application {
         }
         
     	if (tabPane.getTabs().contains(welcomeTab)) {
-    		tabPane.getTabs().setAll(sampleTab, javadocTab);
+    		tabPane.getTabs().setAll(sampleTab, webViewTab);
     	}
     	
     	// update the sample tab
@@ -232,11 +232,13 @@ public class HelloControlsFX extends Application {
                 "If you ever meet any of these wonderful contributors, tell them how great they are! :-)\n\n" +
                 "To keep up to date with the ControlsFX project, visit the website at [http://www.controlsfx.org]");
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
-//        welcomeLabel2.setWrapText(true);
         welcomeLabel2.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
-                // TODO could open up the ControlsFX website in a tab
-                System.out.println(event);
+                webViewTab.setText("ControlsFX Website");
+                
+                webview.getEngine().load("http://www.controlsfx.org");
+                tabPane.getTabs().add(webViewTab);
+                tabPane.getSelectionModel().select(webViewTab);
             }
         });
         

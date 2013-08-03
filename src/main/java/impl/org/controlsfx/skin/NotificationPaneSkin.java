@@ -217,7 +217,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             actionsBar = ActionUtils.createButtonBar(notificationPane.getActions());
             actionsBar.opacityProperty().bind(transition);
             GridPane.setHgrow(actionsBar, Priority.SOMETIMES);
-            
+            pane.getChildren().clear();
             pane.add(label, 0, 0);
             pane.add(actionsBar, 1, 0);
             pane.add(closeBtn, 2, 0);

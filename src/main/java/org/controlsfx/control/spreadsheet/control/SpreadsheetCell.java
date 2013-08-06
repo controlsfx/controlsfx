@@ -46,7 +46,7 @@ import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpanType;
 import org.controlsfx.control.spreadsheet.editor.Editor;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.sponge.TableCellSkin;
+import com.sun.javafx.scene.control.skin.TableCellSkin;
 
 
 /**

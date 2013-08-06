@@ -2,9 +2,9 @@ package org.controlsfx.control.spreadsheet.skin;
 
 import javafx.scene.control.TableColumnBase;
 
-import org.controlsfx.control.spreadsheet.sponge.NestedTableColumnHeader;
-import org.controlsfx.control.spreadsheet.sponge.TableColumnHeader;
-import org.controlsfx.control.spreadsheet.sponge.TableViewSkinBase;
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 
 public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader{
 

@@ -1,5 +1,8 @@
 package org.controlsfx.control.spreadsheet.skin;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,9 +16,13 @@ import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
+
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
+
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
-import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
+
+
 
 
 final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow<T> {
@@ -52,6 +59,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 	 */
 	private final ArrayList<Integer> fixedRows = new ArrayList<Integer>();
 //	private double scrollY = 0;
+	
 
 	/***************************************************************************
      *                                                                         *
@@ -214,10 +222,13 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 			return ((SpreadsheetRow)cell).getIndexVirtualFlow();
 		}
 	}
-	
-	
+
 	@Override
 	protected void addLeadingCells(int currentIndex, double startOffset) {
+		addLeadingCells(new Helper<T>(this),currentIndex,  startOffset);
+	}
+	
+	private void addLeadingCells(Helper<T> ch, int currentIndex, double startOffset) {
 		// The offset will keep track of the distance from the top of the
 		// viewport to the top of the current index. We will increment it
 		// as we lay out leading cells.
@@ -257,7 +268,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 		cellFixedAdded = 0;
 
 		while (index >= 0 && (offset > 0 || first)) {
-			/*if(index >= getCellCount()){
+			if(index >= getCellCount()){
 				if (first) {
 					first = false;
 				}else {
@@ -265,7 +276,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 				}
 				--index;
 				--cellToAdd;
-			}else{*/
+			}else{
 				// If the remaining cells to add are in the header
 				if(!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()){
 					final int realIndex = fixedRows.get(cellToAdd-1);
@@ -280,7 +291,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 					setCellIndex(cell, index);
 				}
 				resizeCellSize(cell); // resize must be after config
-				cells.addFirst(cell);
+				ch.addFirst(cell);
 
 
 				// A little gross but better than alternatives because it reduces
@@ -296,11 +307,11 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 
 				// Position the cell, and update the maxPrefBreadth variable as we go.
 				positionCell(cell, offset);
-				setMaxPrefBreadth(Math.max(getMaxPrefBreadth(), getCellBreadth(cell)));
+				setMaxPrefBreadth(Math.max(ch.getMaxPrefBreadth(this), getCellBreadth(cell)));
 				cell.setVisible(true);
 				--index;
 				--cellToAdd;
-//			}
+			}
 		}
 
 		// There are times when after laying out the cells we discover that
@@ -308,7 +319,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 		// of the viewport. In these cases, we have to adjust the cells up
 		// and reset the mapper position. This might happen when items got
 		// removed at the top or when the viewport size increased.
-		cell = cells.getFirst();
+		cell = ch.getFirst();
 		final int firstIndex = getCellIndex(cell);
 		final double firstCellPos = getCellPosition(cell);
 		if (firstIndex == 0 && firstCellPos > 0) {
@@ -324,6 +335,10 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 	
 	@Override
 	protected boolean addTrailingCells(boolean fillEmptyCells) {
+		return addTrailingCells(new Helper<T>(this), fillEmptyCells);
+	}
+
+	private boolean addTrailingCells(Helper<T> ch, boolean fillEmptyCells) {
 		// If cells is empty then addLeadingCells bailed for some reason and
 		// we're hosed, so just punt
 		if (getCells().isEmpty()) {
@@ -334,7 +349,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 		// off the flow, so we will continue to create and add cells. When the
 		// offset becomes greater than the width/height of the flow, then we
 		// know we cannot add any more cells.
-		final T startCell = cells.getLast();
+		final T startCell = ch.getLast();
 		double offset = getCellPosition(startCell) + getCellLength(startCell);
 		int index = getCellIndex(startCell) + 1;
 		boolean filledWithNonEmpty = index <= getCellCount();
@@ -366,12 +381,12 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 				setCellIndex(cell, index);
 			}
 			resizeCellSize(cell); // resize happens after config!
-			cells.addLast(cell);
+			ch.addLast(cell);
 
 
 			// Position the cell and update the max pref
 			positionCell(cell, offset);
-			 setMaxPrefBreadth(Math.max(getMaxPrefBreadth(), getCellBreadth(cell)));
+			 setMaxPrefBreadth(Math.max(ch.getMaxPrefBreadth(this), getCellBreadth(cell)));
 
 			offset += getCellLength(cell);
 			cell.setVisible(true);
@@ -385,7 +400,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 		// one at a time, until either the very last non-empty cells is aligned
 		// with the bottom OR we have laid out cell index #0 at the first
 		// position.
-		T firstCell = cells.getFirst();
+		T firstCell = ch.getFirst();
 		index = getCellIndex(firstCell);
 		final T lastNonEmptyCell = getLastVisibleCell();
 		double start = getCellPosition(firstCell);
@@ -396,7 +411,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 			//Quite impossible to add properly the FixedRows so I choose to rebuild the view
 			if(!fixedRows.isEmpty()){
 				final int currentIndex = (int) (getPosition() * getCellCount());
-				addAllToPile();
+				ch.addAllToPile(this);
 
 				// The distance from the top of the viewport to the top of the
 				// cell for the current index.
@@ -425,25 +440,25 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 		                T cell = getAvailableCell(index);
 		                setCellIndex(cell, index);
 		                resizeCellSize(cell); // resize must be after config
-		                cells.addFirst(cell);
+		                ch.addFirst(cell);
 		                double cellLength = getCellLength(cell);
 		                start -= cellLength;
 		                prospectiveEnd += cellLength;
 		                positionCell(cell, start);
-		                setMaxPrefBreadth(Math.max(getMaxPrefBreadth(), getCellBreadth(cell)));
+		                setMaxPrefBreadth(Math.max(ch.getMaxPrefBreadth(this), getCellBreadth(cell)));
 		                cell.setVisible(true);
 		            }
 
 		            // The amount by which to translate the cells down
-		            firstCell = cells.getFirst();
+		            firstCell = ch.getFirst();
 		            start = getCellPosition(firstCell);
 		            double delta = viewportLength - end;
 		            if (getCellIndex(firstCell) == 0 && delta > (-start)) {
 		                delta = (-start);
 		            }
 		            // Move things
-		            for (int i = 0; i < cells.size(); i++) {
-		                T cell = cells.get(i);
+		            for (int i = 0; i < ch.size(); i++) {
+		                T cell = ch.get(i);
 		                positionCell(cell, getCellPosition(cell) + delta);
 		            }
 
@@ -527,3 +542,146 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 		}
 	}*/
 }
+
+	/**
+	 * Helper class to workaround RT-31692
+	 */
+	class Helper<T extends IndexedCell<?>> {
+		 Object cells;
+		 static  Field fcells;
+		 static  Method getFirst;
+		 static  Method getLast;
+		 static  Method get;
+		 static  Method addFirst;
+		 static  Method addLast;
+		 static  Method size;
+		 static  Method getMaxPrefBreadth;
+		 static  Method addAllToPile;
+		 static {
+			try {
+				 Class<?> vfc = VirtualFlow.class;
+				 getMaxPrefBreadth = vfc.getDeclaredMethod("getMaxPrefBreadth");
+				 getMaxPrefBreadth.setAccessible(true);
+				 addAllToPile = vfc.getDeclaredMethod("addAllToPile");
+				 addAllToPile.setAccessible(true);
+				 fcells = vfc.getDeclaredField("cells");
+				 fcells.setAccessible(true);
+				 Class<?> ccells = fcells.getType();
+				 getFirst = ccells.getDeclaredMethod("getFirst");
+				 getFirst.setAccessible(true);;
+				 getLast = ccells.getDeclaredMethod("getLast");
+				 getLast.setAccessible(true);
+				 get = ccells.getDeclaredMethod("get", new Class<?>[]{int.class});
+				 get.setAccessible(true);
+				 addFirst = ccells.getDeclaredMethod("addFirst", new Class<?>[]{Object.class});
+				 addFirst.setAccessible(true);
+				 addLast = ccells.getDeclaredMethod("addLast", new Class<?>[]{Object.class});
+				 addLast.setAccessible(true);
+				 size = ccells.getDeclaredMethod("size");
+				 size.setAccessible(true);
+			} catch (NoSuchFieldException | SecurityException | NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 
+		 }
+		 
+		 Helper(VirtualFlow<?> vf) {
+			 try {
+				cells = fcells.get(vf);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				cells = null;
+			}
+		 }
+		 
+		 void addAllToPile(VirtualFlow<?> vf) {
+			 try {
+				addAllToPile.invoke(vf);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+		 
+		 double getMaxPrefBreadth(VirtualFlow<?> vf) {
+			 try {
+				return (Double) getMaxPrefBreadth.invoke(vf);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 return -1;
+		 }
+		 
+		@SuppressWarnings("unchecked")
+		T get(int index) {
+			 try {
+				return (T) get.invoke(cells, index);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 return null;
+		 }
+		 
+		 @SuppressWarnings("unchecked")
+		T getFirst() {
+			 try {
+				return (T) getFirst.invoke(cells);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 return null;
+		 }
+
+		 @SuppressWarnings("unchecked")
+		 T getLast() {
+			 try {
+				return (T) getLast.invoke(cells);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 return null;
+		 }
+		 
+		 int size() {
+			 try {
+				Integer isize = (Integer) size.invoke(cells);
+				return isize.intValue();
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 return -1;
+		 }
+		 
+		 void addFirst(T cell) {
+			 try {
+				addFirst.invoke(cells, cell);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+		 
+		 void addLast(T cell) {
+			 try {
+				addLast.invoke(cells, cell);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+	 }

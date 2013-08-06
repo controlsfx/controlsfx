@@ -49,7 +49,8 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.skin.SpreadsheetViewSkin;
-import org.controlsfx.control.spreadsheet.sponge.VirtualScrollBar;
+
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 /**
  *
  *

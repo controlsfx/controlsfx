@@ -11,10 +11,9 @@ import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.sponge.NestedTableColumnHeader;
-import org.controlsfx.control.spreadsheet.sponge.TableColumnHeader;
-import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
-
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 
 public class SpreadsheetHeaderRow extends TableHeaderRow{
 

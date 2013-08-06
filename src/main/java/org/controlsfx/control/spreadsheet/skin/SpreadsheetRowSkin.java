@@ -1,5 +1,7 @@
 package org.controlsfx.control.spreadsheet.skin;
 
+import java.lang.reflect.Field;
+
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
@@ -13,10 +15,35 @@ import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.sponge.TableRowSkin;
+
+import com.sun.javafx.scene.control.skin.TableRowSkin;
+
 
 public class SpreadsheetRowSkin<T extends DataRow> extends TableRowSkin<DataRow>{
-SpreadsheetView spreadsheetView;
+	static final double DEFAULT_CELL_SIZE;
+	static {
+		double cell_size = 24.0;
+		try {
+			Class<?> clazz = com.sun.javafx.scene.control.skin.CellSkinBase.class;
+			Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE");
+			f.setAccessible(true);
+			cell_size = f.getDouble(null);
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		DEFAULT_CELL_SIZE = cell_size;
+	}
+	SpreadsheetView spreadsheetView;
 	public SpreadsheetRowSkin(TableRow<DataRow> tableRow, SpreadsheetView spreadsheetView) {
 		super(tableRow);
 		this.spreadsheetView = spreadsheetView;

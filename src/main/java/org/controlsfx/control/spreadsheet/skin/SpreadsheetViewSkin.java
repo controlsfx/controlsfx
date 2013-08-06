@@ -14,9 +14,9 @@ import javafx.scene.control.TableView;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
 import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.sponge.TableHeaderRow;
-import org.controlsfx.control.spreadsheet.sponge.TableViewSkin;
-import org.controlsfx.control.spreadsheet.sponge.VirtualFlow;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 

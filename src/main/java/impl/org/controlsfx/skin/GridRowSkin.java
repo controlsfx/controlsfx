@@ -36,11 +36,12 @@ import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
+import java.util.Collections;
 
 public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<GridRow<T>>> {
 
     public GridRowSkin(GridRow<T> control) {
-        super(control, new CellBehaviorBase<GridRow<T>>(control));
+        super(control, new CellBehaviorBase<GridRow<T>>(control, Collections.EMPTY_LIST));
 
         updateCells();
         

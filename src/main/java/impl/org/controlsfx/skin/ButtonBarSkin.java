@@ -45,6 +45,7 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import java.util.Collections;
 
 public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<ButtonBar>> {
     
@@ -83,7 +84,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
      **************************************************************************/
 
     public ButtonBarSkin(final ButtonBar control) {
-        super(control, new BehaviorBase<>(control));
+        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
         
         this.layout = new HBox(GAP_SIZE) {
             @Override

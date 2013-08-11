@@ -37,6 +37,7 @@ import org.controlsfx.control.SegmentedButton;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import java.util.Collections;
 
 public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>>{
 
@@ -48,7 +49,7 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
      * 
      */
     public SegmentedButtonSkin(SegmentedButton control) {
-        super(control, new BehaviorBase<>(control));
+        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
         
         group = new ToggleGroup();
         container = new HBox();

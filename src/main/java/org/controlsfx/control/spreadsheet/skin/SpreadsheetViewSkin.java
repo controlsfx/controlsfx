@@ -17,6 +17,7 @@ import org.controlsfx.control.spreadsheet.model.DataRow;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.control.TableColumn;
 
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 
@@ -225,9 +226,9 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 	BooleanProperty getTableMenuButtonVisibleProperty(){
 		return tableMenuButtonVisibleProperty();
 	}
-	
+        
 	@Override
-	protected void scrollHorizontally(TableColumnBase col) {
+	protected void scrollHorizontally(TableColumn<DataRow, ?> col) {
 
 		if (col == null || !col.isVisible()) {
 			return;

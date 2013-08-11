@@ -66,7 +66,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
      * We manually specify the focus traversal keys because Slider has        *
      * different usage for up/down arrow keys.                                *
      *************************************************************************/
-    protected static final List<KeyBinding> RANGESLIDER_BINDINGS = new ArrayList<KeyBinding>();
+    private static final List<KeyBinding> RANGESLIDER_BINDINGS = new ArrayList<KeyBinding>();
     static {
         RANGESLIDER_BINDINGS.add(new KeyBinding(F4, "TraverseDebug").alt().ctrl().shift());
 
@@ -91,14 +91,9 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
         RANGESLIDER_BINDINGS.add(new KeyBinding(HOME, KEY_RELEASED, "Home"));
         RANGESLIDER_BINDINGS.add(new KeyBinding(END, KEY_RELEASED, "End"));
     }
-
     
-    @Override protected List<KeyBinding> createKeyBindings() {
-        return RANGESLIDER_BINDINGS;
-    }
-
     public RangeSliderBehavior(RangeSlider slider) {
-        super(slider);
+        super(slider, RANGESLIDER_BINDINGS);
     }
 
     @Override protected void callAction(String s) {

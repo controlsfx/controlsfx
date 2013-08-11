@@ -8,7 +8,7 @@ import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 
 public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader{
 
-	public SpreadsheetNestedTableColumnHeader(TableViewSkinBase<?, ?, ?, ?> skin,
+	public SpreadsheetNestedTableColumnHeader(TableViewSkinBase<?, ?, ?, ?, ?, ?> skin,
 			TableColumnBase<?, ?> tc) {
 		super(skin, tc);
 	}

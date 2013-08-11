@@ -29,9 +29,10 @@ package impl.org.controlsfx.behavior;
 import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import java.util.Collections;
 
 public class GridViewBehavior<T> extends BehaviorBase<GridView<T>> {
     public GridViewBehavior(GridView<T> control) {
-        super(control);
+        super(control, Collections.EMPTY_LIST);
     }
 }

@@ -63,6 +63,7 @@ import org.controlsfx.property.editor.PropertyEditor;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import java.util.Collections;
 
 public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorBase<PropertySheet>> {
 
@@ -97,7 +98,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
 
     public PropertySheetSkin(final PropertySheet control) {
-        super(control, new BehaviorBase<>(control));
+        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
         
         scroller.setFitToWidth(true);
         

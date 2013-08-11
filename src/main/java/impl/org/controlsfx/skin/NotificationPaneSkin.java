@@ -55,6 +55,7 @@ import org.controlsfx.control.action.ActionUtils;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import java.util.Collections;
 
 public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
     
@@ -62,7 +63,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     private Node content;
     
     public NotificationPaneSkin(final NotificationPane control) {
-        super(control, new BehaviorBase<>(control));
+        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
         
         notificationBar = new NotificationBar(control);
         

@@ -1,3 +1,30 @@
+/**
+ * Copyright (c) 2013, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.controlsfx.control.spreadsheet.skin;
 
 import java.lang.reflect.Field;
@@ -23,8 +50,10 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
 
-
-
+/**
+ * A VirtualFlow customized to implement the SpreadSheet behavior wrt spanning cells.
+ * @param <T>
+ */
 final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow<T> {
 	private static final  Comparator<SpreadsheetRow> ROWCMP = new Comparator<SpreadsheetRow>() {
 		@Override
@@ -69,7 +98,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 	public VirtualFlowSpreadsheet(){
 		super();
 		final ChangeListener<Number> listenerY = new ChangeListener<Number>() {
-			@Override public void changed(ObservableValue ov, Number t, Number t1) {
+			@Override public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
 				layoutTotal();
 			}
 		};
@@ -190,7 +219,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
 			reconfigureCells();
 			//recreateCells();
 		}
-		for (Cell cell : getCells()) {
+		for (Cell<?> cell : getCells()) {
 			if (cell != null) {
 				cell.requestLayout();
 			}

@@ -436,7 +436,7 @@ public final class Dialogs {
      * {@link TabPane}, and this will only block on that one tab - all other 
      * tabs will continue to be interactive and execute as per usual.
      * 
-     * @return dialog instance.
+     * @return dialog instance
      */
     public Dialogs lightweight() {
         this.lightweight = true;
@@ -448,7 +448,7 @@ public final class Dialogs {
      * operating system rather than the custom cross-platform rendering used by 
      * default. Refer to the Dialogs class JavaDoc for more information.
      * 
-     * @return Dialog instance.
+     * @return dialog instance.
      */
     public Dialogs nativeTitleBar() {
         this.nativeTitleBar = true;
@@ -604,8 +604,7 @@ public final class Dialogs {
     }
 
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
-     * a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
@@ -677,8 +676,7 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
-     * a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent a set of available 'radio' buttons
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */    
@@ -687,8 +685,7 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
-     * a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
@@ -698,7 +695,7 @@ public final class Dialogs {
     }
     
     /**
-     * Show font selection dialog, allowing to manipulate font name, style and size 
+     * Show font selection dialog, allowing to manipulate font name, style and size. 
      * 
      * @param font Default font value 
      * @return selected font or null if the dialog is canceled

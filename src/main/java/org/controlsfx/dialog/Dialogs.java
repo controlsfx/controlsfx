@@ -368,7 +368,7 @@ public final class Dialogs {
      * or if owner is null, the dialog will block input to the entire application.
      * 
      * @param owner The dialog owner.
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs owner(final Object owner) {
         this.owner = owner;
@@ -378,7 +378,7 @@ public final class Dialogs {
     /**
      * Assigns dialog's title
      * @param title dialog title
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs title(final String title) {
         this.title = title;
@@ -389,7 +389,7 @@ public final class Dialogs {
     /**
      * Assigns dialog's instructions
      * @param message dialog message
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs message(final String message) {
         this.message = message;
@@ -399,7 +399,7 @@ public final class Dialogs {
     /**
      * Assigns dialog's masthead
      * @param masthead dialog masthead
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs masthead(final String masthead) {
         this.masthead = masthead;
@@ -409,7 +409,7 @@ public final class Dialogs {
     /**
      * Completely replaces standard actions with provided ones.
      * @param actions new dialog actions
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs actions( Collection<? extends Action> actions) {
         this.actions.clear();
@@ -420,7 +420,7 @@ public final class Dialogs {
     /**
      * Completely replaces standard actions with provided ones.  
      * @param actions new dialog actions
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs actions( Action... actions) {
         return actions( Arrays.asList(actions));
@@ -436,7 +436,7 @@ public final class Dialogs {
      * {@link TabPane}, and this will only block on that one tab - all other 
      * tabs will continue to be interactive and execute as per usual.
      * 
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs lightweight() {
         this.lightweight = true;
@@ -456,15 +456,15 @@ public final class Dialogs {
     }
     
     /**
-     * Shows information dialog
+     * Shows information dialog.
      */
     public void showInformation() {
         showSimpleContentDialog(Type.INFORMATION);
     }
 
     /**
-     * Shows confirmation dialog
-     * @return action used to close dialog
+     * Shows confirmation dialog.
+     * @return action used to close dialog.
      */
     public Action showConfirm() {
         return showSimpleContentDialog(Type.CONFIRMATION);
@@ -549,7 +549,7 @@ public final class Dialogs {
      * will be set to a default value if one is provided.
      * @param defaultChoice default combobox selection 
      * @param choices dialog choices
-     * @return selected choice or null if dialog is cancelled
+     * @return selected choice or null if dialog is cancelled.
      */
     @SuppressWarnings("unchecked") public <T> T showChoices(T defaultChoice, Collection<T> choices) {
 
@@ -604,7 +604,8 @@ public final class Dialogs {
     }
 
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent 
+     * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
@@ -676,7 +677,8 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * a set of available 'radio' buttons
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */    
@@ -685,7 +687,8 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
@@ -697,8 +700,8 @@ public final class Dialogs {
     /**
      * Show font selection dialog, allowing to manipulate font name, style and size. 
      * 
-     * @param font Default font value 
-     * @return selected font or null if the dialog is canceled
+     * @param font default font value 
+     * @return selected font or null if the dialog is canceled.
      */
     public Font showFontSelector(Font font) {
         FontPanel fontPanel = new FontPanel();

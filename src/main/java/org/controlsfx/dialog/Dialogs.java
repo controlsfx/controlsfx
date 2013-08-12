@@ -368,7 +368,7 @@ public final class Dialogs {
      * or if owner is null, the dialog will block input to the entire application.
      * 
      * @param owner The dialog owner.
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs owner(final Object owner) {
         this.owner = owner;
@@ -378,7 +378,7 @@ public final class Dialogs {
     /**
      * Assigns dialog's title
      * @param title dialog title
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs title(final String title) {
         this.title = title;
@@ -389,7 +389,7 @@ public final class Dialogs {
     /**
      * Assigns dialog's instructions
      * @param message dialog message
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs message(final String message) {
         this.message = message;
@@ -399,7 +399,7 @@ public final class Dialogs {
     /**
      * Assigns dialog's masthead
      * @param masthead dialog masthead
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs masthead(final String masthead) {
         this.masthead = masthead;
@@ -409,7 +409,7 @@ public final class Dialogs {
     /**
      * Completely replaces standard actions with provided ones.
      * @param actions new dialog actions
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs actions( Collection<? extends Action> actions) {
         this.actions.clear();
@@ -420,7 +420,7 @@ public final class Dialogs {
     /**
      * Completely replaces standard actions with provided ones.  
      * @param actions new dialog actions
-     * @return dialog instance
+     * @return dialog instance.
      */
     public Dialogs actions( Action... actions) {
         return actions( Arrays.asList(actions));
@@ -448,7 +448,7 @@ public final class Dialogs {
      * operating system rather than the custom cross-platform rendering used by 
      * default. Refer to the Dialogs class JavaDoc for more information.
      * 
-     * @return Dialog instance.
+     * @return dialog instance.
      */
     public Dialogs nativeTitleBar() {
         this.nativeTitleBar = true;
@@ -456,15 +456,15 @@ public final class Dialogs {
     }
     
     /**
-     * Shows information dialog
+     * Shows information dialog.
      */
     public void showInformation() {
         showSimpleContentDialog(Type.INFORMATION);
     }
 
     /**
-     * Shows confirmation dialog
-     * @return action used to close dialog
+     * Shows confirmation dialog.
+     * @return action used to close dialog.
      */
     public Action showConfirm() {
         return showSimpleContentDialog(Type.CONFIRMATION);
@@ -549,7 +549,7 @@ public final class Dialogs {
      * will be set to a default value if one is provided.
      * @param defaultChoice default combobox selection 
      * @param choices dialog choices
-     * @return selected choice or null if dialog is cancelled
+     * @return selected choice or null if dialog is cancelled.
      */
     @SuppressWarnings("unchecked") public <T> T showChoices(T defaultChoice, Collection<T> choices) {
 
@@ -604,7 +604,7 @@ public final class Dialogs {
     }
 
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent 
      * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links list of command links presented in specified sequence
@@ -698,10 +698,10 @@ public final class Dialogs {
     }
     
     /**
-     * Show font selection dialog, allowing to manipulate font name, style and size 
+     * Show font selection dialog, allowing to manipulate font name, style and size. 
      * 
-     * @param font Default font value 
-     * @return selected font or null if the dialog is canceled
+     * @param font default font value 
+     * @return selected font or null if the dialog is canceled.
      */
     public Font showFontSelector(Font font) {
         FontPanel fontPanel = new FontPanel();

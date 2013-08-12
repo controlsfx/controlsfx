@@ -350,7 +350,7 @@ public class Dialog {
     /**
      * Returns whether or not the dialog is resizable.
      * 
-     * @return true if dialog is resizable
+     * @return true if dialog is resizable.
      */
     public final boolean isResizable() {
         return resizableProperty().get();

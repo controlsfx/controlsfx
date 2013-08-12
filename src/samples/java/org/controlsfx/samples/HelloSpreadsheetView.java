@@ -29,6 +29,8 @@ package org.controlsfx.samples;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -196,12 +198,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		DataCell<?> cell;
 		final double random = Math.random();
 		if (random < 0.3) {
-			ArrayList<String> stringList = new ArrayList<>(3);
-			stringList.add("Banana");
-			stringList.add("Apple");
-			stringList.add("Mango");
-			stringList.add("Cherry");
-			stringList.add("Watermelon");
+			List<String> stringList = Arrays.asList("Banana","Apple","Mango","Cherry","Watermelon");
 			cell = SpreadsheetCells.createListCell(row, column, rowSpan, colSpan, stringList);
 		} else if (random >= 0.3 && random < 0.8) {
 			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,Integer.toString((int)(Math.random()*100)));

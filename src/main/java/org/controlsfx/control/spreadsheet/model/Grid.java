@@ -29,7 +29,7 @@ package org.controlsfx.control.spreadsheet.model;
 
 import java.util.ArrayList;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView;
 
 /**
  *

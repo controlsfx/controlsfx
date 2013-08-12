@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -42,10 +42,11 @@ import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpanType;
-import org.controlsfx.control.spreadsheet.editor.Editor;
+import org.controlsfx.control.SpreadsheetView.SpanType;
+import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
+
 import com.sun.javafx.scene.control.skin.TableCellSkin;
 
 
@@ -54,7 +55,7 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
  * The View cell that will be visible on screen.
  * It holds the {@link DataRow} and the {@link DataCell}.
  */
-public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
+public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
 
 	/***************************************************************************
      *                                                                         *
@@ -128,7 +129,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 		final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
 		final SpanType type = spv.getSpanType(row, column);
 		if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
-			Editor editor = spv.getEditor(getItem(), this);
+			SpreadsheetCellEditor<?> editor = spv.getEditor(getItem(), this);
 			if(editor != null){
 				super.startEdit();
 //				System.out.println("je start"+row+"/"+((SpreadsheetRow) getTableRow()).getIndexVirtualFlow()+"/"+column);
@@ -141,7 +142,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 	}
 
 	@Override
-	public void commitEdit(DataCell<?> newValue) {
+	public void commitEdit(DataCell<T> newValue) {
 		if (! isEditing()) {
 			return;
 		}
@@ -173,7 +174,7 @@ public class SpreadsheetCell extends TableCell<DataRow, DataCell<?>> {
 	}
 
 	@Override
-	public void updateItem(final DataCell<?> item, boolean empty) {
+	public void updateItem(final DataCell<T> item, boolean empty) {
 		final boolean emptyRow = getTableView().getItems().size() < getIndex() + 1;
 
 		/**

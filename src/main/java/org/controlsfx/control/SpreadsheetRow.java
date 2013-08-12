@@ -24,7 +24,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control;
+
+import impl.org.controlsfx.skin.SpreadsheetRowSkin;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,7 +37,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.skin.SpreadsheetRowSkin;
 
 
 /**

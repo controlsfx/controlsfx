@@ -46,13 +46,11 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
-import org.controlsfx.control.spreadsheet.model.DateCell;
 import org.controlsfx.control.spreadsheet.model.Grid;
-import org.controlsfx.control.spreadsheet.model.ListCell;
-import org.controlsfx.control.spreadsheet.model.TextCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
 
 /**
  *
@@ -204,11 +202,11 @@ public class HelloSpreadsheetView extends Application implements Sample {
 			stringList.add("Mango");
 			stringList.add("Cherry");
 			stringList.add("Watermelon");
-			cell = new ListCell(row, column, rowSpan, colSpan, stringList);
+			cell = SpreadsheetCells.createListCell(row, column, rowSpan, colSpan, stringList);
 		} else if (random >= 0.3 && random < 0.8) {
-			cell = new TextCell(row, column, rowSpan, colSpan,Integer.toString((int)(Math.random()*100)));
+			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,Integer.toString((int)(Math.random()*100)));
 		}else{
-			cell = new DateCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+			cell = SpreadsheetCells.createDateCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
 		}
 
 		// Styling for preview

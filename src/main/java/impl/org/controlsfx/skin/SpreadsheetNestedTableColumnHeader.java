@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.skin;
+package impl.org.controlsfx.skin;
 
 import javafx.scene.control.TableColumnBase;
 

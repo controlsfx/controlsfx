@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.skin;
+package impl.org.controlsfx.skin;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -11,12 +11,14 @@ import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetRow;
+import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataRow;
+
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
+
 import javafx.scene.control.TableColumn;
 
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {

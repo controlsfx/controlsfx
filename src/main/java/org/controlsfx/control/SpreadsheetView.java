@@ -1,5 +1,8 @@
-package org.controlsfx.control.spreadsheet.control;
+package org.controlsfx.control;
 
+import impl.org.controlsfx.skin.SpreadsheetViewSkin;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -41,14 +44,11 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
-import org.controlsfx.control.spreadsheet.editor.DateEditor;
-import org.controlsfx.control.spreadsheet.editor.Editor;
-import org.controlsfx.control.spreadsheet.editor.ListEditor;
-import org.controlsfx.control.spreadsheet.editor.TextEditor;
+import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditors;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
-import org.controlsfx.control.spreadsheet.skin.SpreadsheetViewSkin;
 
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 /**
@@ -93,11 +93,11 @@ public class SpreadsheetView extends StackPane{
 	private final SpreadsheetViewInternal<DataRow> spreadsheetViewInternal;
 	private static final String DEFAULT_STYLE_CLASS = "cell-spreadsheet";
 	private final double DEFAULT_CELL_SIZE = 24.0; 	// Height of a cell
-	private SpreadsheetCell lastHover = null;
+	private SpreadsheetCell<?> lastHover = null;
 	private Grid grid;
 	private DataFormat fmt;
 	private final double cellPrefWidth = 100;			// Width of a cell
-	private final Map<DataCell.CellType, Editor> editors = FXCollections.observableHashMap();
+	private final Map<DataCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
 	private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
 	private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
 	private final BooleanProperty columnHeader = new SimpleBooleanProperty(true);
@@ -361,7 +361,9 @@ public class SpreadsheetView extends StackPane{
      * Private/Protected Implementation                                                  *
      *                                                                         *
      **************************************************************************/   
-	boolean addCell(SpreadsheetCell cell){
+	
+	// FIXME this shouldn't be here!
+	public boolean addCell(SpreadsheetCell<?> cell){
 		SpreadsheetRow temp = getRow(cells.size()-1-fixedRows.size());
 		if(temp != null){
 			temp.addCell(cell);
@@ -371,7 +373,8 @@ public class SpreadsheetView extends StackPane{
 		
 	}
 	
-	int getVirtualFlowCellSize(){
+	// FIXME this shouldn't be here!
+	public int getVirtualFlowCellSize(){
 		return cells.size();
 	}
 	
@@ -395,7 +398,7 @@ public class SpreadsheetView extends StackPane{
 	 */
 	void hoverGridCell(DataCell<?> cell) {
 		//If the top of the spanned cell is visible, then no problem
-		SpreadsheetCell gridCell;
+		SpreadsheetCell<?> gridCell;
 		if (!isEmptyCells() && getNonFixed(0).getIndex() <= cell.getRow()) {
 			// We want to get the top of the spanned cell, so we need
 			// to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
@@ -431,33 +434,34 @@ public class SpreadsheetView extends StackPane{
 	 * @param bc The SpreadsheetCell
 	 * @return
 	 */
-	Editor getEditor(DataCell<?> cell, SpreadsheetCell bc) {
-		Editor editor = editors.get(cell.getCellType());
+	@SuppressWarnings("unchecked")
+    <T> SpreadsheetCellEditor<?> getEditor(final DataCell<T> cell, final SpreadsheetCell<T> bc) {
+		SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
 		if (editor == null) {
 			switch (cell.getCellType()) {
-			case STRING:
-				final TextEditor te = new TextEditor();
-				editors.put(cell.getCellType(), te);
-				editor = te;
-				break;
-			case ENUM:
-				final ListEditor le = new ListEditor();
-				editors.put(cell.getCellType(), le);
-				editor = le;
-				break;
-			case DATE:
-				final DateEditor de = new DateEditor();
-				editors.put(cell.getCellType(), de);
-				editor = de;
-				break;
-			default:
-				return null;
+    			case STRING:
+    				editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createTextEditor();
+    				editors.put(cell.getCellType(), editor);
+    				break;
+    			case ENUM:
+    			    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createListEditor();
+    				editors.put(cell.getCellType(), editor);
+    				break;
+    			case DATE:
+    			    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDateEditor();
+                    editors.put(cell.getCellType(), editor);
+    				break;
+    			default:
+    				return null;
 			}
 		}
-		if(editor.isWorking()){
+		
+		if(editor.isEditing()){
 			return null;
-		}else{
-			editor.begin(cell, bc, this);
+		} else {
+		    editor.updateSpreadsheetView(this);
+		    editor.updateSpreadsheetCell(bc);
+		    editor.updateDataCell(cell);
 			return editor;
 		}
 	}

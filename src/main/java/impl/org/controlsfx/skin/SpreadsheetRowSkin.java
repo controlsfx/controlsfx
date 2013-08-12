@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.skin;
+package impl.org.controlsfx.skin;
 
 import java.lang.reflect.Field;
 
@@ -9,10 +9,10 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetRow;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
+import org.controlsfx.control.SpreadsheetCell;
+import org.controlsfx.control.SpreadsheetRow;
+import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 

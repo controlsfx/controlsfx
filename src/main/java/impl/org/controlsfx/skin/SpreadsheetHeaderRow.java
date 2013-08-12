@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.skin;
+package impl.org.controlsfx.skin;
 
 import java.util.List;
 
@@ -9,8 +9,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.shape.Rectangle;
 
-import org.controlsfx.control.spreadsheet.control.SpreadsheetView.SpreadsheetViewSelectionModel;
+import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.DataRow;
+
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;

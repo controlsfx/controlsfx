@@ -27,6 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.event.ActionEvent;
@@ -41,8 +42,8 @@ import javafx.scene.text.TextFlow;
 import org.controlsfx.control.HyperlinkLabel;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-import java.util.Collections;
 
 public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, BehaviorBase<HyperlinkLabel>> {
     
@@ -83,7 +84,7 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
      **************************************************************************/
     
     public HyperlinkLabelSkin(HyperlinkLabel control) {
-        super(control, new BehaviorBase<HyperlinkLabel>(control, Collections.EMPTY_LIST));
+        super(control, new BehaviorBase<HyperlinkLabel>(control, Collections.<KeyBinding> emptyList()));
         
         this.textFlow = new TextFlow();
         getChildren().add(textFlow);

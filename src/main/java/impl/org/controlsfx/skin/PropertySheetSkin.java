@@ -27,6 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -62,8 +63,8 @@ import org.controlsfx.property.editor.AbstractPropertyEditor;
 import org.controlsfx.property.editor.PropertyEditor;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-import java.util.Collections;
 
 public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorBase<PropertySheet>> {
 
@@ -98,7 +99,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
 
     public PropertySheetSkin(final PropertySheet control) {
-        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
         scroller.setFitToWidth(true);
         

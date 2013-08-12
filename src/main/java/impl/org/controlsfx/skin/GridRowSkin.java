@@ -26,22 +26,21 @@
  */
 package impl.org.controlsfx.skin;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.HPos;
+import java.util.Collections;
+
 import javafx.scene.Node;
 
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
-import java.util.Collections;
 
 public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<GridRow<T>>> {
 
     public GridRowSkin(GridRow<T> control) {
-        super(control, new CellBehaviorBase<GridRow<T>>(control, Collections.EMPTY_LIST));
+        super(control, new CellBehaviorBase<GridRow<T>>(control, Collections.<KeyBinding> emptyList()));
 
         updateCells();
         

@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
+import java.util.Collections;
+
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -46,7 +48,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import org.controlsfx.control.ButtonBar;
@@ -54,8 +55,8 @@ import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.ActionUtils;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-import java.util.Collections;
 
 public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
     
@@ -63,7 +64,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     private Node content;
     
     public NotificationPaneSkin(final NotificationPane control) {
-        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
         notificationBar = new NotificationBar(control);
         

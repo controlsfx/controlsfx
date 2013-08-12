@@ -27,6 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,8 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-import java.util.Collections;
 
 public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<ButtonBar>> {
     
@@ -84,7 +85,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
      **************************************************************************/
 
     public ButtonBarSkin(final ButtonBar control) {
-        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
         this.layout = new HBox(GAP_SIZE) {
             @Override

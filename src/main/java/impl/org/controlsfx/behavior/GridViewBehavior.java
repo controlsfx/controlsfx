@@ -26,13 +26,15 @@
  */
 package impl.org.controlsfx.behavior;
 
+import java.util.Collections;
+
 import org.controlsfx.control.GridView;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import java.util.Collections;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 
 public class GridViewBehavior<T> extends BehaviorBase<GridView<T>> {
     public GridViewBehavior(GridView<T> control) {
-        super(control, Collections.EMPTY_LIST);
+        super(control, Collections.<KeyBinding> emptyList());
     }
 }

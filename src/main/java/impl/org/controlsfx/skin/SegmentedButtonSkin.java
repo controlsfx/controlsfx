@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
+import java.util.Collections;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
@@ -36,8 +38,8 @@ import javafx.scene.layout.HBox;
 import org.controlsfx.control.SegmentedButton;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-import java.util.Collections;
 
 public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>>{
 
@@ -49,7 +51,7 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
      * 
      */
     public SegmentedButtonSkin(SegmentedButton control) {
-        super(control, new BehaviorBase<>(control, Collections.EMPTY_LIST));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
         group = new ToggleGroup();
         container = new HBox();

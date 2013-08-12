@@ -26,16 +26,18 @@
  */
 package impl.org.controlsfx.skin;
 
+import java.util.Collections;
+
 import org.controlsfx.control.GridCell;
 
 import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
-import java.util.Collections;
 
 public class GridCellSkin<T> extends CellSkinBase<GridCell<T>, CellBehaviorBase<GridCell<T>>> {
 
     public GridCellSkin(GridCell<T> control) {
-        super(control, new CellBehaviorBase<>(control, Collections.EMPTY_LIST));
+        super(control, new CellBehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
     }
 
 }

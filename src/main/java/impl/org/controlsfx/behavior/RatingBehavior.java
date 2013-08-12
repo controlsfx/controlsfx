@@ -26,14 +26,16 @@
  */
 package impl.org.controlsfx.behavior;
 
+import java.util.Collections;
+
 import org.controlsfx.control.Rating;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import java.util.Collections;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 
 public class RatingBehavior extends BehaviorBase<Rating> {
 
     public RatingBehavior(Rating control) {
-        super(control, Collections.EMPTY_LIST);
+        super(control, Collections.<KeyBinding> emptyList());
     }
 }

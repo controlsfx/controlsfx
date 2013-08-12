@@ -2,6 +2,7 @@ package org.controlsfx.property.editor;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 import javafx.scene.paint.Color;
@@ -38,6 +39,10 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         
         if (type != null && (type == boolean.class || type == Boolean.class)) {
             return Editors.createCheckEditor(item);
+        }
+
+        if (type != null && type.isAssignableFrom(LocalDate.class)) {
+            return Editors.createDateEditor(item);
         }
 
         if (type != null && type.isAssignableFrom(Color.class)) {

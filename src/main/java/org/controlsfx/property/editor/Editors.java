@@ -1,6 +1,7 @@
 package org.controlsfx.property.editor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.util.Collection;
 
 import javafx.application.Platform;
@@ -12,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.paint.Color;
@@ -115,6 +117,22 @@ public class Editors {
             }
         };
     }
+    
+    
+    public static final PropertyEditor<?> createDateEditor( Item property ) {
+        return new AbstractPropertyEditor<LocalDate, DatePicker>(property, new DatePicker()) {
+            
+            //TODO: Provide date picker customization support
+            
+            @Override protected ObservableValue<LocalDate> getObservableValue() {
+                return getEditor().valueProperty();
+            }
+
+            @Override public void setValue(LocalDate value) {
+                getEditor().setValue((LocalDate) value);
+            }
+        };
+    }    
     
     public static final PropertyEditor<?> createFontEditor( Item property ) {
         

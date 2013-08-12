@@ -26,6 +26,8 @@
  */
 package org.controlsfx.samples;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -64,6 +66,7 @@ public class HelloPropertySheet extends Application implements Sample {
     static {
         customDataMap.put("1. Name#First Name", "Jonathan");
         customDataMap.put("1. Name#Last Name", "Giles");
+        customDataMap.put("1. Name#Birthday",  LocalDate.of(1985, Month.JANUARY, 11));
         customDataMap.put("2. Billing Address#Address 1", "");
         customDataMap.put("2. Billing Address#Address 2", "");
         customDataMap.put("2. Billing Address#City", "");

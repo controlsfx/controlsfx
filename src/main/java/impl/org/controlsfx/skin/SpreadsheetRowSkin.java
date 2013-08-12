@@ -144,7 +144,7 @@ public class SpreadsheetRowSkin<T extends DataRow> extends TableRowSkin<DataRow>
 		//		System.out.println("Je layout"+index+"/"+((SpreadsheetRow)getSkinnable()).getIndexVirtualFlow() );
 		for (int column = 0; column < max; column++) {
 						
-			final SpreadsheetCell tableCell = (SpreadsheetCell) cells.get(column);
+			final SpreadsheetCell<?> tableCell = (SpreadsheetCell<?>) cells.get(column);
 			final TableColumnBase<DataRow, ?> tableColumn = getTableColumnBase(tableCell);
 
 			//show(tableCell);

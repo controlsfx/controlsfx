@@ -132,7 +132,7 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {
-        double currentWidth = getSkinnable().getWidth();
+//        double currentWidth = getSkinnable().getWidth();
         double cellWidth = getSkinnable().gridViewProperty().get().getCellWidth();
         double cellHeight = getSkinnable().gridViewProperty().get().getCellHeight();
         double horizontalCellSpacing = getSkinnable().gridViewProperty().get().getHorizontalCellSpacing();

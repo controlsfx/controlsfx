@@ -156,6 +156,7 @@ public class RangeSlider extends Control {
      * For now we force the developer to set the min/max/low/high values in the
      * other RangeSlider constructor, as this method is private
      */
+    @SuppressWarnings("unused")
     private RangeSlider() {
         // no-op
     }
@@ -814,6 +815,7 @@ public class RangeSlider extends Control {
                 return n.blockIncrement == null || !n.blockIncrement.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Number> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Number>)n.blockIncrementProperty();
             }
@@ -827,6 +829,7 @@ public class RangeSlider extends Control {
                 return n.showTickLabels == null || !n.showTickLabels.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Boolean> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Boolean>)n.showTickLabelsProperty();
             }
@@ -840,6 +843,7 @@ public class RangeSlider extends Control {
                 return n.showTickMarks == null || !n.showTickMarks.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Boolean> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Boolean>)n.showTickMarksProperty();
             }
@@ -853,6 +857,7 @@ public class RangeSlider extends Control {
                 return n.snapToTicks == null || !n.snapToTicks.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Boolean> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Boolean>)n.snapToTicksProperty();
             }
@@ -866,6 +871,7 @@ public class RangeSlider extends Control {
                 return n.majorTickUnit == null || !n.majorTickUnit.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Number> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Number>)n.majorTickUnitProperty();
             }
@@ -875,6 +881,7 @@ public class RangeSlider extends Control {
             new CssMetaData<RangeSlider,Number>("-fx-minor-tick-count",
                 SizeConverter.getInstance(), 3.0) {
 
+            @SuppressWarnings("deprecation")
             @Override public void set(RangeSlider node, Number value, StyleOrigin origin) {
                 super.set(node, value.intValue(), origin);
             } 
@@ -883,6 +890,7 @@ public class RangeSlider extends Control {
                 return n.minorTickCount == null || !n.minorTickCount.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Number> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Number>)n.minorTickCountProperty();
             }
@@ -902,6 +910,7 @@ public class RangeSlider extends Control {
                 return n.orientation == null || !n.orientation.isBound();
             }
 
+            @SuppressWarnings("unchecked")
             @Override public StyleableProperty<Orientation> getStyleableProperty(RangeSlider n) {
                 return (StyleableProperty<Orientation>)n.orientationProperty();
             }

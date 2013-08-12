@@ -26,7 +26,6 @@
  */
 package org.controlsfx.dialog;
 
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 class DialogFactory {

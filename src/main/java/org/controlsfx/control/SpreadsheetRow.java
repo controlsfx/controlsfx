@@ -119,11 +119,11 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 			@Override
 			public int compare(Node o1, Node o2) {
 				// In case it's null (some rows are initiated after rowCount)
-				if(((SpreadsheetCell)o1).getItem() == null || ((SpreadsheetCell)o2).getItem() == null){
+				if(((SpreadsheetCell<?>)o1).getItem() == null || ((SpreadsheetCell<?>)o2).getItem() == null){
 					return -1;
 				}
-				final int lhs = getTableView().getColumns().indexOf(((SpreadsheetCell) o1).getTableColumn());
-				final int rhs = getTableView().getColumns().indexOf(((SpreadsheetCell) o2).getTableColumn());
+				final int lhs = getTableView().getColumns().indexOf(((SpreadsheetCell<?>) o1).getTableColumn());
+				final int rhs = getTableView().getColumns().indexOf(((SpreadsheetCell<?>) o2).getTableColumn());
 				if (lhs < rhs) {
 					return -1;
 				}
@@ -138,11 +138,11 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 	}
 
 	
-	public void addCell(SpreadsheetCell cell){
+	public void addCell(SpreadsheetCell<?> cell){
 		getChildren().add(cell);
 	}
 
-	public void removeCell(SpreadsheetCell gc) {
+	public void removeCell(SpreadsheetCell<?> gc) {
 		getChildren().remove(gc);
 	}
 	
@@ -171,16 +171,16 @@ public class SpreadsheetRow extends TableRow<DataRow>{
 	 * @param col
 	 * @return the corresponding SpreadsheetCell
 	 */
-	SpreadsheetCell getGridCell(int col){
+	SpreadsheetCell<?> getGridCell(int col){
 		int fixedColSize;
 		if((fixedColSize =spreadsheetView.getFixedColumns().size() ) != 0){
 			if(col < fixedColSize){
-				return (SpreadsheetCell) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - fixedColSize + col);
+				return (SpreadsheetCell<?>) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - fixedColSize + col);
 			} else {
-				return (SpreadsheetCell) getChildrenUnmodifiable().get( col- fixedColSize );
+				return (SpreadsheetCell<?>) getChildrenUnmodifiable().get( col- fixedColSize );
 			}
 		}else{
-			return (SpreadsheetCell) getChildrenUnmodifiable().get(col);
+			return (SpreadsheetCell<?>) getChildrenUnmodifiable().get(col);
 		}
 	}
 	

@@ -169,7 +169,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
 
 
-    private class SpreadsheetEditor<T> {
+    private class SpreadsheetEditor<A> {
 
         /***********************************************************************
          *                                                                     *

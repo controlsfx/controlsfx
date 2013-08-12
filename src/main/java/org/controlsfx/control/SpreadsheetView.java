@@ -2,7 +2,6 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -535,7 +534,8 @@ public class SpreadsheetView extends StackPane{
 
 		//		final ArrayList<ArrayList<DataCell>> temp = new ArrayList<>();
 		final ArrayList<DataCell<?>> list = new ArrayList<DataCell<?>>();
-		final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
+		@SuppressWarnings("rawtypes")
+        final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
 		for (final TablePosition<?,?> p : posList) {
 			list.add(getGrid().getRows().get(p.getRow()).get(p.getColumn()));
@@ -556,7 +556,8 @@ public class SpreadsheetView extends StackPane{
 		final Clipboard clipboard = Clipboard.getSystemClipboard();
 		if(clipboard.getContent(fmt) != null){
 
-			final ArrayList<DataCell<?>> list = (ArrayList<DataCell<?>>) clipboard.getContent(fmt);
+			@SuppressWarnings("unchecked")
+            final ArrayList<DataCell<?>> list = (ArrayList<DataCell<?>>) clipboard.getContent(fmt);
 			//TODO algorithm very bad
 			int minRow=grid.getRowCount();
 			int minCol=grid.getColumnCount();
@@ -1278,7 +1279,7 @@ public class SpreadsheetView extends StackPane{
 			}
 
 			/*
-			 * Performance optimisation - if multiple selection is disabled, only
+			 * Performance optimization - if multiple selection is disabled, only
 			 * process the end-most row index.
 			 */
 			final int rowCount = getItemCount();
@@ -1749,7 +1750,7 @@ class SpreadsheetViewInternal<T> extends TableView<DataRow> {
 		return SpreadsheetViewInternal.class.getResource("spreadsheet.css").toExternalForm();
 	}
 
-	public void addCell(SpreadsheetCell cell){
+	public void addCell(SpreadsheetCell<?> cell){
 		getChildren().add(cell);
 	}
 

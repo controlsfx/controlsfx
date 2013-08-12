@@ -29,7 +29,6 @@ package org.controlsfx.control.cell;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.RectangleBuilder;
 
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
@@ -52,7 +51,8 @@ public class ColorGridCell extends GridCell<Color> {
     public ColorGridCell() {
 		getStyleClass().add("color-grid-cell");
 		
-		colorRect = RectangleBuilder.create().stroke(Color.BLACK).build();
+		colorRect = new Rectangle();
+		colorRect.setStroke(Color.BLACK);
 		colorRect.heightProperty().bind(heightProperty());
 		colorRect.widthProperty().bind(widthProperty());   
 		setGraphic(colorRect);

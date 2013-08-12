@@ -26,14 +26,12 @@
  */
 package org.controlsfx.control.cell;
 
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
-
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaPlayerBuilder;
 import javafx.scene.media.MediaView;
-import javafx.scene.media.MediaViewBuilder;
+
+import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 
 /**
  * A {@link GridCell} that can be used to show media (i.e. movies) inside the 
@@ -52,7 +50,8 @@ public class MediaImageCell extends GridCell<Media> {
 	public MediaImageCell() {
 		getStyleClass().add("media-grid-cell");
 		
-        mediaView = MediaViewBuilder.create().mediaPlayer(mediaPlayer).build();
+		mediaView = new MediaView();
+		mediaView.setMediaPlayer(mediaPlayer);
         mediaView.fitHeightProperty().bind(heightProperty());
         mediaView.fitWidthProperty().bind(widthProperty());
         mediaView.setMediaPlayer(mediaPlayer);
@@ -99,7 +98,7 @@ public class MediaImageCell extends GridCell<Media> {
 	    if (empty) {
 	        setGraphic(null);
 	    } else {
-	        mediaPlayer = MediaPlayerBuilder.create().media(item).build();
+	        mediaPlayer = new MediaPlayer(item);
 	        mediaView.setMediaPlayer(mediaPlayer);
 	        setGraphic(mediaView);
 	    }

@@ -31,9 +31,6 @@ import impl.org.controlsfx.skin.GridViewSkin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-
-import org.controlsfx.control.cell.ColorGridCell;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -44,9 +41,7 @@ import javafx.css.CssMetaData;
 import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
-import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
-import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
@@ -55,7 +50,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
-import com.sun.javafx.css.converters.EnumConverter;
+import org.controlsfx.control.cell.ColorGridCell;
 
 /**
  * A GridView is a virtualised control for displaying {@link #getItems()} in a
@@ -460,6 +455,7 @@ public class GridView<T> extends Control {
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public StyleableProperty<Number> getStyleableProperty(GridView<?> n) {
                 return (StyleableProperty<Number>)n.horizontalCellSpacingProperty();
             }
@@ -477,6 +473,7 @@ public class GridView<T> extends Control {
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public StyleableProperty<Number> getStyleableProperty(GridView<?> n) {
                 return (StyleableProperty<Number>)n.verticalCellSpacingProperty();
             }
@@ -494,6 +491,7 @@ public class GridView<T> extends Control {
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public StyleableProperty<Number> getStyleableProperty(GridView<?> n) {
                 return (StyleableProperty<Number>)n.cellWidthProperty();
             }
@@ -511,6 +509,7 @@ public class GridView<T> extends Control {
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public StyleableProperty<Number> getStyleableProperty(GridView<?> n) {
                 return (StyleableProperty<Number>)n.cellHeightProperty();
             }

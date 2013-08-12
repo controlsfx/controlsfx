@@ -137,6 +137,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             }
         });
         
+        // initialize properly 
+        refreshProperties(); 
+        updateToolbar();
+        
         
     }
 

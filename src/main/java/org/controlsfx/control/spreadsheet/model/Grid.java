@@ -28,6 +28,8 @@
 package org.controlsfx.control.spreadsheet.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.controlsfx.control.SpreadsheetView;
 
@@ -43,7 +45,7 @@ public class Grid {
      * Private Fields                                                          *
      *                                                                         *
      **************************************************************************/
-	private ArrayList<DataRow> rows;
+	private List<DataRow> rows;
 	private int rowCount;
 	private int columnCount;
 
@@ -52,16 +54,23 @@ public class Grid {
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-	public Grid(int rowCount, int columnCount, ArrayList<DataRow> rows) {
+	
+	// creates grid with 'unlimited' rows and columns
+	public Grid() {
+	    this(Integer.MAX_VALUE, Integer.MAX_VALUE);
+	}
+	
+	public Grid(int rowCount, int columnCount) {
+        this(rowCount, columnCount, Collections.<DataRow>emptyList());
+    }
+	
+	public Grid(int rowCount, int columnCount, List<DataRow> rows) {
 		this.rowCount = rowCount;
 		this.columnCount = columnCount;
 		this.rows = rows;
 	}
 	
-	public Grid(int rowCount, int columnCount) {
-		this.rowCount = rowCount;
-		this.columnCount = columnCount;
-	}
+	
 
 	/***************************************************************************
      *                                                                         *
@@ -112,7 +121,7 @@ public class Grid {
 	public void setRows(ArrayList<DataRow> rows) {
 		this.rows = rows;
 	}
-	public ArrayList<DataRow> getRows() {
+	public List<DataRow> getRows() {
 		return rows;
 	}
 

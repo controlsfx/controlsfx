@@ -112,8 +112,14 @@ public class SpreadsheetView extends StackPane{
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-	public SpreadsheetView(){
+	
+	public SpreadsheetView() {
+	    this(new Grid());
+	}
+	
+	public SpreadsheetView(final Grid grid){
 		super();
+		
 		this.setPadding(new Insets(10, 10, 10, 10));
 		spreadsheetViewInternal = new SpreadsheetViewInternal<>();
 
@@ -143,6 +149,8 @@ public class SpreadsheetView extends StackPane{
 		spreadsheetViewInternal.getStyleClass().add(DEFAULT_STYLE_CLASS);
 		
 		getChildren().add(spreadsheetViewInternal);
+		
+		setGrid(grid);
 	}
 	
 	/***************************************************************************
@@ -150,53 +158,6 @@ public class SpreadsheetView extends StackPane{
      * Public Methods                                                          *
      *                                                                         *
      **************************************************************************/
-	
-	public void buildSpreadsheetView(Grid grid) {
-		setGrid(grid);
-		
-		if(grid.getRows() != null){
-			final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(grid.getRows());
-			spreadsheetViewInternal.setItems(observableRows);
-	
-	
-			for (int i = 0; i < grid.getColumnCount(); ++i) {
-				final int col = i;
-	
-				final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
-	
-				column.setEditable(true);
-				// We don't want to sort the column
-				column.setSortable(false);
-				
-				column.impl_setReorderable(false);
-				
-				column.setPrefWidth(getCellPrefWidth());
-	
-	
-				// We assign a DataCell for each Cell needed (MODEL).
-				column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
-					@Override
-					public ObservableValue<DataCell<?>> call(TableColumn.CellDataFeatures<DataRow, DataCell<?>> p) {
-						return new ReadOnlyObjectWrapper<DataCell<?>>(p.getValue().getCell(col));
-					}
-				});
-				// We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
-				column.setCellFactory(new Callback<TableColumn<DataRow, DataCell<?>>, TableCell<DataRow, DataCell<?>>>() {
-					@Override
-					public TableCell<DataRow, DataCell<?>> call(TableColumn<DataRow, DataCell<?>> p) {
-						return new SpreadsheetCell();
-					}
-				});
-				getColumns().add(column);
-			}
-		}
-		
-		/** Set the skin in place and give access to the VirtualFlow
-		*   It has to be placed at the end because otherwise UI is responding weirdly 
-		*   (horizontal scrollBar replace at initial position when resizing width
-		*/
-		spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin(spreadsheetViewInternal,this));
-	}
 	
 	public VirtualScrollBar getHbar() {
 		return hbar;
@@ -472,6 +433,49 @@ public class SpreadsheetView extends StackPane{
 	private void setGrid(Grid grid) {
 		this.grid = grid;
 
+		// TODO move into a property
+		if(grid.getRows() != null){
+            final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(grid.getRows());
+            spreadsheetViewInternal.setItems(observableRows);
+    
+    
+            for (int i = 0; i < grid.getColumnCount(); ++i) {
+                final int col = i;
+    
+                final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
+    
+                column.setEditable(true);
+                // We don't want to sort the column
+                column.setSortable(false);
+                
+                column.impl_setReorderable(false);
+                
+                column.setPrefWidth(getCellPrefWidth());
+    
+    
+                // We assign a DataCell for each Cell needed (MODEL).
+                column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
+                    @Override
+                    public ObservableValue<DataCell<?>> call(TableColumn.CellDataFeatures<DataRow, DataCell<?>> p) {
+                        return new ReadOnlyObjectWrapper<DataCell<?>>(p.getValue().getCell(col));
+                    }
+                });
+                // We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
+                column.setCellFactory(new Callback<TableColumn<DataRow, DataCell<?>>, TableCell<DataRow, DataCell<?>>>() {
+                    @Override
+                    public TableCell<DataRow, DataCell<?>> call(TableColumn<DataRow, DataCell<?>> p) {
+                        return new SpreadsheetCell();
+                    }
+                });
+                getColumns().add(column);
+            }
+        }
+        
+        /** Set the skin in place and give access to the VirtualFlow
+        *   It has to be placed at the end because otherwise UI is responding weirdly 
+        *   (horizontal scrollBar replace at initial position when resizing width
+        */
+        spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin(spreadsheetViewInternal,this));
 	}
 
 	/**

@@ -39,7 +39,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
-import org.controlsfx.control.SpreadsheetRow;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
@@ -53,6 +52,8 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 
     private final TableView<DataRow> tableView;
+    
+//    private SpreadsheetCell<?> lastHover = null;
 
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
@@ -71,13 +72,11 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         tableView.setEditable(true);
 
         // Do nothing basically but give access to the Hover Property.
-        tableView
-                .setRowFactory(new Callback<TableView<DataRow>, TableRow<DataRow>>() {
-                    @Override
-                    public TableRow<DataRow> call(TableView<DataRow> p) {
-                        return new SpreadsheetRow(spreadsheetView);
-                    }
-                });
+        tableView.setRowFactory(new Callback<TableView<DataRow>, TableRow<DataRow>>() {
+            @Override public TableRow<DataRow> call(TableView<DataRow> p) {
+                return new SpreadsheetRow(spreadsheetView);
+            }
+        });
 
         tableView.setFixedCellSize(spreadsheetView.getDefaultCellSize());
 

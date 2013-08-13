@@ -26,11 +26,11 @@
  */
 package org.controlsfx.control.spreadsheet.editor;
 
+import impl.org.controlsfx.skin.SpreadsheetCell;
+import impl.org.controlsfx.skin.SpreadsheetRow;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
-import org.controlsfx.control.SpreadsheetCell;
-import org.controlsfx.control.SpreadsheetRow;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.property.editor.PropertyEditor;

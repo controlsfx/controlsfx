@@ -24,11 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package impl.org.controlsfx.skin;
+
+import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
@@ -42,8 +45,10 @@ import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
+import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpanType;
 import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditors;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
@@ -72,6 +77,8 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
     static boolean hasAnchor(Control table) {
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
+    
+    private static final Map<DataCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
 
     /***************************************************************************
      *                                                                         *
@@ -84,15 +91,15 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
             @Override
             public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
                 final int row = getIndex();
-                final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
+//                final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
 
                 if (getItem() == null) {
                     getTableRow().requestLayout();
                     // If we are not at the top of the Spanned Cell
                 } else if (t1 && row != getItem().getRow()) {
-                    spv.hoverGridCell(getItem());
+//                    hoverGridCell(getItem());
                 } else if (!t1 && row != getItem().getRow()) {
-                    spv.unHoverGridCell();
+//                    unHoverGridCell();
                 }
             }
         });
@@ -126,13 +133,12 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
-        final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
+        final SpreadsheetView spv = getSpreadsheetView();
         final SpanType type = spv.getSpanType(row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
-            SpreadsheetCellEditor<?> editor = spv.getEditor(getItem(), this);
+            SpreadsheetCellEditor<?> editor = getEditor(getItem(), spv);
             if(editor != null){
                 super.startEdit();
-                //				System.out.println("je start"+row+"/"+((SpreadsheetRow) getTableRow()).getIndexVirtualFlow()+"/"+column);
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 editor.startEdit();
             }else{
@@ -140,6 +146,50 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
             }
         }
     }
+    
+    
+    /**
+     * Return an instance of Editor specific to the Cell type
+     * We are not using the build-in editor-Cell because we cannot know in advance
+     * which editor we will need. Furthermore, we want to control the behavior very closely
+     * in regards of the spanned cell (invisible etc).
+     * @param cell The SpreadsheetCell
+     * @param bc The SpreadsheetCell
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private SpreadsheetCellEditor<?> getEditor(final DataCell<T> cell, final SpreadsheetView spv) {
+        SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
+        if (editor == null) {
+            switch (cell.getCellType()) {
+                case STRING:
+                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createTextEditor();
+                    editors.put(cell.getCellType(), editor);
+                    break;
+                case ENUM:
+                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createListEditor();
+                    editors.put(cell.getCellType(), editor);
+                    break;
+                case DATE:
+                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDateEditor();
+                    editors.put(cell.getCellType(), editor);
+                    break;
+                default:
+                    return null;
+            }
+        }
+
+        if (editor.isEditing()){
+            return null;
+        } else {
+            editor.updateSpreadsheetView(spv);
+            editor.updateSpreadsheetCell(this);
+            editor.updateDataCell(cell);
+            return editor;
+        }
+    }
+    
+    
 
     @Override
     public void commitEdit(DataCell<T> newValue) {
@@ -199,18 +249,18 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
 
         }
     }
-
-    /**
-     * Set this SpreadsheetCell hoverProperty
-     *
-     * @param hover
-     */
-    public void setHoverPublic(boolean hover) {
-        this.setHover(hover);
-        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
-        //Otherwise it's will not be visible
-        ((SpreadsheetRow) this.getTableRow()).setHoverPublic(hover);
-    }
+    
+//    /**
+//     * Set this SpreadsheetCell hoverProperty
+//     *
+//     * @param hover
+//     */
+//    void setHoverPublic(boolean hover) {
+//        this.setHover(hover);
+//        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
+//        //Otherwise it's will not be visible
+//        ((SpreadsheetRow) this.getTableRow()).setHoverPublic(hover);
+//    }
 
     @Override
     public String toString(){
@@ -262,6 +312,50 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
      * Private Methods                                                          *
      *                                                                         *
      **************************************************************************/
+    
+    private SpreadsheetView getSpreadsheetView() {
+        return ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
+    }
+    
+//    /**
+//     * A SpreadsheetCell is being hovered and we need to re-route the signal.
+//     *
+//     * @param cell The DataCell needed to be hovered.
+//     * @param hover
+//     */
+//    private void hoverGridCell(DataCell<?> cell) {
+//        //If the top of the spanned cell is visible, then no problem
+//        SpreadsheetCell<?> gridCell;
+//        
+//        final SpreadsheetView spv = getSpreadsheetView();
+//        final SpreadsheetRow row = spv.getNonFixed(0);
+//        
+//        if (!spv.isEmptyCells() && row.getIndex() <= cell.getRow()) {
+//            // We want to get the top of the spanned cell, so we need
+//            // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
+//            if(spv.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex()) != null) {// Sometime when scrolling fast it's null so..
+//                gridCell = spv.getRow(spv.getFixedRows().size()+cell.getRow()-row.getIndex()).getGridCell(cell.getColumn());
+//            } else {
+//                gridCell = row.getGridCell(cell.getColumn());
+//            }
+//        } else { // If it's not, then it's the firstkey
+//            gridCell = row.getGridCell(cell.getColumn());
+//        }
+//        gridCell.setHoverPublic(true);
+//        lastHover = gridCell;
+//    }
+//
+//    /**
+//     * Set Hover to false to the previous Cell we force to be hovered
+//     */
+//    private void unHoverGridCell() {
+//        //If the top of the spanned cell is visible, then no problem
+//        if(lastHover != null){
+//            lastHover.setHoverPublic(false);
+//        }
+//    }
+    
+    
     /**
      * Method that will select all the cells between the drag place and that cell.
      * @param e

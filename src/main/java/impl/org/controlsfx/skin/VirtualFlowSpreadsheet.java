@@ -40,7 +40,6 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 
-import org.controlsfx.control.SpreadsheetRow;
 import org.controlsfx.control.SpreadsheetView;
 
 import com.sun.javafx.scene.control.skin.VirtualFlow;

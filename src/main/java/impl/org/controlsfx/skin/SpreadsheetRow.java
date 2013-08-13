@@ -24,9 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
-
-import impl.org.controlsfx.skin.SpreadsheetRowSkin;
+package impl.org.controlsfx.skin;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,6 +34,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
+import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
 
@@ -160,7 +159,7 @@ public class SpreadsheetRow extends TableRow<DataRow>{
      * Set this SpreadsheetRow hoverProperty
      * @param hover
      */
-    protected void setHoverPublic(boolean hover) {
+    void setHoverPublic(boolean hover) {
         this.setHover(hover);
     }
 

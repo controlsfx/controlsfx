@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control;
 
+import impl.org.controlsfx.skin.SpreadsheetCell;
+import impl.org.controlsfx.skin.SpreadsheetRow;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
 import java.util.ArrayList;
@@ -122,11 +124,9 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     private final double DEFAULT_CELL_SIZE = 24.0; 	// Height of a cell
-    private SpreadsheetCell<?> lastHover = null;
     private Grid grid;
     private DataFormat fmt;
     private final double cellPrefWidth = 100;			// Width of a cell
-    private final Map<DataCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
     private final BooleanProperty columnHeader = new SimpleBooleanProperty(true);
@@ -384,7 +384,8 @@ public class SpreadsheetView extends Control {
         return cells.size();
     }
 
-    private SpreadsheetRow getNonFixed(int index){
+    // FIXME not clear what this method is
+    public SpreadsheetRow getNonFixed(int index){
         return cells.get(fixedRows.size()+index);
     }
 
@@ -394,82 +395,6 @@ public class SpreadsheetView extends Control {
                 return true;
         }
         return false;
-    }
-
-    /**
-     * A SpreadsheetCell is being hovered and we need to re-route the signal.
-     *
-     * @param cell The DataCell needed to be hovered.
-     * @param hover
-     */
-    void hoverGridCell(DataCell<?> cell) {
-        //If the top of the spanned cell is visible, then no problem
-        SpreadsheetCell<?> gridCell;
-        if (!isEmptyCells() && getNonFixed(0).getIndex() <= cell.getRow()) {
-            // We want to get the top of the spanned cell, so we need
-            // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
-            if(getRow(getFixedRows().size()+cell.getRow()-getNonFixed(0).getIndex()) != null) {// Sometime when scrolling fast it's null so..
-                gridCell = getRow(getFixedRows().size()+cell.getRow()-getNonFixed(0).getIndex()).getGridCell(cell.getColumn());
-            } else {
-                gridCell = getNonFixed(0).getGridCell(cell.getColumn());
-            }
-        } else { // If it's not, then it's the firstkey
-            gridCell = getNonFixed(0).getGridCell(cell.getColumn());
-        }
-        gridCell.setHoverPublic(true);
-        lastHover = gridCell;
-
-    }
-
-    /**
-     * Set Hover to false to the previous Cell we force to be hovered
-     */
-    void unHoverGridCell() {
-        //If the top of the spanned cell is visible, then no problem
-        if(lastHover != null){
-            lastHover.setHoverPublic(false);
-        }
-    }
-
-    /**
-     * Return an instance of Editor specific to the Cell type
-     * We are not using the build-in editor-Cell because we cannot know in advance
-     * which editor we will need. Furthermore, we want to control the behavior very closely
-     * in regards of the spanned cell (invisible etc).
-     * @param cell The SpreadsheetCell
-     * @param bc The SpreadsheetCell
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    <T> SpreadsheetCellEditor<?> getEditor(final DataCell<T> cell, final SpreadsheetCell<T> bc) {
-        SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
-        if (editor == null) {
-            switch (cell.getCellType()) {
-                case STRING:
-                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createTextEditor();
-                    editors.put(cell.getCellType(), editor);
-                    break;
-                case ENUM:
-                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createListEditor();
-                    editors.put(cell.getCellType(), editor);
-                    break;
-                case DATE:
-                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDateEditor();
-                    editors.put(cell.getCellType(), editor);
-                    break;
-                default:
-                    return null;
-            }
-        }
-
-        if(editor.isEditing()){
-            return null;
-        } else {
-            editor.updateSpreadsheetView(this);
-            editor.updateSpreadsheetCell(bc);
-            editor.updateDataCell(cell);
-            return editor;
-        }
     }
 
     private Grid getGrid(){

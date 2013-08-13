@@ -30,62 +30,54 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- *
- * Specialization of the {@link DataCell} class.
- * It holds a {@link LocalDate}
+ * 
+ * Specialization of the {@link DataCell} class. It holds a {@link LocalDate}
  */
 public class DateCell extends DataCell<LocalDate> {
-	
-	/***************************************************************************
-     *                                                                         *
-     * Static Fields                                                           *
-     *                                                                         *
+
+    /***************************************************************************
+     * * Static Fields * *
      **************************************************************************/
-	private static final long serialVersionUID = -1711498694430990374L;
+    private static final long serialVersionUID = -1711498694430990374L;
 
-	/***************************************************************************
-     *                                                                         *
-     * Private Fields                                                          *
-     *                                                                         *
+    /***************************************************************************
+     * * Private Fields * *
      **************************************************************************/
-	private LocalDate value;
+    private LocalDate value;
 
-	/***************************************************************************
-     *                                                                         *
-     * Constructor                                                             *
-     *                                                                         *
+    /***************************************************************************
+     * * Constructor * *
      **************************************************************************/
-	public DateCell(int r, int c, int rs, int cs, LocalDate value) {
-		super(r, c, rs, cs);
-		this.type = CellType.DATE;
-		this.setCellValue(value);
-	}
+    public DateCell(int r, int c, int rs, int cs, LocalDate value) {
+        super(r, c, rs, cs);
+        this.type = CellType.DATE;
+        this.setCellValue(value);
+    }
 
-	/***************************************************************************
-     *                                                                         *
-     * Public Methods                                                          *
-     *                                                                         *
+    /***************************************************************************
+     * * Public Methods * *
      **************************************************************************/
-	
-	@Override
-	public void setCellValue(LocalDate value) {
-		this.value = value;
-		this.str = value.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-	}
 
-	@Override
-	public LocalDate getCellValue() {
-		return value;
-	}
+    @Override
+    public void setCellValue(LocalDate value) {
+        this.value = value;
+        this.str = value.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
 
-	@Override
-	public void match(DataCell<?> cell) {
-		try {
-			LocalDate temp = LocalDate.parse(cell.getStr().subSequence(0, cell.getStr().length()), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-			setCellValue(temp);
-	      }
-	      catch (Exception e) {
-	      }
-	}
+    @Override
+    public LocalDate getCellValue() {
+        return value;
+    }
+
+    @Override
+    public void match(DataCell<?> cell) {
+        try {
+            LocalDate temp = LocalDate.parse(
+                    cell.getStr().subSequence(0, cell.getStr().length()),
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            setCellValue(temp);
+        } catch (Exception e) {
+        }
+    }
 
 }

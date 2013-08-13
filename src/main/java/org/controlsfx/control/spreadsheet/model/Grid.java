@@ -24,7 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.controlsfx.control.spreadsheet.model;
 
 import java.util.ArrayList;
@@ -34,123 +33,120 @@ import java.util.List;
 import org.controlsfx.control.SpreadsheetView;
 
 /**
- *
- * That class holds some {@link DataRow} filled with {@link DataCell} in order to be used by
- * the {@link SpreadsheetView}
+ * 
+ * That class holds some {@link DataRow} filled with {@link DataCell} in order
+ * to be used by the {@link SpreadsheetView}
  */
 public class Grid {
-	
-	/***************************************************************************
-     *                                                                         *
-     * Private Fields                                                          *
-     *                                                                         *
-     **************************************************************************/
-	private List<DataRow> rows;
-	private int rowCount;
-	private int columnCount;
 
-	/***************************************************************************
-     *                                                                         *
-     * Constructor                                                             *
-     *                                                                         *
+    /***************************************************************************
+     * * Private Fields * *
      **************************************************************************/
-	
-	// creates grid with 'unlimited' rows and columns
-	public Grid() {
-	    this(Integer.MAX_VALUE, Integer.MAX_VALUE);
-	}
-	
-	public Grid(int rowCount, int columnCount) {
-        this(rowCount, columnCount, Collections.<DataRow>emptyList());
+    private List<DataRow> rows;
+    private int rowCount;
+    private int columnCount;
+
+    /***************************************************************************
+     * * Constructor * *
+     **************************************************************************/
+
+    // creates grid with 'unlimited' rows and columns
+    public Grid() {
+        this(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
-	
-	public Grid(int rowCount, int columnCount, List<DataRow> rows) {
-		this.rowCount = rowCount;
-		this.columnCount = columnCount;
-		this.rows = rows;
-	}
-	
-	
 
-	/***************************************************************************
-     *                                                                         *
-     * Public Methods                                                          *
-     *                                                                         *
+    public Grid(int rowCount, int columnCount) {
+        this(rowCount, columnCount, Collections.<DataRow> emptyList());
+    }
+
+    public Grid(int rowCount, int columnCount, List<DataRow> rows) {
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
+        this.rows = rows;
+    }
+
+    /***************************************************************************
+     * * Public Methods * *
      **************************************************************************/
 
-	/**
-	 * Span in row the cell situated at rowIndex and colIndex
-	 * by the number count
-	 * @param count
-	 * @param rowIndex
-	 * @param colIndex
-	 */
-	public void spanRow(int count, int rowIndex, int colIndex) {
-		final int colSpan = rows.get(rowIndex).get(colIndex).getColumnSpan();
-		final int rowSpan = count;
-		rows.get(rowIndex).get(colIndex).setRowSpan(rowSpan);
-		for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
-			for (int col = colIndex; col < colIndex + colSpan && col < columnCount; ++col) {
-				if (row != rowIndex || col != colIndex) {
-					rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
-				}
-			}
-		}
-	}
+    /**
+     * Span in row the cell situated at rowIndex and colIndex by the number
+     * count
+     * 
+     * @param count
+     * @param rowIndex
+     * @param colIndex
+     */
+    public void spanRow(int count, int rowIndex, int colIndex) {
+        final int colSpan = rows.get(rowIndex).get(colIndex).getColumnSpan();
+        final int rowSpan = count;
+        rows.get(rowIndex).get(colIndex).setRowSpan(rowSpan);
+        for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
+            for (int col = colIndex; col < colIndex + colSpan
+                    && col < columnCount; ++col) {
+                if (row != rowIndex || col != colIndex) {
+                    rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
+                }
+            }
+        }
+    }
 
-	/**
-	 * Span in column the cell situated at rowIndex and colIndex
-	 * by the number count
-	 * @param count
-	 * @param rowIndex
-	 * @param colIndex
-	 */
-	public void spanCol(int count, int rowIndex, int colIndex) {
-		final int colSpan = count;
-		final int rowSpan = rows.get(rowIndex).get(colIndex).getRowSpan();
-		rows.get(rowIndex).get(colIndex).setColumnSpan(colSpan);
-		for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
-			for (int col = colIndex; col < colIndex + colSpan && col < columnCount; ++col) {
-				if (row != rowIndex || col != colIndex) {
-					rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
-				}
-			}
-		}
-	}
-	
-	public void setRows(ArrayList<DataRow> rows) {
-		this.rows = rows;
-	}
-	public List<DataRow> getRows() {
-		return rows;
-	}
+    /**
+     * Span in column the cell situated at rowIndex and colIndex by the number
+     * count
+     * 
+     * @param count
+     * @param rowIndex
+     * @param colIndex
+     */
+    public void spanCol(int count, int rowIndex, int colIndex) {
+        final int colSpan = count;
+        final int rowSpan = rows.get(rowIndex).get(colIndex).getRowSpan();
+        rows.get(rowIndex).get(colIndex).setColumnSpan(colSpan);
+        for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
+            for (int col = colIndex; col < colIndex + colSpan
+                    && col < columnCount; ++col) {
+                if (row != rowIndex || col != colIndex) {
+                    rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
+                }
+            }
+        }
+    }
 
-	public void setRowCount(int rowCount) {
-		this.rowCount = rowCount;
-	}
-	
-	public int getRowCount() {
-		return rowCount;
-	}
-	
-	public void setColumnCount(int columnCount) {
-		this.columnCount = columnCount;
-	}
-	
-	public int getColumnCount() {
-		return columnCount;
-	}
-	
-	/**
-	 * Debug function to print the Grid.
-	 * @param grid
-	 */
-	public void print(DataCell<?>[][] grid) {
-		for (int row = 0; row < rowCount; ++row) {
-			for (int column = 0; column < columnCount; ++column) {
-				System.out.print(grid[row][column].toString());
-			}
-			System.out.println("");
-		}
-	}
+    public void setRows(ArrayList<DataRow> rows) {
+        this.rows = rows;
+    }
+    public List<DataRow> getRows() {
+        return rows;
+    }
+
+    public void setRowCount(int rowCount) {
+        this.rowCount = rowCount;
+    }
+
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    public void setColumnCount(int columnCount) {
+        this.columnCount = columnCount;
+    }
+
+    public int getColumnCount() {
+        return columnCount;
+    }
+
+    /**
+     * Debug function to print the Grid.
+     * 
+     * @param grid
+     */
+    public void print(DataCell<?>[][] grid) {
+        for (int row = 0; row < rowCount; ++row) {
+            for (int column = 0; column < columnCount; ++column) {
+                System.out.print(grid[row][column].toString());
+            }
+            System.out.println("");
+        }
+    }
 }

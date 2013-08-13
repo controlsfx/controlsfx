@@ -24,131 +24,116 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.controlsfx.control.spreadsheet.model;
 
 import java.io.Serializable;
 
-
 /**
- * The model cell that hold the data. It has all the information needed by the View.
+ * The model cell that hold the data. It has all the information needed by the
+ * View.
  * 
  * 
  */
-public abstract class DataCell<T> implements Serializable{
+public abstract class DataCell<T> implements Serializable {
 
-	/***************************************************************************
-     *                                                                         *
-     * Static Fields                                                           *
-     *                                                                         *
+    /***************************************************************************
+     * * Static Fields * *
      **************************************************************************/
-	private static final long serialVersionUID = -7648169794403402662L;
+    private static final long serialVersionUID = -7648169794403402662L;
 
-	public static enum CellType {
-		STRING,
-		ENUM,
-		NUMBER,
-		READ_ONLY,
-		DATE,
-		SPLITTER;
-	}
-	/***************************************************************************
-     *                                                                         *
-     * Private Fields                                                          *
-     *                                                                         *
+    public static enum CellType {
+        STRING, ENUM, NUMBER, READ_ONLY, DATE, SPLITTER;
+    }
+    /***************************************************************************
+     * * Private Fields * *
      **************************************************************************/
-	private String styleCss;
+    private String styleCss;
 
-	protected CellType type;
-	protected String str;
-	private int row, column, rowSpan, columnSpan;
-	
-	/***************************************************************************
-     *                                                                         *
-     * Constructor                                                             *
-     *                                                                         *
+    protected CellType type;
+    protected String str;
+    private int row, column, rowSpan, columnSpan;
+
+    /***************************************************************************
+     * * Constructor * *
      **************************************************************************/
-	
-	public DataCell(int r, int c, int rs, int cs) {
-		row = r;
-		column = c;
-		rowSpan = rs;
-		columnSpan = cs;
-		str="";
-	}
-	
-	/***************************************************************************
-     *                                                                         *
-     * Public Methods                                                          *
-     *                                                                         *
+
+    public DataCell(int r, int c, int rs, int cs) {
+        row = r;
+        column = c;
+        rowSpan = rs;
+        columnSpan = cs;
+        str = "";
+    }
+
+    /***************************************************************************
+     * * Public Methods * *
      **************************************************************************/
-	
-	public void setStr(String str) {
-		this.str = str;
-	}
 
-	public String getStr() {
-		return str;
-	}
-	
-	public abstract void setCellValue(T value);
+    public void setStr(String str) {
+        this.str = str;
+    }
 
-	public abstract T getCellValue();
+    public String getStr() {
+        return str;
+    }
 
-	public CellType getCellType() {
-		return type;
-	}
+    public abstract void setCellValue(T value);
 
-	@Override
-	public String toString() {
-		return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
-	}
+    public abstract T getCellValue();
 
-	public int getRow() {
-		return row;
-	}
+    public CellType getCellType() {
+        return type;
+    }
 
-	public int getColumn() {
-		return column;
-	}
+    @Override
+    public String toString() {
+        return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
+    }
 
-	public int getRowSpan() {
-		return rowSpan;
-	}
+    public int getRow() {
+        return row;
+    }
 
-	public void setRowSpan(int rowSpan) {
-		this.rowSpan = rowSpan;
-	}
+    public int getColumn() {
+        return column;
+    }
 
-	public int getColumnSpan() {
-		return columnSpan;
-	}
+    public int getRowSpan() {
+        return rowSpan;
+    }
 
-	public void setColumnSpan(int columnSpan) {
-		this.columnSpan = columnSpan;
-	}
-	
-	public String getStyleCss() {
-		return styleCss;
-	}
+    public void setRowSpan(int rowSpan) {
+        this.rowSpan = rowSpan;
+    }
 
-	public void setStyleCss(String style) {
-		this.styleCss = style;
-	}
+    public int getColumnSpan() {
+        return columnSpan;
+    }
 
-	/**
-	 * @param cell
-	 * @return
-	 */
-	public boolean equals(DataCell<?> cell){
-		if(cell != null && cell.getRow() == row && cell.getColumn() == column && cell.getStr().equals(str)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public void setColumnSpan(int columnSpan) {
+        this.columnSpan = columnSpan;
+    }
 
-	public abstract void match(DataCell<?> cell);
+    public String getStyleCss() {
+        return styleCss;
+    }
+
+    public void setStyleCss(String style) {
+        this.styleCss = style;
+    }
+
+    /**
+     * @param cell
+     * @return
+     */
+    public boolean equals(DataCell<?> cell) {
+        if (cell != null && cell.getRow() == row && cell.getColumn() == column
+                && cell.getStr().equals(str)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public abstract void match(DataCell<?> cell);
 }
-
-

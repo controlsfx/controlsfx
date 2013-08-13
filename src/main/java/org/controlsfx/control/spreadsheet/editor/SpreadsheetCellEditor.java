@@ -24,7 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.controlsfx.control.spreadsheet.editor;
 
 import javafx.beans.InvalidationListener;
@@ -36,20 +35,16 @@ import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.property.editor.PropertyEditor;
 
-
 /**
- *
- * Mother Class for all the possible editors displayed in the {@link SpreadsheetCell}.
- * It reacts to all the possible events in order to submit or cancel the
- * displayed editor or the value entered.
+ * 
+ * Mother Class for all the possible editors displayed in the
+ * {@link SpreadsheetCell}. It reacts to all the possible events in order to
+ * submit or cancel the displayed editor or the value entered.
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
-
     /***************************************************************************
-     *                                                                         *
-     * Protected/Private Fields                                                *
-     *                                                                         *
+     * * Protected/Private Fields * *
      **************************************************************************/
 
     // transient properties - these fields will change based on the current
@@ -65,24 +60,16 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
     protected InvalidationListener il;
 
-
-
     /***************************************************************************
-     *                                                                         *
-     * Constructor                                                             *
-     *                                                                         *
+     * * Constructor * *
      **************************************************************************/
 
-    public SpreadsheetCellEditor(){
+    public SpreadsheetCellEditor() {
         this.spreadsheetEditor = new SpreadsheetEditor<T>();
     }
 
-
-
     /***************************************************************************
-     *                                                                         *
-     * Public Methods                                                          *
-     *                                                                         *
+     * * Public Methods * *
      **************************************************************************/
 
     public void updateDataCell(DataCell<T> cell) {
@@ -98,17 +85,18 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
     }
 
     /**
-     * In case the cell is spanning in rows.
-     * We want the cell to be fully accessible so we need to remove it from its tableRow
-     * and add it to the last row possible. Then we translate the cell so that it's invisible for
+     * In case the cell is spanning in rows. We want the cell to be fully
+     * accessible so we need to remove it from its tableRow and add it to the
+     * last row possible. Then we translate the cell so that it's invisible for
      * the user.
      */
-    public void startEdit(){
+    public void startEdit() {
         spreadsheetEditor.startEdit();
 
-        //In ANY case, we stop when something move in scrollBar Vertical
+        // In ANY case, we stop when something move in scrollBar Vertical
         editorListener = new InvalidationListener() {
-            @Override public void invalidated(Observable arg0) {
+            @Override
+            public void invalidated(Observable arg0) {
                 commitEdit();
 
                 if (viewCell != null) {
@@ -121,29 +109,27 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         spreadsheetView.getVbar().valueProperty().addListener(editorListener);
     }
 
-
-
     /***************************************************************************
-     *                                                                         *
-     * Protected Methods                                                       *
-     *                                                                         *
+     * * Protected Methods * *
      **************************************************************************/
     /**
      * When we have finish editing. We put the cell back to its right TableRow.
      */
-    protected void end(){
+    protected void end() {
         editing = false;
         spreadsheetEditor.end();
 
-        spreadsheetView.getVbar().valueProperty().removeListener(editorListener);
+        spreadsheetView.getVbar().valueProperty()
+                .removeListener(editorListener);
         editorListener = null;
     }
 
-    public boolean isEditing(){
+    public boolean isEditing() {
         return editing;
     }
 
-    @Override public T getValue() {
+    @Override
+    public T getValue() {
         return modelCell == null ? null : modelCell.getCellValue();
     }
 
@@ -154,57 +140,47 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         }
     }
 
-
     /***************************************************************************
-     *                                                                         *
-     * Protected Abstract Methods                                              *
-     *                                                                         *
+     * * Protected Abstract Methods * *
      **************************************************************************/
 
     protected abstract void cancelEdit();
 
     protected abstract DataCell<T> commitEdit();
 
-
-
-
-
     private class SpreadsheetEditor<A> {
 
         /***********************************************************************
-         *                                                                     *
-         * Private Fields                                                      *
-         *                                                                     *
+         * * Private Fields * *
          **********************************************************************/
         private SpreadsheetRow original;
         private boolean isMoved;
 
-        
-        
         /***********************************************************************
-         *                                                                     *
-         * Public Methods                                                      *
-         *                                                                     *
+         * * Public Methods * *
          **********************************************************************/
 
         public void startEdit() {
-            //Case when RowSpan if larger and we're not on the last row
-            if(modelCell.getRowSpan()>1 && modelCell.getRow() != spreadsheetView.getVirtualFlowCellSize()-1){
+            // Case when RowSpan if larger and we're not on the last row
+            if (modelCell.getRowSpan() > 1
+                    && modelCell.getRow() != spreadsheetView
+                            .getVirtualFlowCellSize() - 1) {
                 original = (SpreadsheetRow) viewCell.getTableRow();
 
                 final double temp = viewCell.getLocalToSceneTransform().getTy();
                 isMoved = spreadsheetView.addCell(viewCell);
-                if(isMoved){
-                    viewCell.setTranslateY(temp - viewCell.getLocalToSceneTransform().getTy());
+                if (isMoved) {
+                    viewCell.setTranslateY(temp
+                            - viewCell.getLocalToSceneTransform().getTy());
                     original.putFixedColumnToBack();
                 }
             }
         }
 
         public void end() {
-            if(modelCell != null && modelCell.getRowSpan() >1){
+            if (modelCell != null && modelCell.getRowSpan() > 1) {
                 viewCell.setTranslateY(0);
-                if(isMoved){
+                if (isMoved) {
                     original.addCell(viewCell);
                     original.putFixedColumnToBack();
                 }

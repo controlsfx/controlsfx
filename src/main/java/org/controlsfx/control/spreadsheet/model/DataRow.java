@@ -24,55 +24,48 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.controlsfx.control.spreadsheet.model;
 
 import java.util.ArrayList;
 
 /**
- *
- * The model row that holds the {@link DataCell}. It is used by the view
- * to get access to the different {@link DataCell}.
+ * 
+ * The model row that holds the {@link DataCell}. It is used by the view to get
+ * access to the different {@link DataCell}.
  */
 public class DataRow {
-	
-	/***************************************************************************
-     *                                                                         *
-     * Private Fields                                                          *
-     *                                                                         *
-     **************************************************************************/
-	private final int rowNumber;
-	private final ArrayList<DataCell<?>> list;
 
-	/***************************************************************************
-     *                                                                         *
-     * Constructor                                                             *
-     *                                                                         *
+    /***************************************************************************
+     * * Private Fields * *
      **************************************************************************/
-	public DataRow(int rowNumber, int columnCount) {
-		this.rowNumber = rowNumber;
-		list = new ArrayList<>(columnCount);
-	}
+    private final int rowNumber;
+    private final ArrayList<DataCell<?>> list;
 
-	/***************************************************************************
-     *                                                                         *
-     * Public Methods                                                          *
-     *                                                                         *
+    /***************************************************************************
+     * * Constructor * *
      **************************************************************************/
-	public int getRowNumber() {
-		return rowNumber;
-	}
-	public void add(DataCell<?> cell){
-		list.add(cell);
-	}
-	public DataCell<?> get(int i){
-		return list.get(i);
-	}
+    public DataRow(int rowNumber, int columnCount) {
+        this.rowNumber = rowNumber;
+        list = new ArrayList<>(columnCount);
+    }
 
-	public void set(int i, DataCell<?> cell){
-		list.set(i, cell);
-	}
-	public DataCell<?> getCell(int col) {
-		return list.get(col);
-	}
+    /***************************************************************************
+     * * Public Methods * *
+     **************************************************************************/
+    public int getRowNumber() {
+        return rowNumber;
+    }
+    public void add(DataCell<?> cell) {
+        list.add(cell);
+    }
+    public DataCell<?> get(int i) {
+        return list.get(i);
+    }
+
+    public void set(int i, DataCell<?> cell) {
+        list.set(i, cell);
+    }
+    public DataCell<?> getCell(int col) {
+        return list.get(col);
+    }
 }

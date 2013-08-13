@@ -52,24 +52,20 @@ public class SpreadsheetCellEditors {
     }
 
     /**
-     *
-     * Specialization of the {@link SpreadsheetCellEditor} Class.
-     * It displays a {@link TextField} where the user can type a different value.
+     * 
+     * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+     * {@link TextField} where the user can type a different value.
      */
     public static SpreadsheetCellEditor<String> createTextEditor() {
         return new SpreadsheetCellEditor<String>() {
 
             /***************************************************************************
-             *                                                                         *
-             * Private Fields                                                          *
-             *                                                                         *
+             * * Private Fields * *
              **************************************************************************/
             private final TextField tf;
 
             /***************************************************************************
-             *                                                                         *
-             * Constructor                                                             *
-             *                                                                         *
+             * * Constructor * *
              **************************************************************************/
             {
                 tf = new TextField();
@@ -77,9 +73,7 @@ public class SpreadsheetCellEditors {
             }
 
             /***************************************************************************
-             *                                                                         *
-             * Public Methods                                                          *
-             *                                                                         *
+             * * Public Methods * *
              **************************************************************************/
             @Override
             public void startEdit() {
@@ -88,8 +82,10 @@ public class SpreadsheetCellEditors {
                 attachEnterEscapeEventHandler();
 
                 // If the SpreadsheetCell is deselected, we commit.
-                // Sometimes, when you you touch the scrollBar when editing, this is called way
-                // too late and the SpreadsheetCell is null, so we need to be careful.
+                // Sometimes, when you you touch the scrollBar when editing,
+                // this is called way
+                // too late and the SpreadsheetCell is null, so we need to be
+                // careful.
                 il = new InvalidationListener() {
                     @Override
                     public void invalidated(Observable observable) {
@@ -100,14 +96,11 @@ public class SpreadsheetCellEditors {
                         }
                         end();
 
-
                     }
                 };
 
                 viewCell.selectedProperty().addListener(il);
                 viewCell.setGraphic(tf);
-
-
 
                 final Runnable r = new Runnable() {
                     @Override
@@ -119,12 +112,11 @@ public class SpreadsheetCellEditors {
             }
 
             /***************************************************************************
-             *                                                                         *
-             * Protected Methods                                                       *
-             *                                                                         *
+             * * Protected Methods * *
              **************************************************************************/
 
-            @Override public void updateDataCell(DataCell<String> cell) {
+            @Override
+            public void updateDataCell(DataCell<String> cell) {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
@@ -135,7 +127,7 @@ public class SpreadsheetCellEditors {
             @Override
             protected void end() {
                 super.end();
-                if(viewCell != null) {
+                if (viewCell != null) {
                     viewCell.selectedProperty().removeListener(il);
                 }
 
@@ -179,47 +171,52 @@ public class SpreadsheetCellEditors {
         };
     }
 
-
-
     /**
-     *
-     * Specialization of the {@link SpreadsheetCellEditor} Class.
-     * It displays a {@link ComboBox} where the user can choose a value.
+     * 
+     * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+     * {@link ComboBox} where the user can choose a value.
      */
     public static SpreadsheetCellEditor<List<String>> createListEditor() {
         return new SpreadsheetCellEditor<List<String>>() {
             /***************************************************************************
-             *                                                                         *
-             * Private Fields                                                          *
-             *                                                                         *
+             * * Private Fields * *
              **************************************************************************/
             private final ComboBox<String> cb;
             private ChangeListener<Number> cl;
 
             /***************************************************************************
-             *                                                                         *
-             * Constructor                                                             *
-             *                                                                         *
+             * * Constructor * *
              **************************************************************************/
             {
                 cb = new ComboBox<String>();
                 cb.setVisibleRowCount(3);
 
-                //TODO Modify this properly
+                // TODO Modify this properly
                 // We don't want the list to display out of the spreadsheetView
                 cb.showingProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
-                    public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
+                    public void changed(ObservableValue<? extends Boolean> ov,
+                            Boolean t, Boolean t1) {
                         if (t1) {
-                            if (spreadsheetView.getLayoutBounds().getMaxX() < cb.getLocalToSceneTransform().getTx() + cb.getWidth()) {
+                            if (spreadsheetView.getLayoutBounds().getMaxX() < cb
+                                    .getLocalToSceneTransform().getTx()
+                                    + cb.getWidth()) {
                                 cb.setLayoutX(cb.getParent().getLayoutX());
-                            }else if(cb.getLocalToSceneTransform().getTx() <0 ){
-                                cb.setLayoutX(cb.getLayoutX() + Math.abs(cb.getLocalToSceneTransform().getTx()));
+                            } else if (cb.getLocalToSceneTransform().getTx() < 0) {
+                                cb.setLayoutX(cb.getLayoutX()
+                                        + Math.abs(cb
+                                                .getLocalToSceneTransform()
+                                                .getTx()));
                             }
-                            if(spreadsheetView.getLayoutBounds().getMaxY() < cb.getLocalToSceneTransform().getTy()) {
-                                cb.setLayoutY(spreadsheetView.getLayoutBounds().getMaxY()-50);// Modify the "50" here
-                            }else if(cb.getLocalToSceneTransform().getTy() <0 ){
-                                cb.setLayoutY(cb.getLayoutY()+Math.abs(cb.getLocalToSceneTransform().getTy()));
+                            if (spreadsheetView.getLayoutBounds().getMaxY() < cb
+                                    .getLocalToSceneTransform().getTy()) {
+                                cb.setLayoutY(spreadsheetView.getLayoutBounds()
+                                        .getMaxY() - 50);// Modify the "50" here
+                            } else if (cb.getLocalToSceneTransform().getTy() < 0) {
+                                cb.setLayoutY(cb.getLayoutY()
+                                        + Math.abs(cb
+                                                .getLocalToSceneTransform()
+                                                .getTy()));
                             }
                         }
                     }
@@ -227,9 +224,7 @@ public class SpreadsheetCellEditors {
             }
 
             /***************************************************************************
-             *                                                                         *
-             * Public Methods                                                          *
-             *                                                                         *
+             * * Public Methods * *
              **************************************************************************/
 
             @Override
@@ -237,7 +232,7 @@ public class SpreadsheetCellEditors {
                 super.startEdit();
 
                 attachEnterEscapeEventHandler();
-                if(viewCell != null){
+                if (viewCell != null) {
                     viewCell.setGraphic(cb);
 
                     final Runnable r = new Runnable() {
@@ -251,9 +246,7 @@ public class SpreadsheetCellEditors {
             }
 
             /***************************************************************************
-             *                                                                         *
-             * Protected Methods                                                       *
-             *                                                                         *
+             * * Protected Methods * *
              **************************************************************************/
 
             @Override
@@ -262,7 +255,8 @@ public class SpreadsheetCellEditors {
 
                 if (cell != null) {
                     final List<String> temp = cell.getCellValue();
-                    final ObservableList<String> temp2 = FXCollections.observableList(temp);
+                    final ObservableList<String> temp2 = FXCollections
+                            .observableList(temp);
                     cb.setItems(temp2);
                     cb.setValue(cell.getStr());
 
@@ -275,10 +269,11 @@ public class SpreadsheetCellEditors {
             protected void end() {
                 super.end();
 
-                cb.getSelectionModel().selectedIndexProperty().removeListener(cl);
+                cb.getSelectionModel().selectedIndexProperty()
+                        .removeListener(cl);
                 cb.setOnKeyPressed(null);
-                if(viewCell != null)
-                    viewCell.selectedProperty().removeListener(il);
+                if (viewCell != null) viewCell.selectedProperty()
+                        .removeListener(il);
 
                 this.modelCell = null;
                 this.viewCell = null;
@@ -289,7 +284,8 @@ public class SpreadsheetCellEditors {
             @Override
             protected DataCell<List<String>> commitEdit() {
                 if (cb.getSelectionModel().getSelectedIndex() != -1) {
-                    this.modelCell.setStr(cb.getItems().get(cb.getSelectionModel().getSelectedIndex()));
+                    this.modelCell.setStr(cb.getItems().get(
+                            cb.getSelectionModel().getSelectedIndex()));
                 }
                 return modelCell;
             }
@@ -307,7 +303,8 @@ public class SpreadsheetCellEditors {
             private void attachEnterEscapeEventHandler() {
                 cl = new ChangeListener<Number>() {
                     @Override
-                    public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+                    public void changed(ObservableValue<? extends Number> ov,
+                            Number t, Number t1) {
                         commitEdit();
                         viewCell.commitEdit(modelCell);
                         end();
@@ -333,37 +330,31 @@ public class SpreadsheetCellEditors {
                         end();
                     }
                 };
-                if(viewCell == null){
+                if (viewCell == null) {
                     end();
-                }else{
+                } else {
                     viewCell.selectedProperty().addListener(il);
                 }
             }
         };
     }
 
-
-
     /**
-     *
-     * Specialization of the {@link SpreadsheetCellEditor} Class.
-     * It displays a {@link DatePicker}.
+     * 
+     * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+     * {@link DatePicker}.
      */
     public static SpreadsheetCellEditor<LocalDate> createDateEditor() {
         return new SpreadsheetCellEditor<LocalDate>() {
 
             /***************************************************************************
-             *                                                                         *
-             * Private Fields                                                          *
-             *                                                                         *
+             * * Private Fields * *
              **************************************************************************/
             private final DatePicker datePicker;
             private EventHandler<KeyEvent> eh;
 
             /***************************************************************************
-             *                                                                         *
-             * Constructor                                                             *
-             *                                                                         *
+             * * Constructor * *
              **************************************************************************/
 
             {
@@ -371,9 +362,7 @@ public class SpreadsheetCellEditors {
             }
 
             /***************************************************************************
-             *                                                                         *
-             * Public Methods                                                          *
-             *                                                                         *
+             * * Public Methods * *
              **************************************************************************/
             @Override
             public void startEdit() {
@@ -382,7 +371,8 @@ public class SpreadsheetCellEditors {
                 attachEnterEscapeEventHandler();
 
                 // If the GridCell is deselected, we commit.
-                // Sometimes, when you you touch the scrollBar when editing, this is called way
+                // Sometimes, when you you touch the scrollBar when editing,
+                // this is called way
                 // too late and the GridCell is null, so we need to be careful.
                 il = new InvalidationListener() {
                     @Override
@@ -410,9 +400,7 @@ public class SpreadsheetCellEditors {
             }
 
             /***************************************************************************
-             *                                                                         *
-             * Protected Methods                                                       *
-             *                                                                         *
+             * * Protected Methods * *
              **************************************************************************/
 
             @Override
@@ -425,11 +413,11 @@ public class SpreadsheetCellEditors {
             protected void end() {
                 super.end();
 
-                if(viewCell != null) {
+                if (viewCell != null) {
                     viewCell.selectedProperty().removeListener(il);
                 }
 
-                if(datePicker.isShowing()){
+                if (datePicker.isShowing()) {
                     datePicker.hide();
                 }
 
@@ -459,10 +447,10 @@ public class SpreadsheetCellEditors {
 
             private void attachEnterEscapeEventHandler() {
                 /**
-                 * We need to add an EventFilter because otherwise the DatePicker
-                 * will block "escape" and "enter".
-                 * But when "enter" is hit, we need to runLater the commit because
-                 * the value has not yet hit the DatePicker itself.
+                 * We need to add an EventFilter because otherwise the
+                 * DatePicker will block "escape" and "enter". But when "enter"
+                 * is hit, we need to runLater the commit because the value has
+                 * not yet hit the DatePicker itself.
                  */
                 eh = new EventHandler<KeyEvent>() {
                     @Override
@@ -484,7 +472,7 @@ public class SpreadsheetCellEditors {
                     }
                 };
 
-                datePicker.addEventFilter(KeyEvent.KEY_PRESSED,eh);
+                datePicker.addEventFilter(KeyEvent.KEY_PRESSED, eh);
             }
         };
     }

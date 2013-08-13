@@ -35,164 +35,142 @@ public class SpreadsheetCells {
     private SpreadsheetCells() {
         // no-op
     }
-    
-    public static DataCell<String> createTextCell(final int r, final int c, final int rs, final int cs, final String value) {
+
+    public static DataCell<String> createTextCell(final int r, final int c,
+            final int rs, final int cs, final String value) {
         return new DataCell<String>(r, c, rs, cs) {
-        
+
             /*******************************************************************
-             *                                                                 *
-             * Static Fields                                                   *
-             *                                                                 *
+             * * Static Fields * *
              ******************************************************************/
             private static final long serialVersionUID = -1711498694430990374L;
-            
-            
-    
+
             /*******************************************************************
-             *                                                                 *
-             * Constructor                                                     *
-             *                                                                 *
+             * * Constructor * *
              ******************************************************************/
             {
                 this.type = CellType.STRING;
                 this.setCellValue(value);
             }
-    
+
             /*******************************************************************
-             *                                                                 *
-             * Public Methods                                                  *
-             *                                                                 *
+             * * Public Methods * *
              ******************************************************************/
             @Override
             public void setCellValue(String value) {
                 this.str = value;
             }
-    
+
             @Override
             public String getCellValue() {
                 return str;
             }
-    
+
             @Override
             public void match(DataCell<?> cell) {
                 setStr(cell.getStr());
             }
-    
+
         };
     }
-    
-    
-    
-    
-    public static DataCell<List<String>> createListCell(final int r, final int c, final int rs, final int cs, final List<String> _value) {
+
+    public static DataCell<List<String>> createListCell(final int r,
+            final int c, final int rs, final int cs, final List<String> _value) {
         return new DataCell<List<String>>(r, c, rs, cs) {
             /***************************************************************************
-             *                                                                         *
-             * Static Fields                                                           *
-             *                                                                         *
+             * * Static Fields * *
              **************************************************************************/
             private static final long serialVersionUID = -1003136076165430609L;
-            
+
             /***************************************************************************
-             *                                                                         *
-             * Private Fields                                                          *
-             *                                                                         *
+             * * Private Fields * *
              **************************************************************************/
             private List<String> value;
-            
+
             /***************************************************************************
-             *                                                                         *
-             * Constructor                                                             *
-             *                                                                         *
+             * * Constructor * *
              **************************************************************************/
             {
-                this.type= CellType.ENUM;
+                this.type = CellType.ENUM;
                 this.value = _value;
-                
-                str = value.size() > 0 ? this.value.get((int) (Math.random() * value.size())) : "";
+
+                str = value.size() > 0 ? this.value
+                        .get((int) (Math.random() * value.size())) : "";
             }
-    
+
             /***************************************************************************
-             *                                                                         *
-             * Public Methods                                                          *
-             *                                                                         *
+             * * Public Methods * *
              **************************************************************************/
             @Override
             public void setCellValue(List<String> value) {
                 this.value = value;
-                if(value.size() >0){
+                if (value.size() > 0) {
                     str = value.get(0);
                 }
             }
-    
+
             @Override
             public List<String> getCellValue() {
                 return value;
             }
-    
+
             @Override
             public void match(DataCell<?> cell) {
-                if(value.contains(cell.getStr())){
+                if (value.contains(cell.getStr())) {
                     setStr(cell.getStr());
                 }
             }
         };
     }
-    
-    
-    
-    public static DataCell<LocalDate> createDateCell(final int r, final int c, final int rs, final int cs, final LocalDate _value) {
+
+    public static DataCell<LocalDate> createDateCell(final int r, final int c,
+            final int rs, final int cs, final LocalDate _value) {
         return new DataCell<LocalDate>(r, c, rs, cs) {
-        
+
             /***************************************************************************
-             *                                                                         *
-             * Static Fields                                                           *
-             *                                                                         *
+             * * Static Fields * *
              **************************************************************************/
             private static final long serialVersionUID = -1711498694430990374L;
-    
+
             /***************************************************************************
-             *                                                                         *
-             * Private Fields                                                          *
-             *                                                                         *
+             * * Private Fields * *
              **************************************************************************/
             private LocalDate value;
-    
+
             /***************************************************************************
-             *                                                                         *
-             * Constructor                                                             *
-             *                                                                         *
+             * * Constructor * *
              **************************************************************************/
             {
                 this.type = CellType.DATE;
                 this.setCellValue(_value);
             }
-    
+
             /***************************************************************************
-             *                                                                         *
-             * Public Methods                                                          *
-             *                                                                         *
+             * * Public Methods * *
              **************************************************************************/
-            
+
             @Override
             public void setCellValue(LocalDate _value) {
                 this.value = _value;
-                this.str = value.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                this.str = value.format(DateTimeFormatter
+                        .ofPattern("dd/MM/yyyy"));
             }
-    
+
             @Override
             public LocalDate getCellValue() {
                 return value;
             }
-    
+
             @Override
             public void match(DataCell<?> cell) {
                 try {
-                    LocalDate temp = LocalDate.parse(cell.getStr().subSequence(0, cell.getStr().length()), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    LocalDate temp = LocalDate.parse(
+                            cell.getStr()
+                                    .subSequence(0, cell.getStr().length()),
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     setCellValue(temp);
-                  }
-                  catch (Exception e) {
-                  }
+                } catch (Exception e) {
+                }
             }
         };
     }

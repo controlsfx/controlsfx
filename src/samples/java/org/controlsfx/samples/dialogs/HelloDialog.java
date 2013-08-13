@@ -258,7 +258,7 @@ public class HelloDialog extends Application implements Sample {
         // Input Dialog (with masthead)
         // *******************************************************************
 
-        grid.add(createLabel("Input Dialog (with Masthead): "), 0, row);
+        grid.add(createLabel("Input Dialog: "), 0, row);
 
         final Button Hyperlink8 = new Button("TextField");
         Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {

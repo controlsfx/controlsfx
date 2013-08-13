@@ -25,14 +25,15 @@ import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -54,7 +55,12 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
  *
  *
  */
-public class SpreadsheetView extends StackPane{
+public class SpreadsheetView extends Control {
+    
+    private final TableView<DataRow> tableView;
+    
+    
+    
 	
 	/***************************************************************************
      *                                                                         *
@@ -65,7 +71,6 @@ public class SpreadsheetView extends StackPane{
 	 * Define how this cell is spanning.
 	 */
 	public static enum SpanType {
-
 		NORMAL_CELL, 		// Normal Cell (visible)
 		COLUMN_INVISIBLE, 	//Invisible cell spanned in column
 		ROW_INVISIBLE, 		//Invisible cell spanned in row
@@ -89,8 +94,6 @@ public class SpreadsheetView extends StackPane{
      *                                                                         *
      **************************************************************************/
 
-	private final SpreadsheetViewInternal<DataRow> spreadsheetViewInternal;
-	private static final String DEFAULT_STYLE_CLASS = "cell-spreadsheet";
 	private final double DEFAULT_CELL_SIZE = 24.0; 	// Height of a cell
 	private SpreadsheetCell<?> lastHover = null;
 	private Grid grid;
@@ -120,35 +123,51 @@ public class SpreadsheetView extends StackPane{
 	public SpreadsheetView(final Grid grid){
 		super();
 		
-		this.setPadding(new Insets(10, 10, 10, 10));
-		spreadsheetViewInternal = new SpreadsheetViewInternal<>();
-
+		getStyleClass().add("SpreadsheetView");
+		
+		// FIXME extract this out as a separate skin class
+		setSkin(new Skin<SpreadsheetView>() {
+		    @Override public Node getNode() {
+		        return tableView;
+		    }
+		    
+		    @Override public SpreadsheetView getSkinnable() {
+		        return SpreadsheetView.this;
+		    }
+		    
+		    @Override public void dispose() {
+		        // no-op
+		    }
+        });
+		
+		// FIXME the SpreadsheetViewSkin actually belongs to the TableView, so
+		// we should probably make that private and instead expose the skin
+		// for this class (that is, the code above)
+		this.tableView = new TableView<DataRow>() {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override protected String getUserAgentStylesheet() {
+		        return SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm();
+		    }
+		    
+		    @Override protected Skin<?> createDefaultSkin() {
+		        return new SpreadsheetViewSkin(SpreadsheetView.this, tableView);
+		    }
+		};
+		getChildren().add(tableView);
+		
 		//Add a listener to the selection model in order to edit the spanned cells when clicked
-		setSelectionModel();
+		tableView.setSelectionModel(new SpreadsheetViewSelectionModel<>(this,tableView));
+        getSelectionModel().setCellSelectionEnabled(true);
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		spreadsheetViewInternal.setEditable(true);
-
-		// For keyboard catch
-		setFocusModel();
-
-		// TODO conflict of menu when right-clicking on editor textfield
-		spreadsheetViewInternal.setContextMenu(getSpreadsheetViewContextMenu());
-
-		//Do nothing basically but give access to the Hover Property.
-		spreadsheetViewInternal.setRowFactory(new Callback<TableView<DataRow>, TableRow<DataRow>>() {
-			@Override
-			public TableRow<DataRow> call(TableView<DataRow> p) {
-				return new SpreadsheetRow(SpreadsheetView.this);
-			}
-		});
-
-		
-
-		spreadsheetViewInternal.setFixedCellSize(getDefaultCellSize());
-
-		spreadsheetViewInternal.getStyleClass().add(DEFAULT_STYLE_CLASS);
-		
-		getChildren().add(spreadsheetViewInternal);
+        /**
+         * Set the focus model to track keyboard change and redirect focus on spanned
+         * cells
+         */
+        // We add a listener on the focus model in order to catch when we are on a hidden cell
+        tableView.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
 		
 		setGrid(grid);
 	}
@@ -188,7 +207,7 @@ public class SpreadsheetView extends StackPane{
 	}
 	
 	public TablePosition<DataRow, ?> getEditingCell(){
-		return spreadsheetViewInternal.getEditingCell();
+		return tableView.getEditingCell();
 	}
 
 	public double getCellPrefWidth() {
@@ -256,11 +275,11 @@ public class SpreadsheetView extends StackPane{
 	}
 
 	public DoubleProperty fixedCellSizeProperty() {
-		return spreadsheetViewInternal.fixedCellSizeProperty();
+		return tableView.fixedCellSizeProperty();
 	}
 
 	public ObservableList<DataRow> getItems() {
-		return spreadsheetViewInternal.getItems();
+		return tableView.getItems();
 	}
 
 	/**
@@ -302,11 +321,11 @@ public class SpreadsheetView extends StackPane{
 	}
 
 	public SpreadsheetViewSelectionModel<DataRow> getSelectionModel() {
-		return (SpreadsheetViewSelectionModel<DataRow>) spreadsheetViewInternal.getSelectionModel();
+		return (SpreadsheetViewSelectionModel<DataRow>) tableView.getSelectionModel();
 	}
 
 	public ObservableList<TableColumn<DataRow,?>> getColumns() {
-		return spreadsheetViewInternal.getColumns();
+		return tableView.getColumns();
 	}
 
 	/**
@@ -436,7 +455,7 @@ public class SpreadsheetView extends StackPane{
 		// TODO move into a property
 		if(grid.getRows() != null){
             final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(grid.getRows());
-            spreadsheetViewInternal.setItems(observableRows);
+            tableView.setItems(observableRows);
     
     
             for (int i = 0; i < grid.getColumnCount(); ++i) {
@@ -471,11 +490,11 @@ public class SpreadsheetView extends StackPane{
             }
         }
         
-        /** Set the skin in place and give access to the VirtualFlow
-        *   It has to be placed at the end because otherwise UI is responding weirdly 
-        *   (horizontal scrollBar replace at initial position when resizing width
-        */
-        spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin(spreadsheetViewInternal,this));
+//        /** Set the skin in place and give access to the VirtualFlow
+//        *   It has to be placed at the end because otherwise UI is responding weirdly 
+//        *   (horizontal scrollBar replace at initial position when resizing width
+//        */
+//        spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin(spreadsheetViewInternal,this));
 	}
 
 	/**
@@ -584,7 +603,7 @@ public class SpreadsheetView extends StackPane{
 				}
 			}
 
-			final TablePosition<?,?> p = spreadsheetViewInternal.getFocusModel().getFocusedCell();
+			final TablePosition<?,?> p = tableView.getFocusModel().getFocusedCell();
 
 			final int offsetRow = p.getRow()-minRow;
 			final int offsetCol = p.getColumn()-minCol;
@@ -616,22 +635,12 @@ public class SpreadsheetView extends StackPane{
 	 * 
 	 * *************************************************************************/
 
-	/**
-	 * Set the focus model to track keyboard change and redirect focus on spanned
-	 * cells
-	 *
-	 * @param spreadsheetView
-	 */
-	private void setFocusModel() {
-		// We add a listener on the focus model in order to catch when we are on a hidden cell
-		spreadsheetViewInternal.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
-	}
 	class FocusModelListener implements ChangeListener<TablePosition<DataRow,?>> {
 
 		private final TableView.TableViewFocusModel<DataRow> tfm;
 
 		public FocusModelListener(SpreadsheetView spreadsheetView) {
-			tfm = spreadsheetViewInternal.getFocusModel();
+			tfm = tableView.getFocusModel();
 		}
 
 		@Override
@@ -712,18 +721,6 @@ public class SpreadsheetView extends StackPane{
 	 * *************************************************************************/
 
 	/**
-	 * Set the selection model to give edit when clicking on the spanned Cells
-	 *
-	 * @param spreadsheetView
-	 */
-	private void setSelectionModel() {
-		spreadsheetViewInternal.setSelectionModel(new SpreadsheetViewSelectionModel<>(this,spreadsheetViewInternal));
-		getSelectionModel().setCellSelectionEnabled(true);
-		getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-	}
-
-	/**
 	 * Return the TableColumn right after the current TablePosition (including
 	 * the ColumSpan to be on a visible Cell)
 	 *
@@ -731,7 +728,7 @@ public class SpreadsheetView extends StackPane{
 	 * @return
 	 */
 	TableColumn<DataRow, ?> getTableColumnSpan(final TablePosition<?,?> t) {
-		return spreadsheetViewInternal.getVisibleLeafColumn(t.getColumn() + spreadsheetViewInternal.getItems().get(t.getRow()).getCell(t.getColumn()).getColumnSpan());
+		return tableView.getVisibleLeafColumn(t.getColumn() + tableView.getItems().get(t.getRow()).getCell(t.getColumn()).getColumnSpan());
 	}
 
 	/**
@@ -742,7 +739,7 @@ public class SpreadsheetView extends StackPane{
 	 * @return
 	 */
 	int getTableColumnSpanInt(final TablePosition<?,?> t) {
-		return t.getColumn() + spreadsheetViewInternal.getItems().get(t.getRow()).getCell(t.getColumn()).getColumnSpan();
+		return t.getColumn() + tableView.getItems().get(t.getRow()).getCell(t.getColumn()).getColumnSpan();
 	}
 
 	/**
@@ -754,8 +751,8 @@ public class SpreadsheetView extends StackPane{
 	 * @return
 	 */
 	int getTableRowSpan(final TablePosition<?,?> t) {
-		return spreadsheetViewInternal.getItems().get(t.getRow()).getCell(t.getColumn()).getRowSpan()
-				+ spreadsheetViewInternal.getItems().get(t.getRow()).getCell(t.getColumn()).getRow();
+		return tableView.getItems().get(t.getRow()).getCell(t.getColumn()).getRowSpan()
+				+ tableView.getItems().get(t.getRow()).getCell(t.getColumn()).getRow();
 	}
 
 	/**
@@ -772,17 +769,17 @@ public class SpreadsheetView extends StackPane{
 		switch (spanType) {
 		case NORMAL_CELL:
 		case ROW_VISIBLE:
-			return new TablePosition<>(spreadsheetViewInternal, row, column);
+			return new TablePosition<>(tableView, row, column);
 		case BOTH_INVISIBLE:
 		case COLUMN_INVISIBLE:
 		case ROW_INVISIBLE:
 		default:
-			final DataCell<?> cellSpan = spreadsheetViewInternal.getItems().get(row).getCell(col);
+			final DataCell<?> cellSpan = tableView.getItems().get(row).getCell(col);
 			if (!isEmptyCells() && getNonFixed(0).getIndex() <= cellSpan.getRow()) {
-				return new TablePosition<>(spreadsheetViewInternal, cellSpan.getRow(), spreadsheetViewInternal.getColumns().get(cellSpan.getColumn()));
+				return new TablePosition<>(tableView, cellSpan.getRow(), tableView.getColumns().get(cellSpan.getColumn()));
 
 			} else { // If it's not, then it's the firstkey
-				return new TablePosition<>(spreadsheetViewInternal, getNonFixed(0).getIndex(),spreadsheetViewInternal.getColumns().get(cellSpan.getColumn()));
+				return new TablePosition<>(tableView, getNonFixed(0).getIndex(),tableView.getColumns().get(cellSpan.getColumn()));
 			}
 		}
 	}
@@ -802,7 +799,7 @@ public class SpreadsheetView extends StackPane{
 		private final SpreadsheetView spreadsheetView;
 
 		/**
-		 * Make the SpreadsheetViewInternal move when selection operating outside bounds
+		 * Make the tableView move when selection operating outside bounds
 		 */
 		private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
 			@Override
@@ -1738,25 +1735,4 @@ public class SpreadsheetView extends StackPane{
 		 * 				END OF MODIFIED BY NELLARMONIA
 		 *****************************************************************/
 	}
-}
-
-
-
-
-class SpreadsheetViewInternal<T> extends TableView<DataRow> {
-	public SpreadsheetViewInternal() {
-		super();
-	}
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override protected String getUserAgentStylesheet() {
-		return SpreadsheetViewInternal.class.getResource("spreadsheet.css").toExternalForm();
-	}
-
-	public void addCell(SpreadsheetCell<?> cell){
-		getChildren().add(cell);
-	}
-
-
 }

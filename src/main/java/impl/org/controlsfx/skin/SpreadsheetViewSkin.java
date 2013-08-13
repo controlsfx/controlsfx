@@ -32,10 +32,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.util.Callback;
 
 import org.controlsfx.control.SpreadsheetRow;
 import org.controlsfx.control.SpreadsheetView;
@@ -45,10 +47,13 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 
-import javafx.scene.control.TableColumn;
-
+// Despite the name, this skin is actually the skin of the TableView contained
+// within the SpreadsheetView. The skin for the SpreadsheetView itself currently
+// resides inside the SpreadsheetView constructor!
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 
+    private final TableView<DataRow> tableView;
+    
 	protected RowHeader rowHeader;
 	private final double rowHeaderWidth = 50;
 	public double getRowHeaderWidth() {
@@ -57,10 +62,31 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 	
 	protected SpreadsheetView spreadsheetView;
 	
-	public SpreadsheetViewSkin(TableView<DataRow> tableView,
-			SpreadsheetView spreadsheetView) {
+	public SpreadsheetViewSkin(final SpreadsheetView spreadsheetView, final TableView<DataRow> tableView) {
 		super(tableView);
 		this.spreadsheetView = spreadsheetView;
+		this.tableView = tableView;
+
+		tableView.setEditable(true);
+
+        //Do nothing basically but give access to the Hover Property.
+		tableView.setRowFactory(new Callback<TableView<DataRow>, TableRow<DataRow>>() {
+            @Override
+            public TableRow<DataRow> call(TableView<DataRow> p) {
+                return new SpreadsheetRow(spreadsheetView);
+            }
+        });
+
+
+		tableView.setFixedCellSize(spreadsheetView.getDefaultCellSize());
+
+		tableView.getStyleClass().add("cell-spreadsheet");
+		
+		
+		
+		
+		
+		
 		/*****************************************************************
 		 * 				MODIFIED BY NELLARMONIA
 		 *****************************************************************/
@@ -103,14 +129,15 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 		getFlow().init(spreadsheetView);
 	}
 
-	@Override protected void layoutChildren( double x, double y,
-			double w, final double h) {
-		if(spreadsheetView == null)
-			return;
+	@Override protected void layoutChildren( double x, double y, double w, final double h) {
+		if(spreadsheetView == null) {
+		    return;
+		}
 		if(spreadsheetView.getRowHeader().get()){
 			x+= rowHeaderWidth;
 			w-=rowHeaderWidth;
 		}
+		
 		super.layoutChildren(x, y, w, h);
 		
 		final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
@@ -121,6 +148,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 			tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
 			layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight, baselineOffset,
 					HPos.CENTER, VPos.CENTER);
+			
 			y += tableHeaderRowHeight;
 		}else{
 			//TODO try to hide the columnHeader

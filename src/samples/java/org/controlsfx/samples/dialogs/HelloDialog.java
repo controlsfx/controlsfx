@@ -410,7 +410,7 @@ public class HelloDialog extends Application implements Sample {
                 @Override public void execute(ActionEvent ae) {
                     Dialog dlg = (Dialog) ae.getSource();
                     // real login code here
-                    dlg.hide();
+                    dlg.setResult(this);
                 }
             };
             

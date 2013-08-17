@@ -330,6 +330,23 @@ public class Dialog {
         dialog.hide();
     }
     
+    /**
+     * Assigns the resulting action. If action is a {@link DialogAction} and either its isCancel or isClosing
+     * methods return true the dialog will be closed.
+     * @param result
+     */
+    public void setResult(Action result) {
+    
+        this.result = result;
+        
+        if ( result instanceof DialogAction ) {
+            DialogAction action = (DialogAction) result;
+            if ( action.isCancel() || action.isClosing() ) {
+                hide();
+            }
+        }
+
+    }
     
     
     /**************************************************************************
@@ -636,6 +653,15 @@ public class Dialog {
         return actions;
     }
     
+    /**
+     *  Interface for specialized dialog {@link Action}, which can be closing, cancel and default 
+     */
+    public interface DialogAction extends Action {
+        public boolean isClosing();
+        public boolean isDefault();
+        public boolean isCancel();
+
+    }
     
     
     /**************************************************************************
@@ -653,7 +679,7 @@ public class Dialog {
      * @see Dialog
      * @see Action
      */
-    public enum Actions implements org.controlsfx.control.action.Action {
+    public enum Actions implements org.controlsfx.control.action.Action, DialogAction {
 
         /**
          * An action that, by default, will show 'Cancel'.
@@ -736,12 +762,22 @@ public class Dialog {
         /** {@inheritDoc} */
         @Override public void execute(ActionEvent ae) {
             if (! action.isDisabled()) {
-                if (ae.getSource() instanceof Dialog && (isCancel || isClosing) ) {
-                    Dialog dlg = (Dialog) ae.getSource();
-                    dlg.result = Actions.this;        
-                    dlg.hide();
+                if (ae.getSource() instanceof Dialog ) {
+                    ((Dialog) ae.getSource()).setResult(this);
                 }
             }
+        }
+
+        @Override public boolean isClosing() {
+            return isClosing;
+        }
+
+        @Override public boolean isDefault() {
+            return isDefault;
+        }
+
+        @Override public boolean isCancel() {
+            return isCancel;
         }
     }
 
@@ -937,10 +973,10 @@ public class Dialog {
     private Button createButton(final Action action, boolean keepDefault) {
         final Button button = ActionUtils.createButton(action);
         
-        if (action instanceof Actions) {
-            Actions stdAction = (Actions) action;
-            button.setDefaultButton(stdAction.isDefault && keepDefault);
-            button.setCancelButton(stdAction.isCancel);
+        if (action instanceof DialogAction) {
+            DialogAction dlgAction = (DialogAction) action;
+            button.setDefaultButton(dlgAction.isDefault() && keepDefault);
+            button.setCancelButton(dlgAction.isCancel());
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {

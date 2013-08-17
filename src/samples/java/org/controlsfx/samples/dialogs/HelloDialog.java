@@ -36,8 +36,8 @@ import org.controlsfx.Sample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.AbstractDialogAction;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
@@ -401,7 +401,7 @@ public class HelloDialog extends Application implements Sample {
 
             final TextField txUserName = new TextField();
             final PasswordField txPassword = new PasswordField();
-            final Action actionLogin = new AbstractAction("Login") {
+            final Action actionLogin = new AbstractDialogAction("Login", true, true, false) {
                 
                 {  
                     ButtonBar.setType(this, ButtonType.OK_DONE); 
@@ -460,7 +460,8 @@ public class HelloDialog extends Application implements Sample {
                 });
 
                 
-                dlg.show();
+                Action response = dlg.show();
+                System.out.println("response: " + response);
             }
         });
         

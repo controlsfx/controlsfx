@@ -332,8 +332,8 @@ public class Dialog {
     }
     
     /**
-     * Assigns the resulting action. If action is a {@link DialogAction} and either its isCancel or isClosing
-     * methods return true the dialog will be closed.
+     * Assigns the resulting action. If action is a {@link DialogAction} and has either CANCEL or CLOSING traits
+     * the dialog will be closed.
      * @param result
      */
     public void setResult(Action result) {

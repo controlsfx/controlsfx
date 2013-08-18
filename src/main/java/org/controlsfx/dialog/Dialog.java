@@ -30,6 +30,7 @@ import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialog.DialogResources.getString;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -721,12 +722,12 @@ public class Dialog {
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,  EnumSet.of( ActionTrait.DEFAULT, ActionTrait.CLOSING)),
+        OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( getString("common.yes.button"),    ButtonType.YES, EnumSet.of( ActionTrait.DEFAULT, ActionTrait.CLOSING));
+        YES   ( getString("common.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
 
         private final AbstractAction action;
         private final EnumSet<ActionTrait> traits;
@@ -738,18 +739,18 @@ public class Dialog {
          * @param isCancel true if action produces the dialog cancellation. 
          * @param isClosing true if action is closing the dialog
          */
-        private Actions(String title, ButtonType type, EnumSet<ActionTrait> traits) {
+        private Actions(String title, ButtonType type, ActionTrait... traits) {
             this.action = new AbstractAction(title) {
                 @Override public void execute(ActionEvent ae) {
                     Actions.this.execute(ae);
                 }
             };
-            this.traits = traits == null? EnumSet.noneOf(ActionTrait.class): traits;
+            this.traits = EnumSet.copyOf(Arrays.asList(traits));
             ButtonBar.setType(this, type);
         }
         
         private Actions(String title, ButtonType type) {
-            this( title, type, EnumSet.allOf(ActionTrait.class) );
+            this( title, type, ActionTrait.CANCEL, ActionTrait.CLOSING, ActionTrait.DEFAULT );
         }
 
         /** {@inheritDoc} */

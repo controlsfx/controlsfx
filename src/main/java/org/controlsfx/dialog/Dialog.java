@@ -730,7 +730,7 @@ public class Dialog {
          * @param isCancel true if action produces the dialog cancellation. 
          * @param isClosing true if action is closing the dialog
          */
-        private Actions(String title, ButtonType type, EnumSet<ActionTrait> traits/*boolean isDefault, boolean isCancel, boolean isClosing*/) {
+        private Actions(String title, ButtonType type, EnumSet<ActionTrait> traits) {
             this.action = new AbstractAction(title) {
                 @Override public void execute(ActionEvent ae) {
                     Actions.this.execute(ae);

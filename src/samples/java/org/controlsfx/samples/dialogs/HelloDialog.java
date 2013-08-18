@@ -4,7 +4,6 @@ import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 
 import javafx.application.Application;
@@ -403,8 +402,7 @@ public class HelloDialog extends Application implements Sample {
 
             final TextField txUserName = new TextField();
             final PasswordField txPassword = new PasswordField();
-            final Action actionLogin = new AbstractDialogAction("Login", 
-                     EnumSet.of( ActionTrait.CLOSING,  ActionTrait.DEFAULT)) {
+            final Action actionLogin = new AbstractDialogAction("Login",  ActionTrait.CLOSING,  ActionTrait.DEFAULT) {
                 
                 {  
                     ButtonBar.setType(this, ButtonType.OK_DONE); 

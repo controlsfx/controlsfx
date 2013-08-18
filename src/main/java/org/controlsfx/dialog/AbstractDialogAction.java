@@ -1,5 +1,6 @@
 package org.controlsfx.dialog;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import org.controlsfx.control.action.AbstractAction;
@@ -27,9 +28,9 @@ public abstract class AbstractDialogAction extends AbstractAction implements Dia
      * @param text
      * @param traits
      */
-    public AbstractDialogAction(String text, EnumSet<ActionTrait> traits ) {
+    public AbstractDialogAction(String text, ActionTrait... traits) {
         super(text);
-        this.traits = traits == null? EnumSet.noneOf(ActionTrait.class): traits;
+        this.traits = EnumSet.copyOf(Arrays.asList(traits));
     }
 
     /**
@@ -37,7 +38,7 @@ public abstract class AbstractDialogAction extends AbstractAction implements Dia
      * @param text
      */
     public AbstractDialogAction(String text ) {
-        this(text, EnumSet.of(ActionTrait.CLOSING, ActionTrait.DEFAULT));
+        this(text, ActionTrait.CLOSING, ActionTrait.DEFAULT);
     }
     
     

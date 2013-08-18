@@ -667,13 +667,21 @@ public class Dialog {
     
     /**
      * Possible traits of {@link DialogAction}
-     * If action has {@link CLOSING} trait it will close the dialog
-     * If action has {@link DEFAULT} trait related button will be set as default
-     * If action has {@link CANCEL} trait it will cancel the dialog 
      */
     public enum ActionTrait {
+        /**
+         * Action with this trait will close the dialog
+         */
         CLOSING,
+        
+        /**
+         * Button related to an action with this will be set as default  
+         */
         DEFAULT,
+        
+        /**
+         * Action with this trait will cancel the dialog
+         */
         CANCEL
     }
     

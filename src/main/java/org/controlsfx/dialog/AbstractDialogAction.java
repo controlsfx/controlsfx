@@ -1,7 +1,10 @@
 package org.controlsfx.dialog;
 
+import java.util.EnumSet;
+
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialog.DialogAction;
 
 /**
@@ -17,27 +20,30 @@ import org.controlsfx.dialog.Dialog.DialogAction;
  */
 public abstract class AbstractDialogAction extends AbstractAction implements DialogAction {
     
-    private boolean _closing;
-    private boolean _default;
-    private boolean _cancel;
+    private final EnumSet<ActionTrait> traits;
 
-    public AbstractDialogAction(String text, boolean isClosing, boolean isDefault, boolean isCancel ) {
+    /**
+     * Creates a dialog action with given text and traits
+     * @param text
+     * @param traits
+     */
+    public AbstractDialogAction(String text, EnumSet<ActionTrait> traits ) {
         super(text);
-        _closing = isClosing;
-        _default = isDefault;
-        _cancel  = isCancel;
+        this.traits = traits == null? EnumSet.noneOf(ActionTrait.class): traits;
     }
 
-    @Override public boolean isClosing() {
-        return _closing;
+    /**
+     * Creates a dialog action with given text and common set of traits: CLOSING and DEFAULT
+     * @param text
+     */
+    public AbstractDialogAction(String text ) {
+        this(text, EnumSet.of(ActionTrait.CLOSING, ActionTrait.DEFAULT));
     }
-
-    @Override public boolean isDefault() {
-        return _default;
-    }
-
-    @Override public boolean isCancel() {
-        return _cancel;
+    
+    
+    /** {@inheritDoc} */
+    @Override public boolean hasTrait(ActionTrait trait) {
+        return traits.contains(trait);
     }
 
 }

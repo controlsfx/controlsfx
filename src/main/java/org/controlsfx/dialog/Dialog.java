@@ -30,6 +30,7 @@ import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialog.DialogResources.getString;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import javafx.beans.binding.DoubleBinding;
@@ -340,8 +341,8 @@ public class Dialog {
         this.result = result;
         
         if ( result instanceof DialogAction ) {
-            DialogAction action = (DialogAction) result;
-            if ( action.isCancel() || action.isClosing() ) {
+            DialogAction dlgAction = (DialogAction) result;
+            if ( dlgAction.hasTrait(ActionTrait.CANCEL) || dlgAction.hasTrait(ActionTrait.CLOSING) ) {
                 hide();
             }
         }
@@ -654,13 +655,26 @@ public class Dialog {
     }
     
     /**
-     *  Interface for specialized dialog {@link Action}, which can be closing, cancel and default 
+     *  Interface for specialized dialog {@link Action}, which can have a set of traits {@link ActionTrait}
      */
     public interface DialogAction extends Action {
-        public boolean isClosing();
-        public boolean isDefault();
-        public boolean isCancel();
-
+        
+        /**
+         * Returns true if {@link Action} has given trait 
+         */
+        boolean hasTrait( ActionTrait trait);
+    }
+    
+    /**
+     * Possible traits of {@link DialogAction}
+     * If action has {@link CLOSING} trait it will close the dialog
+     * If action has {@link DEFAULT} trait related button will be set as default
+     * If action has {@link CANCEL} trait it will cancel the dialog 
+     */
+    public enum ActionTrait {
+        CLOSING,
+        DEFAULT,
+        CANCEL
     }
     
     
@@ -679,37 +693,35 @@ public class Dialog {
      * @see Dialog
      * @see Action
      */
-    public enum Actions implements org.controlsfx.control.action.Action, DialogAction {
+    public enum Actions implements  DialogAction {
 
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( getString("common.cancel.button"), ButtonType.CANCEL_CLOSE, true, true),
+        CANCEL( getString("common.cancel.button"), ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( getString("common.close.button"),  ButtonType.CANCEL_CLOSE, true, true),
+        CLOSE ( getString("common.close.button"),  ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( getString("common.no.button"),     ButtonType.NO,           true, true),
+        NO    ( getString("common.no.button"),     ButtonType.NO ),
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,      true, false),
+        OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,  EnumSet.of( ActionTrait.DEFAULT, ActionTrait.CLOSING)),
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( getString("common.yes.button"),    ButtonType.YES,          true, false);
+        YES   ( getString("common.yes.button"),    ButtonType.YES, EnumSet.of( ActionTrait.DEFAULT, ActionTrait.CLOSING));
 
         private final AbstractAction action;
-        private final boolean isClosing;
-        private final boolean isDefault;
-        private final boolean isCancel;
+        private final EnumSet<ActionTrait> traits;
 
         /**
          * Creates common dialog action
@@ -718,22 +730,20 @@ public class Dialog {
          * @param isCancel true if action produces the dialog cancellation. 
          * @param isClosing true if action is closing the dialog
          */
-        private Actions(String title, ButtonType type, boolean isDefault, boolean isCancel, boolean isClosing) {
+        private Actions(String title, ButtonType type, EnumSet<ActionTrait> traits/*boolean isDefault, boolean isCancel, boolean isClosing*/) {
             this.action = new AbstractAction(title) {
                 @Override public void execute(ActionEvent ae) {
                     Actions.this.execute(ae);
                 }
             };
-            this.isClosing = isClosing;
-            this.isDefault = isDefault;
-            this.isCancel = isCancel;
+            this.traits = traits == null? EnumSet.noneOf(ActionTrait.class): traits;
             ButtonBar.setType(this, type);
         }
-
-        private Actions(String title, ButtonType type, boolean isDefault, boolean isCancel) {
-            this(title, type, isDefault, isCancel, true);
-        }
         
+        private Actions(String title, ButtonType type) {
+            this( title, type, EnumSet.allOf(ActionTrait.class) );
+        }
+
         /** {@inheritDoc} */
         @Override public StringProperty textProperty() {
             return action.textProperty();
@@ -767,18 +777,11 @@ public class Dialog {
                 }
             }
         }
-
-        @Override public boolean isClosing() {
-            return isClosing;
+        
+        @Override public boolean hasTrait(ActionTrait trait) {
+            return traits.contains(trait);
         }
-
-        @Override public boolean isDefault() {
-            return isDefault;
-        }
-
-        @Override public boolean isCancel() {
-            return isCancel;
-        }
+        
     }
 
     
@@ -975,8 +978,8 @@ public class Dialog {
         
         if (action instanceof DialogAction) {
             DialogAction dlgAction = (DialogAction) action;
-            button.setDefaultButton(dlgAction.isDefault() && keepDefault);
-            button.setCancelButton(dlgAction.isCancel());
+            button.setDefaultButton(keepDefault && dlgAction.hasTrait(ActionTrait.DEFAULT));
+            button.setCancelButton(dlgAction.hasTrait(ActionTrait.CANCEL));
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {

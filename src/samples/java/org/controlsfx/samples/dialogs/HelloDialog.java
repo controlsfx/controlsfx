@@ -4,6 +4,7 @@ import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import javafx.application.Application;
@@ -39,6 +40,7 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.AbstractDialogAction;
 import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
@@ -362,7 +364,7 @@ public class HelloDialog extends Application implements Sample {
         final Button Hyperlink12b = new Button("Progress");
         Hyperlink12b.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Task worker = new Task() {
+                Task<Object> worker = new Task<Object>() {
                     @Override protected Object call() throws Exception {
                         for (int i=0; i<100; i++) {
                             updateProgress(i, 99);
@@ -401,7 +403,8 @@ public class HelloDialog extends Application implements Sample {
 
             final TextField txUserName = new TextField();
             final PasswordField txPassword = new PasswordField();
-            final Action actionLogin = new AbstractDialogAction("Login", true, true, false) {
+            final Action actionLogin = new AbstractDialogAction("Login", 
+                     EnumSet.of( ActionTrait.CLOSING,  ActionTrait.DEFAULT)) {
                 
                 {  
                     ButtonBar.setType(this, ButtonType.OK_DONE); 
@@ -412,6 +415,8 @@ public class HelloDialog extends Application implements Sample {
                     // real login code here
                     dlg.setResult(this);
                 }
+                
+                public String toString() { return "LOGIN"; };
             };
             
             private void validate() {

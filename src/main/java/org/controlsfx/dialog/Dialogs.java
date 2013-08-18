@@ -927,7 +927,7 @@ public final class Dialogs {
      * Command Link class.
      * Represents one command link in command links dialog. 
      */
-    public static class CommandLink extends AbstractAction {
+    public static class CommandLink extends AbstractDialogAction {
         
         public CommandLink( Node graphic, String text, String longText ) {
             super(text);
@@ -941,8 +941,7 @@ public final class Dialogs {
 
         @Override public final void execute(ActionEvent ae) {
             Dialog dlg = (Dialog)ae.getSource();
-            dlg.result = this;
-            dlg.hide();
+            dlg.setResult(this);
         }
 
         @Override public String toString() {

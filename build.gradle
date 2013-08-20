@@ -10,9 +10,6 @@ configurations {
     jdk
 }
 
-def currentJvm = org.gradle.internal.jvm.Jvm.current()
-println currentJvm
-
 sourceSets {
     main {
         compileClasspath += configurations.jdk
@@ -27,6 +24,7 @@ sourceSets {
 
 dependencies {
     try {
+        println(" >>>>>>>>>> ${System.properties['java.home']}")
         jdk files(jfxrtJar)
     } catch (MissingPropertyException pne) {
         jdk files("${System.properties['java.home']}/lib/jfxrt.jar")

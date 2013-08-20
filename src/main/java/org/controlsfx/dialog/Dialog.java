@@ -26,9 +26,6 @@
  */
 package org.controlsfx.dialog;
 
-import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialog.DialogResources.getString;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -68,6 +65,9 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
+
+import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
+import static org.controlsfx.dialog.DialogResources.getString;
 
 /**
  * A lower-level API for creating standardized dialogs consisting of the following

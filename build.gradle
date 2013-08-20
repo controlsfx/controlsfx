@@ -10,6 +10,9 @@ configurations {
     jdk
 }
 
+def currentJvm = org.gradle.internal.jvm.Jvm.current()
+println currentJvm
+
 sourceSets {
     main {
         compileClasspath += configurations.jdk

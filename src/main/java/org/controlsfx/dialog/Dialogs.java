@@ -1345,14 +1345,20 @@ public final class Dialogs {
      */
     private static class WorkerProgressPane extends Region {
         private Worker<?> worker;
-        
+
+        private boolean dialogVisible = false;
+        private boolean cancelDialogShow = false;
+
         private ChangeListener<Worker.State> stateListener = new ChangeListener<Worker.State>() {
             @Override public void changed(ObservableValue<? extends State> observable, State old, State value) {
                 switch(value) {
                     case CANCELLED:
                     case FAILED:
                     case SUCCEEDED:
-                        if(old == State.SCHEDULED || old == State.RUNNING) {
+                        if(!dialogVisible) {
+                            cancelDialogShow = true;
+                        }
+                        else if(old == State.SCHEDULED || old == State.RUNNING) {
                             end();
                         }
                         break;
@@ -1413,17 +1419,30 @@ public final class Dialogs {
             // state, calling show() without wrapping it in Platform.runLater
             // will cause the progress dialog to run forever when the dialog
             // is attached to workers that start out with a state of READY.
+            //
+            // This also creates a case where the worker's state can change
+            // to finished before the dialog is shown, resulting in an
+            // an attempt to hide the dialog before it is shown.  It's
+            // necessary to track whether or not this occurs, so flags are
+            // set to indicate if the dialog is visible and if if the call
+            // to show should still be allowed.
+            cancelDialogShow = false;
+
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    progressBar.progressProperty().bind(worker.progressProperty());
-                    dialog.show();
+                    if(!cancelDialogShow) {
+                        progressBar.progressProperty().bind(worker.progressProperty());
+                        dialogVisible = true;
+                        dialog.show();
+                    }
                 }
             });
         }
 
         private void end() {
             progressBar.progressProperty().unbind();
+            dialogVisible = false;
             dialog.hide();
         }
 

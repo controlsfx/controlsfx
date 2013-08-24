@@ -726,7 +726,6 @@ public final class Dialogs {
         
         final WorkerProgressPane content = new WorkerProgressPane(dlg);
         content.setMaxWidth(Double.MAX_VALUE);
-        content.setWorker(worker);
 
         VBox vbox = new VBox(10, new Label(message == null ? "Progress:" : message), content);
         vbox.setMaxWidth(Double.MAX_VALUE);
@@ -734,6 +733,7 @@ public final class Dialogs {
         vbox.setPrefSize(300, 100);
         
         dlg.setContent(vbox);
+        content.setWorker(worker);
     }
     
     

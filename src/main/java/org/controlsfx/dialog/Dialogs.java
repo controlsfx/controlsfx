@@ -1280,7 +1280,9 @@ public final class Dialogs {
                     case CANCELLED:
                     case FAILED:
                     case SUCCEEDED:
-                        end();
+                        if(old == State.RUNNING) {
+                            end();
+                        }
                         break;
                     case SCHEDULED:
                         begin();

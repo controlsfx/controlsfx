@@ -1296,6 +1296,9 @@ public final class Dialogs {
                     worker.stateProperty().removeListener(stateListener);
                     end();
                 }
+
+                worker = newWorker;
+
                 if (newWorker != null) {
                     newWorker.stateProperty().addListener(stateListener);
                     if (newWorker.getState() == Worker.State.RUNNING || newWorker.getState() == Worker.State.SCHEDULED) {
@@ -1303,7 +1306,6 @@ public final class Dialogs {
                         begin();
                     }
                 }
-                worker = newWorker;
             }
         }
 

@@ -729,10 +729,10 @@ public final class Dialogs {
      *
      * <h2><u>Expected Behavior</u></h2>
      *
-     * If the worker has a state of {@link Worker.State#READY},
-     * {@link Worker.State#SUCCEEDED}, {@link Worker.State#FAILED}, or
-     * {@link Worker.State#CANCELLED}, the dialog will be shown when the worker's
-     * state changes to {@link Worker.State#SCHEDULED}.
+     * If the worker has a state of {@link Worker.State#SCHEDULED} or
+     * {@link Worker.State#RUNNING}, the dialog will be hidden when the worker's
+     * state changes to {@link Worker.State#SUCCEEDED}, {@link Worker.State#FAILED},
+     * or {@link Worker.State#CANCELLED}.
      *
      * If the worker has a state of {@link Worker.State#RUNNING}, the
      * dialog will be hidden when the worker's state changes to
@@ -1352,7 +1352,7 @@ public final class Dialogs {
                     case CANCELLED:
                     case FAILED:
                     case SUCCEEDED:
-                        if(old == State.RUNNING) {
+                        if(old == State.SCHEDULED || old == State.RUNNING) {
                             end();
                         }
                         break;

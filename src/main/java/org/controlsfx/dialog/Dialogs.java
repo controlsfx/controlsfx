@@ -720,6 +720,82 @@ public final class Dialogs {
      * 
      * @param worker The worker that the progress dialog is watching.
      */
+    /**
+     * Creates a progress bar {@link Dialog} which is attached to the given
+     * {@link Worker} instance.  The worker will be observed permanently and
+     * the attached dialog will be shown and hidden as the worker starts and
+     * completes. If the worker's state is {@link Worker.State#SCHEDULED} or
+     * {@link Worker.State#RUNNING} the dialog will be visible.
+     *
+     * <h2><u>Expected Behavior</u></h2>
+     *
+     * If the worker has a state of {@link Worker.State#READY},
+     * {@link Worker.State#SUCCEEDED}, {@link Worker.State#FAILED}, or
+     * {@link Worker.State#CANCELLED}, the dialog will be shown when the worker's
+     * state changes to {@link Worker.State#SCHEDULED}.
+     *
+     * If the worker has a state of {@link Worker.State#RUNNING}, the
+     * dialog will be hidden when the worker's state changes to
+     * {@link Worker.State#SUCCEEDED}, {@link Worker.State#FAILED},
+     * or {@link Worker.State#CANCELLED}.
+
+     * All other changes in worker state will not cause the visibility of the
+     * attached dialog to change.
+     *
+     * <h2><u>Multiple Workers</u></h2>
+     *
+     * It's important to make sure that only one progress dialog is shown at a
+     * time, especially when using {@link LightweightDialog}s.  If an attempt is
+     * made to show more than one lightweight dialog at a time, an
+     * {@link IllegalArgumentException} will be thrown.  If several workers have
+     * dialogs attached, care should be taken to ensure only one of those workers
+     * is SCHEDULED or RUNNING at any given time.
+     *
+     * <h2><u>Worker Completion Handling<u></u></h2>
+     *
+     * It's important to remember, especially when using lightweight dialogs, that
+     * when a worker completes the attached dialog may still be visible.  If a
+     * worker's completion handler attempts to show another dialog, the result may
+     * be undesirable.  For heavyweight dialogs it's possible to end up with two
+     * dialogs on the screen at once.  For lightweight dialogs it's possible for an
+     * {@link IllegalArgumentException} to be thrown.  If a worker's completion
+     * handler is going to cause another dialog to be shown, or is going to restart
+     * a failed worker, {@link Platform#runLater(Runnable)} should be used to
+     * ensure notification about the worker's completion is finished first.  Doing
+     * so makes sure the worker's attached dialog has been hidden before any new
+     * dialogs are shown during completion handling.
+     *
+     * <pre>{@code
+    Service<Void> service = getService();
+
+    service.setOnFailed(new EventHandler<WorkerStateEvent>() {
+        public void handle(WorkerStateEvent event) {
+            Platform.runLater(new Runnable() {
+                public void run() {
+                    // Show a dialog to the user asking if they want to
+                    // retry/
+                    if(shouldRetry()) {
+                        service.restart();
+                    }
+                }
+            });
+        }
+    });
+     * }</pre>
+     *
+     * The above code is much cleaner with Java 8 syntax:
+     *
+     * <pre>{@code
+    Service<Void> service = getService();
+
+    service.setOnFailed(event -> Platform.runLater(() -> {
+        if(shouldRetry()) {
+            service.restart();
+        }
+    }));
+     * }</pre>
+     */
+
     public void showWorkerProgress(final Worker<?> worker) {
         Dialog dlg = buildDialog(Type.PROGRESS);
         dlg.setClosable(false);
@@ -1259,17 +1335,13 @@ public final class Dialogs {
     
     
     /**
-     * The WorkerProgressPane is automatically shown or hidden based on the status of the
-     * Worker that is associated with it. You can specify the ProgressIndicator to be used,
-     * as well as what kind of a delay the WorkerProgressPane should have before being shown,
-     * and the speed at which it should be shown / hidden.
-     *
-     * The WorkerProgressPane will listen to the Worker as it changes state. When the Worker enters
-     * the running state, the pane will wait for some short (configurable) period of time to determine
-     * what the rate of progress is, and to figure out whether the task will be complete before the
-     * (configurable) showTime is specified. When it is triggered, it will show the pane (it must have
-     * previously been added to the parent) and when either the worker succeeds, or fails, or is cancelled,
-     * the WorkerProgressPane will hide itself.
+     * The WorkerProgressPane takes a {@link Dialog} and a {@link Worker}
+     * and links them together so the dialog is shown or hidden depending
+     * on the state of the worker.  The WorkerProgressPane also includes
+     * a progress bar that is automatically bound to the progress property
+     * of the worker.  The way in which the WorkerProgressPane shows and
+     * hides its worker's dialog is consistent with the expected behavior
+     * for {@link #showWorkerProgress(Worker)}.
      */
     private static class WorkerProgressPane extends Region {
         private Worker<?> worker;

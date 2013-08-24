@@ -1328,8 +1328,24 @@ public final class Dialogs {
         }
 
         private void begin() {
-            progressBar.progressProperty().bind(worker.progressProperty());
-            dialog.show();
+            // Platform.runLater needs to be used to show the dialog because
+            // the call begin() is going to be occurring when the worker is
+            // notifying state listeners about changes.  If Platform.runLater
+            // is not used, the call to show() will cause the worker to get
+            // blocked during notification and it will prevent the worker
+            // from performing any additional notification for state changes.
+            //
+            // Sine the dialog is hidden as a result of a change in worker
+            // state, calling show() without wrapping it in Platform.runLater
+            // will cause the progress dialog to run forever when the dialog
+            // is attached to workers that start out with a state of READY.
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.progressProperty().bind(worker.progressProperty());
+                    dialog.show();
+                }
+            });
         }
 
         private void end() {

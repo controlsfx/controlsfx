@@ -264,7 +264,13 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
 
             if (timeline != null && (timeline.getStatus() != Status.STOPPED)) {
                 duration = timeline.getCurrentTime();
+                
+                // fix for #70 - the notification pane freezes up as it has zero
+                // duration to expand / contract
+                duration = duration == Duration.ZERO ? TRANSITION_DURATION : duration;
                 transitionStartValue = transition.get();
+                // --- end of fix
+                
                 timeline.stop();
             } else {
                 duration = TRANSITION_DURATION;

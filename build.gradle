@@ -65,7 +65,9 @@ task jarSamples (type: Jar) {
     from sourceSets.samples.output
     manifest {
         attributes(
-            'Main-Class': 'org.controlsfx.HelloControlsFX'
+            'Manifest-Version': '1.0',
+            "Main-Class": "org.controlsfx.HelloControlsFX",
+            "Class-Path": "controlsfx-${version}.jar"
         )
     }
 }

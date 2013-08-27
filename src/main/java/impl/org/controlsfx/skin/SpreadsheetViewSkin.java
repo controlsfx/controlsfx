@@ -40,6 +40,7 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
 import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView.RowAccessor;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
@@ -50,8 +51,16 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 // within the SpreadsheetView. The skin for the SpreadsheetView itself currently
 // resides inside the SpreadsheetView constructor!
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
+    
+//    // hacky, but at least it lets us hide some API
+//    public static final SpreadsheetViewSkin getSkin(SpreadsheetView spv) {
+//        return (SpreadsheetViewSkin) spv.getSkin();
+//    }
+    
+    private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
 
-    private final TableView<DataRow> tableView;
+    final TableView<DataRow> tableView;
+//    private RowAccessor<SpreadsheetRow> cells=null;
     
 //    private SpreadsheetCell<?> lastHover = null;
 
@@ -78,7 +87,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
             }
         });
 
-        tableView.setFixedCellSize(spreadsheetView.getDefaultCellSize());
+        tableView.setFixedCellSize(getDefaultCellSize());
 
         tableView.getStyleClass().add("cell-spreadsheet");
 
@@ -107,6 +116,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 
         };
 
+//        this.cells = lcells;
         spreadsheetView.setRows(lcells);
         /*****************************************************************
          * END MODIFIED BY NELLARMONIA
@@ -222,6 +232,13 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     protected void onSelectNextCell() {
         super.onSelectNextCell();
         scrollHorizontally();
+    }
+    
+    /**
+     * @return the defaultCellSize
+     */
+    public double getDefaultCellSize() {
+        return DEFAULT_CELL_SIZE;
     }
 
     /**

@@ -115,10 +115,9 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/
 
-    private final double DEFAULT_CELL_SIZE = 24.0; 	// Height of a cell
     private Grid grid;
 //    private DataFormat fmt;
-    private final double cellPrefWidth = 100;			// Width of a cell
+//    private final double cellPrefWidth = 100;			// Width of a cell
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
     private final BooleanProperty columnHeader = new SimpleBooleanProperty(true);
@@ -221,20 +220,18 @@ public class SpreadsheetView extends Control {
         return cells.get(index);
     }
 
+    // FIXME this shouldn't be here!
     public boolean isEmptyCells() {
         return cells.isEmpty();
     }
 
+    // FIXME this shouldn't be here!
     public void setRows(RowAccessor<SpreadsheetRow> cells) {
         this.cells = (RowAccessor<SpreadsheetRow>) cells;
     }
 
     public TablePosition<DataRow, ?> getEditingCell(){
         return tableView.getEditingCell();
-    }
-
-    public double getCellPrefWidth() {
-        return cellPrefWidth;
     }
 
     /**
@@ -270,8 +267,7 @@ public class SpreadsheetView extends Control {
      * Fix the first "numberOfFixedRows" at the top.
      * @param numberOfFixedRows
      */
-    public void fixRows(int numberOfFixedRows){
-
+    public final void fixRows(int numberOfFixedRows){
         getFixedRows().clear();
         for (int j = 0; j < numberOfFixedRows; j++) {
             getFixedRows().add(j);
@@ -303,7 +299,7 @@ public class SpreadsheetView extends Control {
         return tableView.fixedCellSizeProperty();
     }
 
-    public ObservableList<DataRow> getItems() {
+    private ObservableList<DataRow> getItems() {
         return tableView.getItems();
     }
 
@@ -349,17 +345,12 @@ public class SpreadsheetView extends Control {
         return (SpreadsheetViewSelectionModel<DataRow>) tableView.getSelectionModel();
     }
 
-    public ObservableList<TableColumn<DataRow,?>> getColumns() {
+    private final ObservableList<TableColumn<DataRow,?>> getColumns() {
         return tableView.getColumns();
     }
 
-    /**
-     * @return the defaultCellSize
-     */
-    public double getDefaultCellSize() {
-        return DEFAULT_CELL_SIZE;
-    }
-
+    
+    
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -378,12 +369,12 @@ public class SpreadsheetView extends Control {
     }
 
     // FIXME this shouldn't be here!
-    public int getVirtualFlowCellSize(){
+    public final int getRowCount(){
         return cells.size();
     }
 
-    // FIXME not clear what this method is
-    public SpreadsheetRow getNonFixed(int index){
+    // returns the given row after the fixed rows
+    private SpreadsheetRow getNonFixedRow(int index){
         return cells.get(fixedRows.size()+index);
     }
 
@@ -420,7 +411,7 @@ public class SpreadsheetView extends Control {
 
                 column.impl_setReorderable(false);
 
-                column.setPrefWidth(getCellPrefWidth());
+//                column.setPrefWidth(getCellPrefWidth());
 
 
                 // We assign a DataCell for each Cell needed (MODEL).
@@ -727,11 +718,11 @@ public class SpreadsheetView extends Control {
             case ROW_INVISIBLE:
             default:
                 final DataCell<?> cellSpan = tableView.getItems().get(row).getCell(col);
-                if (!isEmptyCells() && getNonFixed(0).getIndex() <= cellSpan.getRow()) {
+                if (!isEmptyCells() && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
                     return new TablePosition<>(tableView, cellSpan.getRow(), tableView.getColumns().get(cellSpan.getColumn()));
 
                 } else { // If it's not, then it's the firstkey
-                    return new TablePosition<>(tableView, getNonFixed(0).getIndex(),tableView.getColumns().get(cellSpan.getColumn()));
+                    return new TablePosition<>(tableView, getNonFixedRow(0).getIndex(),tableView.getColumns().get(cellSpan.getColumn()));
                 }
         }
     }
@@ -1179,7 +1170,7 @@ public class SpreadsheetView extends Control {
 
             //We try to make visible the rows that may be hiden by Fixed rows
             // We don't want to do any scroll behavior when dragging
-            if(!drag && !spreadsheetView.isEmptyCells() && spreadsheetView.getNonFixed(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
+            if(!drag && !spreadsheetView.isEmptyCells() && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());
             }
 

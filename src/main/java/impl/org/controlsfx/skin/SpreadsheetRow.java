@@ -80,7 +80,7 @@ public class SpreadsheetRow extends TableRow<DataRow>{
     @Override
     public void updateIndex(int i){
 
-        for (int j = 0; j<spreadsheetView.getVirtualFlowCellSize();j++ ) {
+        for (int j = 0; j<spreadsheetView.getRowCount();j++ ) {
             if(spreadsheetView.getRow(j) != null){
                 if(spreadsheetView.getRow(j).getIndexVirtualFlow() == i){
 

@@ -34,6 +34,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
@@ -68,11 +69,15 @@ public class SpreadsheetRowSkin<T extends DataRow>
         }
         DEFAULT_CELL_SIZE = cell_size;
     }
+    
     SpreadsheetView spreadsheetView;
+    private TableView<DataRow> tableView;
+    
     public SpreadsheetRowSkin(TableRow<DataRow> tableRow,
             SpreadsheetView spreadsheetView) {
         super(tableRow);
         this.spreadsheetView = spreadsheetView;
+        this.tableView = (TableView<DataRow>) spreadsheetView.getSkin().getNode();
     }
 
     @Override
@@ -89,7 +94,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
         // that extra row at the bottom layouting.
         final TableRow<DataRow> control = (TableRow<DataRow>) getSkinnable();
         final int index = control.getIndex();
-        if (index < 0 || index >= spreadsheetView.getItems().size()) {
+        if (index < 0 || index >= tableView.getItems().size()) {
             control.setOpacity(0);
             return;
         }
@@ -212,8 +217,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
                 }
                 // System.out.println("Je layout"+index+"/"+column );
 
-                final DataCell<?> cellSpan = ((DataRow) spreadsheetView
-                        .getItems().get(index)).getCell(column);
+                final DataCell<?> cellSpan = ((DataRow) tableView.getItems().get(index)).getCell(column);
                 final SpreadsheetView.SpanType spanType = spreadsheetView
                         .getSpanType(index, column);
 
@@ -240,8 +244,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
                         // SpreadsheetCell was created
                         final SpreadsheetViewSelectionModel<DataRow> sm = spreadsheetView
                                 .getSelectionModel();
-                        final TableColumn<DataRow, ?> col = spreadsheetView
-                                .getColumns().get(column);
+                        final TableColumn<DataRow, ?> col = tableView.getColumns().get(column);
 
                         // In case this cell was selected before but we scroll
                         // up/down and it's invisible now.

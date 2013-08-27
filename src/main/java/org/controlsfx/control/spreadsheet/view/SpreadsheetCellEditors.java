@@ -260,8 +260,8 @@ public class SpreadsheetCellEditors {
                     cb.setItems(temp2);
                     cb.setValue(cell.getStr());
 
-                    cb.setPrefWidth(spreadsheetView.getCellPrefWidth());
-                    cb.setMinWidth(spreadsheetView.getCellPrefWidth());
+//                    cb.setPrefWidth(spreadsheetView.getCellPrefWidth());
+//                    cb.setMinWidth(spreadsheetView.getCellPrefWidth());
                 }
             }
 

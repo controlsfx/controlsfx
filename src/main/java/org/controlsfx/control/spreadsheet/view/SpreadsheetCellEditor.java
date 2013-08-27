@@ -163,8 +163,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         public void startEdit() {
             // Case when RowSpan if larger and we're not on the last row
             if (modelCell.getRowSpan() > 1
-                    && modelCell.getRow() != spreadsheetView
-                            .getVirtualFlowCellSize() - 1) {
+                    && modelCell.getRow() != spreadsheetView.getRowCount() - 1) {
                 original = (SpreadsheetRow) viewCell.getTableRow();
 
                 final double temp = viewCell.getLocalToSceneTransform().getTy();

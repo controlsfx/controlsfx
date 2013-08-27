@@ -97,7 +97,7 @@ public class RowHeader  extends StackPane {
      *                                                                         *
      **************************************************************************/
 	void init(){
-		prefHeight = spreadsheetViewSkin.spreadsheetView.getDefaultCellSize();
+		prefHeight = spreadsheetViewSkin.getDefaultCellSize();
 		selectionModel = spreadsheetView.getSelectionModel();
 
 		//Clip property to stay within bounds

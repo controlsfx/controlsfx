@@ -47,10 +47,10 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpanType;
-import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditor;
-import org.controlsfx.control.spreadsheet.editor.SpreadsheetCellEditors;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditors;
 
 import com.sun.javafx.scene.control.skin.TableCellSkin;
 

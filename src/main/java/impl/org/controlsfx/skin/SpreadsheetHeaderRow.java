@@ -54,7 +54,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
             @Override
             public void run() {
 
-                spreadsheetViewSkin.spreadsheetView.getRowHeader().addListener(
+                spreadsheetViewSkin.spreadsheetView.rowHeaderProperty().addListener(
                         rowHeaderListener);
                 selectionModel = spreadsheetViewSkin.spreadsheetView
                         .getSelectionModel();
@@ -78,7 +78,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
                  *****************************************************************/
                 // We listen to the BooleanProperty linked with the CheckBox of
                 // the columnHeader
-                spreadsheetViewSkin.spreadsheetView.getColumnHeader()
+                spreadsheetViewSkin.spreadsheetView.columnHeaderProperty()
                         .addListener(new ChangeListener<Boolean>() {
                             @Override
                             public void changed(
@@ -107,7 +107,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
          *****************************************************************/
         if (spreadsheetViewSkin != null
                 && spreadsheetViewSkin.spreadsheetView != null
-                && spreadsheetViewSkin.spreadsheetView.getRowHeader().get()) {
+                && spreadsheetViewSkin.spreadsheetView.rowHeaderProperty().get()) {
             padding += spreadsheetViewSkin.getRowHeaderWidth();
         }
 

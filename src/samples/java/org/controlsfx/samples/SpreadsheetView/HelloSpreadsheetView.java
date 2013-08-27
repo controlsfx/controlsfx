@@ -52,7 +52,7 @@ import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 
 /**
  *

@@ -128,7 +128,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     @Override
     protected void layoutChildren(double x, double y, double w, final double h) {
         if (spreadsheetView == null) { return; }
-        if (spreadsheetView.getRowHeader().get()) {
+        if (spreadsheetView.rowHeaderProperty().get()) {
             x += rowHeaderWidth;
             w -= rowHeaderWidth;
         }
@@ -139,7 +139,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
                 .getHeight() / 2;
         double tableHeaderRowHeight = 0;
 
-        if (spreadsheetView.getColumnHeader().get()) {
+        if (spreadsheetView.columnHeaderProperty().get()) {
             // position the table header
             tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
             layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight,
@@ -150,7 +150,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
             // TODO try to hide the columnHeader
         }
 
-        if (spreadsheetView.getRowHeader().get()) {
+        if (spreadsheetView.rowHeaderProperty().get()) {
             layoutInArea(rowHeader, x - rowHeaderWidth, y
                     - tableHeaderRowHeight, w, h, baselineOffset, HPos.CENTER,
                     VPos.CENTER);

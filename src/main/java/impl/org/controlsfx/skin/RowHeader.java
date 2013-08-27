@@ -108,7 +108,7 @@ public class RowHeader  extends StackPane {
 		RowHeader.this.setClip(clip);
 
 		// We desactivate and activate the rowheader upon request
-		spreadsheetView.getRowHeader().addListener(new ChangeListener<Boolean>(){
+		spreadsheetView.rowHeaderProperty().addListener(new ChangeListener<Boolean>(){
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0,
 					Boolean arg1, Boolean arg2) {
@@ -117,7 +117,7 @@ public class RowHeader  extends StackPane {
 			}});
 
 		// When the Column header is showing or not, we need to update the position of the rowHeader
-		spreadsheetView.getColumnHeader().addListener(layout);
+		spreadsheetView.columnHeaderProperty().addListener(layout);
 
 		spreadsheetView.getFixedRows().addListener(layout);
 		//In case we resize the view in any manners
@@ -136,7 +136,7 @@ public class RowHeader  extends StackPane {
 			//We add prefHeight because we need to take the other header into account
 			// And also the fixedRows if any
 			double y = snappedTopInset() ;//+prefHeight*flow.getFixedRows().size();
-			if(spreadsheetView.getColumnHeader().get()){
+			if(spreadsheetView.columnHeaderProperty().get()){
 				y+=prefHeight;
 			}
 
@@ -174,7 +174,7 @@ public class RowHeader  extends StackPane {
 					label.resize(prefWidth,prefHeight);
 
 					//If the columnHeader is here, we need to translate a bit
-					if(spreadsheetView.getColumnHeader().get()){
+					if(spreadsheetView.columnHeaderProperty().get()){
 						label.relocate(x, snappedTopInset()+prefHeight*(i+1));
 					}else{
 						label.relocate(x, snappedTopInset()+prefHeight*i);
@@ -190,7 +190,7 @@ public class RowHeader  extends StackPane {
 			}
 
 			//First one blank and on top (z-order) of the others
-			if(spreadsheetView.getColumnHeader().get()){
+			if(spreadsheetView.columnHeaderProperty().get()){
 				label = getLabel(rowCount++);
 				label.setText("");
 				label.resize(prefWidth,prefHeight);

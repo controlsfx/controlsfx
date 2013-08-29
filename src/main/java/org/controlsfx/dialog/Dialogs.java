@@ -714,33 +714,27 @@ public final class Dialogs {
     }
     
     /**
-     * Creates a progress bar dialog which is attached to the given {@link Worker}
-     * instance, so that as the worker starts and completes, so too does the
-     * dialog show and hide automatically. 
-     * 
-     * @param worker The worker that the progress dialog is watching.
-     */
-    /**
      * Creates a progress bar {@link Dialog} which is attached to the given
      * {@link Worker} instance.  The worker will be observed permanently and
      * the attached dialog will be shown and hidden as the worker starts and
-     * completes. If the worker's state is {@link Worker.State#SCHEDULED} or
-     * {@link Worker.State#RUNNING} the dialog will be visible.
+     * completes. If the worker's state is
+     * {@link javafx.concurrent.Worker.State#SCHEDULED} or
+     * {@link javafx.concurrent.Worker.State#RUNNING} the dialog will be visible.
      *
      * <h2><u>Expected Behavior</u></h2>
      *
-     * If the worker has a state of {@link Worker.State#SCHEDULED} or
-     * {@link Worker.State#RUNNING}, the dialog will be hidden when the worker's
-     * state changes to {@link Worker.State#SUCCEEDED}, {@link Worker.State#FAILED},
-     * or {@link Worker.State#CANCELLED}.
+     * If the worker has a state of {@link javafx.concurrent.Worker.State#READY},
+     * {@link javafx.concurrent.Worker.State#SUCCEEDED},
+     * {@link javafx.concurrent.Worker.State#FAILED}, or
+     * {@link javafx.concurrent.Worker.State#CANCELLED}, the dialog will be shown
+     * when the worker's state changes to SUCCEDED or RUNNING.
      *
-     * If the worker has a state of {@link Worker.State#RUNNING}, the
-     * dialog will be hidden when the worker's state changes to
-     * {@link Worker.State#SUCCEEDED}, {@link Worker.State#FAILED},
-     * or {@link Worker.State#CANCELLED}.
-
+     * If the worker has a state of SCHEDULED or RUNNING, the dialog will be
+     * hidden when the worker's state changes to SUCCEEDED, FAILED, or CANCELLED.
+     *
      * All other changes in worker state will not cause the visibility of the
-     * attached dialog to change.
+     * attached dialog to change.  Note that if a worker is submitted with a
+     * state of SCHEDULED or RUNNING the dialog will be shown immediately.
      *
      * <h2><u>Multiple Workers</u></h2>
      *
@@ -751,7 +745,7 @@ public final class Dialogs {
      * dialogs attached, care should be taken to ensure only one of those workers
      * is SCHEDULED or RUNNING at any given time.
      *
-     * <h2><u>Worker Completion Handling<u></u></h2>
+     * <h2><u>Worker Completion Handling</u></h2>
      *
      * It's important to remember, especially when using lightweight dialogs, that
      * when a worker completes the attached dialog may still be visible.  If a
@@ -772,9 +766,11 @@ public final class Dialogs {
         public void handle(WorkerStateEvent event) {
             Platform.runLater(new Runnable() {
                 public void run() {
-                    // Show a dialog to the user asking if they want to
-                    // retry/
-                    if(shouldRetry()) {
+                    // Make sure the service state is still failed.  If so, the
+                    // call to shouldRetry() will show the user a dialog asking
+                    // if they'd like to retry and will return true or false
+                    // depending on the user's answer.
+                    if(isFailed(service) && shouldRetry()) {
                         service.restart();
                     }
                 }
@@ -789,7 +785,7 @@ public final class Dialogs {
     Service<Void> service = getService();
 
     service.setOnFailed(event -> Platform.runLater(() -> {
-        if(shouldRetry()) {
+        if(isFailed(service) && shouldRetry()) {
             service.restart();
         }
     }));

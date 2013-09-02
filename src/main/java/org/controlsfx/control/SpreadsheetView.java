@@ -39,6 +39,8 @@ import java.util.Set;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -53,16 +55,21 @@ import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
@@ -116,7 +123,7 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     private Grid grid;
-//    private DataFormat fmt;
+    private DataFormat fmt;
 //    private final double cellPrefWidth = 100;			// Width of a cell
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
@@ -187,6 +194,8 @@ public class SpreadsheetView extends Control {
         // We add a listener on the focus model in order to catch when we are on a hidden cell
         tableView.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
 
+        setContextMenu(getSpreadsheetViewContextMenu());
+        
         setGrid(grid);
     }
 
@@ -358,17 +367,6 @@ public class SpreadsheetView extends Control {
      **************************************************************************/   
 
     // FIXME this shouldn't be here!
-    public boolean addCell(SpreadsheetCell<?> cell){
-        SpreadsheetRow temp = getRow(cells.size()-1-fixedRows.size());
-        if(temp != null){
-            temp.addCell(cell);
-            return true;
-        }
-        return false;
-
-    }
-
-    // FIXME this shouldn't be here!
     public final int getRowCount(){
         return cells.size();
     }
@@ -386,10 +384,9 @@ public class SpreadsheetView extends Control {
         return false;
     }
 
-    // FIXME commented out as never called
-//    private final Grid getGrid(){
-//        return grid;
-//    }
+    private final Grid getGrid(){
+        return grid;
+    }
 
     private final void setGrid(Grid grid) {
         this.grid = grid;
@@ -462,114 +459,131 @@ public class SpreadsheetView extends Control {
      * 						COPY / PASTE METHODS
      **************************************************************************/
 
-    // FIXME Commented out as these methods were never called
-//    private void checkFormat(){
-//        if((fmt = DataFormat.lookupMimeType("shuttle"))== null){
-//            fmt = new DataFormat("shuttle");
-//        }
-//    }
-//    /***
-//     * Create a menu on rightClick with two options: Copy/Paste
-//     * @return
-//     */
-//    private ContextMenu getSpreadsheetViewContextMenu(){
-//        final ContextMenu contextMenu = new ContextMenu();
-//        final MenuItem item1 = new MenuItem("Copy");
-//        item1.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent e) {
-//                putClipboard();
-//            }
-//        });
-//        final MenuItem item2 = new MenuItem("Paste");
-//        item2.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent e) {
-//                getClipboard();
-//            }
-//        });
-//        contextMenu.getItems().addAll(item1, item2);
-//        return contextMenu;
-//    }
-//
-//    /**
-//     * Put the current selection into the ClipBoard
-//     */
-//    private void putClipboard(){
-//        checkFormat();
-//
-//        //		final ArrayList<ArrayList<DataCell>> temp = new ArrayList<>();
-//        final ArrayList<DataCell<?>> list = new ArrayList<DataCell<?>>();
-//        @SuppressWarnings("rawtypes")
-//        final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
-//
-//        for (final TablePosition<?,?> p : posList) {
-//            list.add(getGrid().getRows().get(p.getRow()).get(p.getColumn()));
-//        }
-//
-//        final ClipboardContent content = new ClipboardContent();
-//        content.put(fmt,list);
-//        Clipboard.getSystemClipboard().setContent(content);
-//    }
-//
-//    /**
-//     * Try to paste the clipBoard to the specified position
-//     * Try to paste the current selection into the Grid. If the two contents are
-//     * not matchable, then it's not pasted.
-//     */
-//    private void getClipboard(){
-//        checkFormat();
-//        final Clipboard clipboard = Clipboard.getSystemClipboard();
-//        if(clipboard.getContent(fmt) != null){
-//
-//            @SuppressWarnings("unchecked")
-//            final ArrayList<DataCell<?>> list = (ArrayList<DataCell<?>>) clipboard.getContent(fmt);
-//            //TODO algorithm very bad
-//            int minRow=grid.getRowCount();
-//            int minCol=grid.getColumnCount();
-//            int maxRow=0;
-//            int maxCol=0;
-//            for (final DataCell<?> p : list) {
-//                final int tempcol = p.getColumn();
-//                final int temprow = p.getRow();
-//                if(tempcol<minCol) {
-//                    minCol = tempcol;
-//                }
-//                if(tempcol>maxCol) {
-//                    maxCol = tempcol;
-//                }
-//                if(temprow<minRow) {
-//                    minRow = temprow;
-//                }
-//                if(temprow>maxRow) {
-//                    maxRow =temprow;
-//                }
-//            }
-//
-//            final TablePosition<?,?> p = tableView.getFocusModel().getFocusedCell();
-//
-//            final int offsetRow = p.getRow()-minRow;
-//            final int offsetCol = p.getColumn()-minCol;
-//            int row;
-//            int column;
-//
-//
-//            for (final DataCell<?> row1 : list) {
-//                row = row1.getRow();
-//                column = row1.getColumn();
-//                if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()
-//                        && row+offsetRow >= 0 && column+offsetCol >=0 ){
-//                    final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
-//                    if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
-//                        getGrid().getRows().get(row+offsetRow).get(column+offsetCol).match(row1);
-//                    }
-//                }
-//            }
-//            //For layout
-//            getSelectionModel().clearSelection();
-//            requestLayout();
-//        }
-//    }
+    private void checkFormat(){
+        if((fmt = DataFormat.lookupMimeType("shuttle"))== null){
+            fmt = new DataFormat("shuttle");
+        }
+    }
+    /***
+     * Create a menu on rightClick with two options: Copy/Paste
+     * @return
+     */
+    private ContextMenu getSpreadsheetViewContextMenu(){
+        final ContextMenu contextMenu = new ContextMenu();
+        
+        // We don't want to open a contextMenu when editing because editors
+        // have their own contextMenu
+        contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent arg0) {
+				if(getEditingCell() != null){
+					// We're being reactive but we want to be pro-active so we may need a work-around.
+					final Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                        	contextMenu.hide();
+                        }
+                    };
+                    Platform.runLater(r);
+				}
+			}
+		});
+        final MenuItem item1 = new MenuItem("Copy");
+        item1.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                putClipboard();
+            }
+        });
+        final MenuItem item2 = new MenuItem("Paste");
+        item2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                getClipboard();
+            }
+        });
+        contextMenu.getItems().addAll(item1, item2);
+        return contextMenu;
+    }
+
+    /**
+     * Put the current selection into the ClipBoard
+     */
+    private void putClipboard(){
+        checkFormat();
+
+        //		final ArrayList<ArrayList<DataCell>> temp = new ArrayList<>();
+        final ArrayList<DataCell<?>> list = new ArrayList<DataCell<?>>();
+        @SuppressWarnings("rawtypes")
+        final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
+
+        for (final TablePosition<?,?> p : posList) {
+            list.add(getGrid().getRows().get(p.getRow()).get(p.getColumn()));
+        }
+
+        final ClipboardContent content = new ClipboardContent();
+        content.put(fmt,list);
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
+    /**
+     * Try to paste the clipBoard to the specified position
+     * Try to paste the current selection into the Grid. If the two contents are
+     * not matchable, then it's not pasted.
+     */
+    private void getClipboard(){
+        checkFormat();
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        if(clipboard.getContent(fmt) != null){
+
+            @SuppressWarnings("unchecked")
+            final ArrayList<DataCell<?>> list = (ArrayList<DataCell<?>>) clipboard.getContent(fmt);
+            //TODO algorithm very bad
+            int minRow=grid.getRowCount();
+            int minCol=grid.getColumnCount();
+            int maxRow=0;
+            int maxCol=0;
+            for (final DataCell<?> p : list) {
+                final int tempcol = p.getColumn();
+                final int temprow = p.getRow();
+                if(tempcol<minCol) {
+                    minCol = tempcol;
+                }
+                if(tempcol>maxCol) {
+                    maxCol = tempcol;
+                }
+                if(temprow<minRow) {
+                    minRow = temprow;
+                }
+                if(temprow>maxRow) {
+                    maxRow =temprow;
+                }
+            }
+
+            final TablePosition<?,?> p = tableView.getFocusModel().getFocusedCell();
+
+            final int offsetRow = p.getRow()-minRow;
+            final int offsetCol = p.getColumn()-minCol;
+            int row;
+            int column;
+
+
+            for (final DataCell<?> row1 : list) {
+                row = row1.getRow();
+                column = row1.getColumn();
+                if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()
+                        && row+offsetRow >= 0 && column+offsetCol >=0 ){
+                    final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
+                    if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
+                        getGrid().getRows().get(row+offsetRow).get(column+offsetCol).match(row1);
+                    }
+                }
+            }
+            //For layout
+            getSelectionModel().clearSelection();
+            requestLayout();
+        }
+    }
 
 
     /**************************************************************************

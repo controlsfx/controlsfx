@@ -62,8 +62,6 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     final TableView<DataRow> tableView;
 //    private RowAccessor<SpreadsheetRow> cells=null;
     
-//    private SpreadsheetCell<?> lastHover = null;
-
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
     public double getRowHeaderWidth() {

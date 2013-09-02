@@ -91,6 +91,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
      * the user.
      */
     public void startEdit() {
+    	editing = true;
         spreadsheetEditor.startEdit();
 
         // In ANY case, we stop when something move in scrollBar Vertical
@@ -156,18 +157,28 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         private SpreadsheetRow original;
         private boolean isMoved;
 
+        
+        private boolean addCell(SpreadsheetCell<?> cell){
+            SpreadsheetRow temp = spreadsheetView.getRow(spreadsheetView.getRowCount()-1-spreadsheetView.getFixedRows().size());
+            if(temp != null){
+                temp.addCell(cell);
+                return true;
+            }
+            return false;
+
+        }
         /***********************************************************************
          * * Public Methods * *
          **********************************************************************/
 
         public void startEdit() {
             // Case when RowSpan if larger and we're not on the last row
-            if (modelCell.getRowSpan() > 1
+            if (modelCell != null && modelCell.getRowSpan() > 1
                     && modelCell.getRow() != spreadsheetView.getRowCount() - 1) {
                 original = (SpreadsheetRow) viewCell.getTableRow();
 
                 final double temp = viewCell.getLocalToSceneTransform().getTy();
-                isMoved = spreadsheetView.addCell(viewCell);
+                isMoved = addCell(viewCell);
                 if (isMoved) {
                     viewCell.setTranslateY(temp
                             - viewCell.getLocalToSceneTransform().getTy());

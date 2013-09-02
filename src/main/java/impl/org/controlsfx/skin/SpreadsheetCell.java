@@ -79,7 +79,9 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
     }
     
     private static final Map<DataCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
-
+    private static SpreadsheetCell<?> lastHover = null;
+    
+    
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
@@ -87,7 +89,7 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
      **************************************************************************/
     public SpreadsheetCell() {
 
-        hoverProperty().addListener(new ChangeListener<Boolean>() {
+    	hoverProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
                 final int row = getIndex();
@@ -97,9 +99,9 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
                     getTableRow().requestLayout();
                     // If we are not at the top of the Spanned Cell
                 } else if (t1 && row != getItem().getRow()) {
-//                    hoverGridCell(getItem());
+                    hoverGridCell(getItem());
                 } else if (!t1 && row != getItem().getRow()) {
-//                    unHoverGridCell();
+                    unHoverGridCell();
                 }
             }
         });
@@ -136,13 +138,32 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
         final SpreadsheetView spv = getSpreadsheetView();
         final SpanType type = spv.getSpanType(row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
+        	
+        	/* FIXME Currently we're adding a row two times if it's located in the fixedRows.
+        	 * So we have a problem because some events, especially when editing
+        	 * are received in double.
+        	 * I don't know right now why this is happening but I have found a work-around.
+        	 * I check if the current SpreadsheetRow is referenced in the SpreadsheetView,
+        	 * if not, then I know I can throw it away (setManaged(false) ?)
+        	 */
+        	if(row <= spv.getFixedRows().size()){
+	        	boolean flag = false;
+	        	for (int j = 0; j<spv.getRowCount();j++ ) {
+	                    if(spv.getRow(j) == getTableRow()){
+	                    	flag = true;
+	                    }
+	            }
+	        	if(!flag){
+	        		getTableRow().setManaged(false);
+	        		return;
+	        	}
+        	}
+        	
             SpreadsheetCellEditor<?> editor = getEditor(getItem(), spv);
             if(editor != null){
                 super.startEdit();
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 editor.startEdit();
-            }else{
-                //TODO We got a problem right now because two lines are added.
             }
         }
     }
@@ -246,21 +267,26 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
             setContentDisplay(null);
         } else if (!isEditing() && item != null) {
             show(item);
+            //Sometimes the hoverProperty is not called on exit. So the cell is affected to a new Item but
+            // the hover is still activated. So we fix it now.
+            if(isHover()){
+            	setHoverPublic(false);
+            }
 
         }
     }
     
-//    /**
-//     * Set this SpreadsheetCell hoverProperty
-//     *
-//     * @param hover
-//     */
-//    void setHoverPublic(boolean hover) {
-//        this.setHover(hover);
-//        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
-//        //Otherwise it's will not be visible
-//        ((SpreadsheetRow) this.getTableRow()).setHoverPublic(hover);
-//    }
+    /**
+     * Set this SpreadsheetCell hoverProperty
+     *
+     * @param hover
+     */
+    void setHoverPublic(boolean hover) {
+        this.setHover(hover);
+        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
+        //Otherwise it's will not be visible
+        ((SpreadsheetRow) this.getTableRow()).setHoverPublic(hover);
+    }
 
     @Override
     public String toString(){
@@ -317,43 +343,43 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
         return ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
     }
     
-//    /**
-//     * A SpreadsheetCell is being hovered and we need to re-route the signal.
-//     *
-//     * @param cell The DataCell needed to be hovered.
-//     * @param hover
-//     */
-//    private void hoverGridCell(DataCell<?> cell) {
-//        //If the top of the spanned cell is visible, then no problem
-//        SpreadsheetCell<?> gridCell;
-//        
-//        final SpreadsheetView spv = getSpreadsheetView();
-//        final SpreadsheetRow row = spv.getNonFixed(0);
-//        
-//        if (!spv.isEmptyCells() && row.getIndex() <= cell.getRow()) {
-//            // We want to get the top of the spanned cell, so we need
-//            // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
-//            if(spv.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex()) != null) {// Sometime when scrolling fast it's null so..
-//                gridCell = spv.getRow(spv.getFixedRows().size()+cell.getRow()-row.getIndex()).getGridCell(cell.getColumn());
-//            } else {
-//                gridCell = row.getGridCell(cell.getColumn());
-//            }
-//        } else { // If it's not, then it's the firstkey
-//            gridCell = row.getGridCell(cell.getColumn());
-//        }
-//        gridCell.setHoverPublic(true);
-//        lastHover = gridCell;
-//    }
-//
-//    /**
-//     * Set Hover to false to the previous Cell we force to be hovered
-//     */
-//    private void unHoverGridCell() {
-//        //If the top of the spanned cell is visible, then no problem
-//        if(lastHover != null){
-//            lastHover.setHoverPublic(false);
-//        }
-//    }
+    /**
+     * A SpreadsheetCell is being hovered and we need to re-route the signal.
+     *
+     * @param cell The DataCell needed to be hovered.
+     * @param hover
+     */
+    private void hoverGridCell(DataCell<?> cell) {
+        //If the top of the spanned cell is visible, then no problem
+        SpreadsheetCell<?> gridCell;
+        
+        final SpreadsheetView spv = getSpreadsheetView();
+        final SpreadsheetRow row = spv.getRow(spv.getFixedRows().size());
+        
+        if (!spv.isEmptyCells() && row.getIndex() <= cell.getRow()) {
+            // We want to get the top of the spanned cell, so we need
+            // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
+            if(spv.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex()) != null) {// Sometime when scrolling fast it's null so..
+                gridCell = spv.getRow(spv.getFixedRows().size()+cell.getRow()-row.getIndex()).getGridCell(cell.getColumn());
+            } else {
+                gridCell = row.getGridCell(cell.getColumn());
+            }
+        } else { // If it's not, then it's the firstkey
+            gridCell = row.getGridCell(cell.getColumn());
+        }
+        gridCell.setHoverPublic(true);
+        lastHover = gridCell;
+    }
+
+    /**
+     * Set Hover to false to the previous Cell we force to be hovered
+     */
+    private void unHoverGridCell() {
+        //If the top of the spanned cell is visible, then no problem
+        if(lastHover != null){
+        	lastHover.setHoverPublic(false);
+        }
+    }
     
     
     /**

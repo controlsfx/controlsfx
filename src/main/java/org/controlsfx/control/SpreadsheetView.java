@@ -76,12 +76,51 @@ import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
- *
- *
+ * The SpreadsheetView is a control based on {@link TableView} with different functionalities. The aim
+ * is to have a powerful grid where data can be written and retrieved.
+ * 
+ * <h3>Features </h3>
+ * <li> Cells can span in row and in column.</li>
+ * <li> Rows can be fixed to the top of the {@link SpreadsheetView} so that they are
+ * always visible on screen.</li>
+ * <li> Columns can be fixed to the left of the {@link SpreadsheetView} so that they are
+ * always visible on screen.</li>
+ * <li> A row header can be switched on in order to display the row number.</li>
+ * <li> Selection of several cells can be made with a click and drag.</li>
+ * <li> A copy/paste context menu is accessible with a right-click.</li>
+ * 
+ * 
+ * <h3>Creating a SpreadsheetView </h3>
+ * Just like the {@link TableView}, you can instantiate the underlying model, a {@link Grid}.
+ * You will create some {@link DataRow} filled with {@link DataCell}. 
+ * 
+ * {@code 
+ * int rowCount = 15;
+ * int columnCount = 10;
+ * Grid grid = new Grid(rowCount, columnCount);
+ * 
+ * ArrayList<DataRow> rows = new ArrayList<DataRow>(grid.getRowCount());
+ *		for (int row = 0; row < grid.getRowCount(); ++row) {
+ *			final DataRow dataRow = new DataRow(row, grid.getColumnCount());
+ *			for (int column = 0; column < grid.getColumnCount(); ++column) {
+ *				dataRow.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
+ *			}
+ *			rows.add(dataRow);
+ *		}
+ * grid.setRows(rows);
+ * }
+ * 
+ * At that moment you can span some of the cells with the convenient method provided by the grid.
+ * Then you just need to instantiate the SpreadsheetView.
+ *		
+ * {@code
+ * SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
+ * }
  */
 public class SpreadsheetView extends Control {
 
@@ -124,7 +163,6 @@ public class SpreadsheetView extends Control {
 
     private Grid grid;
     private DataFormat fmt;
-//    private final double cellPrefWidth = 100;			// Width of a cell
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
     private final BooleanProperty columnHeader = new SimpleBooleanProperty(true);
@@ -256,11 +294,9 @@ public class SpreadsheetView extends Control {
      * @param b
      */
     public final void setColumnHeader(final boolean b){
-        // FIXME this isn't correct
         //TODO Need to do that again
         //flow.recreateCells(); // Because otherwise we have at the bottom
         columnHeader.setValue(b);
-        columnHeader.get();//For invalidation Listener to react again
     }
 
     public final BooleanProperty columnHeaderProperty() {
@@ -268,13 +304,11 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Activate and desactivate the Column Header
+     * Activate and deactivate the Column Header
      * @param b
      */
     public final void setRowHeader(final boolean b){
-        // FIXME this isn't correct
         rowHeader.setValue(b);
-        rowHeader.get();//For invalidation Listener to react again
     }
     public final BooleanProperty rowHeaderProperty() {
         return rowHeader;
@@ -297,7 +331,7 @@ public class SpreadsheetView extends Control {
 
     // FIXME Need to allow for any rows / columns to be fixed
     /**
-     * Fix the first "numberOfFixedRows" on the left.
+     * Fix the first "numberOfFixedColumns" on the left.
      * @param numberOfFixedColumns
      */
     public void fixColumns(int numberOfFixedColumns){

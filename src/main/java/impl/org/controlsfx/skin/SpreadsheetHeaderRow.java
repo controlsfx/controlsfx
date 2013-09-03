@@ -139,11 +139,11 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
      * When the Rowheader is showing (or not anymore) we need to react
      * accordingly
      */
-    private final InvalidationListener rowHeaderListener = new InvalidationListener() {
-        @Override
-        public void invalidated(Observable valueModel) {
-            updateTableWidth();
-        }
+    private final ChangeListener<Boolean> rowHeaderListener = new ChangeListener<Boolean>() {
+		@Override
+		public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+			 updateTableWidth();
+		}
     };
     /**
      * When we fix/unfix some columns, the header must react accordingly TODO

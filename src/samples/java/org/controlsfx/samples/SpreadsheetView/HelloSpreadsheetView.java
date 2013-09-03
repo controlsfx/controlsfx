@@ -53,6 +53,7 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
+import org.controlsfx.samples.Utils;
 
 /**
  *
@@ -153,8 +154,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 
 	@Override
 	public String getJavaDocURL() {
-		// TODO Auto-generated method stub
-		return null;
+		return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/control/SpreadsheetView.html";
 	}
 
 	@Override

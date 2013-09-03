@@ -6,20 +6,19 @@
 SpreadsheetCell.row_header:filled:selected ,
 SpreadsheetCell.row_header:filled:focused:selected,
 SpreadsheetCell.row_header:filled:focused:selected:hover {
-    -fx-background-color: #6b9591;
-    -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
+    -fx-background-color: #26ADE4;
+   /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
     -fx-text-fill: -fx-selection-bar-text;
 }
 SpreadsheetCell.row_header:hover,
 SpreadsheetCell.row_header:filled:focused {
-    -fx-background-color: #97bea9 ;
+    -fx-background-color: #97bea9;
     -fx-text-fill: -fx-text-inner-color;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
-SpreadsheetCell.row_header,
-SpreadsheetCell.row_header {
-    -fx-background-color:-fx-table-cell-border-color,#b4d4ad  ;
+SpreadsheetCell.row_header{
+    -fx-background-color:-fx-table-cell-border-color,#b4d4ad ;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }
@@ -28,8 +27,8 @@ SpreadsheetCell.row_header {
 SpreadsheetCell.col_header:filled:selected ,
 SpreadsheetCell.col_header:filled:focused:selected,
 SpreadsheetCell.col_header:filled:focused:selected:hover {
-    -fx-background-color: #55436d;
-    -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
+    -fx-background-color: #26ADE4;
+    /*-fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
     -fx-text-fill: -fx-selection-bar-text;
 }
 SpreadsheetCell.col_header:hover,
@@ -39,8 +38,7 @@ SpreadsheetCell.col_header:filled:focused {
     -fx-background-insets: 0, 0 0 1 0;
 }
 
-SpreadsheetCell.col_header,
-SpreadsheetCell.col_header {
+SpreadsheetCell.col_header{
     -fx-background-color: -fx-table-cell-border-color, #e18cb3;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
@@ -50,20 +48,19 @@ SpreadsheetCell.col_header {
 SpreadsheetCell.five_rows:filled:selected ,
 SpreadsheetCell.five_rows:filled:focused:selected,
 SpreadsheetCell.five_rows:filled:focused:selected:hover {
-    -fx-background-color: #99e699  ;
-    -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
+    -fx-background-color: #26ADE4 ;
+    /*-fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
     -fx-text-fill: -fx-selection-bar-text;
 }
 SpreadsheetCell.five_rows:hover,
 SpreadsheetCell.five_rows:filled:focused {
-    -fx-background-color: #a9f0b4 ;
+    -fx-background-color: #a9f0b4;
     -fx-text-fill: -fx-text-inner-color;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
-SpreadsheetCell.five_rows,
 SpreadsheetCell.five_rows{
-    -fx-background-color: -fx-table-cell-border-color, #ccffff ;
+    -fx-background-color: -fx-table-cell-border-color, #ccffff;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }
@@ -72,9 +69,12 @@ SpreadsheetCell.five_rows{
 SpreadsheetCell:filled:selected,
 SpreadsheetCell:filled:focused:selected,
 SpreadsheetCell:filled:focused:selected:hover {
-    -fx-background-color: #ffffff ;
-    -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
+    -fx-background-color: #26ADE4;
+   /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
+    -fx-border-color: #a9a9a9;
+    -fx-border-width : 0.5px;
     -fx-text-fill: -fx-selection-bar-text;
+    
 }
 SpreadsheetCell:hover,
 SpreadsheetCell:filled:focused {
@@ -83,9 +83,8 @@ SpreadsheetCell:filled:focused {
     -fx-background-insets: 0, 0 0 1 0;
 }
 
-SpreadsheetCell,
-SpreadsheetCell {
-    -fx-background-color: -fx-table-cell-border-color, #d9d6dd ;
+SpreadsheetCell{
+    -fx-background-color: -fx-table-cell-border-color, #d9d6dd;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }
@@ -118,5 +117,4 @@ Label.selected{
     -fx-alignment: center;
 }  
     
-
 

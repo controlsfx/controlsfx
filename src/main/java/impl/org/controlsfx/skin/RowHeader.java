@@ -154,7 +154,7 @@ public class RowHeader  extends StackPane {
 			// We iterate over the visibleRows
 			while(!spreadsheetView.isEmptyCells() && spreadsheetView.getRow(i) != null && i< modelRowCount){
 				label = getLabel(rowCount++);
-				label.setText(String.valueOf(spreadsheetView.getRow(i).getIndexVirtualFlow()));
+				label.setText(String.valueOf(spreadsheetView.getRow(i).getIndexVirtualFlow()+1));
 				label.resize(prefWidth,prefHeight);
 				label.relocate(x, y);
 				//We want to highlight selected rows
@@ -172,7 +172,7 @@ public class RowHeader  extends StackPane {
 			if(!spreadsheetView.getFixedRows().isEmpty() && !spreadsheetView.isEmptyCells()){
 				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
 					label = getLabel(rowCount++);
-					label.setText(String.valueOf(i));
+					label.setText(String.valueOf(i+1));
 					label.resize(prefWidth,prefHeight);
 
 					//If the columnHeader is here, we need to translate a bit

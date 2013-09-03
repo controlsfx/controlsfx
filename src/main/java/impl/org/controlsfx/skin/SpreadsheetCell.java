@@ -97,11 +97,15 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
 
                 if (getItem() == null) {
                     getTableRow().requestLayout();
-                    // If we are not at the top of the Spanned Cell
-                } else if (t1 && row != getItem().getRow()) {
-                    hoverGridCell(getItem());
-                } else if (!t1 && row != getItem().getRow()) {
-                    unHoverGridCell();
+                // We only need to re-route if the rowSpan is large because
+                // it's the only case where it's not handled correctly.
+                }else if(getItem().getRowSpan() >1){
+                	 // If we are not at the top of the Spanned Cell
+                	if (t1 && row != getItem().getRow()) {
+                        hoverGridCell(getItem());
+                    } else if (!t1 && row != getItem().getRow()) {
+                        unHoverGridCell();
+                    }
                 }
             }
         });
@@ -355,12 +359,13 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
         
         final SpreadsheetView spv = getSpreadsheetView();
         final SpreadsheetRow row = spv.getRow(spv.getFixedRows().size());
-        
+         
         if (!spv.isEmptyCells() && row.getIndex() <= cell.getRow()) {
+        	final SpreadsheetRow rightRow = spv.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need
             // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
-            if(spv.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex()) != null) {// Sometime when scrolling fast it's null so..
-                gridCell = spv.getRow(spv.getFixedRows().size()+cell.getRow()-row.getIndex()).getGridCell(cell.getColumn());
+            if( rightRow != null) {// Sometime when scrolling fast it's null so..
+                gridCell = rightRow.getGridCell(cell.getColumn());
             } else {
                 gridCell = row.getGridCell(cell.getColumn());
             }

@@ -3,45 +3,45 @@
 }
 
 /* CELLULE ROW HEADER */
-SpreadsheetCell.col_header:filled:selected ,
-SpreadsheetCell.col_header:filled:focused:selected,
-SpreadsheetCell.col_header:filled:focused:selected:hover {
-    -fx-background-color: rgb(128,64,0);
-    -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
-    -fx-text-fill: -fx-selection-bar-text;
-}
-SpreadsheetCell.col_header:hover,
-SpreadsheetCell.col_header:filled:focused {
-    -fx-background-color: rgb(255,128,64);
-    -fx-text-fill: -fx-text-inner-color;
-    -fx-background-insets: 0, 0 0 1 0;
-}
-
-SpreadsheetCell.col_header,
-SpreadsheetCell.col_header .combo-box *{
-    -fx-background-color:-fx-table-cell-border-color,rgb(255,128,0) ;
-    -fx-background-insets: 0, 0 1 1 0;
-    -fx-alignment: center;
-}
-
-/* CELL COLUMN HEADER */
 SpreadsheetCell.row_header:filled:selected ,
 SpreadsheetCell.row_header:filled:focused:selected,
 SpreadsheetCell.row_header:filled:focused:selected:hover {
-    -fx-background-color: red;
+    -fx-background-color: #6b9591;
     -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
     -fx-text-fill: -fx-selection-bar-text;
 }
 SpreadsheetCell.row_header:hover,
 SpreadsheetCell.row_header:filled:focused {
-    -fx-background-color: #ff6666;
+    -fx-background-color: #97bea9 ;
     -fx-text-fill: -fx-text-inner-color;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
 SpreadsheetCell.row_header,
-SpreadsheetCell.row_header .combo-box *{
-    -fx-background-color: -fx-table-cell-border-color, #ffcccc;
+SpreadsheetCell.row_header {
+    -fx-background-color:-fx-table-cell-border-color,#b4d4ad  ;
+    -fx-background-insets: 0, 0 1 1 0;
+    -fx-alignment: center;
+}
+
+/* CELL COLUMN HEADER */
+SpreadsheetCell.col_header:filled:selected ,
+SpreadsheetCell.col_header:filled:focused:selected,
+SpreadsheetCell.col_header:filled:focused:selected:hover {
+    -fx-background-color: #55436d;
+    -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+SpreadsheetCell.col_header:hover,
+SpreadsheetCell.col_header:filled:focused {
+    -fx-background-color: #b07297;
+    -fx-text-fill: -fx-text-inner-color;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+SpreadsheetCell.col_header,
+SpreadsheetCell.col_header {
+    -fx-background-color: -fx-table-cell-border-color, #e18cb3;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }
@@ -50,20 +50,20 @@ SpreadsheetCell.row_header .combo-box *{
 SpreadsheetCell.five_rows:filled:selected ,
 SpreadsheetCell.five_rows:filled:focused:selected,
 SpreadsheetCell.five_rows:filled:focused:selected:hover {
-    -fx-background-color: darkgreen ;
+    -fx-background-color: #99e699  ;
     -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
     -fx-text-fill: -fx-selection-bar-text;
 }
 SpreadsheetCell.five_rows:hover,
 SpreadsheetCell.five_rows:filled:focused {
-    -fx-background-color: green;
+    -fx-background-color: #a9f0b4 ;
     -fx-text-fill: -fx-text-inner-color;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
 SpreadsheetCell.five_rows,
-SpreadsheetCell.five_rows .combo-box *{
-    -fx-background-color: -fx-table-cell-border-color, lightgreen;
+SpreadsheetCell.five_rows{
+    -fx-background-color: -fx-table-cell-border-color, #ccffff ;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }
@@ -72,21 +72,20 @@ SpreadsheetCell.five_rows .combo-box *{
 SpreadsheetCell:filled:selected,
 SpreadsheetCell:filled:focused:selected,
 SpreadsheetCell:filled:focused:selected:hover {
-    -fx-background-color: blue;
+    -fx-background-color: #ffffff ;
     -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;
     -fx-text-fill: -fx-selection-bar-text;
-    -fx-border-color: black;
 }
 SpreadsheetCell:hover,
 SpreadsheetCell:filled:focused {
-    -fx-background-color: #6666ff;
+    -fx-background-color: #988490;
     -fx-text-fill: -fx-text-inner-color;
     -fx-background-insets: 0, 0 0 1 0;
 }
 
 SpreadsheetCell,
-SpreadsheetCell .combo-box *{
-    -fx-background-color: -fx-table-cell-border-color, #ccccff;
+SpreadsheetCell {
+    -fx-background-color: -fx-table-cell-border-color, #d9d6dd ;
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }

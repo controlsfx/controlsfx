@@ -242,6 +242,14 @@ public class SpreadsheetView extends Control {
     public TablePosition<DataRow, ?> getEditingCell(){
         return tableView.getEditingCell();
     }
+    
+    /**
+     * Return the number of rows in the model.
+     * @return
+     */
+    public int getModelRowCount(){
+    	return grid.getRowCount();
+    }
 
     /**
      * Activate and deactivate the Column Header
@@ -360,6 +368,7 @@ public class SpreadsheetView extends Control {
 
     
     
+    
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -370,6 +379,7 @@ public class SpreadsheetView extends Control {
     public final int getRowCount(){
         return cells.size();
     }
+    
 
     // returns the given row after the fixed rows
     private SpreadsheetRow getNonFixedRow(int index){
@@ -396,8 +406,9 @@ public class SpreadsheetView extends Control {
             final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(grid.getRows());
             tableView.setItems(observableRows);
 
-
-            for (int i = 0; i < grid.getColumnCount(); ++i) {
+            final int columnCount = grid.getColumnCount();
+            final List<Integer> columnWidth = grid.getColumnWidth();
+            for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
                 final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
@@ -407,9 +418,8 @@ public class SpreadsheetView extends Control {
                 column.setSortable(false);
 
                 column.impl_setReorderable(false);
-
-//                column.setPrefWidth(getCellPrefWidth());
-
+                
+                column.setPrefWidth(columnWidth.size()> i? columnWidth.get(i): 100);
 
                 // We assign a DataCell for each Cell needed (MODEL).
                 column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {

@@ -208,10 +208,10 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		if(row%5 ==0){
 			cell.setStyleCss("five_rows");
 		}
-		if(row == 0) {
+		if(column == 0 && rowSpan == 1){
 			cell.setStyleCss("row_header");
 		}
-		if(column == 0 && rowSpan == 1){
+		if(row == 0) {
 			cell.setStyleCss("col_header");
 		}
 		return cell;

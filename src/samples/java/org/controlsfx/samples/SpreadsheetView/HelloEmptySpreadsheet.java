@@ -73,12 +73,13 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 	public Node getPanel(Stage stage) {
 		BorderPane borderPane = new BorderPane();
 		
-		int rowCount = 50;
+		int rowCount = 15;
 		int columnCount = 10;
-//		normalGrid(grid);
+		Grid grid = new Grid(rowCount, columnCount);
+		blankGrid(grid);
 //		buildBothGrid(grid);
 		
-		Grid grid = new Grid(rowCount, columnCount);
+		
 
 		SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
 //		spreadSheetView.buildSpreadsheetView(grid);
@@ -173,17 +174,21 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 		primaryStage.show();
 	}
 
-//	private void normalGrid(Grid grid) {
-//		ArrayList<DataRow> rows = new ArrayList<DataRow>(grid.getRowCount());
-//		for (int row = 0; row < grid.getRowCount(); ++row) {
-//			final DataRow dataRow = new DataRow(row, grid.getColumnCount());
-//			for (int column = 0; column < grid.getColumnCount(); ++column) {
-//				dataRow.add(generateCell(row, column, 1, 1));
-//			}
-//			rows.add(dataRow);
-//		}
-//		grid.setRows(rows);
-//	}
+	/**
+	 * Generate a blank grid, with only TextField and no data.
+	 * @param grid
+	 */
+	private void blankGrid(Grid grid) {
+		ArrayList<DataRow> rows = new ArrayList<DataRow>(grid.getRowCount());
+		for (int row = 0; row < grid.getRowCount(); ++row) {
+			final DataRow dataRow = new DataRow(row, grid.getColumnCount());
+			for (int column = 0; column < grid.getColumnCount(); ++column) {
+				dataRow.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
+			}
+			rows.add(dataRow);
+		}
+		grid.setRows(rows);
+	}
 //
 //	/**
 //	 * Randomly generate a dataCell(list or text)

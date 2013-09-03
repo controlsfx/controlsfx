@@ -148,9 +148,11 @@ public class RowHeader  extends StackPane {
 			int rowCount = 0;
 			Label label;
 			int i=0;
+			// We don't want to add Label if there are no rows associated with.
+			final int modelRowCount = spreadsheetView.getModelRowCount();
 
 			// We iterate over the visibleRows
-			while(!spreadsheetView.isEmptyCells() && spreadsheetView.getRow(i) != null){
+			while(!spreadsheetView.isEmptyCells() && spreadsheetView.getRow(i) != null && i< modelRowCount){
 				label = getLabel(rowCount++);
 				label.setText(String.valueOf(spreadsheetView.getRow(i).getIndexVirtualFlow()));
 				label.resize(prefWidth,prefHeight);

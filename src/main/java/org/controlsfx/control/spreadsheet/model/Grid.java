@@ -45,6 +45,7 @@ public class Grid {
     private List<DataRow> rows;
     private int rowCount;
     private int columnCount;
+    private List<Integer> columnWidth;
 
     /***************************************************************************
      * * Constructor * *
@@ -56,13 +57,14 @@ public class Grid {
     }
 
     public Grid(int rowCount, int columnCount) {
-        this(rowCount, columnCount, Collections.<DataRow> emptyList());
+        this(rowCount, columnCount, Collections.<DataRow> emptyList(), Collections.<Integer> emptyList());
     }
 
-    public Grid(int rowCount, int columnCount, List<DataRow> rows) {
+    public Grid(int rowCount, int columnCount, List<DataRow> rows, List<Integer> columnWidth) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.rows = rows;
+        this.columnWidth = columnWidth;
     }
 
     /***************************************************************************
@@ -118,6 +120,13 @@ public class Grid {
     }
     public List<DataRow> getRows() {
         return rows;
+    }
+    
+    public void setColumnWidth(ArrayList<Integer> columnWidth) {
+        this.columnWidth = columnWidth;
+    }
+    public List<Integer> getColumnWidth() {
+        return columnWidth;
     }
 
     public void setRowCount(int rowCount) {

@@ -152,16 +152,17 @@ public class SpreadsheetRowSkin<T extends DataRow>
          * FOR FIXED COLUMN
          */
         // If we called layoutChildren just to re-layout the fixed columns
-        final int max = ((SpreadsheetRow) getSkinnable())
+        /*final int max = ((SpreadsheetRow) getSkinnable())
                 .getLayoutFixedColumns() ? spreadsheetView.getFixedColumns()
-                .size() : cells.size();
+                .size() : cells.size();*/
 
         // In case we were doing layout only of the fixed columns
         // ((SpreadsheetRow)getSkinnable()).setLayoutFixedColumns(false);
 
         // System.out.println("Je layout"+index+"/"+((SpreadsheetRow)getSkinnable()).getIndexVirtualFlow()
         // );
-        for (int column = 0; column < max; column++) {
+        double fixedColumnWidth = 0;
+        for (int column = 0; column < cells.size(); column++) {
 
             final SpreadsheetCell<?> tableCell = (SpreadsheetCell<?>) cells
                     .get(column);
@@ -181,18 +182,15 @@ public class SpreadsheetRowSkin<T extends DataRow>
              * FOR FIXED COLUMNS
              */
             double tableCellX = 0;
-            int indexColumn = 0;
             final double hbarValue = spreadsheetView.getHbar().getValue();
             // We translate that column by the Hbar Value if it's fixed
-            if ((indexColumn = spreadsheetView.getFixedColumns()
-                    .indexOf(column)) != -1) {
-                /*
-                 * if(hbarValue - fixedCellSize*(column-indexColumn) >0){
-                 * tableCellX = Math.abs(hbarValue -
-                 * tableCell.getWidth()*(column-indexColumn)); }
-                 */
-                tableCellX = Math.abs(hbarValue);
-                tableCell.toFront();
+            if (((SpreadsheetColumn)(tableView.getColumns().get(column))).isFixed()) {
+                
+                 if(hbarValue + fixedColumnWidth >x){
+                	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
+                	 tableCell.toFront();
+                	 fixedColumnWidth += tableCell.getWidth();
+                 }
             }
 
             boolean isVisible = true;

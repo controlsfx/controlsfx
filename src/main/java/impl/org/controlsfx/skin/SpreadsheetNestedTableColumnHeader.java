@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
+import org.controlsfx.control.SpreadsheetView;
+
 import javafx.scene.control.TableColumnBase;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
@@ -65,24 +67,32 @@ public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader 
      * @param scrollX
      */
     public void layoutFixedColumns() {
-        double scrollX = ((SpreadsheetViewSkin) getTableViewSkin()).spreadsheetView
-                .getHbar().getValue();
-        final double h = getHeight() - snappedTopInset() - snappedBottomInset();
-
+    	final SpreadsheetView spreadsheetView = ((SpreadsheetViewSkin) getTableViewSkin()).spreadsheetView;
+        double hbarValue = spreadsheetView.getHbar().getValue();
+        
         final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
-        for (int j = 0; j < ((SpreadsheetViewSkin) getTableViewSkin()).spreadsheetView
-                .getFixedColumns().size(); ++j) {
-            final TableColumnHeader n = getColumnHeaders().get(j);
-            n.toFront();
-            final double prefWidth = snapSize(n.prefWidth(-1));
-            // double prefHeight = n.prefHeight(-1);
+        double fixedColumnWidth = 0;
+        double x = snappedLeftInset();
+        
+        for (int j = 0, max = getColumnHeaders().size(); j < max; j++) {
+        	final TableColumnHeader n = getColumnHeaders().get(j);
+        	final double prefWidth = snapSize(n.prefWidth(-1));
+        	 
+        	//If the column is fixed
+        	if(spreadsheetView.getFixedColumns().indexOf(Integer.valueOf(j)) != -1){
+                 double tableCellX = 0;
+                 //If the column is hidden we have to translate it
+                 if(hbarValue + fixedColumnWidth > x){
 
-            // position the column header in the default location...
-            n.resize(prefWidth, snapSize(h - labelHeight));
-            n.relocate(scrollX, labelHeight + snappedTopInset());
+                 	tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 
-            // shuffle along the x-axis appropriately
-            scrollX += prefWidth;
+                 	n.toFront();
+                 	fixedColumnWidth += prefWidth;
+                 }
+                 n.relocate(x+tableCellX , labelHeight + snappedTopInset());
+        	}
+        	
+           x+= prefWidth;
         }
 
     }

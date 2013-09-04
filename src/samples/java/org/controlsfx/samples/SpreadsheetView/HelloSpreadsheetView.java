@@ -84,7 +84,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 			
 		borderPane.setCenter(spreadSheetView);
 
-		borderPane.setLeft(buildCommonControlGrid(spreadSheetView));
+		borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane));
 		
 		return borderPane;
 	}
@@ -96,7 +96,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	 * @param spreadsheetView
 	 * @return
 	 */
-	private GridPane buildCommonControlGrid(final SpreadsheetView spv) {
+	private GridPane buildCommonControlGrid(final SpreadsheetView spv,final BorderPane borderPane) {
 		final GridPane grid = new GridPane();
 		grid.setHgap(5);
 		grid.setVgap(5);
@@ -142,12 +142,41 @@ public class HelloSpreadsheetView extends Application implements Sample {
 				spv.setColumnHeader(arg2);
 			}
 		});
+		//In order to change the span style more easily
+		final ChoiceBox<String> typeOfGrid = new ChoiceBox<String>(FXCollections.observableArrayList("Normal", "Both"));
+		typeOfGrid.setValue("Both");
+		typeOfGrid.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>(){
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0,
+					Number arg1, Number arg2) {
+				if(arg2.equals(0)){
+					int rowCount = 50;
+					int columnCount = 10;
+					Grid grid = new Grid(rowCount, columnCount);
+					normalGrid(grid);
+					
+					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
+					borderPane.setCenter(spreadSheetView);
+				}else{
+					int rowCount = 50;
+					int columnCount = 10;
+					Grid grid = new Grid(rowCount, columnCount);
+					normalGrid(grid);
+					buildBothGrid(grid);
+					
+					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
+					borderPane.setCenter(spreadSheetView);
+				}
+			}});
+		
 		grid.add(new Label("Freeze Rows:"), 1, 1);
 		grid.add(fixedRows, 1, 2);
 		grid.add(new Label("Freeze Columns:"), 1, 3);
 		grid.add(fixedColumns, 1, 4);
 		grid.add(rowHeader, 1, 5);
 		grid.add(columnHeader, 1, 6);
+		grid.add(new Label("Span model:"), 1, 7);
+		grid.add(typeOfGrid, 1, 8);
 
 		return grid;
 	}

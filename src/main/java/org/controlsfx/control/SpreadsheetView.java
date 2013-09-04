@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.SpreadsheetCell;
+import impl.org.controlsfx.skin.SpreadsheetColumn;
 import impl.org.controlsfx.skin.SpreadsheetRow;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
@@ -54,7 +55,10 @@ import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
@@ -64,11 +68,13 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -77,7 +83,9 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
+import org.controlsfx.samples.HelloNotificationPane;
 
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
@@ -290,6 +298,13 @@ public class SpreadsheetView extends Control {
     }
 
     /**
+     * Return the model Grid used by the SpreadsheetView
+     * @return
+     */
+    public final Grid getGrid(){
+        return grid;
+    }
+    /**
      * Activate and deactivate the Column Header
      * @param b
      */
@@ -329,16 +344,21 @@ public class SpreadsheetView extends Control {
         return fixedRows;
     }
 
-    // FIXME Need to allow for any rows / columns to be fixed
     /**
      * Fix the first "numberOfFixedColumns" on the left.
+     * It's possible to fix columns also by right-clicking on colums header
      * @param numberOfFixedColumns
      */
     public void fixColumns(int numberOfFixedColumns){
 
         getFixedColumns().clear();
+        ObservableList<TableColumn<DataRow, ?>> columns = tableView.getColumns();
+        for (TableColumn<DataRow, ?> spc : columns) {
+			((SpreadsheetColumn)spc).setFixed(false);
+		}
+        
         for (int j = 0; j < numberOfFixedColumns; j++) {
-            getFixedColumns().add(j);
+            ((SpreadsheetColumn)columns.get(j)).setFixed(true);
         }
     }
 
@@ -428,33 +448,30 @@ public class SpreadsheetView extends Control {
         return false;
     }
 
-    private final Grid getGrid(){
-        return grid;
-    }
-
     private final void setGrid(Grid grid) {
         this.grid = grid;
 
         // TODO move into a property
         if(grid.getRows() != null){
             final ObservableList<DataRow> observableRows = FXCollections.observableArrayList(grid.getRows());
+            tableView.getItems().clear();
             tableView.setItems(observableRows);
 
             final int columnCount = grid.getColumnCount();
-            final List<Integer> columnWidth = grid.getColumnWidth();
+            getColumns().clear();
             for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
-                final TableColumn<DataRow, DataCell<?>> column = new TableColumn<>(getEquivColumn(col));
+                final SpreadsheetColumn column = new SpreadsheetColumn(getEquivColumn(col),this);
 
                 column.setEditable(true);
                 // We don't want to sort the column
                 column.setSortable(false);
-
+                
                 column.impl_setReorderable(false);
                 
-                column.setPrefWidth(columnWidth.size()> i? columnWidth.get(i): 100);
-
+                column.setContextMenu(getColumnContextMenu());
+                
                 // We assign a DataCell for each Cell needed (MODEL).
                 column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
                     @Override
@@ -499,6 +516,36 @@ public class SpreadsheetView extends Control {
         return converted;
     }
 
+    /**
+     * Generate a context Menu in order to fix/unfix some column
+     * It is shown when right-clicking on the column header
+     * @return
+     */
+    private ContextMenu getColumnContextMenu(){
+    	final ContextMenu contextMenu = new ContextMenu();
+        final CheckMenuItem fixItem = new CheckMenuItem("Fix");
+        
+        fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0,
+					Boolean arg1, Boolean arg2) {
+				
+				if(contextMenu.getOwnerNode() instanceof TableColumnHeader){
+					TableColumnHeader columnHeader = (TableColumnHeader) contextMenu.getOwnerNode();
+					Integer indexCol = tableView.getColumns().indexOf(columnHeader.getTableColumn());
+					if(arg2){
+						((SpreadsheetColumn)tableView.getColumns().get(indexCol)).setFixed(true);
+					}else{
+						((SpreadsheetColumn)tableView.getColumns().get(indexCol)).setFixed(false);
+					}
+				}
+			}
+        	
+        });
+        contextMenu.getItems().addAll(fixItem);
+        return contextMenu;
+    }
+    
     /***************************************************************************
      * 						COPY / PASTE METHODS
      **************************************************************************/
@@ -508,7 +555,7 @@ public class SpreadsheetView extends Control {
             fmt = new DataFormat("shuttle");
         }
     }
-    /***
+    /**
      * Create a menu on rightClick with two options: Copy/Paste
      * @return
      */

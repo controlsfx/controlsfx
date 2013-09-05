@@ -83,7 +83,6 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
-import org.controlsfx.samples.HelloNotificationPane;
 
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;

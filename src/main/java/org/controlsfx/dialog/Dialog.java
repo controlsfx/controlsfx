@@ -26,9 +26,6 @@
  */
 package org.controlsfx.dialog;
 
-import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialog.DialogResources.getString;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -322,7 +319,7 @@ public class Dialog {
             return result;
         } catch (Throwable e) {
             e.printStackTrace();
-            return CANCEL;
+            return Actions.CANCEL;
         }
     }
 
@@ -708,27 +705,27 @@ public class Dialog {
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( getString("common.cancel.button"), ButtonType.CANCEL_CLOSE ),
+        CANCEL( DialogResources.getString("common.cancel.button"), ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( getString("common.close.button"),  ButtonType.CANCEL_CLOSE ),
+        CLOSE ( DialogResources.getString("common.close.button"),  ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( getString("common.no.button"),     ButtonType.NO ),
+        NO    ( DialogResources.getString("common.no.button"),     ButtonType.NO ),
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( getString("common.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
+        OK    ( DialogResources.getString("common.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( getString("common.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
+        YES   ( DialogResources.getString("common.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
 
         private final AbstractAction action;
         private final EnumSet<ActionTrait> traits;
@@ -966,8 +963,8 @@ public class Dialog {
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
         detailsButton.getStyleClass().setAll("details-button", "more");
-        final String moreText = getString("common.detail.button.more");
-        final String lessText = getString("common.detail.button.less");
+        final String moreText = DialogResources.getString("common.detail.button.more");
+        final String lessText = DialogResources.getString("common.detail.button.less");
         
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {

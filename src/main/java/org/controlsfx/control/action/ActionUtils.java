@@ -34,8 +34,6 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -438,7 +436,6 @@ public class ActionUtils {
         btn.disableProperty().bind(action.disabledProperty());
         
         
-        //btn.graphicProperty().bind(action.graphicProperty());
         btn.graphicProperty().bind(new ObjectBinding<ImageView>() {
             { bind(action.graphicProperty()); }
 
@@ -448,12 +445,6 @@ public class ActionUtils {
             }
         });
         
-        
-        action.graphicProperty().addListener( new ChangeListener<ImageView>() {
-            @Override public void changed(ObservableValue<? extends ImageView> o, ImageView oldValue, ImageView newValue) {
-                btn.graphicProperty().set(newValue == null? null: new ImageView(newValue.getImage()));
-            }}
-        );
         
         // add all the properties of the action into the button, and set up
         // a listener so they are always copied across
@@ -507,7 +498,6 @@ public class ActionUtils {
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
         
-        //btn.graphicProperty().bind(action.graphicProperty());
         btn.graphicProperty().bind(new ObjectBinding<ImageView>() {
             { bind(action.graphicProperty()); }
 

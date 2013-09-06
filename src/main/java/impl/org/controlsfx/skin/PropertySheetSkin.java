@@ -45,7 +45,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -244,12 +243,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             final String text = "By " + capitalize(mode.toString());
             
             if (mode == Mode.CATEGORY) {
-                ImageView graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png"));
-                setGraphic(graphic);
+                setGraphic(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png"));
                 setLongText(text);
             } else if (mode == Mode.NAME) {
-                ImageView graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png"));
-                setGraphic(graphic);
+                setGraphic(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png"));
                 setLongText(text);
             } else {
                 setText(text);

@@ -46,7 +46,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -81,7 +80,7 @@ public class HelloActionGroup extends Application implements Sample {
 
         public DummyAction(String name, Image image) {
             super(name);
-            setGraphic(new ImageView(image));
+            setGraphic(image);
         }
         
         public DummyAction( String name ) {

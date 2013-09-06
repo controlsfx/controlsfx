@@ -36,7 +36,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 
 /**
  * A convenience class that implements the {@link Action} interface and provides
@@ -144,20 +144,20 @@ public abstract class AbstractAction implements Action {
     
     
     // --- graphic
-    private final ObjectProperty<ImageView> graphicProperty = new SimpleObjectProperty<ImageView>(this, "graphic");
+    private final ObjectProperty<Image> graphicProperty = new SimpleObjectProperty<Image>(this, "graphic");
     
     /** {@inheritDoc} */
-    @Override public ObjectProperty<ImageView> graphicProperty() {
+    @Override public ObjectProperty<Image> graphicProperty() {
         return graphicProperty;
     }
     
     //  javadoc auto-generated from property
-    public final ImageView getGraphic() {
+    public final Image getGraphic() {
         return graphicProperty.get();
     }
     
     //  javadoc auto-generated from property
-    public final void setGraphic(ImageView value) {
+    public final void setGraphic(Image value) {
         graphicProperty.set(value);
     }
     

@@ -922,9 +922,9 @@ public final class Dialogs {
         messageLabel.setMaxHeight(Double.MAX_VALUE);
         GridPane.setVgrow(messageLabel, Priority.SOMETIMES);
         
-        ImageView graphic = commandLink.getGraphic();
-        graphic = graphic == null? new ImageView(DialogResources.getImage("command.link.icon")) : graphic;
-        Pane graphicContainer = new Pane(graphic);
+        Image graphic = commandLink.getGraphic();
+        ImageView view = new ImageView( graphic == null? DialogResources.getImage("command.link.icon") : graphic);
+        Pane graphicContainer = new Pane(view);
         graphicContainer.getStyleClass().add("graphic-container");
         GridPane.setValignment(graphicContainer, VPos.TOP);
         GridPane.setMargin(graphicContainer, new Insets(0,10,0,0));
@@ -1001,7 +1001,7 @@ public final class Dialogs {
      */
     public static class CommandLink extends AbstractDialogAction {
         
-        public CommandLink( ImageView graphic, String text, String longText ) {
+        public CommandLink( Image graphic, String text, String longText ) {
             super(text);
             setLongText(longText);
             setGraphic(graphic);

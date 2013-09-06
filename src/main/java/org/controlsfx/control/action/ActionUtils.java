@@ -58,6 +58,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.controlsfx.control.ButtonBar;
@@ -271,7 +272,7 @@ public class ActionUtils {
             return null;
         }
 
-        @Override public ObjectProperty<ImageView> graphicProperty() {
+        @Override public ObjectProperty<Image> graphicProperty() {
             return null;
         }
 
@@ -440,8 +441,8 @@ public class ActionUtils {
             { bind(action.graphicProperty()); }
 
             @Override protected ImageView computeValue() {
-                ImageView view = action.graphicProperty().get();
-                return view == null? null: new ImageView(view.getImage());
+                Image image = action.graphicProperty().get();
+                return image == null? null: new ImageView(image);
             }
         });
         
@@ -502,8 +503,8 @@ public class ActionUtils {
             { bind(action.graphicProperty()); }
 
             @Override protected ImageView computeValue() {
-                ImageView view = action.graphicProperty().get();
-                return view == null? null: new ImageView(view.getImage());
+                Image image = action.graphicProperty().get();
+                return image == null? null: new ImageView(image);
             }
         });
         

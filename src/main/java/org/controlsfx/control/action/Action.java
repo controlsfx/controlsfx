@@ -31,9 +31,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
+import javafx.scene.image.ImageView;
 
 /**
  * Common interface for dialog actions, where Actions are converted into buttons 
@@ -87,7 +87,7 @@ public interface Action {
      * @return An observable {@link ObjectProperty} that represents the current
      *      graphic for this property, and which can be observed for changes.
      */
-    public ObjectProperty<Node> graphicProperty();
+    public ObjectProperty<ImageView> graphicProperty();
     
     /**
      * Returns an observable map of properties on this Action for use primarily

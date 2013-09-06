@@ -34,6 +34,8 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -58,6 +60,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.SegmentedButton;
@@ -270,7 +273,7 @@ public class ActionUtils {
             return null;
         }
 
-        @Override public ObjectProperty<Node> graphicProperty() {
+        @Override public ObjectProperty<ImageView> graphicProperty() {
             return null;
         }
 
@@ -433,7 +436,24 @@ public class ActionUtils {
         // button bind to action properties
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
-        btn.graphicProperty().bind(action.graphicProperty());
+        
+        
+        //btn.graphicProperty().bind(action.graphicProperty());
+        btn.graphicProperty().bind(new ObjectBinding<ImageView>() {
+            { bind(action.graphicProperty()); }
+
+            @Override protected ImageView computeValue() {
+                ImageView view = action.graphicProperty().get();
+                return view == null? null: new ImageView(view.getImage());
+            }
+        });
+        
+        
+        action.graphicProperty().addListener( new ChangeListener<ImageView>() {
+            @Override public void changed(ObservableValue<? extends ImageView> o, ImageView oldValue, ImageView newValue) {
+                btn.graphicProperty().set(newValue == null? null: new ImageView(newValue.getImage()));
+            }}
+        );
         
         // add all the properties of the action into the button, and set up
         // a listener so they are always copied across
@@ -486,7 +506,17 @@ public class ActionUtils {
         // button bind to action properties
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
-        btn.graphicProperty().bind(action.graphicProperty());
+        
+        //btn.graphicProperty().bind(action.graphicProperty());
+        btn.graphicProperty().bind(new ObjectBinding<ImageView>() {
+            { bind(action.graphicProperty()); }
+
+            @Override protected ImageView computeValue() {
+                ImageView view = action.graphicProperty().get();
+                return view == null? null: new ImageView(view.getImage());
+            }
+        });
+        
         
         // add all the properties of the action into the button, and set up
         // a listener so they are always copied across

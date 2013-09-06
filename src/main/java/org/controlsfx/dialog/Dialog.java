@@ -26,6 +26,9 @@
  */
 package org.controlsfx.dialog;
 
+import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
+import static org.controlsfx.dialog.DialogResources.getString;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -51,6 +54,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -65,9 +69,6 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
-
-import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialog.DialogResources.getString;
 
 /**
  * A lower-level API for creating standardized dialogs consisting of the following
@@ -769,7 +770,7 @@ public class Dialog {
         }
         
         /** {@inheritDoc} */
-        @Override public ObjectProperty<Node> graphicProperty() {
+        @Override public ObjectProperty<ImageView> graphicProperty() {
             return action.graphicProperty();
         }
         

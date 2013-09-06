@@ -244,11 +244,11 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             final String text = "By " + capitalize(mode.toString());
             
             if (mode == Mode.CATEGORY) {
-                Node graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png"));
+                ImageView graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png"));
                 setGraphic(graphic);
                 setLongText(text);
             } else if (mode == Mode.NAME) {
-                Node graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png"));
+                ImageView graphic = new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png"));
                 setGraphic(graphic);
                 setLongText(text);
             } else {

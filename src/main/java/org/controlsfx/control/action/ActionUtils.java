@@ -554,7 +554,7 @@ public class ActionUtils {
             
             { 
                 bind(action.longTextProperty()); 
-                tooltip.textProperty().bind(action.longTextProperty());
+                tooltip.textProperty().bind(textBahavior == TextBehavior.SHOW_AS_TOOLITP? action.textProperty(): action.longTextProperty());
             }
             
             @Override protected Tooltip computeValue() {

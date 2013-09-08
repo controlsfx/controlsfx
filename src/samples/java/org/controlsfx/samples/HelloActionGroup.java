@@ -57,7 +57,7 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionUtils;
-import org.controlsfx.control.action.ActionUtils.TextBehavior;
+import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
 
 public class HelloActionGroup extends Application implements Sample {
     
@@ -164,11 +164,11 @@ public class HelloActionGroup extends Application implements Sample {
         root.getChildren().add(menuBar);
 
         root.getChildren().add(new Label("ToolBar (with text on controls)"));
-        ToolBar toolBar = ActionUtils.createToolBar(actions, TextBehavior.SHOW);
+        ToolBar toolBar = ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW);
         root.getChildren().add(toolBar);
 
         root.getChildren().add(new Label("ToolBar (no text on controls)"));
-        toolBar = ActionUtils.createToolBar(actions, TextBehavior.SHOW_AS_TOOLITP);
+        toolBar = ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW_AS_TOOLITP);
         root.getChildren().add(toolBar);
 
         

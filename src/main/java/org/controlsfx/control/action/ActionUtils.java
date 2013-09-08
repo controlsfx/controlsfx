@@ -110,12 +110,6 @@ public class ActionUtils {
          * Text is not shown on the related control
          */
         HIDE,
-        
-        /**
-         * Text is hidden, but is shown as a tooltip.
-         * In this case control's tooltip is bound to action's text property instead of longText one.   
-         */
-        SHOW_AS_TOOLITP
     }    
     
     
@@ -555,11 +549,11 @@ public class ActionUtils {
             
             { 
                 bind(action.longTextProperty()); 
-                tooltip.textProperty().bind(textBahavior == ActionTextBehavior.SHOW_AS_TOOLITP? action.textProperty(): action.longTextProperty());
+                tooltip.textProperty().bind(action.longTextProperty());
             }
             
             @Override protected Tooltip computeValue() {
-                String longText = (textBahavior == ActionTextBehavior.SHOW_AS_TOOLITP)? action.textProperty().get():  action.longTextProperty().get();
+                String longText =  action.longTextProperty().get();
                 return longText == null || longText.isEmpty() ? null : tooltip;
             } 
         });

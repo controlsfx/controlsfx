@@ -168,7 +168,7 @@ public class HelloActionGroup extends Application implements Sample {
         root.getChildren().add(toolBar);
 
         root.getChildren().add(new Label("ToolBar (no text on controls)"));
-        toolBar = ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW_AS_TOOLITP);
+        toolBar = ActionUtils.createToolBar(actions, ActionTextBehavior.HIDE);
         root.getChildren().add(toolBar);
 
         

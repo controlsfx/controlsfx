@@ -97,6 +97,41 @@ public class ActionUtils {
      **************************************************************************/
     
     /**
+     * Action text behavior 
+     * 
+     */
+    public enum TextBehavior {
+        /**
+         * Text is shown as usual
+         */
+        SHOW,
+        
+        /**
+         * Text is hidden
+         */
+        HIDE,
+        
+        /**
+         * Text is hidden, but shown as a tooltip
+         */
+        SHOW_AS_TOOLITP
+    }    
+    
+    
+    /**
+     * Takes the provided {@link Action} and returns a {@link Button} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link Button} should bind to.
+     * @param textBehavior Defines {@link TextBehavior}
+     * @return A {@link Button} that is bound to the state of the provided 
+     *      {@link Action}
+     */
+    public static Button createButton(final Action action, final TextBehavior textBehavior) {
+        return configure(new Button(), action, textBehavior);
+    }
+    
+    /**
      * Takes the provided {@link Action} and returns a {@link Button} instance
      * with all relevant properties bound to the properties of the Action.
      * 
@@ -105,9 +140,22 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static Button createButton(final Action action) {
-        return configure(new Button(), action);
+        return configure(new Button(), action, TextBehavior.SHOW);
     }
     
+    
+    /**
+     * Takes the provided {@link Action} and returns a {@link MenuButton} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link MenuButton} should bind to.
+     * @param textBehavior Defines {@link TextBehavior}
+     * @return A {@link MenuButton} that is bound to the state of the provided 
+     *      {@link Action}
+     */
+    public static MenuButton createMenuButton(final Action action, final TextBehavior textBehavior) {
+        return configure(new MenuButton(), action, textBehavior);
+    }
     
     /**
      * Takes the provided {@link Action} and returns a {@link MenuButton} instance
@@ -118,7 +166,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static MenuButton createMenuButton(final Action action) {
-        return configure(new MenuButton(), action);
+        return configure(new MenuButton(), action, TextBehavior.SHOW);
     }
     
     /**
@@ -130,7 +178,20 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static Hyperlink createHyperlink(final Action action) {
-        return configure(new Hyperlink(), action);
+        return configure(new Hyperlink(), action, TextBehavior.SHOW);
+    }
+    
+    /**
+     * Takes the provided {@link Action} and returns a {@link ToggleButton} instance
+     * with all relevant properties bound to the properties of the Action.
+     * 
+     * @param action The {@link Action} that the {@link ToggleButton} should bind to.
+     * @param textBehavior Defines {@link TextBehavior}
+     * @return A {@link ToggleButton} that is bound to the state of the provided 
+     *      {@link Action}
+     */
+    public static ToggleButton createToggleButton(final TextBehavior textBehavior, final Action action ) {
+        return configure(new ToggleButton(), action, textBehavior);
     }
     
     /**
@@ -141,8 +202,24 @@ public class ActionUtils {
      * @return A {@link ToggleButton} that is bound to the state of the provided 
      *      {@link Action}
      */
-    public static ToggleButton createToggleButton(final Action action) {
-        return configure(new ToggleButton(), action);
+    public static ToggleButton createToggleButton( final Action action ) {
+        return createToggleButton( TextBehavior.SHOW, action );
+    }    
+    
+    /**
+     * Takes the provided {@link Collection} of {@link Action}  and returns a {@link SegmentedButton} instance
+     * with all relevant properties bound to the properties of the actions.
+     * 
+     * @param actions The {@link Collection} of {@link Action} that the {@link SegmentedButton} should bind to.
+     * @param textBehavior Defines {@link TextBehavior}
+     * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
+     */
+    public static SegmentedButton createSegmentedButton(final TextBehavior textBehavior, Collection<? extends Action> actions) {
+        ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
+        for( Action a: actions ) {
+            buttons.add( createToggleButton(textBehavior, a));
+        }
+        return new SegmentedButton( buttons );
     }
     
     /**
@@ -153,11 +230,19 @@ public class ActionUtils {
      * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
      */
     public static SegmentedButton createSegmentedButton(Collection<? extends Action> actions) {
-        ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
-        for( Action a: actions ) {
-            buttons.add( createToggleButton(a));
-        }
-        return new SegmentedButton( buttons );
+        return createSegmentedButton( TextBehavior.SHOW, actions);
+    }    
+  
+    /**
+     * Takes the provided varargs array of {@link Action}  and returns a {@link SegmentedButton} instance
+     * with all relevant properties bound to the properties of the actions.
+     * 
+     * @param actions A varargs array of {@link Action} that the {@link SegmentedButton} should bind to.
+     * @param textBehavior Defines {@link TextBehavior}
+     * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
+     */
+    public static SegmentedButton createSegmentedButton(TextBehavior textBehavior, Action... actions) {
+        return createSegmentedButton(textBehavior, Arrays.asList(actions));
     }
     
     /**
@@ -168,8 +253,9 @@ public class ActionUtils {
      * @return A {@link SegmentedButton} that is bound to the state of the provided {@link Action}s
      */
     public static SegmentedButton createSegmentedButton(Action... actions) {
-        return createSegmentedButton(Arrays.asList(actions));
-    }
+        return createSegmentedButton(TextBehavior.SHOW, Arrays.asList(actions));
+    }    
+    
     
     
     /**
@@ -181,7 +267,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static CheckBox createCheckBox(final Action action) {
-        return configure(new CheckBox(), action);
+        return configure(new CheckBox(), action, TextBehavior.SHOW);
     }
     
     /**
@@ -193,7 +279,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static RadioButton createRadioButton(final Action action) {
-        return configure(new RadioButton(), action);
+        return configure(new RadioButton(), action, TextBehavior.SHOW);
     }
     
     /**
@@ -296,21 +382,22 @@ public class ActionUtils {
      * {@link Action actions}.
      * 
      * @param actions The {@link Action actions} to place on the {@link ToolBar}.
+     * @param textBehavior defines {@link TextBahavior}
      * @return A {@link ToolBar} that contains {@link Node nodes} which are bound 
      *      to the state of the provided {@link Action}
      */
-    public static ToolBar createToolBar(Collection<? extends Action> actions) {
+    public static ToolBar createToolBar(Collection<? extends Action> actions, TextBehavior textBehavior) {
         ToolBar toolbar = new ToolBar();
         for (Action action : actions) {
             if ( action instanceof ActionGroup ) {
-                MenuButton menu = createMenuButton( action );
+                MenuButton menu = createMenuButton( action, textBehavior );
                 menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
                 toolbar.getItems().add(menu);
             } else if ( action == ACTION_SEPARATOR ) {
                 toolbar.getItems().add( new Separator());
             } else if ( action == null ) {
             } else {
-                toolbar.getItems().add( createButton(action));
+                toolbar.getItems().add( createButton(action,textBehavior));
             }
         }
         
@@ -366,7 +453,7 @@ public class ActionUtils {
             } else if ( action == null ) {
                 // no-op
             } else {
-                buttonBar.getButtons().add(createButton(action));
+                buttonBar.getButtons().add(createButton(action, TextBehavior.SHOW));
             }
         }
         
@@ -426,14 +513,17 @@ public class ActionUtils {
         
     }
     
-    private static <T extends ButtonBase> T configure(final T btn, final Action action) {
+    private static <T extends ButtonBase> T configure(final T btn, final Action action, final TextBehavior textBahavior ) {
         
         if (action == null) {
             throw new NullPointerException("Action can not be null");
         }
         
         // button bind to action properties
-        btn.textProperty().bind(action.textProperty());
+        //btn.textProperty().bind(action.textProperty());
+        if ( textBahavior == TextBehavior.SHOW ) {
+            btn.textProperty().bind(action.textProperty());
+        }
         btn.disableProperty().bind(action.disabledProperty());
         
         
@@ -468,7 +558,7 @@ public class ActionUtils {
             }
             
             @Override protected Tooltip computeValue() {
-                String longText = action.longTextProperty().get();
+                String longText = (textBahavior == TextBehavior.SHOW_AS_TOOLITP)? action.textProperty().get():  action.longTextProperty().get();
                 return longText == null || longText.isEmpty() ? null : tooltip;
             } 
         });

@@ -57,23 +57,24 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.control.action.ActionUtils.TextBehavior;
 
 public class HelloActionGroup extends Application implements Sample {
     
     private static final Image image = new Image("/org/controlsfx/samples/security-low.png");
     
     private Collection<? extends Action> actions = Arrays.asList(
-        new ActionGroup("Group 1",  new DummyAction("Action 1.1", image), 
-                                    new DummyAction("Action 1.2") ),
-        new ActionGroup("Group 2",  new DummyAction("Action 2.1"), 
-                                    ACTION_SEPARATOR,
-                                    new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
+        new ActionGroup("Group 1", image, new DummyAction("Action 1.1", image), 
+                                          new DummyAction("Action 1.2") ),
+        new ActionGroup("Group 2", image, new DummyAction("Action 2.1"), 
+                                          ACTION_SEPARATOR,
+                                          new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
                                                                   new DummyAction("Action 2.2.2")),
-                                    new DummyAction("Action 2.3") ),
+                                          new DummyAction("Action 2.3") ),
         ACTION_SEPARATOR,                                    
         new DummyAction("Action 3", image),
-        new ActionGroup("Group 4",  new DummyAction("Action 4.1", image), 
-                                    new DummyAction("Action 4.2"))
+        new ActionGroup("Group 4",  image, new DummyAction("Action 4.1", image), 
+                                           new DummyAction("Action 4.2"))
     );
     
     static class DummyAction extends AbstractAction {
@@ -162,8 +163,12 @@ public class HelloActionGroup extends Application implements Sample {
         MenuBar menuBar = ActionUtils.createMenuBar(actions);
         root.getChildren().add(menuBar);
 
-        root.getChildren().add(new Label("ToolBar"));
-        ToolBar toolBar = ActionUtils.createToolBar(actions);
+        root.getChildren().add(new Label("ToolBar (with text on controls)"));
+        ToolBar toolBar = ActionUtils.createToolBar(actions, TextBehavior.SHOW);
+        root.getChildren().add(toolBar);
+
+        root.getChildren().add(new Label("ToolBar (no text on controls)"));
+        toolBar = ActionUtils.createToolBar(actions, TextBehavior.SHOW_AS_TOOLITP);
         root.getChildren().add(toolBar);
 
         

@@ -32,6 +32,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.Image;
 
 /**
  * An ActionGroup (unsurprisingly) groups together zero or more {@link Action} 
@@ -102,6 +103,22 @@ public class ActionGroup extends AbstractAction {
      */
     public ActionGroup(String text, Action... actions) {
         super(text);
+        getActions().addAll(actions);
+    }
+    
+    /**
+     * Creates an ActionGroup with the given text as the name of the {@link Action}, 
+     * and zero or more Actions as members of this ActionGroup. Note that it is
+     * legitimate to pass in zero Actions to this constructor, and to later 
+     * set the actions directly into the {@link #getActions() actions} list.
+     * 
+     * @param text The {@link Action#textProperty() text} of this {@link Action}.
+     * @param icon The {@link Action#graphicProperty() image} of this {@link Action}.
+     * @param actions Zero or more actions to insert into this ActionGroup.
+     */
+    public ActionGroup(String text, Image icon, Action... actions) {
+        super(text);
+        setGraphic(icon);
         getActions().addAll(actions);
     }
 

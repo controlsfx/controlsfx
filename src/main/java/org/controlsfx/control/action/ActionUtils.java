@@ -185,7 +185,7 @@ public class ActionUtils {
      * @return A {@link ToggleButton} that is bound to the state of the provided 
      *      {@link Action}
      */
-    public static ToggleButton createToggleButton(final ActionTextBehavior textBehavior, final Action action ) {
+    public static ToggleButton createToggleButton(final Action action, final ActionTextBehavior textBehavior ) {
         return configure(new ToggleButton(), action, textBehavior);
     }
     
@@ -198,7 +198,7 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static ToggleButton createToggleButton( final Action action ) {
-        return createToggleButton( ActionTextBehavior.SHOW, action );
+        return createToggleButton( action, ActionTextBehavior.SHOW );
     }    
     
     /**
@@ -212,7 +212,7 @@ public class ActionUtils {
     public static SegmentedButton createSegmentedButton(final ActionTextBehavior textBehavior, Collection<? extends Action> actions) {
         ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
         for( Action a: actions ) {
-            buttons.add( createToggleButton(textBehavior, a));
+            buttons.add( createToggleButton(a,textBehavior));
         }
         return new SegmentedButton( buttons );
     }

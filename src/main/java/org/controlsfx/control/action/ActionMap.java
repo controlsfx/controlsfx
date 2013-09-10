@@ -11,7 +11,7 @@ import javafx.scene.image.Image;
 
 public class ActionMap {
 
-	private static Map<String, org.controlsfx.control.action.Action> actions = new HashMap<>();
+	private static Map<String, AnnotatedAction> actions = new HashMap<>();
 
 	private ActionMap() {
 		// no-op
@@ -38,6 +38,16 @@ public class ActionMap {
 			}
 		}
 
+	}
+	
+	public void unregister(final Object target) {
+		if ( target != null ) {
+			for ( String key: actions.keySet() ) {
+				if ( actions.get(key).getTarget() == target) {
+					actions.remove(key);
+				}
+			}
+		}
 	}
 
 	public static org.controlsfx.control.action.Action get(String id) {
@@ -67,6 +77,10 @@ class AnnotatedAction extends AbstractAction {
 		this.method = method;
 		this.method.setAccessible(true);
 		this.target = target;
+	}
+	
+	public Object getTarget() {
+		return target;
 	}
 
 	@Override

@@ -56,6 +56,8 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionMap;
+import static org.controlsfx.control.action.ActionMap.action;
+import static org.controlsfx.control.action.ActionMap.actions;
 import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
@@ -70,20 +72,12 @@ public class HelloActionProxy extends Application implements Sample {
     public HelloActionProxy() {
 		ActionMap.register(this);
 		actions = Arrays.asList(
-		        new ActionGroup("Group 1", image, ActionMap.get("action11"), 
-                        ActionMap.get("action12") ),
-                        
-				new ActionGroup("Group 2", image, ActionMap.get("action21"), 
-				                        ACTION_SEPARATOR,
-				                        ActionMap.get("action22"), 
-				                        ActionMap.get("action221"), 
-				                        ActionMap.get("action222"),
-				                        ActionMap.get("action23") ),
-				ACTION_SEPARATOR,                                    
-				ActionMap.get("action3"),
-				new ActionGroup("Group 4",  image, ActionMap.get("action41"),   		
-				                         ActionMap.get("action42"))
-				);
+	        new ActionGroup("Group 1", image, actions("action11","action12") ),
+			new ActionGroup("Group 2", image, actions("action21","---","action22", "action221","action222","action23") ),
+			ACTION_SEPARATOR,                                    
+			action("action3"),
+			new ActionGroup("Group 4",  image, actions("action41","action42"))
+		);
 	}
     
     @ActionProxy(text="Action 1.1", image=imagePath)

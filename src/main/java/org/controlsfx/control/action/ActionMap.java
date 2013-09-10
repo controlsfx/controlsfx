@@ -3,7 +3,10 @@ package org.controlsfx.control.action;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.event.ActionEvent;
@@ -50,10 +53,21 @@ public class ActionMap {
 		}
 	}
 
-	public static org.controlsfx.control.action.Action get(String id) {
+	public static Action action(String id) {
 		return actions.get(id);
 	}
 
+	public static Collection<Action> actions(String... ids) {
+		List<Action> result = new ArrayList<>();
+		for( String id: ids ) {
+			if ( id.startsWith("---")) result.add(ActionUtils.ACTION_SEPARATOR);
+			Action action = action(id);
+			if ( action != null ) result.add(action);
+		}
+		return result;
+	}
+	
+	
 }
 
 class AnnotatedAction extends AbstractAction {

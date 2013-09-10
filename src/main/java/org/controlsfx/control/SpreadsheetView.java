@@ -179,6 +179,7 @@ public class SpreadsheetView extends Control {
     private VirtualScrollBar hbar=null;
     private VirtualScrollBar vbar=null;
     private RowAccessor<SpreadsheetRow> cells=null;
+    private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
 
     /***************************************************************************
      *                                                                         *
@@ -288,6 +289,9 @@ public class SpreadsheetView extends Control {
         return tableView.getEditingCell();
     }
     
+    public ObservableList<SpreadsheetColumn> getColumns(){
+		return columns;
+    }
     /**
      * Return the number of rows in the model.
      * @return
@@ -352,12 +356,12 @@ public class SpreadsheetView extends Control {
 
         getFixedColumns().clear();
         ObservableList<TableColumn<DataRow, ?>> columns = tableView.getColumns();
-        for (TableColumn<DataRow, ?> spc : columns) {
-			((SpreadsheetColumn)spc).setFixed(false);
+        for (SpreadsheetColumn spc : getColumns()) {
+			spc.setFixed(false);
 		}
         
         for (int j = 0; j < numberOfFixedColumns; j++) {
-            ((SpreadsheetColumn)columns.get(j)).setFixed(true);
+            getColumns().get(j).setFixed(true);
         }
     }
 
@@ -415,13 +419,6 @@ public class SpreadsheetView extends Control {
         return (SpreadsheetViewSelectionModel<DataRow>) tableView.getSelectionModel();
     }
 
-    private final ObservableList<TableColumn<DataRow,?>> getColumns() {
-        return tableView.getColumns();
-    }
-
-    
-    
-    
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -461,7 +458,7 @@ public class SpreadsheetView extends Control {
             for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
-                final SpreadsheetColumn column = new SpreadsheetColumn(getEquivColumn(col),this);
+                final TableColumn<DataRow, DataCell<?>> column = new TableColumn<DataRow, DataCell<?>>(getEquivColumn(col));
 
                 column.setEditable(true);
                 // We don't want to sort the column
@@ -485,7 +482,9 @@ public class SpreadsheetView extends Control {
                         return new SpreadsheetCell();
                     }
                 });
-                getColumns().add(column);
+                tableView.getColumns().add(column);
+                final SpreadsheetColumn spreadsheetColumns = new SpreadsheetColumn(column,this, i);
+                columns.add(spreadsheetColumns);
             }
         }
 
@@ -522,9 +521,11 @@ public class SpreadsheetView extends Control {
      */
     private ContextMenu getColumnContextMenu(){
     	final ContextMenu contextMenu = new ContextMenu();
-        final CheckMenuItem fixItem = new CheckMenuItem("Fix");
-        
-        fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
+
+    	final CheckMenuItem fixItem = new CheckMenuItem("Fix");
+
+    	//FIXME Conflict between the menuItem and the fixColumn method...
+    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0,
 					Boolean arg1, Boolean arg2) {
@@ -533,15 +534,16 @@ public class SpreadsheetView extends Control {
 					TableColumnHeader columnHeader = (TableColumnHeader) contextMenu.getOwnerNode();
 					Integer indexCol = tableView.getColumns().indexOf(columnHeader.getTableColumn());
 					if(arg2){
-						((SpreadsheetColumn)tableView.getColumns().get(indexCol)).setFixed(true);
+						getColumns().get(indexCol).setFixed(true);
 					}else{
-						((SpreadsheetColumn)tableView.getColumns().get(indexCol)).setFixed(false);
+						getColumns().get(indexCol).setFixed(false);
 					}
 				}
 			}
         	
         });
         contextMenu.getItems().addAll(fixItem);
+        
         return contextMenu;
     }
     
@@ -725,7 +727,7 @@ public class SpreadsheetView extends Control {
                     final Runnable r = new Runnable() {
                         @Override
                         public void run() {
-                            tfm.focus(t1.getRow() - 1, getColumns().get(t1.getColumn() - 1));
+                            tfm.focus(t1.getRow() - 1, tableView.getColumns().get(t1.getColumn() - 1));
                         }
                     };
                     Platform.runLater(r);
@@ -750,7 +752,7 @@ public class SpreadsheetView extends Control {
                         final Runnable r2 = new Runnable() {
                             @Override
                             public void run() {
-                                tfm.focus(t1.getRow(), getColumns().get(t1.getColumn() - 1));
+                                tfm.focus(t1.getRow(), tableView.getColumns().get(t1.getColumn() - 1));
                             }
                         };
                         Platform.runLater(r2);

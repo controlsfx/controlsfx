@@ -35,6 +35,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
 
@@ -158,10 +159,23 @@ public class SpreadsheetRow extends TableRow<DataRow>{
      * @return the corresponding SpreadsheetCell
      */
     SpreadsheetCell<?> getGridCell(int col){
-        int fixedColSize;
-        if((fixedColSize =spreadsheetView.getFixedColumns().size() ) != 0){
-            if(col < fixedColSize){
-                return (SpreadsheetCell<?>) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - fixedColSize + col);
+    	
+    	// We compute the number of cells set at the end
+    	//aka the fixed columns that have moved.
+ 		final int max = getChildrenUnmodifiable().size()-1;
+ 		int j = max;
+ 		while(((SpreadsheetCell<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
+ 			--j;
+ 		}
+ 		
+    	int fixedColSize = max -j;
+    	
+    	//If any cells was moved to the end
+        if(fixedColSize != 0){
+        	//if the requested column is fixed
+            if(spreadsheetView.getColumns().get(col).getCurrentlyFixed()){
+            	final int indexCol = spreadsheetView.getFixedColumns().indexOf(col);
+                return (SpreadsheetCell<?>) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() + indexCol - fixedColSize);
             } else {
                 return (SpreadsheetCell<?>) getChildrenUnmodifiable().get( col- fixedColSize );
             }

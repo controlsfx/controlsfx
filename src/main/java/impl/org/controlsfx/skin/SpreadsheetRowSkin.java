@@ -80,6 +80,25 @@ public class SpreadsheetRowSkin<T extends DataRow>
         this.tableView = (TableView<DataRow>) spreadsheetView.getSkin().getNode();
     }
 
+    /**
+     * We need to override this since B105 because it's messing up our
+     * fixedRows and also our rows CSS.. (kind of flicker)
+     */
+    @Override protected void handleControlPropertyChanged(String p) {
+        if ("ITEM".equals(p)) {
+            updateCells = true;
+            getSkinnable().requestLayout();
+        } else if ("INDEX".equals(p)){
+           /* // update the index of all children cells (RT-29849)
+            final int newIndex = getSkinnable().getIndex();
+            for (int i = 0, max = cells.size(); i < max; i++) {
+                cells.get(i).updateIndex(newIndex);
+            }*/
+        } else  {
+            super.handleControlPropertyChanged(p);
+        }
+    }
+    
     @Override
     protected void layoutChildren(double x, final double y, final double w,
             final double h) {
@@ -184,12 +203,15 @@ public class SpreadsheetRowSkin<T extends DataRow>
             double tableCellX = 0;
             final double hbarValue = spreadsheetView.getHbar().getValue();
             // We translate that column by the Hbar Value if it's fixed
-            if (((SpreadsheetColumn)(tableView.getColumns().get(column))).isFixed()) {
+            if (spreadsheetView.getColumns().get(column).isFixed()) {
                 
                  if(hbarValue + fixedColumnWidth >x){
+                	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(true);
                 	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
                 	 tableCell.toFront();
                 	 fixedColumnWidth += tableCell.getWidth();
+                 }else{
+                	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(false);
                  }
             }
 

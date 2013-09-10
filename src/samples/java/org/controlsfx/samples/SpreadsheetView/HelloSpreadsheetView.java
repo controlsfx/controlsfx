@@ -134,6 +134,12 @@ public class HelloSpreadsheetView extends Application implements Sample {
 
 		final CheckBox columnHeader = new CheckBox("Column Header");
 		columnHeader.setSelected(true);
+		
+		/**
+		 * FIXME It's not working right now, see in SpreadsheetViewSkin in LayoutChildren
+		 */
+		columnHeader.setDisable(true);
+		
 		columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
 
 			@Override

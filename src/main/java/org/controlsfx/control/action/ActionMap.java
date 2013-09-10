@@ -11,30 +11,36 @@ import javafx.scene.image.Image;
 
 public class ActionMap {
 
-	private Map<String, org.controlsfx.control.action.Action> actions = new HashMap<>();
+	private static Map<String, org.controlsfx.control.action.Action> actions = new HashMap<>();
 
-	public ActionMap(final Object target) {
+	private ActionMap() {
+		// no-op
+	}
+	
+	public static void register(final Object target) {
 
 		for (final Method method : target.getClass().getDeclaredMethods()) {
 			
 			// process only methods with no parameters or one parameter of type ActionEvent
-			switch (method.getParameterCount()) {
-			    case 0: break;
-			    case 1: if ( method.getParameterTypes()[0] == ActionEvent.class) break; 
-			    default: continue;
+			int paramCount = method.getParameterCount();
+			if ( paramCount > 1 || (paramCount == 1 && method.getParameterTypes()[0] != ActionEvent.class )){
+				continue;
 			}
 			
 			Annotation[] annotations = method.getAnnotationsByType(ActionProxy.class);
 			if (annotations.length > 0) {
 				ActionProxy annotation = (ActionProxy) annotations[0];
 				String id = annotation.id().isEmpty()? method.getName(): annotation.id();
+				if ( actions.containsKey(id)) {
+					throw new IllegalArgumentException( String.format("Action proxy with key = '%s' already exists", id));
+				}
 				actions.put(id, new AnnotatedAction( annotation, method, target));
 			}
 		}
 
 	}
 
-	public org.controlsfx.control.action.Action get(String id) {
+	public static org.controlsfx.control.action.Action get(String id) {
 		return actions.get(id);
 	}
 
@@ -51,6 +57,11 @@ class AnnotatedAction extends AbstractAction {
 		String imageLocation = annotation.image().trim();
 		if ( !imageLocation.isEmpty()) {
 			this.setGraphic(new Image(imageLocation));
+		}
+		
+		String longText = annotation.longText().trim();
+		if ( !imageLocation.isEmpty()) {
+			this.setLongText(longText);
 		}
 		
 		this.method = method;

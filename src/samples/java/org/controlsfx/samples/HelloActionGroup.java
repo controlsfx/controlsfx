@@ -41,15 +41,15 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.Separator;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
@@ -131,13 +131,13 @@ public class HelloActionGroup extends Application implements Sample {
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
         
-        Label overview = new Label("MenuBar, TaskBar and ContenxtMenu presented here are effortlesly built out of the same action tree. " +
+        Label overview = new Label("MenuBar, ToolBar and ContextMenu presented here are effortlesly built out of the same action tree. " +
         		"Action properties can be dynamically changed, triggering changes in all related controls");
         overview.setWrapText(true);
         root.getChildren().add(overview);
         
         HBox hbox = new HBox(10);
-        final ComboBox<Action> cbActions = new ComboBox<Action>(  flatten( actions, FXCollections.<Action>observableArrayList()));
+        final ComboBox<Action> cbActions = new ComboBox<Action>( flatten( actions, FXCollections.<Action>observableArrayList()));
         cbActions.getSelectionModel().select(0);
         
         hbox.getChildren().add(new Label("Dynamically enable/disable action: "));
@@ -159,26 +159,38 @@ public class HelloActionGroup extends Application implements Sample {
         root.getChildren().add(hbox);
         root.getChildren().add( new Separator());
 
-        root.getChildren().add(new Label("MenuBar"));
-        MenuBar menuBar = ActionUtils.createMenuBar(actions);
-        root.getChildren().add(menuBar);
-
-        root.getChildren().add(new Label("ToolBar (with text on controls)"));
-        ToolBar toolBar = ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW);
-        root.getChildren().add(toolBar);
-
-        root.getChildren().add(new Label("ToolBar (no text on controls)"));
-        toolBar = ActionUtils.createToolBar(actions, ActionTextBehavior.HIDE);
-        root.getChildren().add(toolBar);
-
+        VBox examplesPane = new VBox(5);
+        examplesPane.setStyle("-fx-background-color: white;-fx-border-color: gray;-fx-border-width: 2;-fx-border-style: dotted");
+        root.getChildren().add(examplesPane);
         
-        root.getChildren().add(new Label("ContextMenu"));
+        Insets topMargin = new Insets(7, 7, 0, 7);
+        Insets margin = new Insets(0, 7, 7, 7);
+        
+        addWithMargin(examplesPane, new Label("MenuBar"), topMargin ).setStyle("-fx-font-weight: bold;");
+        addWithMargin(examplesPane, ActionUtils.createMenuBar(actions), margin);
+
+        addWithMargin(examplesPane,new Label("ToolBar (with text on controls)"), topMargin).setStyle("-fx-font-weight: bold;");
+        addWithMargin(examplesPane, ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW), margin);
+
+        addWithMargin(examplesPane,new Label("ToolBar (no text on controls)"), topMargin).setStyle("-fx-font-weight: bold;");
+        addWithMargin(examplesPane, ActionUtils.createToolBar(actions, ActionTextBehavior.HIDE), margin);
+        
+        addWithMargin(examplesPane, new Label("ContextMenu"), topMargin).setStyle("-fx-font-weight: bold;");
         Label context = new Label("Right-click to see the context menu");
-        context.setContextMenu( ActionUtils.createContextMenu(actions));  
-        root.getChildren().add(context);
+        addWithMargin(examplesPane,context, margin);
+        context.setContextMenu( ActionUtils.createContextMenu(actions)); 
+        context.setStyle("-fx-background-color: #E0E0E0 ;-fx-border-color: black;-fx-border-style: dotted");
+        context.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         VBox.setVgrow(context, Priority.ALWAYS);
+        VBox.setVgrow(examplesPane, Priority.ALWAYS);
         
         return root;
+    }
+    
+    private Control addWithMargin( VBox parent, Control control, Insets insets) {
+    	parent.getChildren().add(control);
+    	VBox.setMargin(control, insets);
+    	return control;
     }
     
     @Override public void start(Stage stage) throws Exception {

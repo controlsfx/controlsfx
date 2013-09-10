@@ -12,6 +12,10 @@ import java.util.Map;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 
+/**
+ * Action Map provides an ability to create an action map of any object.
+ * Attempts to convert methods annotated with {@link ActionProxy} to {@link Action}. 
+ */
 public class ActionMap {
 
 	private static Map<String, AnnotatedAction> actions = new HashMap<>();
@@ -20,6 +24,15 @@ public class ActionMap {
 		// no-op
 	}
 	
+	/**
+	 * Attempts to convert target's methods annotated with {@link ActionProxy} to {@link Action}s.
+	 * Only two types of methods are currently converted: parameter-less methods and 
+     * methods with one parameter of type {@link ActionEvent}.
+     * 
+     * Actions are registered with their id or method name if id is not defined.
+     * @throws IllegalArgumentException on duplicate action id
+	 * @param target object to work on
+	 */
 	public static void register(final Object target) {
 
 		for (final Method method : target.getClass().getDeclaredMethods()) {
@@ -43,6 +56,10 @@ public class ActionMap {
 
 	}
 	
+	/**
+	 * Removes all the actions associated with target object from the action amp
+	 * @param target object to work on
+	 */
 	public void unregister(final Object target) {
 		if ( target != null ) {
 			for ( String key: actions.keySet() ) {
@@ -53,10 +70,22 @@ public class ActionMap {
 		}
 	}
 
+	/**
+	 * Returns action by it's id
+	 * @param id action id
+	 * @return action or null if id was found
+	 */
 	public static Action action(String id) {
 		return actions.get(id);
 	}
 
+	/**
+	 * Returns collection of actions by ids. Useful to create {@link ActionGroup}s.
+	 * Ids starting with "---" are converted to {@link ActionUtils.ACTION_SEPARATOR}
+	 * Incorrect ids are ignored. 
+	 * @param ids action ids
+	 * @return collection of actions
+	 */
 	public static Collection<Action> actions(String... ids) {
 		List<Action> result = new ArrayList<>();
 		for( String id: ids ) {

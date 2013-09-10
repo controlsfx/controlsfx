@@ -11,4 +11,5 @@ public @interface ActionProxy {
 	String id() default "";
     String text();
     String image() default "";
+    String longText() default "";
 }

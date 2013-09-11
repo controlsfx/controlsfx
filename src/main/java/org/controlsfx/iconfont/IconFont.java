@@ -74,7 +74,7 @@ public class IconFont {
 			super(fontChar.toString());
 		    this.fontChar = fontChar;
 		    this.size = size;
-		    setStyle("-fx-font-family: "+ fontName +"; -fx-font-size: " + size + ";");
+		    setFont(Font.font(fontName, size));
 		}
 		
 		public Character getFontChar() {
@@ -85,8 +85,7 @@ public class IconFont {
 			return size;
 		}
 		
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			return fontChar.toString();
 		}
 		

@@ -26,6 +26,7 @@
  */
 package org.controlsfx.samples;
 
+import static org.controlsfx.iconfont.IconFontRegistry.glyph;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -83,9 +84,9 @@ public class HelloIconFont extends Application implements Sample {
 		Label title = new Label("Using FontAwesome(CDN)");
 		root.getChildren().add(title);
 		ToolBar toolbar = new ToolBar(
-				new Button("", fontAwesome.create(FAW_TRASH).build()), 
+				new Button("", glyph("FontAwesome:TRASH")), 
 				new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED).build()), 
-				new Button("", fontAwesome.create(FAW_STAR).build()));
+				new Button("", glyph("FontAwesome:STAR")));//fontAwesome.create(FAW_STAR).build()));
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);

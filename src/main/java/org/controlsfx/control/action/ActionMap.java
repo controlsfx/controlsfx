@@ -166,5 +166,10 @@ class AnnotatedAction extends AbstractAction {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return getText();
+	}
 
 }

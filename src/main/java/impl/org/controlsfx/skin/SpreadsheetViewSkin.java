@@ -93,7 +93,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
          * MODIFIED BY NELLARMONIA
          *****************************************************************/
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
-//        spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
+        spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
         spreadsheetView.setHbar(getFlow().getHorizontalBar());
         spreadsheetView.setVbar(getFlow().getVerticalBar());
         final SpreadsheetView.RowAccessor<SpreadsheetRow> lcells = new SpreadsheetView.RowAccessor<SpreadsheetRow>() {
@@ -264,29 +264,29 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
      * We listen on the FixedColumns in order to do the modification in the
      * VirtualFlow
      */
-    /*private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
+    private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
-            if (getFlow().getFixedColumns().size() > c.getList().size()) {
+            if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
                 for (int i = 0; i < getFlow().getCells().size(); ++i) {
                     ((SpreadsheetRow) getFlow().getCells().get(i))
                             .putFixedColumnToBack();
                 }
             }
 
-            while (c.next()) {
+            /*while (c.next()) {
                 for (final Integer remitem : c.getRemoved()) {
                     getFlow().getFixedColumns().remove(remitem);
                 }
                 for (final Integer additem : c.getAddedSubList()) {
                     getFlow().getFixedColumns().add(additem);
                 }
-            }
+            }*/
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
 
-    };*/
+    };
 
     @Override
     protected VirtualFlow<TableRow<DataRow>> createVirtualFlow() {

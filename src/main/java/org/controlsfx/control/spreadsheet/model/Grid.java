@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.controlsfx.control.SpreadsheetView;
 
 /**
@@ -42,7 +45,7 @@ public class Grid {
     /***************************************************************************
      * * Private Fields * *
      **************************************************************************/
-    private List<DataRow> rows;
+    private ObservableList<DataRow> rows;
     private int rowCount;
     private int columnCount;
 
@@ -50,16 +53,18 @@ public class Grid {
      * * Constructor * *
      **************************************************************************/
 
-    // creates grid with 'unlimited' rows and columns
+    /**
+     * Creates grid with 'unlimited' rows and columns
+     */
     public Grid() {
         this(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     public Grid(int rowCount, int columnCount) {
-        this(rowCount, columnCount, Collections.<DataRow> emptyList());
+        this(rowCount, columnCount,FXCollections.<DataRow> emptyObservableList());
     }
 
-    public Grid(int rowCount, int columnCount, List<DataRow> rows) {
+    public Grid(int rowCount, int columnCount, ObservableList<DataRow> rows) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.rows = rows;
@@ -113,31 +118,67 @@ public class Grid {
         }
     }
 
-    public void setRows(ArrayList<DataRow> rows) {
+    /**
+     * Set the rows used by the Grid.
+     * the rowCount is then updated
+     * @param rows
+     */
+    public void setRows(ObservableList<DataRow> rows) {
         this.rows = rows;
+        setRowCount(rows.size());
     }
-    public List<DataRow> getRows() {
+    
+    /**
+     * Set the rows used by the Grid.
+     * the rowCount is then updated
+     * @param rows
+     */
+    public void setRows(ArrayList<DataRow> rows) {
+        this.rows = FXCollections.observableArrayList(rows);
+        setRowCount(rows.size());
+    }
+    /**
+     * Return a list of the {@link DataRow} used by the Grid.
+     * @return
+     */
+    public ObservableList<DataRow> getRows() {
         return rows;
     }
     
+    /**
+     * Set a new rowCount for the grid.
+     * @param rowCount
+     */
     public void setRowCount(int rowCount) {
         this.rowCount = rowCount;
     }
 
+    /**
+     * Return how many rows are inside the grid.
+     * @return
+     */
     public int getRowCount() {
         return rowCount;
     }
 
+    /**
+     * Set a new columnCount for the grid.
+     * @param columnCount
+     */
     public void setColumnCount(int columnCount) {
         this.columnCount = columnCount;
     }
 
+    /**
+     * Return how many columns are inside the grid.
+     * @return
+     */
     public int getColumnCount() {
         return columnCount;
     }
 
     /**
-     * Debug function to print the Grid.
+     * Debug function to print all the cells inside the grid.
      * 
      * @param grid
      */

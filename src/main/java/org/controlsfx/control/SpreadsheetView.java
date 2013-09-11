@@ -27,7 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.SpreadsheetCell;
-import impl.org.controlsfx.skin.SpreadsheetColumn;
 import impl.org.controlsfx.skin.SpreadsheetRow;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
@@ -83,6 +82,7 @@ import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
@@ -96,7 +96,7 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
  * <li> Rows can be fixed to the top of the {@link SpreadsheetView} so that they are
  * always visible on screen.</li>
  * <li> Columns can be fixed to the left of the {@link SpreadsheetView} so that they are
- * always visible on screen.</li>
+ * always visible on screen. Only columns without any spanning cells can be fixed.</li>
  * <li> A row header can be switched on in order to display the row number.</li>
  * <li> Selection of several cells can be made with a click and drag.</li>
  * <li> A copy/paste context menu is accessible with a right-click.</li>
@@ -132,9 +132,6 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 public class SpreadsheetView extends Control {
 
     private final TableView<DataRow> tableView;
-
-
-
 
     /***************************************************************************
      *                                                                         *
@@ -186,11 +183,17 @@ public class SpreadsheetView extends Control {
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-
+    /**
+     * Creates a default SpreadsheetView control with no content. 
+     */
     public SpreadsheetView() {
         this(new Grid());
     }
 
+    /**
+     * Creates a SpreadsheetView control with the {@link Grid} specified. 
+     * @param grid The Grid that contains the items to be rendered
+     */
     public SpreadsheetView(final Grid grid){
         super();
 
@@ -317,23 +320,31 @@ public class SpreadsheetView extends Control {
         columnHeader.setValue(b);
     }
 
+    /**
+     * BooleanProperty associated with the column Header.
+     * @return
+     */
     public final BooleanProperty columnHeaderProperty() {
         return columnHeader;
     }
 
     /**
-     * Activate and deactivate the Column Header
+     * Activate and deactivate the Row Header
      * @param b
      */
     public final void setRowHeader(final boolean b){
         rowHeader.setValue(b);
     }
+    /**
+     * BooleanProperty associated with the row Header.
+     * @return
+     */
     public final BooleanProperty rowHeaderProperty() {
         return rowHeader;
     }
 
     /**
-     * Fix the first "numberOfFixedRows" at the top.
+     * Fix the first "numberOfFixedRows" at the top of the SpreadsheetView
      * @param numberOfFixedRows
      */
     public final void fixRows(int numberOfFixedRows){
@@ -343,38 +354,40 @@ public class SpreadsheetView extends Control {
         }
     }
 
+    /**
+     * Return an ObservableList of the fixed rows. 
+     * Just the number of the rows are returned.
+     * @return
+     */
     public ObservableList<Integer> getFixedRows() {
         return fixedRows;
     }
 
     /**
      * Fix the first "numberOfFixedColumns" on the left.
-     * It's possible to fix columns also by right-clicking on colums header
+     * It will unfix any previously fixed column.
+     * It's possible to fix columns also by right-clicking on columns header.
      * @param numberOfFixedColumns
      */
     public void fixColumns(int numberOfFixedColumns){
 
         getFixedColumns().clear();
-        ObservableList<TableColumn<DataRow, ?>> columns = tableView.getColumns();
         for (SpreadsheetColumn spc : getColumns()) {
 			spc.setFixed(false);
 		}
-        
+
         for (int j = 0; j < numberOfFixedColumns; j++) {
             getColumns().get(j).setFixed(true);
         }
     }
 
+    /**
+     * Return an ObservableList of the fixed columns. 
+     * Just the number of the columns are returned.
+     * @return
+     */
     public ObservableList<Integer> getFixedColumns() {
         return fixedColumns;
-    }
-
-    public DoubleProperty fixedCellSizeProperty() {
-        return tableView.fixedCellSizeProperty();
-    }
-
-    private ObservableList<DataRow> getItems() {
-        return tableView.getItems();
     }
 
     /**
@@ -415,6 +428,10 @@ public class SpreadsheetView extends Control {
         }
     }
 
+    /**
+     * Return the selectionModel used by the SpreadsheetView.
+     * @return {@link SpreadsheetViewSelectionModel}
+     */
     public SpreadsheetViewSelectionModel<DataRow> getSelectionModel() {
         return (SpreadsheetViewSelectionModel<DataRow>) tableView.getSelectionModel();
     }
@@ -425,17 +442,39 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/   
 
+    /**
+     * Return a list of {@link DataRow} used by the SpreadsheetView.
+     * @return
+     */
+    private ObservableList<DataRow> getItems() {
+        return tableView.getItems();
+    }
+    
     // FIXME this shouldn't be here!
+    /**
+     * Return the number of rows actually visible on screen.
+     * @return
+     */
     public final int getRowCount(){
         return cells.size();
     }
     
 
-    // returns the given row after the fixed rows
+    /**
+     * Return the {@link SpreadsheetRow} at the specified index
+     * @param index
+     * @return
+     */
     private SpreadsheetRow getNonFixedRow(int index){
         return cells.get(fixedRows.size()+index);
     }
 
+    /**
+     * Indicate whether or not the row at the specified index is currently 
+     * being displayed.
+     * @param index
+     * @return
+     */
     private final boolean containsRow(int index){
         for (int i =0 ;i<cells.size();++i) {
             if(cells.get(i).getIndex() == index)
@@ -444,6 +483,10 @@ public class SpreadsheetView extends Control {
         return false;
     }
 
+    /**
+     * Set a grid for the SpreadsheetView.
+     * @param grid
+     */
     private final void setGrid(Grid grid) {
         this.grid = grid;
 
@@ -465,8 +508,6 @@ public class SpreadsheetView extends Control {
                 column.setSortable(false);
                 
                 column.impl_setReorderable(false);
-                
-                column.setContextMenu(getColumnContextMenu());
                 
                 // We assign a DataCell for each Cell needed (MODEL).
                 column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DataRow, DataCell<?>>, ObservableValue<DataCell<?>>>() {
@@ -514,39 +555,6 @@ public class SpreadsheetView extends Control {
         return converted;
     }
 
-    /**
-     * Generate a context Menu in order to fix/unfix some column
-     * It is shown when right-clicking on the column header
-     * @return
-     */
-    private ContextMenu getColumnContextMenu(){
-    	final ContextMenu contextMenu = new ContextMenu();
-
-    	final CheckMenuItem fixItem = new CheckMenuItem("Fix");
-
-    	//FIXME Conflict between the menuItem and the fixColumn method...
-    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0,
-					Boolean arg1, Boolean arg2) {
-				
-				if(contextMenu.getOwnerNode() instanceof TableColumnHeader){
-					TableColumnHeader columnHeader = (TableColumnHeader) contextMenu.getOwnerNode();
-					Integer indexCol = tableView.getColumns().indexOf(columnHeader.getTableColumn());
-					if(arg2){
-						getColumns().get(indexCol).setFixed(true);
-					}else{
-						getColumns().get(indexCol).setFixed(false);
-					}
-				}
-			}
-        	
-        });
-        contextMenu.getItems().addAll(fixItem);
-        
-        return contextMenu;
-    }
-    
     /***************************************************************************
      * 						COPY / PASTE METHODS
      **************************************************************************/

@@ -119,7 +119,7 @@ public class HelloActionProxy extends Application implements Sample {
     	 System.out.println( "Action 2.3 is executed");
     }
     
-    @ActionProxy(text="Action 3", image=imagePath)
+    @ActionProxy(text="Action 3", image="@FontAwesome:STAR")
     private void action3() {
     	 System.out.println( "Action 3 is executed");
     }    

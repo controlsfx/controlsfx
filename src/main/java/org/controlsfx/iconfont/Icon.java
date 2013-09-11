@@ -1,9 +1,11 @@
 package org.controlsfx.iconfont;
 
+import org.controlsfx.tools.Duplicatable;
+
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
-public class Icon extends Label {
+public class Icon extends Label implements Duplicatable<Icon>{
 
     private final String fontFamily;
     private final Character character;
@@ -47,4 +49,11 @@ public class Icon extends Label {
         }
         setStyle(css.toString());
     }
+
+
+
+	@Override
+	public Icon duplicate() {
+		return new Icon( fontFamily, character, size, color);
+	}
 }

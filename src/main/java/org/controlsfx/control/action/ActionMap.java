@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.controlsfx.iconfont.IconFontRegistry;
+
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -136,7 +138,11 @@ class AnnotatedAction extends AbstractAction {
 		
 		String imageLocation = annotation.image().trim();
 		if ( !imageLocation.isEmpty()) {
-			this.setGraphic(new ImageView(new Image(imageLocation)));
+			if ( imageLocation.startsWith("@")) {
+			   this.setGraphic(IconFontRegistry.glyph(imageLocation.substring(1))); 	
+			} else {
+			   this.setGraphic(new ImageView(new Image(imageLocation)));
+			}
 		}
 		
 		String longText = annotation.longText().trim();

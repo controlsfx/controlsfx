@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.actions;
 
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 
@@ -49,86 +49,56 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
-import org.controlsfx.control.action.ActionMap;
-import static org.controlsfx.control.action.ActionMap.action;
-import static org.controlsfx.control.action.ActionMap.actions;
-import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
+import org.controlsfx.samples.Utils;
 
-public class HelloActionProxy extends Application implements Sample {
+public class HelloActionGroup extends Application implements Sample {
     
-    private static final String imagePath = "/org/controlsfx/samples/security-low.png";
-    private static final Image image = new Image(imagePath);
+    private static final Image image = new Image("/org/controlsfx/samples/security-low.png");
     
-    private Collection<? extends Action> actions;
+    private Collection<? extends Action> actions = Arrays.asList(
+        new ActionGroup("Group 1", image, new DummyAction("Action 1.1", image), 
+                                          new DummyAction("Action 1.2") ),
+        new ActionGroup("Group 2", image, new DummyAction("Action 2.1"), 
+                                          ACTION_SEPARATOR,
+                                          new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
+                                                                  new DummyAction("Action 2.2.2")),
+                                          new DummyAction("Action 2.3") ),
+        ACTION_SEPARATOR,                                    
+        new DummyAction("Action 3", image),
+        new ActionGroup("Group 4",  image, new DummyAction("Action 4.1", image), 
+                                           new DummyAction("Action 4.2"))
+    );
     
-    public HelloActionProxy() {
-		ActionMap.register(this);
-		actions = Arrays.asList(
-	        new ActionGroup("Group 1", image, actions("action11","action12") ),
-			new ActionGroup("Group 2", image, actions("action21","---","action22", "action221","action222","action23") ),
-			ACTION_SEPARATOR,                                    
-			action("action3"),
-			new ActionGroup("Group 4",  image, actions("action41","action42"))
-		);
-	}
-    
-    @ActionProxy(text="Action 1.1", image=imagePath)
-    private void action11() {
-    	 System.out.println( "Action 1.1 is executed");
+    static class DummyAction extends AbstractAction {
+
+        public DummyAction(String name, Image image) {
+            super(name);
+            setGraphic(image);
+        }
+        
+        public DummyAction( String name ) {
+            super(name);
+        }
+
+        @Override public void execute(javafx.event.ActionEvent ae) {
+            System.out.println( String.format("Action '%s' is executed", getText()));
+        }
+        
+        @Override public String toString() {
+            return getText();
+        }
+
+        
     }
-    
-    @ActionProxy(text="Action 1.2", image=imagePath)
-    private void action12() {
-    	 System.out.println( "Action 1.2 is executed");
-    }
-    
-    @ActionProxy(text="Action 2.1", image=imagePath)
-    private void action21() {
-    	 System.out.println( "Action 2.1 is executed");
-    }
-    
-    @ActionProxy(text="Action 2.2", image=imagePath)
-    private void action22() {
-    	 System.out.println( "Action 2.2 is executed");
-    }
-    
-    @ActionProxy(text="Action 2.2.1", image=imagePath)
-    private void action221() {
-    	 System.out.println( "Action 2.2,1 is executed");
-    }
-    
-    @ActionProxy(text="Action 2.2.2", image=imagePath)
-    private void action222() {
-    	 System.out.println( "Action 2.2.2 is executed");
-    }   
-    
-    @ActionProxy(text="Action 2.3", image=imagePath)
-    private void action23() {
-    	 System.out.println( "Action 2.3 is executed");
-    }
-    
-    @ActionProxy(text="Action 3", image=imagePath)
-    private void action3() {
-    	 System.out.println( "Action 3 is executed");
-    }    
-    
-    @ActionProxy(text="Action 4.1", image=imagePath)
-    private void action41() {
-    	 System.out.println( "Action 4.1 is executed");
-    }
-    
-    @ActionProxy(text="Action 4.2", image=imagePath)
-    private void action42() {
-    	 System.out.println( "Action 4.2 is executed");
-    }    
     
     private ObservableList<Action> flatten( Collection<? extends Action> actions, ObservableList<Action> dest ) {
         
@@ -145,11 +115,11 @@ public class HelloActionProxy extends Application implements Sample {
     
     
     @Override public String getSampleName() {
-        return "Action Proxy";
+        return "Action Group";
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionProxy.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionGroup.html";
     }
     
     @Override public boolean includeInSamples() {
@@ -225,7 +195,7 @@ public class HelloActionProxy extends Application implements Sample {
     }
     
     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Action Proxy Demo");
+        stage.setTitle("Action Group Demo");
         
         Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
         scene.setFill(Color.WHITE);

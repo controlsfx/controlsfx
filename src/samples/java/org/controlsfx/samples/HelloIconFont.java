@@ -40,6 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
+import org.controlsfx.iconfont.FontAwesomePack;
 import org.controlsfx.iconfont.IconFont;
 
 public class HelloIconFont extends Application implements Sample {
@@ -86,7 +87,8 @@ public class HelloIconFont extends Application implements Sample {
 		ToolBar toolbar = new ToolBar(
 				new Button("", glyph("FontAwesome:TRASH")), 
 				new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED).build()), 
-				new Button("", glyph("FontAwesome:STAR")));//fontAwesome.create(FAW_STAR).build()));
+				new Button("", glyph("FontAwesome:STAR")),
+				new Button("", FontAwesomePack.Glyph.ANCHOR.create()));
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);

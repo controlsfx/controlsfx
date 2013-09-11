@@ -29,9 +29,11 @@ package org.controlsfx.iconfont;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.scene.Node;
+
 public class FontAwesomePack implements FontIconPack {
 
-	private String fontName = "FontAwesome";
+	private static String fontName = "FontAwesome";
 	private IconFont fontAwesome = new IconFont( fontName,
 	 	 "http://fontawesome.io/assets/font-awesome/font/fontawesome-webfont.ttf");
 	
@@ -427,13 +429,17 @@ public class FontAwesomePack implements FontIconPack {
 		public Character getChar() {
 			return ch;
 		}
+		
+		public Node create() {
+		    return IconFontRegistry.glyph(fontName, name());
+		}
 	};
 	
-	public FontAwesomePack() {
+	// only needs to be instantiated by the IconFontRegistry
+	FontAwesomePack() {
 		for( Glyph e:  Glyph.values()) {
 			glyphs.put(e.name(), e.getChar());
 		}
-		
 	}
 	
 	@Override

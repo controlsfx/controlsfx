@@ -62,7 +62,4 @@ public final class IconFontRegistry {
 		String[] args = fontAndGlyph.split(":");
 		return glyph( args[0], args[1]);
 	}
-	
-	
-
 }

@@ -28,37 +28,51 @@ package org.controlsfx.iconfont;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javafx.scene.Node;
 
 public final class IconFontRegistry {
 	
-	private static Map<String, FontIconPack> packMap = new HashMap<>();
+	private static Map<String, IconFontPack> packMap = new HashMap<>();
 	
-	static {
-		register(new FontAwesomePack());
-	}
+	private static boolean isInited = false;
 	
 	private IconFontRegistry() {
 		// no-op
 	}
 	
-	public static void register( FontIconPack pack ) {
+	private static void init() {
+	    if (isInited) return;
+	    isInited = true;
+	    
+	    // find all classes that implement IconFontPack and register them now
+	    ServiceLoader<IconFontPack> ldr = ServiceLoader.load(IconFontPack.class);
+        for (IconFontPack fontPack : ldr) {
+            // no-op, just run to instantiate the pack
+        }
+	}
+	
+	public static void register( IconFontPack pack ) {
+	    init();
 		if (pack != null ) {
 			packMap.put( pack.getFontName(), pack );
 		}
 	}
 	
-	public static FontIconPack pack( String fontName ) {
+	public static IconFontPack pack( String fontName ) {
+	    init();
 		return packMap.get(fontName);
 	}
 	
 	public static Node glyph( String fontName, String glyphName ) {
-		FontIconPack pack = pack(fontName);
+	    init();
+		IconFontPack pack = pack(fontName);
 		return pack.getFont().create(pack.getGlyphs().get(glyphName));
 	}
 	
 	public static Node glyph( String fontAndGlyph ) {
+	    init();
 		String[] args = fontAndGlyph.split(":");
 		return glyph( args[0], args[1]);
 	}

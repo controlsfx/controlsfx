@@ -28,7 +28,7 @@ package org.controlsfx.iconfont;
 
 import java.util.Map;
 
-public interface FontIconPack {
+public interface IconFontPack {
 	String getFontName();
 	IconFont getFont();
 	Map<String,Character> getGlyphs();

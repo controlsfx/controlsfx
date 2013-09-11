@@ -24,14 +24,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.iconfont;
+package org.controlsfx.iconfont.fontpack;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.controlsfx.iconfont.IconFont;
+import org.controlsfx.iconfont.IconFontPack;
+import org.controlsfx.iconfont.IconFontRegistry;
+
 import javafx.scene.Node;
 
-public class FontAwesomePack implements FontIconPack {
+public class FontAwesomePack implements IconFontPack {
 
 	private static String fontName = "FontAwesome";
 	private IconFont fontAwesome = new IconFont( fontName,
@@ -435,26 +440,25 @@ public class FontAwesomePack implements FontIconPack {
 		}
 	};
 	
-	// only needs to be instantiated by the IconFontRegistry
-	FontAwesomePack() {
-		for( Glyph e:  Glyph.values()) {
+	// FIXME only needs to be instantiated by the IconFontRegistry, so this
+	// constructor shouldn't really be called multiple times...
+	public FontAwesomePack() {
+		for (Glyph e:  Glyph.values()) {
 			glyphs.put(e.name(), e.getChar());
 		}
+		
+		IconFontRegistry.register(this);
 	}
 	
-	@Override
-	public String getFontName() {
+	@Override public String getFontName() {
 		return fontName;
 	}
 
-	@Override
-	public IconFont getFont() {
+	@Override public IconFont getFont() {
 		return fontAwesome;
 	}
 
-	@Override
-	public Map<String, Character> getGlyphs() {
-		return glyphs;
+	@Override public Map<String, Character> getGlyphs() {
+		return Collections.unmodifiableMap(glyphs);
 	}
-
 }

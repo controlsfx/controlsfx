@@ -50,10 +50,7 @@ public class Icon extends Label implements Duplicatable<Icon>{
         setStyle(css.toString());
     }
 
-
-
-	@Override
-	public Icon duplicate() {
-		return new Icon( fontFamily, character, size, color);
+	@Override public Icon duplicate() {
+		return new Icon(fontFamily, character, size, color);
 	}
 }

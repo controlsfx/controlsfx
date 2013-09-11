@@ -40,8 +40,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.iconfont.FontAwesomePack;
 import org.controlsfx.iconfont.IconFont;
+import org.controlsfx.iconfont.fontpack.FontAwesomePack;
 
 public class HelloIconFont extends Application implements Sample {
 

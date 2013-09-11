@@ -102,13 +102,7 @@ public class SpreadsheetCellEditors {
                 viewCell.selectedProperty().addListener(il);
                 viewCell.setGraphic(tf);
 
-                final Runnable r = new Runnable() {
-                    @Override
-                    public void run() {
-                        tf.requestFocus();
-                    }
-                };
-                Platform.runLater(r);
+                tf.requestFocus();
             }
 
             /***************************************************************************
@@ -235,13 +229,7 @@ public class SpreadsheetCellEditors {
                 if (viewCell != null) {
                     viewCell.setGraphic(cb);
 
-                    final Runnable r = new Runnable() {
-                        @Override
-                        public void run() {
-                            cb.requestFocus();
-                        }
-                    };
-                    Platform.runLater(r);
+                cb.requestFocus();
                 }
             }
 
@@ -390,13 +378,7 @@ public class SpreadsheetCellEditors {
 
                 viewCell.setGraphic(datePicker);
 
-                final Runnable r = new Runnable() {
-                    @Override
-                    public void run() {
-                        datePicker.requestFocus();
-                    }
-                };
-                Platform.runLater(r);
+                datePicker.getEditor().requestFocus();
             }
 
             /***************************************************************************
@@ -459,9 +441,11 @@ public class SpreadsheetCellEditors {
                             final Runnable r = new Runnable() {
                                 @Override
                                 public void run() {
-                                    commitEdit();
-                                    viewCell.commitEdit(modelCell);
-                                    end();
+                                	if (viewCell != null && viewCell.isEditing()) {
+	                                    commitEdit();
+	                                    viewCell.commitEdit(modelCell);
+	                                    end();
+                                	}
                                 }
                             };
                             Platform.runLater(r);

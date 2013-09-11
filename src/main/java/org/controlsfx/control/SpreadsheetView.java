@@ -39,10 +39,7 @@ import java.util.Set;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -54,10 +51,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
@@ -67,13 +61,11 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -84,7 +76,6 @@ import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
@@ -255,43 +246,80 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     // FIXME this shouldn't be here!
+    /**
+     * Not for public use.
+     * @return
+     */
     public VirtualScrollBar getHbar() {
         return hbar;
     }
 
     // FIXME this shouldn't be here!
+    /**
+     * Not for public use.
+     * @return
+     */
     public void setHbar(VirtualScrollBar hbar) {
         this.hbar = hbar;
     }
 
     // FIXME this shouldn't be here!
+    /**
+     * Not for public use.
+     * @return
+     */
     public VirtualScrollBar getVbar() {
         return vbar;
     }
 
     // FIXME this shouldn't be here!
+    /**
+     * Not for public use.
+     * @return
+     */
     public void setVbar(VirtualScrollBar vbar) {
         this.vbar = vbar;
     }
 
+
+    /**
+     * Not for public use.
+     * @return
+     */
     public SpreadsheetRow getRow(int index) {
         return cells.get(index);
     }
 
     // FIXME this shouldn't be here!
+    /**
+     * Not for public use.
+     * @return
+     */
     public boolean isEmptyCells() {
         return cells.isEmpty();
     }
 
     // FIXME this shouldn't be here!
+    /**
+     * Not for public use.
+     * @return
+     */
     public void setRows(RowAccessor<SpreadsheetRow> cells) {
         this.cells = (RowAccessor<SpreadsheetRow>) cells;
     }
 
+    /**
+     * Return a {@link TablePosition} of cell being currently edited.
+     * @return
+     */
     public TablePosition<DataRow, ?> getEditingCell(){
         return tableView.getEditingCell();
     }
     
+    /**
+     * Return an observableList of the {@link SpreadsheetColumn} used.
+     * @return
+     */
     public ObservableList<SpreadsheetColumn> getColumns(){
 		return columns;
     }
@@ -682,6 +710,15 @@ public class SpreadsheetView extends Control {
             //For layout
             getSelectionModel().clearSelection();
             requestLayout();
+        //To be improved
+        }else if(clipboard.hasString()){
+        	final TablePosition<?,?> p = tableView.getFocusModel().getFocusedCell();
+        	
+        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(SpreadsheetCells.createTextCell(0, 0, 1, 1, clipboard.getString()));
+        	
+        	//For layout
+        	getSelectionModel().clearSelection();
+        	requestLayout();
         }
     }
 

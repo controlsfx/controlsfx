@@ -174,7 +174,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
 	 * @param i
 	 */
 	private void removeStyleHeader(Integer i) {
-        	getRootHeader().getColumnHeaders().get(i).getChildrenUnmodifiable().get(0).getStyleClass().remove("fixed");
+        	getRootHeader().getColumnHeaders().get(i).getChildrenUnmodifiable().get(0).getStyleClass().removeAll("fixed");
     }
 	/**
 	 * Remove the fix style of the header Label of the specified column
@@ -203,7 +203,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
      */
     private void updateHighlighSelection() {
     	for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-            i.getChildrenUnmodifiable().get(0).getStyleClass().remove("selected");
+            i.getChildrenUnmodifiable().get(0).getStyleClass().removeAll("selected");
 
         }
         final List<Integer> selectedColumns = selectionModel

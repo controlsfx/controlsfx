@@ -58,11 +58,11 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.tools.Duplicatable;
 
 /**
  * Convenience class for users of the {@link Action} API. Primarily this class
@@ -353,7 +353,7 @@ public class ActionUtils {
             return null;
         }
 
-        @Override public ObjectProperty<Image> graphicProperty() {
+        @Override public ObjectProperty<Node> graphicProperty() {
             return null;
         }
 
@@ -508,6 +508,16 @@ public class ActionUtils {
         
     }
     
+    private static Node copyNode( Node node ) {
+    	if ( node instanceof ImageView ) {
+    		return new ImageView( ((ImageView)node).getImage());
+    	} else if ( node instanceof Duplicatable<?> ) {
+    		return (Node) ((Duplicatable<?>)node).duplicate();
+    	} else {
+    	    return null;
+    	}
+    }
+    
     private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBahavior ) {
         
         if (action == null) {
@@ -522,12 +532,11 @@ public class ActionUtils {
         btn.disableProperty().bind(action.disabledProperty());
         
         
-        btn.graphicProperty().bind(new ObjectBinding<ImageView>() {
+        btn.graphicProperty().bind(new ObjectBinding<Node>() {
             { bind(action.graphicProperty()); }
 
-            @Override protected ImageView computeValue() {
-                Image image = action.graphicProperty().get();
-                return image == null? null: new ImageView(image);
+            @Override protected Node computeValue() {
+                return copyNode(action.graphicProperty().get());
             }
         });
         
@@ -584,12 +593,11 @@ public class ActionUtils {
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
         
-        btn.graphicProperty().bind(new ObjectBinding<ImageView>() {
+        btn.graphicProperty().bind(new ObjectBinding<Node>() {
             { bind(action.graphicProperty()); }
 
-            @Override protected ImageView computeValue() {
-                Image image = action.graphicProperty().get();
-                return image == null? null: new ImageView(image);
+            @Override protected Node computeValue() {
+                return copyNode( action.graphicProperty().get());
             }
         });
         

@@ -32,10 +32,10 @@ import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ToolBar;
-import javafx.scene.image.Image;
 
 /**
  * An ActionGroup (unsurprisingly) groups together zero or more {@link Action} 
@@ -130,7 +130,7 @@ public class ActionGroup extends AbstractAction {
      * @param icon The {@link Action#graphicProperty() image} of this {@link Action}.
      * @param actions Zero or more actions to insert into this ActionGroup.
      */
-    public ActionGroup(String text, Image icon, Action... actions) {
+    public ActionGroup(String text, Node icon, Action... actions) {
     	 this( text, icon, Arrays.asList(actions));
     }
     
@@ -142,7 +142,7 @@ public class ActionGroup extends AbstractAction {
      * @param icon The {@link Action#graphicProperty() image} of this {@link Action}.
      * @param actions Collection of actions to insert into this ActionGroup.
      */
-    public ActionGroup(String text, Image icon, Collection<Action> actions) {
+    public ActionGroup(String text, Node icon, Collection<Action> actions) {
         super(text);
         setGraphic(icon);
         getActions().addAll(actions);

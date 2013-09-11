@@ -37,6 +37,7 @@ import java.util.Map;
 
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * Action Map provides an ability to create an action map of any object.
@@ -135,7 +136,7 @@ class AnnotatedAction extends AbstractAction {
 		
 		String imageLocation = annotation.image().trim();
 		if ( !imageLocation.isEmpty()) {
-			this.setGraphic(new Image(imageLocation));
+			this.setGraphic(new ImageView(new Image(imageLocation)));
 		}
 		
 		String longText = annotation.longText().trim();

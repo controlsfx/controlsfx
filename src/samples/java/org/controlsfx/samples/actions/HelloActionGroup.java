@@ -45,11 +45,11 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
@@ -62,7 +62,7 @@ import org.controlsfx.samples.Utils;
 
 public class HelloActionGroup extends Application implements Sample {
     
-    private static final Image image = new Image("/org/controlsfx/samples/security-low.png");
+    private static final ImageView image = new ImageView( new Image("/org/controlsfx/samples/security-low.png"));
     
     private Collection<? extends Action> actions = Arrays.asList(
         new ActionGroup("Group 1", image, new DummyAction("Action 1.1", image), 
@@ -70,7 +70,7 @@ public class HelloActionGroup extends Application implements Sample {
         new ActionGroup("Group 2", image, new DummyAction("Action 2.1"), 
                                           ACTION_SEPARATOR,
                                           new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
-                                                                  new DummyAction("Action 2.2.2")),
+                                                                        new DummyAction("Action 2.2.2")),
                                           new DummyAction("Action 2.3") ),
         ACTION_SEPARATOR,                                    
         new DummyAction("Action 3", image),
@@ -80,7 +80,7 @@ public class HelloActionGroup extends Application implements Sample {
     
     static class DummyAction extends AbstractAction {
 
-        public DummyAction(String name, Image image) {
+        public DummyAction(String name, Node image) {
             super(name);
             setGraphic(image);
         }

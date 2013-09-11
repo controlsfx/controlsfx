@@ -45,6 +45,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -68,7 +69,7 @@ import org.controlsfx.samples.Utils;
 public class HelloActionProxy extends Application implements Sample {
     
     private static final String imagePath = "/org/controlsfx/samples/security-low.png";
-    private static final Image image = new Image(imagePath);
+    private static final ImageView image = new ImageView(new Image(imagePath));
     
     private Collection<? extends Action> actions;
     

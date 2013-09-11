@@ -28,17 +28,27 @@ package org.controlsfx.iconfont;
 
 import java.io.InputStream;
 
+import com.sun.javafx.css.StyleManager;
+
 import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class IconFont {
+    
+    static {
+        StyleManager.getInstance().addUserAgentStylesheet(
+                IconFont.class.getResource("iconfont.css").toExternalForm());
+    }
 
 	private static double DEFAULT_ICON_SIZE = 16.0;
 	
 	private final String fontName;
+	
+	private Character character;
+	private double size = DEFAULT_ICON_SIZE;
+	private Color color;
 	
 	public IconFont( String fontName, InputStream in   ) {
 		this.fontName = fontName;
@@ -50,47 +60,58 @@ public class IconFont {
 		Font.loadFont(urlStr, DEFAULT_ICON_SIZE);
 	}
 	
-	public Node createNode(char c, double size) {
-		return new Icon(c, size);
+	public IconFont create(char c) {
+	    this.character = c;
+	    
+	    // reset other properties to default
+	    size = DEFAULT_ICON_SIZE;
+	    color = null;
+	    
+	    return this;
 	}
 	
-	public Node createNode(char c) {
-		return createNode(c,DEFAULT_ICON_SIZE);
+	public IconFont size(double size) {
+	    this.size = size;
+	    return this;
 	}
 	
-	public Image createImage(char c, double size) {
-		return createNode(c, size).snapshot( new SnapshotParameters(), null);
+	public IconFont color(Color color) {
+	    this.color = color;
+	    return this;
 	}
 	
-	public Image createImage(char c) {
-		return createImage(c,DEFAULT_ICON_SIZE);
+	public Node build() {
+	    return new Icon(character, size, color);
 	}
 	
 	
 	private class Icon extends Label {
 		
-		private final Character fontChar;
-		private final double size;
+		private final Character _character;
+		private final double _size;
+		private final Color _color;
 		
-		public Icon( Character fontChar, double size ) {
-			super(fontChar.toString());
-		    this.fontChar = fontChar;
-		    this.size = size;
-		    setFont(Font.font(fontName, size));
+		public Icon(Character character, double size, Color color) {
+			super(character.toString());
+			
+			this._character = character;
+			this._size = size;
+			this._color = color;
+			
+			StringBuilder css = new StringBuilder("-fx-font-family: "+ fontName +"; -fx-font-size: " + _size + ";");
+			if (color == null) {
+			    css.append("-icons-color: -fx-text-background-color;");
+			} else {
+			    css.append("-icons-color: rgb(");
+			    css.append((int)(_color.getRed()*255));
+			    css.append(",");
+			    css.append((int)(_color.getGreen()*255));
+			    css.append(",");
+			    css.append((int)(_color.getBlue())*255);
+			    css.append(");");
+			}
+		    setStyle(css.toString());
+		    getStyleClass().add("icon-font");
 		}
-		
-		public Character getFontChar() {
-			return fontChar;
-		}
-		
-		public double getSize() {
-			return size;
-		}
-		
-		@Override public String toString() {
-			return fontChar.toString();
-		}
-		
 	}
-	
 }

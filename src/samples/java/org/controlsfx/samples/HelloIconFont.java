@@ -77,21 +77,22 @@ public class HelloIconFont extends Application implements Sample {
 	public Node getPanel(final Stage stage) {
 
 		VBox root = new VBox(10);
+		
 		root.setPadding(new Insets(10, 10, 10, 10));
 		root.setMaxHeight(Double.MAX_VALUE);
 		Label title = new Label("Using FontAwesome(CDN)");
 		root.getChildren().add(title);
 		ToolBar toolbar = new ToolBar(
-				new Button("", fontAwesome.createNode(FAW_TRASH)), 
-				new Button("", fontAwesome.createNode(FAW_GEAR)), 
-				new Button("", fontAwesome.createNode(FAW_STAR)));
+				new Button("", fontAwesome.create(FAW_TRASH).build()), 
+				new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED).build()), 
+				new Button("", fontAwesome.create(FAW_STAR).build()));
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);
 		toolbar = new ToolBar(
-				new Button("", icoMoon.createNode(IM_BOLD)),
-				new Button("", icoMoon.createNode(IM_UNDERSCORED)), 
-				new Button("", icoMoon.createNode(IM_ITALIC)));
+				new Button("", icoMoon.create(IM_BOLD).size(16).build()),
+				new Button("", icoMoon.create(IM_UNDERSCORED).size(32).build()), 
+				new Button("", icoMoon.create(IM_ITALIC).size(48).build()));
 		root.getChildren().add(toolbar);
 		return root;
 

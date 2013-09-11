@@ -250,7 +250,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 setGraphic( new ImageView(CATEGORY_IMAGE));
                 setLongText(text);
             } else if (mode == Mode.NAME) {
-                setGraphic(new ImageView(CATEGORY_IMAGE));
+                setGraphic(new ImageView(NAME_IMAGE));
                 setLongText(text);
             } else {
                 setText(text);

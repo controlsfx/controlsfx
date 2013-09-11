@@ -86,16 +86,16 @@ public class HelloIconFont extends Application implements Sample {
 		root.getChildren().add(title);
 		ToolBar toolbar = new ToolBar(
 				new Button("", glyph("FontAwesome:TRASH")), 
-				new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED).build()), 
+				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)), 
 				new Button("", glyph("FontAwesome:STAR")),
 				new Button("", FontAwesomePack.Glyph.ANCHOR.create()));
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);
 		toolbar = new ToolBar(
-				new Button("", icoMoon.create(IM_BOLD).size(16).build()),
-				new Button("", icoMoon.create(IM_UNDERSCORED).size(32).build()), 
-				new Button("", icoMoon.create(IM_ITALIC).size(48).build()));
+				new Button("", icoMoon.fontSize(16).create(IM_BOLD)),
+				new Button("", icoMoon.fontColor(Color.GREEN).fontSize(32).create(IM_UNDERSCORED)), 
+				new Button("", icoMoon.fontSize(48).create(IM_ITALIC)));
 		root.getChildren().add(toolbar);
 		return root;
 

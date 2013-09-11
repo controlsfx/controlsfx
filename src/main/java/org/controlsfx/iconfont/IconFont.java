@@ -30,8 +30,6 @@ import java.io.InputStream;
 
 import com.sun.javafx.css.StyleManager;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -46,7 +44,6 @@ public class IconFont {
 	
 	private final String fontName;
 	
-	private Character character;
 	private double size = DEFAULT_ICON_SIZE;
 	private Color color;
 	
@@ -60,58 +57,17 @@ public class IconFont {
 		Font.loadFont(urlStr, DEFAULT_ICON_SIZE);
 	}
 	
-	public IconFont create(char c) {
-	    this.character = c;
-	    
-	    // reset other properties to default
-	    size = DEFAULT_ICON_SIZE;
-	    color = null;
-	    
-	    return this;
-	}
-	
-	public IconFont size(double size) {
+	public IconFont fontSize(double size) {
 	    this.size = size;
 	    return this;
 	}
 	
-	public IconFont color(Color color) {
+	public IconFont fontColor(Color color) {
 	    this.color = color;
 	    return this;
 	}
 	
-	public Node build() {
-	    return new Icon(character, size, color);
-	}
-	
-	
-	private class Icon extends Label {
-		
-		private final Character _character;
-		private final double _size;
-		private final Color _color;
-		
-		public Icon(Character character, double size, Color color) {
-			super(character.toString());
-			
-			this._character = character;
-			this._size = size;
-			this._color = color;
-			
-			StringBuilder css = new StringBuilder("-fx-font-family: "+ fontName +"; -fx-font-size: " + _size + ";");
-			if (color == null) {
-			    css.append("-icons-color: -fx-text-background-color;");
-			} else {
-			    css.append("-icons-color: rgb(");
-			    css.append((int)(_color.getRed()*255));
-			    css.append(",");
-			    css.append((int)(_color.getGreen()*255));
-			    css.append(",");
-			    css.append((int)(_color.getBlue())*255);
-			    css.append(");");
-			}
-		    setStyle(css.toString());
-		    getStyleClass().add("icon-font");
-		}
+	public Icon create(char character) {
+	    return new Icon(fontName, character, size, color);
 	}
 }

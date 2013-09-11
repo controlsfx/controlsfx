@@ -55,7 +55,7 @@ public final class IconFontRegistry {
 	
 	public static Node glyph( String fontName, String glyphName ) {
 		FontIconPack pack = pack(fontName);
-		return pack.getFont().create( pack.getGlyphs().get(glyphName)).build();
+		return pack.getFont().create(pack.getGlyphs().get(glyphName));
 	}
 	
 	public static Node glyph( String fontAndGlyph ) {

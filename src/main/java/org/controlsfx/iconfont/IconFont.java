@@ -26,6 +26,8 @@
  */
 package org.controlsfx.iconfont;
 
+import java.io.InputStream;
+
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
@@ -38,12 +40,12 @@ public class IconFont {
 	
 	private final String fontName;
 	
-	public IconFont( String fontName, java.io.InputStream in   ) {
+	public IconFont( String fontName, InputStream in   ) {
 		this.fontName = fontName;
 		Font.loadFont(in, DEFAULT_ICON_SIZE);
 	}
 	
-	public IconFont( String fontName, java.lang.String urlStr ) {
+	public IconFont( String fontName, String urlStr ) {
 		this.fontName = fontName;
 		Font.loadFont(urlStr, DEFAULT_ICON_SIZE);
 	}

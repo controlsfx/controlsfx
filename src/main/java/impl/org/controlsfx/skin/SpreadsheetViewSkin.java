@@ -155,7 +155,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
 
             y += tableHeaderRowHeight;
         } else {
-            // TODO try to hide the columnHeader
+            // FIXME try to hide the columnHeader
         }
 
         if (spreadsheetView.rowHeaderProperty().get()) {
@@ -246,14 +246,14 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
-            while (c.next()) {
+           /* while (c.next()) {
                 for (final Integer remitem : c.getRemoved()) {
                     getFlow().getFixedRows().remove(remitem);
                 }
                 for (final Integer additem : c.getAddedSubList()) {
                     getFlow().getFixedRows().add(additem);
                 }
-            }
+            }*/
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
@@ -267,21 +267,21 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
-            if (getFlow().getFixedColumns().size() > c.getList().size()) {
+            if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
                 for (int i = 0; i < getFlow().getCells().size(); ++i) {
                     ((SpreadsheetRow) getFlow().getCells().get(i))
                             .putFixedColumnToBack();
                 }
             }
 
-            while (c.next()) {
+            /*while (c.next()) {
                 for (final Integer remitem : c.getRemoved()) {
                     getFlow().getFixedColumns().remove(remitem);
                 }
                 for (final Integer additem : c.getAddedSubList()) {
                     getFlow().getFixedColumns().add(additem);
                 }
-            }
+            }*/
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
@@ -371,8 +371,8 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
      */
     private double getFixedColumnWidth() {
         double fixedColumnWidth = 0;
-        if (!getFlow().getFixedColumns().isEmpty()) {
-            for (int i = 0, max = getFlow().getFixedColumns().size(); i < max; ++i) {
+        if (!spreadsheetView.getFixedColumns().isEmpty()) {
+            for (int i = 0, max = spreadsheetView.getFixedColumns().size(); i < max; ++i) {
                 final TableColumnBase<DataRow, ?> c = getVisibleLeafColumn(i);
                 fixedColumnWidth += c.getWidth();
             }

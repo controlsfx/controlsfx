@@ -36,6 +36,7 @@ import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
@@ -70,15 +71,11 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
      */
     private int cellFixedAdded = 0;
     private boolean cellIndexCall = false;
-    /**
-     * The list of Columns fixed.It only contains the number of the colums,
-     * sorted.
-     */
-    private final ArrayList<Integer> fixedColumns = new ArrayList<Integer>();
+
     /**
      * The list of Rows fixed. It only contains the number of the rows, sorted.
      */
-    private final ArrayList<Integer> fixedRows = new ArrayList<Integer>();
+//    private final ArrayList<Integer> fixedRows = new ArrayList<Integer>();
     // private double scrollY = 0;
 
     /***************************************************************************
@@ -139,12 +136,8 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
         return returnValue;
     }
 
-    public ArrayList<Integer> getFixedColumns() {
-        return fixedColumns;
-    }
-
-    public ArrayList<Integer> getFixedRows() {
-        return fixedRows;
+    public ObservableList<Integer> getFixedRows() {
+        return spreadSheetView.getFixedRows();
     }
 
     public T getFirstVisibleCellWithinViewPort() {
@@ -230,7 +223,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
     }
 
     /**
-     * Return the index for a given cell. This allows subclasses to customise
+     * Return the index for a given cell. This allows subclasses to customize
      * how cell indices are retrieved.
      */
     @Override
@@ -300,8 +293,8 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
                 --cellToAdd;
             } else {
                 // If the remaining cells to add are in the header
-                if (!fixedRows.isEmpty() && cellToAdd <= fixedRows.size()) {
-                    final int realIndex = fixedRows.get(cellToAdd - 1);
+                if (!getFixedRows().isEmpty() && cellToAdd <= getFixedRows().size()) {
+                    final int realIndex = getFixedRows().get(cellToAdd - 1);
                     // System.out.println("JaddC"+realIndex+"/"+index);
                     cell = getAvailableCell(realIndex); // We grab the right one
                     setCellIndex(cell, realIndex); // the index is the real one
@@ -393,9 +386,9 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
             // I Added fillEmptyCells because it appears that when
             // AddtrailingCells is called from
             // adjustPixel, we add several time the rows in fixedHeader...
-            if (!fixedRows.isEmpty() && cellFixedAdded < fixedRows.size()
+            if (!getFixedRows().isEmpty() && cellFixedAdded < getFixedRows().size()
                     && fillEmptyCells) {
-                final int realIndex = fixedRows.get(cellFixedAdded);
+                final int realIndex = getFixedRows().get(cellFixedAdded);
                 // System.out.println("JaddD"+realIndex);
                 cell = getAvailableCell(realIndex); // We grab the right one
                 setCellIndex(cell, realIndex); // the index is the real one
@@ -441,7 +434,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
 
             // Quite impossible to add properly the FixedRows so I choose to
             // rebuild the view
-            if (!fixedRows.isEmpty()) {
+            if (!getFixedRows().isEmpty()) {
                 final int currentIndex = (int) (getPosition() * getCellCount());
                 ch.addAllToPile(this);
 

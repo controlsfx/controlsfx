@@ -31,14 +31,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataCell.CellType;
+import org.controlsfx.control.spreadsheet.model.Grid;
 
+/**
+ * You can generate some {@link DataCell} used by the {@link Grid}
+ * with the static method provided. 
+ * 
+ * Currently you can only create a textCell, listCell or a DateCell.
+ */
 public class SpreadsheetCells {
 
     private SpreadsheetCells() {
         // no-op
     }
 
+    /**
+     * Creates a cell that hold a String at the specified position, with 
+     * the specified row/column span.
+     * @param r row number
+     * @param c column number
+     * @param rs rowSpan (1 is normal)
+     * @param cs ColumnSpan (1 is normal)
+     * @param value the String to display
+     * @return
+     */
     public static DataCell<String> createTextCell(final int r, final int c,
             final int rs, final int cs, final String value) {
         return new DataCell<String>(r, c, rs, cs) {
@@ -77,6 +93,16 @@ public class SpreadsheetCells {
         };
     }
 
+	/**
+	 * Creates a cell that hold a list of String at the specified position, with 
+     * the specified row/column span.
+	 * @param r row number
+     * @param c column number
+     * @param rs rowSpan (1 is normal)
+     * @param cs ColumnSpan (1 is normal)
+	 * @param _value A list of String to display
+	 * @return
+	 */
     public static DataCell<List<String>> createListCell(final int r,
             final int c, final int rs, final int cs, final List<String> _value) {
         return new DataCell<List<String>>(r, c, rs, cs) {
@@ -126,6 +152,16 @@ public class SpreadsheetCells {
         };
     }
 
+    /**
+     * Creates a cell that hold a Date at the specified position, with 
+     * the specified row/column span.
+     * @param r row number
+     * @param c column number
+     * @param rs rowSpan (1 is normal)
+     * @param cs ColumnSpan (1 is normal)
+     * @param _value A {@link LocalDate}
+     * @return
+     */
     public static DataCell<LocalDate> createDateCell(final int r, final int c,
             final int rs, final int cs, final LocalDate _value) {
         return new DataCell<LocalDate>(r, c, rs, cs) {

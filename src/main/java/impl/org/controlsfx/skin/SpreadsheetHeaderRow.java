@@ -33,6 +33,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
@@ -145,30 +146,64 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
 			 updateTableWidth();
 		}
     };
+    
     /**
-     * When we fix/unfix some columns, the header must react accordingly TODO
-     * maybe modify and remove that "runLater" TODO But if if have not that
-     * "runLater", we call "layoutFixedColumns" too early..
+     * When we fix/unfix some columns, we change the style of the Label header text
      */
-    private final InvalidationListener fixedColumnsListener = new InvalidationListener() {
+    private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
+
+		@Override
+		public void onChanged(
+				javafx.collections.ListChangeListener.Change<? extends Integer> arg0) {
+			while(arg0.next()){
+				//If we unfix a column
+				for (Integer remitem : arg0.getRemoved()) {
+                   removeStyleHeader(remitem);
+                }
+				//If we fix one
+                for (Integer additem : arg0.getAddedSubList()) {
+                	addStyleHeader(additem);
+                }
+			}
+			 updateHighlighSelection();
+		}
+	}; 
+
+	/**
+	 * Add the fix style of the header Label of the specified column
+	 * @param i
+	 */
+	private void removeStyleHeader(Integer i) {
+        	getRootHeader().getColumnHeaders().get(i).getChildrenUnmodifiable().get(0).getStyleClass().removeAll("fixed");
+    }
+	/**
+	 * Remove the fix style of the header Label of the specified column
+	 * @param i
+	 */
+	private void addStyleHeader(Integer i) {
+            getRootHeader().getColumnHeaders().get((Integer) i)
+                    .getChildrenUnmodifiable().get(0).getStyleClass()
+                    .addAll("fixed");
+    }
+    private SpreadsheetViewSelectionModel<DataRow> selectionModel;
+    
+    
+    /**
+     * When we select some cells, we want the header to be highlighted
+     */
+    private final InvalidationListener selectionListener = new InvalidationListener() {
         @Override
         public void invalidated(Observable valueModel) {
-            getRootHeader().updateHeader();
-            getRootHeader().layoutFixedColumns();
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    updateHighlighSelection();
-                }
-            };
-            Platform.runLater(r);
+            updateHighlighSelection();
         }
     };
-
-    private SpreadsheetViewSelectionModel<DataRow> selectionModel;
+    
+    /**
+     * Highlight the header Label when selection change.
+     */
     private void updateHighlighSelection() {
-        for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-            i.getChildrenUnmodifiable().get(0).getStyleClass().clear();
+    	for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
+            i.getChildrenUnmodifiable().get(0).getStyleClass().removeAll("selected");
 
         }
         final List<Integer> selectedColumns = selectionModel
@@ -181,15 +216,6 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
         }
 
     }
-    /**
-     * When we select some cells, we want the header to be highlighted
-     */
-    private final InvalidationListener selectionListener = new InvalidationListener() {
-        @Override
-        public void invalidated(Observable valueModel) {
-            updateHighlighSelection();
-        }
-    };
 
     protected NestedTableColumnHeader createRootHeader() {
         return new SpreadsheetNestedTableColumnHeader(getTableSkin(), null);

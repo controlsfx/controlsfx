@@ -32,7 +32,6 @@ import java.io.Serializable;
  * The model cell that hold the data. It has all the information needed by the
  * View.
  * 
- * 
  */
 public abstract class DataCell<T> implements Serializable {
 
@@ -135,5 +134,12 @@ public abstract class DataCell<T> implements Serializable {
         }
     }
 
+    /**
+     * Verify that the upcoming cell value can be set to the current cell.
+     * If it's possible, the cell's value is changed.
+     * If not, nothing is done.
+     * This is currently used by the Copy/Paste.
+     * @param cell
+     */
     public abstract void match(DataCell<?> cell);
 }

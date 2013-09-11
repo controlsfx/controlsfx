@@ -103,6 +103,7 @@ SpreadsheetCell.fixed {
     -fx-text-fill: -fx-selection-bar-text;
     -fx-padding: 0.166667em;
     -fx-alignment: center;
+    -fx-font-style : normal;
 }  
 
 RowHeader > Label.selected,
@@ -116,5 +117,10 @@ Label.selected{
     -fx-padding: 0.166667em;
     -fx-alignment: center;
 }  
+
+/* FIXED COLUMNS  */
+TableColumnHeader > Label.fixed{
+	-fx-font-style : italic;
+}
     
 

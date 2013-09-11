@@ -354,12 +354,11 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
      * @param hover
      */
     private void hoverGridCell(DataCell<?> cell) {
-        //If the top of the spanned cell is visible, then no problem
         SpreadsheetCell<?> gridCell;
         
         final SpreadsheetView spv = getSpreadsheetView();
         final SpreadsheetRow row = spv.getRow(spv.getFixedRows().size());
-         
+        
         if (!spv.isEmptyCells() && row.getIndex() <= cell.getRow()) {
         	final SpreadsheetRow rightRow = spv.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need

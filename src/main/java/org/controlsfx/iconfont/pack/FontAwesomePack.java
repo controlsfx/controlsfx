@@ -30,17 +30,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.controlsfx.iconfont.IconFont;
-import org.controlsfx.iconfont.IconFontPack;
-import org.controlsfx.iconfont.IconFontRegistry;
-
 import javafx.scene.Node;
 
-public class FontAwesomePack implements IconFontPack {
+import org.controlsfx.iconfont.AbstractIconFontPack;
+import org.controlsfx.iconfont.IconFontRegistry;
+
+public class FontAwesomePack extends  AbstractIconFontPack {
 
 	private static String fontName = "FontAwesome";
-	private IconFont fontAwesome = new IconFont( fontName,
-	 	 "http://fontawesome.io/assets/font-awesome/font/fontawesome-webfont.ttf");
 	
 	private Map<String, Character> glyphs;
 	
@@ -444,21 +441,13 @@ public class FontAwesomePack implements IconFontPack {
 	// constructor shouldn't really be called multiple times...
 	public FontAwesomePack() {
 		
-		Map<String, Character> map = new HashMap<>();
+		super(fontName, "http://fontawesome.io/assets/font-awesome/font/fontawesome-webfont.ttf");
 		
+		Map<String, Character> map = new HashMap<>();
 		for (Glyph e:  Glyph.values()) {
 			map.put(e.name(), e.getChar());
 		}
-		
 		glyphs = Collections.unmodifiableMap(map);
-	}
-	
-	@Override public String getFontName() {
-		return fontName;
-	}
-
-	@Override public IconFont getFont() {
-		return fontAwesome;
 	}
 
 	@Override public Map<String, Character> getGlyphs() {

@@ -47,9 +47,9 @@ public final class IconFontRegistry {
 	    isInited = true;
 	    
 	    // find all classes that implement IconFontPack and register them now
-	    ServiceLoader<IconFontPack> ldr = ServiceLoader.load(IconFontPack.class);
-        for (IconFontPack fontPack : ldr) {
-            // no-op, just run to instantiate the pack
+	    ServiceLoader<IconFontPack> loader = ServiceLoader.load(IconFontPack.class);
+        for (IconFontPack fontPack : loader) {
+        	IconFontRegistry.register(fontPack);
         }
 	}
 	

@@ -446,8 +446,6 @@ public class FontAwesomePack implements IconFontPack {
 		for (Glyph e:  Glyph.values()) {
 			glyphs.put(e.name(), e.getChar());
 		}
-		
-		IconFontRegistry.register(this);
 	}
 	
 	@Override public String getFontName() {

@@ -41,7 +41,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.iconfont.IconFont;
-import org.controlsfx.iconfont.fontpack.FontAwesomePack;
+import org.controlsfx.iconfont.pack.FontAwesomePack;
 
 public class HelloIconFont extends Application implements Sample {
 

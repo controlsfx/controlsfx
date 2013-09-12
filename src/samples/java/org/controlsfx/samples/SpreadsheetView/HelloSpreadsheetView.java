@@ -84,7 +84,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 			
 		borderPane.setCenter(spreadSheetView);
 
-		borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane));
+		borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Both"));
 		
 		return borderPane;
 	}
@@ -92,11 +92,12 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	/**
 	 * Build a common control Grid with some options on the left to control the
 	 * SpreadsheetViewInternal
+	 * @param gridType 
 	 *
 	 * @param spreadsheetView
 	 * @return
 	 */
-	private GridPane buildCommonControlGrid(final SpreadsheetView spv,final BorderPane borderPane) {
+	private GridPane buildCommonControlGrid(final SpreadsheetView spv,final BorderPane borderPane, String gridType) {
 		final GridPane grid = new GridPane();
 		grid.setHgap(5);
 		grid.setVgap(5);
@@ -150,7 +151,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		});
 		//In order to change the span style more easily
 		final ChoiceBox<String> typeOfGrid = new ChoiceBox<String>(FXCollections.observableArrayList("Normal", "Both"));
-		typeOfGrid.setValue("Both");
+		typeOfGrid.setValue(gridType);
 		typeOfGrid.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>(){
 			@Override
 			public void changed(ObservableValue<? extends Number> arg0,
@@ -163,6 +164,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 					
 					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
 					borderPane.setCenter(spreadSheetView);
+					borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Normal"));
 				}else{
 					int rowCount = 50;
 					int columnCount = 10;
@@ -172,6 +174,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 					
 					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
 					borderPane.setCenter(spreadSheetView);
+					borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Both"));
 				}
 			}});
 		

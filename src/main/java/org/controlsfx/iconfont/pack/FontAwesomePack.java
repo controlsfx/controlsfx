@@ -42,7 +42,7 @@ public class FontAwesomePack implements IconFontPack {
 	private IconFont fontAwesome = new IconFont( fontName,
 	 	 "http://fontawesome.io/assets/font-awesome/font/fontawesome-webfont.ttf");
 	
-	private Map<String, Character> glyphs = new HashMap<>();
+	private Map<String, Character> glyphs;
 	
 	public static enum Glyph {
 
@@ -443,9 +443,14 @@ public class FontAwesomePack implements IconFontPack {
 	// FIXME only needs to be instantiated by the IconFontRegistry, so this
 	// constructor shouldn't really be called multiple times...
 	public FontAwesomePack() {
+		
+		Map<String, Character> map = new HashMap<>();
+		
 		for (Glyph e:  Glyph.values()) {
-			glyphs.put(e.name(), e.getChar());
+			map.put(e.name(), e.getChar());
 		}
+		
+		glyphs = Collections.unmodifiableMap(map);
 	}
 	
 	@Override public String getFontName() {
@@ -457,6 +462,6 @@ public class FontAwesomePack implements IconFontPack {
 	}
 
 	@Override public Map<String, Character> getGlyphs() {
-		return Collections.unmodifiableMap(glyphs);
+		return glyphs;
 	}
 }

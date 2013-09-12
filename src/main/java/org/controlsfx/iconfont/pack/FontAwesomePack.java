@@ -32,10 +32,10 @@ import java.util.Map;
 
 import javafx.scene.Node;
 
-import org.controlsfx.iconfont.AbstractIconFontPack;
+import org.controlsfx.iconfont.IconFontPack;
 import org.controlsfx.iconfont.IconFontRegistry;
 
-public class FontAwesomePack extends  AbstractIconFontPack {
+public class FontAwesomePack extends  IconFontPack {
 
 	private static String fontName = "FontAwesome";
 	

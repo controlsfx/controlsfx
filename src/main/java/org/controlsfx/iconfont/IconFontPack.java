@@ -26,10 +26,33 @@
  */
 package org.controlsfx.iconfont;
 
+import java.io.InputStream;
 import java.util.Map;
 
-public interface IconFontPack {
-	String getFontName();
-	IconFont getFont();
-	Map<String,Character> getGlyphs();
+public abstract class IconFontPack  {
+
+	private final String fontName;
+	private final IconFont font;
+	
+	public IconFontPack(String fontName, InputStream in) {
+		this.fontName = fontName;
+		this.font = new IconFont(fontName, in);
+	}
+
+	public IconFontPack( String fontName, String urlStr ) { 
+		this.fontName = fontName;
+		this.font = new IconFont(fontName, urlStr);
+	} 
+
+
+	public String getFontName() {
+		return fontName;
+	}
+
+	public IconFont getFont() {
+		return font;
+	}
+
+	public abstract Map<String, Character> getGlyphs();
+
 }

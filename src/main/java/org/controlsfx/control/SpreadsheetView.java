@@ -64,6 +64,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
@@ -235,6 +238,17 @@ public class SpreadsheetView extends Control {
         tableView.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
 
         setContextMenu(getSpreadsheetViewContextMenu());
+        
+        //Handle copy Paste action, quite naive right now..
+        this.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent arg0) {
+			if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
+				copyClipBoard();
+			else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
+				pasteClipboard();
+			}	
+		});
         
         setGrid(grid);
     }
@@ -620,14 +634,14 @@ public class SpreadsheetView extends Control {
         item1.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                putClipboard();
+                copyClipBoard();
             }
         });
         final MenuItem item2 = new MenuItem("Paste");
         item2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                getClipboard();
+                pasteClipboard();
             }
         });
         contextMenu.getItems().addAll(item1, item2);
@@ -637,7 +651,7 @@ public class SpreadsheetView extends Control {
     /**
      * Put the current selection into the ClipBoard
      */
-    private void putClipboard(){
+    private void copyClipBoard(){
         checkFormat();
 
         //		final ArrayList<ArrayList<DataCell>> temp = new ArrayList<>();
@@ -659,7 +673,7 @@ public class SpreadsheetView extends Control {
      * Try to paste the current selection into the Grid. If the two contents are
      * not matchable, then it's not pasted.
      */
-    private void getClipboard(){
+    private void pasteClipboard(){
         checkFormat();
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         if(clipboard.getContent(fmt) != null){

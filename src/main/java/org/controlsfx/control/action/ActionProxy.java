@@ -43,6 +43,6 @@ import java.lang.annotation.RetentionPolicy;
 public @interface ActionProxy {
 	String id() default "";
     String text();
-    String image() default "";
+    String graphic() default "";
     String longText() default "";
 }

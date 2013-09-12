@@ -73,7 +73,7 @@ public final class IconFontRegistry {
 	
 	public static Node glyph( String fontAndGlyph ) {
 	    init();
-		String[] args = fontAndGlyph.split(":");
+		String[] args = fontAndGlyph.split("\\|");
 		return glyph( args[0], args[1]);
 	}
 }

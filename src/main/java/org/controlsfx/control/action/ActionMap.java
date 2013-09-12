@@ -38,6 +38,7 @@ import java.util.Map;
 import org.controlsfx.iconfont.IconFontRegistry;
 
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -136,23 +137,32 @@ class AnnotatedAction extends AbstractAction {
 	public AnnotatedAction(ActionProxy annotation, Method method, Object target) {
 		super(annotation.text());
 		
-		String imageLocation = annotation.image().trim();
-		if ( !imageLocation.isEmpty()) {
-			if ( imageLocation.startsWith("@")) {
-			   this.setGraphic(IconFontRegistry.glyph(imageLocation.substring(1))); 	
-			} else {
-			   this.setGraphic(new ImageView(new Image(imageLocation)));
-			}
-		}
+		Node graphic = resolveGraphic(annotation);
+		this.setGraphic(graphic);
 		
 		String longText = annotation.longText().trim();
-		if ( !imageLocation.isEmpty()) {
+		if ( graphic != null ) {
 			this.setLongText(longText);
 		}
 		
 		this.method = method;
 		this.method.setAccessible(true);
 		this.target = target;
+	}
+	
+	private Node resolveGraphic( ActionProxy annotation ) {
+		String graphicDef = annotation.graphic().trim();
+		if ( !graphicDef.isEmpty()) {
+			
+			String[] def = graphicDef.split("\\>");  // cannot use ':' because it used in urls
+			if ( def.length == 1 ) return new ImageView(new Image(def[0]));
+			switch (def[0]) {
+			   case "font"    : return IconFontRegistry.glyph(def[1]);  
+			   case "image"   : return new ImageView(new Image(def[1]));
+			   default: throw new IllegalArgumentException( String.format("Unknown ActionProxy graphic protocol: %s", def[0]));
+			}
+		}
+		return null;
 	}
 	
 	public Object getTarget() {

@@ -51,9 +51,9 @@ public class HelloIconFont extends Application implements Sample {
 	private IconFont icoMoon = new IconFont("icomoon", getClass()
 			.getResourceAsStream("icomoon.ttf"));
 
-	private static char FAW_TRASH = '\uf014';
+//	private static char FAW_TRASH = '\uf014';
 	private static char FAW_GEAR  = '\uf013';
-	private static char FAW_STAR  = '\uf005';
+//	private static char FAW_STAR  = '\uf005';
 
 	private static char IM_BOLD        = '\ue027';
 	private static char IM_UNDERSCORED = '\ue02b';
@@ -85,9 +85,9 @@ public class HelloIconFont extends Application implements Sample {
 		Label title = new Label("Using FontAwesome(CDN)");
 		root.getChildren().add(title);
 		ToolBar toolbar = new ToolBar(
-				new Button("", glyph("FontAwesome:TRASH")), 
+				new Button("", glyph("FontAwesome|TRASH")), 
 				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)), 
-				new Button("", glyph("FontAwesome:STAR")),
+				new Button("", glyph("FontAwesome|STAR")),
 				new Button("", FontAwesomePack.Glyph.ANCHOR.create()));
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");

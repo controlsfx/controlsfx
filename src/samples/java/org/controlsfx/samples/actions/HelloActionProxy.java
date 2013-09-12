@@ -84,52 +84,52 @@ public class HelloActionProxy extends Application implements Sample {
 		);
 	}
     
-    @ActionProxy(text="Action 1.1", image=imagePath)
+    @ActionProxy(text="Action 1.1", graphic=imagePath)
     private void action11() {
     	 System.out.println( "Action 1.1 is executed");
     }
     
-    @ActionProxy(text="Action 1.2", image=imagePath)
+    @ActionProxy(text="Action 1.2", graphic="http://icons.iconarchive.com/icons/custom-icon-design/mini-3/16/teacher-male-icon.png") 
     private void action12() {
     	 System.out.println( "Action 1.2 is executed");
     }
     
-    @ActionProxy(text="Action 2.1", image=imagePath)
+    @ActionProxy(text="Action 2.1", graphic=imagePath)
     private void action21() {
     	 System.out.println( "Action 2.1 is executed");
     }
     
-    @ActionProxy(text="Action 2.2", image=imagePath)
+    @ActionProxy(text="Action 2.2", graphic=imagePath)
     private void action22() {
     	 System.out.println( "Action 2.2 is executed");
     }
     
-    @ActionProxy(text="Action 2.2.1", image=imagePath)
+    @ActionProxy(text="Action 2.2.1", graphic=imagePath)
     private void action221() {
     	 System.out.println( "Action 2.2,1 is executed");
     }
     
-    @ActionProxy(text="Action 2.2.2", image=imagePath)
+    @ActionProxy(text="Action 2.2.2", graphic=imagePath)
     private void action222() {
     	 System.out.println( "Action 2.2.2 is executed");
     }   
     
-    @ActionProxy(text="Action 2.3", image=imagePath)
+    @ActionProxy(text="Action 2.3", graphic=imagePath)
     private void action23() {
     	 System.out.println( "Action 2.3 is executed");
     }
     
-    @ActionProxy(text="Action 3", image="@FontAwesome:STAR")
+    @ActionProxy(text="Action 3", graphic="font>FontAwesome|STAR")
     private void action3() {
     	 System.out.println( "Action 3 is executed");
     }    
     
-    @ActionProxy(text="Action 4.1", image=imagePath)
+    @ActionProxy(text="Action 4.1", graphic=imagePath)
     private void action41() {
     	 System.out.println( "Action 4.1 is executed");
     }
     
-    @ActionProxy(text="Action 4.2", image=imagePath)
+    @ActionProxy(text="Action 4.2", graphic=imagePath)
     private void action42() {
     	 System.out.println( "Action 4.2 is executed");
     }    

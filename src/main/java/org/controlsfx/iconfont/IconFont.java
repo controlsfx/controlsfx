@@ -49,12 +49,12 @@ public class IconFont {
 	
 	public IconFont( String fontName, InputStream in   ) {
 		this.fontName = fontName;
-		Font.loadFont(in, DEFAULT_ICON_SIZE);
+		Font.loadFont(in, -1);
 	}
 	
 	public IconFont( String fontName, String urlStr ) {
 		this.fontName = fontName;
-		Font.loadFont(urlStr, DEFAULT_ICON_SIZE);
+		Font.loadFont(urlStr, -1);
 	}
 	
 	public IconFont fontSize(double size) {

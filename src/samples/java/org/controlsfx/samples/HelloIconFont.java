@@ -41,14 +41,14 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.iconfont.IconFont;
+import org.controlsfx.iconfont.IconFontRegistry;
 import org.controlsfx.iconfont.pack.FontAwesomePack;
 
 public class HelloIconFont extends Application implements Sample {
 
-	private IconFont fontAwesome = new IconFont("FontAwesome",
-			"http://fontawesome.io/assets/font-awesome/font/fontawesome-webfont.ttf");
+	private IconFont fontAwesome = IconFontRegistry.pack("FontAwesome").getFont();
 
-	private IconFont icoMoon = new IconFont("icomoon", getClass()
+	private IconFont icoMoon = new IconFont("icomoon", 16, getClass()
 			.getResourceAsStream("icomoon.ttf"));
 
 //	private static char FAW_TRASH = '\uf014';
@@ -86,9 +86,10 @@ public class HelloIconFont extends Application implements Sample {
 		root.getChildren().add(title);
 		ToolBar toolbar = new ToolBar(
 				new Button("", glyph("FontAwesome|TRASH")), 
-				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)), 
 				new Button("", glyph("FontAwesome|STAR")),
-				new Button("", FontAwesomePack.Glyph.ANCHOR.create()));
+				new Button("", FontAwesomePack.Glyph.ANCHOR.create()),
+				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)) 
+        );
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);

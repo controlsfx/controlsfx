@@ -441,7 +441,7 @@ public class FontAwesomePack extends  IconFontPack {
 	// constructor shouldn't really be called multiple times...
 	public FontAwesomePack() {
 		
-		super(fontName, "http://fontawesome.io/assets/font-awesome/font/fontawesome-webfont.ttf");
+		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf" ); 
 		
 		Map<String, Character> map = new HashMap<>();
 		for (Glyph e:  Glyph.values()) {

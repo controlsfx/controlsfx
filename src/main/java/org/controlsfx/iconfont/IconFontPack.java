@@ -34,14 +34,14 @@ public abstract class IconFontPack  {
 	private final String fontName;
 	private final IconFont font;
 	
-	public IconFontPack(String fontName, InputStream in) {
+	public IconFontPack(String fontName, int defaultSize, InputStream in) {
 		this.fontName = fontName;
-		this.font = new IconFont(fontName, in);
+		this.font = new IconFont(fontName, defaultSize, in);
 	}
 
-	public IconFontPack( String fontName, String urlStr ) { 
+	public IconFontPack( String fontName, int defaultSize, String urlStr ) { 
 		this.fontName = fontName;
-		this.font = new IconFont(fontName, urlStr);
+		this.font = new IconFont(fontName, defaultSize, urlStr);
 	} 
 
 

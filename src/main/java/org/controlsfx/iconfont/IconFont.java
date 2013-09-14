@@ -40,21 +40,28 @@ public class IconFont {
                 IconFont.class.getResource("iconfont.css").toExternalForm());
     }
 
-	private static double DEFAULT_ICON_SIZE = 16.0;
-	
 	private final String fontName;
 	
-	private double size = DEFAULT_ICON_SIZE;
+	private final double defaultSize;
+	private double size;
 	private Color color;
 	
-	public IconFont( String fontName, InputStream in   ) {
+	public IconFont( String fontName, int defaultSize, InputStream in   ) {
 		this.fontName = fontName;
+		this.defaultSize = defaultSize;
+		this.size = defaultSize;
 		Font.loadFont(in, -1);
 	}
 	
-	public IconFont( String fontName, String urlStr ) {
+	public IconFont( String fontName, int defaultSize, String urlStr ) {
 		this.fontName = fontName;
+		this.defaultSize = defaultSize;
+		this.size = defaultSize;
 		Font.loadFont(urlStr, -1);
+	}
+	
+	public double getDefaultSize() {
+		return defaultSize;
 	}
 	
 	public IconFont fontSize(double size) {

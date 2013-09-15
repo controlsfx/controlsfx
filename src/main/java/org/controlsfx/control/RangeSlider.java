@@ -153,12 +153,11 @@ public class RangeSlider extends Control {
      **************************************************************************/
     
     /**
-     * For now we force the developer to set the min/max/low/high values in the
-     * other RangeSlider constructor, as this method is private
+     * Creates a new RangeSlider instance using default values of 0.0, 0.25, 0.75
+     * and 1.0 for min/lowValue/highValue/max, respectively. 
      */
-    @SuppressWarnings("unused")
-    private RangeSlider() {
-        // no-op
+    public RangeSlider() {
+        this(0, 1.0, 0.25, 0.75);
     }
 
     /**

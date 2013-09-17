@@ -41,14 +41,14 @@ public abstract class DataCell<T> implements Serializable {
     private static final long serialVersionUID = -7648169794403402662L;
 
     public static enum CellType {
-        STRING, ENUM, NUMBER, READ_ONLY, DATE, SPLITTER;
+        STRING, ENUM, NUMBER, DATE, SPLITTER;
     }
     /***************************************************************************
      * * Private Fields * *
      **************************************************************************/
     private String styleCss;
-
-    protected CellType type;
+    private Boolean editable;
+	protected CellType type;
     protected String str;
     private int row, column, rowSpan, columnSpan;
 
@@ -62,6 +62,7 @@ public abstract class DataCell<T> implements Serializable {
         rowSpan = rs;
         columnSpan = cs;
         str = "";
+        editable = true;
     }
 
     /***************************************************************************
@@ -121,6 +122,13 @@ public abstract class DataCell<T> implements Serializable {
         this.styleCss = style;
     }
 
+    public Boolean getEditable() {
+		return editable;
+	}
+
+	public void setEditable(Boolean readOnly) {
+		this.editable = readOnly;
+	}
     /**
      * @param cell
      * @return

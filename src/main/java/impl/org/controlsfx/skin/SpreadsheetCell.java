@@ -305,10 +305,7 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
     public void show(final DataCell<?> item){
         //We reset the settings
         setText(item.getStr());
-        this.setEditable(true);
-        if (item.getCellType().equals(DataCell.CellType.SPLITTER) || item.getCellType().equals(DataCell.CellType.READ_ONLY)){
-            this.setEditable(false);
-        }
+        this.setEditable(item.getEditable());
 
         // Style
         final ObservableList<String> css = getStyleClass();

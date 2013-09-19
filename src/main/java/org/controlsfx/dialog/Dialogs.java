@@ -796,11 +796,11 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.PROGRESS);
         dlg.setClosable(false);
         
+        final Label label = new Label();
+        label.textProperty().bind(worker.messageProperty());
         final WorkerProgressPane content = new WorkerProgressPane(dlg);
         content.setMaxWidth(Double.MAX_VALUE);
 
-        Label label = new Label(message == null ? "Progress:" : message);
-        label.textProperty().bind(worker.messageProperty());
         VBox vbox = new VBox(10, label, content);
         vbox.setMaxWidth(Double.MAX_VALUE);
         

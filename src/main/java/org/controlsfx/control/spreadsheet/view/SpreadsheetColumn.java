@@ -9,6 +9,7 @@ import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -68,7 +69,7 @@ public class SpreadsheetColumn{
 	public SpreadsheetColumn(TableColumn<DataRow, DataCell<?>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
-		column.setPrefWidth(100);
+//		column.setPrefWidth(100);
 		this.indexColumn = indexColumn;
 //		this.columnSpanConstraint = 0;
 //		this.columnSpanConstraint = 0;
@@ -149,7 +150,21 @@ public class SpreadsheetColumn{
 	public void setPrefWidth(double arg0){
 		column.setPrefWidth(arg0);
 	}
+	/**
+	 * Return the Actual width of the column
+	 * @return
+	 */
+	public double getWidth(){
+		return column.getWidth();
+	}
 	
+	/**
+	 * If this column can be resized by the user
+	 * @param b
+	 */
+	public void setResizable(boolean b){
+		column.setResizable(b);
+	}
 	
 	public Boolean getCurrentlyFixed() {
 		return currentlyFixed;

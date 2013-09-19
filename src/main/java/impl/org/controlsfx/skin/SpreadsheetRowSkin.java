@@ -303,9 +303,9 @@ public class SpreadsheetRowSkin<T extends DataRow>
                         for (int i = 1, colSpan = cellSpan.getColumnSpan(), max1 = getChildren()
                                 .size() - column; i < colSpan && i < max1; i++) {
                             // calculate the width
-                            final Node adjacentNode = (Node) getChildren().get(
-                                    column + i);
-                            width += snapSize(adjacentNode.prefWidth(-1));
+//                            final Node adjacentNode = (Node) getChildren().get(
+//                                    column + i);
+                            width += snapSize(spreadsheetView.getColumns().get(column+i).getWidth());//adjacentNode.maxWidth(-1));
                         }
                     }
 

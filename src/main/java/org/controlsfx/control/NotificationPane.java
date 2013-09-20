@@ -29,6 +29,7 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.NotificationPaneSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,6 +39,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -145,7 +149,39 @@ import org.controlsfx.control.action.Action;
  */
 public class NotificationPane extends Control {
     
+    /***************************************************************************
+     * 
+     * Static fields
+     * 
+     **************************************************************************/
+    
     public static final String STYLE_CLASS_DARK = "dark";
+    
+    /**
+     * Called when the NotificationPane <b>will</b> be shown.
+     */
+    public static final EventType<Event> ON_SHOWING =
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWING");
+
+    /**
+     * Called when the NotificationPane shows.
+     */
+    public static final EventType<Event> ON_SHOWN =
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWN");
+
+    /**
+     * Called when the NotificationPane <b>will</b> be hidden.
+     */
+    public static final EventType<Event> ON_HIDING =
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDING");
+
+    /**
+     * Called when the NotificationPane is hidden.
+     */
+    public static final EventType<Event> ON_HIDDEN =
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDDEN");
+    
+    
     
     /***************************************************************************
      * 
@@ -175,64 +211,8 @@ public class NotificationPane extends Control {
      *      <strong>will not</strong>appear in the notification bar. 
      */
     public NotificationPane(Node content) {
-        this(content, "");
-    }
-    
-    /**
-     * Creates an instance of NotificationPane with the 
-     * {@link #contentProperty() content} and {@link #textProperty() text} 
-     * property set, but no {@link #graphicProperty() graphic} property set, and
-     * no {@link #getActions() actions} specified.
-     * 
-     * @param content The content to show in the NotificationPane behind where
-     *      the notification bar will appear, that is, the content 
-     *      <strong>will not</strong>appear in the notification bar. 
-     * @param text The text to show in the notification pane.
-     */
-    public NotificationPane(Node content, String text) {
-        this(content, text, null);
-    }
-    
-    /**
-     * Creates an instance of NotificationPane with the 
-     * {@link #contentProperty() content}, {@link #textProperty() text} and 
-     * {@link #graphicProperty() graphic} properties set, but no 
-     * {@link #getActions() actions} specified.
-     * 
-     * @param content The content to show in the NotificationPane behind where
-     *      the notification bar will appear, that is, the content 
-     *      <strong>will not</strong>appear in the notification bar. 
-     * @param text The text to show in the notification pane.
-     * @param graphic The node to show in the notification pane.
-     */
-    public NotificationPane(Node content, String text, Node graphic) {
-        this(content, text, graphic, (Action[])null);
-    }
-    
-    /**
-     * Creates an instance of NotificationPane with the 
-     * {@link #contentProperty() content}, {@link #textProperty() text} and 
-     * {@link #graphicProperty() graphic} property set, and the provided actions 
-     * copied into the {@link #getActions() actions} list.
-     * 
-     * @param content The content to show in the NotificationPane behind where
-     *      the notification bar will appear, that is, the content 
-     *      <strong>will not</strong>appear in the notification bar. 
-     * @param text The text to show in the notification pane.
-     * @param graphic The node to show in the notification pane.
-     * @param actions The actions to show in the notification pane.
-     */
-    public NotificationPane(Node content, String text, Node graphic, Action... actions) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setContent(content);
-        setText(text);
-        setGraphic(graphic);
-        if (actions != null) {
-            for (Action action : actions) {
-                if (action == null) continue;
-                getActions().add(action);
-            }
-        }
     }
     
     
@@ -377,6 +357,62 @@ public class NotificationPane extends Control {
     }
     
     
+    // --- On Showing
+    public final ObjectProperty<EventHandler<Event>> onShowingProperty() { return onShowing; }
+    /**
+     * Called just prior to the {@code NotificationPane} being shown.
+     */
+    public final void setOnShowing(EventHandler<Event> value) { onShowingProperty().set(value); }
+    public final EventHandler<Event> getOnShowing() { return onShowingProperty().get(); }
+    private ObjectProperty<EventHandler<Event>> onShowing = new SimpleObjectProperty<EventHandler<Event>>(this, "onShowing") {
+        @Override protected void invalidated() {
+            setEventHandler(ON_SHOWING, get());
+         }
+     };
+
+
+    // -- On Shown
+    public final ObjectProperty<EventHandler<Event>> onShownProperty() { return onShown; }
+    /**
+     * Called just after the {@link NotificationPane} is shown.
+     */
+    public final void setOnShown(EventHandler<Event> value) { onShownProperty().set(value); }
+    public final EventHandler<Event> getOnShown() { return onShownProperty().get(); }
+    private ObjectProperty<EventHandler<Event>> onShown = new SimpleObjectProperty<EventHandler<Event>>(this, "onShown") {
+        @Override protected void invalidated() {
+            setEventHandler(ON_SHOWN, get());
+        }
+    };
+
+
+    // --- On Hiding
+    public final ObjectProperty<EventHandler<Event>> onHidingProperty() { return onHiding; }
+    /**
+     * Called just prior to the {@link NotificationPane} being hidden.
+     */
+    public final void setOnHiding(EventHandler<Event> value) { onHidingProperty().set(value); }
+    public final EventHandler<Event> getOnHiding() { return onHidingProperty().get(); }
+    private ObjectProperty<EventHandler<Event>> onHiding = new SimpleObjectProperty<EventHandler<Event>>(this, "onHiding") {
+        @Override protected void invalidated() {
+            setEventHandler(ON_HIDING, get());
+        }
+    };
+
+
+    // --- On Hidden
+    public final ObjectProperty<EventHandler<Event>> onHiddenProperty() { return onHidden; }
+    /**
+     * Called just after the {@link NotificationPane} has been hidden.
+     */
+    public final void setOnHidden(EventHandler<Event> value) { onHiddenProperty().set(value); }
+    public final EventHandler<Event> getOnHidden() { return onHiddenProperty().get(); }
+    private ObjectProperty<EventHandler<Event>> onHidden = new SimpleObjectProperty<EventHandler<Event>>(this, "onHidden") {
+        @Override protected void invalidated() {
+            setEventHandler(ON_HIDDEN, get());
+        }
+    };
+    
+    
     
     /***************************************************************************
      * 
@@ -407,12 +443,101 @@ public class NotificationPane extends Control {
     }
     
     /**
+     * Shows the NotificationPane with the 
+     * {@link #contentProperty() content} and {@link #textProperty() text} 
+     * property set, but no {@link #graphicProperty() graphic} property set, and
+     * no {@link #getActions() actions} specified.
+     * 
+     * @param text The text to show in the notification pane.
+     */
+    public void show(final String text) {
+        hideAndThen(new Runnable() {
+            @Override public void run() {
+                setText(text);
+                setShowing(true);
+            }
+        });
+    }
+    
+    /**
+     * Shows the NotificationPane with the 
+     * {@link #contentProperty() content}, {@link #textProperty() text} and 
+     * {@link #graphicProperty() graphic} properties set, but no 
+     * {@link #getActions() actions} specified.
+     * 
+     * @param text The text to show in the notification pane.
+     * @param graphic The node to show in the notification pane.
+     */
+    public void show(final String text, final Node graphic) {
+        hideAndThen(new Runnable() {
+            @Override public void run() {
+                setText(text);
+                setGraphic(graphic);
+                setShowing(true);
+            }
+        });
+    }
+    
+    /**
+     * Shows the NotificationPane with the 
+     * {@link #contentProperty() content}, {@link #textProperty() text} and 
+     * {@link #graphicProperty() graphic} property set, and the provided actions 
+     * copied into the {@link #getActions() actions} list.
+     * 
+     * @param text The text to show in the notification pane.
+     * @param graphic The node to show in the notification pane.
+     * @param actions The actions to show in the notification pane.
+     */
+    public void show(final String text, final Node graphic, final Action... actions) {
+        hideAndThen(new Runnable() {
+            @Override public void run() {
+                setText(text);
+                setGraphic(graphic);
+
+                if (actions == null) {
+                    getActions().clear();
+                } else {
+                    for (Action action : actions) {
+                        if (action == null) continue;
+                        getActions().add(action);
+                    }
+                }
+                
+                setShowing(true);
+            }
+        });
+    }
+    
+    /**
      * Call this to make the notification bar disappear from the 
      * {@link #contentProperty() content} of this {@link NotificationPane}.
      * If the notification bar is already hidden this will be a no-op.
      */
     public void hide() {
         setShowing(false);
+    }
+    
+    
+    
+    /**************************************************************************
+     *                                                                         *
+     * Private Implementation                                                  *
+     *                                                                         *
+     **************************************************************************/
+    
+    private void hideAndThen(final Runnable r) {
+        if (isShowing()) {
+            final EventHandler<Event> eventHandler = new EventHandler<Event>() {
+                @Override public void handle(Event e) {
+                    r.run();
+                    removeEventHandler(NotificationPane.ON_HIDDEN, this);
+                }
+            };
+            addEventHandler(NotificationPane.ON_HIDDEN, eventHandler);
+            hide();
+        } else {
+            r.run();
+        }
     }
     
     

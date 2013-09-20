@@ -35,18 +35,21 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.TextFields;
 import org.controlsfx.control.action.AbstractAction;
 
 public class HelloNotificationPane extends Application implements Sample {
     
     private NotificationPane notificationPane;
     private CheckBox cbUseDarkTheme;
+    private TextField textField;
     
     public static void main(String[] args) {
         launch(args);
@@ -103,9 +106,17 @@ public class HelloNotificationPane extends Application implements Sample {
             }
         });
         
+        textField = new TextField();
+        textField.setPromptText("Type text to display and press Enter");
+        textField.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent arg0) {
+                notificationPane.show(textField.getText());
+            }
+        });
+        
         VBox root = new VBox(10);
         root.setPadding(new Insets(50, 0, 0, 10));
-        root.getChildren().addAll(showBtn, cbSlideFromTop, cbUseDarkTheme);
+        root.getChildren().addAll(showBtn, cbSlideFromTop, cbUseDarkTheme, textField);
         
         notificationPane.setContent(root);
         updateBar();

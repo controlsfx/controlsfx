@@ -130,6 +130,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
             y += tableHeaderRowHeight;
         } else {
             // FIXME try to hide the columnHeader
+        	// FIXME tweak open in RT-32673
         }
 
         if (spreadsheetView.showRowHeaderProperty().get()) {
@@ -159,7 +160,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         final int row = fm.getFocusedIndex();
         // We try to make visible the rows that may be hiden by Fixed rows
         if (!getFlow().getCells().isEmpty()
-                && getFlow().getCell(0 + getFlow().getFixedRows().size())
+                && getFlow().getCells().get(getFlow().getFixedRows().size())
                         .getIndex() > row
                 && !getFlow().getFixedRows().contains(row)) {
             flow.scrollTo(row);
@@ -182,7 +183,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         final int row = fm.getFocusedIndex();
         // We try to make visible the rows that may be hiden by Fixed rows
         if (!getFlow().getCells().isEmpty()
-                && getFlow().getCell(0 + getFlow().getFixedRows().size())
+                && getFlow().getCells().get(getFlow().getFixedRows().size())
                         .getIndex() > row
                 && !getFlow().getFixedRows().contains(row)) {
             flow.scrollTo(row);
@@ -196,7 +197,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     }
     @Override
     protected void onSelectPreviousCell() {
-        super.onFocusPreviousCell();
+        super.onSelectPreviousCell();
         scrollHorizontally();
     }
 

@@ -507,9 +507,8 @@ public class SpreadsheetView extends Control {
      * @return
      */
     private SpreadsheetRow getNonFixedRow(int index){
-//        return cells.get(fixedRows.size()+index);
         SpreadsheetViewSkin skin = (SpreadsheetViewSkin) tableView.getSkin();
-        return skin.getCell(index);
+        return skin.getCell(fixedRows.size()+index);
     }
 
     /**
@@ -1331,7 +1330,7 @@ public class SpreadsheetView extends Control {
             //spreadsheetView.scrollTo(posFinal.getRow());
             //		spreadsheetView.scrollToColumnIndex(posFinal.getColumn());
 
-            //We try to make visible the rows that may be hiden by Fixed rows
+            //We try to make visible the rows that may be hidden by Fixed rows
             // We don't want to do any scroll behavior when dragging
             if(!drag && SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRowsList().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());

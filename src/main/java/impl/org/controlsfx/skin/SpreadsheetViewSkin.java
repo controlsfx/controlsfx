@@ -383,8 +383,6 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     }
     
     public static SpreadsheetRow getCell(SpreadsheetView spv, int index) {
-        TableView<DataRow> tableView = (TableView<DataRow>) spv.getSkin().getNode();
-        SpreadsheetViewSkin spvSkin = (SpreadsheetViewSkin) tableView.getSkin();
-        return spvSkin.getCell(index);
+        return getSkin(spv).getCell(index);
     }
 }

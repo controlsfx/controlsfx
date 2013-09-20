@@ -42,7 +42,6 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.TextFields;
 import org.controlsfx.control.action.AbstractAction;
 
 public class HelloNotificationPane extends Application implements Sample {

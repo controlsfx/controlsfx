@@ -26,20 +26,20 @@
  */
 package org.controlsfx.control.spreadsheet.view;
 
-import impl.org.controlsfx.skin.SpreadsheetCell;
-import impl.org.controlsfx.skin.SpreadsheetRow;
+import impl.org.controlsfx.skin.SpreadsheetCellImpl;
+import impl.org.controlsfx.skin.SpreadsheetRowImpl;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.property.editor.PropertyEditor;
 
 /**
  * 
  * Mother Class for all the possible editors displayed in the
- * {@link SpreadsheetCell}. It reacts to all the possible events in order to
+ * {@link SpreadsheetCellImpl}. It reacts to all the possible events in order to
  * submit or cancel the displayed editor or the value entered.
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
@@ -50,8 +50,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
     // transient properties - these fields will change based on the current
     // cell being edited.
-    protected DataCell<T> modelCell;
-    protected SpreadsheetCell<T> viewCell;
+    protected SpreadsheetCell<T> modelCell;
+    protected SpreadsheetCellImpl<T> viewCell;
     protected SpreadsheetView spreadsheetView;
 
     // private internal fields
@@ -73,11 +73,11 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
      * * Public Methods * *
      **************************************************************************/
 
-    public void updateDataCell(DataCell<T> cell) {
+    public void updateDataCell(SpreadsheetCell<T> cell) {
         this.modelCell = cell;
     }
 
-    public void updateSpreadsheetCell(SpreadsheetCell<T> cell) {
+    public void updateSpreadsheetCell(SpreadsheetCellImpl<T> cell) {
         this.viewCell = cell;
     }
 
@@ -147,22 +147,22 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
     protected abstract void cancelEdit();
 
-    protected abstract DataCell<T> commitEdit();
+    protected abstract SpreadsheetCell<T> commitEdit();
 
     private class SpreadsheetEditor<A> {
 
         /***********************************************************************
          * * Private Fields * *
          **********************************************************************/
-        private SpreadsheetRow original;
+        private SpreadsheetRowImpl original;
         private boolean isMoved;
 
         private int getCellCount() {
             return SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize();
         }
         
-        private boolean addCell(SpreadsheetCell<?> cell){
-            SpreadsheetRow temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows());
+        private boolean addCell(SpreadsheetCellImpl<?> cell){
+            SpreadsheetRowImpl temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows());
             if(temp != null){
                 temp.addCell(cell);
                 return true;
@@ -177,7 +177,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
             // Case when RowSpan if larger and we're not on the last row
             if (modelCell != null && modelCell.getRowSpan() > 1
                     && modelCell.getRow() != getCellCount() - 1) {
-                original = (SpreadsheetRow) viewCell.getTableRow();
+                original = (SpreadsheetRowImpl) viewCell.getTableRow();
 
                 final double temp = viewCell.getLocalToSceneTransform().getTy();
                 isMoved = addCell(viewCell);

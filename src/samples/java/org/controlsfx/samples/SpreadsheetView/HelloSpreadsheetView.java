@@ -50,10 +50,10 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.GridBase;
-import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 import org.controlsfx.samples.Utils;
 
 /**
@@ -215,9 +215,9 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	}
 
 	private void normalGrid(GridBase grid) {
-		ArrayList<ObservableList<DataCell>> rows = new ArrayList<ObservableList<DataCell>>(grid.getRowCount());
+		ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<ObservableList<SpreadsheetCell>>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
-			final ObservableList<DataCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
+			final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
 			for (int column = 0; column < grid.getColumnCount(); ++column) {
 				dataRow.add(generateCell(row, column, 1, 1));
 			}
@@ -235,8 +235,8 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	 * @param colSpan
 	 * @return
 	 */
-	private DataCell<?> generateCell(int row, int column, int rowSpan, int colSpan) {
-		DataCell<?> cell;
+	private SpreadsheetCell<?> generateCell(int row, int column, int rowSpan, int colSpan) {
+		SpreadsheetCell<?> cell;
 		final double random = Math.random();
 		if (random < 0.3) {
 			List<String> stringList = Arrays.asList("Banana","Apple","Mango","Cherry","Watermelon");

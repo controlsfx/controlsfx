@@ -50,10 +50,10 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.GridBase;
-import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 
 /**
  *
@@ -180,9 +180,9 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 	 * @param grid
 	 */
 	private void blankGrid(GridBase grid) {
-		ArrayList<ObservableList<DataCell>> rows = new ArrayList<ObservableList<DataCell>>(grid.getRowCount());
+		ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<ObservableList<SpreadsheetCell>>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
-			final ObservableList<DataCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
+			final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
 			for (int column = 0; column < grid.getColumnCount(); ++column) {
 				dataRow.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
 			}

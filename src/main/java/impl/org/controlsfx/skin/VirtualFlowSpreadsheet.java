@@ -42,7 +42,7 @@ import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
@@ -50,9 +50,9 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
         extends
             VirtualFlow<T> {
-    private static final Comparator<SpreadsheetRow> ROWCMP = new Comparator<SpreadsheetRow>() {
+    private static final Comparator<SpreadsheetRowImpl> ROWCMP = new Comparator<SpreadsheetRowImpl>() {
         @Override
-        public int compare(SpreadsheetRow o1, SpreadsheetRow o2) {
+        public int compare(SpreadsheetRowImpl o1, SpreadsheetRowImpl o2) {
             final int lhs = o1.getIndex();
             final int rhs = o2.getIndex();
             return lhs < rhs ? -1 : +1;
@@ -231,7 +231,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
             cellIndexCall = false;
             return cell.getIndex();
         } else {
-            return ((SpreadsheetRow) cell).getIndexVirtualFlow();
+            return ((SpreadsheetRowImpl) cell).getIndexVirtualFlow();
         }
     }
 
@@ -520,7 +520,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
     private void setCellIndexVirtualFlow(T cell, int index) {
         if (cell == null) { return; }
 
-        ((SpreadsheetRow) cell).setIndexVirtualFlow(index);
+        ((SpreadsheetRowImpl) cell).setIndexVirtualFlow(index);
     }
 
     /**
@@ -530,7 +530,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
         sortRows();
         if (!getCells().isEmpty() && !getFixedRows().isEmpty()) {
             for (int i = getFixedRows().size() - 1; i >= 0; --i) {
-                SpreadsheetRow cell = (SpreadsheetRow) getCells().get(i);
+                SpreadsheetRowImpl cell = (SpreadsheetRowImpl) getCells().get(i);
                 if (cell != null && getFixedRows().contains(cell.getIndex())) {
                     cell.toFront();
                     cell.requestLayout();
@@ -543,10 +543,10 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
      * Sort the rows so that they stay in order for layout
      */
     private void sortRows() {
-        final List<SpreadsheetRow> temp = (List<SpreadsheetRow>) getCells();
-        final List<SpreadsheetRow> tset = new ArrayList<>(temp);
+        final List<SpreadsheetRowImpl> temp = (List<SpreadsheetRowImpl>) getCells();
+        final List<SpreadsheetRowImpl> tset = new ArrayList<>(temp);
         Collections.sort(tset, ROWCMP);
-        for (final TableRow<ObservableList<DataCell>> r : tset) {
+        for (final TableRow<ObservableList<SpreadsheetCell>> r : tset) {
             r.toFront();
         }
     }

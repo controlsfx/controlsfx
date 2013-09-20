@@ -38,11 +38,11 @@ import javafx.scene.control.TableView;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.TableRowSkin;
 
-public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends TableRowSkin<ObservableList<DataCell>> {
+public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell>> extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     static final double DEFAULT_CELL_SIZE;
     static {
         double cell_size = 24.0;
@@ -68,13 +68,13 @@ public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends Tabl
     }
     
     SpreadsheetView spreadsheetView;
-    private TableView<ObservableList<DataCell>> tableView;
+    private TableView<ObservableList<SpreadsheetCell>> tableView;
     
-    public SpreadsheetRowSkin(TableRow<ObservableList<DataCell>> tableRow,
+    public SpreadsheetRowSkin(TableRow<ObservableList<SpreadsheetCell>> tableRow,
             SpreadsheetView spreadsheetView) {
         super(tableRow);
         this.spreadsheetView = spreadsheetView;
-        this.tableView = (TableView<ObservableList<DataCell>>) spreadsheetView.getSkin().getNode();
+        this.tableView = (TableView<ObservableList<SpreadsheetCell>>) spreadsheetView.getSkin().getNode();
     }
 
     /**
@@ -108,7 +108,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends Tabl
          */
         // I put that at the very beginning in the hope that I will not have
         // that extra row at the bottom layouting.
-        final TableRow<ObservableList<DataCell>> control = (TableRow<ObservableList<DataCell>>) getSkinnable();
+        final TableRow<ObservableList<SpreadsheetCell>> control = (TableRow<ObservableList<SpreadsheetCell>>) getSkinnable();
         final int index = control.getIndex();
         if (index < 0 || index >= tableView.getItems().size()) {
             control.setOpacity(0);
@@ -180,9 +180,9 @@ public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends Tabl
         double fixedColumnWidth = 0;
         for (int column = 0; column < cells.size(); column++) {
 
-            final SpreadsheetCell<?> tableCell = (SpreadsheetCell<?>) cells
+            final SpreadsheetCellImpl<?> tableCell = (SpreadsheetCellImpl<?>) cells
                     .get(column);
-            final TableColumnBase<ObservableList<DataCell>, ?> tableColumn = getTableColumnBase(tableCell);
+            final TableColumnBase<ObservableList<SpreadsheetCell>, ?> tableColumn = getTableColumnBase(tableCell);
 
             // show(tableCell);
 
@@ -234,7 +234,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends Tabl
                 }
                 // System.out.println("Je layout"+index+"/"+column );
 
-                final DataCell<?> cellSpan = ((ObservableList<DataCell>) tableView.getItems().get(index)).get(column);
+                final SpreadsheetCell<?> cellSpan = ((ObservableList<SpreadsheetCell>) tableView.getItems().get(index)).get(column);
                 final SpreadsheetView.SpanType spanType = spreadsheetView
                         .getSpanType(index, column);
 
@@ -259,15 +259,15 @@ public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends Tabl
                         // To be sure that the text is the same
                         // in case we modified the DataCell after that
                         // SpreadsheetCell was created
-                        final SpreadsheetViewSelectionModel<ObservableList<DataCell>> sm = spreadsheetView
+                        final SpreadsheetViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
                                 .getSelectionModel();
-                        final TableColumn<ObservableList<DataCell>, ?> col = tableView.getColumns().get(column);
+                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableView.getColumns().get(column);
 
                         // In case this cell was selected before but we scroll
                         // up/down and it's invisible now.
                         // It has to pass his "selected property" to the new
                         // Cell in charge of spanning
-                        final TablePosition<ObservableList<DataCell>, ?> selectedPosition = sm
+                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm
                                 .isSelectedRange(index, col, column);
                         if (selectedPosition != null
                                 && selectedPosition.getRow() != index) { // If

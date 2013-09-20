@@ -47,7 +47,7 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpanType;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditors;
 
@@ -57,9 +57,9 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
 /**
  *
  * The View cell that will be visible on screen.
- * It holds the {@link DataRow} and the {@link DataCell}.
+ * It holds the {@link DataRow} and the {@link SpreadsheetCell}.
  */
-public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, DataCell<T>> {
+public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell<T>> {
 
     /***************************************************************************
      *                                                                         *
@@ -77,8 +77,8 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
     
-    private static final Map<DataCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
-    private static SpreadsheetCell<?> lastHover = null;
+    private static final Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
+    private static SpreadsheetCellImpl<?> lastHover = null;
     
     
     /***************************************************************************
@@ -86,7 +86,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-    public SpreadsheetCell() {
+    public SpreadsheetCellImpl() {
 
     	hoverProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -182,7 +182,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
      * @return
      */
     @SuppressWarnings("unchecked")
-    private SpreadsheetCellEditor<?> getEditor(final DataCell<T> cell, final SpreadsheetView spv) {
+    private SpreadsheetCellEditor<?> getEditor(final SpreadsheetCell<T> cell, final SpreadsheetView spv) {
         SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
         if (editor == null) {
             switch (cell.getCellType()) {
@@ -216,7 +216,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
     
 
     @Override
-    public void commitEdit(DataCell<T> newValue) {
+    public void commitEdit(SpreadsheetCell<T> newValue) {
         if (! isEditing()) {
             return;
         }
@@ -248,7 +248,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
     }
 
     @Override
-    public void updateItem(final DataCell<T> item, boolean empty) {
+    public void updateItem(final SpreadsheetCell<T> item, boolean empty) {
         final boolean emptyRow = getTableView().getItems().size() < getIndex() + 1;
 
         /**
@@ -288,7 +288,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
         this.setHover(hover);
         // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
         //Otherwise it's will not be visible
-        ((SpreadsheetRow) this.getTableRow()).setHoverPublic(hover);
+        ((SpreadsheetRowImpl) this.getTableRow()).setHoverPublic(hover);
     }
 
     @Override
@@ -301,7 +301,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
      * This allow not to override opacity in the row and let the
      * cell handle itself
      */
-    public void show(final DataCell<?> item){
+    public void show(final SpreadsheetCell<?> item){
         //We reset the settings
         setText(item.getStr());
         this.setEditable(item.getEditable());
@@ -340,7 +340,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
      **************************************************************************/
     
     private SpreadsheetView getSpreadsheetView() {
-        return ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
+        return ((SpreadsheetRowImpl)getTableRow()).getSpreadsheetView();
     }
     
     /**
@@ -349,14 +349,14 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
      * @param cell The DataCell needed to be hovered.
      * @param hover
      */
-    private void hoverGridCell(DataCell<?> cell) {
-        SpreadsheetCell<?> gridCell;
+    private void hoverGridCell(SpreadsheetCell<?> cell) {
+        SpreadsheetCellImpl<?> gridCell;
         
         final SpreadsheetView spv = getSpreadsheetView();
-        final SpreadsheetRow row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRowsList().size());
+        final SpreadsheetRowImpl row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRowsList().size());
         
         if (SpreadsheetViewSkin.getSkin(spv).getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
-        	final SpreadsheetRow rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRowsList().size()+cell.getRow() - row.getIndex());
+        	final SpreadsheetRowImpl rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRowsList().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need
             // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
             if( rightRow != null) {// Sometime when scrolling fast it's null so..
@@ -394,7 +394,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
             return;
         }
 
-        final TableView<ObservableList<DataCell>> tableView = getTableView();
+        final TableView<ObservableList<SpreadsheetCell>> tableView = getTableView();
         if (tableView == null) {
             return;
         }
@@ -404,7 +404,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
             return;
         }
 
-        final TableSelectionModel<ObservableList<DataCell>> sm = tableView.getSelectionModel();
+        final TableSelectionModel<ObservableList<SpreadsheetCell>> sm = tableView.getSelectionModel();
         if (sm == null) {
             return;
         }
@@ -412,7 +412,7 @@ public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, Data
         final int row = getIndex();
         final int column = tableView.getVisibleLeafIndex(getTableColumn());
         // For spanned Cells
-        final DataCell<?> cell = (DataCell<?>) getItem();
+        final SpreadsheetCell<?> cell = (SpreadsheetCell<?>) getItem();
         final int rowCell = cell.getRow()+cell.getRowSpan()-1;
         final int columnCell = cell.getColumn()+cell.getColumnSpan()-1;
 

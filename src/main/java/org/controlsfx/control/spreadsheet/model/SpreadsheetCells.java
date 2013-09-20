@@ -24,17 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.spreadsheet.view;
+package org.controlsfx.control.spreadsheet.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.Grid;
-
 /**
- * You can generate some {@link DataCell} used by the {@link Grid}
+ * You can generate some {@link SpreadsheetCell} used by the {@link Grid}
  * with the static method provided. 
  * 
  * Currently you can only create a textCell, listCell or a DateCell.
@@ -55,9 +52,9 @@ public class SpreadsheetCells {
      * @param value the String to display
      * @return
      */
-    public static DataCell<String> createTextCell(final int r, final int c,
+    public static SpreadsheetCell<String> createTextCell(final int r, final int c,
             final int rs, final int cs, final String value) {
-        return new DataCell<String>(r, c, rs, cs) {
+        return new SpreadsheetCell<String>(r, c, rs, cs) {
 
             /*******************************************************************
              * * Static Fields * *
@@ -86,7 +83,7 @@ public class SpreadsheetCells {
             }
 
             @Override
-            public void match(DataCell<?> cell) {
+            public void match(SpreadsheetCell<?> cell) {
                 setStr(cell.getStr());
             }
 
@@ -103,9 +100,9 @@ public class SpreadsheetCells {
 	 * @param _value A list of String to display
 	 * @return
 	 */
-    public static DataCell<List<String>> createListCell(final int r,
+    public static SpreadsheetCell<List<String>> createListCell(final int r,
             final int c, final int rs, final int cs, final List<String> _value) {
-        return new DataCell<List<String>>(r, c, rs, cs) {
+        return new SpreadsheetCell<List<String>>(r, c, rs, cs) {
             /***************************************************************************
              * * Static Fields * *
              **************************************************************************/
@@ -144,7 +141,7 @@ public class SpreadsheetCells {
             }
 
             @Override
-            public void match(DataCell<?> cell) {
+            public void match(SpreadsheetCell<?> cell) {
                 if (value.contains(cell.getStr())) {
                     setStr(cell.getStr());
                 }
@@ -162,9 +159,9 @@ public class SpreadsheetCells {
      * @param _value A {@link LocalDate}
      * @return
      */
-    public static DataCell<LocalDate> createDateCell(final int r, final int c,
+    public static SpreadsheetCell<LocalDate> createDateCell(final int r, final int c,
             final int rs, final int cs, final LocalDate _value) {
-        return new DataCell<LocalDate>(r, c, rs, cs) {
+        return new SpreadsheetCell<LocalDate>(r, c, rs, cs) {
 
             /***************************************************************************
              * * Static Fields * *
@@ -201,7 +198,7 @@ public class SpreadsheetCells {
             }
 
             @Override
-            public void match(DataCell<?> cell) {
+            public void match(SpreadsheetCell<?> cell) {
                 try {
                     LocalDate temp = LocalDate.parse(
                             cell.getStr()

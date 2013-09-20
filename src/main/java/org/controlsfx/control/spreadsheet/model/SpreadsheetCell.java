@@ -33,18 +33,25 @@ import java.io.Serializable;
  * View.
  * 
  */
-public abstract class DataCell<T> implements Serializable {
+public abstract class SpreadsheetCell<T> implements Serializable {
 
     /***************************************************************************
-     * * Static Fields * *
+     * 
+     * Static Fields
+     * 
      **************************************************************************/
     private static final long serialVersionUID = -7648169794403402662L;
 
     public static enum CellType {
         STRING, ENUM, NUMBER, DATE, SPLITTER;
     }
+    
+    
+    
     /***************************************************************************
-     * * Private Fields * *
+     * 
+     * Private Fields
+     * 
      **************************************************************************/
     private String styleCss;
     private Boolean editable;
@@ -52,11 +59,15 @@ public abstract class DataCell<T> implements Serializable {
     protected String str;
     private int row, column, rowSpan, columnSpan;
 
+    
+    
     /***************************************************************************
-     * * Constructor * *
+     * 
+     * Constructor
+     * 
      **************************************************************************/
 
-    public DataCell(int r, int c, int rs, int cs) {
+    public SpreadsheetCell(int r, int c, int rs, int cs) {
         row = r;
         column = c;
         rowSpan = rs;
@@ -64,9 +75,34 @@ public abstract class DataCell<T> implements Serializable {
         str = "";
         editable = true;
     }
-
+    
+    
+    
     /***************************************************************************
-     * * Public Methods * *
+    *
+    * Abstract Methods
+    * 
+    **************************************************************************/
+
+    public abstract void setCellValue(T value);
+
+    public abstract T getCellValue();
+    
+    /**
+     * Verify that the upcoming cell value can be set to the current cell.
+     * If it's possible, the cell's value is changed.
+     * If not, nothing is done.
+     * This is currently used by the Copy/Paste.
+     * @param cell
+     */
+    public abstract void match(SpreadsheetCell<?> cell);
+    
+    
+    
+    /***************************************************************************
+     *
+     * Public Methods
+     * 
      **************************************************************************/
 
     public void setStr(String str) {
@@ -76,10 +112,6 @@ public abstract class DataCell<T> implements Serializable {
     public String getStr() {
         return str;
     }
-
-    public abstract void setCellValue(T value);
-
-    public abstract T getCellValue();
 
     public CellType getCellType() {
         return type;
@@ -129,11 +161,12 @@ public abstract class DataCell<T> implements Serializable {
 	public void setEditable(Boolean readOnly) {
 		this.editable = readOnly;
 	}
+	
     /**
      * @param cell
      * @return
      */
-    public boolean equals(DataCell<?> cell) {
+    public boolean equals(SpreadsheetCell<?> cell) {
         if (cell != null && cell.getRow() == row && cell.getColumn() == column
                 && cell.getStr().equals(str)) {
             return true;
@@ -141,13 +174,4 @@ public abstract class DataCell<T> implements Serializable {
             return false;
         }
     }
-
-    /**
-     * Verify that the upcoming cell value can be set to the current cell.
-     * If it's possible, the cell's value is changed.
-     * If not, nothing is done.
-     * This is currently used by the Copy/Paste.
-     * @param cell
-     */
-    public abstract void match(DataCell<?> cell);
 }

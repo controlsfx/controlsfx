@@ -38,7 +38,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -186,7 +186,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
                     .getChildrenUnmodifiable().get(0).getStyleClass()
                     .addAll("fixed");
     }
-    private SpreadsheetViewSelectionModel<ObservableList<DataCell>> selectionModel;
+    private SpreadsheetViewSelectionModel<ObservableList<SpreadsheetCell>> selectionModel;
     
     
     /**

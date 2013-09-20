@@ -36,14 +36,14 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 
 /**
  *
  * The tableRow which will holds the SpreadsheetCell.
  */
-public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
+public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell>>{
 
     /***************************************************************************
      *                                                                         *
@@ -64,7 +64,7 @@ public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-    public SpreadsheetRow(SpreadsheetView spreadsheetView) {
+    public SpreadsheetRowImpl(SpreadsheetView spreadsheetView) {
         super();
         this.spreadsheetView = spreadsheetView;
     }
@@ -106,11 +106,11 @@ public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
             @Override
             public int compare(Node o1, Node o2) {
                 // In case it's null (some rows are initiated after rowCount)
-                if(((SpreadsheetCell<?>)o1).getItem() == null || ((SpreadsheetCell<?>)o2).getItem() == null){
+                if(((SpreadsheetCellImpl<?>)o1).getItem() == null || ((SpreadsheetCellImpl<?>)o2).getItem() == null){
                     return -1;
                 }
-                final int lhs = getTableView().getColumns().indexOf(((SpreadsheetCell<?>) o1).getTableColumn());
-                final int rhs = getTableView().getColumns().indexOf(((SpreadsheetCell<?>) o2).getTableColumn());
+                final int lhs = getTableView().getColumns().indexOf(((SpreadsheetCellImpl<?>) o1).getTableColumn());
+                final int rhs = getTableView().getColumns().indexOf(((SpreadsheetCellImpl<?>) o2).getTableColumn());
                 if (lhs < rhs) {
                     return -1;
                 }
@@ -125,11 +125,11 @@ public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
     }
 
 
-    public void addCell(SpreadsheetCell<?> cell){
+    public void addCell(SpreadsheetCellImpl<?> cell){
         getChildren().add(cell);
     }
 
-    public void removeCell(SpreadsheetCell<?> gc) {
+    public void removeCell(SpreadsheetCellImpl<?> gc) {
         getChildren().remove(gc);
     }
 
@@ -158,13 +158,13 @@ public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
      * @param col
      * @return the corresponding SpreadsheetCell
      */
-    SpreadsheetCell<?> getGridCell(int col){
+    SpreadsheetCellImpl<?> getGridCell(int col){
     	
     	// We compute the number of cells set at the end
     	//aka the fixed columns that have moved.
  		final int max = getChildrenUnmodifiable().size()-1;
  		int j = max;
- 		while(j>= 0 && ((SpreadsheetCell<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
+ 		while(j>= 0 && ((SpreadsheetCellImpl<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
  			--j;
  		}
  		
@@ -175,12 +175,12 @@ public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
         	//if the requested column is fixed
             if(spreadsheetView.getColumns().get(col).getCurrentlyFixed()){
             	final int indexCol = spreadsheetView.getFixedColumns().indexOf(col);
-                return (SpreadsheetCell<?>) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() + indexCol - fixedColSize);
+                return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() + indexCol - fixedColSize);
             } else {
-                return (SpreadsheetCell<?>) getChildrenUnmodifiable().get( col- fixedColSize );
+                return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get( col- fixedColSize );
             }
         }else{
-            return (SpreadsheetCell<?>) getChildrenUnmodifiable().get(col);
+            return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get(col);
         }
     }
 

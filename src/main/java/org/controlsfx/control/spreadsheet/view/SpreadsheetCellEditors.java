@@ -43,7 +43,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.controlsfx.control.spreadsheet.model.DataCell;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 public class SpreadsheetCellEditors {
 
@@ -110,7 +110,7 @@ public class SpreadsheetCellEditors {
              **************************************************************************/
 
             @Override
-            public void updateDataCell(DataCell<String> cell) {
+            public void updateDataCell(SpreadsheetCell<String> cell) {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
@@ -132,7 +132,7 @@ public class SpreadsheetCellEditors {
             }
 
             @Override
-            protected DataCell<String> commitEdit() {
+            protected SpreadsheetCell<String> commitEdit() {
                 this.modelCell.setStr(tf.getText());
                 return modelCell;
             }
@@ -238,7 +238,7 @@ public class SpreadsheetCellEditors {
              **************************************************************************/
 
             @Override
-            public void updateDataCell(DataCell<List<String>> cell) {
+            public void updateDataCell(SpreadsheetCell<List<String>> cell) {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
@@ -270,7 +270,7 @@ public class SpreadsheetCellEditors {
             }
 
             @Override
-            protected DataCell<List<String>> commitEdit() {
+            protected SpreadsheetCell<List<String>> commitEdit() {
                 if (cb.getSelectionModel().getSelectedIndex() != -1) {
                     this.modelCell.setStr(cb.getItems().get(
                             cb.getSelectionModel().getSelectedIndex()));
@@ -386,7 +386,7 @@ public class SpreadsheetCellEditors {
              **************************************************************************/
 
             @Override
-            public void updateDataCell(DataCell<LocalDate> cell) {
+            public void updateDataCell(SpreadsheetCell<LocalDate> cell) {
                 super.updateDataCell(cell);
                 datePicker.setValue(cell.getCellValue());
             }
@@ -410,8 +410,8 @@ public class SpreadsheetCellEditors {
             }
 
             @Override
-            protected DataCell<LocalDate> commitEdit() {
-                final DataCell<LocalDate> temp = (DataCell<LocalDate>) this.modelCell;
+            protected SpreadsheetCell<LocalDate> commitEdit() {
+                final SpreadsheetCell<LocalDate> temp = (SpreadsheetCell<LocalDate>) this.modelCell;
 
                 temp.setCellValue(datePicker.getValue());
                 return modelCell;

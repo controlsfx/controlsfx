@@ -31,7 +31,7 @@ import javafx.collections.ObservableList;
 import org.controlsfx.control.SpreadsheetView;
 
 /**
- * That class holds some {@link DataRow} filled with {@link DataCell} in order
+ * That class holds some {@link DataRow} filled with {@link SpreadsheetCell} in order
  * to be used by the {@link SpreadsheetView}
  */
 public interface Grid {
@@ -53,7 +53,7 @@ public interface Grid {
      * Return a list of the {@link DataRow} used by the Grid.
      * @return
      */
-    public ObservableList<ObservableList<DataCell>> getRows();
+    public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
     
 }

@@ -84,7 +84,7 @@ public class HelloActionProxy extends Application implements Sample {
 		);
 	}
     
-    @ActionProxy(text="Action 1.1", graphic=imagePath)
+    @ActionProxy(text="Action 1.1", graphic=imagePath, accelerator="ctrl+shift+T")
     private void action11() {
     	 System.out.println( "Action 1.1 is executed");
     }

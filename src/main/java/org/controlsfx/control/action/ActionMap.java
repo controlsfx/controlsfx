@@ -41,6 +41,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCombination;
 
 /**
  * Action Map provides an ability to create an action map of any object.
@@ -135,15 +136,25 @@ class AnnotatedAction extends AbstractAction {
 	private Object target;
 
 	public AnnotatedAction(ActionProxy annotation, Method method, Object target) {
+	    // set text
 		super(annotation.text());
 		
+		// set graphic
 		Node graphic = resolveGraphic(annotation);
 		this.setGraphic(graphic);
 		
+		// set long text / tooltip
 		String longText = annotation.longText().trim();
 		if ( graphic != null ) {
 			this.setLongText(longText);
 		}
+		
+		// set accelerator
+		String acceleratorText = annotation.accelerator().trim();
+		if (acceleratorText != null && ! acceleratorText.isEmpty()) {
+		    this.setAccelerator(KeyCombination.keyCombination(acceleratorText));
+		}
+		
 		
 		this.method = method;
 		this.method.setAccessible(true);

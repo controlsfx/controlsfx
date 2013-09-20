@@ -592,6 +592,7 @@ public class ActionUtils {
         // button bind to action properties
         btn.textProperty().bind(action.textProperty());
         btn.disableProperty().bind(action.disabledProperty());
+        btn.acceleratorProperty().bind(action.acceleratorProperty());
         
         btn.graphicProperty().bind(new ObjectBinding<Node>() {
             { bind(action.graphicProperty()); }

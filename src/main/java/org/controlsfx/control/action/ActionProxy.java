@@ -45,4 +45,11 @@ public @interface ActionProxy {
     String text();
     String graphic() default "";
     String longText() default "";
+    
+    /**
+     * Accepts string values such as "ctrl+shift+T" to represent the keyboard
+     * shortcut for this action. By default this is empty if there is no keyboard
+     * shortcut desired for this action.
+     */
+    String accelerator() default "";
 }

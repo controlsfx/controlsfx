@@ -32,7 +32,8 @@ import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to allow conversion of class methods to {@link Action}  
+ * Annotation to allow conversion of class methods to {@link Action}.
+ * 
  * @param id action id
  * @param text action text, required
  * @param image action image 
@@ -41,9 +42,28 @@ import java.lang.annotation.RetentionPolicy;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ActionProxy {
+    
+    /**
+     * By default the method name that this annotation is applied to, but if not
+     * null then this ID is what you use when requesting the {@link Action} out
+     * of the {@link ActionMap} when using the {@link ActionMap#action(String)}
+     * method.
+     */
 	String id() default "";
+	
+	/**
+	 * The text that should be set in {@link Action#textProperty()}.
+	 */
     String text();
+    
+    /**
+     * The graphic that should be set in {@link Action#graphicProperty()}.
+     */
     String graphic() default "";
+    
+    /**
+     * The text that should be set in {@link Action#longTextProperty()}.
+     */
     String longText() default "";
     
     /**

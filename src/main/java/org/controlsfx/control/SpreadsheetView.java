@@ -153,8 +153,6 @@ public class SpreadsheetView extends Control {
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
-    private final BooleanProperty columnHeader = new SimpleBooleanProperty(true);
-    private final BooleanProperty rowHeader = new SimpleBooleanProperty(true);
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private VirtualScrollBar hbar=null;
@@ -237,51 +235,51 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/
 
-    // FIXME this shouldn't be here!
-    /**
-     * Not for public use.
-     * @return
-     */
-    public VirtualScrollBar getHbar() {
-        return hbar;
-    }
-
-    // FIXME this shouldn't be here!
-    /**
-     * Not for public use.
-     * @return
-     */
-    public void setHbar(VirtualScrollBar hbar) {
-        this.hbar = hbar;
-    }
-
-    // FIXME this shouldn't be here!
-    /**
-     * Not for public use.
-     * @return
-     */
-    public VirtualScrollBar getVbar() {
-        return vbar;
-    }
-
-    // FIXME this shouldn't be here!
-    /**
-     * Not for public use.
-     * @return
-     */
-    public void setVbar(VirtualScrollBar vbar) {
-        this.vbar = vbar;
-    }
-
-    // FIXME this shouldn't be here!
-    /**
-     * Not for public use.
-     * @return
-     */
-    public boolean isEmptyCells() {
-//        return cells.isEmpty();
-        return grid.getRows().isEmpty();
-    }
+//    // FIXME this shouldn't be here!
+//    /**
+//     * Not for public use.
+//     * @return
+//     */
+//    public VirtualScrollBar getHbar() {
+//        return hbar;
+//    }
+//
+//    // FIXME this shouldn't be here!
+//    /**
+//     * Not for public use.
+//     * @return
+//     */
+//    public void setHbar(VirtualScrollBar hbar) {
+//        this.hbar = hbar;
+//    }
+//
+//    // FIXME this shouldn't be here!
+//    /**
+//     * Not for public use.
+//     * @return
+//     */
+//    public VirtualScrollBar getVbar() {
+//        return vbar;
+//    }
+//
+//    // FIXME this shouldn't be here!
+//    /**
+//     * Not for public use.
+//     * @return
+//     */
+//    public void setVbar(VirtualScrollBar vbar) {
+//        this.vbar = vbar;
+//    }
+//
+//    // FIXME this shouldn't be here!
+//    /**
+//     * Not for public use.
+//     * @return
+//     */
+//    public boolean isEmptyCells() {
+////        return cells.isEmpty();
+//        return grid.getRows().isEmpty();
+//    }
 
     /**
      * Return a {@link TablePosition} of cell being currently edited.
@@ -298,13 +296,23 @@ public class SpreadsheetView extends Control {
     public ObservableList<SpreadsheetColumn> getColumns(){
 		return columns;
     }
-    /**
-     * Return the number of rows in the model.
-     * @return
-     */
-    public int getModelRowCount(){
-    	return grid.getRowCount();
-    }
+//    /**
+//     * Return the number of rows in the model.
+//     * @return
+//     */
+//    public int getModelRowCount(){
+//    	return grid.getRowCount();
+//    }
+//    
+// // FIXME this shouldn't be here!
+//    /**
+//     * Return the number of rows actually visible on screen.
+//     * @return
+//     */
+//    public final int getRowCount(){
+//        return grid.getRowCount();
+////        return cells.size();
+//    }
 
     /**
      * Return the model Grid used by the SpreadsheetView
@@ -313,37 +321,53 @@ public class SpreadsheetView extends Control {
     public final Grid getGrid(){
         return grid;
     }
+    
+    
+    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader");
+    
     /**
      * Activate and deactivate the Column Header
      * @param b
      */
-    public final void setColumnHeader(final boolean b){
+    public final void setShowColumnHeader(final boolean b){
         //TODO Need to do that again
         //flow.recreateCells(); // Because otherwise we have at the bottom
-        columnHeader.setValue(b);
+        showColumnHeader.setValue(b);
+    }
+    
+    public final boolean isShowColumnHeader() {
+        return showColumnHeader.get();
     }
 
     /**
      * BooleanProperty associated with the column Header.
      * @return
      */
-    public final BooleanProperty columnHeaderProperty() {
-        return columnHeader;
+    public final BooleanProperty showColumnHeaderProperty() {
+        return showColumnHeader;
     }
 
+    
+    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader");
+    
     /**
      * Activate and deactivate the Row Header
      * @param b
      */
-    public final void setRowHeader(final boolean b){
-        rowHeader.setValue(b);
+    public final void setShowRowHeader(final boolean b){
+        showRowHeader.setValue(b);
     }
+    
+    public final boolean isShowRowHeader() {
+        return showRowHeader.get();
+    }
+    
     /**
      * BooleanProperty associated with the row Header.
      * @return
      */
-    public final BooleanProperty rowHeaderProperty() {
-        return rowHeader;
+    public final BooleanProperty showRowHeaderProperty() {
+        return showRowHeader;
     }
 
     /**
@@ -453,17 +477,6 @@ public class SpreadsheetView extends Control {
         return tableView.getItems();
     }
     
-    // FIXME this shouldn't be here!
-    /**
-     * Return the number of rows actually visible on screen.
-     * @return
-     */
-    public final int getRowCount(){
-        return grid.getRowCount();
-//        return cells.size();
-    }
-    
-
     /**
      * Return the {@link SpreadsheetRow} at the specified index
      * @param index
@@ -849,7 +862,7 @@ public class SpreadsheetView extends Control {
             case ROW_INVISIBLE:
             default:
                 final DataCell<?> cellSpan = tableView.getItems().get(row).getCell(col);
-                if (!isEmptyCells() && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
+                if (!grid.getRows().isEmpty() && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
                     return new TablePosition<>(tableView, cellSpan.getRow(), tableView.getColumns().get(cellSpan.getColumn()));
 
                 } else { // If it's not, then it's the firstkey
@@ -876,18 +889,19 @@ public class SpreadsheetView extends Control {
          * Make the tableView move when selection operating outside bounds
          */
         private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
+            @Override public void handle(ActionEvent event) {
+                SpreadsheetViewSkin skin = SpreadsheetViewSkin.getSkin(spreadsheetView);
+                
                 if (mouseEvent != null && !tableView.contains(mouseEvent.getX(), mouseEvent.getY())) {
                     if(mouseEvent.getSceneX() < tableView.getLayoutX()) {
-                        spreadsheetView.getHbar().decrement();
+                        skin.getHBar().decrement();
                     }else if(mouseEvent.getSceneX() > tableView.getLayoutX()+tableView.getWidth()){
-                        spreadsheetView.getHbar().increment();
+                        skin.getHBar().increment();
                     }
                     else if(mouseEvent.getSceneY() < tableView.getLayoutY()) {
-                        spreadsheetView.getVbar().decrement();
+                        skin.getVBar().decrement();
                     }else if(mouseEvent.getSceneY() > tableView.getLayoutY()+tableView.getHeight()) {
-                        spreadsheetView.getVbar().increment();
+                        skin.getVBar().increment();
                     }
                 }
             }
@@ -1301,7 +1315,7 @@ public class SpreadsheetView extends Control {
 
             //We try to make visible the rows that may be hiden by Fixed rows
             // We don't want to do any scroll behavior when dragging
-            if(!drag && !spreadsheetView.isEmptyCells() && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
+            if(!drag && !spreadsheetView.getGrid().getRows().isEmpty() && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());
             }
 

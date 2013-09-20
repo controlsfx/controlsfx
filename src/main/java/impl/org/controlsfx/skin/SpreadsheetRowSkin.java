@@ -201,7 +201,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
              * FOR FIXED COLUMNS
              */
             double tableCellX = 0;
-            final double hbarValue = spreadsheetView.getHbar().getValue();
+            final double hbarValue = SpreadsheetViewSkin.getSkin(spreadsheetView).getHBar().getValue();
             // We translate that column by the Hbar Value if it's fixed
             if (spreadsheetView.getColumns().get(column).isFixed()) {
                 

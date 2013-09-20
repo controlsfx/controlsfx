@@ -68,7 +68,7 @@ public class SpreadsheetNestedTableColumnHeader extends NestedTableColumnHeader 
      */
     public void layoutFixedColumns() {
     	final SpreadsheetView spreadsheetView = ((SpreadsheetViewSkin) getTableViewSkin()).spreadsheetView;
-        double hbarValue = spreadsheetView.getHbar().getValue();
+        double hbarValue = SpreadsheetViewSkin.getSkin(spreadsheetView).getHBar().getValue();
         
         final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
         double fixedColumnWidth = 0;

@@ -152,7 +152,7 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
         	 */
         	if(row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
-	        	for (int j = 0; j<spv.getRowCount();j++ ) {
+	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin(spv).getCellsSize();j++ ) {
 	                    if(SpreadsheetViewSkin.getCell(spv, j) == getTableRow()){
 	                    	flag = true;
 	                    }
@@ -359,7 +359,7 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
         final SpreadsheetView spv = getSpreadsheetView();
         final SpreadsheetRow row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size());
         
-        if (!spv.isEmptyCells() && row.getIndex() <= cell.getRow()) {
+        if (!spv.getGrid().getRows().isEmpty() && row.getIndex() <= cell.getRow()) {
         	final SpreadsheetRow rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need
             // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)

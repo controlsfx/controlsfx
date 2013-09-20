@@ -26,168 +26,34 @@
  */
 package org.controlsfx.control.spreadsheet.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.controlsfx.control.SpreadsheetView;
 
 /**
- * 
  * That class holds some {@link DataRow} filled with {@link DataCell} in order
  * to be used by the {@link SpreadsheetView}
  */
-public class Grid {
-
-    /***************************************************************************
-     * * Private Fields * *
-     **************************************************************************/
-    private ObservableList<DataRow> rows;
-    private int rowCount;
-    private int columnCount;
-
-    /***************************************************************************
-     * * Constructor * *
-     **************************************************************************/
-
-    /**
-     * Creates grid with 'unlimited' rows and columns
-     */
-    public Grid() {
-        this(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    }
-
-    public Grid(int rowCount, int columnCount) {
-        this(rowCount, columnCount,FXCollections.<DataRow> emptyObservableList());
-    }
-
-    public Grid(int rowCount, int columnCount, ObservableList<DataRow> rows) {
-        this.rowCount = rowCount;
-        this.columnCount = columnCount;
-        this.rows = rows;
-    }
-
-    /***************************************************************************
-     * * Public Methods * *
-     **************************************************************************/
-
-    /**
-     * Span in row the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
-     */
-    public void spanRow(int count, int rowIndex, int colIndex) {
-        final int colSpan = rows.get(rowIndex).get(colIndex).getColumnSpan();
-        final int rowSpan = count;
-        rows.get(rowIndex).get(colIndex).setRowSpan(rowSpan);
-        for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
-            for (int col = colIndex; col < colIndex + colSpan
-                    && col < columnCount; ++col) {
-                if (row != rowIndex || col != colIndex) {
-                    rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
-                }
-            }
-        }
-    }
-
-    /**
-     * Span in column the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
-     */
-    public void spanCol(int count, int rowIndex, int colIndex) {
-        final int colSpan = count;
-        final int rowSpan = rows.get(rowIndex).get(colIndex).getRowSpan();
-        rows.get(rowIndex).get(colIndex).setColumnSpan(colSpan);
-        for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
-            for (int col = colIndex; col < colIndex + colSpan
-                    && col < columnCount; ++col) {
-                if (row != rowIndex || col != colIndex) {
-                    rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
-                }
-            }
-        }
-    }
-
-    /**
-     * Set the rows used by the Grid.
-     * the rowCount is then updated
-     * @param rows
-     */
-    public void setRows(ObservableList<DataRow> rows) {
-        this.rows = rows;
-        setRowCount(rows.size());
-    }
+public interface Grid {
+    
+//  public abstract DataRow getRow(int row);
+//  public abstract SpanType getSpanType(int row, int column);
     
     /**
-     * Set the rows used by the Grid.
-     * the rowCount is then updated
-     * @param rows
+     * Return how many rows are inside the grid.
      */
-    public void setRows(ArrayList<DataRow> rows) {
-        this.rows = FXCollections.observableArrayList(rows);
-        setRowCount(rows.size());
-    }
+    public int getRowCount();
+    
+    /**
+     * Return how many columns are inside the grid.
+     */
+    public int getColumnCount();
+    
     /**
      * Return a list of the {@link DataRow} used by the Grid.
      * @return
      */
-    public ObservableList<DataRow> getRows() {
-        return rows;
-    }
+    public ObservableList<DataRow> getRows();
+
     
-    /**
-     * Set a new rowCount for the grid.
-     * @param rowCount
-     */
-    public void setRowCount(int rowCount) {
-        this.rowCount = rowCount;
-    }
-
-    /**
-     * Return how many rows are inside the grid.
-     * @return
-     */
-    public int getRowCount() {
-        return rowCount;
-    }
-
-    /**
-     * Set a new columnCount for the grid.
-     * @param columnCount
-     */
-    public void setColumnCount(int columnCount) {
-        this.columnCount = columnCount;
-    }
-
-    /**
-     * Return how many columns are inside the grid.
-     * @return
-     */
-    public int getColumnCount() {
-        return columnCount;
-    }
-
-    /**
-     * Debug function to print all the cells inside the grid.
-     * 
-     * @param grid
-     */
-    public void print(DataCell<?>[][] grid) {
-        for (int row = 0; row < rowCount; ++row) {
-            for (int column = 0; column < columnCount; ++column) {
-                System.out.print(grid[row][column].toString());
-            }
-            System.out.println("");
-        }
-    }
 }

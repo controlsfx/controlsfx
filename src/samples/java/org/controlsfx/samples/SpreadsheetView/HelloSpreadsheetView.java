@@ -52,6 +52,7 @@ import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
+import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 import org.controlsfx.samples.Utils;
 
@@ -76,7 +77,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		
 		int rowCount = 50;
 		int columnCount = 10;
-		Grid grid = new Grid(rowCount, columnCount);
+		GridBase grid = new GridBase(rowCount, columnCount);
 		normalGrid(grid);
 		buildBothGrid(grid);
 
@@ -163,7 +164,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 				if(arg2.equals(0)){
 					int rowCount = 50;
 					int columnCount = 10;
-					Grid grid = new Grid(rowCount, columnCount);
+					GridBase grid = new GridBase(rowCount, columnCount);
 					normalGrid(grid);
 					
 					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
@@ -172,7 +173,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 				}else{
 					int rowCount = 50;
 					int columnCount = 10;
-					Grid grid = new Grid(rowCount, columnCount);
+					GridBase grid = new GridBase(rowCount, columnCount);
 					normalGrid(grid);
 					buildBothGrid(grid);
 					
@@ -213,7 +214,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		primaryStage.show();
 	}
 
-	private void normalGrid(Grid grid) {
+	private void normalGrid(GridBase grid) {
 		ArrayList<DataRow> rows = new ArrayList<DataRow>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
 			final DataRow dataRow = new DataRow(row, grid.getColumnCount());
@@ -280,7 +281,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	 * Build a sample RowSpan and ColSpan grid
 	 * @param grid
 	 */
-	private void buildBothGrid(Grid grid) {
+	private void buildBothGrid(GridBase grid) {
 		grid.spanRow(2, 2, 2);
 		grid.spanCol(2, 2, 2);
 

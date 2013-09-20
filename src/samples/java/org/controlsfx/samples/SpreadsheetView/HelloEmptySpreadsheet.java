@@ -52,6 +52,7 @@ import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
+import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 
 /**
@@ -75,7 +76,7 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 		
 		int rowCount = 15;
 		int columnCount = 10;
-		Grid grid = new Grid(rowCount, columnCount);
+		GridBase grid = new GridBase(rowCount, columnCount);
 		blankGrid(grid);
 //		buildBothGrid(grid);
 		
@@ -178,7 +179,7 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 	 * Generate a blank grid, with only TextField and no data.
 	 * @param grid
 	 */
-	private void blankGrid(Grid grid) {
+	private void blankGrid(GridBase grid) {
 		ArrayList<DataRow> rows = new ArrayList<DataRow>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
 			final DataRow dataRow = new DataRow(row, grid.getColumnCount());

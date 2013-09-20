@@ -76,6 +76,7 @@ import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.model.DataCell;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
+import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
@@ -171,7 +172,7 @@ public class SpreadsheetView extends Control {
      * Creates a default SpreadsheetView control with no content. 
      */
     public SpreadsheetView() {
-        this(new Grid());
+        this(new GridBase());
     }
 
     /**

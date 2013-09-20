@@ -115,7 +115,7 @@ public class HelloRangeSlider extends Application implements Sample {
         box.setPadding(new Insets(0,0,0, 20));
 //        box.setAlignment(Pos.CENTER);
         box.setFillWidth(false);
-        box.getChildren().addAll(minField, vSlider, maxField);
+        box.getChildren().addAll(maxField, vSlider, minField);
         return box;
     }
     

@@ -40,27 +40,21 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.RowAccessor;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 // Despite the name, this skin is actually the skin of the TableView contained
 // within the SpreadsheetView. The skin for the SpreadsheetView itself currently
 // resides inside the SpreadsheetView constructor!
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     
-//    // hacky, but at least it lets us hide some API
-//    public static final SpreadsheetViewSkin getSkin(SpreadsheetView spv) {
-//        return (SpreadsheetViewSkin) spv.getSkin();
-//    }
-    
     private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
 
     final TableView<DataRow> tableView;
-//    private RowAccessor<SpreadsheetRow> cells=null;
     
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
@@ -94,28 +88,8 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
          *****************************************************************/
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
-        spreadsheetView.setHbar(getFlow().getHorizontalBar());
-        spreadsheetView.setVbar(getFlow().getVerticalBar());
-        final SpreadsheetView.RowAccessor<SpreadsheetRow> lcells = new SpreadsheetView.RowAccessor<SpreadsheetRow>() {
-            @Override
-            public SpreadsheetRow get(int index) {
-                return (SpreadsheetRow) getFlow().getCells().get(index);
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return getFlow().getCells().isEmpty();
-            }
-
-            @Override
-            public int size() {
-                return getFlow().getCells().size();
-            }
-
-        };
-
-//        this.cells = lcells;
-        spreadsheetView.setRows(lcells);
+//        spreadsheetView.setHbar(getFlow().getHorizontalBar());
+//        spreadsheetView.setVbar(getFlow().getVerticalBar());
         /*****************************************************************
          * END MODIFIED BY NELLARMONIA
          *****************************************************************/
@@ -136,7 +110,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     @Override
     protected void layoutChildren(double x, double y, double w, final double h) {
         if (spreadsheetView == null) { return; }
-        if (spreadsheetView.rowHeaderProperty().get()) {
+        if (spreadsheetView.showRowHeaderProperty().get()) {
             x += rowHeaderWidth;
             w -= rowHeaderWidth;
         }
@@ -147,7 +121,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
                 .getHeight() / 2;
         double tableHeaderRowHeight = 0;
 
-        if (spreadsheetView.columnHeaderProperty().get()) {
+        if (spreadsheetView.showColumnHeaderProperty().get()) {
             // position the table header
             tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
             layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight,
@@ -158,7 +132,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
             // FIXME try to hide the columnHeader
         }
 
-        if (spreadsheetView.rowHeaderProperty().get()) {
+        if (spreadsheetView.showRowHeaderProperty().get()) {
             layoutInArea(rowHeader, x - rowHeaderWidth, y
                     - tableHeaderRowHeight, w, h, baselineOffset, HPos.CENTER,
                     VPos.CENTER);
@@ -380,8 +354,36 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         return fixedColumnWidth;
     }
 
-    private VirtualFlowSpreadsheet<?> getFlow() {
+    public VirtualFlowSpreadsheet<?> getFlow() {
         return (VirtualFlowSpreadsheet<?>) flow;
     }
 
+    public SpreadsheetRow getCell(int index) {
+        return (SpreadsheetRow) getFlow().getCells().get(index);
+    }
+    
+    public int getCellsSize() {
+        return getFlow().getCells().size();
+    }
+    
+    public VirtualScrollBar getHBar() {
+        return getFlow().getHorizontalBar();
+    }
+    
+    public VirtualScrollBar getVBar() {
+        return getFlow().getVerticalBar();
+    }
+    
+    
+    
+    // hacky, but at least it lets us hide some API
+    public static final SpreadsheetViewSkin getSkin(SpreadsheetView spv) {
+        return (SpreadsheetViewSkin) spv.getSkin();
+    }
+    
+    public static SpreadsheetRow getCell(SpreadsheetView spv, int index) {
+        TableView<DataRow> tableView = (TableView<DataRow>) spv.getSkin().getNode();
+        SpreadsheetViewSkin spvSkin = (SpreadsheetViewSkin) tableView.getSkin();
+        return spvSkin.getCell(index);
+    }
 }

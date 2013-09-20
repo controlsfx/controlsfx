@@ -89,6 +89,7 @@ public class HelloGridView extends Application implements Sample {
             new ActionShowGrid("Images", getImageGrid(false)),
             new ActionShowGrid("Images (preserve properties)", getImageGrid(true))
         );
+        root.getChildren().clear();
         root.getChildren().add(new ToolBar(selector));
         selector.getButtons().get(0).fire();
         return root;

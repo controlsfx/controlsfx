@@ -300,18 +300,31 @@ public class HelloControlsFX extends Application {
         Enumeration<URL> resources = classLoader.getResources(path);
         List<File> dirs = new ArrayList<File>();
         while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            dirs.add(new File(resource.getFile()));
+            URL next = resources.nextElement();
+            
+            // Only "file" and "jar" URLs are recognized, other schemes will be ignored.
+            String protocol = next.getProtocol().toLowerCase();
+            if ("file".equals(protocol)) {
+                dirs.add(new File(next.getFile()));
+            } else if ("jar".equals(protocol)) {
+                String fileName = new URL(next.getFile()).getFile();
+                
+                // JAR URL specs must contain the string "!/" which separates the name
+                // of the JAR file from the path of the resource contained in it, even
+                // if the path is empty.
+                int sep = fileName.indexOf("!/");
+                if (sep > 0) {
+                    dirs.add(new File(fileName.substring(0, sep)));
+                }
+                // otherwise the URL was invalid
+            }
         }
         ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
         for (File directory : dirs) {
             String fullPath = directory.getAbsolutePath();
             
-            if (fullPath.contains(".jar")) {
-                // scan the jar, but first we need to strip out everything after
-                // the .jar text (and before the file:)
-                fullPath = fullPath.substring(fullPath.indexOf("file:") + 6);
-                fullPath = fullPath.substring(0, fullPath.indexOf(".jar") + 4);
+            if (fullPath.toLowerCase().endsWith(".jar")) {
+                // scan the jar
                 classes.addAll(findClassesInJar(new File(fullPath), packageName));
             } else {
                 // scan the classpath

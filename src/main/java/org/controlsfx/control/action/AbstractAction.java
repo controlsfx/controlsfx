@@ -35,8 +35,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
+import javafx.scene.input.KeyCombination;
 
 /**
  * A convenience class that implements the {@link Action} interface and provides
@@ -144,21 +145,40 @@ public abstract class AbstractAction implements Action {
     
     
     // --- graphic
-    private final ObjectProperty<Image> graphicProperty = new SimpleObjectProperty<Image>(this, "graphic");
+    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic");
     
     /** {@inheritDoc} */
-    @Override public ObjectProperty<Image> graphicProperty() {
+    @Override public ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
     
     //  javadoc auto-generated from property
-    public final Image getGraphic() {
+    public final Node getGraphic() {
         return graphicProperty.get();
     }
     
     //  javadoc auto-generated from property
-    public final void setGraphic(Image value) {
+    public final void setGraphic(Node value) {
         graphicProperty.set(value);
+    }
+    
+    
+    // --- accelerator
+    private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator");
+    
+    /** {@inheritDoc} */
+    @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
+        return acceleratorProperty;
+    }
+    
+    //  javadoc auto-generated from property
+    public final KeyCombination getAccelerator() {
+        return acceleratorProperty.get();
+    }
+    
+    //  javadoc auto-generated from property
+    public final void setAccelerator(KeyCombination value) {
+        acceleratorProperty.set(value);
     }
     
     

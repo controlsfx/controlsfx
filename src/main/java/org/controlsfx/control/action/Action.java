@@ -31,9 +31,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
-import javafx.scene.image.Image;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCombination;
 
 /**
  * Common interface for dialog actions, where Actions are converted into buttons 
@@ -87,7 +89,16 @@ public interface Action {
      * @return An observable {@link ObjectProperty} that represents the current
      *      graphic for this property, and which can be observed for changes.
      */
-    public ObjectProperty<Image> graphicProperty();
+    public ObjectProperty<Node> graphicProperty();
+    
+    /**
+     * The accelerator {@link KeyCombination} that should be used for this action,
+     * if it is used in an applicable UI control (most notably {@link MenuItem}.
+     * 
+     * @return An observable {@link ObjectProperty} that represents the current
+     *      accelerator for this property, and which can be observed for changes.
+     */
+    public ObjectProperty<KeyCombination> acceleratorProperty();
     
     /**
      * Returns an observable map of properties on this Action for use primarily
@@ -104,4 +115,5 @@ public interface Action {
      * @param ae The action context.
      */
     public void execute(ActionEvent ae);
+    
 }

@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet.view;
 
 import impl.org.controlsfx.skin.SpreadsheetCell;
 import impl.org.controlsfx.skin.SpreadsheetRow;
+import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
@@ -107,7 +108,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
                 end();
             }
         };
-        spreadsheetView.getVbar().valueProperty().addListener(editorListener);
+        SpreadsheetViewSkin.getSkin(spreadsheetView).getVBar().valueProperty().addListener(editorListener);
     }
 
     /***************************************************************************
@@ -120,8 +121,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         editing = false;
         spreadsheetEditor.end();
 
-        spreadsheetView.getVbar().valueProperty()
-                .removeListener(editorListener);
+        SpreadsheetViewSkin.getSkin(spreadsheetView).getVBar().valueProperty().removeListener(editorListener);
         editorListener = null;
     }
 
@@ -157,15 +157,17 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         private SpreadsheetRow original;
         private boolean isMoved;
 
+        private int getCellCount() {
+            return SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize();
+        }
         
         private boolean addCell(SpreadsheetCell<?> cell){
-            SpreadsheetRow temp = spreadsheetView.getRow(spreadsheetView.getRowCount()-1-spreadsheetView.getFixedRows().size());
+            SpreadsheetRow temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows().size());
             if(temp != null){
                 temp.addCell(cell);
                 return true;
             }
             return false;
-
         }
         /***********************************************************************
          * * Public Methods * *
@@ -174,7 +176,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         public void startEdit() {
             // Case when RowSpan if larger and we're not on the last row
             if (modelCell != null && modelCell.getRowSpan() > 1
-                    && modelCell.getRow() != spreadsheetView.getRowCount() - 1) {
+                    && modelCell.getRow() != getCellCount() - 1) {
                 original = (SpreadsheetRow) viewCell.getTableRow();
 
                 final double temp = viewCell.getLocalToSceneTransform().getTy();

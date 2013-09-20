@@ -40,6 +40,8 @@ import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
+
 
 /**
  * Display a rowHeader, the index of the lines displayed on screen.
@@ -108,7 +110,7 @@ public class RowHeader  extends StackPane {
 		RowHeader.this.setClip(clip);
 
 		// We desactivate and activate the rowheader upon request
-		spreadsheetView.rowHeaderProperty().addListener(new ChangeListener<Boolean>(){
+		spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>(){
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0,
 					Boolean arg1, Boolean arg2) {
@@ -117,7 +119,7 @@ public class RowHeader  extends StackPane {
 			}});
 
 		// When the Column header is showing or not, we need to update the position of the rowHeader
-		spreadsheetView.columnHeaderProperty().addListener(layout);
+		spreadsheetView.showColumnHeaderProperty().addListener(layout);
 
 		spreadsheetView.getFixedRows().addListener(layout);
 		//In case we resize the view in any manners
@@ -136,30 +138,30 @@ public class RowHeader  extends StackPane {
 			//We add prefHeight because we need to take the other header into account
 			// And also the fixedRows if any
 			double y = snappedTopInset() ;//+prefHeight*flow.getFixedRows().size();
-			if(spreadsheetView.columnHeaderProperty().get()){
+			if(spreadsheetView.showColumnHeaderProperty().get()){
 				y+=prefHeight;
 			}
 
 			//The Labels must be aligned with the rows
-			if(!spreadsheetView.isEmptyCells()){
-				y += spreadsheetView.getRow(0).getLocalToParentTransform().getTy();
+			if(!spreadsheetView.getGrid().getRows().isEmpty()){
+				y += spreadsheetViewSkin.getCell(0).getLocalToParentTransform().getTy();
 			}
 
 			int rowCount = 0;
 			Label label;
 			int i=0;
 			// We don't want to add Label if there are no rows associated with.
-			final int modelRowCount = spreadsheetView.getModelRowCount();
+			final int modelRowCount = spreadsheetView.getGrid().getRowCount();
 
 			// We iterate over the visibleRows
-			while(!spreadsheetView.isEmptyCells() && spreadsheetView.getRow(i) != null && i< modelRowCount){
+			while(!spreadsheetView.getGrid().getRows().isEmpty() && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
 				label = getLabel(rowCount++);
-				label.setText(String.valueOf(spreadsheetView.getRow(i).getIndexVirtualFlow()+1));
+				label.setText(String.valueOf(spreadsheetViewSkin.getCell(i).getIndexVirtualFlow()+1));
 				label.resize(prefWidth,prefHeight);
 				label.relocate(x, y);
 				//We want to highlight selected rows
 				final ObservableList<String> css = label.getStyleClass();
-				if(selectionModel.getSelectedRows().contains(spreadsheetView.getRow(i).getIndex())){
+				if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
 					css.setAll("selected");
 				}else{
 					css.clear();
@@ -169,20 +171,20 @@ public class RowHeader  extends StackPane {
 			}
 
 			// Then we iterate over the FixedRows if any
-			if(!spreadsheetView.getFixedRows().isEmpty() && !spreadsheetView.isEmptyCells()){
+			if(!spreadsheetView.getFixedRows().isEmpty() && !spreadsheetView.getGrid().getRows().isEmpty()){
 				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
 					label = getLabel(rowCount++);
 					label.setText(String.valueOf(i+1));
 					label.resize(prefWidth,prefHeight);
 
 					//If the columnHeader is here, we need to translate a bit
-					if(spreadsheetView.columnHeaderProperty().get()){
+					if(spreadsheetView.showColumnHeaderProperty().get()){
 						label.relocate(x, snappedTopInset()+prefHeight*(i+1));
 					}else{
 						label.relocate(x, snappedTopInset()+prefHeight*i);
 					}
 					final ObservableList<String> css = label.getStyleClass();
-					if(selectionModel.getSelectedRows().contains(spreadsheetView.getRow(i).getIndex())){
+					if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
 						css.setAll("selected");
 					}else{
 						css.clear();
@@ -192,7 +194,7 @@ public class RowHeader  extends StackPane {
 			}
 
 			//First one blank and on top (z-order) of the others
-			if(spreadsheetView.columnHeaderProperty().get()){
+			if(spreadsheetView.showColumnHeaderProperty().get()){
 				label = getLabel(rowCount++);
 				label.setText("");
 				label.resize(prefWidth,prefHeight);
@@ -200,12 +202,13 @@ public class RowHeader  extends StackPane {
 				label.getStyleClass().clear();
 			}
 
-			if(spreadsheetView.getHbar().isVisible()){
+			VirtualScrollBar hbar = SpreadsheetViewSkin.getSkin(spreadsheetView).getHBar();
+			if(hbar.isVisible()){
 				//Last one blank and on top (z-order) of the others
 				label = getLabel(rowCount++);
 				label.setText("");
-				label.resize(prefWidth,spreadsheetView.getHbar().getHeight());
-				label.relocate(snappedLeftInset(), getHeight()-spreadsheetView.getHbar().getHeight());
+				label.resize(prefWidth,hbar.getHeight());
+				label.relocate(snappedLeftInset(), getHeight()-hbar.getHeight());
 				label.getStyleClass().clear();
 			}
 			//Flush the rest of the children if any

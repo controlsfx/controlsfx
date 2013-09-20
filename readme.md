@@ -18,7 +18,7 @@ If you want to **play with** the ControlsFX sample application, either clone the
 
 If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug youd like to file, please direct it to the [issue tracker over at the ControlsFX bitbucket website][12].
 
-If you **want to use** ControlsFX, then youre probably wondering how to use the API that weve slaved over for hours! In your case, the best and definitive location for help is definitely [our javadocs][13]. Fair not, these are not a barren wasteland of undescribed functionality weve poured our hearts into making these javadocs full to the brim of examples, commentary and explanation. If anything is unclear to you, [file a bug in our issue tracker][12] and well do our best to update the documentation straight away!
+If you **want to use** ControlsFX, then youre probably wondering how to use the API that weve slaved over for hours! In your case, the best and definitive location for help is definitely [our javadocs][13]. Fear not, these are not a barren wasteland of undescribed functionality weve poured our hearts into making these javadocs full to the brim of examples, commentary and explanation. If anything is unclear to you, [file a bug in our issue tracker][12] and well do our best to update the documentation straight away!
 
 If you *have questions*, you should join the the [mailing list][22].
 

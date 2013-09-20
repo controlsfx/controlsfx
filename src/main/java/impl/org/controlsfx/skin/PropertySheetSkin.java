@@ -45,6 +45,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -234,6 +235,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class ActionChangeMode extends AbstractAction {
         
+    	private final Image CATEGORY_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png");
+    	private final Image NAME_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png");
+    	
         private PropertySheet.Mode mode;
         
         public ActionChangeMode(PropertySheet.Mode mode) {
@@ -243,10 +247,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             final String text = "By " + capitalize(mode.toString());
             
             if (mode == Mode.CATEGORY) {
-                setGraphic(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png"));
+                setGraphic( new ImageView(CATEGORY_IMAGE));
                 setLongText(text);
             } else if (mode == Mode.NAME) {
-                setGraphic(new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png"));
+                setGraphic(new ImageView(NAME_IMAGE));
                 setLongText(text);
             } else {
                 setText(text);

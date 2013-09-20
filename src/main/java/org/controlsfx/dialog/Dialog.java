@@ -51,7 +51,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -700,7 +700,7 @@ public class Dialog {
      * @see Dialog
      * @see Action
      */
-    public enum Actions implements  DialogAction {
+    public enum Actions implements DialogAction {
 
         /**
          * An action that, by default, will show 'Cancel'.
@@ -767,8 +767,13 @@ public class Dialog {
         }
         
         /** {@inheritDoc} */
-        @Override public ObjectProperty<Image> graphicProperty() {
+        @Override public ObjectProperty<Node> graphicProperty() {
             return action.graphicProperty();
+        }
+        
+        /** {@inheritDoc} */
+        @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
+            return action.acceleratorProperty();
         }
         
         /** {@inheritDoc} */
@@ -785,10 +790,10 @@ public class Dialog {
             }
         }
         
+        /** {@inheritDoc} */
         @Override public boolean hasTrait(ActionTrait trait) {
             return traits.contains(trait);
         }
-        
     }
 
     

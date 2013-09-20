@@ -26,9 +26,13 @@
  */
 package org.controlsfx.control.action;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ToolBar;
@@ -101,7 +105,46 @@ public class ActionGroup extends AbstractAction {
      * @param actions Zero or more actions to insert into this ActionGroup.
      */
     public ActionGroup(String text, Action... actions) {
+    	 this(text, Arrays.asList(actions));
+    }
+    
+    /**
+     * Creates an ActionGroup with the given text as the name of the {@link Action}, 
+     * and collection of Actions as members of this ActionGroup. 
+     * 
+     * @param text The {@link Action#textProperty() text} of this {@link Action}.
+     * @param actions Collection of actions to insert into this ActionGroup.
+     */
+    public ActionGroup(String text, Collection<Action> actions) {
         super(text);
+        getActions().addAll(actions);
+    }
+    
+    /**
+     * Creates an ActionGroup with the given text as the name of the {@link Action}, 
+     * and zero or more Actions as members of this ActionGroup. Note that it is
+     * legitimate to pass in zero Actions to this constructor, and to later 
+     * set the actions directly into the {@link #getActions() actions} list.
+     * 
+     * @param text The {@link Action#textProperty() text} of this {@link Action}.
+     * @param icon The {@link Action#graphicProperty() image} of this {@link Action}.
+     * @param actions Zero or more actions to insert into this ActionGroup.
+     */
+    public ActionGroup(String text, Node icon, Action... actions) {
+    	 this( text, icon, Arrays.asList(actions));
+    }
+    
+    /**
+     * Creates an ActionGroup with the given text as the name of the {@link Action},
+     * and collection of Actions as members of this ActionGroup. .
+     * 
+     * @param text The {@link Action#textProperty() text} of this {@link Action}.
+     * @param icon The {@link Action#graphicProperty() image} of this {@link Action}.
+     * @param actions Collection of actions to insert into this ActionGroup.
+     */
+    public ActionGroup(String text, Node icon, Collection<Action> actions) {
+        super(text);
+        setGraphic(icon);
         getActions().addAll(actions);
     }
 

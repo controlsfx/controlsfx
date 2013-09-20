@@ -38,6 +38,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -289,6 +290,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
                             // start expand
                             pane.setCache(true);
                             pane.setVisible(true);
+                            
+                            pane.fireEvent(new Event(NotificationPane.ON_SHOWING));
                         }
                     },
                     new KeyValue(transition, transitionStartValue)
@@ -300,6 +303,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
                         @Override public void handle(ActionEvent event) {
                             // end expand
                             pane.setCache(false);
+                            
+                            pane.fireEvent(new Event(NotificationPane.ON_SHOWN));
                         }
                     },
                     new KeyValue(transition, 1, Interpolator.EASE_OUT)
@@ -312,6 +317,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
                         @Override public void handle(ActionEvent event) {
                             // Start collapse
                             pane.setCache(true);
+                            
+                            pane.fireEvent(new Event(NotificationPane.ON_HIDING));
                         }
                     },
                     new KeyValue(transition, transitionStartValue)
@@ -324,6 +331,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
                             // end collapse
                             pane.setCache(false);
                             pane.setVisible(false);
+                            
+                            pane.fireEvent(new Event(NotificationPane.ON_HIDDEN));
                         }
                     },
                     new KeyValue(transition, 0, Interpolator.EASE_IN)

@@ -121,7 +121,7 @@ public class RowHeader  extends StackPane {
 		// When the Column header is showing or not, we need to update the position of the rowHeader
 		spreadsheetView.showColumnHeaderProperty().addListener(layout);
 
-		spreadsheetView.getFixedRows().addListener(layout);
+		spreadsheetView.getFixedRowsList().addListener(layout);
 		//In case we resize the view in any manners
 		spreadsheetView.heightProperty().addListener(layout);
 
@@ -143,7 +143,7 @@ public class RowHeader  extends StackPane {
 			}
 
 			//The Labels must be aligned with the rows
-			if(!spreadsheetView.getGrid().getRows().isEmpty()){
+			if(spreadsheetViewSkin.getCellsSize() != 0){
 				y += spreadsheetViewSkin.getCell(0).getLocalToParentTransform().getTy();
 			}
 
@@ -154,7 +154,7 @@ public class RowHeader  extends StackPane {
 			final int modelRowCount = spreadsheetView.getGrid().getRowCount();
 
 			// We iterate over the visibleRows
-			while(!spreadsheetView.getGrid().getRows().isEmpty() && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
+			while(spreadsheetViewSkin.getCellsSize() != 0 && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
 				label = getLabel(rowCount++);
 				label.setText(String.valueOf(spreadsheetViewSkin.getCell(i).getIndexVirtualFlow()+1));
 				label.resize(prefWidth,prefHeight);
@@ -171,8 +171,8 @@ public class RowHeader  extends StackPane {
 			}
 
 			// Then we iterate over the FixedRows if any
-			if(!spreadsheetView.getFixedRows().isEmpty() && !spreadsheetView.getGrid().getRows().isEmpty()){
-				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
+			if(!spreadsheetView.getFixedRowsList().isEmpty() && spreadsheetViewSkin.getCellsSize() != 0){
+				for(i = 0;i<spreadsheetView.getFixedRows();++i){
 					label = getLabel(rowCount++);
 					label.setText(String.valueOf(i+1));
 					label.resize(prefWidth,prefHeight);

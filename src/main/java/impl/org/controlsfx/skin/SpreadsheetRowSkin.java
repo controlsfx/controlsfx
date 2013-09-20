@@ -141,7 +141,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
          */
         double tableCellY = 0;
         int positionY;
-        if ((positionY = spreadsheetView.getFixedRows().indexOf(index)) != -1) {// if
+        if ((positionY = spreadsheetView.getFixedRowsList().indexOf(index)) != -1) {// if
                                                                                 // true,
                                                                                 // this
                                                                                 // row

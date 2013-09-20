@@ -337,7 +337,7 @@ public class SpreadsheetView extends Control {
     }
     
     
-    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader");
+    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader",true);
     
     /**
      * Activate and deactivate the Column Header
@@ -362,7 +362,7 @@ public class SpreadsheetView extends Control {
     }
 
     
-    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader");
+    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader",true);
     
     /**
      * Activate and deactivate the Row Header
@@ -389,9 +389,9 @@ public class SpreadsheetView extends Control {
      * @param numberOfFixedRows
      */
     public final void fixRows(int numberOfFixedRows){
-        getFixedRows().clear();
+        getFixedRowsList().clear();
         for (int j = 0; j < numberOfFixedRows; j++) {
-            getFixedRows().add(j);
+            getFixedRowsList().add(j);
         }
     }
 
@@ -400,8 +400,16 @@ public class SpreadsheetView extends Control {
      * Just the number of the rows are returned.
      * @return
      */
-    public ObservableList<Integer> getFixedRows() {
+    public ObservableList<Integer> getFixedRowsList() {
         return fixedRows;
+    }
+    
+    /**
+     * Return the number of fixed rows at the top of the SpreadsheetView
+     * @return
+     */
+    public int getFixedRows() {
+        return fixedRows.size();
     }
 
     /**
@@ -410,15 +418,17 @@ public class SpreadsheetView extends Control {
      * It's possible to fix columns also by right-clicking on columns header.
      * @param numberOfFixedColumns
      */
-    public void fixColumns(int numberOfFixedColumns){
+    public void fixColumns(List<Integer> fixedColumns){
 
         getFixedColumns().clear();
         for (SpreadsheetColumn spc : getColumns()) {
 			spc.setFixed(false);
 		}
 
-        for (int j = 0; j < numberOfFixedColumns; j++) {
-            getColumns().get(j).setFixed(true);
+        for (Integer column: fixedColumns) {
+        	if(column >=0 && column < getColumns().size()){
+        		getColumns().get(column).setFixed(true);
+        	}
         }
     }
 
@@ -563,12 +573,6 @@ public class SpreadsheetView extends Control {
                 columns.add(spreadsheetColumns);
             }
         }
-
-        //        /** Set the skin in place and give access to the VirtualFlow
-        //        *   It has to be placed at the end because otherwise UI is responding weirdly 
-        //        *   (horizontal scrollBar replace at initial position when resizing width
-        //        */
-        //        spreadsheetViewInternal.setSkin(new SpreadsheetViewSkin(spreadsheetViewInternal,this));
     }
 
     /**
@@ -876,7 +880,7 @@ public class SpreadsheetView extends Control {
             case ROW_INVISIBLE:
             default:
                 final DataCell<?> cellSpan = tableView.getItems().get(row).getCell(col);
-                if (!grid.getRows().isEmpty() && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
+                if (SpreadsheetViewSkin.getSkin(this).getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
                     return new TablePosition<>(tableView, cellSpan.getRow(), tableView.getColumns().get(cellSpan.getColumn()));
 
                 } else { // If it's not, then it's the firstkey
@@ -1329,7 +1333,7 @@ public class SpreadsheetView extends Control {
 
             //We try to make visible the rows that may be hiden by Fixed rows
             // We don't want to do any scroll behavior when dragging
-            if(!drag && !spreadsheetView.getGrid().getRows().isEmpty() && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
+            if(!drag && SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRowsList().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());
             }
 

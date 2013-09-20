@@ -54,7 +54,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     
     private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
 
-    final TableView<DataRow> tableView;
+    static TableView<DataRow> tableView;
     
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
@@ -86,7 +86,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         /*****************************************************************
          * MODIFIED BY NELLARMONIA
          *****************************************************************/
-        spreadsheetView.getFixedRows().addListener(fixedRowsListener);
+        spreadsheetView.getFixedRowsList().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 //        spreadsheetView.setHbar(getFlow().getHorizontalBar());
 //        spreadsheetView.setVbar(getFlow().getVerticalBar());
@@ -378,7 +378,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     
     // hacky, but at least it lets us hide some API
     public static final SpreadsheetViewSkin getSkin(SpreadsheetView spv) {
-        return (SpreadsheetViewSkin) spv.getSkin();
+        return (SpreadsheetViewSkin) (tableView.getSkin());
     }
     
     public static SpreadsheetRow getCell(SpreadsheetView spv, int index) {

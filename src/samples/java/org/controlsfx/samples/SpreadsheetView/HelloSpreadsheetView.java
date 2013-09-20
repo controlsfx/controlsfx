@@ -118,7 +118,11 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		fixedColumns.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				spv.fixColumns(arg2.intValue());
+				List<Integer> tempList = new ArrayList<>(arg2.intValue());
+				for(int i=0;i<arg2.intValue();++i){
+					tempList.add(Integer.valueOf(i));
+				}
+				spv.fixColumns(tempList);
 			}
 		});
 

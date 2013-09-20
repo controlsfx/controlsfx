@@ -164,11 +164,11 @@ public class SpreadsheetRow extends TableRow<DataRow>{
     	//aka the fixed columns that have moved.
  		final int max = getChildrenUnmodifiable().size()-1;
  		int j = max;
- 		while(((SpreadsheetCell<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
+ 		while(j>= 0 && ((SpreadsheetCell<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
  			--j;
  		}
  		
-    	int fixedColSize = max -j;
+    	int fixedColSize = j == -1? 0:max -j;
     	
     	//If any cells was moved to the end
         if(fixedColSize != 0){

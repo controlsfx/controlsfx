@@ -142,7 +142,7 @@ public class RowHeader  extends StackPane {
 
 			//The Labels must be aligned with the rows
 			if(!spreadsheetView.isEmptyCells()){
-				y += spreadsheetView.getRow(0).getLocalToParentTransform().getTy();
+				y += spreadsheetViewSkin.getCell(0).getLocalToParentTransform().getTy();
 			}
 
 			int rowCount = 0;
@@ -152,14 +152,14 @@ public class RowHeader  extends StackPane {
 			final int modelRowCount = spreadsheetView.getModelRowCount();
 
 			// We iterate over the visibleRows
-			while(!spreadsheetView.isEmptyCells() && spreadsheetView.getRow(i) != null && i< modelRowCount){
+			while(!spreadsheetView.isEmptyCells() && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
 				label = getLabel(rowCount++);
-				label.setText(String.valueOf(spreadsheetView.getRow(i).getIndexVirtualFlow()+1));
+				label.setText(String.valueOf(spreadsheetViewSkin.getCell(i).getIndexVirtualFlow()+1));
 				label.resize(prefWidth,prefHeight);
 				label.relocate(x, y);
 				//We want to highlight selected rows
 				final ObservableList<String> css = label.getStyleClass();
-				if(selectionModel.getSelectedRows().contains(spreadsheetView.getRow(i).getIndex())){
+				if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
 					css.setAll("selected");
 				}else{
 					css.clear();
@@ -182,7 +182,7 @@ public class RowHeader  extends StackPane {
 						label.relocate(x, snappedTopInset()+prefHeight*i);
 					}
 					final ObservableList<String> css = label.getStyleClass();
-					if(selectionModel.getSelectedRows().contains(spreadsheetView.getRow(i).getIndex())){
+					if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
 						css.setAll("selected");
 					}else{
 						css.clear();

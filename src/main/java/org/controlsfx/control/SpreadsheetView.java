@@ -76,6 +76,7 @@ import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
@@ -140,16 +141,8 @@ public class SpreadsheetView extends Control {
         BOTH_INVISIBLE;   	//Invisible cell, span in diagonal
     }
 
-    /**
-     * A interface to grant access to some {@link SpreadsheetRow}
-     * @param <T>
-     */
-    public static interface RowAccessor<T> {
-        T get(int index);
-        boolean isEmpty();
-        int size();
-    }
 
+    
     /***************************************************************************
      *                                                                         *
      * Private Fields                                                          *
@@ -166,7 +159,6 @@ public class SpreadsheetView extends Control {
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private VirtualScrollBar hbar=null;
     private VirtualScrollBar vbar=null;
-    private RowAccessor<SpreadsheetRow> cells=null;
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
 
     /***************************************************************************
@@ -281,31 +273,14 @@ public class SpreadsheetView extends Control {
         this.vbar = vbar;
     }
 
-
-    /**
-     * Not for public use.
-     * @return
-     */
-    public SpreadsheetRow getRow(int index) {
-        return cells.get(index);
-    }
-
     // FIXME this shouldn't be here!
     /**
      * Not for public use.
      * @return
      */
     public boolean isEmptyCells() {
-        return cells.isEmpty();
-    }
-
-    // FIXME this shouldn't be here!
-    /**
-     * Not for public use.
-     * @return
-     */
-    public void setRows(RowAccessor<SpreadsheetRow> cells) {
-        this.cells = (RowAccessor<SpreadsheetRow>) cells;
+//        return cells.isEmpty();
+        return grid.getRows().isEmpty();
     }
 
     /**
@@ -484,7 +459,8 @@ public class SpreadsheetView extends Control {
      * @return
      */
     public final int getRowCount(){
-        return cells.size();
+        return grid.getRowCount();
+//        return cells.size();
     }
     
 
@@ -494,7 +470,9 @@ public class SpreadsheetView extends Control {
      * @return
      */
     private SpreadsheetRow getNonFixedRow(int index){
-        return cells.get(fixedRows.size()+index);
+//        return cells.get(fixedRows.size()+index);
+        SpreadsheetViewSkin skin = (SpreadsheetViewSkin) tableView.getSkin();
+        return skin.getCell(index);
     }
 
     /**
@@ -504,8 +482,10 @@ public class SpreadsheetView extends Control {
      * @return
      */
     private final boolean containsRow(int index){
-        for (int i =0 ;i<cells.size();++i) {
-            if(cells.get(i).getIndex() == index)
+        SpreadsheetViewSkin skin = (SpreadsheetViewSkin) tableView.getSkin();
+        int size = skin.getCellsSize();
+        for (int i = 0 ; i < size; ++i) {
+            if(skin.getCell(i).getIndex() == index)
                 return true;
         }
         return false;

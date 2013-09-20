@@ -40,7 +40,6 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.RowAccessor;
 import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
@@ -52,15 +51,9 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 // resides inside the SpreadsheetView constructor!
 public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
     
-//    // hacky, but at least it lets us hide some API
-//    public static final SpreadsheetViewSkin getSkin(SpreadsheetView spv) {
-//        return (SpreadsheetViewSkin) spv.getSkin();
-//    }
-    
     private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
 
     final TableView<DataRow> tableView;
-//    private RowAccessor<SpreadsheetRow> cells=null;
     
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
@@ -96,26 +89,6 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
         spreadsheetView.setHbar(getFlow().getHorizontalBar());
         spreadsheetView.setVbar(getFlow().getVerticalBar());
-        final SpreadsheetView.RowAccessor<SpreadsheetRow> lcells = new SpreadsheetView.RowAccessor<SpreadsheetRow>() {
-            @Override
-            public SpreadsheetRow get(int index) {
-                return (SpreadsheetRow) getFlow().getCells().get(index);
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return getFlow().getCells().isEmpty();
-            }
-
-            @Override
-            public int size() {
-                return getFlow().getCells().size();
-            }
-
-        };
-
-//        this.cells = lcells;
-        spreadsheetView.setRows(lcells);
         /*****************************************************************
          * END MODIFIED BY NELLARMONIA
          *****************************************************************/
@@ -380,8 +353,25 @@ public class SpreadsheetViewSkin extends TableViewSkin<DataRow> {
         return fixedColumnWidth;
     }
 
-    private VirtualFlowSpreadsheet<?> getFlow() {
+    public VirtualFlowSpreadsheet<?> getFlow() {
         return (VirtualFlowSpreadsheet<?>) flow;
     }
 
+    public SpreadsheetRow getCell(int index) {
+        return (SpreadsheetRow) getFlow().getCells().get(index);
+    }
+    
+    public int getCellsSize() {
+        return getFlow().getCells().size();
+    }
+    
+    
+    
+    
+    
+    public static SpreadsheetRow getCell(SpreadsheetView spv, int index) {
+        TableView<DataRow> tableView = (TableView<DataRow>) spv.getSkin().getNode();
+        SpreadsheetViewSkin spvSkin = (SpreadsheetViewSkin) tableView.getSkin();
+        return spvSkin.getCell(index);
+    }
 }

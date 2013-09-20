@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet.view;
 
 import impl.org.controlsfx.skin.SpreadsheetCell;
 import impl.org.controlsfx.skin.SpreadsheetRow;
+import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
@@ -159,7 +160,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
         
         private boolean addCell(SpreadsheetCell<?> cell){
-            SpreadsheetRow temp = spreadsheetView.getRow(spreadsheetView.getRowCount()-1-spreadsheetView.getFixedRows().size());
+            SpreadsheetRow temp = SpreadsheetViewSkin.getCell(spreadsheetView, spreadsheetView.getRowCount()-1-spreadsheetView.getFixedRows().size());
             if(temp != null){
                 temp.addCell(cell);
                 return true;

@@ -42,11 +42,10 @@ import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.model.DataCell;
 
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
-
-import org.controlsfx.control.spreadsheet.model.DataRow;
 
 final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
         extends
@@ -547,7 +546,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
         final List<SpreadsheetRow> temp = (List<SpreadsheetRow>) getCells();
         final List<SpreadsheetRow> tset = new ArrayList<>(temp);
         Collections.sort(tset, ROWCMP);
-        for (final TableRow<DataRow> r : tset) {
+        for (final TableRow<ObservableList<DataCell>> r : tset) {
             r.toFront();
         }
     }

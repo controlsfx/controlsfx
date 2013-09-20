@@ -5,7 +5,6 @@ import impl.org.controlsfx.skin.SpreadsheetRowSkin;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 
@@ -14,6 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
@@ -30,7 +30,7 @@ public class SpreadsheetColumn{
      *                                                                         *
      **************************************************************************/
 	private SpreadsheetView spreadsheetView;
-	private TableColumn<DataRow, DataCell<?>> column;
+	private TableColumn<ObservableList<DataCell>, DataCell<?>> column;
 	private boolean canFix;
 	private Integer indexColumn;
 	private CheckMenuItem fixItem;
@@ -66,7 +66,7 @@ public class SpreadsheetColumn{
 	 * @param spreadsheetView
 	 * @param indexColumn
 	 */
-	public SpreadsheetColumn(TableColumn<DataRow, DataCell<?>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
+	public SpreadsheetColumn(TableColumn<ObservableList<DataCell>, DataCell<?>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
 //		column.setPrefWidth(100);
@@ -77,13 +77,11 @@ public class SpreadsheetColumn{
 		column.setContextMenu(getColumnContextMenu());
 		
 		//FIXME implement better listening after
-		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<DataRow>(){
-
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends DataRow> arg0) {
+		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<DataCell>>(){
+			@Override public void onChanged(Change<? extends ObservableList<DataCell>> arg0) {
 				canFix();
-			}});
+			}
+		});
 	}
 	
 	/***************************************************************************
@@ -107,7 +105,7 @@ public class SpreadsheetColumn{
 	 * @return
 	 */
 	public boolean canFix(){
-		for (DataRow row : spreadsheetView.getGrid().getRows()) {
+		for (ObservableList<DataCell> row : spreadsheetView.getGrid().getRows()) {
 			int columnSpan = row.get(indexColumn).getColumnSpan();
 			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
 				return false;

@@ -39,13 +39,10 @@ import javafx.scene.control.TableView;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataRow;
 
 import com.sun.javafx.scene.control.skin.TableRowSkin;
 
-public class SpreadsheetRowSkin<T extends DataRow>
-        extends
-            TableRowSkin<DataRow> {
+public class SpreadsheetRowSkin<T extends ObservableList<DataCell>> extends TableRowSkin<ObservableList<DataCell>> {
     static final double DEFAULT_CELL_SIZE;
     static {
         double cell_size = 24.0;
@@ -71,13 +68,13 @@ public class SpreadsheetRowSkin<T extends DataRow>
     }
     
     SpreadsheetView spreadsheetView;
-    private TableView<DataRow> tableView;
+    private TableView<ObservableList<DataCell>> tableView;
     
-    public SpreadsheetRowSkin(TableRow<DataRow> tableRow,
+    public SpreadsheetRowSkin(TableRow<ObservableList<DataCell>> tableRow,
             SpreadsheetView spreadsheetView) {
         super(tableRow);
         this.spreadsheetView = spreadsheetView;
-        this.tableView = (TableView<DataRow>) spreadsheetView.getSkin().getNode();
+        this.tableView = (TableView<ObservableList<DataCell>>) spreadsheetView.getSkin().getNode();
     }
 
     /**
@@ -111,7 +108,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
          */
         // I put that at the very beginning in the hope that I will not have
         // that extra row at the bottom layouting.
-        final TableRow<DataRow> control = (TableRow<DataRow>) getSkinnable();
+        final TableRow<ObservableList<DataCell>> control = (TableRow<ObservableList<DataCell>>) getSkinnable();
         final int index = control.getIndex();
         if (index < 0 || index >= tableView.getItems().size()) {
             control.setOpacity(0);
@@ -185,7 +182,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
 
             final SpreadsheetCell<?> tableCell = (SpreadsheetCell<?>) cells
                     .get(column);
-            final TableColumnBase<DataRow, ?> tableColumn = getTableColumnBase(tableCell);
+            final TableColumnBase<ObservableList<DataCell>, ?> tableColumn = getTableColumnBase(tableCell);
 
             // show(tableCell);
 
@@ -237,7 +234,7 @@ public class SpreadsheetRowSkin<T extends DataRow>
                 }
                 // System.out.println("Je layout"+index+"/"+column );
 
-                final DataCell<?> cellSpan = ((DataRow) tableView.getItems().get(index)).getCell(column);
+                final DataCell<?> cellSpan = ((ObservableList<DataCell>) tableView.getItems().get(index)).get(column);
                 final SpreadsheetView.SpanType spanType = spreadsheetView
                         .getSpanType(index, column);
 
@@ -262,15 +259,15 @@ public class SpreadsheetRowSkin<T extends DataRow>
                         // To be sure that the text is the same
                         // in case we modified the DataCell after that
                         // SpreadsheetCell was created
-                        final SpreadsheetViewSelectionModel<DataRow> sm = spreadsheetView
+                        final SpreadsheetViewSelectionModel<ObservableList<DataCell>> sm = spreadsheetView
                                 .getSelectionModel();
-                        final TableColumn<DataRow, ?> col = tableView.getColumns().get(column);
+                        final TableColumn<ObservableList<DataCell>, ?> col = tableView.getColumns().get(column);
 
                         // In case this cell was selected before but we scroll
                         // up/down and it's invisible now.
                         // It has to pass his "selected property" to the new
                         // Cell in charge of spanning
-                        final TablePosition<DataRow, ?> selectedPosition = sm
+                        final TablePosition<ObservableList<DataCell>, ?> selectedPosition = sm
                                 .isSelectedRange(index, col, column);
                         if (selectedPosition != null
                                 && selectedPosition.getRow() != index) { // If

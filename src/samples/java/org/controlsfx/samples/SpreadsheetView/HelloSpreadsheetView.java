@@ -36,6 +36,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -50,7 +51,6 @@ import javafx.stage.Stage;
 import org.controlsfx.Sample;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCells;
@@ -215,9 +215,9 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	}
 
 	private void normalGrid(GridBase grid) {
-		ArrayList<DataRow> rows = new ArrayList<DataRow>(grid.getRowCount());
+		ArrayList<ObservableList<DataCell>> rows = new ArrayList<ObservableList<DataCell>>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
-			final DataRow dataRow = new DataRow(row, grid.getColumnCount());
+			final ObservableList<DataCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
 			for (int column = 0; column < grid.getColumnCount(); ++column) {
 				dataRow.add(generateCell(row, column, 1, 1));
 			}

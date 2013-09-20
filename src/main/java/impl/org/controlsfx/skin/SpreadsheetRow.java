@@ -30,20 +30,20 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataRow;
 
 
 /**
  *
  * The tableRow which will holds the SpreadsheetCell.
  */
-public class SpreadsheetRow extends TableRow<DataRow>{
+public class SpreadsheetRow extends TableRow<ObservableList<DataCell>>{
 
     /***************************************************************************
      *                                                                         *

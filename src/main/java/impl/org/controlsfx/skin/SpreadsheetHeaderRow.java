@@ -34,10 +34,11 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.model.DataRow;
+import org.controlsfx.control.spreadsheet.model.DataCell;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -185,7 +186,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
                     .getChildrenUnmodifiable().get(0).getStyleClass()
                     .addAll("fixed");
     }
-    private SpreadsheetViewSelectionModel<DataRow> selectionModel;
+    private SpreadsheetViewSelectionModel<ObservableList<DataCell>> selectionModel;
     
     
     /**

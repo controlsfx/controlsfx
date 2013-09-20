@@ -48,7 +48,6 @@ import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpanType;
 import org.controlsfx.control.spreadsheet.model.DataCell;
-import org.controlsfx.control.spreadsheet.model.DataRow;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditors;
 
@@ -60,7 +59,7 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
  * The View cell that will be visible on screen.
  * It holds the {@link DataRow} and the {@link DataCell}.
  */
-public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
+public class SpreadsheetCell<T> extends TableCell<ObservableList<DataCell>, DataCell<T>> {
 
     /***************************************************************************
      *                                                                         *
@@ -395,7 +394,7 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
             return;
         }
 
-        final TableView<DataRow> tableView = getTableView();
+        final TableView<ObservableList<DataCell>> tableView = getTableView();
         if (tableView == null) {
             return;
         }
@@ -405,7 +404,7 @@ public class SpreadsheetCell<T> extends TableCell<DataRow, DataCell<T>> {
             return;
         }
 
-        final TableSelectionModel<DataRow> sm = tableView.getSelectionModel();
+        final TableSelectionModel<ObservableList<DataCell>> sm = tableView.getSelectionModel();
         if (sm == null) {
             return;
         }

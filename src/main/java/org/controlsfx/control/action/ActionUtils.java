@@ -59,6 +59,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCombination;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.SegmentedButton;
@@ -354,6 +355,10 @@ public class ActionUtils {
         }
 
         @Override public ObjectProperty<Node> graphicProperty() {
+            return null;
+        }
+        
+        @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
             return null;
         }
 

@@ -47,6 +47,7 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpanType;
+import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditors;
@@ -139,7 +140,8 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
         final SpreadsheetView spv = getSpreadsheetView();
-        final SpanType type = spv.getSpanType(row, column);
+        Grid grid = spv.getGrid();
+        final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
         	
         	/* FIXME Currently we're adding a row two times if it's located in the fixedRows.

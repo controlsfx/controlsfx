@@ -248,52 +248,6 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/
 
-//    // FIXME this shouldn't be here!
-//    /**
-//     * Not for public use.
-//     * @return
-//     */
-//    public VirtualScrollBar getHbar() {
-//        return hbar;
-//    }
-//
-//    // FIXME this shouldn't be here!
-//    /**
-//     * Not for public use.
-//     * @return
-//     */
-//    public void setHbar(VirtualScrollBar hbar) {
-//        this.hbar = hbar;
-//    }
-//
-//    // FIXME this shouldn't be here!
-//    /**
-//     * Not for public use.
-//     * @return
-//     */
-//    public VirtualScrollBar getVbar() {
-//        return vbar;
-//    }
-//
-//    // FIXME this shouldn't be here!
-//    /**
-//     * Not for public use.
-//     * @return
-//     */
-//    public void setVbar(VirtualScrollBar vbar) {
-//        this.vbar = vbar;
-//    }
-//
-//    // FIXME this shouldn't be here!
-//    /**
-//     * Not for public use.
-//     * @return
-//     */
-//    public boolean isEmptyCells() {
-////        return cells.isEmpty();
-//        return grid.getRows().isEmpty();
-//    }
-
     /**
      * Return a {@link TablePosition} of cell being currently edited.
      * @return
@@ -309,23 +263,6 @@ public class SpreadsheetView extends Control {
     public ObservableList<SpreadsheetColumn> getColumns(){
 		return columns;
     }
-//    /**
-//     * Return the number of rows in the model.
-//     * @return
-//     */
-//    public int getModelRowCount(){
-//    	return grid.getRowCount();
-//    }
-//    
-// // FIXME this shouldn't be here!
-//    /**
-//     * Return the number of rows actually visible on screen.
-//     * @return
-//     */
-//    public final int getRowCount(){
-//        return grid.getRowCount();
-////        return cells.size();
-//    }
 
     /**
      * Return the model Grid used by the SpreadsheetView
@@ -441,44 +378,6 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return the {@link SpanType} of a cell.
-     * @param row
-     * @param column
-     * @return
-     */
-    public SpanType getSpanType(final int row, final int column) {
-
-        if (row < 0 || column < 0 || !containsRow(row)) {
-            return SpanType.NORMAL_CELL;
-        }
-        final SpreadsheetCell<?> cellSpan = ((ObservableList<SpreadsheetCell<?>>)this.getItems().get(row)).get(column);
-        if (cellSpan.getColumn() == column
-                && cellSpan.getRow() == row
-                && cellSpan.getRowSpan() == 1) {
-            return SpanType.NORMAL_CELL;
-        } else if (containsRow(row-1)
-                && cellSpan.getColumnSpan() > 1
-                && cellSpan.getColumn() != column
-                && cellSpan.getRowSpan() > 1
-                && cellSpan.getRow() != row) {
-            return SpanType.BOTH_INVISIBLE;
-        } else if (cellSpan.getRowSpan() > 1
-                && cellSpan.getColumn() == column) {
-            if (cellSpan.getRow() == row || !containsRow(row-1)) {
-                return SpanType.ROW_VISIBLE;
-            } else {
-                return SpanType.ROW_INVISIBLE;
-            }
-        } else if (cellSpan.getColumnSpan() > 1
-                && cellSpan.getColumn() != column
-                && (cellSpan.getRow() == row || !containsRow(row-1))) {
-            return SpanType.COLUMN_INVISIBLE;
-        } else {
-            return SpanType.NORMAL_CELL;
-        }
-    }
-
-    /**
      * Return the selectionModel used by the SpreadsheetView.
      * @return {@link SpreadsheetViewSelectionModel}
      */
@@ -490,7 +389,21 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      * Private/Protected Implementation                                        *
      *                                                                         *
-     **************************************************************************/   
+     **************************************************************************/
+    
+    /**
+     * Return the {@link SpanType} of a cell.
+     * @param row
+     * @param column
+     * @return
+     */
+    private SpanType getSpanType(final int row, final int column) {
+        Grid grid = getGrid();
+        if (grid == null) {
+            return SpanType.NORMAL_CELL;
+        }
+        return grid.getSpanType(this, row, column);
+    }
 
     /**
      * Return a list of {@code ObservableList<DataCell>} used by the SpreadsheetView.

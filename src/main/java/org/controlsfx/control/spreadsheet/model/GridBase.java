@@ -1,6 +1,11 @@
 package org.controlsfx.control.spreadsheet.model;
 
+import impl.org.controlsfx.skin.SpreadsheetViewSkin;
+
 import java.util.ArrayList;
+
+import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView.SpanType;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -62,6 +67,51 @@ public class GridBase implements Grid {
     /** {@inheritDoc} */
     @Override public int getColumnCount() {
         return columnCount;
+    }
+    
+    /**
+     * Return the {@link SpanType} of a cell.
+     * @param row
+     * @param column
+     * @return
+     */
+    @Override public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
+
+        if (row < 0 || column < 0 || !containsRow(spv, row)) {
+            return SpanType.NORMAL_CELL;
+        }
+        final SpreadsheetCell<?> cellSpan = ((ObservableList<SpreadsheetCell<?>>)getRows().get(row)).get(column);
+        
+        final int cellSpanColumn = cellSpan.getColumn();
+        final int cellSpanRow = cellSpan.getRow();
+        final int cellSpanRowSpan = cellSpan.getRowSpan();
+        final int cellSpanColumnSpan = cellSpan.getColumnSpan();
+        final boolean containsRowMinusOne = containsRow(spv, row-1);
+        
+        if (cellSpanColumn == column
+                && cellSpanRow == row
+                && cellSpanRowSpan == 1) {
+            return SpanType.NORMAL_CELL;
+        } else if (containsRowMinusOne
+                && cellSpanColumnSpan > 1
+                && cellSpanColumn != column
+                && cellSpanRowSpan > 1
+                && cellSpanRow != row) {
+            return SpanType.BOTH_INVISIBLE;
+        } else if (cellSpanRowSpan > 1
+                && cellSpanColumn == column) {
+            if (cellSpanRow == row || !containsRowMinusOne) {
+                return SpanType.ROW_VISIBLE;
+            } else {
+                return SpanType.ROW_INVISIBLE;
+            }
+        } else if (cellSpanColumnSpan > 1
+                && cellSpanColumn != column
+                && (cellSpanRow == row || !containsRowMinusOne)) {
+            return SpanType.COLUMN_INVISIBLE;
+        } else {
+            return SpanType.NORMAL_CELL;
+        }
     }
     
     
@@ -166,4 +216,23 @@ public class GridBase implements Grid {
 //            System.out.println("");
 //        }
 //    }
+    
+    
+    
+    
+    /**
+     * Indicate whether or not the row at the specified index is currently 
+     * being displayed.
+     * @param index
+     * @return
+     */
+    private final boolean containsRow(final SpreadsheetView spv, int index){
+        SpreadsheetViewSkin skin = SpreadsheetViewSkin.getSkin(spv);
+        int size = skin.getCellsSize();
+        for (int i = 0 ; i < size; ++i) {
+            if(skin.getCell(i).getIndex() == index)
+                return true;
+        }
+        return false;
+    }
 }

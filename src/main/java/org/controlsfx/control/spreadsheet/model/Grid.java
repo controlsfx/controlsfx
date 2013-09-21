@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet.model;
 import javafx.collections.ObservableList;
 
 import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView.SpanType;
 
 /**
  * That class holds some {@link DataRow} filled with {@link SpreadsheetCell} in order
@@ -37,7 +38,6 @@ import org.controlsfx.control.SpreadsheetView;
 public interface Grid {
     
 //  public abstract DataRow getRow(int row);
-//  public abstract SpanType getSpanType(int row, int column);
     
     /**
      * Return how many rows are inside the grid.
@@ -55,5 +55,11 @@ public interface Grid {
      */
     public ObservableList<ObservableList<SpreadsheetCell<?>>> getRows();
 
-    
+    /**
+     * Return the {@link SpanType} of a cell.
+     * @param row
+     * @param column
+     * @return
+     */
+    public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
 }

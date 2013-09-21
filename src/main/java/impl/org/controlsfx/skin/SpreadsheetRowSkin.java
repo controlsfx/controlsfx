@@ -38,6 +38,7 @@ import javafx.scene.control.TableView;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
+import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.TableRowSkin;
@@ -234,9 +235,9 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 }
                 // System.out.println("Je layout"+index+"/"+column );
 
-                final SpreadsheetCell<?> cellSpan = ((ObservableList<SpreadsheetCell<?>>) tableView.getItems().get(index)).get(column);
-                final SpreadsheetView.SpanType spanType = spreadsheetView
-                        .getSpanType(index, column);
+                Grid grid = spreadsheetView.getGrid();
+                final SpreadsheetCell<?> cellSpan = grid.getRows().get(index).get(column);
+                final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
 
                 switch (spanType) {
                     case ROW_INVISIBLE :

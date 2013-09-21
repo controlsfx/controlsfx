@@ -28,6 +28,9 @@ package org.controlsfx.control.spreadsheet.model;
 
 import java.io.Serializable;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 /**
  * The model cell that hold the data. It has all the information needed by the
  * View.
@@ -145,13 +148,13 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     public void setColumnSpan(int columnSpan) {
         this.columnSpan = columnSpan;
     }
-
-    public String getStyleCss() {
-        return styleCss;
-    }
-
-    public void setStyleCss(String style) {
-        this.styleCss = style;
+    
+    private ObservableList<String> styleClass;
+    public ObservableList<String> getStyleClass() {
+        if (styleClass == null) {
+            styleClass = FXCollections.observableArrayList();
+        }
+        return styleClass;
     }
 
     public Boolean getEditable() {

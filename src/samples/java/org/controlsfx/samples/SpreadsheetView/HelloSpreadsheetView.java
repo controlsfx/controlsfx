@@ -52,7 +52,6 @@ import org.controlsfx.Sample;
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
-import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.samples.Utils;
 
@@ -249,33 +248,16 @@ public class HelloSpreadsheetView extends Application implements Sample {
 
 		// Styling for preview
 		if(row%5 ==0){
-			cell.setStyleCss("five_rows");
+			cell.getStyleClass().add("five_rows");
 		}
 		if(column == 0 && rowSpan == 1){
-			cell.setStyleCss("row_header");
+			cell.getStyleClass().add("row_header");
 		}
 		if(row == 0) {
-			cell.setStyleCss("col_header");
+			cell.getStyleClass().add("col_header");
 		}
 		return cell;
 	}
-	
-//	/**
-//	 * Build a sample RowSpan grid
-//	 * @param grid
-//	 */
-//	private void buildRowGrid(Grid grid) {
-//		for (int row = 0; row < grid.getRowCount(); ++row) {
-//			for (int column = 0; column < grid.getColumnCount(); ++column) {
-//				if (row % 3 == 0 && column % 2 == 0) {
-//					grid.spanRow(2, row, column);
-//				} else if ((row - 1) % 3 == 0 && column % 2 == 0) {
-//				} else {
-//					grid.getRows().get(row).set(column, generateCell(row, column, 1, 1));
-//				}
-//			}
-//		}
-//	}
 	
 	/**
 	 * Build a sample RowSpan and ColSpan grid
@@ -305,23 +287,4 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		grid.spanCol(4, 30, 3);
 		grid.spanRow(4, 30, 3);
 	}
-
-//	/**
-//	 * Build a sample ColumSpan grid
-//	 * @param grid
-//	 */
-//	private void buildColumnGrid(Grid grid) {
-//		for (int column = 0; column < grid.getColumnCount(); ++column) {
-//			for (int row = 0; row < grid.getRowCount(); ++row) {
-//				if (column % 3 == 0 && row % 2 == 0) {
-//					grid.spanCol(2, row, column);
-//				} else if ((column - 1) % 3 == 0 && row % 2 == 0) {
-//				} else {
-//					grid.getRows().get(row).set(column, generateCell(row, column, 1, 1));
-//				}
-//			}
-//		}
-//	}
-
-
 }

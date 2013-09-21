@@ -29,6 +29,8 @@ package impl.org.controlsfx.skin;
 import java.util.Map;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ListBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -307,16 +309,21 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         //We reset the settings
         setText(item.getStr());
         this.setEditable(item.getEditable());
-
+        
+        getStyleClass().clear();
+        getStyleClass().add("spreadsheet-cell");
+        
+        // TODO bind
+        getStyleClass().addAll(item.getStyleClass());
+        
         // Style
-        final ObservableList<String> css = getStyleClass();
-        if (css.size() == 1) {
-            css.set(0, item.getStyleCss());
-        }else{
-            css.clear();
-            css.add(item.getStyleCss());
-        }
-
+//        final ObservableList<String> css = getStyleClass();
+//        if (css.size() == 1) {
+//            css.set(0, item.getStyleCss());
+//        }else{
+//            css.clear();
+//            css.add(item.getStyleCss());
+//        }
     }
 
     public void show(){

@@ -180,9 +180,9 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 	 * @param grid
 	 */
 	private void blankGrid(GridBase grid) {
-		ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<ObservableList<SpreadsheetCell>>(grid.getRowCount());
+		ArrayList<ObservableList<SpreadsheetCell<?>>> rows = new ArrayList<ObservableList<SpreadsheetCell<?>>>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
-			final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
+			final ObservableList<SpreadsheetCell<?>> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
 			for (int column = 0; column < grid.getColumnCount(); ++column) {
 				dataRow.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
 			}

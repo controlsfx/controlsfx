@@ -56,14 +56,10 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
             @Override
             public void run() {
 
-                spreadsheetViewSkin.spreadsheetView.showRowHeaderProperty().addListener(
-                        rowHeaderListener);
-                selectionModel = spreadsheetViewSkin.spreadsheetView
-                        .getSelectionModel();
-                selectionModel.getSelectedColumns().addListener(
-                        selectionListener);
-                spreadsheetViewSkin.spreadsheetView.getFixedColumns()
-                        .addListener(fixedColumnsListener);
+                spreadsheetViewSkin.spreadsheetView.showRowHeaderProperty().addListener(rowHeaderListener);
+                selectionModel = spreadsheetViewSkin.spreadsheetView.getSelectionModel();
+                selectionModel.getSelectedColumns().addListener(selectionListener);
+                spreadsheetViewSkin.spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 
                 spreadsheetViewSkin.getTableMenuButtonVisibleProperty()
                         .addListener(new InvalidationListener() {
@@ -186,7 +182,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
                     .getChildrenUnmodifiable().get(0).getStyleClass()
                     .addAll("fixed");
     }
-    private SpreadsheetViewSelectionModel<ObservableList<SpreadsheetCell>> selectionModel;
+    private SpreadsheetViewSelectionModel<ObservableList<SpreadsheetCell<?>>> selectionModel;
     
     
     /**

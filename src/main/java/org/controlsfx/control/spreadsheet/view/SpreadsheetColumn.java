@@ -2,13 +2,6 @@ package org.controlsfx.control.spreadsheet.view;
 
 import impl.org.controlsfx.skin.SpreadsheetRowImpl;
 import impl.org.controlsfx.skin.SpreadsheetRowSkin;
-
-import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
-
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -18,11 +11,14 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 
+import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+
 /**
  *A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
  * You can then modify some informations like the width of the column or whether it is fixed or not.
  */
-public class SpreadsheetColumn{
+public class SpreadsheetColumn<T> {
 
 	/***************************************************************************
      *                                                                         *
@@ -30,7 +26,7 @@ public class SpreadsheetColumn{
      *                                                                         *
      **************************************************************************/
 	private SpreadsheetView spreadsheetView;
-	private TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell<?>> column;
+	private TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column;
 	private boolean canFix;
 	private Integer indexColumn;
 	private CheckMenuItem fixItem;
@@ -53,7 +49,7 @@ public class SpreadsheetColumn{
 	 * The column can be fixed, but has not moved yet because we have not exceed it.
 	 * It is needed for the HoverProperty. See {@link SpreadsheetRowImpl} and {@link SpreadsheetRowSkin} implementation.
 	 */
-	Boolean currentlyFixed = false;
+	private Boolean currentlyFixed = false;
 
 	/***************************************************************************
      *                                                                         *
@@ -66,7 +62,7 @@ public class SpreadsheetColumn{
 	 * @param spreadsheetView
 	 * @param indexColumn
 	 */
-	public SpreadsheetColumn(TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell<?>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
+	public SpreadsheetColumn(TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
 //		column.setPrefWidth(100);
@@ -77,8 +73,8 @@ public class SpreadsheetColumn{
 		column.setContextMenu(getColumnContextMenu());
 		
 		//FIXME implement better listening after
-		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell>>(){
-			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell>> arg0) {
+		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell<?>>>(){
+			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell<?>>> arg0) {
 				canFix();
 			}
 		});
@@ -105,7 +101,7 @@ public class SpreadsheetColumn{
 	 * @return
 	 */
 	public boolean canFix(){
-		for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
+		for (ObservableList<SpreadsheetCell<?>> row : spreadsheetView.getGrid().getRows()) {
 			int columnSpan = row.get(indexColumn).getColumnSpan();
 			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
 				return false;
@@ -176,6 +172,8 @@ public class SpreadsheetColumn{
 	public void setCurrentlyFixed(Boolean currentlyFixed) {
 		this.currentlyFixed = currentlyFixed;
 	}
+	
+	
 	
 	/***************************************************************************
      *                                                                         *

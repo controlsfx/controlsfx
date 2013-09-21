@@ -47,9 +47,8 @@ import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
-final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
-        extends
-            VirtualFlow<T> {
+final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow<T> {
+    
     private static final Comparator<SpreadsheetRowImpl> ROWCMP = new Comparator<SpreadsheetRowImpl>() {
         @Override
         public int compare(SpreadsheetRowImpl o1, SpreadsheetRowImpl o2) {
@@ -546,7 +545,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>>
         final List<SpreadsheetRowImpl> temp = (List<SpreadsheetRowImpl>) getCells();
         final List<SpreadsheetRowImpl> tset = new ArrayList<>(temp);
         Collections.sort(tset, ROWCMP);
-        for (final TableRow<ObservableList<SpreadsheetCell>> r : tset) {
+        for (final TableRow<ObservableList<SpreadsheetCell<?>>> r : tset) {
             r.toFront();
         }
     }

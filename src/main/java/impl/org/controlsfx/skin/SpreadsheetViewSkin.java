@@ -51,11 +51,11 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 // Despite the name, this skin is actually the skin of the TableView contained
 // within the SpreadsheetView. The skin for the SpreadsheetView itself currently
 // resides inside the SpreadsheetView constructor!
-public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>> {
+public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell<?>>> {
     
     private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
 
-    static TableView<ObservableList<SpreadsheetCell>> tableView;
+    static TableView<ObservableList<SpreadsheetCell<?>>> tableView;
     
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
@@ -66,7 +66,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     protected SpreadsheetView spreadsheetView;
 
     public SpreadsheetViewSkin(final SpreadsheetView spreadsheetView,
-            final TableView<ObservableList<SpreadsheetCell>> tableView) {
+            final TableView<ObservableList<SpreadsheetCell<?>>> tableView) {
         super(tableView);
         this.spreadsheetView = spreadsheetView;
         this.tableView = tableView;
@@ -74,8 +74,8 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
         tableView.setEditable(true);
 
         // Do nothing basically but give access to the Hover Property.
-        tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
-            @Override public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
+        tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell<?>>>, TableRow<ObservableList<SpreadsheetCell<?>>>>() {
+            @Override public TableRow<ObservableList<SpreadsheetCell<?>>> call(TableView<ObservableList<SpreadsheetCell<?>>> p) {
                 return new SpreadsheetRowImpl(spreadsheetView);
             }
         });
@@ -265,8 +265,8 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     };
 
     @Override
-    protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
-        return new VirtualFlowSpreadsheet<TableRow<ObservableList<SpreadsheetCell>>>();
+    protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell<?>>>> createVirtualFlow() {
+        return new VirtualFlowSpreadsheet<TableRow<ObservableList<SpreadsheetCell<?>>>>();
     }
 
     protected TableHeaderRow createTableHeaderRow() {
@@ -278,7 +278,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     }
 
     @Override
-    protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
+    protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell<?>>, ?> col) {
 
         if (col == null || !col.isVisible()) { return; }
 
@@ -349,7 +349,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
         double fixedColumnWidth = 0;
         if (!spreadsheetView.getFixedColumns().isEmpty()) {
             for (int i = 0, max = spreadsheetView.getFixedColumns().size(); i < max; ++i) {
-                final TableColumnBase<ObservableList<SpreadsheetCell>, ?> c = getVisibleLeafColumn(i);
+                final TableColumnBase<ObservableList<SpreadsheetCell<?>>, ?> c = getVisibleLeafColumn(i);
                 fixedColumnWidth += c.getWidth();
             }
         }

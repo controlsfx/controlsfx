@@ -53,7 +53,7 @@ public interface Grid {
      * Return a list of the {@link DataRow} used by the Grid.
      * @return
      */
-    public ObservableList<ObservableList<SpreadsheetCell>> getRows();
+    public ObservableList<ObservableList<SpreadsheetCell<?>>> getRows();
 
     
 }

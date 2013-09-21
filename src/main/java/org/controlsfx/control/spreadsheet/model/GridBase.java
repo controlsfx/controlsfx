@@ -12,7 +12,7 @@ public class GridBase implements Grid {
      * Private Fields
      * 
      **************************************************************************/
-    private ObservableList<ObservableList<SpreadsheetCell>> rows;
+    private ObservableList<ObservableList<SpreadsheetCell<?>>> rows;
     private int rowCount;
     private int columnCount;
     
@@ -32,10 +32,10 @@ public class GridBase implements Grid {
     }
 
     public GridBase(int rowCount, int columnCount) {
-        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList());
+        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell<?>>> emptyObservableList());
     }
 
-    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows) {
+    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell<?>>> rows) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.rows = rows;
@@ -50,7 +50,7 @@ public class GridBase implements Grid {
      **************************************************************************/
     
     /** {@inheritDoc} */
-    @Override public ObservableList<ObservableList<SpreadsheetCell>> getRows() {
+    @Override public ObservableList<ObservableList<SpreadsheetCell<?>>> getRows() {
         return rows;
     }
     
@@ -121,7 +121,7 @@ public class GridBase implements Grid {
      * the rowCount is then updated
      * @param rows
      */
-    public void setRows(ObservableList<ObservableList<SpreadsheetCell>> rows) {
+    public void setRows(ObservableList<ObservableList<SpreadsheetCell<?>>> rows) {
         this.rows = rows;
         setRowCount(rows.size());
     }
@@ -131,7 +131,7 @@ public class GridBase implements Grid {
      * the rowCount is then updated
      * @param rows
      */
-    public void setRows(ArrayList<ObservableList<SpreadsheetCell>> rows) {
+    public void setRows(ArrayList<ObservableList<SpreadsheetCell<?>>> rows) {
         this.rows = FXCollections.observableArrayList(rows);
         setRowCount(rows.size());
     }

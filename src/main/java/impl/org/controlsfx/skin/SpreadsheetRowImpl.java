@@ -43,7 +43,7 @@ import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
  *
  * The tableRow which will holds the SpreadsheetCell.
  */
-public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell>>{
+public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell<?>>>{
 
     /***************************************************************************
      *                                                                         *

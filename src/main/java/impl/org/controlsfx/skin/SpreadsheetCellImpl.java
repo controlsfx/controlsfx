@@ -59,7 +59,7 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
  * The View cell that will be visible on screen.
  * It holds the {@link DataRow} and the {@link SpreadsheetCell}.
  */
-public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell<T>> {
+public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<SpreadsheetCell<?>>, SpreadsheetCell<T>> {
 
     /***************************************************************************
      *                                                                         *
@@ -394,7 +394,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
             return;
         }
 
-        final TableView<ObservableList<SpreadsheetCell>> tableView = getTableView();
+        final TableView<ObservableList<SpreadsheetCell<?>>> tableView = getTableView();
         if (tableView == null) {
             return;
         }
@@ -404,7 +404,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
             return;
         }
 
-        final TableSelectionModel<ObservableList<SpreadsheetCell>> sm = tableView.getSelectionModel();
+        final TableSelectionModel<ObservableList<SpreadsheetCell<?>>> sm = tableView.getSelectionModel();
         if (sm == null) {
             return;
         }

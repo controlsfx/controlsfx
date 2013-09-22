@@ -796,16 +796,19 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.PROGRESS);
         dlg.setClosable(false);
         
-        final Label label = new Label();
-        label.textProperty().bind(worker.messageProperty());
+        final Label progressMessage = new Label();
+        progressMessage.textProperty().bind(worker.messageProperty());
+
         final WorkerProgressPane content = new WorkerProgressPane(dlg);
         content.setMaxWidth(Double.MAX_VALUE);
 
-        VBox vbox = new VBox(10, label, content);
+        VBox vbox = new VBox(10, progressMessage, content);
         vbox.setMaxWidth(Double.MAX_VALUE);
-        
         vbox.setPrefSize(300, 100);
         
+        if (message != null) {
+            vbox.getChildren().add(0, new Label(message));
+        }
         dlg.setContent(vbox);
         content.setWorker(worker);
     }

@@ -90,6 +90,68 @@ public class SpreadsheetCells {
         };
     }
 
+    /**
+     * Creates a cell that hold a Double at the specified position, with 
+     * the specified row/column span.
+     * @param r row number
+     * @param c column number
+     * @param rs rowSpan (1 is normal)
+     * @param cs ColumnSpan (1 is normal)
+     * @param value the Double to display
+     * @return
+     */
+    public static SpreadsheetCell<Double> createDoubleCell(final int r, final int c,
+            final int rs, final int cs, final Double value) {
+        return new SpreadsheetCell<Double>(r, c, rs, cs) {
+
+            /*******************************************************************
+             * * Static Fields * *
+             ******************************************************************/
+            private static final long serialVersionUID = -1711498694430990374L;
+
+            /***************************************************************************
+             * * Private Fields * *
+             **************************************************************************/
+            private Double doubleValue;
+            
+            /*******************************************************************
+             * * Constructor * *
+             ******************************************************************/
+            {
+                this.type = CellType.DOUBLE;
+                this.setCellValue(value);
+            }
+
+            /*******************************************************************
+             * * Public Methods * *
+             ******************************************************************/
+            @Override
+            public void setCellValue(Double value) {
+                if(value != null && !value.isNaN()){
+                    this.doubleValue = value;
+                    this.str = value.toString();
+                }else{
+                    this.str="";
+                }
+            }
+
+            @Override
+            public Double getCellValue() {
+                return doubleValue;
+            }
+
+            @Override
+            public void match(SpreadsheetCell<?> cell) {
+               try{
+            	   Double temp = Double.parseDouble(cell.getStr());
+            	   this.setCellValue(temp);
+               }catch(Exception e){
+            	   
+               }
+            }
+
+        };
+    }
 	/**
 	 * Creates a cell that hold a list of String at the specified position, with 
      * the specified row/column span.

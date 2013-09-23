@@ -2,6 +2,7 @@ package org.controlsfx.control.spreadsheet.view;
 
 import impl.org.controlsfx.skin.SpreadsheetRowImpl;
 import impl.org.controlsfx.skin.SpreadsheetRowSkin;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -62,7 +63,7 @@ public class SpreadsheetColumn<T> {
 	 * @param spreadsheetView
 	 * @param indexColumn
 	 */
-	public SpreadsheetColumn(TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
+	public SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
 //		column.setPrefWidth(100);
@@ -70,7 +71,14 @@ public class SpreadsheetColumn<T> {
 //		this.columnSpanConstraint = 0;
 //		this.columnSpanConstraint = 0;
 		canFix = canFix();
-		column.setContextMenu(getColumnContextMenu());
+		
+		final Runnable r = new Runnable() {
+            @Override
+            public void run() {
+            	column.setContextMenu(getColumnContextMenu());
+            }
+        };
+        Platform.runLater(r);
 		
 		//FIXME implement better listening after
 		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell<?>>>(){

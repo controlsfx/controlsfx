@@ -126,5 +126,9 @@ Label.selected{
 TableColumnHeader > Label.fixed{
 	-fx-font-style : italic;
 }
+
+.text-field.error{
+	-fx-background-color: red;
+}
     
 

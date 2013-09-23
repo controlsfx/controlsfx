@@ -27,9 +27,9 @@
 package org.controlsfx.control.spreadsheet.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
  * The model cell that hold the data. It has all the information needed by the
@@ -46,7 +46,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     private static final long serialVersionUID = -7648169794403402662L;
 
     public static enum CellType {
-        STRING, ENUM, NUMBER, DATE, SPLITTER;
+        STRING, ENUM, DOUBLE, DATE, SPLITTER;
     }
     
     
@@ -56,7 +56,6 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * Private Fields
      * 
      **************************************************************************/
-    private String styleCss;
     private Boolean editable;
 	protected CellType type;
     protected String str;
@@ -149,10 +148,10 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         this.columnSpan = columnSpan;
     }
     
-    private ObservableList<String> styleClass;
-    public ObservableList<String> getStyleClass() {
+    private List<String> styleClass;
+    public List<String> getStyleClass() {
         if (styleClass == null) {
-            styleClass = FXCollections.observableArrayList();
+            styleClass = new ArrayList<String>();//FXCollections.observableArrayList();
         }
         return styleClass;
     }

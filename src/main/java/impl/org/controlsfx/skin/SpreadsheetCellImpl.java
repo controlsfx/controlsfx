@@ -202,6 +202,10 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
                     editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDateEditor();
                     editors.put(cell.getCellType(), editor);
                     break;
+                case DOUBLE:
+                	 editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDoubleEditor();
+                     editors.put(cell.getCellType(), editor);
+                     break;
                 default:
                     return null;
             }

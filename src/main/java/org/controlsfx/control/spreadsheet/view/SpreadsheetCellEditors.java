@@ -164,6 +164,142 @@ public class SpreadsheetCellEditors {
             }
         };
     }
+    
+    /**
+     * 
+     * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+     * {@link TextField} where the user can type a different value.
+     */
+    public static SpreadsheetCellEditor<Double> createDoubleEditor() {
+        return new SpreadsheetCellEditor<Double>() {
+
+            /***************************************************************************
+             * * Private Fields * *
+             **************************************************************************/
+            private final TextField tf;
+
+            /***************************************************************************
+             * * Constructor * *
+             **************************************************************************/
+            {
+                tf = new TextField();
+                tf.setPrefHeight(20);
+            }
+
+            /***************************************************************************
+             * * Public Methods * *
+             **************************************************************************/
+            @Override
+            public void startEdit() {
+                super.startEdit();
+                tf.getStyleClass().removeAll("error");
+                tf.setMaxHeight(20);
+                attachEnterEscapeEventHandler();
+
+                // If the SpreadsheetCell is deselected, we commit.
+                // Sometimes, when you you touch the scrollBar when editing,
+                // this is called way
+                // too late and the SpreadsheetCell is null, so we need to be
+                // careful.
+                il = new InvalidationListener() {
+                    @Override
+                    public void invalidated(Observable observable) {
+
+                        if (viewCell != null && viewCell.isEditing()) {
+                            commitEdit();
+                            viewCell.commitEdit(modelCell);
+                        }
+                        end();
+
+                    }
+                };
+
+                viewCell.selectedProperty().addListener(il);
+                viewCell.setGraphic(tf);
+
+                tf.requestFocus();
+            }
+
+            /***************************************************************************
+             * * Protected Methods * *
+             **************************************************************************/
+
+            @Override
+            public void updateDataCell(SpreadsheetCell<Double> cell) {
+                super.updateDataCell(cell);
+
+                if (cell != null) {
+                    tf.setText(cell.getStr());
+                }
+            }
+
+            @Override
+            protected void end() {
+                super.end();
+                if (viewCell != null) {
+                    viewCell.selectedProperty().removeListener(il);
+                }
+
+                tf.setOnKeyPressed(null);
+                this.modelCell = null;
+                this.viewCell = null;
+                il = null;
+            }
+
+            @Override
+            protected SpreadsheetCell<Double> commitEdit() {
+            	try{
+            		Double temp = Double.parseDouble(tf.getText());
+            		 this.modelCell.setCellValue(temp);
+            	}catch(Exception e){
+            		
+            	}
+               
+                return modelCell;
+            }
+
+            @Override
+            protected void cancelEdit() {
+                end();
+            }
+
+            @Override
+            public TextField getEditor() {
+                return tf;
+            }
+
+            private void attachEnterEscapeEventHandler() {
+                tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent t) {
+                        if (t.getCode() == KeyCode.ENTER) {
+                            commitEdit();
+                            viewCell.commitEdit(modelCell);
+                            end();
+                        } else if (t.getCode() == KeyCode.ESCAPE) {
+                            viewCell.cancelEdit();
+                            cancelEdit();
+                        }
+                    }
+                });
+                tf.setOnKeyReleased(new EventHandler<KeyEvent>() {
+                	  @Override
+                      public void handle(KeyEvent t) {
+                          	try{
+                          		if(tf.getText().equals("")){
+                          			tf.getStyleClass().removeAll("error");
+                          		}else{
+                          			Double.parseDouble(tf.getText());
+                          			tf.getStyleClass().removeAll("error");
+                          		}
+                          	}catch(Exception e){
+                          		tf.getStyleClass().add("error");
+                          	}
+                          }
+                  });
+            }
+        };
+    }
 
     /**
      * 

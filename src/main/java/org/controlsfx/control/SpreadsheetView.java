@@ -226,7 +226,13 @@ public class SpreadsheetView extends Control {
         // We add a listener on the focus model in order to catch when we are on a hidden cell
         tableView.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
 
-        setContextMenu(getSpreadsheetViewContextMenu());
+        final Runnable r = new Runnable() {
+            @Override
+            public void run() {
+            	SpreadsheetView.this.setContextMenu(getSpreadsheetViewContextMenu());
+            }
+        };
+        Platform.runLater(r);
         
         //Handle copy Paste action, quite naive right now..
         this.setOnKeyPressed(new EventHandler<KeyEvent>() {

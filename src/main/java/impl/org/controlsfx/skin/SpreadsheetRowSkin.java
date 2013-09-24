@@ -29,6 +29,7 @@ package impl.org.controlsfx.skin;
 import java.lang.reflect.Field;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
@@ -37,6 +38,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView.SpanType;
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
@@ -126,6 +128,12 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             return;
         }
 
+     
+        // determine the width of the visible portion of the table
+        double headerWidth =  tableView.getWidth();
+        
+        Grid grid = spreadsheetView.getGrid();
+        
         // layout the individual column cells
         double width;
         double height;
@@ -140,20 +148,10 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
          */
         double tableCellY = 0;
         int positionY;
-        if ((positionY = spreadsheetView.getFixedRowsList().indexOf(index)) != -1) {// if
-                                                                                // true,
-                                                                                // this
-                                                                                // row
-                                                                                // is
-                                                                                // fixed
-            if (getSkinnable().getLocalToParentTransform().getTy() < 0) { // this
-                                                                          // rows
-                                                                          // is
-                                                                          // a
-                                                                          // bit
-                                                                          // hidden
-                                                                          // on
-                                                                          // top
+        //If true, this row is fixed
+        if ((positionY = spreadsheetView.getFixedRowsList().indexOf(index)) != -1) {
+        	//This row is a bit hidden on top
+            if (getSkinnable().getLocalToParentTransform().getTy() < 0) {
                 // We translate then for it to be fully visible
                 tableCellY = Math.abs(getSkinnable()
                         .getLocalToParentTransform().getTy());
@@ -166,26 +164,10 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             }
         }
 
-        /**
-         * FOR FIXED COLUMN
-         */
-        // If we called layoutChildren just to re-layout the fixed columns
-        /*final int max = ((SpreadsheetRow) getSkinnable())
-                .getLayoutFixedColumns() ? spreadsheetView.getFixedColumns()
-                .size() : cells.size();*/
-
-        // In case we were doing layout only of the fixed columns
-        // ((SpreadsheetRow)getSkinnable()).setLayoutFixedColumns(false);
-
-        // System.out.println("Je layout"+index+"/"+((SpreadsheetRow)getSkinnable()).getIndexVirtualFlow()
-        // );
         double fixedColumnWidth = 0;
         for (int column = 0; column < cells.size(); column++) {
 
             final SpreadsheetCellImpl<?> tableCell = (SpreadsheetCellImpl<?>) cells.get(column);
-            final TableColumnBase<ObservableList<SpreadsheetCell<?>>, ?> tableColumn = getTableColumnBase(tableCell);
-
-            // show(tableCell);
 
             // In case the node was treated previously
             tableCell.setOpacity(1);
@@ -200,6 +182,11 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
              */
             double tableCellX = 0;
             final double hbarValue = SpreadsheetViewSkin.getSkin(spreadsheetView).getHBar().getValue();
+            
+            //Virtualization of column
+            final SpreadsheetCell<?> cellSpan = grid.getRows().get(index).get(column);
+            boolean isVisible = !isInvisible(x,width,hbarValue,headerWidth,cellSpan.getColumnSpan());
+            
             // We translate that column by the Hbar Value if it's fixed
             if (spreadsheetView.getColumns().get(column).isFixed()) {
                 
@@ -208,13 +195,14 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
                 	 tableCell.toFront();
                 	 fixedColumnWidth += tableCell.getWidth();
+                	 isVisible = true; // If in fixedColumn, it's obviously visible
                  }else{
                 	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(false);
                  }
             }
 
-            boolean isVisible = true;
-            if (fixedCellSizeProperty().get() > 0) {
+            
+//            if (fixedCellSizeProperty().get() > 0) {
                 // we determine if the cell is visible, and if not we have the
                 // ability to take it out of the scenegraph to help improve
                 // performance. However, we only do this when there is a
@@ -225,18 +213,15 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 // provided by the developer, and this means that we do not have
                 // to concern ourselves with the possibility that the height
                 // may be variable and / or dynamic.
-                isVisible = isColumnPartiallyOrFullyVisible(tableColumn);
-            }
+//                isVisible = isColumnPartiallyOrFullyVisible(tableColumn);
+//            }
 
             if (isVisible) {
-                if (fixedCellSizeProperty().get() > 0
-                        && tableCell.getParent() == null) {
+                if (/*fixedCellSizeProperty().get() > 0
+                        &&*/ tableCell.getParent() == null) {
                     getChildren().add(tableCell);
                 }
-                // System.out.println("Je layout"+index+"/"+column );
 
-                Grid grid = spreadsheetView.getGrid();
-                final SpreadsheetCell<?> cellSpan = grid.getRows().get(index).get(column);
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
 
                 switch (spanType) {
@@ -270,21 +255,9 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                         // Cell in charge of spanning
                         final TablePosition<ObservableList<SpreadsheetCell<?>>, ?> selectedPosition = sm
                                 .isSelectedRange(index, col, column);
+                        // If the selected cell is in the same row, no need to re-select it
                         if (selectedPosition != null
-                                && selectedPosition.getRow() != index) { // If
-                                                                         // the
-                                                                         // selected
-                                                                         // cell
-                                                                         // is
-                                                                         // in
-                                                                         // the
-                                                                         // same
-                                                                         // row,
-                                                                         // no
-                                                                         // need
-                                                                         // to
-                                                                         // re-select
-                                                                         // it
+                                && selectedPosition.getRow() != index) {
                             sm.clearSelection(selectedPosition.getRow(),
                                     selectedPosition.getTableColumn());
                             sm.select(index, col);
@@ -298,7 +271,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                         // we need to span multiple columns, so we sum up
                         // the width of the additional columns, adding it
                         // to the width variable
-                        for (int i = 1, colSpan = cellSpan.getColumnSpan(), max1 = getChildren()
+                        for (int i = 1, colSpan = cellSpan.getColumnSpan(), max1 = cells
                                 .size() - column; i < colSpan && i < max1; i++) {
                             // calculate the width
 //                            final Node adjacentNode = (Node) getChildren().get(
@@ -331,22 +304,31 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 // Request layout is here as (partial) fix for RT-28684
                 // tableCell.requestLayout();
             } else {
-                if (fixedCellSizeProperty().get() > 0) {
+//                if (fixedCellSizeProperty().get() > 0) {
                     // we only add/remove to the scenegraph if the fixed cell
                     // length support is enabled - otherwise we keep all
                     // TableCells in the scenegraph
                     getChildren().remove(tableCell);
-                }
+//                }
             }
-
+            
             x += width;
-
+           
         }
     }
 
-    @Override
-    protected boolean isColumnPartiallyOrFullyVisible(TableColumnBase tc) {
-        return true;
-    }
-
+    /**
+     * Return true if the current cell is part of the sceneGraph.
+     * 
+     * @param x beginning of the cell
+     * @param width total width of the cell
+     * @param hbarValue 
+     * @param headerWidth width of the visible portion of the tableView
+     * @param columnSpan
+     * @return
+     */
+    private boolean isInvisible(double x, double width, double hbarValue,
+			double headerWidth, int columnSpan) {
+		return (x+width <hbarValue && columnSpan == 1) || (x> hbarValue+headerWidth);
+	}
 }

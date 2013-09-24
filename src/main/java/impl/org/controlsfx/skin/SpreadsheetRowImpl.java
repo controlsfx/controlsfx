@@ -160,9 +160,8 @@ public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell<
      */
     SpreadsheetCellImpl<?> getGridCell(int col){
     	
-    	// We compute the number of cells set at the end
-    	//aka the fixed columns that have moved.
- 		final int max = getChildrenUnmodifiable().size()-1;
+    	// Too much complication for a minor effect, simple is better.
+ 	/*	final int max = getChildrenUnmodifiable().size()-1;
  		int j = max;
  		while(j>= 0 && ((SpreadsheetCellImpl<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
  			--j;
@@ -181,7 +180,14 @@ public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell<
             }
         }else{
             return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get(col);
+        }*/
+    	
+        for(Node cell:getChildrenUnmodifiable()){
+        	if(((SpreadsheetCellImpl<?>)cell).getItem().getColumn() == col){
+        		return ((SpreadsheetCellImpl<?>)cell);
+        	}
         }
+        return null;
     }
 
     @Override

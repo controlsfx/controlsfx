@@ -380,8 +380,10 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         } else { // If it's not, then it's the firstkey
             gridCell = row.getGridCell(cell.getColumn());
         }
-        gridCell.setHoverPublic(true);
-        lastHover = gridCell;
+        if(gridCell != null){
+	        gridCell.setHoverPublic(true);
+	        lastHover = gridCell;
+        }
     }
 
     /**

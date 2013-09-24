@@ -72,6 +72,7 @@ public class SpreadsheetColumn<T> {
 //		this.columnSpanConstraint = 0;
 		canFix = canFix();
 		
+		// The contextMenu creation must be on the JFX thread
 		final Runnable r = new Runnable() {
             @Override
             public void run() {

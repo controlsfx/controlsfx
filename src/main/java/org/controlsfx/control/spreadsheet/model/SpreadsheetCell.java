@@ -30,6 +30,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 
 /**
  * The model cell that hold the data. It has all the information needed by the
@@ -60,7 +63,13 @@ public abstract class SpreadsheetCell<T> implements Serializable {
 	protected CellType type;
     protected String str;
     private int row, column, rowSpan, columnSpan;
-
+    /**
+     * Not serializable, it's transient right now because
+     * we don't need the style in copy/paste. But that option
+     * will be provided in the future. 
+     * Help for that : http://www.oracle.com/technetwork/articles/java/javaserial-1536170.html
+     */
+    transient private ObservableList<String> styleClass;
     
     
     /***************************************************************************
@@ -148,10 +157,9 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         this.columnSpan = columnSpan;
     }
     
-    private List<String> styleClass;
-    public List<String> getStyleClass() {
+    public ObservableList<String> getStyleClass() {
         if (styleClass == null) {
-            styleClass = new ArrayList<String>();//FXCollections.observableArrayList();
+            styleClass = FXCollections.observableArrayList();
         }
         return styleClass;
     }

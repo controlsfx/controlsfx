@@ -226,6 +226,7 @@ public class SpreadsheetView extends Control {
         // We add a listener on the focus model in order to catch when we are on a hidden cell
         tableView.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
 
+        // The contextMenu creation must be on the JFX thread
         final Runnable r = new Runnable() {
             @Override
             public void run() {

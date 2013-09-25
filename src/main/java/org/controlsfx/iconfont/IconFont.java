@@ -33,6 +33,11 @@ import com.sun.javafx.css.StyleManager;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+/**
+ *  Represents icon font, which can be loaded locally or from specified URL.
+ *  {@link Icon}s can be created easily using specified character 
+ *
+ */
 public class IconFont {
     
     static {
@@ -46,6 +51,13 @@ public class IconFont {
 	private double size;
 	private Color color;
 	
+
+	/**
+	 * Loads icon font from specified {@link InputStream}
+	 * @param fontName icon font name
+	 * @param defaultSize default font size
+	 * @param in input stream to load the font from
+	 */
 	public IconFont( String fontName, int defaultSize, InputStream in   ) {
 		this.fontName = fontName;
 		this.defaultSize = defaultSize;
@@ -53,6 +65,12 @@ public class IconFont {
 		Font.loadFont(in, -1);
 	}
 	
+	/**
+	 * Load icon font from specified {@link URL} 
+	 * @param fontName icon font name
+	 * @param defaultSize default font size
+	 * @param urlStr {@link URL} to load the font from
+	 */
 	public IconFont( String fontName, int defaultSize, String urlStr ) {
 		this.fontName = fontName;
 		this.defaultSize = defaultSize;
@@ -60,20 +78,39 @@ public class IconFont {
 		Font.loadFont(urlStr, -1);
 	}
 	
+	/**
+	 * Returns the default font size
+	 * @return default font size
+	 */
 	public double getDefaultSize() {
 		return defaultSize;
 	}
 	
+	/**
+	 * Sets font size
+	 * @param size
+	 * @return font instance so the calls can be chained
+	 */
 	public IconFont fontSize(double size) {
 	    this.size = size;
 	    return this;
 	}
 	
+	/**
+	 * Sets font color
+	 * @param color
+	 * @return font instance so the calls can be chained
+	 */
 	public IconFont fontColor(Color color) {
 	    this.color = color;
 	    return this;
 	}
 	
+	/**
+	 * Creates and instance of {@link Icon} using specified font character
+	 * @param character font character
+	 * @return instance of {@link Icon}
+	 */
 	public Icon create(char character) {
 	    return new Icon(fontName, character, size, color);
 	}

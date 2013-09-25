@@ -32,6 +32,13 @@ import java.util.ServiceLoader;
 
 import javafx.scene.Node;
 
+/**
+ * Icon Font Registry. 
+ * Automatically registers available font packs using {@link ServiceLoader} facility.   
+ * Icon pack can also be registered manually using 'register' method.
+ * <br/>
+ * From than on fonts and their glyphs can be requested by name.
+ */
 public final class IconFontRegistry {
 	
 	private static Map<String, IconFontPack> packMap = new HashMap<>();
@@ -53,6 +60,10 @@ public final class IconFontRegistry {
         }
 	}
 	
+	/**
+	 * Registers specified font pack
+	 * @param pack font pack
+	 */
 	public static void register( IconFontPack pack ) {
 	    init();
 		if (pack != null ) {
@@ -60,17 +71,33 @@ public final class IconFontRegistry {
 		}
 	}
 	
+	/**
+	 * Retrieve font pack by font name
+	 * @param fontName font name
+	 * @return font pack or null if not found
+	 */
 	public static IconFontPack pack( String fontName ) {
 	    init();
 		return packMap.get(fontName);
 	}
 	
+	/**
+	 * Retrieve one glyph by font name and glyph name
+	 * @param fontName font name
+	 * @param glyphName glyph name
+	 * @return glyph as a Node
+	 */
 	public static Node glyph( String fontName, String glyphName ) {
 	    init();
 		IconFontPack pack = pack(fontName);
 		return pack.getFont().create(pack.getGlyphs().get(glyphName));
 	}
 	
+	/**
+	 * Retrieve glyph by font name and glyph name using one string where font name an glyph name are separated by pipe
+	 * @param fontAndGlyph font and glyph
+	 * @return glyoh as Node
+	 */
 	public static Node glyph( String fontAndGlyph ) {
 	    init();
 		String[] args = fontAndGlyph.split("\\|");

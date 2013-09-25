@@ -31,6 +31,12 @@ import org.controlsfx.tools.Duplicatable;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
+/**
+ * Represents one icon from the icon font.
+ * The icon is actually a label showing one character from the specified icon font. It can be used as 'graphic' on any UI
+ * control or {@link Action}  
+ *
+ */
 public class Icon extends Label implements Duplicatable<Icon>{
 
     private final String fontFamily;
@@ -38,6 +44,13 @@ public class Icon extends Label implements Duplicatable<Icon>{
     private double size;
     private Color color;
 
+    /**
+     * Creates the icon
+     * @param fontFamily icon font the icon should be based on
+     * @param character character representing the icon in the icon font
+     * @param size icon size in pixels
+     * @param color icon color
+     */
     public Icon(String fontFamily, Character character, double size, Color color) {
         super(character.toString());
 
@@ -50,11 +63,19 @@ public class Icon extends Label implements Duplicatable<Icon>{
         updateStyle();
     }
     
+    /**
+     * Sets icon size in pixels
+     * @param size
+     */
     public void setSize(double size) {
         this.size = size;
         updateStyle();
     }
     
+    /**
+     * Sets icon color
+     * @param color
+     */
     public void setColor(Color color) {
         this.color = color;
         updateStyle();
@@ -77,6 +98,10 @@ public class Icon extends Label implements Duplicatable<Icon>{
         setStyle(css.toString());
     }
 
+    /**
+     * Allows icon duplication. Since in the JavaFX scenegraph it is not possible to insert the same 
+     * {@link Node} in multiple locations at the same time, this method allows for icon reuse in several places  
+     */
 	@Override public Icon duplicate() {
 		return new Icon(fontFamily, character, size, color);
 	}

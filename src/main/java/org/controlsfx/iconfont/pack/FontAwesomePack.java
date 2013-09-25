@@ -26,6 +26,7 @@
  */
 package org.controlsfx.iconfont.pack;
 
+import java.lang.annotation.Inherited;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,11 @@ import javafx.scene.Node;
 import org.controlsfx.iconfont.IconFontPack;
 import org.controlsfx.iconfont.IconFontRegistry;
 
+/**
+ * Defines icon font pack for FontAwesome. Automatically registered with {@link IconFontRegistry}.
+ * <br/>
+ * Currently the font is loaded from Bootstrap CDN 
+ */
 public class FontAwesomePack extends  IconFontPack {
 
 	private static String fontName = "FontAwesome";
@@ -450,6 +456,9 @@ public class FontAwesomePack extends  IconFontPack {
 		glyphs = Collections.unmodifiableMap(map);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override public Map<String, Character> getGlyphs() {
 		return glyphs;
 	}

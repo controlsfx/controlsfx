@@ -29,16 +29,33 @@ package org.controlsfx.iconfont;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Abstract base class for implementing font packs.
+ * Font pack encapsulates icon font and glyph dictionary - 
+ * an association of humanly readable icon names to characters  
+ */
 public abstract class IconFontPack  {
 
 	private final String fontName;
 	private final IconFont font;
 	
+	/**
+	 * Create icon pack from the {@link InputStream}
+	 * @param fontName icon font name
+	 * @param defaultSize icon font default size
+	 * @param in input stream to load the font from
+	 */
 	public IconFontPack(String fontName, int defaultSize, InputStream in) {
 		this.fontName = fontName;
 		this.font = new IconFont(fontName, defaultSize, in);
 	}
 
+	/**
+	 * Create icon pack from {@link URL}
+	 * @param fontName icon font name
+	 * @param defaultSize icon font default size
+	 * @param urlStr url to load the font from
+	 */
 	public IconFontPack( String fontName, int defaultSize, String urlStr ) { 
 		this.fontName = fontName;
 		this.font = new IconFont(fontName, defaultSize, urlStr);

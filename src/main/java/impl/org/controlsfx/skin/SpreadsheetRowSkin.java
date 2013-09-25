@@ -149,7 +149,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
         double tableCellY = 0;
         int positionY;
         //If true, this row is fixed
-        if ((positionY = spreadsheetView.getFixedRowsList().indexOf(index)) != -1) {
+        if ((positionY = spreadsheetView.getFixedRows().indexOf(index)) != -1) {
         	//This row is a bit hidden on top
             if (getSkinnable().getLocalToParentTransform().getTy() < 0) {
                 // We translate then for it to be fully visible

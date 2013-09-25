@@ -26,7 +26,7 @@
  */
 package org.controlsfx.samples;
 
-import static org.controlsfx.iconfont.IconFontRegistry.glyph;
+import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -40,15 +40,15 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.iconfont.IconFont;
-import org.controlsfx.iconfont.IconFontRegistry;
-import org.controlsfx.iconfont.pack.FontAwesomePack;
+import org.controlsfx.glyphfont.GlyphFont;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
+import org.controlsfx.glyphfont.pack.FontAwesomePack;
 
-public class HelloIconFont extends Application implements Sample {
+public class HelloGlyphFont extends Application implements Sample {
 
-	private IconFont fontAwesome = IconFontRegistry.pack("FontAwesome").getFont();
+	private GlyphFont fontAwesome = GlyphFontRegistry.pack("FontAwesome").getFont();
 
-	private IconFont icoMoon = new IconFont("icomoon", 16, getClass()
+	private GlyphFont icoMoon = new GlyphFont("icomoon", 16, getClass()
 			.getResourceAsStream("icomoon.ttf"));
 
 //	private static char FAW_TRASH = '\uf014';
@@ -61,13 +61,13 @@ public class HelloIconFont extends Application implements Sample {
 
 	@Override
 	public String getSampleName() {
-		return "Icon Font";
+		return "Glyph Font";
 	}
 
 	@Override
 	public String getJavaDocURL() {
 		return Utils.JAVADOC_BASE
-				+ "org/controlsfx/control/iconfont/IconFont.html";
+				+ "org/controlsfx/control/glyphfont/GlyphFont.html";
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class HelloIconFont extends Application implements Sample {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		stage.setTitle("Icon Font Demo");
+		stage.setTitle("Glyph Font Demo");
 
 		Scene scene = new Scene((Parent) getPanel(stage), 1300, 300);
 		scene.setFill(Color.WHITE);

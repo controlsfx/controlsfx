@@ -24,52 +24,64 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.iconfont;
+package org.controlsfx.glyphfont;
 
 import java.io.InputStream;
 import java.util.Map;
 
 /**
  * Abstract base class for implementing font packs.
- * Font pack encapsulates icon font and glyph dictionary - 
- * an association of humanly readable icon names to characters  
+ * Font pack encapsulates glyph font and glyph dictionary - 
+ * an association of humanly readable glyph names to characters  
  */
-public abstract class IconFontPack  {
+public abstract class GlyphFontPack  {
 
 	private final String fontName;
-	private final IconFont font;
+	private final GlyphFont font;
 	
 	/**
-	 * Create icon pack from the {@link InputStream}
-	 * @param fontName icon font name
-	 * @param defaultSize icon font default size
+	 * Create glyph pack from the {@link InputStream}
+	 * @param fontName glyph font name
+	 * @param defaultSize glyph font default size
 	 * @param in input stream to load the font from
 	 */
-	public IconFontPack(String fontName, int defaultSize, InputStream in) {
+	public GlyphFontPack(String fontName, int defaultSize, InputStream in) {
 		this.fontName = fontName;
-		this.font = new IconFont(fontName, defaultSize, in);
+		this.font = new GlyphFont(fontName, defaultSize, in);
 	}
 
 	/**
-	 * Create icon pack from {@link URL}
-	 * @param fontName icon font name
-	 * @param defaultSize icon font default size
+	 * Create glyph pack from {@link URL}
+	 * @param fontName glyph font name
+	 * @param defaultSize glyph font default size
 	 * @param urlStr url to load the font from
 	 */
-	public IconFontPack( String fontName, int defaultSize, String urlStr ) { 
+	public GlyphFontPack( String fontName, int defaultSize, String urlStr ) { 
 		this.fontName = fontName;
-		this.font = new IconFont(fontName, defaultSize, urlStr);
+		this.font = new GlyphFont(fontName, defaultSize, urlStr);
 	} 
 
 
+	/**
+	 * Returns the font name
+	 * @return font name
+	 */
 	public String getFontName() {
 		return fontName;
 	}
 
-	public IconFont getFont() {
+	/**
+	 * Returns glyph font
+	 * @return glyph font
+	 */
+	public GlyphFont getFont() {
 		return font;
 	}
 
+	/**
+	 * Returns glyph dictionary
+	 * @return {@link Map} of glyph name to character
+	 */
 	public abstract Map<String, Character> getGlyphs();
 
 }

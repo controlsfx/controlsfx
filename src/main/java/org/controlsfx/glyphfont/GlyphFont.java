@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.iconfont;
+package org.controlsfx.glyphfont;
 
 import java.io.InputStream;
 
@@ -34,15 +34,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 /**
- *  Represents icon font, which can be loaded locally or from specified URL.
- *  {@link Icon}s can be created easily using specified character 
+ *  Represents glyph font, which can be loaded locally or from specified URL.
+ *  {@link Glyph}s can be created easily using specified character 
  *
  */
-public class IconFont {
+public class GlyphFont {
     
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
-                IconFont.class.getResource("iconfont.css").toExternalForm());
+                GlyphFont.class.getResource("glyphfont.css").toExternalForm());
     }
 
 	private final String fontName;
@@ -53,12 +53,12 @@ public class IconFont {
 	
 
 	/**
-	 * Loads icon font from specified {@link InputStream}
-	 * @param fontName icon font name
+	 * Loads glyph font from specified {@link InputStream}
+	 * @param fontName glyph font name
 	 * @param defaultSize default font size
 	 * @param in input stream to load the font from
 	 */
-	public IconFont( String fontName, int defaultSize, InputStream in   ) {
+	public GlyphFont( String fontName, int defaultSize, InputStream in   ) {
 		this.fontName = fontName;
 		this.defaultSize = defaultSize;
 		this.size = defaultSize;
@@ -66,12 +66,12 @@ public class IconFont {
 	}
 	
 	/**
-	 * Load icon font from specified {@link URL} 
-	 * @param fontName icon font name
+	 * Load glyph font from specified {@link URL} 
+	 * @param fontName glyph font name
 	 * @param defaultSize default font size
 	 * @param urlStr {@link URL} to load the font from
 	 */
-	public IconFont( String fontName, int defaultSize, String urlStr ) {
+	public GlyphFont( String fontName, int defaultSize, String urlStr ) {
 		this.fontName = fontName;
 		this.defaultSize = defaultSize;
 		this.size = defaultSize;
@@ -91,7 +91,7 @@ public class IconFont {
 	 * @param size
 	 * @return font instance so the calls can be chained
 	 */
-	public IconFont fontSize(double size) {
+	public GlyphFont fontSize(double size) {
 	    this.size = size;
 	    return this;
 	}
@@ -101,17 +101,17 @@ public class IconFont {
 	 * @param color
 	 * @return font instance so the calls can be chained
 	 */
-	public IconFont fontColor(Color color) {
+	public GlyphFont fontColor(Color color) {
 	    this.color = color;
 	    return this;
 	}
 	
 	/**
-	 * Creates and instance of {@link Icon} using specified font character
+	 * Creates and instance of {@link Glyph} using specified font character
 	 * @param character font character
-	 * @return instance of {@link Icon}
+	 * @return instance of {@link Glyph}
 	 */
-	public Icon create(char character) {
-	    return new Icon(fontName, character, size, color);
+	public Glyph create(char character) {
+	    return new Glyph(fontName, character, size, color);
 	}
 }

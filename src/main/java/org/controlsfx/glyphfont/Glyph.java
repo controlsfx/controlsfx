@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.iconfont;
+package org.controlsfx.glyphfont;
 
 import org.controlsfx.tools.Duplicatable;
 
@@ -32,12 +32,12 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 /**
- * Represents one icon from the icon font.
- * The icon is actually a label showing one character from the specified icon font. It can be used as 'graphic' on any UI
+ * Represents one glyph from the font.
+ * The glyph is actually a label showing one character from the specified font. It can be used as 'graphic' on any UI
  * control or {@link Action}  
  *
  */
-public class Icon extends Label implements Duplicatable<Icon>{
+public class Glyph extends Label implements Duplicatable<Glyph>{
 
     private final String fontFamily;
     private final Character character;
@@ -45,13 +45,13 @@ public class Icon extends Label implements Duplicatable<Icon>{
     private Color color;
 
     /**
-     * Creates the icon
-     * @param fontFamily icon font the icon should be based on
+     * Creates the glyph
+     * @param fontFamily font the glyph should be based on
      * @param character character representing the icon in the icon font
-     * @param size icon size in pixels
-     * @param color icon color
+     * @param size glyph size in pixels
+     * @param color glyph color
      */
-    public Icon(String fontFamily, Character character, double size, Color color) {
+    public Glyph(String fontFamily, Character character, double size, Color color) {
         super(character.toString());
 
         this.fontFamily = fontFamily;
@@ -59,12 +59,12 @@ public class Icon extends Label implements Duplicatable<Icon>{
         this.size = size;
         this.color = color;
 
-        getStyleClass().add("icon-font");
+        getStyleClass().add("glyph-font");
         updateStyle();
     }
     
     /**
-     * Sets icon size in pixels
+     * Sets glyph size in pixels
      * @param size
      */
     public void setSize(double size) {
@@ -73,7 +73,7 @@ public class Icon extends Label implements Duplicatable<Icon>{
     }
     
     /**
-     * Sets icon color
+     * Sets glyph color
      * @param color
      */
     public void setColor(Color color) {
@@ -85,9 +85,9 @@ public class Icon extends Label implements Duplicatable<Icon>{
     private void updateStyle() {
         StringBuilder css = new StringBuilder( String.format("-fx-font-family: %s; -fx-font-size: %fpx;", fontFamily, size));
         if (color == null) {
-            css.append("-icons-color: -fx-text-background-color;");
+            css.append("-glyphs-color: -fx-text-background-color;");
         } else {
-            css.append("-icons-color: rgb(");
+            css.append("-glyphs-color: rgb(");
             css.append((int)(color.getRed()*255));
             css.append(",");
             css.append((int)(color.getGreen()*255));
@@ -99,10 +99,10 @@ public class Icon extends Label implements Duplicatable<Icon>{
     }
 
     /**
-     * Allows icon duplication. Since in the JavaFX scenegraph it is not possible to insert the same 
-     * {@link Node} in multiple locations at the same time, this method allows for icon reuse in several places  
+     * Allows glyph duplication. Since in the JavaFX scenegraph it is not possible to insert the same 
+     * {@link Node} in multiple locations at the same time, this method allows for glyph reuse in several places  
      */
-	@Override public Icon duplicate() {
-		return new Icon(fontFamily, character, size, color);
+	@Override public Glyph duplicate() {
+		return new Glyph(fontFamily, character, size, color);
 	}
 }

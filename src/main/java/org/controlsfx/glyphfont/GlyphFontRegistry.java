@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.iconfont;
+package org.controlsfx.glyphfont;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,19 +33,19 @@ import java.util.ServiceLoader;
 import javafx.scene.Node;
 
 /**
- * Icon Font Registry. 
+ * Glyph Font Registry. 
  * Automatically registers available font packs using {@link ServiceLoader} facility.   
- * Icon pack can also be registered manually using 'register' method.
+ * Glyph font pack can also be registered manually using 'register' method.
  * <br/>
  * From than on fonts and their glyphs can be requested by name.
  */
-public final class IconFontRegistry {
+public final class GlyphFontRegistry {
 	
-	private static Map<String, IconFontPack> packMap = new HashMap<>();
+	private static Map<String, GlyphFontPack> packMap = new HashMap<>();
 	
 	private static boolean isInited = false;
 	
-	private IconFontRegistry() {
+	private GlyphFontRegistry() {
 		// no-op
 	}
 	
@@ -53,10 +53,10 @@ public final class IconFontRegistry {
 	    if (isInited) return;
 	    isInited = true;
 	    
-	    // find all classes that implement IconFontPack and register them now
-	    ServiceLoader<IconFontPack> loader = ServiceLoader.load(IconFontPack.class);
-        for (IconFontPack fontPack : loader) {
-        	IconFontRegistry.register(fontPack);
+	    // find all classes that implement GlyphFontPack and register them now
+	    ServiceLoader<GlyphFontPack> loader = ServiceLoader.load(GlyphFontPack.class);
+        for (GlyphFontPack fontPack : loader) {
+        	GlyphFontRegistry.register(fontPack);
         }
 	}
 	
@@ -64,7 +64,7 @@ public final class IconFontRegistry {
 	 * Registers specified font pack
 	 * @param pack font pack
 	 */
-	public static void register( IconFontPack pack ) {
+	public static void register( GlyphFontPack pack ) {
 	    init();
 		if (pack != null ) {
 			packMap.put( pack.getFontName(), pack );
@@ -76,7 +76,7 @@ public final class IconFontRegistry {
 	 * @param fontName font name
 	 * @return font pack or null if not found
 	 */
-	public static IconFontPack pack( String fontName ) {
+	public static GlyphFontPack pack( String fontName ) {
 	    init();
 		return packMap.get(fontName);
 	}
@@ -89,7 +89,7 @@ public final class IconFontRegistry {
 	 */
 	public static Node glyph( String fontName, String glyphName ) {
 	    init();
-		IconFontPack pack = pack(fontName);
+		GlyphFontPack pack = pack(fontName);
 		return pack.getFont().create(pack.getGlyphs().get(glyphName));
 	}
 	

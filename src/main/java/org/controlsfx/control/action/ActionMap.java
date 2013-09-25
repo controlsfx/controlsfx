@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.controlsfx.iconfont.IconFontRegistry;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -168,7 +168,7 @@ class AnnotatedAction extends AbstractAction {
 			String[] def = graphicDef.split("\\>");  // cannot use ':' because it used in urls
 			if ( def.length == 1 ) return new ImageView(new Image(def[0]));
 			switch (def[0]) {
-			   case "font"    : return IconFontRegistry.glyph(def[1]);  
+			   case "font"    : return GlyphFontRegistry.glyph(def[1]);  
 			   case "image"   : return new ImageView(new Image(def[1]));
 			   default: throw new IllegalArgumentException( String.format("Unknown ActionProxy graphic protocol: %s", def[0]));
 			}

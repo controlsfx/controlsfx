@@ -24,24 +24,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.iconfont.pack;
+package org.controlsfx.glyphfont.pack;
 
-import java.lang.annotation.Inherited;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javafx.scene.Node;
 
-import org.controlsfx.iconfont.IconFontPack;
-import org.controlsfx.iconfont.IconFontRegistry;
+import org.controlsfx.glyphfont.GlyphFontPack;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
- * Defines icon font pack for FontAwesome. Automatically registered with {@link IconFontRegistry}.
+ * Defines glyph font pack for FontAwesome. Automatically registered with {@link GlyphFontRegistry}.
  * <br/>
  * Currently the font is loaded from Bootstrap CDN 
  */
-public class FontAwesomePack extends  IconFontPack {
+public class FontAwesomePack extends  GlyphFontPack {
 
 	private static String fontName = "FontAwesome";
 	
@@ -439,11 +438,11 @@ public class FontAwesomePack extends  IconFontPack {
 		}
 		
 		public Node create() {
-		    return IconFontRegistry.glyph(fontName, name());
+		    return GlyphFontRegistry.glyph(fontName, name());
 		}
 	};
 	
-	// FIXME only needs to be instantiated by the IconFontRegistry, so this
+	// FIXME only needs to be instantiated by the GlyphFontRegistry, so this
 	// constructor shouldn't really be called multiple times...
 	public FontAwesomePack() {
 		

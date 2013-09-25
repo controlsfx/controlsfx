@@ -34,10 +34,40 @@ import org.controlsfx.control.SpreadsheetView.SpanType;
 /**
  * That class holds some {@link DataRow} filled with {@link SpreadsheetCell} in order
  * to be used by the {@link SpreadsheetView}
+ * 
+ * A Grid is used by {@link SpreadsheetView} to represent the data to show on
+ * screen. A default implementation is provided by {@link GridBase}, but for 
+ * more custom purposes (e.g. loading data on demand), this Grid interface may
+ * prove useful.
+ * 
+ * <p>A Grid at its essence consists of rows and columns. Critical to the 
+ * SpreadsheetView is that the {@link #getRowCount() row count} and 
+ * {@link #getColumnCount() column count} are accurately returned when requested
+ * (even if the data returned by {@link #getRows()} is not all fully loaded into
+ * memory). 
+ * 
+ * <p>Whilst the {@link #getRows()} return type may appear confusing, it is 
+ * actually quite logical when you think about it: {@link #getRows()} returns an
+ * ObservableList of ObservableList of {@link SpreadsheetCell} instances. In other
+ * words, this is your classic 2D collection, where the outer ObservableList
+ * can be thought of as the rows, and the inner ObservableList as the columns
+ * within each row. Therefore, if you are wanting to iterate through all columns
+ * in every row of the grid, you would do something like this:
+ * 
+ * <pre>
+ * Grid grid = ...
+ * for (int row = 0; row < grid.getRowCount(); row++) {
+ *     for (int column = 0; column < grid.getColumnCount(); column++) {
+ *         SpreadsheetCell&lt;?&gt; cell = getRows().get(row).get(column);
+ *         doStuff(cell);
+ *     }
+ * }
+ * </pre>
+ * 
+ * @see SpreadsheetView
+ * @see SpreadsheetView
  */
 public interface Grid {
-    
-//  public abstract DataRow getRow(int row);
     
     /**
      * Return how many rows are inside the grid.
@@ -50,16 +80,13 @@ public interface Grid {
     public int getColumnCount();
     
     /**
-     * Return a list of the {@link DataRow} used by the Grid.
-     * @return
+     * Returns an ObservableList of ObservableList of {@link SpreadsheetCell}
+     * instances. Refer to the {@link Grid} class javadoc for more detail.
      */
     public ObservableList<ObservableList<SpreadsheetCell<?>>> getRows();
 
     /**
-     * Return the {@link SpanType} of a cell.
-     * @param row
-     * @param column
-     * @return
+     * Return the {@link SpanType} for a given cell row/column intersection.
      */
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
 }

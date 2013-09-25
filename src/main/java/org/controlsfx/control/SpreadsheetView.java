@@ -56,6 +56,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -809,7 +810,12 @@ public class SpreadsheetView extends Control {
 
 
 
-
+    /**
+     * A {@link SelectionModel} implementation for the {@link SpreadsheetView}
+     * control.
+     *
+     * @param <S>
+     */
     public static class SpreadsheetViewSelectionModel<S> extends TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell<?>>> {
 
         private boolean ctrl = false;   // Register state of 'ctrl' key
@@ -817,7 +823,7 @@ public class SpreadsheetView extends Control {
         private boolean key = false;    // Register if we last touch the keyboard or the mouse
         private boolean drag = false;	//register if we are dragging (no edition)
         private int itemCount = 0;
-        MouseEvent mouseEvent;
+        private MouseEvent mouseEvent;
         private final TableView<ObservableList<SpreadsheetCell<?>>> tableView;
         private final SpreadsheetView spreadsheetView;
 
@@ -847,21 +853,21 @@ public class SpreadsheetView extends Control {
          * When the drag is over, we remove the listener and stop the timer
          */
         private final EventHandler<MouseEvent> dragDoneHandler = new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent arg0) {
+            @Override public void handle(MouseEvent arg0) {
                 drag = false;
                 timer.stop();
                 spreadsheetView.removeEventHandler(MouseEvent.MOUSE_RELEASED, this);
             }
         };
 
-        /**
-         * *********************************************************************
-         *                                                                     *
-         * Constructors * *
-         * ********************************************************************
-         */
+        
+        
+        /***********************************************************************
+         *                                                                     
+         * Constructors 
+         * 
+         **********************************************************************/
+        
         public SpreadsheetViewSelectionModel(SpreadsheetView spreadsheetView, final TableView<ObservableList<SpreadsheetCell<?>>> tableView) {
             super(tableView);
             this.tableView = tableView;

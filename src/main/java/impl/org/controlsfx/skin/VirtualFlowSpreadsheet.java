@@ -135,7 +135,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
     }
 
     public ObservableList<Integer> getFixedRows() {
-        return spreadSheetView.getFixedRowsList();
+        return spreadSheetView.getFixedRows();
     }
 
     public T getFirstVisibleCellWithinViewPort() {

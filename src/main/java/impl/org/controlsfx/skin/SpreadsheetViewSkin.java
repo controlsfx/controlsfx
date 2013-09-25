@@ -87,7 +87,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
         /*****************************************************************
          * MODIFIED BY NELLARMONIA
          *****************************************************************/
-        spreadsheetView.getFixedRowsList().addListener(fixedRowsListener);
+        spreadsheetView.getFixedRows().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 //        spreadsheetView.setHbar(getFlow().getHorizontalBar());
 //        spreadsheetView.setVbar(getFlow().getVerticalBar());

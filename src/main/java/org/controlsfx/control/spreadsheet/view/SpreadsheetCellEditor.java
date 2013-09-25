@@ -162,7 +162,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         }
         
         private boolean addCell(SpreadsheetCellImpl<?> cell){
-            SpreadsheetRowImpl temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows());
+            SpreadsheetRowImpl temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows().size());
             if(temp != null){
                 temp.addCell(cell);
                 return true;

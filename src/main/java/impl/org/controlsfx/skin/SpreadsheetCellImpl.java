@@ -153,7 +153,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         	 * I check if the current SpreadsheetRow is referenced in the SpreadsheetView,
         	 * if not, then I know I can throw it away (setManaged(false) ?)
         	 */
-        	if(row <= spv.getFixedRows()){
+        	if(row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
 	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin(spv).getCellsSize();j++ ) {
 	                    if(SpreadsheetViewSkin.getCell(spv, j) == getTableRow()){
@@ -366,10 +366,10 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         SpreadsheetCellImpl<?> gridCell;
         
         final SpreadsheetView spv = getSpreadsheetView();
-        final SpreadsheetRowImpl row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRowsList().size());
+        final SpreadsheetRowImpl row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size());
         
         if (SpreadsheetViewSkin.getSkin(spv).getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
-        	final SpreadsheetRowImpl rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRowsList().size()+cell.getRow() - row.getIndex());
+        	final SpreadsheetRowImpl rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need
             // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
             if( rightRow != null) {// Sometime when scrolling fast it's null so..

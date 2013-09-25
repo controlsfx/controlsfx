@@ -65,63 +65,58 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
-import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
- * The SpreadsheetView is a control based on {@link TableView} with different functionalities. The aim
- * is to have a powerful grid where data can be written and retrieved.
+ * The SpreadsheetView is a control similar to the JavaFX {@link TableView} control
+ * but with different functionalities and use cases. The aim is to have a 
+ * powerful grid where data can be written and retrieved.
  * 
  * <h3>Features </h3>
- * <li> Cells can span in row and in column.</li>
- * <li> Rows can be fixed to the top of the {@link SpreadsheetView} so that they are
- * always visible on screen.</li>
- * <li> Columns can be fixed to the left of the {@link SpreadsheetView} so that they are
- * always visible on screen. Only columns without any spanning cells can be fixed.</li>
- * <li> A row header can be switched on in order to display the row number.</li>
- * <li> Selection of several cells can be made with a click and drag.</li>
- * <li> A copy/paste context menu is accessible with a right-click.</li>
+ * <ul>
+ *   <li> Cells can span in row and in column.</li>
+ *   <li> Rows can be fixed to the top of the {@link SpreadsheetView} so that they are always visible on screen.</li>
+ *   <li> Columns can be fixed to the left of the {@link SpreadsheetView} so that they are always visible on screen. Only columns without any spanning cells can be fixed.</li>
+ *   <li> A row header can be switched on in order to display the row number.</li>
+ *   <li> Selection of several cells can be made with a click and drag.</li>
+ *   <li> A copy/paste context menu is accessible with a right-click.</li>
+ * </ul>
  * 
- * 
- * <h3>Creating a SpreadsheetView </h3>
- * Just like the {@link TableView}, you can instantiate the underlying model, a {@link Grid}.
+ * <h3>Code Samples</h3>
+ * Just like the {@link TableView}, you instantiate the underlying model, a {@link Grid}.
  * You will create some {@link ObservableList<DataCell>} filled with {@link SpreadsheetCell}. 
  * 
- * {@code 
+ * <br/><br/>
+ * 
+ * <pre>
  * int rowCount = 15;
  * int columnCount = 10;
  * Grid grid = new Grid(rowCount, columnCount);
  * 
- * ArrayList<ObservableList<DataCell>> rows = new ArrayList<ObservableList<DataCell>>(grid.getRowCount());
- *		for (int row = 0; row < grid.getRowCount(); ++row) {
- *			final ObservableList<DataCell> ObservableList<DataCell> = new ObservableList<DataCell>(row, grid.getColumnCount());
- *			for (int column = 0; column < grid.getColumnCount(); ++column) {
- *				ObservableList<DataCell>.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
- *			}
- *			rows.add(ObservableList<DataCell>);
- *		}
- * grid.setRows(rows);
+ * ArrayList&lt;ObservableList&lt;DataCell&gt;&gt; rows = new ArrayList&lt;ObservableList&lt;DataCell&gt;&gt;(grid.getRowCount());
+ * for (int row = 0; row < grid.getRowCount(); ++row) {
+ *     final ObservableList&lt;DataCell&gt; ObservableList&lt;DataCell&gt; = new ObservableList&lt;DataCell&gt;(row, grid.getColumnCount());
+ *     for (int column = 0; column < grid.getColumnCount(); ++column) {
+ *         ObservableList&lt;DataCell&gt;.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
+ *     }
+ *     rows.add(ObservableList&lt;DataCell&gt;);
  * }
+ * grid.setRows(rows);
+ * </pre>
  * 
  * At that moment you can span some of the cells with the convenient method provided by the grid.
  * Then you just need to instantiate the SpreadsheetView.
- *		
- * {@code
- * SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
- * }
  */
 public class SpreadsheetView extends Control {
 
@@ -132,15 +127,27 @@ public class SpreadsheetView extends Control {
      * Static Fields                                                           *
      *                                                                         *
      **************************************************************************/
+    
     /**
-     * Define how this cell is spanning.
+     * Define how each cell is spanning. Refer to {@link SpreadsheetView} for
+     * more information.
      */
     public static enum SpanType {
-        NORMAL_CELL, 		// Normal Cell (visible)
-        COLUMN_INVISIBLE, 	//Invisible cell spanned in column
-        ROW_INVISIBLE, 		//Invisible cell spanned in row
-        ROW_VISIBLE,		//Visible Cell but has invisible cell below
-        BOTH_INVISIBLE;   	//Invisible cell, span in diagonal
+        
+        /** Normal Cell (visible) */
+        NORMAL_CELL,
+        
+        /** Invisible cell spanned in column */
+        COLUMN_INVISIBLE,
+        
+        /** Invisible cell spanned in row */
+        ROW_INVISIBLE,
+        
+        /** Visible Cell but has invisible cell below */
+        ROW_VISIBLE,
+        
+        /** Invisible cell, span in diagonal */
+        BOTH_INVISIBLE;
     }
 
 
@@ -157,15 +164,16 @@ public class SpreadsheetView extends Control {
     private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
-    private VirtualScrollBar hbar=null;
-    private VirtualScrollBar vbar=null;
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
 
+    
+    
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
+    
     /**
      * Creates a default SpreadsheetView control with no content and a null Grid. 
      */
@@ -332,9 +340,9 @@ public class SpreadsheetView extends Control {
      * @param numberOfFixedRows
      */
     public final void fixRows(int numberOfFixedRows){
-        getFixedRowsList().clear();
+        getFixedRows().clear();
         for (int j = 0; j < numberOfFixedRows; j++) {
-            getFixedRowsList().add(j);
+            getFixedRows().add(j);
         }
     }
 
@@ -343,16 +351,8 @@ public class SpreadsheetView extends Control {
      * Just the number of the rows are returned.
      * @return
      */
-    public ObservableList<Integer> getFixedRowsList() {
+    public ObservableList<Integer> getFixedRows() {
         return fixedRows;
-    }
-    
-    /**
-     * Return the number of fixed rows at the top of the SpreadsheetView
-     * @return
-     */
-    public int getFixedRows() {
-        return fixedRows.size();
     }
 
     /**
@@ -1251,7 +1251,7 @@ public class SpreadsheetView extends Control {
 
             //We try to make visible the rows that may be hidden by Fixed rows
             // We don't want to do any scroll behavior when dragging
-            if(!drag && SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRowsList().contains(posFinal.getRow())) {
+            if(!drag && SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());
             }
 

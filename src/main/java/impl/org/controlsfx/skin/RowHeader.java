@@ -121,7 +121,7 @@ public class RowHeader  extends StackPane {
 		// When the Column header is showing or not, we need to update the position of the rowHeader
 		spreadsheetView.showColumnHeaderProperty().addListener(layout);
 
-		spreadsheetView.getFixedRowsList().addListener(layout);
+		spreadsheetView.getFixedRows().addListener(layout);
 		//In case we resize the view in any manners
 		spreadsheetView.heightProperty().addListener(layout);
 
@@ -171,8 +171,8 @@ public class RowHeader  extends StackPane {
 			}
 
 			// Then we iterate over the FixedRows if any
-			if(!spreadsheetView.getFixedRowsList().isEmpty() && spreadsheetViewSkin.getCellsSize() != 0){
-				for(i = 0;i<spreadsheetView.getFixedRows();++i){
+			if(!spreadsheetView.getFixedRows().isEmpty() && spreadsheetViewSkin.getCellsSize() != 0){
+				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
 					label = getLabel(rowCount++);
 					label.setText(String.valueOf(i+1));
 					label.resize(prefWidth,prefHeight);

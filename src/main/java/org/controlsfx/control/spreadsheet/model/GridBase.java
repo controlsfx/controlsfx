@@ -1,15 +1,44 @@
+/**
+ * Copyright (c) 2013, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control.spreadsheet.model;
 
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
-import java.util.ArrayList;
-
-import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpanType;
+import java.util.Collection;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.SpreadsheetView.SpanType;
+
+/**
+ * A base implementation of the {@link Grid} interface.
+ */
 public class GridBase implements Grid {
 
     /***************************************************************************
@@ -36,6 +65,9 @@ public class GridBase implements Grid {
         this(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
+    /**
+     * Creates a grid with a fixed number of rows and columns.
+     */
     public GridBase(int rowCount, int columnCount) {
         this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell<?>>> emptyObservableList());
     }
@@ -69,14 +101,8 @@ public class GridBase implements Grid {
         return columnCount;
     }
     
-    /**
-     * Return the {@link SpanType} of a cell.
-     * @param row
-     * @param column
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
-
         if (row < 0 || column < 0 || !containsRow(spv, row)) {
             return SpanType.NORMAL_CELL;
         }
@@ -152,7 +178,7 @@ public class GridBase implements Grid {
      * @param rowIndex
      * @param colIndex
      */
-    public void spanCol(int count, int rowIndex, int colIndex) {
+    public void spanColumn(int count, int rowIndex, int colIndex) {
         final int colSpan = count;
         final int rowSpan = rows.get(rowIndex).get(colIndex).getRowSpan();
         rows.get(rowIndex).get(colIndex).setColumnSpan(colSpan);
@@ -167,31 +193,30 @@ public class GridBase implements Grid {
     }
 
     /**
-     * Set the rows used by the Grid.
-     * the rowCount is then updated
-     * @param rows
+     * This method sets the rows used by the grid, and updates the rowCount.
      */
-    public void setRows(ObservableList<ObservableList<SpreadsheetCell<?>>> rows) {
-        this.rows = rows;
+    public void setRows(Collection<ObservableList<SpreadsheetCell<?>>> rows) {
+        if (rows instanceof ObservableList) {
+            this.rows = (ObservableList<ObservableList<SpreadsheetCell<?>>>) rows;
+        } else {
+            this.rows = FXCollections.observableArrayList(rows);
+        }
         setRowCount(rows.size());
     }
     
-    /**
-     * Set the rows used by the Grid.
-     * the rowCount is then updated
-     * @param rows
-     */
-    public void setRows(ArrayList<ObservableList<SpreadsheetCell<?>>> rows) {
-        this.rows = FXCollections.observableArrayList(rows);
-        setRowCount(rows.size());
-    }
     
+    
+    /***************************************************************************
+     * 
+     * Private implementation
+     * 
+     **************************************************************************/
     
     /**
      * Set a new rowCount for the grid.
      * @param rowCount
      */
-    public void setRowCount(int rowCount) {
+    private void setRowCount(int rowCount) {
         this.rowCount = rowCount;
     }
 
@@ -199,26 +224,9 @@ public class GridBase implements Grid {
      * Set a new columnCount for the grid.
      * @param columnCount
      */
-    public void setColumnCount(int columnCount) {
+    private void setColumnCount(int columnCount) {
         this.columnCount = columnCount;
     }
-
-//    /**
-//     * Debug function to print all the cells inside the grid.
-//     * 
-//     * @param grid
-//     */
-//    public void print(DataCell<?>[][] grid) {
-//        for (int row = 0; row < rowCount; ++row) {
-//            for (int column = 0; column < columnCount; ++column) {
-//                System.out.print(grid[row][column].toString());
-//            }
-//            System.out.println("");
-//        }
-//    }
-    
-    
-    
     
     /**
      * Indicate whether or not the row at the specified index is currently 

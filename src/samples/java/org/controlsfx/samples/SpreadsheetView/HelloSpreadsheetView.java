@@ -265,26 +265,26 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	 */
 	private void buildBothGrid(GridBase grid) {
 		grid.spanRow(2, 2, 2);
-		grid.spanCol(2, 2, 2);
+		grid.spanColumn(2, 2, 2);
 
 		grid.spanRow(4, 2, 4);
 
-		grid.spanCol(5, 8, 2);
+		grid.spanColumn(5, 8, 2);
 
 		grid.spanRow(15, 3, 8);
 
 		grid.spanRow(3, 5, 5);
-		grid.spanCol(3, 5, 5);
+		grid.spanColumn(3, 5, 5);
 
 		grid.spanRow(2, 10, 4);
-		grid.spanCol(3, 10, 4);
+		grid.spanColumn(3, 10, 4);
 
 		grid.spanRow(2, 12, 3);
-		grid.spanCol(3, 22, 3);
+		grid.spanColumn(3, 22, 3);
 
 		grid.spanRow(1, 27, 4);
 
-		grid.spanCol(4, 30, 3);
+		grid.spanColumn(4, 30, 3);
 		grid.spanRow(4, 30, 3);
 	}
 }

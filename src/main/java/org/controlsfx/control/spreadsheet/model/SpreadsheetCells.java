@@ -30,6 +30,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell.CellType;
+
 /**
  * You can generate some {@link SpreadsheetCell} used by the {@link Grid}
  * with the static method provided. 
@@ -45,16 +47,16 @@ public class SpreadsheetCells {
     /**
      * Creates a cell that hold a String at the specified position, with 
      * the specified row/column span.
-     * @param r row number
-     * @param c column number
+     * @param row row number
+     * @param column column number
      * @param rs rowSpan (1 is normal)
      * @param cs ColumnSpan (1 is normal)
      * @param value the String to display
      * @return
      */
-    public static SpreadsheetCell<String> createTextCell(final int r, final int c,
-            final int rs, final int cs, final String value) {
-        return new SpreadsheetCell<String>(r, c, rs, cs) {
+    public static SpreadsheetCell<String> createTextCell(final int row, final int column,
+            final int rowSpan, final int columnSpan, final String value) {
+        return new SpreadsheetCell<String>(row, column, rowSpan, columnSpan, CellType.STRING) {
 
             /*******************************************************************
              * * Static Fields * *
@@ -65,7 +67,6 @@ public class SpreadsheetCells {
              * * Constructor * *
              ******************************************************************/
             {
-                this.type = CellType.STRING;
                 this.setCellValue(value);
             }
 
@@ -100,9 +101,9 @@ public class SpreadsheetCells {
      * @param value the Double to display
      * @return
      */
-    public static SpreadsheetCell<Double> createDoubleCell(final int r, final int c,
-            final int rs, final int cs, final Double value) {
-        return new SpreadsheetCell<Double>(r, c, rs, cs) {
+    public static SpreadsheetCell<Double> createDoubleCell(final int row, final int column,
+            final int rowSpan, final int columnSpan, final Double value) {
+        return new SpreadsheetCell<Double>(row, column, rowSpan, columnSpan, CellType.DOUBLE) {
 
             /*******************************************************************
              * * Static Fields * *
@@ -118,7 +119,6 @@ public class SpreadsheetCells {
              * * Constructor * *
              ******************************************************************/
             {
-                this.type = CellType.DOUBLE;
                 this.setCellValue(value);
             }
 
@@ -162,9 +162,9 @@ public class SpreadsheetCells {
 	 * @param _value A list of String to display
 	 * @return
 	 */
-    public static SpreadsheetCell<List<String>> createListCell(final int r,
-            final int c, final int rs, final int cs, final List<String> _value) {
-        return new SpreadsheetCell<List<String>>(r, c, rs, cs) {
+    public static SpreadsheetCell<List<String>> createListCell(final int row, final int column,
+            final int rowSpan, final int columnSpan, final List<String> _value) {
+        return new SpreadsheetCell<List<String>>(row, column, rowSpan, columnSpan, CellType.ENUM) {
             /***************************************************************************
              * * Static Fields * *
              **************************************************************************/
@@ -179,7 +179,6 @@ public class SpreadsheetCells {
              * * Constructor * *
              **************************************************************************/
             {
-                this.type = CellType.ENUM;
                 this.value = _value;
 
                 str = value.size() > 0 ? this.value
@@ -221,9 +220,9 @@ public class SpreadsheetCells {
      * @param _value A {@link LocalDate}
      * @return
      */
-    public static SpreadsheetCell<LocalDate> createDateCell(final int r, final int c,
-            final int rs, final int cs, final LocalDate _value) {
-        return new SpreadsheetCell<LocalDate>(r, c, rs, cs) {
+    public static SpreadsheetCell<LocalDate> createDateCell(final int row, final int column,
+            final int rowSpan, final int columnSpan, final LocalDate _value) {
+        return new SpreadsheetCell<LocalDate>(row, column, rowSpan, columnSpan, CellType.DATE) {
 
             /***************************************************************************
              * * Static Fields * *
@@ -239,7 +238,6 @@ public class SpreadsheetCells {
              * * Constructor * *
              **************************************************************************/
             {
-                this.type = CellType.DATE;
                 this.setCellValue(_value);
             }
 

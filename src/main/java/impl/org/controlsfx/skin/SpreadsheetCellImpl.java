@@ -312,7 +312,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
     public void show(final SpreadsheetCell<?> item){
         //We reset the settings
         setText(item.getStr());
-        this.setEditable(item.getEditable());
+        this.setEditable(item.isEditable());
         
         getStyleClass().clear();
         getStyleClass().add("spreadsheet-cell");

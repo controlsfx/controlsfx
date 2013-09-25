@@ -27,11 +27,11 @@
 package org.controlsfx.control.spreadsheet.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.controlsfx.control.SpreadsheetView;
 
 
 /**
@@ -48,6 +48,10 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      **************************************************************************/
     private static final long serialVersionUID = -7648169794403402662L;
 
+    /**
+     * An enumeration to represent the types of cell available in the
+     * {@link SpreadsheetView} control.
+     */
     public static enum CellType {
         STRING, ENUM, DOUBLE, DATE, SPLITTER;
     }
@@ -59,17 +63,23 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * Private Fields
      * 
      **************************************************************************/
-    private Boolean editable;
-	protected CellType type;
+
+    private final CellType type;
+    private final int row;
+    private final int column;
+    private int rowSpan;
+    private int columnSpan;
+    
     protected String str;
-    private int row, column, rowSpan, columnSpan;
+    private boolean editable;
+    
     /**
      * Not serializable, it's transient right now because
      * we don't need the style in copy/paste. But that option
      * will be provided in the future. 
      * Help for that : http://www.oracle.com/technetwork/articles/java/javaserial-1536170.html
      */
-    transient private ObservableList<String> styleClass;
+    private transient ObservableList<String> styleClass;
     
     
     /***************************************************************************
@@ -78,11 +88,16 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * 
      **************************************************************************/
 
-    public SpreadsheetCell(int r, int c, int rs, int cs) {
-        row = r;
-        column = c;
-        rowSpan = rs;
-        columnSpan = cs;
+    public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan) {
+        this(row, column, rowSpan, columnSpan, null);
+    }
+    
+    public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan, final CellType type) {
+        this.row = row;
+        this.column = column;
+        this.rowSpan = rowSpan;
+        this.columnSpan = columnSpan;
+        this.type = type == null ? CellType.STRING : type;
         str = "";
         editable = true;
     }
@@ -127,7 +142,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     public CellType getCellType() {
         return type;
     }
-
+    
     @Override
     public String toString() {
         return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
@@ -164,11 +179,11 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         return styleClass;
     }
 
-    public Boolean getEditable() {
+    public boolean isEditable() {
 		return editable;
 	}
 
-	public void setEditable(Boolean readOnly) {
+	public void setEditable(boolean readOnly) {
 		this.editable = readOnly;
 	}
 	

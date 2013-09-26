@@ -42,18 +42,6 @@ public class SpreadsheetColumn<T> {
 	
 	/***************************************************************************
      *                                                                         *
-     * Package protected Fields                                                *
-     *                                                                         *
-     **************************************************************************/
-	/**
-	 * Indicate whether or not this column is currently fixed on the left.
-	 * The column can be fixed, but has not moved yet because we have not exceed it.
-	 * It is needed for the HoverProperty. See {@link SpreadsheetRowImpl} and {@link SpreadsheetRowSkin} implementation.
-	 */
-	private Boolean currentlyFixed = false;
-
-	/***************************************************************************
-     *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
@@ -99,26 +87,8 @@ public class SpreadsheetColumn<T> {
 	 * @return
 	 */
 	public boolean isFixed() {
-		return column.impl_isFixed();
-	}
-	
-	/**
-	 * Verify that you can fix this column.
-	 * Right now, only a column without any cell spanning 
-	 * can be fixed.
-	 * 
-	 * @return
-	 */
-	public boolean canFix(){
-		for (ObservableList<SpreadsheetCell<?>> row : spreadsheetView.getGrid().getRows()) {
-			int columnSpan = row.get(indexColumn).getColumnSpan();
-			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
-				return false;
-//			}else if(columnSpan>1){
-//				columnSpanConstraint = columnSpanConstraint>columnSpan?columnSpanConstraint:columnSpan;
-//			}
-		}
-		return true;
+//		return column.impl_isFixed();
+		return spreadsheetView.getFixedColumns().contains(this);
 	}
 	
 	/**
@@ -127,23 +97,11 @@ public class SpreadsheetColumn<T> {
 	 * @param fixed
 	 */
 	public void setFixed(boolean fixed) {
-		if(canFix){
-//			if(columnSpanConstraint == 0){
-				column.impl_setFixed(fixed);
-				
-				//Just a visual confirmation, will be removed
-				if(column.impl_isFixed()){
-					spreadsheetView.getFixedColumns().add(indexColumn);
-				}else{
-					spreadsheetView.getFixedColumns().remove(Integer.valueOf(indexColumn));
-				}
-				FXCollections.sort(spreadsheetView.getFixedColumns());
-//			}else{
-//				for(int i=indexColumn;i<columnSpanConstraint;++i){
-//					
-//				}
-//			}
-		}
+	    if (fixed) {
+	        spreadsheetView.getFixedColumns().add(this);
+	    } else {
+	        spreadsheetView.getFixedColumns().removeAll(this);
+	    }
 	}
 	
 	/**
@@ -169,21 +127,6 @@ public class SpreadsheetColumn<T> {
 		column.setResizable(b);
 	}
 	
-	public Boolean getCurrentlyFixed() {
-		return currentlyFixed;
-	}
-
-	/**
-	 * Indicate that this column is bonded on the left because the hbar has 
-	 * exceed the column normal position.
-	 * @param currentlyFixed
-	 */
-	public void setCurrentlyFixed(Boolean currentlyFixed) {
-		this.currentlyFixed = currentlyFixed;
-	}
-	
-	
-	
 	/***************************************************************************
      *                                                                         *
      * Private Methods                                               		   *
@@ -195,25 +138,48 @@ public class SpreadsheetColumn<T> {
      * @return
      */
     private ContextMenu getColumnContextMenu(){
-    	final ContextMenu contextMenu = new ContextMenu();
-
-    	this.fixItem = new CheckMenuItem("Fix");
-    	//FIXME Conflict between this item and fix of SpreadsheetView, not important right now
-    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0,
-					Boolean arg1, Boolean arg2) {
-				
-					if(!isFixed()){
-						setFixed(true);
-					}else{
-						setFixed(false);
-					}
-			}
-        });
-        contextMenu.getItems().addAll(fixItem);
-        
-        return contextMenu;
+    	if(canFix){
+	    	final ContextMenu contextMenu = new ContextMenu();
+	
+	    	this.fixItem = new CheckMenuItem("Fix");
+	    	//FIXME Conflict between this item and fix of SpreadsheetView, not important right now
+	    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0,
+						Boolean arg1, Boolean arg2) {
+					
+						if(!isFixed()){
+							setFixed(true);
+						}else{
+							setFixed(false);
+						}
+				}
+	        });
+	        contextMenu.getItems().addAll(fixItem);
+	        
+	        return contextMenu;
+    	}else{
+    		return null;
+    	}
     }
+    
+    /**
+	 * Verify that you can fix this column.
+	 * Right now, only a column without any cell spanning 
+	 * can be fixed.
+	 * 
+	 * @return
+	 */
+	private boolean canFix(){
+		for (ObservableList<SpreadsheetCell<?>> row : spreadsheetView.getGrid().getRows()) {
+			int columnSpan = row.get(indexColumn).getColumnSpan();
+			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
+				return false;
+//			}else if(columnSpan>1){
+//				columnSpanConstraint = columnSpanConstraint>columnSpan?columnSpanConstraint:columnSpan;
+//			}
+		}
+		return true;
+	}
     
 }

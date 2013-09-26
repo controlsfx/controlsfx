@@ -42,6 +42,7 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
@@ -240,9 +241,9 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
      * We listen on the FixedColumns in order to do the modification in the
      * VirtualFlow
      */
-    private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
+    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
         @Override
-        public void onChanged(Change<? extends Integer> c) {
+        public void onChanged(Change<? extends SpreadsheetColumn> c) {
             if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
                 for (int i = 0; i < getFlow().getCells().size(); ++i) {
                     ((SpreadsheetRowImpl) getFlow().getCells().get(i))

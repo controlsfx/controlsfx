@@ -162,7 +162,7 @@ public class SpreadsheetView extends Control {
     private Grid grid;
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
-    private final ObservableList<Integer> fixedColumns = FXCollections.observableArrayList();
+    private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
@@ -356,32 +356,21 @@ public class SpreadsheetView extends Control {
         return fixedRows;
     }
 
+    
     /**
-     * Fix the first "numberOfFixedColumns" on the left.
-     * It will unfix any previously fixed column.
-     * It's possible to fix columns also by right-clicking on columns header.
-     * @param numberOfFixedColumns
-     */
-    public void fixColumns(List<Integer> fixedColumns){
-
-        getFixedColumns().clear();
-        for (SpreadsheetColumn spc : getColumns()) {
-			spc.setFixed(false);
-		}
-
-        for (Integer column: fixedColumns) {
-        	if(column >=0 && column < getColumns().size()){
-        		getColumns().get(column).setFixed(true);
-        	}
-        }
-    }
-
-    /**
-     * Return an ObservableList of the fixed columns. 
-     * Just the number of the columns are returned.
+     * Return a SpreadsheetColumn
+     * @param index
      * @return
      */
-    public ObservableList<Integer> getFixedColumns() {
+    public SpreadsheetColumn getColumn(int index){
+    	return getColumns().get(index);
+    }
+    /**
+     * Youn can fix or Unfix a column by modifying this list.
+     * Return an ObservableList of the fixed columns. 
+     * @return
+     */
+    public ObservableList<SpreadsheetColumn> getFixedColumns() {
         return fixedColumns;
     }
 

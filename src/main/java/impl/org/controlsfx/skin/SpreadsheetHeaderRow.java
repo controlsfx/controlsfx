@@ -39,6 +39,7 @@ import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -147,19 +148,19 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
     /**
      * When we fix/unfix some columns, we change the style of the Label header text
      */
-    private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
+    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
 
 		@Override
 		public void onChanged(
-				javafx.collections.ListChangeListener.Change<? extends Integer> arg0) {
+				javafx.collections.ListChangeListener.Change<? extends SpreadsheetColumn> arg0) {
 			while(arg0.next()){
 				//If we unfix a column
-				for (Integer remitem : arg0.getRemoved()) {
-                   removeStyleHeader(remitem);
+				for (SpreadsheetColumn remitem : arg0.getRemoved()) {
+                   removeStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(remitem));
                 }
 				//If we fix one
-                for (Integer additem : arg0.getAddedSubList()) {
-                	addStyleHeader(additem);
+                for (SpreadsheetColumn additem : arg0.getAddedSubList()) {
+                	addStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(additem));
                 }
 			}
 			 updateHighlighSelection();

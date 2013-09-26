@@ -189,13 +189,10 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             if (spreadsheetView.getColumns().get(column).isFixed()) {
                 
                  if(hbarValue + fixedColumnWidth >x){
-                	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(true);
                 	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
                 	 tableCell.toFront();
                 	 fixedColumnWidth += tableCell.getWidth();
                 	 isVisible = true; // If in fixedColumn, it's obviously visible
-                 }else{
-                	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(false);
                  }
             }
 

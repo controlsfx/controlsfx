@@ -29,6 +29,7 @@ package impl.org.controlsfx.skin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -241,9 +242,9 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
      * We listen on the FixedColumns in order to do the modification in the
      * VirtualFlow
      */
-    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
+    private final ListChangeListener<SpreadsheetColumn<?>> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn<?>>() {
         @Override
-        public void onChanged(Change<? extends SpreadsheetColumn> c) {
+        public void onChanged(Change<? extends SpreadsheetColumn<?>> c) {
             if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
                 for (int i = 0; i < getFlow().getCells().size(); ++i) {
                     ((SpreadsheetRowImpl) getFlow().getCells().get(i))
@@ -386,5 +387,23 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     
     public static SpreadsheetRowImpl getCell(SpreadsheetView spv, int index) {
         return getSkin(spv).getCell(index);
+    }
+    
+    /**
+     * A list of Integer with the current selected Rows. This is useful for columnheader and
+     * RowHeader because they need to highligh when a selection is made.
+     */
+    private final ObservableList<Integer> selectedRows = FXCollections.observableArrayList();
+    public ObservableList<Integer> getSelectedRows() {
+        return selectedRows;
+    }
+
+    /**
+     * A list of Integer with the current selected Columns. This is useful for columnheader and
+     * RowHeader because they need to highligh when a selection is made.
+     */
+    private final ObservableList<Integer> selectedColumns= FXCollections.observableArrayList();
+    public ObservableList<Integer> getSelectedColumns() {
+        return selectedColumns;
     }
 }

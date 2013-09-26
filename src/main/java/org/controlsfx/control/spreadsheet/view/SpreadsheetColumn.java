@@ -1,11 +1,8 @@
 package org.controlsfx.control.spreadsheet.view;
 
-import impl.org.controlsfx.skin.SpreadsheetRowImpl;
-import impl.org.controlsfx.skin.SpreadsheetRowSkin;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckMenuItem;

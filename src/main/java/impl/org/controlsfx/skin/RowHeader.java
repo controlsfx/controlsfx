@@ -39,12 +39,10 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
@@ -66,7 +64,7 @@ public class RowHeader  extends StackPane {
 	private double prefHeight;
 	private double prefWidth;
 	private Boolean working = true; // Whether or not we are showing the RowHeader
-	private SpreadsheetViewSelectionModel<?> selectionModel;
+//	private SpreadsheetViewSelectionModel<?> selectionModel;
 	private Rectangle clip; // Ensure that children do not go out of bounds
 	private ArrayList<Boolean> rowFix; // Compute if we can fix the rows or not.
 	private ContextMenu blankContextMenu;
@@ -110,7 +108,7 @@ public class RowHeader  extends StackPane {
      **************************************************************************/
 	void init(){
 		prefHeight = spreadsheetViewSkin.getDefaultCellSize();
-		selectionModel = spreadsheetView.getSelectionModel();
+//		selectionModel = spreadsheetView.getSelectionModel();
 
 		//Clip property to stay within bounds
 		clip = new Rectangle(prefWidth, snapSize(spreadsheetViewSkin.getSkinnable().getHeight()));
@@ -135,7 +133,7 @@ public class RowHeader  extends StackPane {
 		spreadsheetView.heightProperty().addListener(layout);
 
 		// For layout properly the rowHeader when there are some selected items
-		selectionModel.getSelectedRows().addListener(layout);
+		spreadsheetViewSkin.getSelectedRows().addListener(layout);
 		initRowFix(spreadsheetView.getGrid());
 		blankContextMenu = new ContextMenu();
 		requestLayout();
@@ -177,7 +175,7 @@ public class RowHeader  extends StackPane {
 				
 				//We want to highlight selected rows
 				final ObservableList<String> css = label.getStyleClass();
-				if(selectionModel.getSelectedRows().contains(row.getIndex())){
+				if(spreadsheetViewSkin.getSelectedRows().contains(row.getIndex())){
 					css.addAll("selected");
 				}else{
 					css.removeAll("selected");
@@ -207,7 +205,7 @@ public class RowHeader  extends StackPane {
 							label.relocate(x, snappedTopInset()+prefHeight*i);
 						}
 						final ObservableList<String> css = label.getStyleClass();
-						if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
+						if(spreadsheetViewSkin.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
 							css.addAll("selected");
 						}else{
 							css.removeAll("selected");

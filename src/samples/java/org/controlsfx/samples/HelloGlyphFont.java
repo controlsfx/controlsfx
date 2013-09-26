@@ -27,6 +27,9 @@
 package org.controlsfx.samples;
 
 import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
+
+import java.util.Map;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -40,16 +43,21 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
+import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
-import org.controlsfx.glyphfont.pack.FontAwesomePack;
 
 public class HelloGlyphFont extends Application implements Sample {
 
-	private GlyphFont fontAwesome = GlyphFontRegistry.pack("FontAwesome").getFont();
+	private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
 	private GlyphFont icoMoon = new GlyphFont("icomoon", 16, getClass()
-			.getResourceAsStream("icomoon.ttf"));
+			.getResourceAsStream("icomoon.ttf")){
+
+				@Override
+				public Map<String, Character> getGlyphs() {
+					return null;
+				}};
 
 //	private static char FAW_TRASH = '\uf014';
 	private static char FAW_GEAR  = '\uf013';
@@ -87,7 +95,7 @@ public class HelloGlyphFont extends Application implements Sample {
 		ToolBar toolbar = new ToolBar(
 				new Button("", glyph("FontAwesome|TRASH")), 
 				new Button("", glyph("FontAwesome|STAR")),
-				new Button("", FontAwesomePack.Glyph.ANCHOR.create()),
+				new Button("", FontAwesome.Glyph.ANCHOR.create()),
 				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)) 
         );
 		root.getChildren().add(toolbar);

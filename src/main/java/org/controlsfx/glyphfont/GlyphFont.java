@@ -27,6 +27,7 @@
 package org.controlsfx.glyphfont;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import com.sun.javafx.css.StyleManager;
 
@@ -38,7 +39,7 @@ import javafx.scene.text.Font;
  *  {@link Glyph}s can be created easily using specified character 
  *
  */
-public class GlyphFont {
+public abstract class GlyphFont {
     
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
@@ -79,6 +80,14 @@ public class GlyphFont {
 	}
 	
 	/**
+	 * Returns font name
+	 * @return font name
+	 */
+	public String getName() {
+		return fontName;
+	}
+	
+	/**
 	 * Returns the default font size
 	 * @return default font size
 	 */
@@ -107,11 +116,27 @@ public class GlyphFont {
 	}
 	
 	/**
-	 * Creates and instance of {@link Glyph} using specified font character
+	 * Creates an instance of {@link Glyph} using specified font character
 	 * @param character font character
 	 * @return instance of {@link Glyph}
 	 */
 	public Glyph create(char character) {
 	    return new Glyph(fontName, character, size, color);
 	}
+	
+	/**
+	 * Creates and instance of {@link Glyph} using glyph name
+	 * @param glyphName glyph name
+	 * @return glyph by its name or null if name is not found
+	 */
+	public Glyph create(String glyphName) {
+		Character ch = getGlyphs().get(glyphName);
+		return ch==null?null:create(ch);
+	}
+	
+	/**
+	 * Returns glyph dictionary
+	 * @return {@link Map} of glyph name to character
+	 */
+	public abstract Map<String, Character> getGlyphs();
 }

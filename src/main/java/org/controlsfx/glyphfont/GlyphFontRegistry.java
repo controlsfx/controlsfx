@@ -34,14 +34,14 @@ import javafx.scene.Node;
 
 /**
  * Glyph Font Registry. 
- * Automatically registers available font packs using {@link ServiceLoader} facility.   
- * Glyph font pack can also be registered manually using 'register' method.
+ * Automatically registers available fonts using {@link ServiceLoader} facility.   
+ * Glyph font can also be registered manually using 'register' method.
  * <br/>
  * From than on fonts and their glyphs can be requested by name.
  */
 public final class GlyphFontRegistry {
 	
-	private static Map<String, GlyphFontPack> packMap = new HashMap<>();
+	private static Map<String, GlyphFont> fontMap = new HashMap<>();
 	
 	private static boolean isInited = false;
 	
@@ -53,32 +53,32 @@ public final class GlyphFontRegistry {
 	    if (isInited) return;
 	    isInited = true;
 	    
-	    // find all classes that implement GlyphFontPack and register them now
-	    ServiceLoader<GlyphFontPack> loader = ServiceLoader.load(GlyphFontPack.class);
-        for (GlyphFontPack fontPack : loader) {
-        	GlyphFontRegistry.register(fontPack);
+	    // find all classes that implement GlyphFont and register them now
+	    ServiceLoader<GlyphFont> loader = ServiceLoader.load(GlyphFont.class);
+        for (GlyphFont font : loader) {
+        	GlyphFontRegistry.register(font);
         }
 	}
 	
 	/**
-	 * Registers specified font pack
-	 * @param pack font pack
+	 * Registers specified font
+	 * @param font
 	 */
-	public static void register( GlyphFontPack pack ) {
+	public static void register( GlyphFont font ) {
 	    init();
-		if (pack != null ) {
-			packMap.put( pack.getFontName(), pack );
+		if (font != null ) {
+			fontMap.put( font.getName(), font );
 		}
 	}
 	
 	/**
-	 * Retrieve font pack by font name
+	 * Retrieve font by font
 	 * @param fontName font name
-	 * @return font pack or null if not found
+	 * @return font or null if not found
 	 */
-	public static GlyphFontPack pack( String fontName ) {
+	public static GlyphFont font( String fontName ) {
 	    init();
-		return packMap.get(fontName);
+		return fontMap.get(fontName);
 	}
 	
 	/**
@@ -89,14 +89,14 @@ public final class GlyphFontRegistry {
 	 */
 	public static Node glyph( String fontName, String glyphName ) {
 	    init();
-		GlyphFontPack pack = pack(fontName);
-		return pack.getFont().create(pack.getGlyphs().get(glyphName));
+		GlyphFont font = font(fontName);
+		return font.create(glyphName);
 	}
 	
 	/**
 	 * Retrieve glyph by font name and glyph name using one string where font name an glyph name are separated by pipe
 	 * @param fontAndGlyph font and glyph
-	 * @return glyoh as Node
+	 * @return glyph as Node
 	 */
 	public static Node glyph( String fontAndGlyph ) {
 	    init();

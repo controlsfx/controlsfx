@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.glyphfont.pack;
+package org.controlsfx.glyphfont;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,15 +32,13 @@ import java.util.Map;
 
 import javafx.scene.Node;
 
-import org.controlsfx.glyphfont.GlyphFontPack;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 /**
- * Defines glyph font pack for FontAwesome. Automatically registered with {@link GlyphFontRegistry}.
+ * Defines glyph font for FontAwesome. Automatically registered with {@link GlyphFontRegistry}.
  * <br/>
  * Currently the font is loaded from Bootstrap CDN 
  */
-public class FontAwesomePack extends  GlyphFontPack {
+public class FontAwesome extends GlyphFont {
 
 	private static String fontName = "FontAwesome";
 	
@@ -444,7 +442,7 @@ public class FontAwesomePack extends  GlyphFontPack {
 	
 	// FIXME only needs to be instantiated by the GlyphFontRegistry, so this
 	// constructor shouldn't really be called multiple times...
-	public FontAwesomePack() {
+	public FontAwesome() {
 		
 		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf" ); 
 		

@@ -337,17 +337,6 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Fix the first "numberOfFixedRows" at the top of the SpreadsheetView
-     * @param numberOfFixedRows
-     */
-    public final void fixRows(int numberOfFixedRows){
-        getFixedRows().clear();
-        for (int j = 0; j < numberOfFixedRows; j++) {
-            getFixedRows().add(j);
-        }
-    }
-
-    /**
      * Return an ObservableList of the fixed rows. 
      * Just the number of the rows are returned.
      * @return
@@ -355,7 +344,6 @@ public class SpreadsheetView extends Control {
     public ObservableList<Integer> getFixedRows() {
         return fixedRows;
     }
-
     
     /**
      * Return a SpreadsheetColumn

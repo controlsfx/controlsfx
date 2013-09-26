@@ -142,7 +142,6 @@ public class SpreadsheetColumn<T> {
 	    	final ContextMenu contextMenu = new ContextMenu();
 	
 	    	this.fixItem = new CheckMenuItem("Fix");
-	    	//FIXME Conflict between this item and fix of SpreadsheetView, not important right now
 	    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
 				@Override
 				public void changed(ObservableValue<? extends Boolean> arg0,
@@ -159,7 +158,7 @@ public class SpreadsheetColumn<T> {
 	        
 	        return contextMenu;
     	}else{
-    		return null;
+    		return new ContextMenu();
     	}
     }
     

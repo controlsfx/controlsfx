@@ -37,8 +37,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.Grid;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.Grid;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.TableRowSkin;
 

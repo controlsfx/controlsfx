@@ -36,7 +36,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.scene.shape.Rectangle;
 
-import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;

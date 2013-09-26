@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.spreadsheet.view;
+package org.controlsfx.control.spreadsheet;
 
 import impl.org.controlsfx.skin.SpreadsheetCellImpl;
 import impl.org.controlsfx.skin.SpreadsheetRowImpl;
@@ -33,7 +33,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.property.editor.PropertyEditor;
 
 /**

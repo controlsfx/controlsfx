@@ -66,10 +66,10 @@ import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
-import org.controlsfx.control.spreadsheet.model.Grid;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
-import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.Grid;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCells;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 
 /**
  * The SpreadsheetView is a control similar to the JavaFX {@link TableView} control

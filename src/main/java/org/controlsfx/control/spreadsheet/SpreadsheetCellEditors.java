@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.spreadsheet.view;
+package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,8 +42,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 public class SpreadsheetCellEditors {
 

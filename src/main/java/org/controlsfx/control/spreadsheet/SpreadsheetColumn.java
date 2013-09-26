@@ -1,4 +1,4 @@
-package org.controlsfx.control.spreadsheet.view;
+package org.controlsfx.control.spreadsheet;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -10,7 +10,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.

@@ -29,8 +29,6 @@ package impl.org.controlsfx.skin;
 import java.util.Map;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ListBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -48,7 +46,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpanType;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.view.SpreadsheetCellEditor;
@@ -153,7 +150,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         	 * I check if the current SpreadsheetRow is referenced in the SpreadsheetView,
         	 * if not, then I know I can throw it away (setManaged(false) ?)
         	 */
-        	if(row <= spv.getFixedRows().size()){
+        	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
 	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin(spv).getCellsSize();j++ ) {
 	                    if(SpreadsheetViewSkin.getCell(spv, j) == getTableRow()){

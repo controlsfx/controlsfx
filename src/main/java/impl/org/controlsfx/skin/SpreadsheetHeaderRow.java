@@ -34,11 +34,9 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.shape.Rectangle;
 
-import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
-import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -57,8 +55,8 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
             public void run() {
 
                 spreadsheetViewSkin.spreadsheetView.showRowHeaderProperty().addListener(rowHeaderListener);
-                selectionModel = spreadsheetViewSkin.spreadsheetView.getSelectionModel();
-                selectionModel.getSelectedColumns().addListener(selectionListener);
+//                selectionModel = spreadsheetViewSkin.spreadsheetView.getSelectionModel();
+                spreadsheetViewSkin.getSelectedColumns().addListener(selectionListener);
                 spreadsheetViewSkin.spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 
                 spreadsheetViewSkin.getTableMenuButtonVisibleProperty()
@@ -147,19 +145,19 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
     /**
      * When we fix/unfix some columns, we change the style of the Label header text
      */
-    private final ListChangeListener<Integer> fixedColumnsListener = new ListChangeListener<Integer>() {
+    private final ListChangeListener<SpreadsheetColumn<?>> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn<?>>() {
 
 		@Override
 		public void onChanged(
-				javafx.collections.ListChangeListener.Change<? extends Integer> arg0) {
+				javafx.collections.ListChangeListener.Change<? extends SpreadsheetColumn<?>> arg0) {
 			while(arg0.next()){
 				//If we unfix a column
-				for (Integer remitem : arg0.getRemoved()) {
-                   removeStyleHeader(remitem);
+				for (SpreadsheetColumn<?> remitem : arg0.getRemoved()) {
+                   removeStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(remitem));
                 }
 				//If we fix one
-                for (Integer additem : arg0.getAddedSubList()) {
-                	addStyleHeader(additem);
+                for (SpreadsheetColumn<?> additem : arg0.getAddedSubList()) {
+                	addStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(additem));
                 }
 			}
 			 updateHighlighSelection();
@@ -182,7 +180,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
                     .getChildrenUnmodifiable().get(0).getStyleClass()
                     .addAll("fixed");
     }
-    private SpreadsheetViewSelectionModel<ObservableList<SpreadsheetCell<?>>> selectionModel;
+//    private TableViewSelectionModel<ObservableList<SpreadsheetCell<?>>> selectionModel;
     
     
     /**
@@ -203,8 +201,7 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
             i.getChildrenUnmodifiable().get(0).getStyleClass().removeAll("selected");
 
         }
-        final List<Integer> selectedColumns = selectionModel
-                .getSelectedColumns();
+        final List<Integer> selectedColumns = spreadsheetViewSkin.getSelectedColumns();
         // TODO Ugly hack to get access to the Label
         for (final Object i : selectedColumns) {
             getRootHeader().getColumnHeaders().get((Integer) i)

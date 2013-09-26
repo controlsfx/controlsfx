@@ -29,17 +29,14 @@ package impl.org.controlsfx.skin;
 import java.lang.reflect.Field;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpanType;
-import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
 import org.controlsfx.control.spreadsheet.model.Grid;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
@@ -143,25 +140,20 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 + snappedRightInset();
         final double controlHeight = control.getHeight();
 
+        
         /**
          * FOR FIXED ROWS
          */
         double tableCellY = 0;
-        int positionY;
+        int positionY = spreadsheetView.getFixedRows().indexOf(index);
         //If true, this row is fixed
-        if ((positionY = spreadsheetView.getFixedRows().indexOf(index)) != -1) {
-        	//This row is a bit hidden on top
-            if (getSkinnable().getLocalToParentTransform().getTy() < 0) {
-                // We translate then for it to be fully visible
-                tableCellY = Math.abs(getSkinnable()
-                        .getLocalToParentTransform().getTy());
-            } else {
-                // The rows is not hidden but we need to translate it anyways
-                // because it will be covered
-                // by the previous fixed rows otherwise
-                tableCellY = positionY * DEFAULT_CELL_SIZE
-                        - getSkinnable().getLocalToParentTransform().getTy();
-            }
+        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= positionY * DEFAULT_CELL_SIZE) {
+        	//This row is a bit hidden on top so we translate then for it to be fully visible
+            tableCellY = positionY * DEFAULT_CELL_SIZE
+                    - getSkinnable().getLocalToParentTransform().getTy();
+            ((SpreadsheetRowImpl)getSkinnable()).setCurrentlyFixed(true);
+        }else{
+        	((SpreadsheetRowImpl)getSkinnable()).setCurrentlyFixed(false);
         }
 
         double fixedColumnWidth = 0;
@@ -191,13 +183,10 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             if (spreadsheetView.getColumns().get(column).isFixed()) {
                 
                  if(hbarValue + fixedColumnWidth >x){
-                	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(true);
                 	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
                 	 tableCell.toFront();
                 	 fixedColumnWidth += tableCell.getWidth();
                 	 isVisible = true; // If in fixedColumn, it's obviously visible
-                 }else{
-                	 spreadsheetView.getColumns().get(column).setCurrentlyFixed(false);
                  }
             }
 
@@ -245,16 +234,14 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                         // To be sure that the text is the same
                         // in case we modified the DataCell after that
                         // SpreadsheetCell was created
-                        final SpreadsheetViewSelectionModel<ObservableList<SpreadsheetCell<?>>> sm = spreadsheetView
-                                .getSelectionModel();
+                        final TableViewSelectionModel<ObservableList<SpreadsheetCell<?>>> sm = spreadsheetView.getSelectionModel();
                         final TableColumn<ObservableList<SpreadsheetCell<?>>, ?> col = tableView.getColumns().get(column);
 
                         // In case this cell was selected before but we scroll
                         // up/down and it's invisible now.
                         // It has to pass his "selected property" to the new
                         // Cell in charge of spanning
-                        final TablePosition<ObservableList<SpreadsheetCell<?>>, ?> selectedPosition = sm
-                                .isSelectedRange(index, col, column);
+                        final TablePosition<ObservableList<SpreadsheetCell<?>>, ?> selectedPosition = isSelectedRange(index, col, column);
                         // If the selected cell is in the same row, no need to re-select it
                         if (selectedPosition != null
                                 && selectedPosition.getRow() != index) {
@@ -331,4 +318,20 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
 			double headerWidth, int columnSpan) {
 		return (x+width <hbarValue && columnSpan == 1) || (x> hbarValue+headerWidth);
 	}
+    public TablePosition<ObservableList<SpreadsheetCell<?>>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell<?>>, ?> column, int col) {
+
+        final SpreadsheetCell<?> cellSpan = tableView.getItems().get(row).get(col);
+        final int infRow = cellSpan.getRow();
+        final int supRow = infRow + cellSpan.getRowSpan();
+
+        final int infCol = cellSpan.getColumn();
+        final int supCol = infCol + cellSpan.getColumnSpan();
+        for (Object tp : spreadsheetView.getSelectionModel().getSelectedCells()) {
+        	 TablePosition<ObservableList<SpreadsheetCell<?>>, ?> tp1 = ( TablePosition<ObservableList<SpreadsheetCell<?>>, ?>)tp;
+            if (tp1.getRow() >= infRow && tp1.getRow() < supRow && tp1.getColumn() >= infCol && tp1.getColumn() < supCol) {
+                return tp1;
+            }
+        }
+        return null;
+    }
 }

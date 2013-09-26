@@ -13,7 +13,7 @@ import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 /**
- *A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
+ * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
  * You can then modify some informations like the width of the column or whether it is fixed or not.
  */
 public class SpreadsheetColumn<T> {
@@ -43,7 +43,7 @@ public class SpreadsheetColumn<T> {
      *                                                                         *
      **************************************************************************/
 	/**
-	 * Creates a new SpreadsheetColumn with an initial width of 100.
+	 * Creates a new SpreadsheetColumn with a minimum width of 30.
 	 * @param column
 	 * @param spreadsheetView
 	 * @param indexColumn

@@ -83,8 +83,17 @@ import org.controlsfx.control.spreadsheet.view.SpreadsheetColumn;
  *   <li> Columns can be fixed to the left of the {@link SpreadsheetView} so that they are always visible on screen. Only columns without any spanning cells can be fixed.</li>
  *   <li> A row header can be switched on in order to display the row number.</li>
  *   <li> Selection of several cells can be made with a click and drag.</li>
- *   <li> A copy/paste context menu is accessible with a right-click.</li>
+ *   <li> A copy/paste context menu is accessible with a right-click or the usual shortcuts.</li>
  * </ul>
+ * 
+ * <br/>
+ *  
+ * <h3>Fixing Rows and Columns </h3>
+ * You can fix some rows and some columns by right-clicking on their header. A context menu will appear if it's possible to fix them.
+ * The label will then be in italic to confirm that the fixing has been done properly.
+ * Keep in mind that only columns without any spanning cells, and only rows without row-spanning cells can be fixed.
+ * 
+ * <br/><br/>
  * 
  * <h3>Code Samples</h3>
  * Just like the {@link TableView}, you instantiate the underlying model, a {@link Grid}.

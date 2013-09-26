@@ -153,7 +153,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         	 * I check if the current SpreadsheetRow is referenced in the SpreadsheetView,
         	 * if not, then I know I can throw it away (setManaged(false) ?)
         	 */
-        	if(row <= spv.getFixedRows().size()){
+        	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
 	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin(spv).getCellsSize();j++ ) {
 	                    if(SpreadsheetViewSkin.getCell(spv, j) == getTableRow()){

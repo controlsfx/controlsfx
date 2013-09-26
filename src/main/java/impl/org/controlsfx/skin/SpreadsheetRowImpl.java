@@ -58,6 +58,7 @@ public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell<
      */
     private Integer indexVirtualFlow = null;
     private boolean layoutFixedColumns = false;
+    private Boolean currentlyFixed = false;
 
     /***************************************************************************
      *                                                                         *
@@ -83,6 +84,18 @@ public class SpreadsheetRowImpl extends TableRow<ObservableList<SpreadsheetCell<
         indexVirtualFlow = i;
     }
 
+    public Boolean getCurrentlyFixed() {
+		return currentlyFixed;
+	}
+
+	/**
+	 * Indicate that this row is bonded on the top.
+	 * @param currentlyFixed
+	 */
+	public void setCurrentlyFixed(Boolean currentlyFixed) {
+		this.currentlyFixed = currentlyFixed;
+	}
+	
     /**
      * For the fixed columns in order to just re-layout the fixed columns
      * @param b

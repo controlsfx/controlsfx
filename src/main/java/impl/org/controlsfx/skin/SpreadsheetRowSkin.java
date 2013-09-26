@@ -28,7 +28,10 @@ package impl.org.controlsfx.skin;
 
 import java.lang.reflect.Field;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
@@ -143,25 +146,20 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 + snappedRightInset();
         final double controlHeight = control.getHeight();
 
+        
         /**
          * FOR FIXED ROWS
          */
         double tableCellY = 0;
-        int positionY;
+        int positionY = spreadsheetView.getFixedRows().indexOf(index);
         //If true, this row is fixed
-        if ((positionY = spreadsheetView.getFixedRows().indexOf(index)) != -1) {
-        	//This row is a bit hidden on top
-            if (getSkinnable().getLocalToParentTransform().getTy() < 0) {
-                // We translate then for it to be fully visible
-                tableCellY = Math.abs(getSkinnable()
-                        .getLocalToParentTransform().getTy());
-            } else {
-                // The rows is not hidden but we need to translate it anyways
-                // because it will be covered
-                // by the previous fixed rows otherwise
-                tableCellY = positionY * DEFAULT_CELL_SIZE
-                        - getSkinnable().getLocalToParentTransform().getTy();
-            }
+        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= positionY * DEFAULT_CELL_SIZE) {
+        	//This row is a bit hidden on top so we translate then for it to be fully visible
+            tableCellY = positionY * DEFAULT_CELL_SIZE
+                    - getSkinnable().getLocalToParentTransform().getTy();
+            ((SpreadsheetRowImpl)getSkinnable()).setCurrentlyFixed(true);
+        }else{
+        	((SpreadsheetRowImpl)getSkinnable()).setCurrentlyFixed(false);
         }
 
         double fixedColumnWidth = 0;

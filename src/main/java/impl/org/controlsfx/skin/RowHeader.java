@@ -27,6 +27,8 @@
 
 package impl.org.controlsfx.skin;
 
+import java.util.ArrayList;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -135,6 +137,8 @@ public class RowHeader  extends StackPane {
 		if(working && spreadsheetView != null) {
 
 			final double x =snappedLeftInset();
+			final int cellSize = spreadsheetViewSkin.getCellsSize();
+			
 			//We add prefHeight because we need to take the other header into account
 			// And also the fixedRows if any
 			double y = snappedTopInset() ;//+prefHeight*flow.getFixedRows().size();
@@ -143,7 +147,7 @@ public class RowHeader  extends StackPane {
 			}
 
 			//The Labels must be aligned with the rows
-			if(spreadsheetViewSkin.getCellsSize() != 0){
+			if( cellSize != 0){
 				y += spreadsheetViewSkin.getCell(0).getLocalToParentTransform().getTy();
 			}
 
@@ -152,9 +156,9 @@ public class RowHeader  extends StackPane {
 			int i=0;
 			// We don't want to add Label if there are no rows associated with.
 			final int modelRowCount = spreadsheetView.getGrid().getRowCount();
-
+			
 			// We iterate over the visibleRows
-			while(spreadsheetViewSkin.getCellsSize() != 0 && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
+			while(cellSize != 0 && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
 				label = getLabel(rowCount++);
 				label.setText(String.valueOf(spreadsheetViewSkin.getCell(i).getIndexVirtualFlow()+1));
 				label.resize(prefWidth,prefHeight);
@@ -171,25 +175,27 @@ public class RowHeader  extends StackPane {
 			}
 
 			// Then we iterate over the FixedRows if any
-			if(!spreadsheetView.getFixedRows().isEmpty() && spreadsheetViewSkin.getCellsSize() != 0){
+			if(!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0){
 				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
-					label = getLabel(rowCount++);
-					label.setText(String.valueOf(i+1));
-					label.resize(prefWidth,prefHeight);
-
-					//If the columnHeader is here, we need to translate a bit
-					if(spreadsheetView.showColumnHeaderProperty().get()){
-						label.relocate(x, snappedTopInset()+prefHeight*(i+1));
-					}else{
-						label.relocate(x, snappedTopInset()+prefHeight*i);
+					if(spreadsheetViewSkin.getCell(i).getCurrentlyFixed()){
+						label = getLabel(rowCount++);
+						label.setText(String.valueOf(spreadsheetView.getFixedRows().get(i)+1));
+						label.resize(prefWidth,prefHeight);
+	
+						//If the columnHeader is here, we need to translate a bit
+						if(spreadsheetView.showColumnHeaderProperty().get()){
+							label.relocate(x, snappedTopInset()+prefHeight*(i+1));
+						}else{
+							label.relocate(x, snappedTopInset()+prefHeight*i);
+						}
+						final ObservableList<String> css = label.getStyleClass();
+						if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
+							css.setAll("selected");
+						}else{
+							css.clear();
+						}
+						y+=prefHeight;
 					}
-					final ObservableList<String> css = label.getStyleClass();
-					if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
-						css.setAll("selected");
-					}else{
-						css.clear();
-					}
-					y+=prefHeight;
 				}
 			}
 

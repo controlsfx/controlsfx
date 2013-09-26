@@ -247,7 +247,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
         double offset = startOffset;
         // The index is the absolute index of the cell being laid out
         int index = currentIndex;
-
+        
         // Offset should really be the bottom of the current index
         boolean first = true; // first time in, we just fudge the offset and let
         // it be the top of the current index then redefine
@@ -279,7 +279,9 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
         index = currentIndex;
         first = true;
         cellFixedAdded = 0;
-
+        int numberOfCellsBelowIndex = 0;
+        boolean flag = false; // We only want to compute once
+        
         while (index >= 0 && (offset > 0 || first)) {
             if (index >= getCellCount()) {
                 if (first) {
@@ -290,18 +292,43 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
                 --index;
                 --cellToAdd;
             } else {
-                // If the remaining cells to add are in the header
+                // If the number of remaining cells to add is the same of the fixedRows size
                 if (!getFixedRows().isEmpty() && cellToAdd <= getFixedRows().size()) {
-                    final int realIndex = getFixedRows().get(cellToAdd - 1);
-                    // System.out.println("JaddC"+realIndex+"/"+index);
-                    cell = getAvailableCell(realIndex); // We grab the right one
-                    setCellIndex(cell, realIndex); // the index is the real one
-                    setCellIndexVirtualFlow(cell, index); // But the index for
-                                                          // the Virtual Flow
-                                                          // remain his (not the
-                                                          // real one)
-                    ++cellFixedAdded;
-                } else {
+                	/**
+                	 * We now try to determine if the current index is superior of any
+                	 * index of our FixedRows. If so, we compute how many FixedRow index 
+                	 * are below the current index.
+                	 */
+                	if(cellFixedAdded < getFixedRows().size() && index>=getFixedRows().get(cellFixedAdded) && !flag){
+                		flag = true;
+                		while(numberOfCellsBelowIndex < getFixedRows().size() && index >= getFixedRows().get(numberOfCellsBelowIndex) && numberOfCellsBelowIndex < cellToAdd){
+                			numberOfCellsBelowIndex++;
+                		}
+                		numberOfCellsBelowIndex--;
+                	}
+                	if(flag && cellToAdd<= (numberOfCellsBelowIndex+1)){
+	                    final int realIndex = getFixedRows().get(numberOfCellsBelowIndex);
+	                    cell = getAvailableCell(realIndex); // We grab the right one
+	                    setCellIndex(cell, realIndex); // the index is the real one
+	                    setCellIndexVirtualFlow(cell, index); // But the index for
+	                                                          // the Virtual Flow
+	                                                          // remain his (not the
+	                	                                   // real one)
+	                    --numberOfCellsBelowIndex;
+	                    ++cellFixedAdded;
+	                }else{
+	                	if(numberOfCellsBelowIndex >=0 && index == getFixedRows().get(numberOfCellsBelowIndex)){
+	                		--numberOfCellsBelowIndex;
+		                    ++cellFixedAdded;
+	                	}
+	                	cell = getAvailableCell(index);
+	                    setCellIndex(cell, index);
+	                }
+                }else {
+                	if(!getFixedRows().isEmpty() && numberOfCellsBelowIndex >=0 && index == getFixedRows().get(numberOfCellsBelowIndex)){
+                		--numberOfCellsBelowIndex;
+	                    ++cellFixedAdded;
+                	}
                     // System.out.println("JaddC"+index);
                     cell = getAvailableCell(index);
                     setCellIndex(cell, index);
@@ -369,7 +396,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
         double offset = getCellPosition(startCell) + getCellLength(startCell);
         int index = getCellIndex(startCell) + 1;
         boolean filledWithNonEmpty = index <= getCellCount();
-
+        
         final double viewportLength = getViewportLength();
         while (offset < viewportLength) {// && index <getCellCount()) {
             if (index >= getCellCount()) {
@@ -379,21 +406,27 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
                 if (!fillEmptyCells) { return filledWithNonEmpty; }
             }
             T cell = null;
-            // If we have a lot of rows in header, we need to add the remaining
-            // in the trailingCells
-            // I Added fillEmptyCells because it appears that when
-            // AddtrailingCells is called from
-            // adjustPixel, we add several time the rows in fixedHeader...
+            /**
+             * If we have a lot of rows in header, we need to add the remaining
+             * in the trailingCells. I Added fillEmptyCells because it appears 
+             * that when AddtrailingCells is called from adjustPixel,
+             * we add several time the rows in fixedHeader...
+             */
             if (!getFixedRows().isEmpty() && cellFixedAdded < getFixedRows().size()
-                    && fillEmptyCells) {
-                final int realIndex = getFixedRows().get(cellFixedAdded);
-                // System.out.println("JaddD"+realIndex);
-                cell = getAvailableCell(realIndex); // We grab the right one
-                setCellIndex(cell, realIndex); // the index is the real one
-                setCellIndexVirtualFlow(cell, index); // But the index for the
-                                                      // Virtual Flow remain his
-                                                      // (not the real one)
-                ++cellFixedAdded;
+                    && fillEmptyCells ) {
+            	if(index>=getFixedRows().get(cellFixedAdded)){
+	                final int realIndex = getFixedRows().get(cellFixedAdded);
+	                // System.out.println("JaddD"+realIndex);
+	                cell = getAvailableCell(realIndex); // We grab the right one
+	                setCellIndex(cell, realIndex); // the index is the real one
+	                setCellIndexVirtualFlow(cell, index); // But the index for the
+	                                                      // Virtual Flow remain his
+	                                                      // (not the real one)
+	                ++cellFixedAdded;
+            	}else{
+            		cell = getAvailableCell(index);
+                    setCellIndex(cell, index);
+            	}
             } else {
                 // System.out.println("JaddD"+index);
                 cell = getAvailableCell(index);

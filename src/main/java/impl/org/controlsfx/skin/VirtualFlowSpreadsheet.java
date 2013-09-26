@@ -292,6 +292,14 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
                 --index;
                 --cellToAdd;
             } else {
+            	if(!flag && !getFixedRows().isEmpty() && index>=getFixedRows().get(cellFixedAdded)){
+            		flag = true;
+            		while(numberOfCellsBelowIndex < getFixedRows().size() && index >= getFixedRows().get(numberOfCellsBelowIndex) && numberOfCellsBelowIndex < cellToAdd){
+            			numberOfCellsBelowIndex++;
+            		}
+            		numberOfCellsBelowIndex--;
+            	}
+            	
                 // If the number of remaining cells to add is the same of the fixedRows size
                 if (!getFixedRows().isEmpty() && cellToAdd <= getFixedRows().size()) {
                 	/**
@@ -299,14 +307,9 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
                 	 * index of our FixedRows. If so, we compute how many FixedRow index 
                 	 * are below the current index.
                 	 */
-                	if(cellFixedAdded < getFixedRows().size() && index>=getFixedRows().get(cellFixedAdded) && !flag){
-                		flag = true;
-                		while(numberOfCellsBelowIndex < getFixedRows().size() && index >= getFixedRows().get(numberOfCellsBelowIndex) && numberOfCellsBelowIndex < cellToAdd){
-                			numberOfCellsBelowIndex++;
-                		}
-                		numberOfCellsBelowIndex--;
-                	}
+                	
                 	if(flag && cellToAdd<= (numberOfCellsBelowIndex+1)){
+                		
 	                    final int realIndex = getFixedRows().get(numberOfCellsBelowIndex);
 	                    cell = getAvailableCell(realIndex); // We grab the right one
 	                    setCellIndex(cell, realIndex); // the index is the real one

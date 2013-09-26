@@ -54,7 +54,6 @@ import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.samples.Utils;
-import org.scenicview.ScenicView;
 
 /**
  *

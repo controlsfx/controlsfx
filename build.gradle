@@ -40,6 +40,7 @@ javadoc {
     options.links("http://download.oracle.com/javase/7/docs/api/");
     options.links("http://docs.oracle.com/javafx/2/api/");
     options.addBooleanOption("Xdoclint:none").setValue(true);
+    options.overview("src/main/docs/overview.html");
     
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement

@@ -27,18 +27,24 @@
 
 package impl.org.controlsfx.skin;
 
+import java.util.ArrayList;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpreadsheetViewSelectionModel;
+import org.controlsfx.control.spreadsheet.model.Grid;
+import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
@@ -58,8 +64,10 @@ public class RowHeader  extends StackPane {
 	private double prefHeight;
 	private double prefWidth;
 	private Boolean working = true; // Whether or not we are showing the RowHeader
-	private SpreadsheetViewSelectionModel<?> selectionModel;
+//	private SpreadsheetViewSelectionModel<?> selectionModel;
 	private Rectangle clip; // Ensure that children do not go out of bounds
+	private ArrayList<Boolean> rowFix; // Compute if we can fix the rows or not.
+	private ContextMenu blankContextMenu;
 	
 	/***************************************************************************
      *                                                                         *
@@ -100,7 +108,7 @@ public class RowHeader  extends StackPane {
      **************************************************************************/
 	void init(){
 		prefHeight = spreadsheetViewSkin.getDefaultCellSize();
-		selectionModel = spreadsheetView.getSelectionModel();
+//		selectionModel = spreadsheetView.getSelectionModel();
 
 		//Clip property to stay within bounds
 		clip = new Rectangle(prefWidth, snapSize(spreadsheetViewSkin.getSkinnable().getHeight()));
@@ -120,13 +128,14 @@ public class RowHeader  extends StackPane {
 
 		// When the Column header is showing or not, we need to update the position of the rowHeader
 		spreadsheetView.showColumnHeaderProperty().addListener(layout);
-
 		spreadsheetView.getFixedRows().addListener(layout);
 		//In case we resize the view in any manners
 		spreadsheetView.heightProperty().addListener(layout);
 
 		// For layout properly the rowHeader when there are some selected items
-		selectionModel.getSelectedRows().addListener(layout);
+		spreadsheetViewSkin.getSelectedRows().addListener(layout);
+		initRowFix(spreadsheetView.getGrid());
+		blankContextMenu = new ContextMenu();
 		requestLayout();
 			
 	}
@@ -135,6 +144,8 @@ public class RowHeader  extends StackPane {
 		if(working && spreadsheetView != null) {
 
 			final double x =snappedLeftInset();
+			final int cellSize = spreadsheetViewSkin.getCellsSize();
+			
 			//We add prefHeight because we need to take the other header into account
 			// And also the fixedRows if any
 			double y = snappedTopInset() ;//+prefHeight*flow.getFixedRows().size();
@@ -143,7 +154,7 @@ public class RowHeader  extends StackPane {
 			}
 
 			//The Labels must be aligned with the rows
-			if(spreadsheetViewSkin.getCellsSize() != 0){
+			if( cellSize != 0){
 				y += spreadsheetViewSkin.getCell(0).getLocalToParentTransform().getTy();
 			}
 
@@ -152,44 +163,56 @@ public class RowHeader  extends StackPane {
 			int i=0;
 			// We don't want to add Label if there are no rows associated with.
 			final int modelRowCount = spreadsheetView.getGrid().getRowCount();
-
+			SpreadsheetRowImpl row;
 			// We iterate over the visibleRows
-			while(spreadsheetViewSkin.getCellsSize() != 0 && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
+			while(cellSize != 0 && spreadsheetViewSkin.getCell(i) != null && i< modelRowCount){
+				row = spreadsheetViewSkin.getCell(i);
 				label = getLabel(rowCount++);
-				label.setText(String.valueOf(spreadsheetViewSkin.getCell(i).getIndexVirtualFlow()+1));
+				label.setText(String.valueOf(row.getIndexVirtualFlow()+1));
 				label.resize(prefWidth,prefHeight);
 				label.relocate(x, y);
+				label.setContextMenu(getRowContextMenu(row.getIndexVirtualFlow()));
+				
 				//We want to highlight selected rows
 				final ObservableList<String> css = label.getStyleClass();
-				if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
-					css.setAll("selected");
+				if(spreadsheetViewSkin.getSelectedRows().contains(row.getIndex())){
+					css.addAll("selected");
 				}else{
-					css.clear();
+					css.removeAll("selected");
+				}
+				if(spreadsheetView.getFixedRows().contains(row.getIndex())){
+					css.addAll("fixed");
+				}else{
+					css.removeAll("fixed");
 				}
 				y+=prefHeight;
 				++i;
 			}
 
 			// Then we iterate over the FixedRows if any
-			if(!spreadsheetView.getFixedRows().isEmpty() && spreadsheetViewSkin.getCellsSize() != 0){
+			if(!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0){
 				for(i = 0;i<spreadsheetView.getFixedRows().size();++i){
-					label = getLabel(rowCount++);
-					label.setText(String.valueOf(i+1));
-					label.resize(prefWidth,prefHeight);
-
-					//If the columnHeader is here, we need to translate a bit
-					if(spreadsheetView.showColumnHeaderProperty().get()){
-						label.relocate(x, snappedTopInset()+prefHeight*(i+1));
-					}else{
-						label.relocate(x, snappedTopInset()+prefHeight*i);
+					if(spreadsheetViewSkin.getCell(i).getCurrentlyFixed()){
+						label = getLabel(rowCount++);
+						label.setText(String.valueOf(spreadsheetView.getFixedRows().get(i)+1));
+						label.resize(prefWidth,prefHeight);
+						label.setContextMenu(getRowContextMenu(spreadsheetView.getFixedRows().get(i)));
+						
+						//If the columnHeader is here, we need to translate a bit
+						if(spreadsheetView.showColumnHeaderProperty().get()){
+							label.relocate(x, snappedTopInset()+prefHeight*(i+1));
+						}else{
+							label.relocate(x, snappedTopInset()+prefHeight*i);
+						}
+						final ObservableList<String> css = label.getStyleClass();
+						if(spreadsheetViewSkin.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
+							css.addAll("selected");
+						}else{
+							css.removeAll("selected");
+						}
+						css.addAll("fixed");
+						y+=prefHeight;
 					}
-					final ObservableList<String> css = label.getStyleClass();
-					if(selectionModel.getSelectedRows().contains(spreadsheetViewSkin.getCell(i).getIndex())){
-						css.setAll("selected");
-					}else{
-						css.clear();
-					}
-					y+=prefHeight;
 				}
 			}
 
@@ -200,6 +223,7 @@ public class RowHeader  extends StackPane {
 				label.resize(prefWidth,prefHeight);
 				label.relocate(x, 0);
 				label.getStyleClass().clear();
+				label.setContextMenu(blankContextMenu);
 			}
 
 			VirtualScrollBar hbar = SpreadsheetViewSkin.getSkin(spreadsheetView).getHBar();
@@ -210,6 +234,7 @@ public class RowHeader  extends StackPane {
 				label.resize(prefWidth,hbar.getHeight());
 				label.relocate(snappedLeftInset(), getHeight()-hbar.getHeight());
 				label.getStyleClass().clear();
+				label.setContextMenu(blankContextMenu);
 			}
 			//Flush the rest of the children if any
 			while(getChildren().size() > rowCount){
@@ -244,6 +269,57 @@ public class RowHeader  extends StackPane {
 		}else{
 			return (Label) getChildren().get(rowNumber);
 		}
+	}
+	
+	/**
+	 * Compute for all the rows if it can be fixed.
+	 * @param grid
+	 */
+	private void initRowFix(Grid grid){
+		rowFix = new ArrayList<>(grid.getRows().size()+1);
+		int count = 0;
+		for(ObservableList<SpreadsheetCell<?>> row : grid.getRows()){
+			rowFix.add(true);
+			for(SpreadsheetCell<?> cell: row){
+				if(cell.getRowSpan() >1){
+					rowFix.set(count, false);
+					break;
+				}
+			}
+			++count;
+		}
+	}
+	
+	/**
+	 * Return a contextMenu for fixing a row if possible.
+	 * @param i
+	 * @return
+	 */
+	private ContextMenu getRowContextMenu(final Integer i){
+		if(i < rowFix.size() && rowFix.get(i)){
+	    	final ContextMenu contextMenu = new ContextMenu();
+	
+	    	CheckMenuItem fixItem = new CheckMenuItem("Fix");
+	    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0,
+						Boolean arg1, Boolean arg2) {
+					
+						if(spreadsheetView.getFixedRows().contains(i)){
+							spreadsheetView.getFixedRows().remove(i);
+						}else{
+							spreadsheetView.getFixedRows().add(i);
+						}
+						//We MUST have the fixed rows sorted!
+						FXCollections.sort(spreadsheetView.getFixedRows());
+				}
+	        });
+	        contextMenu.getItems().addAll(fixItem);
+	        
+	        return contextMenu;
+    	}else{
+    		return blankContextMenu;
+    	}
 	}
 
 }

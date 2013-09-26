@@ -54,6 +54,7 @@ import org.controlsfx.control.spreadsheet.model.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.model.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.model.GridBase;
 import org.controlsfx.samples.Utils;
+import org.scenicview.ScenicView;
 
 /**
  *
@@ -103,7 +104,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		grid.setVgap(5);
 		grid.setPadding(new Insets(5, 5, 5, 5));
 
-		final ChoiceBox<Integer> fixedRows = new ChoiceBox<>(FXCollections.observableArrayList(0, 1, 2));
+		/*final ChoiceBox<Integer> fixedRows = new ChoiceBox<>(FXCollections.observableArrayList(0, 1, 2));
 		fixedRows.getSelectionModel().select(0);
 		fixedRows.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -111,20 +112,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 					Number arg1, Number arg2) {
 				spv.fixRows(arg2.intValue());
 			}
-		});
-
-		final ChoiceBox<Integer> fixedColumns = new ChoiceBox<>(FXCollections.observableArrayList(0, 1, 2));
-		fixedColumns.getSelectionModel().select(0);
-		fixedColumns.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				List<Integer> tempList = new ArrayList<>(arg2.intValue());
-				for(int i=0;i<arg2.intValue();++i){
-					tempList.add(Integer.valueOf(i));
-				}
-				spv.fixColumns(tempList);
-			}
-		});
+		});*/
 
 		final CheckBox rowHeader = new CheckBox("Row Header");
 		rowHeader.setSelected(true);
@@ -182,14 +170,12 @@ public class HelloSpreadsheetView extends Application implements Sample {
 				}
 			}});
 		
-		grid.add(new Label("Freeze Rows:"), 1, 1);
-		grid.add(fixedRows, 1, 2);
-		grid.add(new Label("Freeze Columns:"), 1, 3);
-		grid.add(fixedColumns, 1, 4);
-		grid.add(rowHeader, 1, 5);
-		grid.add(columnHeader, 1, 6);
-		grid.add(new Label("Span model:"), 1, 7);
-		grid.add(typeOfGrid, 1, 8);
+//		grid.add(new Label("Freeze Rows:"), 1, 1);
+//		grid.add(fixedRows, 1, 2);
+		grid.add(rowHeader, 1, 1);
+		grid.add(columnHeader, 1, 2);
+		grid.add(new Label("Span model:"), 1, 3);
+		grid.add(typeOfGrid, 1, 4);
 
 		return grid;
 	}

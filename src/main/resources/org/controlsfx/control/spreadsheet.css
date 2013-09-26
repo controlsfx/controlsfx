@@ -123,7 +123,8 @@ Label.selected{
 }  
 
 /* FIXED COLUMNS  */
-TableColumnHeader > Label.fixed{
+TableColumnHeader > Label.fixed,
+RowHeader > Label.fixed{
 	-fx-font-style : italic;
 }
 

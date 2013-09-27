@@ -39,7 +39,21 @@ import org.controlsfx.control.SpreadsheetView;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
- * You can then modify some informations like the width of the column or whether it is fixed or not.
+ * 
+ * <h3>Configuration: </h3>
+ * 
+ * You can then modify some informations like the width of the column with {@link #setPrefWidth(double)} or
+ * if you want it to be resizable with {@link #setResizable(boolean)}.
+ * <br/>
+ * You have the ability to fix this column at the left of the SpreadsheetView by calling {@link #setFixed(boolean)}. 
+ * But you are strongly advised to check if it's possible with {@link #canFix()}.
+ * Take a look at the {@link SpreadsheetView} description to understand the fixing constraints.
+ * 
+ * <br/>
+ * If the column can be fixed, a {@link ContextMenu} will appear if the user right-click on the header. 
+ * If not, nothing will appear and the user will not have the possibility to fix it.
+ * 
+ * @see SpreadsheetView
  */
 public class SpreadsheetColumn<T> {
 

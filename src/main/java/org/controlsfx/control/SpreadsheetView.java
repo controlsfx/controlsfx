@@ -68,6 +68,7 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 
@@ -94,9 +95,21 @@ import com.sun.javafx.UnmodifiableArrayList;
  * You can fix some rows and some columns by right-clicking on their header. A context menu will appear if it's possible to fix them.
  * The label will then be in italic to confirm that the fixing has been done properly.
  * Keep in mind that only columns without any spanning cells, and only rows without row-spanning cells can be fixed.
+ * <br/>
+ * You have also the possibility to fix them manually by adding and removing items from {@link #getFixedRows()} and {@link #getFixedColumns()}.
+ * But you are strongly advised to check if it's possible to do so with {@link SpreadsheetColumn#canFix()} for the fixed columns and with
+ * {@link #canFixRow(int)} for the fixed rows. Calling those methods prior every move will ensure that no exception will be thrown. 
  * 
  * <br/><br/>
  * 
+ * <h3>Copy pasting </h3>
+ * You can copy every cell you want to paste it elsewhere. Be aware that only the value inside will be pasted, not the style nor the type. 
+ * Thus the value you're trying to paste must be compatible with the {@link CellType} of the receiving cell. Pasting a Double into a String will work but
+ * the reverse operation will not. 
+ * <br/>
+ * A unique cell or a selection of several of them can be copied and pasted.
+ * 
+ * <br/><br/>
  * <h3>Code Samples</h3>
  * Just like the {@link TableView}, you instantiate the underlying model, a {@link Grid}.
  * You will create some {@link ObservableList<DataCell>} filled with {@link SpreadsheetCell}. 
@@ -121,6 +134,11 @@ import com.sun.javafx.UnmodifiableArrayList;
  * 
  * At that moment you can span some of the cells with the convenient method provided by the grid.
  * Then you just need to instantiate the SpreadsheetView.
+ * 
+ * 
+ * @see SpreadsheetCell
+ * @see SpreadsheetColumn
+ * @see Grid
  */
 public class SpreadsheetView extends Control {
 
@@ -807,7 +825,7 @@ public class SpreadsheetView extends Control {
             case ROW_INVISIBLE:
             default:
                 final SpreadsheetCell<?> cellSpan = tableView.getItems().get(row).get(col);
-                if (SpreadsheetViewSkin.getSkin(this).getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
+                if (SpreadsheetViewSkin.getSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
                     return new TablePosition<>(tableView, cellSpan.getRow(), tableView.getColumns().get(cellSpan.getColumn()));
 
                 } else { // If it's not, then it's the firstkey
@@ -840,7 +858,7 @@ public class SpreadsheetView extends Control {
          */
         private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
-                SpreadsheetViewSkin skin = SpreadsheetViewSkin.getSkin(spreadsheetView);
+                SpreadsheetViewSkin skin = SpreadsheetViewSkin.getSkin();
                 
                 if (mouseEvent != null && !tableView.contains(mouseEvent.getX(), mouseEvent.getY())) {
                     if(mouseEvent.getSceneX() < tableView.getLayoutX()) {
@@ -1026,7 +1044,7 @@ public class SpreadsheetView extends Control {
         private void updateScroll(TablePosition<ObservableList<SpreadsheetCell<?>>, ?> posFinal) {
             //We try to make visible the rows that may be hidden by Fixed rows
             // We don't want to do any scroll behavior when dragging
-            if(!drag && SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
+            if(!drag && SpreadsheetViewSkin.getSkin().getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());
             }
 

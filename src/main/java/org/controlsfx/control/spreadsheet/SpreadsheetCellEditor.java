@@ -31,15 +31,60 @@ import impl.org.controlsfx.skin.SpreadsheetRowImpl;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextField;
 
 import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
 import org.controlsfx.property.editor.PropertyEditor;
 
 /**
  * 
- * Mother Class for all the possible editors displayed in the
- * {@link SpreadsheetCellImpl}. It reacts to all the possible events in order to
- * submit or cancel the displayed editor or the value entered.
+ * SpreadsheetCellEditor are used by {@link SpreadsheetCell} in order to control how each value will be entered.
+ * <br/>
+ * 
+ * <h3>General behavior: </h3>
+ * Editors will be displayed if the user double-click or press enter in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ).
+ * <br/>
+ * If the user does anything outside the editor, it will try to save the value and it will close itself. Each editor has its own policy regarding
+ * validation of the value entered. If the value doesn't meet the requirements when saving the cell, the old value is used. 
+ * <br/>
+ * You can abandon a current modification by pressing "esc" key. 
+ * <br/>
+ * <h3>Specific behavior: </h3>
+ * Each editor is linked with a specific {@link CellType}. Here are their properties:
+ * <br/>
+ * 
+ * <ul>
+ *   <li> String: Basic {@link TextField}, can accept all data and save it as a string.</li>
+ *   <li> List: Display a {@link ComboBox} with the different values.</li>
+ *   <li> Double: Display a {@link TextField} which accepts only double value. If the entered value is incorrect,
+ *   the background will turn red so that the user will know in advance if the data will be saved or not.</li>
+ *   <li> Date: Display a {@link DatePicker}.</li>
+ * </ul>
+ * 
+ * <br/>
+ * <h3>Visual: </h3>
+ * <table style="border: 1px solid gray;">
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>String</strong></td>
+ *     <td><center><img src="textEditor.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>List</strong></td>
+ *     <td><center><img src="listEditor.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Double</strong></td>
+ *     <td><center><img src="doubleEditor.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:right;"><strong>Date</strong></td>
+ *     <td><center><img src="dateEditor.png"></center></td>
+ *   </tr>
+ *  </table>
+ * 
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
@@ -107,7 +152,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
                 end();
             }
         };
-        SpreadsheetViewSkin.getSkin(spreadsheetView).getVBar().valueProperty().addListener(editorListener);
+        SpreadsheetViewSkin.getSkin().getVBar().valueProperty().addListener(editorListener);
     }
 
     /***************************************************************************
@@ -120,7 +165,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         editing = false;
         spreadsheetEditor.end();
 
-        SpreadsheetViewSkin.getSkin(spreadsheetView).getVBar().valueProperty().removeListener(editorListener);
+        SpreadsheetViewSkin.getSkin().getVBar().valueProperty().removeListener(editorListener);
         editorListener = null;
     }
 
@@ -157,7 +202,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         private boolean isMoved;
 
         private int getCellCount() {
-            return SpreadsheetViewSkin.getSkin(spreadsheetView).getCellsSize();
+            return SpreadsheetViewSkin.getSkin().getCellsSize();
         }
         
         private boolean addCell(SpreadsheetCellImpl<?> cell){

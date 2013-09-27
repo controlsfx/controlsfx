@@ -35,9 +35,49 @@ import org.controlsfx.control.SpreadsheetView;
 
 
 /**
- * The model cell that hold the data. It has all the information needed by the
- * View.
+ * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. 
+ * <br/>
+ * You will provide these when constructing a {@link Grid}.
  * 
+ * <br/>
+ *  
+ * <h3>Type of SpreadsheetCell: </h3>
+ * Different type of SpreadsheetCell are available depending on the data you want to represent in your {@link SpreadsheetView}. 
+ * Each type has its own {@link SpreadsheetCellEditor} in order to control very closely the possible modifications.
+ * <br/>
+ * Those {@link CellType} are not directly accessible. You have to use the different static method provided in {@link SpreadsheetCells}
+ * in order to create the specialized SpreadsheetCell that suits your need:
+ * <br/>
+ * 
+ * <ul>
+ *   <li> String: Accessible with {@link SpreadsheetCells#createTextCell(int, int, int, int, String)} .</li>
+ *   <li> List: Accessible with {@link SpreadsheetCells#createListCell(int, int, int, int, java.util.List)} .</li>
+ *   <li> Double: Accessible with {@link SpreadsheetCells#createDoubleCell(int, int, int, int, Double)} .</li>
+ *   <li> Date: Accessible with {@link SpreadsheetCells#createDateCell(int, int, int, int, java.time.LocalDate)} .</li>
+ * </ul>
+ * <br/>
+ * 
+ * <h3>Configuration: </h3>
+ * You will have to indicate the coordinates of that Cell together with the row and column Span. You can specify if you want that cell to be editable or not
+ * using {@link #setEditable(boolean)}.
+ * Be advised that a cell with a rowSpan means that the cell will replace all the cells situated in the rowSpan range. Same with the column span.
+ * So the best way to handle spanning is to fill your grid with unique cells, and then call {@link GridBase#spanColumn(int, int, int)} or 
+ * {@link GridBase#spanRow(int, int, int)}.
+ * <br/>
+ * 
+ * 
+ * <h3>Example: </h3>
+ * 
+ * Suppose you want to display some numbers in your SpreadsheetView. You will fill your {@link Grid} 
+ * using {@link SpreadsheetCells#createDoubleCell(int, int, int, int, Double)}.
+ * 
+ * You will then be sure that your cells contain only {@link Double} value. If the user wants to enter a {@link String}, the value will be ignored.
+ * Moreover, the {@link SpreadsheetCellEditor} background color will turn red when the value is incorrect to notify the user that his value will
+ * not be be saved.
+ * 
+ * @see SpreadsheetCells 
+ * @see SpreadsheetView
+ * @see SpreadsheetCellEditor
  */
 public abstract class SpreadsheetCell<T> implements Serializable {
 
@@ -53,7 +93,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * {@link SpreadsheetView} control.
      */
     public static enum CellType {
-        STRING, ENUM, DOUBLE, DATE, SPLITTER;
+        STRING, LIST, DOUBLE, DATE;
     }
     
     

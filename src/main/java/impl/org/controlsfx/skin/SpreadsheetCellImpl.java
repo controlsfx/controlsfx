@@ -57,7 +57,7 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
 /**
  *
  * The View cell that will be visible on screen.
- * It holds the {@link DataRow} and the {@link SpreadsheetCell}.
+ * It holds the {@link SpreadsheetCell}.
  */
 public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<SpreadsheetCell<?>>, SpreadsheetCell<T>> {
 
@@ -152,7 +152,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         	 */
         	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
-	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin(spv).getCellsSize();j++ ) {
+	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin().getCellsSize();j++ ) {
 	                    if(SpreadsheetViewSkin.getCell(spv, j) == getTableRow()){
 	                    	flag = true;
 	                    }
@@ -191,7 +191,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
                     editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createTextEditor();
                     editors.put(cell.getCellType(), editor);
                     break;
-                case ENUM:
+                case LIST:
                     editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createListEditor();
                     editors.put(cell.getCellType(), editor);
                     break;
@@ -365,7 +365,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         final SpreadsheetView spv = getSpreadsheetView();
         final SpreadsheetRowImpl row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size());
         
-        if (SpreadsheetViewSkin.getSkin(spv).getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
+        if (SpreadsheetViewSkin.getSkin().getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
         	final SpreadsheetRowImpl rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need
             // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)

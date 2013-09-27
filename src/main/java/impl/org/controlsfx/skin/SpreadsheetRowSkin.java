@@ -173,7 +173,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
              * FOR FIXED COLUMNS
              */
             double tableCellX = 0;
-            final double hbarValue = SpreadsheetViewSkin.getSkin(spreadsheetView).getHBar().getValue();
+            final double hbarValue = SpreadsheetViewSkin.getSkin().getHBar().getValue();
             
             //Virtualization of column
             final SpreadsheetCell<?> cellSpan = grid.getRows().get(index).get(column);

@@ -36,7 +36,9 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
  * You can generate some {@link SpreadsheetCell} used by the {@link Grid}
  * with the static method provided. 
  * 
- * Currently you can only create a textCell, listCell or a DateCell.
+ * Currently you can only create a textCell, listCell, doubleCell or a DateCell.
+ * 
+ * 
  */
 public class SpreadsheetCells {
 
@@ -164,7 +166,7 @@ public class SpreadsheetCells {
 	 */
     public static SpreadsheetCell<List<String>> createListCell(final int row, final int column,
             final int rowSpan, final int columnSpan, final List<String> _value) {
-        return new SpreadsheetCell<List<String>>(row, column, rowSpan, columnSpan, CellType.ENUM) {
+        return new SpreadsheetCell<List<String>>(row, column, rowSpan, columnSpan, CellType.LIST) {
             /***************************************************************************
              * * Static Fields * *
              **************************************************************************/

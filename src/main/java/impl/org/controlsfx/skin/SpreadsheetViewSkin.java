@@ -381,12 +381,12 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     
     
     // hacky, but at least it lets us hide some API
-    public static final SpreadsheetViewSkin getSkin(SpreadsheetView spv) {
+    public static final SpreadsheetViewSkin getSkin() {
         return (SpreadsheetViewSkin) (tableView.getSkin());
     }
     
     public static SpreadsheetRowImpl getCell(SpreadsheetView spv, int index) {
-        return getSkin(spv).getCell(index);
+        return getSkin().getCell(index);
     }
     
     /**

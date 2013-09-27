@@ -32,7 +32,7 @@ import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.SpreadsheetView.SpanType;
 
 /**
- * That class holds some {@link DataRow} filled with {@link SpreadsheetCell} in order
+ * That class holds some {@link SpreadsheetCell} in order
  * to be used by the {@link SpreadsheetView}.
  * 
  * A Grid is used by {@link SpreadsheetView} to represent the data to show on

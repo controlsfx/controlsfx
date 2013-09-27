@@ -81,7 +81,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		buildBothGrid(grid);
 
 		SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
-			
+		
 		borderPane.setCenter(spreadSheetView);
 
 		borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Both"));
@@ -221,12 +221,15 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	 */
 	private SpreadsheetCell<?> generateCell(int row, int column, int rowSpan, int colSpan) {
 		SpreadsheetCell<?> cell;
+		List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montréal");
 		final double random = Math.random();
-		if (random < 0.3) {
-			List<String> stringList = Arrays.asList("Banana","Apple","Mango","Cherry","Watermelon");
+		if (random < 0.10) {
+			List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
 			cell = SpreadsheetCells.createListCell(row, column, rowSpan, colSpan, stringList);
-		} else if (random >= 0.3 && random < 0.8) {
-			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,Integer.toString((int)(Math.random()*100)));
+		} else if (random >= 0.10 && random < 0.25) {
+			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+		}else if (random >= 0.25 && random < 0.75) {
+			cell = SpreadsheetCells.createDoubleCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
 		}else{
 			cell = SpreadsheetCells.createDateCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
 		}

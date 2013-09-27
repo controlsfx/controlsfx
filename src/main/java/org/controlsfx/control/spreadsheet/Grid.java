@@ -33,7 +33,7 @@ import org.controlsfx.control.SpreadsheetView.SpanType;
 
 /**
  * That class holds some {@link DataRow} filled with {@link SpreadsheetCell} in order
- * to be used by the {@link SpreadsheetView}
+ * to be used by the {@link SpreadsheetView}.
  * 
  * A Grid is used by {@link SpreadsheetView} to represent the data to show on
  * screen. A default implementation is provided by {@link GridBase}, but for 
@@ -62,9 +62,9 @@ import org.controlsfx.control.SpreadsheetView.SpanType;
  *         doStuff(cell);
  *     }
  * }
+ * 
  * </pre>
  * 
- * @see SpreadsheetView
  * @see SpreadsheetView
  */
 public interface Grid {

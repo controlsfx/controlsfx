@@ -80,7 +80,7 @@ public class SpreadsheetColumn<T> {
 		this.indexColumn = indexColumn;
 //		this.columnSpanConstraint = 0;
 //		this.columnSpanConstraint = 0;
-		canFix = canFix();
+		canFix = initCanFix();
 		
 		// The contextMenu creation must be on the JFX thread
 		final Runnable r = new Runnable() {
@@ -94,7 +94,7 @@ public class SpreadsheetColumn<T> {
 		//FIXME implement better listening after
 		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell<?>>>(){
 			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell<?>>> arg0) {
-				canFix();
+				initCanFix();
 			}
 		});
 	}
@@ -114,7 +114,8 @@ public class SpreadsheetColumn<T> {
 	}
 	
 	/**
-	 * Fix this column to the left (if possible)
+	 * Fix this column to the left if possible.
+	 * Call {@link #canFix()} before trying to fix a column.
 	 * Visual confirmation is Label in italic
 	 * @param fixed
 	 */
@@ -149,6 +150,15 @@ public class SpreadsheetColumn<T> {
 		column.setResizable(b);
 	}
 	
+	/**
+	 * Indicate whether this column can be fixed or not.
+	 * Call that method before calling {@link #setFixed(boolean)} or
+	 * adding an item to {@link SpreadsheetView#getFixedColumns()}.
+	 * @return
+	 */
+	public boolean canFix(){
+		return canFix;
+	}
 	/***************************************************************************
      *                                                                         *
      * Private Methods                                               		   *
@@ -191,7 +201,7 @@ public class SpreadsheetColumn<T> {
 	 * 
 	 * @return
 	 */
-	private boolean canFix(){
+	private boolean initCanFix(){
 		for (ObservableList<SpreadsheetCell<?>> row : spreadsheetView.getGrid().getRows()) {
 			int columnSpan = row.get(indexColumn).getColumnSpan();
 			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)

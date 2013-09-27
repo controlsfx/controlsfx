@@ -27,7 +27,6 @@
 
 package impl.org.controlsfx.skin;
 
-import java.util.ArrayList;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -43,9 +42,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.Grid;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 
@@ -66,7 +62,6 @@ public class RowHeader  extends StackPane {
 	private Boolean working = true; // Whether or not we are showing the RowHeader
 //	private SpreadsheetViewSelectionModel<?> selectionModel;
 	private Rectangle clip; // Ensure that children do not go out of bounds
-	private ArrayList<Boolean> rowFix; // Compute if we can fix the rows or not.
 	private ContextMenu blankContextMenu;
 	
 	/***************************************************************************
@@ -134,7 +129,7 @@ public class RowHeader  extends StackPane {
 
 		// For layout properly the rowHeader when there are some selected items
 		spreadsheetViewSkin.getSelectedRows().addListener(layout);
-		initRowFix(spreadsheetView.getGrid());
+		
 		blankContextMenu = new ContextMenu();
 		requestLayout();
 			
@@ -272,31 +267,12 @@ public class RowHeader  extends StackPane {
 	}
 	
 	/**
-	 * Compute for all the rows if it can be fixed.
-	 * @param grid
-	 */
-	private void initRowFix(Grid grid){
-		rowFix = new ArrayList<>(grid.getRows().size()+1);
-		int count = 0;
-		for(ObservableList<SpreadsheetCell<?>> row : grid.getRows()){
-			rowFix.add(true);
-			for(SpreadsheetCell<?> cell: row){
-				if(cell.getRowSpan() >1){
-					rowFix.set(count, false);
-					break;
-				}
-			}
-			++count;
-		}
-	}
-	
-	/**
 	 * Return a contextMenu for fixing a row if possible.
 	 * @param i
 	 * @return
 	 */
 	private ContextMenu getRowContextMenu(final Integer i){
-		if(i < rowFix.size() && rowFix.get(i)){
+		if(spreadsheetView.canFixRow(i)){
 	    	final ContextMenu contextMenu = new ContextMenu();
 	
 	    	CheckMenuItem fixItem = new CheckMenuItem("Fix");

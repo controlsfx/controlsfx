@@ -153,11 +153,11 @@ public class SpreadsheetHeaderRow extends TableHeaderRow {
 			while(arg0.next()){
 				//If we unfix a column
 				for (SpreadsheetColumn<?> remitem : arg0.getRemoved()) {
-                   removeStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(remitem));
+                   removeStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumnsUnmodifiable().indexOf(remitem));
                 }
 				//If we fix one
                 for (SpreadsheetColumn<?> additem : arg0.getAddedSubList()) {
-                	addStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(additem));
+                	addStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumnsUnmodifiable().indexOf(additem));
                 }
 			}
 			 updateHighlighSelection();

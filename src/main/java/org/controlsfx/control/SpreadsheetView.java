@@ -209,7 +209,7 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid){
         super();
-
+        verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
 
         // FIXME extract this out as a separate skin class
@@ -410,7 +410,39 @@ public class SpreadsheetView extends Control {
      * Private/Protected Implementation                                        *
      *                                                                         *
      **************************************************************************/
-
+ 
+    private void verifyGrid(Grid grid){
+    	verifyColumnSpan(grid);
+    }
+    
+    private void verifyColumnSpan(Grid grid){
+    	for(int i=0; i< grid.getRows().size();++i){
+    		ObservableList<SpreadsheetCell<?>> row = grid.getRows().get(i);
+    		int count = 0;
+    		for(int j=0; j< row.size();++j){
+    			if(row.get(j).getColumnSpan() == 1){
+    				++count;
+    			}else if(row.get(j).getColumnSpan() > 1){
+    				++count;
+    				SpreadsheetCell<?> currentCell = row.get(j);
+    				for(int k =j+1;k<currentCell.getColumn()+currentCell.getColumnSpan();++k){
+    					if(!row.get(k).equals(currentCell)){
+    						throw new IllegalStateException("\n At row "+i+" and column "+j
+    								+ ": this cell is in the range of a columnSpan but is different. \n"
+    								+ "Every cell in a range of a ColumnSpan must be of the same instance.");
+    					}
+    					++count;
+    					++j;
+    				}
+    			}else{
+    				throw new IllegalStateException("\n At row "+i+" and column "+j+": this cell has a negative columnSpan");
+    			}
+    		}
+    		if(count != grid.getColumnCount()){
+    			throw new IllegalStateException("The row"+i+" has a number of cells different of the columnCount declared in the grid.");
+    		}
+    	}
+    }
     /**
      * Return the {@link SpanType} of a cell.
      * @param row

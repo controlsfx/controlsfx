@@ -145,24 +145,37 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
     
     /**
-     * Define how each cell is spanning. Refer to {@link SpreadsheetView} for
-     * more information.
+     * The SpanType describes in which state each cell can be.
+     * When a spanning is occurring, one cell is becoming larger and the others are becoming invisible.
+     * Thus, that particular cell is masking the others.
+     * <br/><br/>
+     * But the SpanType cannot be known in advance because it's evolving for each cell
+     * during the lifetime of the {@link SpreadsheetView}. Suppose you have a cell spanning in row,
+     * the first one is in a ROW_VISIBLE state, and all the other below are in a 
+     * ROW_SPAN_INVISIBLE state. But if the user is scrolling down, the first will go out of sight.
+     * At that moment, the second cell is switching from ROW_SPAN_INVISIBLE state to ROW_VISIBLE state. 
+     * <br/>
+     * <br/>
+     * 
+     * <center><img src="spanType.png"></center>
+     *    Refer to {@link SpreadsheetView} for more information.
      */
     public static enum SpanType {
         
-        /** Normal Cell (visible) */
+        /** Visible cell, can be a unique cell (no span) or the first one inside
+         * a column spanning cell.  */
         NORMAL_CELL,
         
-        /** Invisible cell spanned in column */
-        COLUMN_INVISIBLE,
+        /** Invisible cell because a cell in a NORMAL_CELL state on the left is covering it. */
+        COLUMN_SPAN_INVISIBLE,
         
-        /** Invisible cell spanned in row */
-        ROW_INVISIBLE,
+        /** Invisible cell because a cell in a ROW_VISIBLE state on the top is covering it. */
+        ROW_SPAN_INVISIBLE,
         
-        /** Visible Cell but has invisible cell below */
+        /** Visible Cell but has some cells below in a ROW_SPAN_INVISIBLE state. */
         ROW_VISIBLE,
         
-        /** Invisible cell, span in diagonal */
+        /** Invisible cell situated in diagonal of a cell in a ROW_VISIBLE state. */
         BOTH_INVISIBLE;
     }
 
@@ -723,7 +736,7 @@ public class SpreadsheetView extends Control {
         public void changed(ObservableValue<? extends TablePosition<ObservableList<SpreadsheetCell<?>>,?>> ov, final TablePosition<ObservableList<SpreadsheetCell<?>>,?> t, final TablePosition<ObservableList<SpreadsheetCell<?>>,?> t1) {
             final SpreadsheetView.SpanType spanType = getSpanType(t1.getRow(), t1.getColumn());
             switch (spanType) {
-                case ROW_INVISIBLE:
+                case ROW_SPAN_INVISIBLE:
                     // If we notice that the new focused cell is the previous one, then it means that we were
                     //already on the cell and we wanted to go below.
                     if (!isPressed()
@@ -759,7 +772,7 @@ public class SpreadsheetView extends Control {
                     };
                     Platform.runLater(r);
                     break;
-                case COLUMN_INVISIBLE:
+                case COLUMN_SPAN_INVISIBLE:
                     // If we notice that the new focused cell is the previous one, then it means that we were
                     //already on the cell and we wanted to go right.
                     if (!isPressed()
@@ -847,8 +860,8 @@ public class SpreadsheetView extends Control {
             case ROW_VISIBLE:
                 return new TablePosition<>(tableView, row, column);
             case BOTH_INVISIBLE:
-            case COLUMN_INVISIBLE:
-            case ROW_INVISIBLE:
+            case COLUMN_SPAN_INVISIBLE:
+            case ROW_SPAN_INVISIBLE:
             default:
                 final SpreadsheetCell<?> cellSpan = tableView.getItems().get(row).get(col);
                 if (SpreadsheetViewSkin.getSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
@@ -1002,7 +1015,7 @@ public class SpreadsheetView extends Control {
              *
              */
             switch (spanType) {
-                case ROW_INVISIBLE:
+                case ROW_SPAN_INVISIBLE:
                     // If we notice that the new selected cell is the previous one, then it means that we were
                     //already on the cell and we wanted to go below.
                     // We make sure that old is not null, and that the move is initiated by keyboard.
@@ -1020,7 +1033,7 @@ public class SpreadsheetView extends Control {
                     // If the current selected cell if hidden by a both (row and column) span, we go left-above
                     posFinal = spreadsheetView.getVisibleCell(row, column, posFinal.getColumn());
                     break;
-                case COLUMN_INVISIBLE:
+                case COLUMN_SPAN_INVISIBLE:
                     // If we notice that the new selected cell is the previous one, then it means that we were
                     //already on the cell and we wanted to go right.
                     if (old != null && key && !shift
@@ -1038,7 +1051,7 @@ public class SpreadsheetView extends Control {
             //This is to handle edition
             if (posFinal.equals(old) && !ctrl && !shift && !drag) {
                 // If we are on an Invisible row or both (in diagonal), we need to force the edition
-                if (spanType == SpreadsheetView.SpanType.ROW_INVISIBLE || spanType == SpreadsheetView.SpanType.BOTH_INVISIBLE) {
+                if (spanType == SpreadsheetView.SpanType.ROW_SPAN_INVISIBLE || spanType == SpreadsheetView.SpanType.BOTH_INVISIBLE) {
                     final TablePosition<ObservableList<SpreadsheetCell<?>>, ?> FinalPos = new TablePosition<>(tableView, posFinal.getRow(), posFinal.getTableColumn());
                     final Runnable r = new Runnable() {
                         @Override

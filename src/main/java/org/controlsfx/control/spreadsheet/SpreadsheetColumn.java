@@ -40,7 +40,9 @@ import javafx.scene.control.TableColumn;
  * 
  * <h3>Configuration: </h3>
  * 
- * You can then modify some informations like the width of the column with {@link #setPrefWidth(double)} or
+ * SpreadsheetColumns are instantiated by the {@link SpreadsheetView} itself.
+ * <br/>
+ * What you can do is modify some informations like the width of the column with {@link #setPrefWidth(double)} or
  * if you want it to be resizable with {@link #setResizable(boolean)}.
  * <br/>
  * You have the ability to fix this column at the left of the SpreadsheetView by calling {@link #setFixed(boolean)}. 
@@ -85,7 +87,7 @@ public class SpreadsheetColumn<T> {
 	 * @param spreadsheetView
 	 * @param indexColumn
 	 */
-	public SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
+	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
 		column.setMinWidth(30); 

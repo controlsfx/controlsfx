@@ -214,7 +214,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
 
                 switch (spanType) {
-                    case ROW_INVISIBLE :
+                    case ROW_SPAN_INVISIBLE :
                     case BOTH_INVISIBLE :
                         tableCell.setOpacity(0);
                         tableCell.resize(width, height);
@@ -223,7 +223,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
 
                         x += width;
                         continue; // we don't want to fall through
-                    case COLUMN_INVISIBLE :
+                    case COLUMN_SPAN_INVISIBLE :
                         tableCell.setOpacity(0);
                         tableCell.resize(width, height);
                         tableCell.relocate(x + tableCellX, snappedTopInset()

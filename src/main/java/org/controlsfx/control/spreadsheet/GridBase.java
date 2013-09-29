@@ -128,12 +128,12 @@ public class GridBase implements Grid {
             if (cellSpanRow == row || !containsRowMinusOne) {
                 return SpanType.ROW_VISIBLE;
             } else {
-                return SpanType.ROW_INVISIBLE;
+                return SpanType.ROW_SPAN_INVISIBLE;
             }
         } else if (cellSpanColumnSpan > 1
                 && cellSpanColumn != column
                 && (cellSpanRow == row || !containsRowMinusOne)) {
-            return SpanType.COLUMN_INVISIBLE;
+            return SpanType.COLUMN_SPAN_INVISIBLE;
         } else {
             return SpanType.NORMAL_CELL;
         }

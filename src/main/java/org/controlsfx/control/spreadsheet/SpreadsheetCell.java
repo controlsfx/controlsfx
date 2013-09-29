@@ -87,11 +87,25 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     private static final long serialVersionUID = -7648169794403402662L;
 
     /**
-     * An enumeration to represent the types of cell available in the
-     * {@link SpreadsheetView} control.
+     * When instantiating a {@link SpreadsheetCell}, its CellType will be modified 
+     * and it will condition which value the cell can accept, or which {@link SpreadsheetCellEditor}
+     * it will use.
      */
     public static enum CellType {
-        STRING, LIST, DOUBLE, DATE;
+    	/**
+    	 * The string type is the basic one. It will accept any value. */
+        STRING,
+        /**
+         * The list type will accept and display some values. It will not be possible 
+         * to insert other values than those define in its list.*/
+        LIST,
+        /**
+    	 * The double type is for numeric value. It ensures that only numbers
+    	 * will be stored in it. */
+        DOUBLE,
+        /**
+    	 * The date type simply store and display a date. */
+        DATE;
     }
     
     

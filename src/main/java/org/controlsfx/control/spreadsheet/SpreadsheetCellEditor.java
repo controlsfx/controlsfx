@@ -35,7 +35,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
 import org.controlsfx.property.editor.PropertyEditor;
 

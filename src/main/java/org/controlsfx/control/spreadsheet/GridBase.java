@@ -33,8 +33,7 @@ import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpanType;
+import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
  * A base implementation of the {@link Grid} interface.

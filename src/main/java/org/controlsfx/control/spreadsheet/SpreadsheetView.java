@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package org.controlsfx.control.spreadsheet;
 
 import impl.org.controlsfx.skin.SpreadsheetCellImpl;
 import impl.org.controlsfx.skin.SpreadsheetRowImpl;
@@ -65,12 +65,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
-
-import org.controlsfx.control.spreadsheet.Grid;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
-import org.controlsfx.control.spreadsheet.SpreadsheetCells;
-import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 
 import com.sun.javafx.UnmodifiableArrayList;
 

@@ -28,8 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import javafx.collections.ObservableList;
 
-import org.controlsfx.control.SpreadsheetView;
-import org.controlsfx.control.SpreadsheetView.SpanType;
+import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
  * That class holds some {@link SpreadsheetCell} in order

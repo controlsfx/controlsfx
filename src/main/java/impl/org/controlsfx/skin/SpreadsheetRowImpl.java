@@ -35,8 +35,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 
-import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 
 /**

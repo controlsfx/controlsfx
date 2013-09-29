@@ -35,8 +35,6 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 
-import org.controlsfx.control.SpreadsheetView;
-
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
  * 

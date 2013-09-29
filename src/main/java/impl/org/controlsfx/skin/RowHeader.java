@@ -41,7 +41,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
-import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 

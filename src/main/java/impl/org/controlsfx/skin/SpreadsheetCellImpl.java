@@ -45,11 +45,11 @@ import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
-import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditors;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import com.sun.javafx.scene.control.skin.TableCellSkin;
 

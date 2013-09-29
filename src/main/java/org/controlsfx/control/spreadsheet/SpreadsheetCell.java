@@ -31,8 +31,6 @@ import java.io.Serializable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.controlsfx.control.SpreadsheetView;
-
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. 

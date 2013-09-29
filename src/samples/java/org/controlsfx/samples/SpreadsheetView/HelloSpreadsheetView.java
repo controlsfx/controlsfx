@@ -49,10 +49,10 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.control.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCells;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.samples.Utils;
 
 /**

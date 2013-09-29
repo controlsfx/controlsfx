@@ -26,7 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
-import org.controlsfx.control.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import javafx.scene.control.TableColumnBase;
 

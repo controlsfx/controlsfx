@@ -386,14 +386,14 @@ public class SpreadsheetView extends Control {
     public boolean canFixRow(int i){
     	return i<rowFix.size()?rowFix.get(i): false;
     }
-    /**
-     * Return a SpreadsheetColumn
-     * @param index
-     * @return 
-     */
-    public SpreadsheetColumn<?> getColumn(int index){
-    	return getColumns().get(index);
-    }
+//    /**
+//     * Return a SpreadsheetColumn
+//     * @param index
+//     * @return 
+//     */
+//    public SpreadsheetColumn<?> getColumn(int index){
+//    	return getColumns().get(index);
+//    }
     /**
      * You can fix or unfix a column by modifying this list.
      * Call {@link SpreadsheetColumn#canFix()} on the column before adding an item.

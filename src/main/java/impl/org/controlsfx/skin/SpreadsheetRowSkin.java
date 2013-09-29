@@ -180,7 +180,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             boolean isVisible = !isInvisible(x,width,hbarValue,headerWidth,cellSpan.getColumnSpan());
             
             // We translate that column by the Hbar Value if it's fixed
-            if (spreadsheetView.getColumnsUnmodifiable().get(column).isFixed()) {
+            if (spreadsheetView.getColumns().get(column).isFixed()) {
                 
                  if(hbarValue + fixedColumnWidth >x){
                 	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
@@ -263,7 +263,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
                             // calculate the width
 //                            final Node adjacentNode = (Node) getChildren().get(
 //                                    column + i);
-                            width += snapSize(spreadsheetView.getColumnsUnmodifiable().get(column+i).getWidth());//adjacentNode.maxWidth(-1));
+                            width += snapSize(spreadsheetView.getColumns().get(column+i).getWidth());//adjacentNode.maxWidth(-1));
                         }
                     }
 

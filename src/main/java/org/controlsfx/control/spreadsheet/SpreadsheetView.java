@@ -292,9 +292,9 @@ public class SpreadsheetView extends Control {
     
     /**
      * Return an unmodifiable observableList of the {@link SpreadsheetColumn} used.
-     * @return
+     * @return Aa unmodifiable observableList.
      */
-    public ObservableList<SpreadsheetColumn<?>> getColumnsUnmodifiable(){
+    public ObservableList<SpreadsheetColumn<?>> getColumns(){
 		return FXCollections.unmodifiableObservableList(columns);
     }
 
@@ -379,7 +379,7 @@ public class SpreadsheetView extends Control {
      * @return 
      */
     public SpreadsheetColumn<?> getColumn(int index){
-    	return getColumnsUnmodifiable().get(index);
+    	return getColumns().get(index);
     }
     /**
      * You can fix or unfix a column by modifying this list.
@@ -1354,7 +1354,7 @@ public class SpreadsheetView extends Control {
     	}
     	
     	private String computeReason(SpreadsheetColumn<?> element){
-    		int indexColumn = spv.getColumnsUnmodifiable().indexOf(element);
+    		int indexColumn = spv.getColumns().indexOf(element);
     	
     		String reason = "\n This column cannot be fixed.";
     		for (ObservableList<SpreadsheetCell<?>> row : spv.getGrid().getRows()) {

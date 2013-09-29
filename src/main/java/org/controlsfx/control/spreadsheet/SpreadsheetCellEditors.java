@@ -43,6 +43,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+/**
+ * This class offers some static methods in order to create specialized 
+ * {@link SpreadsheetCellEditor} object.
+ * <br/><br/>
+ * 
+ * Since the editors are tightly linked with the {@link SpreadsheetCell}, you have
+ * four pre-built editors corresponding to the four {@link CellType}.
+ * 
+ *
+ *@see SpreadsheetCellEditor
+ *@see SpreadsheetCell
+ *@see SpreadsheetView
+ */
 public class SpreadsheetCellEditors {
 
     private SpreadsheetCellEditors() {
@@ -52,7 +65,7 @@ public class SpreadsheetCellEditors {
     /**
      * 
      * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
-     * {@link TextField} where the user can type a different value.
+     * {@link TextField} where the user can type different values.
      */
     public static SpreadsheetCellEditor<String> createTextEditor() {
         return new SpreadsheetCellEditor<String>() {
@@ -112,7 +125,7 @@ public class SpreadsheetCellEditors {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
-                    tf.setText(cell.getStr());
+                    tf.setText(cell.getVisualString());
                 }
             }
 
@@ -131,7 +144,7 @@ public class SpreadsheetCellEditors {
 
             @Override
             protected SpreadsheetCell<String> commitEdit() {
-                this.modelCell.setStr(tf.getText());
+                this.modelCell.setVisualString(tf.getText());
                 return modelCell;
             }
 
@@ -166,7 +179,11 @@ public class SpreadsheetCellEditors {
     /**
      * 
      * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
-     * {@link TextField} where the user can type a different value.
+     * {@link TextField} where the user can type different numbers. Only numbers will be
+     * stored. 
+     * <br/>
+     * Moreover, the {@link TextField} will turn red if the value currently entered if incorrect.
+     * @see SpreadsheetCellEditor
      */
     public static SpreadsheetCellEditor<Double> createDoubleEditor() {
         return new SpreadsheetCellEditor<Double>() {
@@ -227,7 +244,7 @@ public class SpreadsheetCellEditors {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
-                    tf.setText(cell.getStr());
+                    tf.setText(cell.getVisualString());
                 }
             }
 
@@ -302,7 +319,8 @@ public class SpreadsheetCellEditors {
     /**
      * 
      * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
-     * {@link ComboBox} where the user can choose a value.
+     * {@link ComboBox} where the user can choose a date through a visual calendar.
+     * The user can also type the date directly in the expected format (DD/MM/YYYY).
      */
     public static SpreadsheetCellEditor<List<String>> createListEditor() {
         return new SpreadsheetCellEditor<List<String>>() {
@@ -380,7 +398,7 @@ public class SpreadsheetCellEditors {
                     final ObservableList<String> temp2 = FXCollections
                             .observableList(temp);
                     cb.setItems(temp2);
-                    cb.setValue(cell.getStr());
+                    cb.setValue(cell.getVisualString());
 
 //                    cb.setPrefWidth(spreadsheetView.getCellPrefWidth());
 //                    cb.setMinWidth(spreadsheetView.getCellPrefWidth());
@@ -406,7 +424,7 @@ public class SpreadsheetCellEditors {
             @Override
             protected SpreadsheetCell<List<String>> commitEdit() {
                 if (cb.getSelectionModel().getSelectedIndex() != -1) {
-                    this.modelCell.setStr(cb.getItems().get(
+                    this.modelCell.setVisualString(cb.getItems().get(
                             cb.getSelectionModel().getSelectedIndex()));
                 }
                 return modelCell;

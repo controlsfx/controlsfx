@@ -122,7 +122,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     private int rowSpan;
     private int columnSpan;
     
-    protected String str;
+    private String visualString;
     private boolean editable;
     
     /**
@@ -150,7 +150,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         this.rowSpan = rowSpan;
         this.columnSpan = columnSpan;
         this.type = type == null ? CellType.STRING : type;
-        str = "";
+        visualString = "";
         editable = true;
     }
     
@@ -183,12 +183,12 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * 
      **************************************************************************/
 
-    public void setStr(String str) {
-        this.str = str;
+    public void setVisualString(String str) {
+        this.visualString = str;
     }
 
-    public String getStr() {
-        return str;
+    public String getVisualString() {
+        return visualString;
     }
 
     public CellType getCellType() {
@@ -245,7 +245,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      */
     public boolean equals(SpreadsheetCell<?> cell) {
         if (cell != null && cell.getRow() == row && cell.getColumn() == column
-                && cell.getStr().equals(str)) {
+                && cell.getVisualString().equals(visualString)) {
             return true;
         } else {
             return false;

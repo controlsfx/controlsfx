@@ -84,6 +84,10 @@ import org.controlsfx.property.editor.PropertyEditor;
  *   </tr>
  *  </table>
  * 
+ * 
+ * @see {@link SpreadsheetView}
+ * @see {@link SpreadsheetCellEditors}
+ * @see {@link SpreadsheetCell}
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
@@ -93,16 +97,16 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
     // transient properties - these fields will change based on the current
     // cell being edited.
-    protected SpreadsheetCell<T> modelCell;
-    protected SpreadsheetCellImpl<T> viewCell;
-    protected SpreadsheetView spreadsheetView;
+    SpreadsheetCell<T> modelCell;
+    SpreadsheetCellImpl<T> viewCell;
+    SpreadsheetView spreadsheetView;
 
     // private internal fields
     private SpreadsheetEditor<T> spreadsheetEditor;
     private InvalidationListener editorListener;
     private boolean editing = false;
 
-    protected InvalidationListener il;
+    InvalidationListener il;
 
     /***************************************************************************
      * * Constructor * *
@@ -160,7 +164,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
     /**
      * When we have finish editing. We put the cell back to its right TableRow.
      */
-    protected void end() {
+    void end() {
         editing = false;
         spreadsheetEditor.end();
 

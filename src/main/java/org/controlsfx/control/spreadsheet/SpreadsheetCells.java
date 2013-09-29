@@ -77,17 +77,17 @@ public class SpreadsheetCells {
              ******************************************************************/
             @Override
             public void setCellValue(String value) {
-                this.str = value;
+            	setVisualString(value);
             }
 
             @Override
             public String getCellValue() {
-                return str;
+                return getVisualString();
             }
 
             @Override
             public void match(SpreadsheetCell<?> cell) {
-                setStr(cell.getStr());
+                setVisualString(cell.getVisualString());
             }
 
         };
@@ -131,9 +131,9 @@ public class SpreadsheetCells {
             public void setCellValue(Double value) {
                 if(value != null && !value.isNaN()){
                     this.doubleValue = value;
-                    this.str = value.toString();
+                    setVisualString(value.toString());
                 }else{
-                    this.str="";
+                	 setVisualString("");
                 }
             }
 
@@ -145,7 +145,7 @@ public class SpreadsheetCells {
             @Override
             public void match(SpreadsheetCell<?> cell) {
                try{
-            	   Double temp = Double.parseDouble(cell.getStr());
+            	   Double temp = Double.parseDouble(cell.getVisualString());
             	   this.setCellValue(temp);
                }catch(Exception e){
             	   
@@ -183,8 +183,8 @@ public class SpreadsheetCells {
             {
                 this.value = _value;
 
-                str = value.size() > 0 ? this.value
-                        .get((int) (Math.random() * value.size())) : "";
+                setVisualString(value.size() > 0 ? this.value
+                        .get((int) (Math.random() * value.size())) : "");
             }
 
             /***************************************************************************
@@ -194,7 +194,7 @@ public class SpreadsheetCells {
             public void setCellValue(List<String> value) {
                 this.value = value;
                 if (value.size() > 0) {
-                    str = value.get(0);
+                    setVisualString(value.get(0));
                 }
             }
 
@@ -205,8 +205,8 @@ public class SpreadsheetCells {
 
             @Override
             public void match(SpreadsheetCell<?> cell) {
-                if (value.contains(cell.getStr())) {
-                    setStr(cell.getStr());
+                if (value.contains(cell.getVisualString())) {
+                    setVisualString(cell.getVisualString());
                 }
             }
         };
@@ -250,8 +250,8 @@ public class SpreadsheetCells {
             @Override
             public void setCellValue(LocalDate _value) {
                 this.value = _value;
-                this.str = value.format(DateTimeFormatter
-                        .ofPattern("dd/MM/yyyy"));
+                setVisualString(value.format(DateTimeFormatter
+                        .ofPattern("dd/MM/yyyy")));
             }
 
             @Override
@@ -263,8 +263,8 @@ public class SpreadsheetCells {
             public void match(SpreadsheetCell<?> cell) {
                 try {
                     LocalDate temp = LocalDate.parse(
-                            cell.getStr()
-                                    .subSequence(0, cell.getStr().length()),
+                            cell.getVisualString()
+                                    .subSequence(0, cell.getVisualString().length()),
                             DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     setCellValue(temp);
                 } catch (Exception e) {

@@ -260,7 +260,7 @@ public class SpreadsheetView extends Control {
         tableView.setSelectionModel(new SpreadsheetViewSelectionModel<>(this,tableView));
         getSelectionModel().setCellSelectionEnabled(true);
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+        
         /**
          * Set the focus model to track keyboard change and redirect focus on spanned
          * cells
@@ -954,14 +954,7 @@ public class SpreadsheetView extends Control {
             super(tableView);
             this.tableView = tableView;
             this.spreadsheetView = spreadsheetView;
-            //RunLater because it's not yet instanciated..
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                	spreadsheetViewSkin = (SpreadsheetViewSkin) tableView.getSkin();
-                }
-            };
-            Platform.runLater(r);
+
             tableView.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
@@ -1193,18 +1186,18 @@ public class SpreadsheetView extends Control {
         private void addSelectedRowsAndColumns(TablePosition<?, ?> t){
             final SpreadsheetCell<?> cell = tableView.getItems().get(t.getRow()).get(t.getColumn());
             for(int i=cell.getRow();i<cell.getRowSpan()+cell.getRow();++i){
-            	spreadsheetViewSkin.getSelectedRows().add(i);
+            	getSpreadsheetViewSkin().getSelectedRows().add(i);
                 for(int j=cell.getColumn();j<cell.getColumnSpan()+cell.getColumn();++j){
-                	spreadsheetViewSkin.getSelectedColumns().add(j);
+                	getSpreadsheetViewSkin().getSelectedColumns().add(j);
                 }
             }
         }
         private void removeSelectedRowsAndColumns(TablePosition<?, ?> t){
             final SpreadsheetCell<?> cell = tableView.getItems().get(t.getRow()).get(t.getColumn());
             for(int i=cell.getRow();i<cell.getRowSpan()+cell.getRow();++i){
-            	spreadsheetViewSkin.getSelectedRows().remove(Integer.valueOf(i));
+            	getSpreadsheetViewSkin().getSelectedRows().remove(Integer.valueOf(i));
                 for(int j=cell.getColumn();j<cell.getColumnSpan()+cell.getColumn();++j){
-                	spreadsheetViewSkin.getSelectedColumns().remove(Integer.valueOf(j));
+                	getSpreadsheetViewSkin().getSelectedColumns().remove(Integer.valueOf(j));
                 }
             }
         }
@@ -1285,8 +1278,8 @@ public class SpreadsheetView extends Control {
 		
 		private void quietClearSelection() {
             getSelectedCells().clear();
-            spreadsheetViewSkin.getSelectedRows().clear();
-            spreadsheetViewSkin.getSelectedColumns().clear();
+            getSpreadsheetViewSkin().getSelectedRows().clear();
+            getSpreadsheetViewSkin().getSelectedColumns().clear();
         }
 
 		private TablePosition<ObservableList<SpreadsheetCell<?>>, ?> getFocusedCell() {
@@ -1303,6 +1296,12 @@ public class SpreadsheetView extends Control {
             final int newColumnIndex = columnIndex + offset;
             return getTableView().getVisibleLeafColumn(newColumnIndex);
         }
+		private SpreadsheetViewSkin getSpreadsheetViewSkin(){
+			if(spreadsheetViewSkin == null){
+				spreadsheetViewSkin = SpreadsheetViewSkin.getSkin();
+			}
+			return spreadsheetViewSkin;
+		}
     }
     
     /**

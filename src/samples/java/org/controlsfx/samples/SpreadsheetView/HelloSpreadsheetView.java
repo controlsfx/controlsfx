@@ -221,7 +221,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	 */
 	private SpreadsheetCell<?> generateCell(int row, int column, int rowSpan, int colSpan) {
 		SpreadsheetCell<?> cell;
-		List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montréal");
+		List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
 		final double random = Math.random();
 		if (random < 0.10) {
 			List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");

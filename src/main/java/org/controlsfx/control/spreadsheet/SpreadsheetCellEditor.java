@@ -167,6 +167,9 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
             }
         };
         SpreadsheetViewSkin.getSkin().getVBar().valueProperty().addListener(editorListener);
+        //FIXME We need to REALLY find a way to stop edition when anything happen
+        // This is one way but it will need further investigation
+        spreadsheetView.disabledProperty().addListener(editorListener);
     }
 
     /***************************************************************************
@@ -180,6 +183,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         spreadsheetEditor.end();
 
         SpreadsheetViewSkin.getSkin().getVBar().valueProperty().removeListener(editorListener);
+        spreadsheetView.disabledProperty().removeListener(editorListener);
         editorListener = null;
     }
 

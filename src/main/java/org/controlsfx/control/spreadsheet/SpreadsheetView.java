@@ -209,7 +209,7 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
     
     /**
-     * Creates a default SpreadsheetView control with no content and a Gris set to null. 
+     * Creates a default SpreadsheetView control with no content and a Grid set to null. 
      */
     public SpreadsheetView() {
         this(null);
@@ -424,7 +424,7 @@ public class SpreadsheetView extends Control {
      * Return the selectionModel used by the SpreadsheetView.
      * @return {@link SpreadsheetViewSelectionModel}
      */
-    public TableViewSelectionModel getSelectionModel() {
+    public TableViewSelectionModel<ObservableList<SpreadsheetCell<?>>> getSelectionModel() {
         return tableView.getSelectionModel();
     }
 
@@ -434,6 +434,12 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/
  
+    /**
+     * Verify that the grid is well-formed.
+     * Can be quite time-consuming I guess so I would like it not
+     * to be compulsory..
+     * @param grid
+     */
     private void verifyGrid(Grid grid){
     	verifyColumnSpan(grid);
     }
@@ -1287,9 +1293,6 @@ public class SpreadsheetView extends Control {
                 return new TablePosition<>(getTableView(), -1, null);
             }
             return getTableView().getFocusModel().getFocusedCell();
-        }
-		private TableColumn<ObservableList<SpreadsheetCell<?>>, ?> getTableColumn(int pos) {
-            return getTableView().getVisibleLeafColumn(pos);
         }
 		private TableColumn<ObservableList<SpreadsheetCell<?>>, ?> getTableColumn(TableColumn<ObservableList<SpreadsheetCell<?>>, ?> column, int offset) {
             final int columnIndex = getTableView().getVisibleLeafIndex(column);

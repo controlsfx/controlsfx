@@ -71,7 +71,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
             final TableView<ObservableList<SpreadsheetCell<?>>> tableView) {
         super(tableView);
         this.spreadsheetView = spreadsheetView;
-        this.tableView = tableView;
+        SpreadsheetViewSkin.tableView = tableView;
 
         tableView.setEditable(true);
 

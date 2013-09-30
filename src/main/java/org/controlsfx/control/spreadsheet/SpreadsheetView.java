@@ -130,7 +130,9 @@ import com.sun.javafx.UnmodifiableArrayList;
  * 
  * At that moment you can span some of the cells with the convenient method provided by the grid.
  * Then you just need to instantiate the SpreadsheetView.
- * 
+ * <br/>
+ * <h3>Visual: </h3>
+ * <center><img src="spreadsheetView.png"></center>
  * 
  * @see SpreadsheetCell
  * @see SpreadsheetColumn
@@ -207,7 +209,7 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
     
     /**
-     * Creates a default SpreadsheetView control with no content and a null Grid. 
+     * Creates a default SpreadsheetView control with no content and a Gris set to null. 
      */
     public SpreadsheetView() {
         this(null);
@@ -300,7 +302,7 @@ public class SpreadsheetView extends Control {
 
     /**
      * Return a {@link TablePosition} of cell being currently edited.
-     * @return
+     * @return a {@link TablePosition} of cell being currently edited.
      */
     public TablePosition<ObservableList<SpreadsheetCell<?>>, ?> getEditingCell(){
         return tableView.getEditingCell();
@@ -308,7 +310,7 @@ public class SpreadsheetView extends Control {
     
     /**
      * Return an unmodifiable observableList of the {@link SpreadsheetColumn} used.
-     * @return Aa unmodifiable observableList.
+     * @return An unmodifiable observableList.
      */
     public ObservableList<SpreadsheetColumn<?>> getColumns(){
 		return FXCollections.unmodifiableObservableList(columns);
@@ -341,7 +343,7 @@ public class SpreadsheetView extends Control {
 
     /**
      * BooleanProperty associated with the column Header.
-     * @return
+     * @return the BooleanProperty associated with the column Header.
      */
     public final BooleanProperty showColumnHeaderProperty() {
         return showColumnHeader;
@@ -351,7 +353,7 @@ public class SpreadsheetView extends Control {
     private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader",true);
     
     /**
-     * Activate and deactivate the Row Header
+     * Activate and deactivate the Row Header.
      * @param b
      */
     public final void setShowRowHeader(final boolean b){
@@ -374,7 +376,7 @@ public class SpreadsheetView extends Control {
      * You can fix or unfix a row by modifying this list.
      * Call {@link #isRowFixable(int)} before trying to fix a row.
      * See {@link SpreadsheetView} description for information.
-     * @return
+     * @return an ObservableList of integer representing the fixedRows.
      */
     public ObservableList<Integer> getFixedRows() {
         return fixedRows;
@@ -383,11 +385,11 @@ public class SpreadsheetView extends Control {
     /**
      * Indicate whether a row can be fixed or not.
      * Call that method before adding an item with {@link #getFixedRows()} .
-     * @param i
+     * @param row
      * @return
      */
-    public boolean isRowFixable(int i){
-    	return i<rowFix.size()?rowFix.get(i): false;
+    public boolean isRowFixable(int row){
+    	return row<rowFix.size()?rowFix.get(row): false;
     }
 //    /**
 //     * Return a SpreadsheetColumn
@@ -400,8 +402,7 @@ public class SpreadsheetView extends Control {
     /**
      * You can fix or unfix a column by modifying this list.
      * Call {@link SpreadsheetColumn#isColumnFixable()} on the column before adding an item.
-     * Return an ObservableList of the fixed columns. 
-     * @return
+     * @return an ObservableList of the fixed columns. 
      */
     public ObservableList<SpreadsheetColumn<?>> getFixedColumns() {
         return fixedColumns;
@@ -412,11 +413,11 @@ public class SpreadsheetView extends Control {
      * If you have a {@link SpreadsheetColumn}, call {@link SpreadsheetColumn#isColumnFixable()} 
      * on it directly.
      * Call that method before adding an item with {@link #getFixedColumns()} .
-     * @param i
+     * @param columnIndex
      * @return
      */
-    public boolean isColumnFixable(int i){
-    	return i<getColumns().size()?getColumns().get(i).isColumnFixable():null;
+    public boolean isColumnFixable(int columnIndex){
+    	return columnIndex<getColumns().size()?getColumns().get(columnIndex).isColumnFixable():null;
     }
     
     /**
@@ -465,6 +466,7 @@ public class SpreadsheetView extends Control {
     		}
     	}
     }
+    
     /**
      * Return the {@link SpanType} of a cell.
      * @param row

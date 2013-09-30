@@ -37,6 +37,8 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
  * A base implementation of the {@link Grid} interface.
+ * 
+ * @see Grid
  */
 public class GridBase implements Grid {
 

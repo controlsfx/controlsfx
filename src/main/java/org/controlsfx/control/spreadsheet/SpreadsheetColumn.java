@@ -52,7 +52,15 @@ import javafx.scene.control.TableColumn;
  * <br/>
  * If the column can be fixed, a {@link ContextMenu} will appear if the user right-click on the header. 
  * If not, nothing will appear and the user will not have the possibility to fix it.
+ * <br/>
  * 
+ * <h3>Visual: </h3>
+ * The column <b> A </b> is fixed and is covering column <b> B </b> and partially column <b> C </b>. 
+ * <br/>
+ * The context menu is being shown and offer the possibility to unfix the column.
+ * 
+ * <br/><br/>
+ * <center><img src="fixedColumn.png"></center>
  * @see SpreadsheetView
  */
 public class SpreadsheetColumn<T> {

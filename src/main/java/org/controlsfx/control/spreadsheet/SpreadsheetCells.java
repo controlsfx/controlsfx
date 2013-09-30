@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -43,6 +44,28 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
  * 
  * Currently you can only create a textCell, listCell, doubleCell or a DateCell.
  * 
+ * <h3> Code samples </h3>
+ * Here is a method that uses all the static method. 
+ * The generation is random here  and you'll probably use a switch instruction in your case.
+ * <br/><br/>
+ * <pre>
+ * private SpreadsheetCell&lt;?&gt; generateCell(int row, int column, int rowSpan, int colSpan) {
+ *		SpreadsheetCell&lt;?&gt; cell;
+ *		List&lt;String&gt; stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montréal");
+ *		final double random = Math.random();
+ *		if (random &lt; 0.10) {
+ *			List&lt;String&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
+ *			cell = SpreadsheetCells.createListCell(row, column, rowSpan, colSpan, stringList);
+ *		} else if (random &gt;= 0.10 && random &lt; 0.25) {
+ *			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+ *		}else if (random &gt;= 0.25 && random &lt; 0.75) {
+ *			cell = SpreadsheetCells.createDoubleCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+ *		}else{
+ *			cell = SpreadsheetCells.createDateCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+ *		}
+ * 		return cell;
+ * }
+ * </pre>
  * 
  * @see SpreadsheetCell
  */

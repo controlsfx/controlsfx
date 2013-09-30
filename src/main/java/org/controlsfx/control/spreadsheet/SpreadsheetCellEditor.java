@@ -112,6 +112,9 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
      * * Constructor * *
      **************************************************************************/
 
+    /**
+     * Construct the SpreadsheetCellEditor.
+     */
     public SpreadsheetCellEditor() {
         this.spreadsheetEditor = new SpreadsheetEditor<T>();
     }
@@ -120,10 +123,18 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
      * * Public Methods * *
      **************************************************************************/
 
+    /**
+     * Update the internal {@link SpreadsheetCell}.
+     * @param cell
+     */
     public void updateDataCell(SpreadsheetCell<T> cell) {
         this.modelCell = cell;
     }
 
+    /**
+     * Update the internal {@link SpreadsheetCellImpl}
+     * @param cell
+     */
     public void updateSpreadsheetCell(SpreadsheetCellImpl<T> cell) {
         this.viewCell = cell;
     }
@@ -172,6 +183,10 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
         editorListener = null;
     }
 
+    /**
+     * Return if this editor is currently being used.
+     * @return if this editor is being used.
+     */
     public boolean isEditing() {
         return editing;
     }

@@ -156,14 +156,15 @@ public class GridBase implements Grid {
      * @param colIndex
      */
     public void spanRow(int count, int rowIndex, int colIndex) {
-        final int colSpan = rows.get(rowIndex).get(colIndex).getColumnSpan();
+        final SpreadsheetCell<?> cell = rows.get(rowIndex).get(colIndex);
+        final int colSpan = cell.getColumnSpan();
         final int rowSpan = count;
-        rows.get(rowIndex).get(colIndex).setRowSpan(rowSpan);
+        cell.setRowSpan(rowSpan);
         for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
             for (int col = colIndex; col < colIndex + colSpan
                     && col < columnCount; ++col) {
                 if (row != rowIndex || col != colIndex) {
-                    rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
+                    rows.get(row).set(col, cell);
                 }
             }
         }
@@ -178,14 +179,15 @@ public class GridBase implements Grid {
      * @param colIndex
      */
     public void spanColumn(int count, int rowIndex, int colIndex) {
+        final SpreadsheetCell<?> cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = count;
-        final int rowSpan = rows.get(rowIndex).get(colIndex).getRowSpan();
-        rows.get(rowIndex).get(colIndex).setColumnSpan(colSpan);
+        final int rowSpan = cell.getRowSpan();
+        cell.setColumnSpan(colSpan);
         for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
             for (int col = colIndex; col < colIndex + colSpan
                     && col < columnCount; ++col) {
                 if (row != rowIndex || col != colIndex) {
-                    rows.get(row).set(col, rows.get(rowIndex).get(colIndex));
+                    rows.get(row).set(col, cell);
                 }
             }
         }

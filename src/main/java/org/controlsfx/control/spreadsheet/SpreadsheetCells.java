@@ -30,6 +30,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.util.StringConverter;
+import javafx.util.converter.DefaultStringConverter;
+import javafx.util.converter.DoubleStringConverter;
+
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
 
 /**
@@ -60,36 +65,16 @@ public class SpreadsheetCells {
             final int rowSpan, final int columnSpan, final String value) {
         return new SpreadsheetCell<String>(row, column, rowSpan, columnSpan, CellType.STRING) {
 
-            /*******************************************************************
-             * * Static Fields * *
-             ******************************************************************/
             private static final long serialVersionUID = -1711498694430990374L;
 
-            /*******************************************************************
-             * * Constructor * *
-             ******************************************************************/
             {
-                this.setCellValue(value);
+                this.setItem(value);
+                this.setConverter(new DefaultStringConverter());
             }
 
-            /*******************************************************************
-             * * Public Methods * *
-             ******************************************************************/
-            @Override
-            public void setCellValue(String value) {
-            	setVisualString(value);
+            @Override public void match(SpreadsheetCell<?> cell) {
+                setItem((String) cell.getItem());
             }
-
-            @Override
-            public String getCellValue() {
-                return getVisualString();
-            }
-
-            @Override
-            public void match(SpreadsheetCell<?> cell) {
-                setVisualString(cell.getVisualString());
-            }
-
         };
     }
 
@@ -107,46 +92,17 @@ public class SpreadsheetCells {
             final int rowSpan, final int columnSpan, final Double value) {
         return new SpreadsheetCell<Double>(row, column, rowSpan, columnSpan, CellType.DOUBLE) {
 
-            /*******************************************************************
-             * * Static Fields * *
-             ******************************************************************/
             private static final long serialVersionUID = -1711498694430990374L;
 
-            /***************************************************************************
-             * * Private Fields * *
-             **************************************************************************/
-            private Double doubleValue;
-            
-            /*******************************************************************
-             * * Constructor * *
-             ******************************************************************/
             {
-                this.setCellValue(value);
+                this.setItem(value);
+                this.setConverter(new DoubleStringConverter());
             }
 
-            /*******************************************************************
-             * * Public Methods * *
-             ******************************************************************/
-            @Override
-            public void setCellValue(Double value) {
-                if(value != null && !value.isNaN()){
-                    this.doubleValue = value;
-                    setVisualString(value.toString());
-                }else{
-                	 setVisualString("");
-                }
-            }
-
-            @Override
-            public Double getCellValue() {
-                return doubleValue;
-            }
-
-            @Override
-            public void match(SpreadsheetCell<?> cell) {
+            @Override public void match(SpreadsheetCell<?> cell) {
                try{
-            	   Double temp = Double.parseDouble(cell.getVisualString());
-            	   this.setCellValue(temp);
+            	   Double temp = Double.parseDouble(cell.getText());
+            	   this.setItem(temp);
                }catch(Exception e){
             	   
                }
@@ -164,49 +120,23 @@ public class SpreadsheetCells {
 	 * @param _value A list of String to display
 	 * @return
 	 */
-    public static SpreadsheetCell<List<String>> createListCell(final int row, final int column,
-            final int rowSpan, final int columnSpan, final List<String> _value) {
-        return new SpreadsheetCell<List<String>>(row, column, rowSpan, columnSpan, CellType.LIST) {
-            /***************************************************************************
-             * * Static Fields * *
-             **************************************************************************/
+    public static SpreadsheetCell<String> createListCell(final int row, final int column,
+            final int rowSpan, final int columnSpan, final List<String> items) {
+        return new SpreadsheetCell<String>(row, column, rowSpan, columnSpan, CellType.LIST) {
+
             private static final long serialVersionUID = -1003136076165430609L;
 
-            /***************************************************************************
-             * * Private Fields * *
-             **************************************************************************/
-            private List<String> value;
-
-            /***************************************************************************
-             * * Constructor * *
-             **************************************************************************/
             {
-                this.value = _value;
-
-                setVisualString(value.size() > 0 ? this.value
-                        .get((int) (Math.random() * value.size())) : "");
-            }
-
-            /***************************************************************************
-             * * Public Methods * *
-             **************************************************************************/
-            @Override
-            public void setCellValue(List<String> value) {
-                this.value = value;
-                if (value.size() > 0) {
-                    setVisualString(value.get(0));
+                this.setConverter(new DefaultStringConverter());
+                this.getProperties().put("items", items);
+                if (items != null && items.size() > 0) {
+                    setItem(items.get(0));
                 }
             }
 
-            @Override
-            public List<String> getCellValue() {
-                return value;
-            }
-
-            @Override
-            public void match(SpreadsheetCell<?> cell) {
-                if (value.contains(cell.getVisualString())) {
-                    setVisualString(cell.getVisualString());
+            @Override public void match(SpreadsheetCell<?> cell) {
+                if (getItem().equals(cell.getText())) {
+                    setItem((String)cell.getItem());
                 }
             }
         };
@@ -226,47 +156,29 @@ public class SpreadsheetCells {
             final int rowSpan, final int columnSpan, final LocalDate _value) {
         return new SpreadsheetCell<LocalDate>(row, column, rowSpan, columnSpan, CellType.DATE) {
 
-            /***************************************************************************
-             * * Static Fields * *
-             **************************************************************************/
             private static final long serialVersionUID = -1711498694430990374L;
 
-            /***************************************************************************
-             * * Private Fields * *
-             **************************************************************************/
-            private LocalDate value;
-
-            /***************************************************************************
-             * * Constructor * *
-             **************************************************************************/
             {
-                this.setCellValue(_value);
+                this.setItem(_value);
+                this.setConverter(new StringConverter<LocalDate>() {
+                    @Override public String toString(LocalDate item) {
+                        return item.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    }
+                    
+                    @Override public LocalDate fromString(String str) {
+                        // TODO
+                        return null;
+                    }
+                });
             }
 
-            /***************************************************************************
-             * * Public Methods * *
-             **************************************************************************/
-
-            @Override
-            public void setCellValue(LocalDate _value) {
-                this.value = _value;
-                setVisualString(value.format(DateTimeFormatter
-                        .ofPattern("dd/MM/yyyy")));
-            }
-
-            @Override
-            public LocalDate getCellValue() {
-                return value;
-            }
-
-            @Override
-            public void match(SpreadsheetCell<?> cell) {
+            @Override public void match(SpreadsheetCell<?> cell) {
                 try {
                     LocalDate temp = LocalDate.parse(
-                            cell.getVisualString()
-                                    .subSequence(0, cell.getVisualString().length()),
+                            cell.getText()
+                                    .subSequence(0, cell.getText().length()),
                             DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    setCellValue(temp);
+                    setItem(temp);
                 } catch (Exception e) {
                 }
             }

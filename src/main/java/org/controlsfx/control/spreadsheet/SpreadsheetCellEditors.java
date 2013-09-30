@@ -125,7 +125,7 @@ public class SpreadsheetCellEditors {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
-                    tf.setText(cell.getVisualString());
+                    tf.setText(cell.getText());
                 }
             }
 
@@ -144,7 +144,7 @@ public class SpreadsheetCellEditors {
 
             @Override
             protected SpreadsheetCell<String> commitEdit() {
-                this.modelCell.setVisualString(tf.getText());
+                this.modelCell.setItem(this.modelCell.getConverter().fromString(tf.getText()));
                 return modelCell;
             }
 
@@ -244,7 +244,7 @@ public class SpreadsheetCellEditors {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
-                    tf.setText(cell.getVisualString());
+                    tf.setText(cell.getText());
                 }
             }
 
@@ -265,7 +265,7 @@ public class SpreadsheetCellEditors {
             protected SpreadsheetCell<Double> commitEdit() {
             	try{
             		Double temp = Double.parseDouble(tf.getText());
-            		 this.modelCell.setCellValue(temp);
+            		 this.modelCell.setItem(temp);
             	}catch(Exception e){
             		
             	}
@@ -322,8 +322,8 @@ public class SpreadsheetCellEditors {
      * {@link ComboBox} where the user can choose a date through a visual calendar.
      * The user can also type the date directly in the expected format (DD/MM/YYYY).
      */
-    public static SpreadsheetCellEditor<List<String>> createListEditor() {
-        return new SpreadsheetCellEditor<List<String>>() {
+    public static SpreadsheetCellEditor<String> createListEditor() {
+        return new SpreadsheetCellEditor<String>() {
             /***************************************************************************
              * * Private Fields * *
              **************************************************************************/
@@ -390,15 +390,13 @@ public class SpreadsheetCellEditors {
              **************************************************************************/
 
             @Override
-            public void updateDataCell(SpreadsheetCell<List<String>> cell) {
+            public void updateDataCell(SpreadsheetCell<String> cell) {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
-                    final List<String> temp = cell.getCellValue();
-                    final ObservableList<String> temp2 = FXCollections
-                            .observableList(temp);
-                    cb.setItems(temp2);
-                    cb.setValue(cell.getVisualString());
+                    ObservableList<String> items = (ObservableList<String>) cell.getProperties().get("items");
+                    cb.setItems(items);
+                    cb.setValue(cell.getText());
 
 //                    cb.setPrefWidth(spreadsheetView.getCellPrefWidth());
 //                    cb.setMinWidth(spreadsheetView.getCellPrefWidth());
@@ -422,10 +420,10 @@ public class SpreadsheetCellEditors {
             }
 
             @Override
-            protected SpreadsheetCell<List<String>> commitEdit() {
+            protected SpreadsheetCell<String> commitEdit() {
                 if (cb.getSelectionModel().getSelectedIndex() != -1) {
-                    this.modelCell.setVisualString(cb.getItems().get(
-                            cb.getSelectionModel().getSelectedIndex()));
+                    this.modelCell.setItem(this.modelCell.getConverter().fromString(cb.getSelectionModel().getSelectedItem()));
+                    return modelCell;
                 }
                 return modelCell;
             }
@@ -540,7 +538,7 @@ public class SpreadsheetCellEditors {
             @Override
             public void updateDataCell(SpreadsheetCell<LocalDate> cell) {
                 super.updateDataCell(cell);
-                datePicker.setValue(cell.getCellValue());
+                datePicker.setValue(cell.getItem());
             }
 
             @Override
@@ -565,7 +563,7 @@ public class SpreadsheetCellEditors {
             protected SpreadsheetCell<LocalDate> commitEdit() {
                 final SpreadsheetCell<LocalDate> temp = (SpreadsheetCell<LocalDate>) this.modelCell;
 
-                temp.setCellValue(datePicker.getValue());
+                temp.setItem(datePicker.getValue());
                 return modelCell;
             }
 

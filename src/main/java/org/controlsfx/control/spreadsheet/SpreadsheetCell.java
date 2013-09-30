@@ -28,8 +28,12 @@ package org.controlsfx.control.spreadsheet;
 
 import java.io.Serializable;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.util.StringConverter;
 
 
 /**
@@ -122,7 +126,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     private int rowSpan;
     private int columnSpan;
     
-    private String visualString;
+    private String text;
     private boolean editable;
     
     /**
@@ -150,7 +154,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         this.rowSpan = rowSpan;
         this.columnSpan = columnSpan;
         this.type = type == null ? CellType.STRING : type;
-        visualString = "";
+        text = "";
         editable = true;
     }
     
@@ -162,10 +166,6 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     * 
     **************************************************************************/
 
-    public abstract void setCellValue(T value);
-
-    public abstract T getCellValue();
-    
     /**
      * Verify that the upcoming cell value can be set to the current cell.
      * If it's possible, the cell's value is changed.
@@ -178,28 +178,61 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     
     
     /***************************************************************************
+    *
+    * Properties
+    * 
+    ***************************************************************************/
+    
+    // --- item
+    private ObjectProperty<T> item = new SimpleObjectProperty<T>(this, "item") {
+        @Override protected void invalidated() {
+            updateText();
+        }
+    };
+    public final void setItem(T value) {
+        item.set(value);
+    }
+    public final T getItem() {
+        return item.get();
+    }
+    public final ObjectProperty<T> itemProperty() {
+        return item;
+    }
+    
+    
+    // --- converter
+    private ObjectProperty<StringConverter<T>> converter = 
+            new SimpleObjectProperty<StringConverter<T>>(this, "converter") {
+        @Override protected void invalidated() {
+            updateText();
+        }
+    };
+    public final void setConverter(StringConverter<T> value) {
+        converter.set(value);
+    }
+    public final StringConverter<T> getConverter() {
+        return converter == null ? null : converter.get();
+    }
+    public final ObjectProperty<StringConverter<T>> converterProperty() {
+        return converter;
+    }
+
+    
+    
+    /***************************************************************************
      *
      * Public Methods
      * 
      **************************************************************************/
 
-    public void setVisualString(String str) {
-        this.visualString = str;
-    }
-
-    public String getVisualString() {
-        return visualString;
+    public String getText() {
+        return text;
     }
 
     public CellType getCellType() {
         return type;
     }
     
-    @Override
-    public String toString() {
-        return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
-    }
-
     public int getRow() {
         return row;
     }
@@ -239,16 +272,68 @@ public abstract class SpreadsheetCell<T> implements Serializable {
 		this.editable = readOnly;
 	}
 	
+	// A map containing a set of properties for this cell
+    private ObservableMap<Object, Object> properties;
+
     /**
-     * @param cell
-     * @return
+      * Returns an observable map of properties on this node for use primarily
+      * by application developers.
+      *
+      * @return an observable map of properties on this node for use primarily
+      * by application developers
+      */
+     public final ObservableMap<Object, Object> getProperties() {
+        if (properties == null) {
+            properties = FXCollections.observableHashMap();
+        }
+        return properties;
+    }
+
+    /**
+     * Tests if Node has properties.
+     * @return true if node has properties.
      */
-    public boolean equals(SpreadsheetCell<?> cell) {
+     public boolean hasProperties() {
+        return properties != null && !properties.isEmpty();
+    }
+	
+     
+	
+    /***************************************************************************
+    *
+    * Overridden Methods
+    * 
+    **************************************************************************/
+	
+	/** {@inheritDoc} */
+	@Override public String toString() {
+        return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
+    }
+	
+	/** {@inheritDoc} */
+    @Override public boolean equals(Object obj) {
+        if (! (obj instanceof SpreadsheetCell)) return false;
+        
+        final SpreadsheetCell<?> cell = (SpreadsheetCell<?>) obj;
         if (cell != null && cell.getRow() == row && cell.getColumn() == column
-                && cell.getVisualString().equals(visualString)) {
+                && cell.getText().equals(text)) {
             return true;
         } else {
             return false;
+        }
+    }
+    
+    
+    
+    /***************************************************************************
+    *
+    * Private Implementation
+    * 
+    **************************************************************************/
+    
+    private void updateText() {
+        if (getConverter() != null) {
+            this.text = getConverter().toString(getItem());
         }
     }
 }

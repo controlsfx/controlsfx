@@ -178,13 +178,13 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 
     @Override
     public T getValue() {
-        return modelCell == null ? null : modelCell.getCellValue();
+        return modelCell == null ? null : modelCell.getItem();
     }
 
     @Override
     public void setValue(T value) {
         if (modelCell != null) {
-            modelCell.setCellValue(value);
+            modelCell.setItem(value);
         }
     }
 

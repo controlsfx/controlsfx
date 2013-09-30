@@ -83,7 +83,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
         super();
         final ChangeListener<Number> listenerY = new ChangeListener<Number>() {
             @Override
-            public void changed(ObservableValue ov, Number t, Number t1) {
+            public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
                 layoutTotal();
             }
         };
@@ -201,7 +201,7 @@ final class VirtualFlowSpreadsheet<T extends IndexedCell<?>> extends VirtualFlow
             reconfigureCells();
             // recreateCells();
         }
-        for (Cell cell : getCells()) {
+        for (Cell<?> cell : getCells()) {
             if (cell != null) {
                 cell.requestLayout();
             }

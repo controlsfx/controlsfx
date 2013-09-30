@@ -27,7 +27,6 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;

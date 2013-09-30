@@ -402,7 +402,12 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     
     private void updateText() {
         if (getConverter() != null) {
-            this.text = getConverter().toString(getItem());
+        	// If we have the double set to NaN, we don't want to display it.
+        	if(getItem() != null && getItem().equals(Double.NaN)){
+        		this.text = "";
+        	}else{
+        		this.text = getConverter().toString(getItem());
+        	}
         }
     }
 }

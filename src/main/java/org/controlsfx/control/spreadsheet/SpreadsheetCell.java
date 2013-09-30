@@ -321,7 +321,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * Return if this cell can be edited or not.
      * @return true if this cell is editable.
      */
-    public boolean getEditable() {
+    public boolean isEditable() {
 		return editable.get();
 	}
 

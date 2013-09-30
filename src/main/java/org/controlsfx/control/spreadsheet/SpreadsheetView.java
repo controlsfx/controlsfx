@@ -91,8 +91,8 @@ import com.sun.javafx.UnmodifiableArrayList;
  * Keep in mind that only columns without any spanning cells, and only rows without row-spanning cells can be fixed.
  * <br/>
  * You have also the possibility to fix them manually by adding and removing items from {@link #getFixedRows()} and {@link #getFixedColumns()}.
- * But you are strongly advised to check if it's possible to do so with {@link SpreadsheetColumn#canFix()} for the fixed columns and with
- * {@link #canFixRow(int)} for the fixed rows. Calling those methods prior every move will ensure that no exception will be thrown. 
+ * But you are strongly advised to check if it's possible to do so with {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
+ * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior every move will ensure that no exception will be thrown. 
  * 
  * <br/><br/>
  * 
@@ -369,7 +369,7 @@ public class SpreadsheetView extends Control {
 
     /**
      * You can fix or unfix a row by modifying this list.
-     * Call {@link #canFixRow(int)} before trying to fix a row.
+     * Call {@link #isRowFixable(int)} before trying to fix a row.
      * See {@link SpreadsheetView} description for information.
      * @return
      */
@@ -383,7 +383,7 @@ public class SpreadsheetView extends Control {
      * @param i
      * @return
      */
-    public boolean canFixRow(int i){
+    public boolean isRowFixable(int i){
     	return i<rowFix.size()?rowFix.get(i): false;
     }
 //    /**
@@ -396,7 +396,7 @@ public class SpreadsheetView extends Control {
 //    }
     /**
      * You can fix or unfix a column by modifying this list.
-     * Call {@link SpreadsheetColumn#canFix()} on the column before adding an item.
+     * Call {@link SpreadsheetColumn#isColumnFixable()} on the column before adding an item.
      * Return an ObservableList of the fixed columns. 
      * @return
      */
@@ -404,6 +404,18 @@ public class SpreadsheetView extends Control {
         return fixedColumns;
     }
 
+    /**
+     * Indicate whether this column can be fixed or not.
+     * If you have a {@link SpreadsheetColumn}, call {@link SpreadsheetColumn#isColumnFixable()} 
+     * on it directly.
+     * Call that method before adding an item with {@link #getFixedColumns()} .
+     * @param i
+     * @return
+     */
+    public boolean isColumnFixable(int i){
+    	return i<getColumns().size()?getColumns().get(i).isColumnFixable():null;
+    }
+    
     /**
      * Return the selectionModel used by the SpreadsheetView.
      * @return {@link SpreadsheetViewSelectionModel}
@@ -1304,7 +1316,7 @@ public class SpreadsheetView extends Control {
     	
     	@Override
     	public boolean add(Integer e){
-    		if(spv.canFixRow(e)){
+    		if(spv.isRowFixable(e)){
     			super.add(e);
     			return true;
     		}else{
@@ -1314,7 +1326,7 @@ public class SpreadsheetView extends Control {
     	
     	@Override
     	public void add(int index, Integer element){
-    		if(spv.canFixRow(element)){
+    		if(spv.isRowFixable(element)){
     			super.add(index,element);
     		}else{
     			throw new IllegalArgumentException(computeReason(element)); 
@@ -1349,7 +1361,7 @@ public class SpreadsheetView extends Control {
     	
     	@Override
     	public boolean add(SpreadsheetColumn<?> e){
-    		if(e.canFix()){
+    		if(e.isColumnFixable()){
     			super.add(e);
     			return true;
     		}else{
@@ -1359,7 +1371,7 @@ public class SpreadsheetView extends Control {
     	
     	@Override
     	public void add(int index, SpreadsheetColumn<?> element){
-    		if(element.canFix()){
+    		if(element.isColumnFixable()){
     			super.add(index,element);
     		}else{
     			throw new IllegalArgumentException(computeReason(element)); 

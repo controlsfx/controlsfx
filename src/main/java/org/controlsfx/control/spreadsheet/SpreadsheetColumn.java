@@ -46,7 +46,7 @@ import javafx.scene.control.TableColumn;
  * if you want it to be resizable with {@link #setResizable(boolean)}.
  * <br/>
  * You have the ability to fix this column at the left of the SpreadsheetView by calling {@link #setFixed(boolean)}. 
- * But you are strongly advised to check if it's possible with {@link #canFix()}.
+ * But you are strongly advised to check if it's possible with {@link #isColumnFixable()}.
  * Take a look at the {@link SpreadsheetView} description to understand the fixing constraints.
  * 
  * <br/>
@@ -129,7 +129,7 @@ public class SpreadsheetColumn<T> {
 	
 	/**
 	 * Fix this column to the left if possible.
-	 * Call {@link #canFix()} before trying to fix a column.
+	 * Call {@link #isColumnFixable()} before trying to fix a column.
 	 * Visual confirmation is Label in italic
 	 * @param fixed
 	 */
@@ -170,7 +170,7 @@ public class SpreadsheetColumn<T> {
 	 * adding an item to {@link SpreadsheetView#getFixedColumns()}.
 	 * @return
 	 */
-	public boolean canFix(){
+	public boolean isColumnFixable(){
 		return canFix;
 	}
 	/***************************************************************************

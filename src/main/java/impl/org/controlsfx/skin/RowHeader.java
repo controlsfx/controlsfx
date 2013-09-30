@@ -273,7 +273,7 @@ public class RowHeader  extends StackPane {
 	 * @return
 	 */
 	private ContextMenu getRowContextMenu(final Integer i){
-		if(spreadsheetView.canFixRow(i)){
+		if(spreadsheetView.isRowFixable(i)){
 	    	final ContextMenu contextMenu = new ContextMenu();
 	
 	    	CheckMenuItem fixItem = new CheckMenuItem("Fix");

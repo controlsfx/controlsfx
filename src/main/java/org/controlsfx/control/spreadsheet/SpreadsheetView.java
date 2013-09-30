@@ -31,6 +31,7 @@ import impl.org.controlsfx.skin.SpreadsheetRowImpl;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -41,6 +42,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -189,13 +191,14 @@ public class SpreadsheetView extends Control {
 
     private Grid grid;
     private DataFormat fmt;
-    private final ObservableList<Integer> fixedRows;
-    private final ObservableList<SpreadsheetColumn<?>> fixedColumns;
+    private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();;
+    private final ObservableList<SpreadsheetColumn<?>> fixedColumns = FXCollections.observableArrayList();;
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
 
     private ArrayList<Boolean> rowFix; // Compute if we can fix the rows or not.
+    
     
     /***************************************************************************
      *                                                                         *
@@ -285,8 +288,8 @@ public class SpreadsheetView extends Control {
         initRowFix(grid);
         
         setGrid(grid);
-        fixedRows = FXCollections.observableList(new FixedRowList(this));
-        fixedColumns = FXCollections.observableList(new FixedColumnsList(this));
+        fixedRows.addListener(fixedRowsListener); 
+        fixedColumns.addListener(fixedColumnsListener);
     }
 
     /***************************************************************************
@@ -1298,91 +1301,63 @@ public class SpreadsheetView extends Control {
             final int newColumnIndex = columnIndex + offset;
             return getTableView().getVisibleLeafColumn(newColumnIndex);
         }
-        /*****************************************************************
-         * 				END OF MODIFIED BY NELLARMONIA
-         *****************************************************************/
-    }
-    private class FixedRowList extends ArrayList<Integer>{
-    	/**
-    	 * 
-    	 */
-    	private static final long serialVersionUID = -3029040276343913374L;
-    	private SpreadsheetView spv;
-    	
-    	public FixedRowList(SpreadsheetView spv){
-    		super();
-    		this.spv = spv;
-    	}
-    	
-    	@Override
-    	public boolean add(Integer e){
-    		if(spv.isRowFixable(e)){
-    			super.add(e);
-    			return true;
-    		}else{
-    			throw new IllegalArgumentException(computeReason(e)); 
-    		}
-    	}
-    	
-    	@Override
-    	public void add(int index, Integer element){
-    		if(spv.isRowFixable(element)){
-    			super.add(index,element);
-    		}else{
-    			throw new IllegalArgumentException(computeReason(element)); 
-    		}
-    	}
-    	
-    	private String computeReason(Integer element){
-    		String reason = "\n This row cannot be fixed.";
-    		for(SpreadsheetCell<?> cell: spv.getGrid().getRows().get(element)){
-				if(cell.getRowSpan() >1){
-					reason+= "The cell situated at line "+cell.getRow()+" and column "+cell.getColumn()
-							+"\n has a rowSpan of "+cell.getRowSpan()+", it must be 1.";
-					return reason;
-				}
-			}
-    		return reason;
-    	}
     }
     
-    private class FixedColumnsList extends ArrayList<SpreadsheetColumn<?>>{
-    	
-    	/**
-    	 * 
-    	 */
-    	private static final long serialVersionUID = -2042848184251074151L;
-    	private SpreadsheetView spv;
-    	
-    	public FixedColumnsList(SpreadsheetView spv){
-    		super();
-    		this.spv = spv;
-    	}
-    	
-    	@Override
-    	public boolean add(SpreadsheetColumn<?> e){
-    		if(e.isColumnFixable()){
-    			super.add(e);
-    			return true;
-    		}else{
-    			throw new IllegalArgumentException(computeReason(e)); 
-    		}
-    	}
-    	
-    	@Override
-    	public void add(int index, SpreadsheetColumn<?> element){
-    		if(element.isColumnFixable()){
-    			super.add(index,element);
-    		}else{
-    			throw new IllegalArgumentException(computeReason(element)); 
-    		}
-    	}
-    	
-    	private String computeReason(SpreadsheetColumn<?> element){
-    		int indexColumn = spv.getColumns().indexOf(element);
+    /**
+     * *********************************************************************
+     *                                                                     *
+     * private listeners
+     * ********************************************************************
+     */
+    
+    private ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
+        @Override public void onChanged(Change<? extends Integer> c) {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    List<? extends Integer> newRows = c.getAddedSubList();
+                    for (int row : newRows) {
+                        if(! isRowFixable(row)){
+                            throw new IllegalArgumentException(computeReason(row)); 
+                        }
+                    }
+                    FXCollections.sort(fixedRows);
+                }
+            }
+        }
+        
+        private String computeReason(Integer element){
+            String reason = "\n This row cannot be fixed.";
+            for(SpreadsheetCell<?> cell: getGrid().getRows().get(element)){
+                if(cell.getRowSpan() >1){
+                    reason+= "The cell situated at line "+cell.getRow()+" and column "+cell.getColumn()
+                            +"\n has a rowSpan of "+cell.getRowSpan()+", it must be 1.";
+                    return reason;
+                }
+            }
+            return reason;
+        }
+    };
+    
+    private ListChangeListener<SpreadsheetColumn<?>> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn<?>>() {
+        @Override public void onChanged(Change<? extends SpreadsheetColumn<?>> c) {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    List<? extends SpreadsheetColumn<?>> newRows = c.getAddedSubList();
+                    for (SpreadsheetColumn<?> row : newRows) {
+                        if(! row.isColumnFixable()){
+                            throw new IllegalArgumentException(computeReason(row)); 
+                        }
+                    }
+                    FXCollections.sort(fixedRows);
+                }
+            }
+        }
+        
+        private String computeReason(SpreadsheetColumn<?> element){
+    		int indexColumn = getColumns().indexOf(element);
     	
     		String reason = "\n This column cannot be fixed.";
-    		for (ObservableList<SpreadsheetCell<?>> row : spv.getGrid().getRows()) {
+    		for (ObservableList<SpreadsheetCell<?>> row : getGrid().getRows()) {
     			int columnSpan = row.get(indexColumn).getColumnSpan();
     			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1){
     				reason+= "The cell situated at line "+row.get(indexColumn).getRow()+" and column "+indexColumn
@@ -1392,8 +1367,7 @@ public class SpreadsheetView extends Control {
     		}
     		return reason;
     	}
-    		
-    }
+    };
 }
 
 

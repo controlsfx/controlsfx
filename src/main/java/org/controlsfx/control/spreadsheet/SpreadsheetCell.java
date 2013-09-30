@@ -129,7 +129,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     private int columnSpan;
     
     private String text;
-    private BooleanProperty editable;
+    private transient BooleanProperty editable;
     
     /**
      * Not serializable, it's transient right now because

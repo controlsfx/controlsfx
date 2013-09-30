@@ -73,7 +73,7 @@ public class SpreadsheetCells {
             }
 
             @Override public void match(SpreadsheetCell<?> cell) {
-                setItem((String) cell.getItem());
+                setItem((String) cell.getText());
             }
         };
     }
@@ -135,8 +135,8 @@ public class SpreadsheetCells {
             }
 
             @Override public void match(SpreadsheetCell<?> cell) {
-                if (getItem().equals(cell.getText())) {
-                    setItem((String)cell.getItem());
+                if (getItem().contains(cell.getText())) {
+                    setItem((String)cell.getText());
                 }
             }
         };

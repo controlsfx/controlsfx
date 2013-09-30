@@ -184,7 +184,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     ***************************************************************************/
     
     // --- item
-    private ObjectProperty<T> item = new SimpleObjectProperty<T>(this, "item") {
+    private transient ObjectProperty<T> item = new SimpleObjectProperty<T>(this, "item") {
         @Override protected void invalidated() {
             updateText();
         }
@@ -201,7 +201,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     
     
     // --- converter
-    private ObjectProperty<StringConverter<T>> converter = 
+    private transient ObjectProperty<StringConverter<T>> converter = 
             new SimpleObjectProperty<StringConverter<T>>(this, "converter") {
         @Override protected void invalidated() {
             updateText();
@@ -273,7 +273,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
 	}
 	
 	// A map containing a set of properties for this cell
-    private ObservableMap<Object, Object> properties;
+    private transient ObservableMap<Object, Object> properties;
 
     /**
       * Returns an observable map of properties on this node for use primarily

@@ -27,6 +27,7 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -394,7 +395,7 @@ public class SpreadsheetCellEditors {
                 super.updateDataCell(cell);
 
                 if (cell != null) {
-                    ObservableList<String> items = (ObservableList<String>) cell.getProperties().get("items");
+                    ObservableList<String> items = FXCollections.observableList((List<String>) cell.getProperties().get("items"));
                     cb.setItems(items);
                     cb.setValue(cell.getText());
 

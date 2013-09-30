@@ -85,9 +85,9 @@ import org.controlsfx.property.editor.PropertyEditor;
  *  </table>
  * 
  * 
- * @see {@link SpreadsheetView}
- * @see {@link SpreadsheetCellEditors}
- * @see {@link SpreadsheetCell}
+ * @see SpreadsheetView
+ * @see SpreadsheetCellEditors
+ * @see SpreadsheetCell
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
 

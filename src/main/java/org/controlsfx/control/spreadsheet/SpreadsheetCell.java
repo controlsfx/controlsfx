@@ -28,7 +28,9 @@ package org.controlsfx.control.spreadsheet;
 
 import java.io.Serializable;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,10 +54,10 @@ import javafx.util.StringConverter;
  * <br/>
  * 
  * <ul>
- *   <li> String: Accessible with {@link SpreadsheetCells#createTextCell(int, int, int, int, String)} .</li>
- *   <li> List: Accessible with {@link SpreadsheetCells#createListCell(int, int, int, int, java.util.List)} .</li>
- *   <li> Double: Accessible with {@link SpreadsheetCells#createDoubleCell(int, int, int, int, Double)} .</li>
- *   <li> Date: Accessible with {@link SpreadsheetCells#createDateCell(int, int, int, int, java.time.LocalDate)} .</li>
+ *   <li> <b>String</b>: Accessible with {@link SpreadsheetCells#createTextCell(int, int, int, int, String)} .</li>
+ *   <li> <b>List</b>: Accessible with {@link SpreadsheetCells#createListCell(int, int, int, int, java.util.List)} .</li>
+ *   <li> <b>Double</b>: Accessible with {@link SpreadsheetCells#createDoubleCell(int, int, int, int, Double)} .</li>
+ *   <li> <b>Date</b>: Accessible with {@link SpreadsheetCells#createDateCell(int, int, int, int, java.time.LocalDate)} .</li>
  * </ul>
  * <br/>
  * 
@@ -92,7 +94,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
 
     /**
      * When instantiating a {@link SpreadsheetCell}, its CellType will be modified 
-     * and it will condition which value the cell can accept, or which {@link SpreadsheetCellEditor}
+     * and it will condition which value the cell can accept, and which {@link SpreadsheetCellEditor}
      * it will use.
      */
     public static enum CellType {
@@ -127,7 +129,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
     private int columnSpan;
     
     private String text;
-    private boolean editable;
+    private BooleanProperty editable;
     
     /**
      * Not serializable, it's transient right now because
@@ -144,10 +146,26 @@ public abstract class SpreadsheetCell<T> implements Serializable {
      * 
      **************************************************************************/
 
-    public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan) {
-        this(row, column, rowSpan, columnSpan, null);
+    /**
+     * Constructs a SpreadsheetCell with the given configuration and a {@link CellType} set to String.
+     * @param row
+     * @param column
+     * @param rowSpan
+     * @param columnSpan
+     */
+    public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan){
+    	this(row, column, rowSpan, columnSpan, null);
     }
     
+    /**
+     * Constructs a SpreadsheetCell with the given configuration.
+     * @see SpreadsheetCells
+     * @param row
+     * @param column
+     * @param rowSpan
+     * @param columnSpan
+     * @param type
+     */
     public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan, final CellType type) {
         this.row = row;
         this.column = column;
@@ -155,7 +173,7 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         this.columnSpan = columnSpan;
         this.type = type == null ? CellType.STRING : type;
         text = "";
-        editable = true;
+        editable = new SimpleBooleanProperty(true);
     }
     
     
@@ -229,34 +247,69 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         return text;
     }
 
+    /**
+     * Return the {@link CellType} of this particular cell.
+     * @return the {@link CellType} of this particular cell.
+     */
     public CellType getCellType() {
         return type;
     }
     
+    /**
+     * Return the row of this cell.
+     * @return the row of this cell.
+     */
     public int getRow() {
         return row;
     }
 
+    /**
+     * Return the column of this cell.
+     * @return the column of this cell.
+     */
     public int getColumn() {
         return column;
     }
 
+    /**
+     * Return how much this cell is spanning in row, 1 is normal.
+     * @return how much this cell is spanning in row, 1 is normal.
+     */
     public int getRowSpan() {
         return rowSpan;
     }
 
+    /**
+     * Sets how much this cell is spanning in row. See {@link SpreadsheetCell} description for information. 
+     * You should use {@link GridBase#spanRow(int, int, int)} instead of using this method directly.
+     * @param rowSpan
+     */
     public void setRowSpan(int rowSpan) {
         this.rowSpan = rowSpan;
     }
-
+    
+    /**
+     * Return how much this cell is spanning in column, 1 is normal.
+     * @param rowSpan
+     */
     public int getColumnSpan() {
         return columnSpan;
     }
-
+    
+    /**
+     * Sets how much this cell is spanning in column. See {@link SpreadsheetCell} description for information. 
+     * You should use {@link GridBase#spanColumn(int, int, int)} instead of using this method directly.
+     * @param rowSpan
+     */
     public void setColumnSpan(int columnSpan) {
         this.columnSpan = columnSpan;
     }
     
+    /**
+     * Return an ObservableList of String of all the style class associated with this cell.
+     * You can easily modify its appearance by adding a style class (previously set in CSS).
+     * @return
+     */
     public ObservableList<String> getStyleClass() {
         if (styleClass == null) {
             styleClass = FXCollections.observableArrayList();
@@ -264,12 +317,28 @@ public abstract class SpreadsheetCell<T> implements Serializable {
         return styleClass;
     }
 
-    public boolean isEditable() {
-		return editable;
+    /**
+     * Return if this cell can be edited or not.
+     * @return true if this cell is editable.
+     */
+    public boolean getEditable() {
+		return editable.get();
 	}
 
+    /**
+     * Change the editable state of this cell
+     * @param readOnly
+     */
 	public void setEditable(boolean readOnly) {
-		this.editable = readOnly;
+		editable.set(readOnly);
+	}
+	
+	/**
+	 * The {@link BooleanProperty} linked with the editable state.
+	 * @return
+	 */
+	public BooleanProperty editableProperty(){
+		return editable;
 	}
 	
 	// A map containing a set of properties for this cell

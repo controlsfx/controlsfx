@@ -44,6 +44,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
  * Currently you can only create a textCell, listCell, doubleCell or a DateCell.
  * 
  * 
+ * @see SpreadsheetCell
  */
 public class SpreadsheetCells {
 

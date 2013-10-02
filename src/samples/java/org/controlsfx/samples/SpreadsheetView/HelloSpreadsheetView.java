@@ -52,7 +52,6 @@ import org.controlsfx.Sample;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
-import org.controlsfx.control.spreadsheet.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.samples.Utils;
 
@@ -228,11 +227,11 @@ public class HelloSpreadsheetView extends Application implements Sample {
 			List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
 			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
 		} else if (random >= 0.10 && random < 0.25) {
-			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+			cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
 		}else if (random >= 0.25 && random < 0.75) {
-			cell = SpreadsheetCells.createDoubleCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+			cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
 		}else{
-			cell = SpreadsheetCells.createDateCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+			cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
 		}
 
 		// Styling for preview

@@ -208,7 +208,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             if (isVisible) {
                 if (/*fixedCellSizeProperty().get() > 0
                         &&*/ tableCell.getParent() == null) {
-                    getChildren().add(tableCell);
+                    getChildren().add(0,tableCell);
                 }
 
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);

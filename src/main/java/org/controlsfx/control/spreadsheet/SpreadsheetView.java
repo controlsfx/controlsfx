@@ -124,7 +124,7 @@ import com.sun.javafx.UnmodifiableArrayList;
  * for (int row = 0; row < grid.getRowCount(); ++row) {
  *     final ObservableList&lt;DataCell&gt; ObservableList&lt;DataCell&gt; = new ObservableList&lt;DataCell&gt;(row, grid.getColumnCount());
  *     for (int column = 0; column < grid.getColumnCount(); ++column) {
- *         ObservableList&lt;DataCell&gt;.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
+ *         ObservableList&lt;DataCell&gt;.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,""));
  *     }
  *     rows.add(ObservableList&lt;DataCell&gt;);
  * }
@@ -735,7 +735,7 @@ public class SpreadsheetView extends Control {
         }else if(clipboard.hasString()){
         	final TablePosition<?,?> p = tableView.getFocusModel().getFocusedCell();
         	
-        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(SpreadsheetCells.createTextCell(0, 0, 1, 1, clipboard.getString()));
+        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(SpreadsheetCellType.STRING.createCell(0, 0, 1, 1, clipboard.getString()));
         	
         	//For layout
         	getSelectionModel().clearSelection();

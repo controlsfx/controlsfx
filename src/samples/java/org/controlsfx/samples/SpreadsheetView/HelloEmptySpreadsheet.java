@@ -52,7 +52,7 @@ import org.controlsfx.Sample;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCells;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
@@ -184,7 +184,7 @@ public class HelloEmptySpreadsheet extends Application implements Sample {
 		for (int row = 0; row < grid.getRowCount(); ++row) {
 			final ObservableList<SpreadsheetCell<?>> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
 			for (int column = 0; column < grid.getColumnCount(); ++column) {
-				dataRow.add(SpreadsheetCells.createTextCell(row, column, 1, 1,""));
+				dataRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,""));
 			}
 			rows.add(dataRow);
 		}

@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -44,30 +45,38 @@ import javafx.util.converter.DoubleStringConverter;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br/>
- * You will provide these when constructing a {@link Grid}.
+ * You will provide them when constructing a {@link Grid}.
  * 
  * <br/>
  * 
- * <h3>Type of SpreadsheetCell:</h3> Different type of SpreadsheetCell are
+ * <h3>Type of SpreadsheetCell:</h3> 
+ * Each SpreadsheetCell has its own {@link SpreadsheetCellType}.
+ * Different {@link SpreadsheetCellType} are
  * available depending on the data you want to represent in your
- * {@link SpreadsheetView}. Each type has its own {@link SpreadsheetCellEditor}
+ * {@link SpreadsheetView}. MoreOver, each {@link SpreadsheetCellType} has its own {@link SpreadsheetCellEditor}
  * in order to control very closely the possible modifications. <br/>
- * Those {@link CellType} are not directly accessible. You have to use the
- * different static method provided in {@link SpreadsheetCells} in order to
+ * 
+ * 
+ * You can use the different static method provided in {@link SpreadsheetCellType} in order to
  * create the specialized SpreadsheetCell that suits your need: <br/>
  * 
  * <ul>
  * <li><b>String</b>: Accessible with
- * {@link SpreadsheetCells#createTextCell(int, int, int, int, String)} .</li>
+ * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)} .</li>
  * <li><b>List</b>: Accessible with
- * {@link SpreadsheetCells#createListCell(int, int, int, int, java.util.List)} .
+ * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)} .
  * </li>
  * <li><b>Double</b>: Accessible with
- * {@link SpreadsheetCells#createDoubleCell(int, int, int, int, Double)} .</li>
+ * {@link  SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)} .</li>
  * <li><b>Date</b>: Accessible with
- * {@link SpreadsheetCells#createDateCell(int, int, int, int, java.time.LocalDate)}
+ * {@link  SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}
  * .</li>
  * </ul>
+ * <br/>
+ * 
+ * If you want to create a SpreadsheetCell of your own, you simply have to create your own
+ * {@link  SpreadsheetCellType} and implements the abstract method {@link  SpreadsheetCellType#createCell(int, int, int, int, Object)}.
+ * You will also have to provide the custom {@link SpreadsheetCellEditor}.
  * <br/>
  * 
  * <h3>Configuration:</h3> You will have to indicate the coordinates of that
@@ -80,19 +89,34 @@ import javafx.util.converter.DoubleStringConverter;
  * {@link GridBase#spanRow(int, int, int)}. <br/>
  * 
  * 
- * <h3>Example:</h3>
- * 
- * Suppose you want to display some numbers in your SpreadsheetView. You will
- * fill your {@link Grid} using
- * {@link SpreadsheetCells#createDoubleCell(int, int, int, int, Double)}.
- * 
- * You will then be sure that your cells contain only {@link Double} value. If
+ * <h3> Code samples </h3>
+ * Here is an example that uses all the pre-built {@link SpreadsheetCellType}
+ * The generation is random here  and you'll probably use a switch instruction in your case.
+ * <br/><br/>
+ * <pre>
+ * private SpreadsheetCell&lt;?&gt; generateCell(int row, int column, int rowSpan, int colSpan) {
+ *		List&lt;String?&gt; stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
+		final double random = Math.random();
+		if (random &lt; 0.10) {
+			List&lt;String?&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
+			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
+		} else if (random ?&gt;= 0.10 && random &lt; 0.25) {
+			cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+		}else if (random ?&gt;= 0.25 && random &lt; 0.75) {
+			cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+		}else{
+			cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+		}
+		return cell;
+ * }
+ * </pre>
+ * When you are using {@link SpreadsheetCellType.DoubleType},
+ * you will then be sure that your cells contain only {@link Double} value. If
  * the user wants to enter a {@link String}, the value will be ignored.
  * Moreover, the {@link SpreadsheetCellEditor} background color will turn red
  * when the value is incorrect to notify the user that his value will not be be
  * saved.
  * 
- * @see SpreadsheetCells
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
  */
@@ -136,7 +160,7 @@ public class SpreadsheetCell<T> implements Serializable {
 
 	/**
 	 * Constructs a SpreadsheetCell with the given configuration and a
-	 * {@link CellType} set to String.
+	 * {@link SpreadsheetCellType} set to {@link SpreadsheetCellType#OBJECT}.
 	 * 
 	 * @param row
 	 * @param column

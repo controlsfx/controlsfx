@@ -54,25 +54,43 @@ import org.controlsfx.property.editor.PropertyEditor;
  * <br/>
  * If the user does anything outside the editor, the editor <b> will be forced </b> to cancel the edition and close itself. 
  * Each editor has its own policy regarding validation of the value entered. This policy is
- * define by each editor in the {link {@link #validateEdit()}} method.
- *  If the value doesn't meet the requirements when saving the cell, nothing happens and the editor keep editing.
+ * define by each editor in the {@link #validateEdit()} method.
+ *  If the value doesn't meet the requirements when saving the cell, nothing happens and the editor keeps editing.
  * <br/>
  * You can abandon a current modification by pressing "esc" key. 
  * <br/>
  * 
  * <h3>Specific behavior: </h3>
- * Each editor is linked with a specific {@link CellType}. Here are their properties:
+ * This class offers some static methods in order to create a {@link SpreadsheetCellEditor}. Here are their properties:
  * <br/>
  * 
  * <ul>
- *   <li> String: Basic {@link TextField}, can accept all data and save it as a string.</li>
- *   <li> List: Display a {@link ComboBox} with the different values.</li>
- *   <li> Double: Display a {@link TextField} which accepts only double value. If the entered value is incorrect,
+ *   <li> {@link #createTextEditor()}: Basic {@link TextField}, can accept all data and save it as a string.</li>
+ *   <li> {@link #createListEditor(List)}: Display a {@link ComboBox} with the different values.</li>
+ *   <li> {@link #createDoubleEditor()}: Display a {@link TextField} which accepts only double value. If the entered value is incorrect,
  *   the background will turn red so that the user will know in advance if the data will be saved or not.</li>
- *   <li> Date: Display a {@link DatePicker}.</li>
+ *   <li> {@link #createDateEditor()}: Display a {@link DatePicker}.</li>
+ *   <li> {@link #createObjectEditor()}: Display a {@link TextField}, accept an Object.</li>
  * </ul>
  * 
  * <br/>
+ * <h3>Creating your editor: </h3>
+ * You can of course create your own {@link SpreadsheetCellEditor} if you want to control more closely 
+ * what is happening or simply for displaying other controls.<br/>
+ * 
+ * You just have to override the three abstract methods. <b>Remember</b> that you will never call those
+ * methods directly. They will be called by the {@link SpreadsheetView} when the time comes.
+ * <ul>
+ *   <li> {@link #startEdit()}: You can instantiate your own control.</li>
+ *   <li> {@link #validateEdit()}: You can decide whether the value entered is valid for you.</li>
+ *   <li> {@link #end()}: When editing is finished, you can properly close your own control.</li>
+ * </ul>
+ * <br/>
+ * Keep in mind that you will interact only with {@link #endEdit(boolean)} where a <b>true</b> value
+ * means you want to commit, and a <b>false</b> means you want to cancel. The {@link SpreadsheetView}
+ * will handle all the rest for you and call your methods at the right moment.
+ * <br/>
+ * 
  * <h3>Visual: </h3>
  * <table style="border: 1px solid gray;">
  *   <tr>
@@ -95,7 +113,6 @@ import org.controlsfx.property.editor.PropertyEditor;
  * 
  * 
  * @see SpreadsheetView
- * @see SpreadsheetCellEditors
  * @see SpreadsheetCell
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
@@ -326,7 +343,6 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 	 * stored. 
 	 * <br/>
 	 * Moreover, the {@link TextField} will turn red if the value currently entered if incorrect.
-	 * @see SpreadsheetCellEditor
 	 */
 	public static SpreadsheetCellEditor<Double> createDoubleEditor() {
 		return new SpreadsheetCellEditor<Double>() {

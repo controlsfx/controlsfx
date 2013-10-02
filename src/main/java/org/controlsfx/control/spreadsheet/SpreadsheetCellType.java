@@ -11,6 +11,11 @@ import javafx.util.converter.DoubleStringConverter;
 /**
  * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will condition which value the cell can accept, and which
  * {@link SpreadsheetCellEditor} it will use.
+ * 
+ * 
+ * @see SpreadsheetView
+ * @see SpreadsheetCellEditor
+ * @see SpreadsheetCell
  */
 public abstract class SpreadsheetCellType<T> {
 	/** An instance of converter from string to cell type. */
@@ -240,16 +245,15 @@ public abstract class SpreadsheetCellType<T> {
 
 	};
 	
+	
+	public static final SpreadsheetCellType<String> LIST(final List<String> items) {
+		return new ListType(items);
+	}
+	
 	/**
 	 * Creates a list type from a list of string values.
 	 * @param items the list of acceptable values
 	 * @return the cell type instance
-	 */
-	public static final SpreadsheetCellType<String> LIST(final List<String> items) {
-		return new ListType(items);
-	}
-	/**
-	 * The list base class.
 	 */
 	public static class ListType extends SpreadsheetCellType<String> {
 		protected final List<String> items;

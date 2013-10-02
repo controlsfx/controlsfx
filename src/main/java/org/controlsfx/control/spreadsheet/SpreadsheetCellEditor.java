@@ -26,10 +26,21 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.controlsfx.property.editor.PropertyEditor;
 
@@ -165,5 +176,417 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      * post editing.
      */
     public abstract void end();
+
+	/**
+	 * 
+	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+	 * {@link TextField} where the user can type different values.
+	 */
+	public static SpreadsheetCellEditor<Object> createObjectEditor() {
+		return new SpreadsheetCellEditor<Object>() {
+
+			/***************************************************************************
+			 * * Private Fields * *
+			 **************************************************************************/
+			private final TextField tf;
+
+			/***************************************************************************
+			 * * Constructor * *
+			 **************************************************************************/
+			{
+				tf = new TextField();
+				tf.setPrefHeight(20);
+			}
+
+			/***************************************************************************
+			 * * Public Methods * *
+			 **************************************************************************/
+			@Override
+			public void startEdit() {
+				Object value = getValue();
+				if (value != null) {
+					tf.setText(value.toString());
+				}
+				tf.setMaxHeight(20);
+				attachEnterEscapeEventHandler();
+
+				tf.requestFocus();
+			}
+
+			/***************************************************************************
+			 * * Protected Methods * *
+			 **************************************************************************/
+
+
+			@Override
+			public void end() {
+				tf.setOnKeyPressed(null);
+			}
+
+			@Override
+			public String validateEdit() {
+				return tf.getText();
+			}
+
+			@Override
+			public TextField getEditor() {
+				return tf;
+			}
+
+			private void attachEnterEscapeEventHandler() {
+				tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							endEdit(true);
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							endEdit(false);
+						}
+					}
+				});
+			}
+		};
+	}
+	
+	/**
+	 * 
+	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+	 * {@link TextField} where the user can type different values.
+	 */
+	public static SpreadsheetCellEditor<String> createTextEditor() {
+		return new SpreadsheetCellEditor<String>() {
+
+			/***************************************************************************
+			 * * Private Fields * *
+			 **************************************************************************/
+			private final TextField tf;
+
+			/***************************************************************************
+			 * * Constructor * *
+			 **************************************************************************/
+			{
+				tf = new TextField();
+				tf.setPrefHeight(20);
+			}
+
+			/***************************************************************************
+			 * * Public Methods * *
+			 **************************************************************************/
+			@Override
+			public void startEdit() {
+				String value = getValue();
+				if (value != null) {
+					tf.setText(value);
+				}
+				tf.setMaxHeight(20);
+				attachEnterEscapeEventHandler();
+
+				tf.requestFocus();
+			}
+
+			/***************************************************************************
+			 * * Protected Methods * *
+			 **************************************************************************/
+
+
+			@Override
+			public void end() {
+				tf.setOnKeyPressed(null);
+			}
+
+			@Override
+			public String validateEdit() {
+				return tf.getText();
+			}
+
+			@Override
+			public TextField getEditor() {
+				return tf;
+			}
+
+			private void attachEnterEscapeEventHandler() {
+				tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							endEdit(true);
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							endEdit(false);
+						}
+					}
+				});
+			}
+		};
+	}
+
+	/**
+	 * 
+	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+	 * {@link TextField} where the user can type different numbers. Only numbers will be
+	 * stored. 
+	 * <br/>
+	 * Moreover, the {@link TextField} will turn red if the value currently entered if incorrect.
+	 * @see SpreadsheetCellEditor
+	 */
+	public static SpreadsheetCellEditor<Double> createDoubleEditor() {
+		return new SpreadsheetCellEditor<Double>() {
+
+			/***************************************************************************
+			 * * Private Fields * *
+			 **************************************************************************/
+			private final TextField tf;
+
+			/***************************************************************************
+			 * * Constructor * *
+			 **************************************************************************/
+			{
+				tf = new TextField();
+				tf.setPrefHeight(20);
+			}
+
+			/***************************************************************************
+			 * * Public Methods * *
+			 **************************************************************************/
+			@Override
+			public void startEdit() {
+				if (getValue() != null) {
+					tf.setText(getValue().toString());
+				}
+				tf.getStyleClass().removeAll("error");
+				tf.setMaxHeight(20);
+				attachEnterEscapeEventHandler();
+
+				tf.requestFocus();
+			}
+
+			/***************************************************************************
+			 * * Protected Methods * *
+			 **************************************************************************/
+
+
+			@Override
+			public void end() {
+				tf.setOnKeyPressed(null);
+			}
+
+			@Override
+			public Double validateEdit() {
+				try{
+					Double temp = Double.parseDouble(tf.getText());
+					return temp;
+				}catch(Exception e){
+					return null;
+				}
+			}
+
+			@Override
+			public TextField getEditor() {
+				return tf;
+			}
+
+			private void attachEnterEscapeEventHandler() {
+				tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							endEdit(true);
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							endEdit(false);
+						}
+					}
+				});
+				tf.setOnKeyReleased(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						try{
+							if(tf.getText().equals("")){
+								tf.getStyleClass().removeAll("error");
+							}else{
+								Double.parseDouble(tf.getText());
+								tf.getStyleClass().removeAll("error");
+							}
+						}catch(Exception e){
+							tf.getStyleClass().add("error");
+						}
+					}
+				});
+			}
+		};
+	}
+
+	/**
+	 * 
+	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+	 * {@link ComboBox} where the user can choose a date through a visual calendar.
+	 * The user can also type the date directly in the expected format (DD/MM/YYYY).
+	 */
+	public static SpreadsheetCellEditor<String> createListEditor(final List<String> itemList) {
+		return new SpreadsheetCellEditor<String>() {
+			/***************************************************************************
+			 * * Private Fields * *
+			 **************************************************************************/
+			private final ComboBox<String> cb;
+			private ChangeListener<Number> cl;
+
+			/***************************************************************************
+			 * * Constructor * *
+			 **************************************************************************/
+			{
+				cb = new ComboBox<String>();
+				cb.setVisibleRowCount(3);
+
+			}
+
+			/***************************************************************************
+			 * * Public Methods * *
+			 **************************************************************************/
+
+			@Override
+			public void startEdit() {
+				//                super.startEdit();
+				if (getValue() != null) {
+					ObservableList<String> items = FXCollections.observableList(itemList);
+					cb.setItems(items);
+					cb.setValue(getValue());
+				}
+				attachEnterEscapeEventHandler();
+
+				cb.requestFocus();
+			}
+
+
+			/***************************************************************************
+			 * * Protected Methods * *
+			 **************************************************************************/
+
+
+			@Override
+			public void end() {
+				cb.getSelectionModel().selectedIndexProperty()
+				.removeListener(cl);
+				cb.setOnKeyPressed(null);
+				cl = null;
+			}
+
+			@Override
+			public String validateEdit() {
+				if (cb.getSelectionModel().getSelectedIndex() != -1) {
+					return cb.getSelectionModel().getSelectedItem();
+				}
+				return null;
+			}
+
+			@Override
+			public ComboBox<String> getEditor() {
+				return cb;
+			}
+
+			private void attachEnterEscapeEventHandler() {
+				cl = new ChangeListener<Number>() {
+					@Override
+					public void changed(ObservableValue<? extends Number> ov,
+							Number t, Number t1) {
+						endEdit(true);
+					}
+				};
+				cb.getSelectionModel().selectedIndexProperty().addListener(cl);
+				cb.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ESCAPE) {
+							endEdit(false);
+						}
+					}
+				});
+			}
+		};
+	}
+
+	/**
+	 * 
+	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+	 * {@link DatePicker}.
+	 */
+	public static SpreadsheetCellEditor<LocalDate> createDateEditor() {
+		return new SpreadsheetCellEditor<LocalDate>() {
+
+			/***************************************************************************
+			 * * Private Fields * *
+			 **************************************************************************/
+			private final DatePicker datePicker;
+			private EventHandler<KeyEvent> eh;
+
+			/***************************************************************************
+			 * * Constructor * *
+			 **************************************************************************/
+
+			{
+				datePicker = new DatePicker();
+			}
+
+			/***************************************************************************
+			 * * Public Methods * *
+			 **************************************************************************/
+			@Override
+			public void startEdit() {
+				datePicker.setValue(getValue());
+				attachEnterEscapeEventHandler();
+
+				datePicker.getEditor().requestFocus();
+			}
+
+			/***************************************************************************
+			 * * Protected Methods * *
+			 **************************************************************************/
+
+
+			@Override
+			public void end() {
+
+				if (datePicker.isShowing()) {
+					datePicker.hide();
+				}
+
+				datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
+			}
+
+			@Override
+			public LocalDate validateEdit() {
+				return datePicker.getValue();
+			}
+
+			@Override
+			public DatePicker getEditor() {
+				return datePicker;
+			}
+
+			private void attachEnterEscapeEventHandler() {
+				/**
+				 * We need to add an EventFilter because otherwise the
+				 * DatePicker will block "escape" and "enter". But when "enter"
+				 * is hit, we need to runLater the commit because the value has
+				 * not yet hit the DatePicker itself.
+				 */
+				eh = new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							final Runnable r = new Runnable() {
+								@Override
+								public void run() {
+									endEdit(true);
+								}
+							};
+							Platform.runLater(r);
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							endEdit(false);
+						}
+					}
+				};
+
+				datePicker.addEventFilter(KeyEvent.KEY_PRESSED, eh);
+			}
+		};
+	}
 
 }

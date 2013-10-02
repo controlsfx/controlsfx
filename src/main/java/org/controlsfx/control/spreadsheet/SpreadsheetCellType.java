@@ -58,23 +58,20 @@ public abstract class SpreadsheetCellType<T> {
 	 * Gets this type editor.
 	 * @return the editor instance
 	 */
-	public SpreadsheetCellEditor<T> getEditor() {
-		return null;
-	}
+	public abstract SpreadsheetCellEditor<T> getEditor();
 
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
 	 * @param from the source cell
 	 * @param to the destination cell
 	 */
-	abstract protected void copy(SpreadsheetCell<?> from,
-			SpreadsheetCell<T> to);
+	protected abstract void copy(SpreadsheetCell<?> from, SpreadsheetCell<T> to);
 	
 
 	/**
 	 * The Object type instance.
 	 */
-	static final SpreadsheetCellType<Object> OBJECT = new ObjectType();
+	public static final SpreadsheetCellType<Object> OBJECT = new ObjectType();
 
 	/**
 	 * The Object type base class.
@@ -121,7 +118,7 @@ public abstract class SpreadsheetCellType<T> {
 
 		public SpreadsheetCellEditor<Object> getEditor() {
 			if (editor == null) {
-				editor = SpreadsheetCellEditors.createObjectEditor();
+				editor = SpreadsheetCellEditor.createObjectEditor();
 			}
 			return editor;
 		}
@@ -166,7 +163,7 @@ public abstract class SpreadsheetCellType<T> {
 		@Override
 		public SpreadsheetCellEditor<String> getEditor() {
 			if (editor == null) {
-				editor = SpreadsheetCellEditors.createTextEditor();
+				editor = SpreadsheetCellEditor.createTextEditor();
 			}
 			return editor;
 		}
@@ -226,7 +223,7 @@ public abstract class SpreadsheetCellType<T> {
 		@Override
 		public SpreadsheetCellEditor<Double> getEditor() {
 			if (editor == null) {
-				editor = SpreadsheetCellEditors.createDoubleEditor();
+				editor = SpreadsheetCellEditor.createDoubleEditor();
 			}
 			return editor;
 		}
@@ -297,7 +294,7 @@ public abstract class SpreadsheetCellType<T> {
 		@Override
 		public SpreadsheetCellEditor<String> getEditor() {
 			if (editor == null) {
-				editor = SpreadsheetCellEditors.createListEditor(items);
+				editor = SpreadsheetCellEditor.createListEditor(items);
 			}
 			return editor;
 		}
@@ -366,7 +363,7 @@ public abstract class SpreadsheetCellType<T> {
 		@Override
 		public SpreadsheetCellEditor<LocalDate> getEditor() {
 			if (editor == null) {
-				editor = SpreadsheetCellEditors.createDateEditor();
+				editor = SpreadsheetCellEditor.createDateEditor();
 			}
 			return editor;
 		}

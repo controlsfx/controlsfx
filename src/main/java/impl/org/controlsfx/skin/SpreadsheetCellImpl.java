@@ -77,7 +77,6 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
     
-    private static final Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
     private static SpreadsheetCellImpl<?> lastHover = null;
     
     
@@ -163,7 +162,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
 	        	}
         	}
         	
-            SpreadsheetCellEditor<?> editor = getEditor(getItem(), spv);
+        	SpreadsheetCellEditorImpl<T> editor = getEditor(getItem(), spv);
             if(editor != null){
                 super.startEdit();
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -171,7 +170,6 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
             }
         }
     }
-    
     
     /**
      * Return an instance of Editor specific to the Cell type
@@ -183,10 +181,12 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
      * @return
      */
     @SuppressWarnings("unchecked")
-    private SpreadsheetCellEditor<?> getEditor(final SpreadsheetCell<T> cell, final SpreadsheetView spv) {
-        SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
+    private SpreadsheetCellEditorImpl<T> getEditor(final SpreadsheetCell<T> cell, final SpreadsheetView spv) {
+    	SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) SpreadsheetViewSkin.getSkin().getEditors(cell.getCellType());
+    	SpreadsheetCellEditorImpl<T> editor2 = (SpreadsheetCellEditorImpl<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
+//        SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
         if (editor == null) {
-            switch (cell.getCellType()) {
+            /*switch (cell.getCellType()) {
                 case STRING:
                     editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createTextEditor();
                     editors.put(cell.getCellType(), editor);
@@ -203,18 +203,19 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
                 	 editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDoubleEditor();
                      editors.put(cell.getCellType(), editor);
                      break;
-                default:
+                default:*/
                     return null;
-            }
+//            }
         }
 
-        if (editor.isEditing()){
+        if (editor2.isEditing()){
             return null;
         } else {
-            editor.updateSpreadsheetView(spv);
-            editor.updateSpreadsheetCell(this);
-            editor.updateDataCell(cell);
-            return editor;
+        	editor2.updateSpreadsheetView(spv);
+        	editor2.updateSpreadsheetCell(this);
+        	editor2.updateDataCell(cell);
+        	editor2.updateSpreadsheetCellEditor(editor);
+            return editor2;
         }
     }
     
@@ -230,7 +231,6 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         setContentDisplay(ContentDisplay.TEXT_ONLY);
 
         updateItem(newValue, false);
-
 
     }
 

@@ -32,6 +32,9 @@ import impl.org.controlsfx.skin.SpreadsheetViewSkin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.text.TabExpander;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -201,25 +204,30 @@ public class SpreadsheetView extends Control {
 
     private ArrayList<Boolean> rowFix; // Compute if we can fix the rows or not.
     
-    
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
     
-    /**
+	/**
      * Creates a default SpreadsheetView control with no content and a Grid set to null. 
      */
     public SpreadsheetView() {
-        this(null);
+        this(null,getDefaultEditors());
+    }
+    public SpreadsheetView(Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors) {
+        this(null,editors);
     }
 
+    public SpreadsheetView(final Grid grid){
+    	this(grid,getDefaultEditors());
+    }
     /**
      * Creates a SpreadsheetView control with the {@link Grid} specified. 
      * @param grid The Grid that contains the items to be rendered
      */
-    public SpreadsheetView(final Grid grid){
+    public SpreadsheetView(final Grid grid, final Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors){
         super();
         verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
@@ -251,7 +259,7 @@ public class SpreadsheetView extends Control {
             }
 
             @Override protected Skin<?> createDefaultSkin() {
-                return new SpreadsheetViewSkin(SpreadsheetView.this, tableView);
+                return new SpreadsheetViewSkin(SpreadsheetView.this, tableView, editors);
             }
         };
         getChildren().add(tableView);
@@ -288,7 +296,7 @@ public class SpreadsheetView extends Control {
 			}	
 		});
         initRowFix(grid);
-        
+
         setGrid(grid);
         fixedRows.addListener(fixedRowsListener); 
         fixedColumns.addListener(fixedColumnsListener);
@@ -434,6 +442,15 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/
  
+    private static Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> getDefaultEditors() {
+    	Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>>  map = new java.util.IdentityHashMap<>();
+    	map.put(SpreadsheetCell.CellType.STRING, SpreadsheetCellEditors.createTextEditor());
+    	map.put(SpreadsheetCell.CellType.LIST, SpreadsheetCellEditors.createListEditor());
+    	map.put(SpreadsheetCell.CellType.DATE, SpreadsheetCellEditors.createDateEditor());
+    	map.put(SpreadsheetCell.CellType.DOUBLE, SpreadsheetCellEditors.createDoubleEditor());
+    	return map;
+    }
+    
     /**
      * Verify that the grid is well-formed.
      * Can be quite time-consuming I guess so I would like it not

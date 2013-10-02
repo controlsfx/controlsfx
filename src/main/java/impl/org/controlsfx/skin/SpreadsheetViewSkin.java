@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
+import java.util.Map;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -42,6 +44,8 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -56,7 +60,9 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell<?>>> {
     
     private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
-
+    private Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors = FXCollections.observableHashMap();
+    private SpreadsheetCellEditorImpl<?> spreadsheetCellEditorImpl;
+    
     static TableView<ObservableList<SpreadsheetCell<?>>> tableView;
     
     protected RowHeader rowHeader;
@@ -68,9 +74,11 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     protected SpreadsheetView spreadsheetView;
 
     public SpreadsheetViewSkin(final SpreadsheetView spreadsheetView,
-            final TableView<ObservableList<SpreadsheetCell<?>>> tableView) {
+            final TableView<ObservableList<SpreadsheetCell<?>>> tableView, Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors) {
         super(tableView);
         this.spreadsheetView = spreadsheetView;
+        this.editors = editors;
+        spreadsheetCellEditorImpl = new SpreadsheetCellEditorImpl<>();
         SpreadsheetViewSkin.tableView = tableView;
 
         tableView.setEditable(true);
@@ -99,7 +107,7 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
         init();
     }
 
-    protected void init() {
+	protected void init() {
         getFlow().getVerticalBar().valueProperty()
                 .addListener(vbarValueListener);
         rowHeader = new RowHeader(this, spreadsheetView, rowHeaderWidth);
@@ -406,4 +414,12 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     public ObservableList<Integer> getSelectedColumns() {
         return selectedColumns;
     }
+
+	public SpreadsheetCellEditor<?> getEditors(CellType type){
+		return editors.get(type);
+	}
+	
+	public SpreadsheetCellEditorImpl<?> getSpreadsheetCellEditorImpl() {
+		return spreadsheetCellEditorImpl;
+	}
 }

@@ -26,11 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import impl.org.controlsfx.skin.SpreadsheetCellImpl;
-import impl.org.controlsfx.skin.SpreadsheetRowImpl;
 import impl.org.controlsfx.skin.SpreadsheetViewSkin;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
@@ -46,11 +42,14 @@ import org.controlsfx.property.editor.PropertyEditor;
  * <h3>General behavior: </h3>
  * Editors will be displayed if the user double-click or press enter in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ).
  * <br/>
- * If the user does anything outside the editor, it will try to save the value and it will close itself. Each editor has its own policy regarding
- * validation of the value entered. If the value doesn't meet the requirements when saving the cell, the old value is used. 
+ * If the user does anything outside the editor, the editor <b> will be forced </b> to cancel the edition and close itself. 
+ * Each editor has its own policy regarding validation of the value entered. This policy is
+ * define by each editor in the {link {@link #validateEdit()}} method.
+ *  If the value doesn't meet the requirements when saving the cell, nothing happens and the editor keep editing.
  * <br/>
  * You can abandon a current modification by pressing "esc" key. 
  * <br/>
+ * 
  * <h3>Specific behavior: </h3>
  * Each editor is linked with a specific {@link CellType}. Here are their properties:
  * <br/>
@@ -89,24 +88,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see SpreadsheetCellEditors
  * @see SpreadsheetCell
  */
-public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
-
-    /***************************************************************************
-     * * Protected/Private Fields * *
-     **************************************************************************/
-
-    // transient properties - these fields will change based on the current
-    // cell being edited.
-    SpreadsheetCell<T> modelCell;
-    SpreadsheetCellImpl<T> viewCell;
-    SpreadsheetView spreadsheetView;
-
-    // private internal fields
-    private SpreadsheetEditor<T> spreadsheetEditor;
-    private InvalidationListener editorListener;
-    private boolean editing = false;
-
-    InvalidationListener il;
+public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 
     /***************************************************************************
      * * Constructor * *
@@ -116,153 +98,70 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T> {
      * Construct the SpreadsheetCellEditor.
      */
     public SpreadsheetCellEditor() {
-        this.spreadsheetEditor = new SpreadsheetEditor<T>();
     }
 
     /***************************************************************************
-     * * Public Methods * *
-     **************************************************************************/
-
-    /**
-     * Update the internal {@link SpreadsheetCell}.
-     * @param cell
-     */
-    public void updateDataCell(SpreadsheetCell<T> cell) {
-        this.modelCell = cell;
-    }
-
-    /**
-     * Update the internal {@link SpreadsheetCellImpl}
-     * @param cell
-     */
-    public void updateSpreadsheetCell(SpreadsheetCellImpl<T> cell) {
-        this.viewCell = cell;
-    }
-
-    public void updateSpreadsheetView(SpreadsheetView spreadsheet) {
-        this.spreadsheetView = spreadsheet;
-    }
-
-    /**
-     * In case the cell is spanning in rows. We want the cell to be fully
-     * accessible so we need to remove it from its tableRow and add it to the
-     * last row possible. Then we translate the cell so that it's invisible for
-     * the user.
-     */
-    public void startEdit() {
-    	editing = true;
-        spreadsheetEditor.startEdit();
-
-        // In ANY case, we stop when something move in scrollBar Vertical
-        editorListener = new InvalidationListener() {
-            @Override
-            public void invalidated(Observable arg0) {
-                commitEdit();
-
-                if (viewCell != null) {
-                    viewCell.commitEdit(modelCell);
-                }
-
-                end();
-            }
-        };
-        SpreadsheetViewSkin.getSkin().getVBar().valueProperty().addListener(editorListener);
-        //FIXME We need to REALLY find a way to stop edition when anything happen
-        // This is one way but it will need further investigation
-        spreadsheetView.disabledProperty().addListener(editorListener);
-    }
-
-    /***************************************************************************
-     * * Protected Methods * *
+     * * Public Final Methods * *
      **************************************************************************/
     /**
-     * When we have finish editing. We put the cell back to its right TableRow.
+     * Return the {@link SpreadsheetCell#getItem()} associated with the editor.
      */
-    void end() {
-        editing = false;
-        spreadsheetEditor.end();
-
-        SpreadsheetViewSkin.getSkin().getVBar().valueProperty().removeListener(editorListener);
-        spreadsheetView.disabledProperty().removeListener(editorListener);
-        editorListener = null;
+    @Override
+    public final T getValue() {
+    	SpreadsheetCell<T> cell = (SpreadsheetCell<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell();
+        return cell == null ? null : cell.getItem();
     }
 
     /**
-     * Return if this editor is currently being used.
-     * @return if this editor is being used.
+     * Return the {@link SpreadsheetCell#getProperties()} associated with
+     * the string in parameter.
+     * @param key The key which has a Object associated with in {@link SpreadsheetCell#getProperties()}
+     * @return
      */
-    public boolean isEditing() {
-        return editing;
+    public final Object getProperties(String key){
+    	return SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell().getProperties().get(key);
     }
-
-    @Override
-    public T getValue() {
-        return modelCell == null ? null : modelCell.getItem();
+    
+    /**
+     * Whenever you want to stop the edition, you call that method.<br/>
+     * True means you're trying to commit the value, then {@link #validateEdit()}
+     * will be called in order to verify that the value is correct.<br/>
+     * False means you're trying to cancel the value and it will be follow by {@link #end()}.<br/>
+     * See SpreadsheetCellEditor description
+     * @param b true means commit, false means cancel
+     */
+    public final void endEdit(boolean b){
+    	SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().endEdit(b);
     }
-
-    @Override
-    public void setValue(T value) {
-        if (modelCell != null) {
+ 
+    public final void setValue(T value) {
+       /* if (modelCell != null) {
             modelCell.setItem(value);
-        }
+        }*/
     }
-
+    
     /***************************************************************************
-     * * Protected Abstract Methods * *
+     * * Public Abstract Methods * *
      **************************************************************************/
+    /**
+     * This method will be called when edition start.<br/>
+     * You will then do all the configuration of your editor.
+     */
+    public abstract void startEdit();
+    
+    /**
+     * This method will be called when a commit is happening.<br/>
+     * You will then compute the value of the editor in order to determine
+     * if the current value is valid.
+     * @return null if not valid or the correct value otherwise.
+     */
+    public abstract T validateEdit();
+	
+    /**
+     * This method will be called at the end of edition.<br/>
+     * You will be offered the possibility to do the configuration
+     * post editing.
+     */
+    public abstract void end();
 
-    protected abstract void cancelEdit();
-
-    protected abstract SpreadsheetCell<T> commitEdit();
-
-    private class SpreadsheetEditor<A> {
-
-        /***********************************************************************
-         * * Private Fields * *
-         **********************************************************************/
-        private SpreadsheetRowImpl original;
-        private boolean isMoved;
-
-        private int getCellCount() {
-            return SpreadsheetViewSkin.getSkin().getCellsSize();
-        }
-        
-        private boolean addCell(SpreadsheetCellImpl<?> cell){
-            SpreadsheetRowImpl temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows().size());
-            if(temp != null){
-                temp.addCell(cell);
-                return true;
-            }
-            return false;
-        }
-        /***********************************************************************
-         * * Public Methods * *
-         **********************************************************************/
-
-        public void startEdit() {
-            // Case when RowSpan if larger and we're not on the last row
-            if (modelCell != null && modelCell.getRowSpan() > 1
-                    && modelCell.getRow() != getCellCount() - 1) {
-                original = (SpreadsheetRowImpl) viewCell.getTableRow();
-
-                final double temp = viewCell.getLocalToSceneTransform().getTy();
-                isMoved = addCell(viewCell);
-                if (isMoved) {
-                    viewCell.setTranslateY(temp
-                            - viewCell.getLocalToSceneTransform().getTy());
-                    original.putFixedColumnToBack();
-                }
-            }
-        }
-
-        public void end() {
-            if (modelCell != null && modelCell.getRowSpan() > 1) {
-                viewCell.setTranslateY(0);
-                if (isMoved) {
-                    original.addCell(viewCell);
-                    original.putFixedColumnToBack();
-                }
-            }
-        }
-    }
 }

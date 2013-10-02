@@ -7,7 +7,6 @@
 	<classpathentry kind="src" path="src/samples/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0 b104"/>
-	<classpathentry kind="lib" path="C:/Users/samir.hadzic/Desktop/ScenicView8.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JDK8"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -31,7 +31,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
 import org.controlsfx.property.editor.PropertyEditor;
 
 /**
@@ -111,6 +110,14 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
     	SpreadsheetCell<T> cell = (SpreadsheetCell<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell();
         return cell == null ? null : cell.getItem();
     }
+    
+    @Override
+    public final void setValue(T value) {
+        SpreadsheetCell<T> cell = (SpreadsheetCell<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell();
+        if (cell != null) {
+    	   cell.setItem(value);
+        }
+    }
 
     /**
      * Return the {@link SpreadsheetCell#getProperties()} associated with
@@ -133,12 +140,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
     public final void endEdit(boolean b){
     	SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().endEdit(b);
     }
- 
-    public final void setValue(T value) {
-       /* if (modelCell != null) {
-            modelCell.setItem(value);
-        }*/
-    }
+
     
     /***************************************************************************
      * * Public Abstract Methods * *

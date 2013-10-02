@@ -214,20 +214,14 @@ public class SpreadsheetView extends Control {
      * Creates a default SpreadsheetView control with no content and a Grid set to null. 
      */
     public SpreadsheetView() {
-        this(null,getDefaultEditors());
-    }
-    public SpreadsheetView(Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors) {
-        this(null,editors);
+        this(null);
     }
 
-    public SpreadsheetView(final Grid grid){
-    	this(grid,getDefaultEditors());
-    }
     /**
      * Creates a SpreadsheetView control with the {@link Grid} specified. 
      * @param grid The Grid that contains the items to be rendered
      */
-    public SpreadsheetView(final Grid grid, final Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> editors){
+    public SpreadsheetView(final Grid grid){
         super();
         verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
@@ -259,7 +253,7 @@ public class SpreadsheetView extends Control {
             }
 
             @Override protected Skin<?> createDefaultSkin() {
-                return new SpreadsheetViewSkin(SpreadsheetView.this, tableView, editors);
+                return new SpreadsheetViewSkin(SpreadsheetView.this, tableView);
             }
         };
         getChildren().add(tableView);
@@ -441,16 +435,7 @@ public class SpreadsheetView extends Control {
      * Private/Protected Implementation                                        *
      *                                                                         *
      **************************************************************************/
- 
-    private static Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>> getDefaultEditors() {
-    	Map<SpreadsheetCell.CellType, SpreadsheetCellEditor<?>>  map = new java.util.IdentityHashMap<>();
-    	map.put(SpreadsheetCell.CellType.STRING, SpreadsheetCellEditors.createTextEditor());
-    	map.put(SpreadsheetCell.CellType.LIST, SpreadsheetCellEditors.createListEditor());
-    	map.put(SpreadsheetCell.CellType.DATE, SpreadsheetCellEditors.createDateEditor());
-    	map.put(SpreadsheetCell.CellType.DOUBLE, SpreadsheetCellEditors.createDoubleEditor());
-    	return map;
-    }
-    
+
     /**
      * Verify that the grid is well-formed.
      * Can be quite time-consuming I guess so I would like it not
@@ -571,6 +556,7 @@ public class SpreadsheetView extends Control {
                         return new ReadOnlyObjectWrapper<SpreadsheetCell<?>>(p.getValue().get(col));
                     }
                 });
+                final SpreadsheetView view = this;
                 // We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
                 column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell<?>>, SpreadsheetCell<?>>, TableCell<ObservableList<SpreadsheetCell<?>>, SpreadsheetCell<?>>>() {
                     @Override

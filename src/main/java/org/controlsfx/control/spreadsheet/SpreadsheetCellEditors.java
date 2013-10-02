@@ -65,6 +65,77 @@ public class SpreadsheetCellEditors {
 	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
 	 * {@link TextField} where the user can type different values.
 	 */
+	public static SpreadsheetCellEditor<Object> createObjectEditor() {
+		return new SpreadsheetCellEditor<Object>() {
+
+			/***************************************************************************
+			 * * Private Fields * *
+			 **************************************************************************/
+			private final TextField tf;
+
+			/***************************************************************************
+			 * * Constructor * *
+			 **************************************************************************/
+			{
+				tf = new TextField();
+				tf.setPrefHeight(20);
+			}
+
+			/***************************************************************************
+			 * * Public Methods * *
+			 **************************************************************************/
+			@Override
+			public void startEdit() {
+				Object value = getValue();
+				if (value != null) {
+					tf.setText(value.toString());
+				}
+				tf.setMaxHeight(20);
+				attachEnterEscapeEventHandler();
+
+				tf.requestFocus();
+			}
+
+			/***************************************************************************
+			 * * Protected Methods * *
+			 **************************************************************************/
+
+
+			@Override
+			public void end() {
+				tf.setOnKeyPressed(null);
+			}
+
+			@Override
+			public String validateEdit() {
+				return tf.getText();
+			}
+
+			@Override
+			public TextField getEditor() {
+				return tf;
+			}
+
+			private void attachEnterEscapeEventHandler() {
+				tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							endEdit(true);
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							endEdit(false);
+						}
+					}
+				});
+			}
+		};
+	}
+	
+	/**
+	 * 
+	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
+	 * {@link TextField} where the user can type different values.
+	 */
 	public static SpreadsheetCellEditor<String> createTextEditor() {
 		return new SpreadsheetCellEditor<String>() {
 
@@ -86,8 +157,9 @@ public class SpreadsheetCellEditors {
 			 **************************************************************************/
 			@Override
 			public void startEdit() {
-				if (getValue() != null) {
-					tf.setText(getValue());
+				String value = getValue();
+				if (value != null) {
+					tf.setText(value);
 				}
 				tf.setMaxHeight(20);
 				attachEnterEscapeEventHandler();
@@ -231,7 +303,7 @@ public class SpreadsheetCellEditors {
 	 * {@link ComboBox} where the user can choose a date through a visual calendar.
 	 * The user can also type the date directly in the expected format (DD/MM/YYYY).
 	 */
-	public static SpreadsheetCellEditor<String> createListEditor() {
+	public static SpreadsheetCellEditor<String> createListEditor(final List<String> itemList) {
 		return new SpreadsheetCellEditor<String>() {
 			/***************************************************************************
 			 * * Private Fields * *
@@ -256,7 +328,7 @@ public class SpreadsheetCellEditors {
 			public void startEdit() {
 				//                super.startEdit();
 				if (getValue() != null) {
-					ObservableList<String> items = FXCollections.observableList((List<String>) getProperties("items"));
+					ObservableList<String> items = FXCollections.observableList(itemList);
 					cb.setItems(items);
 					cb.setValue(getValue());
 				}

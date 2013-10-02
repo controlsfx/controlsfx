@@ -27,14 +27,7 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
-import javafx.util.StringConverter;
-import javafx.util.converter.DefaultStringConverter;
-import javafx.util.converter.DoubleStringConverter;
-
-import org.controlsfx.control.spreadsheet.SpreadsheetCell.CellType;
 
 /**
  * You can generate some {@link SpreadsheetCell} used by the {@link Grid}
@@ -85,19 +78,7 @@ public class SpreadsheetCells {
      */
     public static SpreadsheetCell<String> createTextCell(final int row, final int column,
             final int rowSpan, final int columnSpan, final String value) {
-        return new SpreadsheetCell<String>(row, column, rowSpan, columnSpan, CellType.STRING) {
-
-            private static final long serialVersionUID = -1711498694430990374L;
-
-            {
-                this.setItem(value);
-                this.setConverter(new DefaultStringConverter());
-            }
-
-            @Override public void match(SpreadsheetCell<?> cell) {
-                setItem((String) cell.getText());
-            }
-        };
+        return SpreadsheetCellType.STRING.createCell(row, column, rowSpan, columnSpan, value);
     }
 
     /**
@@ -112,25 +93,7 @@ public class SpreadsheetCells {
      */
     public static SpreadsheetCell<Double> createDoubleCell(final int row, final int column,
             final int rowSpan, final int columnSpan, final Double value) {
-        return new SpreadsheetCell<Double>(row, column, rowSpan, columnSpan, CellType.DOUBLE) {
-
-            private static final long serialVersionUID = -1711498694430990374L;
-
-            {
-                this.setItem(value);
-                this.setConverter(new DoubleStringConverter());
-            }
-
-            @Override public void match(SpreadsheetCell<?> cell) {
-               try{
-            	   Double temp = Double.parseDouble(cell.getText());
-            	   this.setItem(temp);
-               }catch(Exception e){
-            	   
-               }
-            }
-
-        };
+        return SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, columnSpan, value);
     }
 	/**
 	 * Creates a cell that hold a list of String at the specified position, with 
@@ -142,7 +105,7 @@ public class SpreadsheetCells {
 	 * @param _value A list of String to display
 	 * @return
 	 */
-    public static SpreadsheetCell<String> createListCell(final int row, final int column,
+    /*public static SpreadsheetCell<String> createListCell(final int row, final int column,
             final int rowSpan, final int columnSpan, final List<String> items) {
         return new SpreadsheetCell<String>(row, column, rowSpan, columnSpan, CellType.LIST) {
 
@@ -162,7 +125,7 @@ public class SpreadsheetCells {
                 }
             }
         };
-    }
+    }*/
 
     /**
      * Creates a cell that hold a Date at the specified position, with 
@@ -171,39 +134,11 @@ public class SpreadsheetCells {
      * @param c column number
      * @param rs rowSpan (1 is normal)
      * @param cs ColumnSpan (1 is normal)
-     * @param _value A {@link LocalDate}
+     * @param value A {@link LocalDate}
      * @return
      */
     public static SpreadsheetCell<LocalDate> createDateCell(final int row, final int column,
-            final int rowSpan, final int columnSpan, final LocalDate _value) {
-        return new SpreadsheetCell<LocalDate>(row, column, rowSpan, columnSpan, CellType.DATE) {
-
-            private static final long serialVersionUID = -1711498694430990374L;
-
-            {
-                this.setItem(_value);
-                this.setConverter(new StringConverter<LocalDate>() {
-                    @Override public String toString(LocalDate item) {
-                        return item.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    }
-                    
-                    @Override public LocalDate fromString(String str) {
-                        // TODO
-                        return null;
-                    }
-                });
-            }
-
-            @Override public void match(SpreadsheetCell<?> cell) {
-                try {
-                    LocalDate temp = LocalDate.parse(
-                            cell.getText()
-                                    .subSequence(0, cell.getText().length()),
-                            DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    setItem(temp);
-                } catch (Exception e) {
-                }
-            }
-        };
+            final int rowSpan, final int columnSpan, final LocalDate value) {
+        return SpreadsheetCellType.DATE.createCell(row, column, rowSpan, columnSpan, value);
     }
 }

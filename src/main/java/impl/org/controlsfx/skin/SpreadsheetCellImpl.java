@@ -26,12 +26,9 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.util.Map;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
@@ -47,9 +44,8 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellEditors;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
 import com.sun.javafx.scene.control.skin.TableCellSkin;
 
@@ -77,7 +73,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
     
-    private static SpreadsheetCellImpl<?> lastHover = null;
+   // private static SpreadsheetCellImpl<?> lastHover = null;
     
     
     /***************************************************************************
@@ -86,7 +82,6 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
      *                                                                         *
      **************************************************************************/
     public SpreadsheetCellImpl() {
-
     	hoverProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
@@ -182,39 +177,15 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
      */
     @SuppressWarnings("unchecked")
     private SpreadsheetCellEditorImpl<T> getEditor(final SpreadsheetCell<T> cell, final SpreadsheetView spv) {
-    	SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) SpreadsheetViewSkin.getSkin().getEditors(cell.getCellType());
+    	SpreadsheetCellType cellType = cell.getCellType();
     	SpreadsheetCellEditorImpl<T> editor2 = (SpreadsheetCellEditorImpl<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
-//        SpreadsheetCellEditor<T> editor = (SpreadsheetCellEditor<T>) editors.get(cell.getCellType());
-        if (editor == null) {
-            /*switch (cell.getCellType()) {
-                case STRING:
-                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createTextEditor();
-                    editors.put(cell.getCellType(), editor);
-                    break;
-                case LIST:
-                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createListEditor();
-                    editors.put(cell.getCellType(), editor);
-                    break;
-                case DATE:
-                    editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDateEditor();
-                    editors.put(cell.getCellType(), editor);
-                    break;
-                case DOUBLE:
-                	 editor = (SpreadsheetCellEditor<T>) SpreadsheetCellEditors.createDoubleEditor();
-                     editors.put(cell.getCellType(), editor);
-                     break;
-                default:*/
-                    return null;
-//            }
-        }
-
         if (editor2.isEditing()){
             return null;
         } else {
         	editor2.updateSpreadsheetView(spv);
         	editor2.updateSpreadsheetCell(this);
         	editor2.updateDataCell(cell);
-        	editor2.updateSpreadsheetCellEditor(editor);
+        	editor2.updateSpreadsheetCellEditor(cellType.getEditor());
             return editor2;
         }
     }
@@ -377,9 +348,11 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         } else { // If it's not, then it's the firstkey
             gridCell = row.getGridCell(cell.getColumn());
         }
+        
         if(gridCell != null){
 	        gridCell.setHoverPublic(true);
-	        lastHover = gridCell;
+	        SpreadsheetCellEditorImpl<?> editor = SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
+	        editor.setLastHover(gridCell);
         }
     }
 
@@ -388,7 +361,9 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
      */
     private void unHoverGridCell() {
         //If the top of the spanned cell is visible, then no problem
-        if(lastHover != null){
+        SpreadsheetCellEditorImpl<?> editor = SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
+        SpreadsheetCellImpl<?> lastHover = editor.getLastHover();
+        if(editor.getLastHover() != null){
         	lastHover.setHoverPublic(false);
         }
     }

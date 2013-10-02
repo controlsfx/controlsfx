@@ -25,6 +25,7 @@ public class SpreadsheetCellEditorImpl<T>{
 	private boolean editing = false;
 	private SpreadsheetView spreadsheetView;
 	private SpreadsheetCellEditor<T> spreadsheetCellEditor;
+    private SpreadsheetCellImpl<?> lastHover = null;
 
 	/***************************************************************************
 	 * * Constructor * *
@@ -70,7 +71,15 @@ public class SpreadsheetCellEditorImpl<T>{
 	public void updateSpreadsheetCellEditor(final SpreadsheetCellEditor<T> spreadsheetCellEditor) {
 		this.spreadsheetCellEditor = spreadsheetCellEditor;
 	}
-
+    
+    public SpreadsheetCellImpl<?> getLastHover() {
+    	return lastHover;
+    }
+    
+    public void setLastHover(SpreadsheetCellImpl<?> lastHover) {
+    	this.lastHover = lastHover;
+    }
+    
 	/**
 	 * Whenever you want to stop the edition, you call that method.<br/>
 	 * True means you're trying to commit the value, then {@link #validateEdit()}

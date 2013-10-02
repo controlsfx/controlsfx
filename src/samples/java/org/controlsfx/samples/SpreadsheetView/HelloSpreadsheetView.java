@@ -51,6 +51,7 @@ import javafx.stage.Stage;
 import org.controlsfx.Sample;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetCells;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.samples.Utils;
@@ -225,7 +226,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		final double random = Math.random();
 		if (random < 0.10) {
 			List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
-			cell = SpreadsheetCells.createListCell(row, column, rowSpan, colSpan, stringList);
+			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
 		} else if (random >= 0.10 && random < 0.25) {
 			cell = SpreadsheetCells.createTextCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
 		}else if (random >= 0.25 && random < 0.75) {

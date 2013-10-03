@@ -48,11 +48,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
@@ -233,8 +235,20 @@ public class SpreadsheetView extends Control {
         super();
         verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
+        // anonymous skin
+        setSkin(new Skin<SpreadsheetView>() {
+        	@Override public Node getNode() {
+        		return SpreadsheetView.this.getCellsView();
+        	}
 
-        setSkin(new SpreadsheetSkin(this));
+        	@Override public SpreadsheetView getSkinnable() {
+        		return SpreadsheetView.this;
+        	}
+
+        	@Override public void dispose() {
+        		// no-op
+        	}
+        });
 
         this.cellsView = new GridView(this);
         getChildren().add(cellsView);

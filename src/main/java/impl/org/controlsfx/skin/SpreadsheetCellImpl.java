@@ -133,6 +133,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
         final SpreadsheetView spv = getSpreadsheetView();
+        final SpreadsheetViewSkin sps = spv.getSpreadsheetSkin();
         Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
@@ -146,8 +147,8 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         	 */
         	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
-	        	for (int j = 0; j<SpreadsheetViewSkin.getSkin().getCellsSize();j++ ) {
-	                    if(SpreadsheetViewSkin.getCell(spv, j) == getTableRow()){
+	        	for (int j = 0; j< sps.getCellsSize();j++ ) {
+	                    if(sps.getRow(j) == getTableRow()){
 	                    	flag = true;
 	                    }
 	            }
@@ -178,14 +179,14 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
     @SuppressWarnings("unchecked")
     private SpreadsheetCellEditorImpl<T> getEditor(final SpreadsheetCell<T> cell, final SpreadsheetView spv) {
     	SpreadsheetCellType cellType = cell.getCellType();
-    	SpreadsheetCellEditorImpl<T> editor2 = (SpreadsheetCellEditorImpl<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
+    	SpreadsheetCellEditorImpl<T> editor2 = (SpreadsheetCellEditorImpl<T>) spv.getSpreadsheetSkin().getSpreadsheetCellEditorImpl();
         if (editor2.isEditing()){
             return null;
         } else {
         	editor2.updateSpreadsheetView(spv);
         	editor2.updateSpreadsheetCell(this);
         	editor2.updateDataCell(cell);
-        	editor2.updateSpreadsheetCellEditor(cellType.getEditor());
+        	editor2.updateSpreadsheetCellEditor(cellType.getEditor(spv));
             return editor2;
         }
     }
@@ -334,10 +335,11 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         SpreadsheetCellImpl<?> gridCell;
         
         final SpreadsheetView spv = getSpreadsheetView();
-        final SpreadsheetRowImpl row = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size());
+        final SpreadsheetViewSkin sps = spv.getSpreadsheetSkin();
+        final SpreadsheetRowImpl row = sps.getRow(spv.getFixedRows().size());
         
-        if (SpreadsheetViewSkin.getSkin().getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
-        	final SpreadsheetRowImpl rightRow = SpreadsheetViewSkin.getCell(spv, spv.getFixedRows().size()+cell.getRow() - row.getIndex());
+        if (sps.getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
+        	final SpreadsheetRowImpl rightRow = sps.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex());
             // We want to get the top of the spanned cell, so we need
             // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
             if( rightRow != null) {// Sometime when scrolling fast it's null so..
@@ -351,7 +353,7 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
         
         if(gridCell != null){
 	        gridCell.setHoverPublic(true);
-	        SpreadsheetCellEditorImpl<?> editor = SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
+	        SpreadsheetCellEditorImpl<?> editor = sps.getSpreadsheetCellEditorImpl();
 	        editor.setLastHover(gridCell);
         }
     }
@@ -361,7 +363,9 @@ public class SpreadsheetCellImpl<T> extends TableCell<ObservableList<Spreadsheet
      */
     private void unHoverGridCell() {
         //If the top of the spanned cell is visible, then no problem
-        SpreadsheetCellEditorImpl<?> editor = SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl();
+        final SpreadsheetView spv = getSpreadsheetView();
+        final SpreadsheetViewSkin sps = spv.getSpreadsheetSkin();
+        SpreadsheetCellEditorImpl<?> editor = sps.getSpreadsheetCellEditorImpl();
         SpreadsheetCellImpl<?> lastHover = editor.getLastHover();
         if(editor.getLastHover() != null){
         	lastHover.setHoverPublic(false);

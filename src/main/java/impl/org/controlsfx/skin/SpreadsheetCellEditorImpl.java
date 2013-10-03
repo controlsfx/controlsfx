@@ -145,7 +145,7 @@ public class SpreadsheetCellEditorImpl<T>{
 				endEdit(false);
 			}
 		};
-		SpreadsheetViewSkin.getSkin().getVBar().valueProperty().addListener(editorListener);
+		spreadsheetView.getSpreadsheetSkin().getVBar().valueProperty().addListener(editorListener);
 		//FIXME We need to REALLY find a way to stop edition when anything happen
 		// This is one way but it will need further investigation
 		spreadsheetView.disabledProperty().addListener(editorListener);
@@ -165,7 +165,7 @@ public class SpreadsheetCellEditorImpl<T>{
 		}
 		il = null;
 
-		SpreadsheetViewSkin.getSkin().getVBar().valueProperty().removeListener(editorListener);
+		spreadsheetView.getSpreadsheetSkin().getVBar().valueProperty().removeListener(editorListener);
 		spreadsheetView.disabledProperty().removeListener(editorListener);
 		editorListener = null;
 		this.modelCell = null;
@@ -182,11 +182,11 @@ public class SpreadsheetCellEditorImpl<T>{
 		private boolean isMoved;
 
 		private int getCellCount() {
-			return SpreadsheetViewSkin.getSkin().getCellsSize();
+			return spreadsheetView.getSpreadsheetSkin().getCellsSize();
 		}
 
 		private boolean addCell(SpreadsheetCellImpl<?> cell){
-			SpreadsheetRowImpl temp = SpreadsheetViewSkin.getCell(spreadsheetView, getCellCount()-1-spreadsheetView.getFixedRows().size());
+			SpreadsheetRowImpl temp = spreadsheetView.getSpreadsheetSkin().getRow(getCellCount()-1-spreadsheetView.getFixedRows().size());
 			if(temp != null){
 				temp.addCell(cell);
 				return true;

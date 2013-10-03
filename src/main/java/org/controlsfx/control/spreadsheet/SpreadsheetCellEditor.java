@@ -116,7 +116,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see SpreadsheetCell
  */
 public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
-
+	SpreadsheetView view;
     /***************************************************************************
      * * Constructor * *
      **************************************************************************/
@@ -124,7 +124,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
     /**
      * Construct the SpreadsheetCellEditor.
      */
-    public SpreadsheetCellEditor() {
+    public SpreadsheetCellEditor(SpreadsheetView view) {
+    	this.view = view;
     }
 
     /***************************************************************************
@@ -135,13 +136,13 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      */
     @Override
     public final T getValue() {
-    	SpreadsheetCell<T> cell = (SpreadsheetCell<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell();
+    	SpreadsheetCell<T> cell = (SpreadsheetCell<T>) view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().getModelCell();
         return cell == null ? null : cell.getItem();
     }
     
     @Override
     public final void setValue(T value) {
-        SpreadsheetCell<T> cell = (SpreadsheetCell<T>) SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell();
+        SpreadsheetCell<T> cell = (SpreadsheetCell<T>) view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().getModelCell();
         if (cell != null) {
     	   cell.setItem(value);
         }
@@ -154,7 +155,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      * @return
      */
     public final Object getProperties(String key){
-    	return SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().getModelCell().getProperties().get(key);
+    	return view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().getModelCell().getProperties().get(key);
     }
     
     /**
@@ -166,7 +167,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      * @param b true means commit, false means cancel
      */
     public final void endEdit(boolean b){
-    	SpreadsheetViewSkin.getSkin().getSpreadsheetCellEditorImpl().endEdit(b);
+    	view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().endEdit(b);
     }
 
     
@@ -199,8 +200,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
 	 * {@link TextField} where the user can type different values.
 	 */
-	public static SpreadsheetCellEditor<Object> createObjectEditor() {
-		return new SpreadsheetCellEditor<Object>() {
+	public static SpreadsheetCellEditor<Object> createObjectEditor(SpreadsheetView view) {
+		return new SpreadsheetCellEditor<Object>(view) {
 
 			/***************************************************************************
 			 * * Private Fields * *
@@ -270,8 +271,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
 	 * {@link TextField} where the user can type different values.
 	 */
-	public static SpreadsheetCellEditor<String> createTextEditor() {
-		return new SpreadsheetCellEditor<String>() {
+	public static SpreadsheetCellEditor<String> createTextEditor(SpreadsheetView view) {
+		return new SpreadsheetCellEditor<String>(view) {
 
 			/***************************************************************************
 			 * * Private Fields * *
@@ -344,8 +345,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 	 * <br/>
 	 * Moreover, the {@link TextField} will turn red if the value currently entered if incorrect.
 	 */
-	public static SpreadsheetCellEditor<Double> createDoubleEditor() {
-		return new SpreadsheetCellEditor<Double>() {
+	public static SpreadsheetCellEditor<Double> createDoubleEditor(SpreadsheetView view) {
+		return new SpreadsheetCellEditor<Double>(view) {
 
 			/***************************************************************************
 			 * * Private Fields * *
@@ -436,8 +437,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 	 * {@link ComboBox} where the user can choose a date through a visual calendar.
 	 * The user can also type the date directly in the expected format (DD/MM/YYYY).
 	 */
-	public static SpreadsheetCellEditor<String> createListEditor(final List<String> itemList) {
-		return new SpreadsheetCellEditor<String>() {
+	public static SpreadsheetCellEditor<String> createListEditor(SpreadsheetView view, final List<String> itemList) {
+		return new SpreadsheetCellEditor<String>(view) {
 			/***************************************************************************
 			 * * Private Fields * *
 			 **************************************************************************/
@@ -523,8 +524,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 	 * Specialization of the {@link SpreadsheetCellEditor} Class. It displays a
 	 * {@link DatePicker}.
 	 */
-	public static SpreadsheetCellEditor<LocalDate> createDateEditor() {
-		return new SpreadsheetCellEditor<LocalDate>() {
+	public static SpreadsheetCellEditor<LocalDate> createDateEditor(SpreadsheetView view) {
+		return new SpreadsheetCellEditor<LocalDate>(view) {
 
 			/***************************************************************************
 			 * * Private Fields * *

@@ -63,7 +63,7 @@ public abstract class SpreadsheetCellType<T> {
 	 * Gets this type editor.
 	 * @return the editor instance
 	 */
-	public abstract SpreadsheetCellEditor<T> getEditor();
+	public abstract SpreadsheetCellEditor<T> getEditor(SpreadsheetView view);
 
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
@@ -121,9 +121,9 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		public SpreadsheetCellEditor<Object> getEditor() {
+		public SpreadsheetCellEditor<Object> getEditor(SpreadsheetView view) {
 			if (editor == null) {
-				editor = SpreadsheetCellEditor.createObjectEditor();
+				editor = SpreadsheetCellEditor.createObjectEditor(view);
 			}
 			return editor;
 		}
@@ -166,9 +166,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<String> getEditor() {
+		public SpreadsheetCellEditor<String> getEditor(SpreadsheetView view) {
 			if (editor == null) {
-				editor = SpreadsheetCellEditor.createTextEditor();
+				editor = SpreadsheetCellEditor.createTextEditor(view);
 			}
 			return editor;
 		}
@@ -226,9 +226,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<Double> getEditor() {
+		public SpreadsheetCellEditor<Double> getEditor(SpreadsheetView view) {
 			if (editor == null) {
-				editor = SpreadsheetCellEditor.createDoubleEditor();
+				editor = SpreadsheetCellEditor.createDoubleEditor(view);
 			}
 			return editor;
 		}
@@ -296,9 +296,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<String> getEditor() {
+		public SpreadsheetCellEditor<String> getEditor(SpreadsheetView view) {
 			if (editor == null) {
-				editor = SpreadsheetCellEditor.createListEditor(items);
+				editor = SpreadsheetCellEditor.createListEditor(view, items);
 			}
 			return editor;
 		}
@@ -365,9 +365,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<LocalDate> getEditor() {
+		public SpreadsheetCellEditor<LocalDate> getEditor(SpreadsheetView view) {
 			if (editor == null) {
-				editor = SpreadsheetCellEditor.createDateEditor();
+				editor = SpreadsheetCellEditor.createDateEditor(view);
 			}
 			return editor;
 		}

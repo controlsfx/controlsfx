@@ -238,7 +238,7 @@ public class GridBase implements Grid {
      * @return
      */
     private final boolean containsRow(final SpreadsheetView spv, int index){
-        SpreadsheetViewSkin skin = SpreadsheetViewSkin.getSkin();
+        SpreadsheetViewSkin skin = spv.getSpreadsheetSkin();
         int size = skin.getCellsSize();
         for (int i = 0 ; i < size; ++i) {
             if(skin.getCell(i).getIndex() == index)

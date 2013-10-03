@@ -75,7 +75,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
             SpreadsheetView spreadsheetView) {
         super(tableRow);
         this.spreadsheetView = spreadsheetView;
-        this.tableView = (TableView<ObservableList<SpreadsheetCell<?>>>) spreadsheetView.getSkin().getNode();
+        this.tableView = (TableView<ObservableList<SpreadsheetCell<?>>>) spreadsheetView.getSpreadsheetSkin().getNode();
     }
 
     /**
@@ -173,7 +173,7 @@ public class SpreadsheetRowSkin<T extends ObservableList<SpreadsheetCell<?>>> ex
              * FOR FIXED COLUMNS
              */
             double tableCellX = 0;
-            final double hbarValue = SpreadsheetViewSkin.getSkin().getHBar().getValue();
+            final double hbarValue = spreadsheetView.getSpreadsheetSkin().getHBar().getValue();
             
             //Virtualization of column
             final SpreadsheetCell<?> cellSpan = grid.getRows().get(index).get(column);

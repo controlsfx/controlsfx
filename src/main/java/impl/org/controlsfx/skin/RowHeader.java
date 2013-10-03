@@ -222,7 +222,7 @@ public class RowHeader  extends StackPane {
 				label.setContextMenu(blankContextMenu);
 			}
 
-			VirtualScrollBar hbar = SpreadsheetViewSkin.getSkin().getHBar();
+			VirtualScrollBar hbar = spreadsheetView.getSpreadsheetSkin().getHBar();
 			if(hbar.isVisible()){
 				//Last one blank and on top (z-order) of the others
 				label = getLabel(rowCount++);

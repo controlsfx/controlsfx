@@ -144,6 +144,15 @@ import com.sun.javafx.UnmodifiableArrayList;
 public class SpreadsheetView extends Control {
 
     private final TableView<ObservableList<SpreadsheetCell<?>>> tableView;
+    
+    // hacky, but at least it lets us hide some API
+    public final SpreadsheetViewSkin getSpreadsheetSkin() {
+        return (SpreadsheetViewSkin) (tableView.getSkin());
+    }
+    
+    public final TableView<ObservableList<SpreadsheetCell<?>>> getTableView() {
+    	return tableView;
+    }
 
     /***************************************************************************
      *                                                                         *
@@ -203,6 +212,7 @@ public class SpreadsheetView extends Control {
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
 
     private ArrayList<Boolean> rowFix; // Compute if we can fix the rows or not.
+
     
     /***************************************************************************
      *                                                                         *
@@ -253,7 +263,7 @@ public class SpreadsheetView extends Control {
             }
 
             @Override protected Skin<?> createDefaultSkin() {
-                return new SpreadsheetViewSkin(SpreadsheetView.this, tableView);
+                return new SpreadsheetViewSkin(SpreadsheetView.this);
             }
         };
         getChildren().add(tableView);
@@ -890,7 +900,7 @@ public class SpreadsheetView extends Control {
             case ROW_SPAN_INVISIBLE:
             default:
                 final SpreadsheetCell<?> cellSpan = tableView.getItems().get(row).get(col);
-                if (SpreadsheetViewSkin.getSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
+                if (getSpreadsheetSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= cellSpan.getRow()) {
                     return new TablePosition<>(tableView, cellSpan.getRow(), tableView.getColumns().get(cellSpan.getColumn()));
 
                 } else { // If it's not, then it's the firstkey
@@ -923,7 +933,7 @@ public class SpreadsheetView extends Control {
          */
         private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
-                SpreadsheetViewSkin skin = SpreadsheetViewSkin.getSkin();
+                SpreadsheetViewSkin skin = getSpreadsheetSkin();
                 
                 if (mouseEvent != null && !tableView.contains(mouseEvent.getX(), mouseEvent.getY())) {
                     if(mouseEvent.getSceneX() < tableView.getLayoutX()) {
@@ -1102,7 +1112,7 @@ public class SpreadsheetView extends Control {
         private void updateScroll(TablePosition<ObservableList<SpreadsheetCell<?>>, ?> posFinal) {
             //We try to make visible the rows that may be hidden by Fixed rows
             // We don't want to do any scroll behavior when dragging
-            if(!drag && SpreadsheetViewSkin.getSkin().getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
+            if(!drag && getSpreadsheetSkin().getCellsSize() != 0 && spreadsheetView.getNonFixedRow(0).getIndex()> posFinal.getRow() && !spreadsheetView.getFixedRows().contains(posFinal.getRow())) {
                 tableView.scrollTo(posFinal.getRow());
             }
 
@@ -1304,7 +1314,7 @@ public class SpreadsheetView extends Control {
         }
 		private SpreadsheetViewSkin getSpreadsheetViewSkin(){
 			if(spreadsheetViewSkin == null){
-				spreadsheetViewSkin = SpreadsheetViewSkin.getSkin();
+				spreadsheetViewSkin = getSpreadsheetSkin();
 			}
 			return spreadsheetViewSkin;
 		}

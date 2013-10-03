@@ -58,7 +58,6 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     private final double DEFAULT_CELL_SIZE = 24.0;  // Height of a cell
     private SpreadsheetCellEditorImpl<?> spreadsheetCellEditorImpl;
     
-    static TableView<ObservableList<SpreadsheetCell<?>>> tableView;
     
     protected RowHeader rowHeader;
     private final double rowHeaderWidth = 50;
@@ -69,13 +68,11 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
     protected SpreadsheetView spreadsheetView;
 
 
-    public SpreadsheetViewSkin(final SpreadsheetView spreadsheetView,
-            final TableView<ObservableList<SpreadsheetCell<?>>> tableView) {
-        super(tableView);
+    public SpreadsheetViewSkin(final SpreadsheetView spreadsheetView) {
+        super(spreadsheetView.getTableView());
         this.spreadsheetView = spreadsheetView;
         spreadsheetCellEditorImpl = new SpreadsheetCellEditorImpl<>();
-        SpreadsheetViewSkin.tableView = tableView;
-
+        TableView<ObservableList<SpreadsheetCell<?>>> tableView = spreadsheetView.getTableView();
         tableView.setEditable(true);
 
         // Do nothing basically but give access to the Hover Property.
@@ -381,15 +378,13 @@ public class SpreadsheetViewSkin extends TableViewSkin<ObservableList<Spreadshee
         return getFlow().getVerticalBar();
     }
     
-    
-    
     // hacky, but at least it lets us hide some API
-    public static final SpreadsheetViewSkin getSkin() {
-        return (SpreadsheetViewSkin) (tableView.getSkin());
-    }
+    //public static final SpreadsheetViewSkin getSkin() {
+      //  return (SpreadsheetViewSkin) (tableView.getSkin());
+    //}
     
-    public static SpreadsheetRowImpl getCell(SpreadsheetView spv, int index) {
-        return getSkin().getCell(index);
+    public SpreadsheetRowImpl getRow(int index) {
+        return spreadsheetView.getSpreadsheetSkin().getCell(index);
     }
     
     /**

@@ -5,6 +5,7 @@ import javafx.beans.Observable;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class GridCellEditor {
@@ -90,7 +91,7 @@ public class GridCellEditor {
 	 */
 	public void endEdit(boolean b){
 		if(b){
-			Object value = spreadsheetCellEditor.validateEdit();
+			Object value = modelCell.getCellType().convertValue(spreadsheetCellEditor.getControlValue());
 			if(value != null && viewCell != null){
 				modelCell.setItem(value);
 				viewCell.commitEdit(modelCell);
@@ -151,7 +152,8 @@ public class GridCellEditor {
 		spreadsheetView.disabledProperty().addListener(editorListener);
 
 		//Then we call the user editor in order for it to be ready
-		spreadsheetCellEditor.startEdit();
+		Object value = modelCell.getItem();
+		spreadsheetCellEditor.startEdit(value);
 
 		viewCell.setGraphic(spreadsheetCellEditor.getEditor());
 	}

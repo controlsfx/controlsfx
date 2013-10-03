@@ -28,9 +28,6 @@ package org.controlsfx.control.spreadsheet;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -39,9 +36,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.util.StringConverter;
-import javafx.util.converter.DefaultStringConverter;
-import javafx.util.converter.DoubleStringConverter;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br/>
@@ -182,7 +176,6 @@ public class SpreadsheetCell implements Serializable {
 	 * @param columnSpan
 	 * @param type
 	 */
-	@SuppressWarnings("unchecked")
 	public SpreadsheetCell(final int row, final int column, final int rowSpan,
 			final int columnSpan, final SpreadsheetCellType<?> type) {
 		this.row = row;
@@ -418,6 +411,6 @@ public class SpreadsheetCell implements Serializable {
 	 **************************************************************************/
 
 	private void updateText() {
-		this.text = type.getConverter().toString(getItem());
+		this.text = type.toString(getItem());
 	}
 }

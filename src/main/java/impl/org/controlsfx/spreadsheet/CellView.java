@@ -171,7 +171,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @param bc The SpreadsheetCell
      * @return
      */
-    @SuppressWarnings("unchecked")
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
     	SpreadsheetCellType<?> cellType = cell.getCellType();
     	GridCellEditor editor = spv.getCellsViewSkin().getSpreadsheetCellEditorImpl();

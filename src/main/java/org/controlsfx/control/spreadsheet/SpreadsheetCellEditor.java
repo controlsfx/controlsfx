@@ -29,20 +29,18 @@ package org.controlsfx.control.spreadsheet;
 import java.time.LocalDate;
 import java.util.List;
 
-import impl.org.controlsfx.spreadsheet.GridViewSkin;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.controlsfx.property.editor.PropertyEditor;
 
 /**
  * 
@@ -75,14 +73,14 @@ import org.controlsfx.property.editor.PropertyEditor;
  * 
  * <br/>
  * <h3>Creating your editor: </h3>
- * You can of course create your own {@link SpreadsheetCellEditor} if you want to control more closely 
- * what is happening or simply for displaying other controls.<br/>
+ * You can of course create your own {@link SpreadsheetCellEditor} for displaying other controls.<br/>
  * 
  * You just have to override the three abstract methods. <b>Remember</b> that you will never call those
  * methods directly. They will be called by the {@link SpreadsheetView} when the time comes.
  * <ul>
  *   <li> {@link #startEdit()}: You can instantiate your own control.</li>
- *   <li> {@link #validateEdit()}: You can decide whether the value entered is valid for you.</li>
+ *   <li> {@link #getEditor()}: You will return which control you're using (for display).</li>
+ *   <li> {@link #getControlValue()}: You will return the value inside your editor for validation.</li>
  *   <li> {@link #end()}: When editing is finished, you can properly close your own control.</li>
  * </ul>
  * <br/>
@@ -115,7 +113,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see SpreadsheetView
  * @see SpreadsheetCell
  */
-public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
+public abstract class SpreadsheetCellEditor<T>{
 	SpreadsheetView view;
     /***************************************************************************
      * * Constructor * *
@@ -131,33 +129,6 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
     /***************************************************************************
      * * Public Final Methods * *
      **************************************************************************/
-    /**
-     * Return the {@link SpreadsheetCell#getItem()} associated with the editor.
-     */
-    @Override
-    public final T getValue() {
-    	SpreadsheetCell cell = (SpreadsheetCell) view.getCellsViewSkin().getSpreadsheetCellEditorImpl().getModelCell();
-        return cell == null ? null : (T) cell.getItem();
-    }
-    
-    @Override
-    public final void setValue(T value) {
-        SpreadsheetCell cell = (SpreadsheetCell) view.getCellsViewSkin().getSpreadsheetCellEditorImpl().getModelCell();
-        if (cell != null) {
-    	   cell.setItem(value);
-        }
-    }
-
-    /**
-     * Return the {@link SpreadsheetCell#getProperties()} associated with
-     * the string in parameter.
-     * @param key The key which has a Object associated with in {@link SpreadsheetCell#getProperties()}
-     * @return
-     */
-    public final Object getProperties(String key){
-    	return view.getCellsViewSkin().getSpreadsheetCellEditorImpl().getModelCell().getProperties().get(key);
-    }
-    
     /**
      * Whenever you want to stop the edition, you call that method.<br/>
      * True means you're trying to commit the value, then {@link #validateEdit()}
@@ -178,15 +149,24 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      * This method will be called when edition start.<br/>
      * You will then do all the configuration of your editor.
      */
-    public abstract void startEdit();
+    public abstract void startEdit(Object item);
     
     /**
-     * This method will be called when a commit is happening.<br/>
-     * You will then compute the value of the editor in order to determine
-     * if the current value is valid.
-     * @return null if not valid or the correct value otherwise.
+     * Return the control used for controling the input.
+     * This is called at the beginning in order to display your control
+     * in the cell.
+     * @return
      */
-    public abstract T validateEdit();
+    public abstract Control getEditor();
+   
+    /**
+     * Return the value your editor as a string.
+     * This will be used by the {@link SpreadsheetCellType#convertValue(String)}
+     * in order to compute whether the value is valid regarding
+     * the {@link SpreadsheetCellType} policy.
+     * @return
+     */
+    public abstract String getControlValue();
 	
     /**
      * This method will be called at the end of edition.<br/>
@@ -220,9 +200,8 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 			 * * Public Methods * *
 			 **************************************************************************/
 			@Override
-			public void startEdit() {
-				Object value = getValue();
-				if (value != null) {
+			public void startEdit(Object value) {
+				if (value instanceof String) {
 					tf.setText(value.toString());
 				}
 				tf.setMaxHeight(20);
@@ -241,10 +220,10 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				tf.setOnKeyPressed(null);
 			}
 
-			@Override
+			/*@Override
 			public String validateEdit() {
 				return tf.getText();
-			}
+			}*/
 
 			@Override
 			public TextField getEditor() {
@@ -262,6 +241,12 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 						}
 					}
 				});
+			}
+
+			@Override
+			public String getControlValue() {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		};
 	}
@@ -291,10 +276,10 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 			 * * Public Methods * *
 			 **************************************************************************/
 			@Override
-			public void startEdit() {
-				String value = getValue();
-				if (value != null) {
-					tf.setText(value);
+			public void startEdit(Object value) {
+				
+				if (value instanceof String) {
+					tf.setText((String)value);
 				}
 				tf.setMaxHeight(20);
 				attachEnterEscapeEventHandler();
@@ -312,10 +297,10 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				tf.setOnKeyPressed(null);
 			}
 
-			@Override
+			/*@Override
 			public String validateEdit() {
 				return tf.getText();
-			}
+			}*/
 
 			@Override
 			public TextField getEditor() {
@@ -333,6 +318,11 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 						}
 					}
 				});
+			}
+
+			@Override
+			public String getControlValue() {
+				return tf.getText();
 			}
 		};
 	}
@@ -365,9 +355,9 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 			 * * Public Methods * *
 			 **************************************************************************/
 			@Override
-			public void startEdit() {
-				if (getValue() != null) {
-					tf.setText(getValue().toString());
+			public void startEdit(Object value) {
+				if(value instanceof Double){
+					tf.setText(value.toString());
 				}
 				tf.getStyleClass().removeAll("error");
 				tf.setMaxHeight(20);
@@ -386,7 +376,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				tf.setOnKeyPressed(null);
 			}
 
-			@Override
+			/*@Override
 			public Double validateEdit() {
 				try{
 					Double temp = Double.parseDouble(tf.getText());
@@ -394,7 +384,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				}catch(Exception e){
 					return null;
 				}
-			}
+			}*/
 
 			@Override
 			public TextField getEditor() {
@@ -428,6 +418,11 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 					}
 				});
 			}
+
+			@Override
+			public String getControlValue() {
+				return tf.getText();
+			}
 		};
 	}
 
@@ -459,12 +454,12 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 			 **************************************************************************/
 
 			@Override
-			public void startEdit() {
-				//                super.startEdit();
-				if (getValue() != null) {
+			public void startEdit(Object value) {
+				
+				if (value instanceof String) {
 					ObservableList<String> items = FXCollections.observableList(itemList);
 					cb.setItems(items);
-					cb.setValue(getValue());
+					cb.setValue(value.toString());
 				}
 				attachEnterEscapeEventHandler();
 
@@ -485,13 +480,13 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				cl = null;
 			}
 
-			@Override
+			/*@Override
 			public String validateEdit() {
 				if (cb.getSelectionModel().getSelectedIndex() != -1) {
 					return cb.getSelectionModel().getSelectedItem();
 				}
 				return null;
-			}
+			}*/
 
 			@Override
 			public ComboBox<String> getEditor() {
@@ -515,6 +510,12 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 						}
 					}
 				});
+			}
+
+
+			@Override
+			public String getControlValue() {
+				return cb.getSelectionModel().getSelectedItem();
 			}
 		};
 	}
@@ -545,8 +546,10 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 			 * * Public Methods * *
 			 **************************************************************************/
 			@Override
-			public void startEdit() {
-				datePicker.setValue(getValue());
+			public void startEdit(Object value) {
+				if(value instanceof LocalDate){
+					datePicker.setValue((LocalDate)value);
+				}
 				attachEnterEscapeEventHandler();
 
 				datePicker.getEditor().requestFocus();
@@ -567,11 +570,11 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
 			}
 
-			@Override
+			/*@Override
 			public LocalDate validateEdit() {
 				return datePicker.getValue();
 			}
-
+*/
 			@Override
 			public DatePicker getEditor() {
 				return datePicker;
@@ -588,13 +591,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 					@Override
 					public void handle(KeyEvent t) {
 						if (t.getCode() == KeyCode.ENTER) {
-							final Runnable r = new Runnable() {
-								@Override
-								public void run() {
-									endEdit(true);
-								}
-							};
-							Platform.runLater(r);
+							endEdit(true);
 						} else if (t.getCode() == KeyCode.ESCAPE) {
 							endEdit(false);
 						}
@@ -602,6 +599,11 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
 				};
 
 				datePicker.addEventFilter(KeyEvent.KEY_PRESSED, eh);
+			}
+
+			@Override
+			public String getControlValue() {
+				return datePicker.getEditor().getText();
 			}
 		};
 	}

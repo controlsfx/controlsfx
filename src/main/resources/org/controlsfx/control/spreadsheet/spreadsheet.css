@@ -121,8 +121,8 @@ Label.selected{
 }  
 
 /* FIXED COLUMNS  */
-HorizontalHeader > Label.fixed,
-VerticalHeader > Label.fixed{
+VerticalHeader > Label.fixed,
+Label.fixed{
 	-fx-font-style : italic;
 }
 

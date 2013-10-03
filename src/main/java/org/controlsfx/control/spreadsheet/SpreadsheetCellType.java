@@ -12,6 +12,11 @@ import javafx.util.converter.DoubleStringConverter;
  * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will
  * condition which value the cell can accept, and which
  * {@link SpreadsheetCellEditor} it will use.
+ * <br/>
+ * 
+ * 
+ * 
+ * 
  * 
  * 
  * @see SpreadsheetView
@@ -54,21 +59,13 @@ public abstract class SpreadsheetCellType<T> {
 			final int rowSpan, final int columnSpan, final T value);
 
 	/**
-	 * Gets this type String converter.
-	 * 
-	 * @return the converter instance
-	 */
-	public StringConverter<T> getConverter() {
-		return converter;
-	}
-
-	/**
 	 * Gets this type editor.
 	 * 
 	 * @return the editor instance
 	 */
 	public abstract SpreadsheetCellEditor<T> getEditor(SpreadsheetView view);
 
+	public abstract String toString(T item);
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
 	 * 
@@ -80,6 +77,14 @@ public abstract class SpreadsheetCellType<T> {
 	protected abstract void copy(SpreadsheetCell from, SpreadsheetCell to);
 
 	/**
+     * This method will be called when a commit is happening.<br/>
+     * You will then compute the value of the editor in order to determine
+     * if the current value is valid.
+     * @return null if not valid or the correct value otherwise.
+     */
+    public abstract T convertValue(String value);
+	
+    /**
 	 * The Object type instance.
 	 */
 	public static final SpreadsheetCellType<Object> OBJECT = new ObjectType();
@@ -132,6 +137,17 @@ public abstract class SpreadsheetCellType<T> {
 			}
 			return editor;
 		}
+
+		@Override
+		public Object convertValue(String value) {
+			return converter.fromString(value);
+		}
+
+		@Override
+		public String toString(Object item) {
+			return converter.toString(item);
+		}
+
 	};
 
 	/**
@@ -178,6 +194,17 @@ public abstract class SpreadsheetCellType<T> {
 			}
 			return editor;
 		}
+
+		@Override
+		public String convertValue(String value) {
+			return value;
+		}
+
+		@Override
+		public String toString(String item) {
+			return converter.toString(item);
+		}
+
 	};
 
 	/**
@@ -249,6 +276,20 @@ public abstract class SpreadsheetCellType<T> {
 			}
 		}
 
+		@Override
+		public Double convertValue(String value) {
+			try {
+				return converter.fromString(value);
+			} catch (Exception e) {
+				return null;
+			}
+		}
+
+		@Override
+		public String toString(Double item) {
+			return converter.toString(item);
+		}
+
 	};
 
 	public static final SpreadsheetCellType<String> LIST(
@@ -317,6 +358,17 @@ public abstract class SpreadsheetCellType<T> {
 				to.setItem(value);
 			}
 		}
+
+		@Override
+		public String convertValue(String value) {
+			return converter.fromString(value);
+		}
+
+		@Override
+		public String toString(String item) {
+			return converter.toString(item);
+		}
+
 	}
 
 	/**
@@ -390,6 +442,22 @@ public abstract class SpreadsheetCellType<T> {
 
 			}
 		}
+
+		@Override
+		public LocalDate convertValue(String value) {
+			try {
+				LocalDate temp = converter.fromString(value);
+				return temp;
+			} catch (Exception e) {
+				return null;
+			}
+		}
+
+		@Override
+		public String toString(LocalDate item) {
+			return converter.toString(item);
+		}
+
 	}
 
 }

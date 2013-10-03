@@ -45,7 +45,10 @@ import java.lang.annotation.RetentionPolicy;
       }
  * }</pre>
  * The annotation is designed to recognize 2 types of methods: methods with no parameters and 
- * methods with one parameter of type {@link ActionEvent}
+ * methods with one parameter of type {@link ActionEvent}. 
+ * Annotation's graphic property supports different node types: images and font glyphs. For more information see 
+ * {@link ActionProxy#graphic()}.
+ * 
  * </li>
  * <li>
  * Register your class in the global {@link ActionMap}, preferably in the class constructor  
@@ -77,7 +80,9 @@ public @interface ActionProxy {
     
     /**
      * The graphic that should be set in {@link Action#graphicProperty()}.
-     * Graphic can be either image path, image url or font glyph. The follwing are the example of different graphic nodes:
+     * The graphic can be either image (local path or url) or font glyph. Protocol prefix is used to designate the type. 
+     * Currently supported prefixes are 'image>' and 'font>'. Default protocol is `image>` - it is assumed if protocol prefix is not found. 
+     * The following are the examples of different graphic nodes:
 	 * <pre>
 	 * {@code
 	 * @ActionProxy(text="Teacher", graphic="http://icons.iconarchive.com/icons/custom-icon-design/mini-3/16/teacher-male-icon.png")

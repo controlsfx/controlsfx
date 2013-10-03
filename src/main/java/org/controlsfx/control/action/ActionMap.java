@@ -35,17 +35,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.controlsfx.glyphfont.GlyphFontRegistry;
-
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 
+import org.controlsfx.glyphfont.GlyphFontRegistry;
+
 /**
  * Action Map provides an ability to create an action map of any object.
  * Attempts to convert methods annotated with {@link ActionProxy} to {@link Action}. 
+ * 
+ * <h3>Code Example</h3>
+ * Here's a very simple example of how to use ActionMap to register a class (in
+ * this class it is the application class itself), and to then retrieve actions
+ * out of the ActionMap (via the static {@link ActionMap#action(String)} method:
+ * <br/>
+ * 
+ * <pre>
+ * public class ActionMapDemo extends Application {
+ *     public ActionMapDemo() {
+ *         ActionMap.register(this);
+ *         Action action11 = ActionMap.action("action11");
+ *         Button actionButton = ActionUtils.createButton(action11);
+ *     }
+ *  
+ *     &#64;ActionProxy(text="Action 1.1", graphic="start.png", accelerator="ctrl+shift+T")
+ *     private void action11() {
+ *         System.out.println( "Action 1.1 is executed");
+ *     }
+ * }
+ * </pre>
+ * 
+ * @see ActionProxy
+ * @see Action
  */
 public class ActionMap {
 

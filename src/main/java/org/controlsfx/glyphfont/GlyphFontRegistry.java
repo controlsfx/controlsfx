@@ -34,20 +34,23 @@ import java.util.ServiceLoader;
 import javafx.scene.Node;
 
 /**
- * Glyph Font Registry. 
- * Automatically registers available fonts using {@link ServiceLoader} facility.   
- * Glyph font can also be registered manually using 'register' method.
- * <br/>
- * From than on fonts and their glyphs can be requested by name.
- * <br/>
- * From the registry glyph nodes can be easily accessed by using 'glyph` method:
+ * The glyph font registry automatically registers available fonts using a 
+ * {@link ServiceLoader} facility, however it is also possible to register 
+ * glyph fonts manually using the provided 
+ * {@link GlyphFontRegistry#register(GlyphFont)} method. 
+ * 
+ * <p>Once registered fonts and their glyphs can be requested by name using the
+ * {@link GlyphFontRegistry#glyph(String)} and
+ * {@link GlyphFontRegistry#glyph(String, String)} methods. For example:
+ * 
  * <pre>{@code
  * import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph; 
  * new Button("", glyph("FontAwesome|TRASH")) 
  * }</pre>
- * <br/> 
- * An ability to retrieve glyph node by combination of font name and glyph name extends to the {@link ActionProxy}'s graphic attribute, 
- * where "font>" prefix should be used. For more information see {@link ActionProxy}  
+ * 
+ * <p>An ability to retrieve glyph node by combination of font name and glyph name 
+ * extends to the {@link ActionProxy} graphic attribute, where the "font>" 
+ * prefix should be used. For more information see {@link ActionProxy}.  
  */
 public final class GlyphFontRegistry {
 	

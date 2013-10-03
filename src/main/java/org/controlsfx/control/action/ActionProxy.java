@@ -33,11 +33,30 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * Annotation to allow conversion of class methods to {@link Action}.
- * 
- * @param id action id
- * @param text action text, required
- * @param image action image 
- * @param longText action long text
+ * <br/><br/>
+ * The following steps are required to use {@link ActionProxy} annotations:<br/>
+ * <ol>
+ * <li>
+ * Annotate your methods with {@link ActionProxy} annotation such as
+ * <pre>
+ * {@code  @ActionProxy(text="Action 1.1", graphic=imagePath, accelerator="ctrl+shift+T")
+       private void action11() {
+    	 System.out.println( "Action 1.1 is executed");
+      }
+ * }</pre>
+ * The annotation is designed to recognize 2 types of methods: methods with no parameters and 
+ * methods with one parameter of type {@link ActionEvent}
+ * </li>
+ * <li>
+ * Register your class in the global {@link ActionMap}, preferably in the class constructor  
+ * <pre>
+ * {@code
+ * ActionMap.register(this);
+ * }</pre> 
+ * Immediately after that actions are be created according to provided annotations and are accessible from {@link ActionMap},
+ * which provides several convenience methods to access actions by id. 
+ * </li>
+ * </ol> 
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

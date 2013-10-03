@@ -31,13 +31,49 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
+import javafx.event.ActionEvent;
+
 /**
- * Annotation to allow conversion of class methods to {@link Action}.
+ * An annotation to allow conversion of class methods to {@link Action} instances.
  * 
- * @param id action id
- * @param text action text, required
- * @param image action image 
- * @param longText action long text
+ * <p>The following steps are required to use {@link ActionProxy} annotations:
+ * 
+ * <ol>
+ * <li>Annotate your methods with the {@link ActionProxy} annotation. For example:
+ * <pre>{@code @ActionProxy(text="Action 1.1", graphic=imagePath, accelerator="ctrl+shift+T")
+ * private void action11() {
+ *     System.out.println("Action 1.1 is executed");
+ * }}</pre>
+ * 
+ * <p>The ActionProxy annotation is designed to work with two types of methods: 
+ * <ol>
+ *     <li>Methods with no parameters, 
+ *     <li>Methods with one parameter of type {@link ActionEvent}.
+ * </ol> 
+ * 
+ * <p>The ActionProxy annotation {@link #graphic()} property supports different node types:
+ * <ol>
+ *     <li>Images,
+ *     <li>Glyph fonts.
+ * </ol>
+ * 
+ * <p>The ability for ActionProxy to support glyph fonts is part of the ControlsFX
+ * {@link org.controlsfx.glyphFont} API. For more information on how to specify
+ * images and glyph fonts, refer to the {@link ActionProxy#graphic()} method.
+ * <br/><br/></li>
+ * 
+ * <li>Register your class in the global {@link ActionMap}, preferably in the 
+ * class constructor:  
+ * <pre>{@code ActionMap.register(this); }</pre> 
+ * 
+ * Immediately after that actions will be created according to the provided 
+ * annotations and are accessible from {@link ActionMap}, which provides several 
+ * convenience methods to access actions by id. Refer to the {@link ActionMap}
+ * class for more details on how to use it.</li>
+ * </ol>
+ * 
+ * @see Action
+ * @see ActionMap
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -58,7 +94,23 @@ public @interface ActionProxy {
     
     /**
      * The graphic that should be set in {@link Action#graphicProperty()}.
-     */
+     * 
+     * <p>The graphic can be either image (local path or url) or font glyph. 
+     * 
+     * <p>Because a graphic can come from multiple sources, a simple protocol 
+     * prefix is used to designate the type. Currently supported prefixes are 
+     * '<code>image></code>' and '<code>font></code>'. Default protocol is 
+     * '<code>image></code>'. 
+     * 
+     * <p>The following are the examples of different graphic nodes:
+	 * <pre>
+	 * &#64;ActionProxy(text="Teacher", graphic="http://icons.iconarchive.com/icons/custom-icon-design/mini-3/16/teacher-male-icon.png")
+	 * &#64;ActionProxy(text="Security", graphic="/org/controlsfx/samples/security-low.png")
+	 * &#64;ActionProxy(text="Security", graphic="image>/org/controlsfx/samples/security-low.png")
+	 * &#64;ActionProxy(text="Star", graphic="font>FontAwesome|STAR")
+	 * </pre>     
+	 * 
+	 */
     String graphic() default "";
     
     /**

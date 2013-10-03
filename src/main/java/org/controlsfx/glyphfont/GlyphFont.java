@@ -35,9 +35,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 /**
- *  Represents glyph font, which can be loaded locally or from specified URL.
- *  {@link Glyph}s can be created easily using specified character 
- *
+ *  Represents glyph font, which can be loaded locally or from specified URL.<br/>
+ *  {@link Glyph}s can be created easily using specified character.  
+ *  To simplify glyph customization, methods can be chained: 
+ *  <pre>{@code
+ *    Glyph glyph = fontAwesome.fontSize(28).fontColor(Color.RED).create('\uf013'); //GEAR
+ *  }</pre>
  */
 public abstract class GlyphFont {
     

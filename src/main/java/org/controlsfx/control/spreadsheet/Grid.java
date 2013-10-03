@@ -85,7 +85,7 @@ public interface Grid {
      * Returns an ObservableList of ObservableList of {@link SpreadsheetCell}
      * instances. Refer to the {@link Grid} class javadoc for more detail.
      */
-    public ObservableList<ObservableList<SpreadsheetCell<?>>> getRows();
+    public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
     /**
      * Return the {@link SpanType} for a given cell row/column intersection.

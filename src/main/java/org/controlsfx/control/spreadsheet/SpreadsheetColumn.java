@@ -71,7 +71,7 @@ public class SpreadsheetColumn<T> {
      *                                                                         *
      **************************************************************************/
 	private SpreadsheetView spreadsheetView;
-	private TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column;
+	private TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
 	private boolean canFix;
 	private Integer indexColumn;
 	private CheckMenuItem fixItem;
@@ -95,7 +95,7 @@ public class SpreadsheetColumn<T> {
 	 * @param spreadsheetView
 	 * @param indexColumn
 	 */
-	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
+	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
 		column.setMinWidth(30); 
@@ -114,8 +114,8 @@ public class SpreadsheetColumn<T> {
         Platform.runLater(r);
 		
 		//FIXME implement better listening after
-		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell<?>>>(){
-			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell<?>>> arg0) {
+		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell>>(){
+			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell>> arg0) {
 				initCanFix();
 			}
 		});
@@ -224,7 +224,7 @@ public class SpreadsheetColumn<T> {
 	 * @return
 	 */
 	private boolean initCanFix(){
-		for (ObservableList<SpreadsheetCell<?>> row : spreadsheetView.getGrid().getRows()) {
+		for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
 			int columnSpan = row.get(indexColumn).getColumnSpan();
 			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
 				return false;

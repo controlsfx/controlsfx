@@ -29,7 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import java.time.LocalDate;
 import java.util.List;
 
-import impl.org.controlsfx.skin.SpreadsheetViewSkin;
+import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -136,13 +136,13 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      */
     @Override
     public final T getValue() {
-    	SpreadsheetCell<T> cell = (SpreadsheetCell<T>) view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().getModelCell();
-        return cell == null ? null : cell.getItem();
+    	SpreadsheetCell cell = (SpreadsheetCell) view.getCellsViewSkin().getSpreadsheetCellEditorImpl().getModelCell();
+        return cell == null ? null : (T) cell.getItem();
     }
     
     @Override
     public final void setValue(T value) {
-        SpreadsheetCell<T> cell = (SpreadsheetCell<T>) view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().getModelCell();
+        SpreadsheetCell cell = (SpreadsheetCell) view.getCellsViewSkin().getSpreadsheetCellEditorImpl().getModelCell();
         if (cell != null) {
     	   cell.setItem(value);
         }
@@ -155,7 +155,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      * @return
      */
     public final Object getProperties(String key){
-    	return view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().getModelCell().getProperties().get(key);
+    	return view.getCellsViewSkin().getSpreadsheetCellEditorImpl().getModelCell().getProperties().get(key);
     }
     
     /**
@@ -167,7 +167,7 @@ public abstract class SpreadsheetCellEditor<T> implements PropertyEditor<T>  {
      * @param b true means commit, false means cancel
      */
     public final void endEdit(boolean b){
-    	view.getSpreadsheetSkin().getSpreadsheetCellEditorImpl().endEdit(b);
+    	view.getCellsViewSkin().getSpreadsheetCellEditorImpl().endEdit(b);
     }
 
     

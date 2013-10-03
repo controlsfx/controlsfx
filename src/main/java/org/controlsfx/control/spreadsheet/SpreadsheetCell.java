@@ -120,7 +120,7 @@ import javafx.util.converter.DoubleStringConverter;
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
  */
-public class SpreadsheetCell<T> implements Serializable {
+public class SpreadsheetCell implements Serializable {
 
 	/***************************************************************************
 	 * 
@@ -135,7 +135,7 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * 
 	 **************************************************************************/
 
-	private transient final SpreadsheetCellType<T> type;
+	private transient final SpreadsheetCellType type;
 	private final int row;
 	private final int column;
 	private transient int rowSpan;
@@ -189,7 +189,7 @@ public class SpreadsheetCell<T> implements Serializable {
 		this.column = column;
 		this.rowSpan = rowSpan;
 		this.columnSpan = columnSpan;
-		this.type = (SpreadsheetCellType<T>) type;
+		this.type = (SpreadsheetCellType) type;
 		text = "";
 		editable = new SimpleBooleanProperty(true);
 	}
@@ -207,7 +207,7 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * 
 	 * @param cell
 	 */
-	public void match(SpreadsheetCell<?> cell) {
+	public void match(SpreadsheetCell cell) {
 		type.copy(cell, this);
 	}
 
@@ -218,7 +218,7 @@ public class SpreadsheetCell<T> implements Serializable {
 	 ***************************************************************************/
 
 	// --- item
-	private transient ObjectProperty<T> item = new SimpleObjectProperty<T>(
+	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(
 			this, "item") {
 		@Override
 		protected void invalidated() {
@@ -226,15 +226,15 @@ public class SpreadsheetCell<T> implements Serializable {
 		}
 	};
 
-	public final void setItem(T value) {
+	public final void setItem(Object value) {
 		item.set(value);
 	}
 
-	public final T getItem() {
+	public final Object getItem() {
 		return item.get();
 	}
 
-	public final ObjectProperty<T> itemProperty() {
+	public final ObjectProperty<Object> itemProperty() {
 		return item;
 	}
 
@@ -402,7 +402,7 @@ public class SpreadsheetCell<T> implements Serializable {
 		if (!(obj instanceof SpreadsheetCell))
 			return false;
 
-		final SpreadsheetCell<?> cell = (SpreadsheetCell<?>) obj;
+		final SpreadsheetCell cell = (SpreadsheetCell) obj;
 		if (cell != null && cell.getRow() == row && cell.getColumn() == column
 				&& cell.getText().equals(text)) {
 			return true;

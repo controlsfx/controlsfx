@@ -9,7 +9,8 @@ import javafx.util.converter.DefaultStringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
 /**
- * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will condition which value the cell can accept, and which
+ * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will
+ * condition which value the cell can accept, and which
  * {@link SpreadsheetCellEditor} it will use.
  * 
  * 
@@ -23,7 +24,9 @@ public abstract class SpreadsheetCellType<T> {
 
 	/**
 	 * Default constructor.
-	 * @param converter the converter to use
+	 * 
+	 * @param converter
+	 *            the converter to use
 	 */
 	public SpreadsheetCellType(StringConverter<T> converter) {
 		this.converter = converter;
@@ -47,12 +50,12 @@ public abstract class SpreadsheetCellType<T> {
 	 *            the <T> to display
 	 * @return
 	 */
-	public abstract SpreadsheetCell<T> createCell(final int row,
-			final int column, final int rowSpan, final int columnSpan,
-			final T value);
+	public abstract SpreadsheetCell createCell(final int row, final int column,
+			final int rowSpan, final int columnSpan, final T value);
 
 	/**
 	 * Gets this type String converter.
+	 * 
 	 * @return the converter instance
 	 */
 	public StringConverter<T> getConverter() {
@@ -61,17 +64,20 @@ public abstract class SpreadsheetCellType<T> {
 
 	/**
 	 * Gets this type editor.
+	 * 
 	 * @return the editor instance
 	 */
 	public abstract SpreadsheetCellEditor<T> getEditor(SpreadsheetView view);
 
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
-	 * @param from the source cell
-	 * @param to the destination cell
+	 * 
+	 * @param from
+	 *            the source cell
+	 * @param to
+	 *            the destination cell
 	 */
-	protected abstract void copy(SpreadsheetCell<?> from, SpreadsheetCell<T> to);
-	
+	protected abstract void copy(SpreadsheetCell from, SpreadsheetCell to);
 
 	/**
 	 * The Object type instance.
@@ -85,8 +91,7 @@ public abstract class SpreadsheetCellType<T> {
 		protected transient SpreadsheetCellEditor<Object> editor = null;
 
 		public ObjectType() {
-			this(
-			new StringConverter<Object>() {
+			this(new StringConverter<Object>() {
 				@Override
 				public Object fromString(String arg0) {
 					return arg0;
@@ -98,8 +103,9 @@ public abstract class SpreadsheetCellType<T> {
 				}
 			});
 		}
+
 		public ObjectType(StringConverter<Object> converter) {
-			super(converter); 
+			super(converter);
 		}
 
 		@Override
@@ -107,16 +113,15 @@ public abstract class SpreadsheetCellType<T> {
 			return "object";
 		}
 
-		protected void copy(SpreadsheetCell<?> from, SpreadsheetCell<Object> to) {
+		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
 			to.setItem(from.getText());
 		}
 
 		@Override
-		public SpreadsheetCell<Object> createCell(final int row,
-				final int column, final int rowSpan, final int columnSpan,
-				final Object value) {
-			SpreadsheetCell<Object> cell = new SpreadsheetCell<Object>(row,
-					column, rowSpan, columnSpan, this);
+		public SpreadsheetCell createCell(final int row, final int column,
+				final int rowSpan, final int columnSpan, final Object value) {
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
+					columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -128,11 +133,12 @@ public abstract class SpreadsheetCellType<T> {
 			return editor;
 		}
 	};
-	
+
 	/**
 	 * The String type instance.
 	 */
 	public static final SpreadsheetCellType<String> STRING = new StringType();
+
 	/**
 	 * The String type base class.
 	 */
@@ -142,6 +148,7 @@ public abstract class SpreadsheetCellType<T> {
 		public StringType() {
 			this(new DefaultStringConverter());
 		}
+
 		public StringType(StringConverter<String> converter) {
 			super(converter);
 		}
@@ -151,16 +158,15 @@ public abstract class SpreadsheetCellType<T> {
 			return "string";
 		}
 
-		protected void copy(SpreadsheetCell<?> from, SpreadsheetCell<String> to) {
+		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
 			to.setItem((String) from.getText());
 		}
 
 		@Override
-		public SpreadsheetCell<String> createCell(final int row,
-				final int column, final int rowSpan, final int columnSpan,
-				final String value) {
-			SpreadsheetCell<String> cell = new SpreadsheetCell<String>(row,
-					column, rowSpan, columnSpan, this);
+		public SpreadsheetCell createCell(final int row, final int column,
+				final int rowSpan, final int columnSpan, final String value) {
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
+					columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -173,11 +179,12 @@ public abstract class SpreadsheetCellType<T> {
 			return editor;
 		}
 	};
-	
+
 	/**
 	 * The Double type instance.
 	 */
 	public static final SpreadsheetCellType<Double> DOUBLE = new DoubleType();
+
 	/**
 	 * The Double type base class.
 	 */
@@ -216,11 +223,10 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCell<Double> createCell(final int row,
-				final int column, final int rowSpan, final int columnSpan,
-				final Double value) {
-			SpreadsheetCell<Double> cell = new SpreadsheetCell<Double>(row,
-					column, rowSpan, columnSpan, this);
+		public SpreadsheetCell createCell(final int row, final int column,
+				final int rowSpan, final int columnSpan, final Double value) {
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
+					columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -234,7 +240,7 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		protected void copy(SpreadsheetCell<?> from, SpreadsheetCell<Double> to) {
+		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
 			try {
 				Double temp = converter.fromString(from.getText());
 				to.setItem(temp);
@@ -244,15 +250,17 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 	};
-	
-	
-	public static final SpreadsheetCellType<String> LIST(final List<String> items) {
+
+	public static final SpreadsheetCellType<String> LIST(
+			final List<String> items) {
 		return new ListType(items);
 	}
-	
+
 	/**
 	 * Creates a list type from a list of string values.
-	 * @param items the list of acceptable values
+	 * 
+	 * @param items
+	 *            the list of acceptable values
 	 * @return the cell type instance
 	 */
 	public static class ListType extends SpreadsheetCellType<String> {
@@ -280,11 +288,10 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCell<String> createCell(final int row,
-				final int column, final int rowSpan, final int columnSpan,
-				String item) {
-			SpreadsheetCell<String> cell = new SpreadsheetCell<String>(row,
-					column, rowSpan, columnSpan, this);
+		public SpreadsheetCell createCell(final int row, final int column,
+				final int rowSpan, final int columnSpan, String item) {
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
+					columnSpan, this);
 			if (items != null && items.size() > 0) {
 				if (item != null && items.contains(item)) {
 					cell.setItem(item);
@@ -304,18 +311,19 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		protected void copy(SpreadsheetCell<?> from, SpreadsheetCell<String> to) {
+		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
 			String value = from.getText();
 			if (items.contains(value)) {
 				to.setItem(value);
 			}
 		}
 	}
-	
+
 	/**
 	 * The Date type instance.
 	 */
 	public static final SpreadsheetCellType<LocalDate> DATE = new DateType();
+
 	/**
 	 * The Date type base class.
 	 */
@@ -327,7 +335,7 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		public DateType(final String format) {
-			this( new StringConverter<LocalDate>() {
+			this(new StringConverter<LocalDate>() {
 				@Override
 				public String toString(LocalDate item) {
 					return item.format(DateTimeFormatter.ofPattern(format));
@@ -342,7 +350,7 @@ public abstract class SpreadsheetCellType<T> {
 						return null;
 					}
 				}
-			} );
+			});
 		}
 
 		public DateType(StringConverter<LocalDate> converter) {
@@ -355,11 +363,10 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCell<LocalDate> createCell(final int row,
-				final int column, final int rowSpan, final int columnSpan,
-				final LocalDate value) {
-			SpreadsheetCell<LocalDate> cell = new SpreadsheetCell<LocalDate>(
-					row, column, rowSpan, columnSpan, this);
+		public SpreadsheetCell createCell(final int row, final int column,
+				final int rowSpan, final int columnSpan, final LocalDate value) {
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
+					columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -373,8 +380,7 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		protected void copy(SpreadsheetCell<?> from,
-				SpreadsheetCell<LocalDate> to) {
+		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
 			try {
 				LocalDate temp = converter.fromString(from.getText());
 				if (temp != null) {

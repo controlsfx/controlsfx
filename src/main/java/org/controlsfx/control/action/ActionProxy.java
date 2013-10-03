@@ -77,7 +77,17 @@ public @interface ActionProxy {
     
     /**
      * The graphic that should be set in {@link Action#graphicProperty()}.
-     */
+     * Graphic can be either image path, image url or font glyph. The follwing are the example of different graphic nodes:
+	 * <pre>
+	 * {@code
+	 * @ActionProxy(text="Teacher", graphic="http://icons.iconarchive.com/icons/custom-icon-design/mini-3/16/teacher-male-icon.png")
+	 * @ActionProxy(text="Security", graphic="/org/controlsfx/samples/security-low.png")
+	 * @ActionProxy(text="Security", graphic="image>/org/controlsfx/samples/security-low.png")
+	 * @ActionProxy(text="Star", graphic="font>FontAwesome|STAR")
+	 * }
+	 * </pre>     
+	 * 
+	 * */
     String graphic() default "";
     
     /**

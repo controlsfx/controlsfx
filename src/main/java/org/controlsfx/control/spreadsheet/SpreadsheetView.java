@@ -200,7 +200,7 @@ public class SpreadsheetView extends Control {
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
-
+    private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
     
     /**
      * @return the inner table view skin
@@ -277,15 +277,23 @@ public class SpreadsheetView extends Control {
         };
         Platform.runLater(r);
         
-        //Handle copy Paste action, quite naive right now..
+        //Handle keyBoard action, maybe use accelerator
         this.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent arg0) {
-			if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
-				copyClipBoard();
-			else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
-				pasteClipboard();
-			}	
+				if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
+					copyClipBoard();
+				else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
+					pasteClipboard();
+				//We want to edit if the user is on a cell and typing
+				else if(!arg0.isShortcutDown() 
+						&& !arg0.isAltDown()
+						&& !arg0.isMetaDown()
+						&& arg0.getCode().compareTo(KeyCode.ESCAPE) != 0){
+					TablePosition<ObservableList<SpreadsheetCell>, ?> position = cellsView.getFocusModel().getFocusedCell();
+					cellsView.edit(position.getRow(), position.getTableColumn());
+				}
+			}
 		});
         initRowFix(grid);
 
@@ -443,6 +451,14 @@ public class SpreadsheetView extends Control {
     	}
 		return cellEditor;
 	}
+    
+    /**
+     * Return a list of {@link SpreadsheetCell} that has been modified.
+     * @return a list of {@link SpreadsheetCell} that has been modified.
+     */
+    public ObservableList<SpreadsheetCell> getModifiedCells(){
+    	return modifiedCells;
+    }
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *

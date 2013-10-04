@@ -98,7 +98,7 @@ public class GridCellEditor {
 				end();
 				spreadsheetCellEditor.end();
 			}
-		}else{
+		}else if(viewCell != null){
 			viewCell.cancelEdit();
 			end();
 			spreadsheetCellEditor.end();

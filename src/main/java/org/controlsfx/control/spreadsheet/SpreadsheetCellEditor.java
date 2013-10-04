@@ -356,7 +356,7 @@ public abstract class SpreadsheetCellEditor<T>{
 			@Override
 			public void startEdit(Object value) {
 				if(value instanceof Double){
-					tf.setText(value.toString());
+					tf.setText(((Double) value).isNaN()?"":value.toString());
 				}
 				tf.getStyleClass().removeAll("error");
 				tf.setMaxHeight(20);

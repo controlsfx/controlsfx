@@ -137,7 +137,6 @@ public abstract class SpreadsheetCellType<T> {
 	 * The Object type base class.
 	 */
 	public static class ObjectType extends SpreadsheetCellType<Object> {
-		protected transient SpreadsheetCellEditor<Object> editor = null;
 
 		public ObjectType() {
 			this(new StringConverter<Object>() {
@@ -176,10 +175,7 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		public SpreadsheetCellEditor<Object> getEditor(SpreadsheetView view) {
-			if (editor == null) {
-				editor = SpreadsheetCellEditor.createObjectEditor(view);
-			}
-			return editor;
+				return SpreadsheetCellEditor.createObjectEditor(view);
 		}
 
 		@Override
@@ -233,10 +229,7 @@ public abstract class SpreadsheetCellType<T> {
 
 		@Override
 		public SpreadsheetCellEditor<String> getEditor(SpreadsheetView view) {
-			if (editor == null) {
-				editor = SpreadsheetCellEditor.createTextEditor(view);
-			}
-			return editor;
+				return SpreadsheetCellEditor.createTextEditor(view);
 		}
 
 		@Override
@@ -304,10 +297,7 @@ public abstract class SpreadsheetCellType<T> {
 
 		@Override
 		public SpreadsheetCellEditor<Double> getEditor(SpreadsheetView view) {
-			if (editor == null) {
-				editor = SpreadsheetCellEditor.createDoubleEditor(view);
-			}
-			return editor;
+				return SpreadsheetCellEditor.createDoubleEditor(view);
 		}
 
 		@Override
@@ -387,10 +377,7 @@ public abstract class SpreadsheetCellType<T> {
 
 		@Override
 		public SpreadsheetCellEditor<String> getEditor(SpreadsheetView view) {
-			if (editor == null) {
-				editor = SpreadsheetCellEditor.createListEditor(view, items);
-			}
-			return editor;
+				return SpreadsheetCellEditor.createListEditor(view, items);
 		}
 
 		@Override
@@ -467,10 +454,7 @@ public abstract class SpreadsheetCellType<T> {
 
 		@Override
 		public SpreadsheetCellEditor<LocalDate> getEditor(SpreadsheetView view) {
-			if (editor == null) {
-				editor = SpreadsheetCellEditor.createDateEditor(view);
-			}
-			return editor;
+				return SpreadsheetCellEditor.createDateEditor(view);
 		}
 
 		@Override

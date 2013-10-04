@@ -44,8 +44,10 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
 
 /**
  *
@@ -171,8 +173,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @param bc The SpreadsheetCell
      * @return
      */
+    
+    
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
     	SpreadsheetCellType<?> cellType = cell.getCellType();
+    	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
+
     	GridCellEditor editor = spv.getCellsViewSkin().getSpreadsheetCellEditorImpl();
         if (editor.isEditing()){
             return null;
@@ -180,7 +186,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         	editor.updateSpreadsheetView(spv);
         	editor.updateSpreadsheetCell(this);
         	editor.updateDataCell(cell);
-        	editor.updateSpreadsheetCellEditor(cellType.getEditor(spv));
+        	editor.updateSpreadsheetCellEditor(cellEditor);
             return editor;
         }
     }
@@ -283,14 +289,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // TODO bind
         getStyleClass().addAll(item.getStyleClass());
         
-        // Style
-//        final ObservableList<String> css = getStyleClass();
-//        if (css.size() == 1) {
-//            css.set(0, item.getStyleCss());
-//        }else{
-//            css.clear();
-//            css.add(item.getStyleCss());
-//        }
     }
 
     public void show(){

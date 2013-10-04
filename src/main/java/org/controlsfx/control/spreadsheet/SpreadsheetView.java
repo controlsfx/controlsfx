@@ -33,7 +33,9 @@ import impl.org.controlsfx.spreadsheet.GridViewSkin;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -196,7 +198,7 @@ public class SpreadsheetView extends Control {
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
-
+    private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
 
     
@@ -427,6 +429,20 @@ public class SpreadsheetView extends Control {
         return cellsView.getSelectionModel();
     }
 
+    /**
+     * Return the editor associated with the CellType. 
+     * (defined in {@link SpreadsheetCellType#getEditor(SpreadsheetView)}.
+     * @param cellType
+     * @return the editor associated with the CellType.
+     */
+    public SpreadsheetCellEditor<?> getEditor(SpreadsheetCellType<?> cellType) {
+    	SpreadsheetCellEditor<?> cellEditor = editors.get(cellType);
+    	if (cellEditor == null) {
+    		cellEditor = cellType.getEditor(this);
+    		editors.put(cellType, cellEditor);
+    	}
+		return cellEditor;
+	}
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *

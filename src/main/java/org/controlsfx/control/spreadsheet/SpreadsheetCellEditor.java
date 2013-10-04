@@ -44,15 +44,17 @@ import javafx.scene.input.KeyEvent;
 
 /**
  * 
- * SpreadsheetCellEditor are used by {@link SpreadsheetCell} in order to control how each value will be entered.
+ * SpreadsheetCellEditor are used by {@link SpreadsheetCellType} and {@link SpreadsheetCell} in order to control how each value will be entered.
  * <br/>
  * 
  * <h3>General behavior: </h3>
  * Editors will be displayed if the user double-click or press enter in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ).
  * <br/>
  * If the user does anything outside the editor, the editor <b> will be forced </b> to cancel the edition and close itself. 
- * Each editor has its own policy regarding validation of the value entered. This policy is
- * define by each editor in the {@link #validateEdit()} method.
+ * The editor is just here to allow communication between the user and the {@link SpreadsheetView}. It will just be
+ * given a value, and it will just give back another one after. The policy regarding validation of a given value is 
+ * define in {@link SpreadsheetCellType#convertValue(String)}.
+ * 
  *  If the value doesn't meet the requirements when saving the cell, nothing happens and the editor keeps editing.
  * <br/>
  * You can abandon a current modification by pressing "esc" key. 
@@ -63,24 +65,25 @@ import javafx.scene.input.KeyEvent;
  * <br/>
  * 
  * <ul>
- *   <li> {@link #createTextEditor()}: Basic {@link TextField}, can accept all data and save it as a string.</li>
- *   <li> {@link #createListEditor(List)}: Display a {@link ComboBox} with the different values.</li>
- *   <li> {@link #createDoubleEditor()}: Display a {@link TextField} which accepts only double value. If the entered value is incorrect,
+ *   <li> {@link #createTextEditor(SpreadsheetView)}: Basic {@link TextField}, can accept all data and save it as a string.</li>
+ *   <li> {@link #createListEditor(SpreadsheetView, List)}: Display a {@link ComboBox} with the different values.</li>
+ *   <li> {@link #createDoubleEditor(SpreadsheetView)}: Display a {@link TextField} which accepts only double value. If the entered value is incorrect,
  *   the background will turn red so that the user will know in advance if the data will be saved or not.</li>
- *   <li> {@link #createDateEditor()}: Display a {@link DatePicker}.</li>
- *   <li> {@link #createObjectEditor()}: Display a {@link TextField}, accept an Object.</li>
+ *   <li> {@link #createDateEditor(SpreadsheetView)}: Display a {@link DatePicker}.</li>
+ *   <li> {@link #createObjectEditor(SpreadsheetView)}: Display a {@link TextField}, accept an Object.</li>
  * </ul>
  * 
  * <br/>
  * <h3>Creating your editor: </h3>
  * You can of course create your own {@link SpreadsheetCellEditor} for displaying other controls.<br/>
  * 
- * You just have to override the three abstract methods. <b>Remember</b> that you will never call those
+ * You just have to override the four abstract methods. <b>Remember</b> that you will never call those
  * methods directly. They will be called by the {@link SpreadsheetView} when the time comes.
  * <ul>
- *   <li> {@link #startEdit()}: You can instantiate your own control.</li>
+ *   <li> {@link #startEdit(Object)}: You will configure your control with the given value which is {@link SpreadsheetCell#getItem()}
+ *   converted to an object. You do not instantiate your control here, you do it in the constructor.</li>
  *   <li> {@link #getEditor()}: You will return which control you're using (for display).</li>
- *   <li> {@link #getControlValue()}: You will return the value inside your editor for validation.</li>
+ *   <li> {@link #getControlValue()}: You will return the value inside your editor in order to submit it for validation.</li>
  *   <li> {@link #end()}: When editing is finished, you can properly close your own control.</li>
  * </ul>
  * <br/>
@@ -88,6 +91,9 @@ import javafx.scene.input.KeyEvent;
  * means you want to commit, and a <b>false</b> means you want to cancel. The {@link SpreadsheetView}
  * will handle all the rest for you and call your methods at the right moment.
  * <br/>
+ * 
+ * <h3>Use case : </h3>
+ * <td><center><img src="editorScheme.png"></center></td>
  * 
  * <h3>Visual: </h3>
  * <table style="border: 1px solid gray;">
@@ -119,9 +125,10 @@ public abstract class SpreadsheetCellEditor<T>{
      * * Constructor * *
      **************************************************************************/
 
-    /**
-     * Construct the SpreadsheetCellEditor.
-     */
+	/**
+	 * Construct the SpreadsheetCellEditor.
+	 * @param view
+	 */
     public SpreadsheetCellEditor(SpreadsheetView view) {
     	this.view = view;
     }
@@ -131,7 +138,7 @@ public abstract class SpreadsheetCellEditor<T>{
      **************************************************************************/
     /**
      * Whenever you want to stop the edition, you call that method.<br/>
-     * True means you're trying to commit the value, then {@link #validateEdit()}
+     * True means you're trying to commit the value, then {@link SpreadsheetCellType#convertValue(String)}
      * will be called in order to verify that the value is correct.<br/>
      * False means you're trying to cancel the value and it will be follow by {@link #end()}.<br/>
      * See SpreadsheetCellEditor description
@@ -148,23 +155,24 @@ public abstract class SpreadsheetCellEditor<T>{
     /**
      * This method will be called when edition start.<br/>
      * You will then do all the configuration of your editor.
+     * @param item
      */
     public abstract void startEdit(Object item);
     
     /**
-     * Return the control used for controling the input.
+     * Return the control used for controlling the input.
      * This is called at the beginning in order to display your control
      * in the cell.
-     * @return
+     * @return the control used.
      */
     public abstract Control getEditor();
    
     /**
-     * Return the value your editor as a string.
+     * Return the value within your editor as a string.
      * This will be used by the {@link SpreadsheetCellType#convertValue(String)}
      * in order to compute whether the value is valid regarding
      * the {@link SpreadsheetCellType} policy.
-     * @return
+     * @return the value within your editor as a string.
      */
     public abstract String getControlValue();
 	
@@ -208,6 +216,7 @@ public abstract class SpreadsheetCellEditor<T>{
 				attachEnterEscapeEventHandler();
 
 				tf.requestFocus();
+				tf.end();
 			}
 
 			/***************************************************************************
@@ -219,11 +228,6 @@ public abstract class SpreadsheetCellEditor<T>{
 			public void end() {
 				tf.setOnKeyPressed(null);
 			}
-
-			/*@Override
-			public String validateEdit() {
-				return tf.getText();
-			}*/
 
 			@Override
 			public TextField getEditor() {
@@ -245,8 +249,7 @@ public abstract class SpreadsheetCellEditor<T>{
 
 			@Override
 			public String getControlValue() {
-				// TODO Auto-generated method stub
-				return null;
+				return tf.getText();
 			}
 		};
 	}
@@ -285,6 +288,7 @@ public abstract class SpreadsheetCellEditor<T>{
 				attachEnterEscapeEventHandler();
 
 				tf.requestFocus();
+				tf.end();
 			}
 
 			/***************************************************************************
@@ -296,11 +300,6 @@ public abstract class SpreadsheetCellEditor<T>{
 			public void end() {
 				tf.setOnKeyPressed(null);
 			}
-
-			/*@Override
-			public String validateEdit() {
-				return tf.getText();
-			}*/
 
 			@Override
 			public TextField getEditor() {
@@ -364,6 +363,7 @@ public abstract class SpreadsheetCellEditor<T>{
 				attachEnterEscapeEventHandler();
 
 				tf.requestFocus();
+				tf.end();
 			}
 
 			/***************************************************************************
@@ -375,16 +375,6 @@ public abstract class SpreadsheetCellEditor<T>{
 			public void end() {
 				tf.setOnKeyPressed(null);
 			}
-
-			/*@Override
-			public Double validateEdit() {
-				try{
-					Double temp = Double.parseDouble(tf.getText());
-					return temp;
-				}catch(Exception e){
-					return null;
-				}
-			}*/
 
 			@Override
 			public TextField getEditor() {
@@ -480,14 +470,6 @@ public abstract class SpreadsheetCellEditor<T>{
 				cl = null;
 			}
 
-			/*@Override
-			public String validateEdit() {
-				if (cb.getSelectionModel().getSelectedIndex() != -1) {
-					return cb.getSelectionModel().getSelectedItem();
-				}
-				return null;
-			}*/
-
 			@Override
 			public ComboBox<String> getEditor() {
 				return cb;
@@ -570,11 +552,6 @@ public abstract class SpreadsheetCellEditor<T>{
 				datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
 			}
 
-			/*@Override
-			public LocalDate validateEdit() {
-				return datePicker.getValue();
-			}
-*/
 			@Override
 			public DatePicker getEditor() {
 				return datePicker;

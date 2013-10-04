@@ -14,10 +14,50 @@ import javafx.util.converter.DoubleStringConverter;
  * {@link SpreadsheetCellEditor} it will use.
  * <br/>
  * 
+ * <h3> Example </h3>
+ * You can create several types which are using the same editor. 
+ * Suppose you want to handle Double values. 
+ * You will implement the {@link #getEditor(SpreadsheetView)} method and
+ * use the {@link SpreadsheetCellEditor#createDoubleEditor(SpreadsheetView)}.
+ * <br/>
  * 
- * 
- * 
- * 
+ * Then for each type you will provide your own policy in {@link #convertValue(String)},
+ * which most of the time will use your {@link #converter}.
+ * If you only want to accept values between 0 and 10:
+ * <pre>
+ * converter = new DoubleStringConverter() {
+ *				Override
+ *				public String toString(Double item) {
+ *					if (item == null || Double.isNaN(item)) {
+ *						return "";
+ *					} else {
+ *						return super.toString(item);
+ *					}
+ *				}
+ *
+ *				Override
+ *				public Double fromString(String str) {
+ *					if (str == null || str.isEmpty() || "NaN".equals(str)) {
+ *						return Double.NaN;
+ *					} else {
+ *						return super.fromString(str);
+ *					}
+ *				}
+ *			});
+ *			
+ *Override
+ *public Double convertValue(String value) {
+ *	try {
+ *			Double computedValue = converter.fromString(value);
+ *			if(computedValue >=0 && computedValue <=10)
+ *				return computedValue;
+ *			else
+ *				return null;
+ *		} catch (Exception e) {
+ *			return null;
+ *		}
+ *}
+ * </pre>
  * 
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
@@ -30,8 +70,7 @@ public abstract class SpreadsheetCellType<T> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param converter
-	 *            the converter to use
+	 * @param converter The converter to use
 	 */
 	public SpreadsheetCellType(StringConverter<T> converter) {
 		this.converter = converter;
@@ -41,31 +80,36 @@ public abstract class SpreadsheetCellType<T> {
 	 * Creates a cell that hold a <T> at the specified position, with the
 	 * specified row/column span.
 	 * 
-	 * @param <T>
-	 *            the type value class
 	 * @param row
 	 *            row number
 	 * @param column
 	 *            column number
-	 * @param rs
+	 * @param rowSpan
 	 *            rowSpan (1 is normal)
-	 * @param cs
+	 * @param columnSpan
 	 *            ColumnSpan (1 is normal)
 	 * @param value
-	 *            the <T> to display
-	 * @return
+	 *            the value to display
+	 * @return a {@link SpreadsheetCell}
 	 */
 	public abstract SpreadsheetCell createCell(final int row, final int column,
 			final int rowSpan, final int columnSpan, final T value);
 
 	/**
 	 * Gets this type editor.
-	 * 
+	 * @param view
 	 * @return the editor instance
 	 */
 	public abstract SpreadsheetCellEditor<T> getEditor(SpreadsheetView view);
 
+	/**
+	 * Return a string representation of the given item for the 
+	 * {@link SpreadsheetView} to display using the converter.
+	 * @param item
+	 * @return a string representation of the given item.
+	 */
 	public abstract String toString(T item);
+	
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
 	 * 
@@ -298,11 +342,9 @@ public abstract class SpreadsheetCellType<T> {
 	}
 
 	/**
-	 * Creates a list type from a list of string values.
+	 * The List type base class.
 	 * 
-	 * @param items
-	 *            the list of acceptable values
-	 * @return the cell type instance
+	 * @param items the list of acceptable values
 	 */
 	public static class ListType extends SpreadsheetCellType<String> {
 		protected final List<String> items;

@@ -151,11 +151,13 @@ public class GridCellEditor {
 		// This is one way but it will need further investigation
 		spreadsheetView.disabledProperty().addListener(editorListener);
 
+		viewCell.setGraphic(spreadsheetCellEditor.getEditor());
+		
 		//Then we call the user editor in order for it to be ready
 		Object value = modelCell.getItem();
 		spreadsheetCellEditor.startEdit(value);
 
-		viewCell.setGraphic(spreadsheetCellEditor.getEditor());
+		
 	}
 
 

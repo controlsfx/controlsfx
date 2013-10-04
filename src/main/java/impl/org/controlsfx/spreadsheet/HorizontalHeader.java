@@ -88,7 +88,7 @@ public class HorizontalHeader extends TableHeaderRow {
                                 working = arg2;
                                 requestLayout();
                                 getRootHeader().layoutFixedColumns();
-                                updateHighlighSelection();
+                                updateHighlightSelection();
                             }
                         });
                 /*****************************************************************
@@ -163,7 +163,7 @@ public class HorizontalHeader extends TableHeaderRow {
                 	addStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(additem));
                 }
 			}
-			 updateHighlighSelection();
+			 updateHighlightSelection();
 		}
 	}; 
 
@@ -192,14 +192,14 @@ public class HorizontalHeader extends TableHeaderRow {
     private final InvalidationListener selectionListener = new InvalidationListener() {
         @Override
         public void invalidated(Observable valueModel) {
-            updateHighlighSelection();
+            updateHighlightSelection();
         }
     };
     
     /**
      * Highlight the header Label when selection change.
      */
-    private void updateHighlighSelection() {
+    private void updateHighlightSelection() {
     	for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
             i.getChildrenUnmodifiable().get(0).getStyleClass().removeAll("selected");
 

@@ -169,7 +169,6 @@ public class SpreadsheetCell implements Serializable {
 	/**
 	 * Constructs a SpreadsheetCell with the given configuration.
 	 * 
-	 * @see SpreadsheetCells
 	 * @param row
 	 * @param column
 	 * @param rowSpan
@@ -219,14 +218,26 @@ public class SpreadsheetCell implements Serializable {
 		}
 	};
 
+	/**
+	 * Set item
+	 * @param value
+	 */
 	public final void setItem(Object value) {
 		item.set(value);
 	}
 
+	/**
+	 * 
+	 * @return the item
+	 */
 	public final Object getItem() {
 		return item.get();
 	}
 
+	/**
+	 * 
+	 * @return ObjectProperty
+	 */
 	public final ObjectProperty<Object> itemProperty() {
 		return item;
 	}
@@ -237,14 +248,19 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 **************************************************************************/
 
+	/**
+	 * Return the String representation currently used for display
+	 * in the {@link SpreadsheetView}
+	 * @return text representation of the value.
+	 */
 	public String getText() {
 		return text;
 	}
 
 	/**
-	 * Return the {@link CellType} of this particular cell.
+	 * Return the {@link SpreadsheetCellType} of this particular cell.
 	 * 
-	 * @return the {@link CellType} of this particular cell.
+	 * @return the {@link SpreadsheetCellType} of this particular cell.
 	 */
 	public SpreadsheetCellType<?> getCellType() {
 		return type;
@@ -291,8 +307,7 @@ public class SpreadsheetCell implements Serializable {
 
 	/**
 	 * Return how much this cell is spanning in column, 1 is normal.
-	 * 
-	 * @param rowSpan
+	 * @return how much this cell is spanning in column, 1 is normal.
 	 */
 	public int getColumnSpan() {
 		return columnSpan;
@@ -304,7 +319,7 @@ public class SpreadsheetCell implements Serializable {
 	 * {@link GridBase#spanColumn(int, int, int)} instead of using this method
 	 * directly.
 	 * 
-	 * @param rowSpan
+	 * @param columnSpan
 	 */
 	public void setColumnSpan(int columnSpan) {
 		this.columnSpan = columnSpan;
@@ -315,7 +330,7 @@ public class SpreadsheetCell implements Serializable {
 	 * this cell. You can easily modify its appearance by adding a style class
 	 * (previously set in CSS).
 	 * 
-	 * @return
+	 * @return an ObservableList of String of all the style class
 	 */
 	public ObservableList<String> getStyleClass() {
 		if (styleClass == null) {
@@ -345,7 +360,7 @@ public class SpreadsheetCell implements Serializable {
 	/**
 	 * The {@link BooleanProperty} linked with the editable state.
 	 * 
-	 * @return
+	 * @return The {@link BooleanProperty} linked with the editable state.
 	 */
 	public BooleanProperty editableProperty() {
 		return editable;
@@ -410,6 +425,9 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 **************************************************************************/
 
+	/**
+	 * Update the text for the SpreadsheetView.
+	 */
 	private void updateText() {
 		this.text = type.toString(getItem());
 	}

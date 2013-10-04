@@ -101,7 +101,7 @@ import javafx.util.Duration;
  * 
  * <h3>Copy pasting </h3>
  * You can copy every cell you want to paste it elsewhere. Be aware that only the value inside will be pasted, not the style nor the type. 
- * Thus the value you're trying to paste must be compatible with the {@link CellType} of the receiving cell. Pasting a Double into a String will work but
+ * Thus the value you're trying to paste must be compatible with the {@link SpreadsheetCellType} of the receiving cell. Pasting a Double into a String will work but
  * the reverse operation will not. 
  * <br/>
  * A unique cell or a selection of several of them can be copied and pasted.
@@ -109,7 +109,7 @@ import javafx.util.Duration;
  * <br/><br/>
  * <h3>Code Samples</h3>
  * Just like the {@link TableView}, you instantiate the underlying model, a {@link Grid}.
- * You will create some {@link ObservableList<DataCell>} filled with {@link SpreadsheetCell}. 
+ * You will create some ObservableList<{@link SpreadsheetCell}> filled with {@link SpreadsheetCell}. 
  * 
  * <br/><br/>
  * 
@@ -316,7 +316,7 @@ public class SpreadsheetView extends Control {
 
     /**
      * Return the model Grid used by the SpreadsheetView
-     * @return
+     * @return the model Grid used by the SpreadsheetView
      */
     public final Grid getGrid(){
         return grid;
@@ -335,6 +335,10 @@ public class SpreadsheetView extends Control {
         showColumnHeader.setValue(b);
     }
     
+    /**
+     * Return if the Column Header is showing.
+     * @return a boolean telling if the column Header is being shown
+     */
     public final boolean isShowColumnHeader() {
         return showColumnHeader.get();
     }
@@ -358,13 +362,17 @@ public class SpreadsheetView extends Control {
         showRowHeader.setValue(b);
     }
     
+    /**
+     * Return if the row Header is showing.
+     * @return a boolean telling if the row Header is being shown
+     */
     public final boolean isShowRowHeader() {
         return showRowHeader.get();
     }
     
     /**
      * BooleanProperty associated with the row Header.
-     * @return
+     * @return the BooleanProperty associated with the row Header.
      */
     public final BooleanProperty showRowHeaderProperty() {
         return showRowHeader;
@@ -384,19 +392,12 @@ public class SpreadsheetView extends Control {
      * Indicate whether a row can be fixed or not.
      * Call that method before adding an item with {@link #getFixedRows()} .
      * @param row
-     * @return
+     * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row){
     	return row<rowFix.size()?rowFix.get(row): false;
     }
-//    /**
-//     * Return a SpreadsheetColumn
-//     * @param index
-//     * @return 
-//     */
-//    public SpreadsheetColumn<?> getColumn(int index){
-//    	return getColumns().get(index);
-//    }
+
     /**
      * You can fix or unfix a column by modifying this list.
      * Call {@link SpreadsheetColumn#isColumnFixable()} on the column before adding an item.
@@ -412,7 +413,7 @@ public class SpreadsheetView extends Control {
      * on it directly.
      * Call that method before adding an item with {@link #getFixedColumns()} .
      * @param columnIndex
-     * @return
+     * @return true if the column if fixable
      */
     public boolean isColumnFixable(int columnIndex){
     	return columnIndex<getColumns().size()?getColumns().get(columnIndex).isColumnFixable():null;
@@ -420,7 +421,7 @@ public class SpreadsheetView extends Control {
     
     /**
      * Return the selectionModel used by the SpreadsheetView.
-     * @return {@link SpreadsheetViewSelectionModel}
+     * @return {@link TableViewSelectionModel}
      */
     public TableViewSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
         return cellsView.getSelectionModel();
@@ -486,7 +487,7 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return a list of {@code ObservableList<DataCell>} used by the SpreadsheetView.
+     * Return a list of {@code ObservableList<SpreadsheetCell>} used by the SpreadsheetView.
      * @return
      */
     private ObservableList<ObservableList<SpreadsheetCell>> getItems() {

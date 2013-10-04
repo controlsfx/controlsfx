@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+
 apply from: 'mavenPublish.gradle'
+apply from: 'javafx.plugin'
 
 group = 'org.controlsfx'
 version = '8.0.2-SNAPSHOT'
@@ -100,4 +102,37 @@ artifacts {
         main = "org.controlsfx.$name"
         classpath = sourceSets.samples.runtimeClasspath + sourceSets.main.runtimeClasspath + configurations.jdk
     }
+}
+
+// enumerate the samples at build time
+processSamplesResources << {
+    def samplesList = []
+    fileTree(dir:'src/samples/java').visit {
+        if (!it.directory && it.file.text.contains(' implements Sample ') && it.path.contains("samples")) {
+            samplesList += it.path
+        }
+    }
+    ('build/resources/samples/org/controlsfx/samples/samples.txt' as File).text = samplesList.join('\n')
+    println samplesList
+}
+
+
+
+javafx {
+    
+    sourceSet = 'samples'
+
+    appID 'HelloControlsFX'
+    appName 'Hello ControlsFX'
+    mainClass 'org.controlsfx.HelloControlsFX'
+
+    javaRuntime = '<NO RUNTIME>' // for now don't bundle a VM
+
+    // deplpy/info attributes
+    category = 'JavaFX Demos'
+    copyright = 'Copyright (c) 2013 Jonathan Giles and others'
+    description = 'This is a sample of all of the ControlsFX controls'
+    licenseType = '3 clause BSD'
+    vendor = 'FX Experience'
+
 }

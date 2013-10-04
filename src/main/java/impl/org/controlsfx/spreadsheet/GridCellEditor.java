@@ -16,6 +16,7 @@ public class GridCellEditor {
 
 	// transient properties - these fields will change based on the current
 	// cell being edited.
+	private final SpreadsheetHandle handle;
 	private SpreadsheetCell modelCell;
 	private CellView viewCell;
 
@@ -35,7 +36,8 @@ public class GridCellEditor {
 	/**
 	 * Construct the SpreadsheetCellEditor.
 	 */
-	public GridCellEditor() {
+	public GridCellEditor(SpreadsheetHandle handle) {
+		this.handle = handle;
 		this.spreadsheetEditor = new SpreadsheetEditor();
 	}
 
@@ -150,7 +152,7 @@ public class GridCellEditor {
 				endEdit(false);
 			}
 		};
-		spreadsheetView.getCellsViewSkin().getVBar().valueProperty().addListener(editorListener);
+		handle.getCellsViewSkin().getVBar().valueProperty().addListener(editorListener);
 		//FIXME We need to REALLY find a way to stop edition when anything happen
 		// This is one way but it will need further investigation
 		spreadsheetView.disabledProperty().addListener(editorListener);
@@ -173,7 +175,7 @@ public class GridCellEditor {
 		}
 		il = null;
 
-		spreadsheetView.getCellsViewSkin().getVBar().valueProperty().removeListener(editorListener);
+		handle.getCellsViewSkin().getVBar().valueProperty().removeListener(editorListener);
 		spreadsheetView.disabledProperty().removeListener(editorListener);
 		editorListener = null;
 		this.modelCell = null;
@@ -190,11 +192,11 @@ public class GridCellEditor {
 		private boolean isMoved;
 
 		private int getCellCount() {
-			return spreadsheetView.getCellsViewSkin().getCellsSize();
+			return handle.getCellsViewSkin().getCellsSize();
 		}
 
 		private boolean addCell(CellView cell){
-			GridRow temp = spreadsheetView.getCellsViewSkin().getRow(getCellCount()-1-spreadsheetView.getFixedRows().size());
+			GridRow temp = handle.getCellsViewSkin().getRow(getCellCount()-1-spreadsheetView.getFixedRows().size());
 			if(temp != null){
 				temp.addCell(cell);
 				return true;

@@ -56,6 +56,7 @@ public class VerticalHeader extends StackPane {
      * Private Fields                                                          *
      *                                                                         *
      **************************************************************************/
+	private final SpreadsheetHandle handle;
 	private final SpreadsheetView spreadsheetView;
 	private double prefHeight = 24.0;
 	private double prefWidth = 50.0;
@@ -89,8 +90,9 @@ public class VerticalHeader extends StackPane {
 	 * @param spreadsheetView
 	 * @param rowHeaderWidth
 	 ******************************************************************/
-	public VerticalHeader(final GridViewSkin skin, final SpreadsheetView spreadsheetView, final double rowHeaderWidth) {
-		this.spreadsheetView = spreadsheetView;
+	public VerticalHeader(final SpreadsheetHandle handle, final double rowHeaderWidth) {
+		this.handle = handle;
+		this.spreadsheetView = handle.getView();
 		prefWidth = rowHeaderWidth;
 	}
 	
@@ -135,7 +137,7 @@ public class VerticalHeader extends StackPane {
 	@Override protected void layoutChildren() {
 		if(working && spreadsheetView != null) {
 
-			final GridViewSkin skin = spreadsheetView.getCellsViewSkin();
+			final GridViewSkin skin = handle.getCellsViewSkin();
 
 			final double x =snappedLeftInset();
 			final int cellSize = skin.getCellsSize();
@@ -220,7 +222,7 @@ public class VerticalHeader extends StackPane {
 				label.setContextMenu(blankContextMenu);
 			}
 
-			VirtualScrollBar hbar = spreadsheetView.getCellsViewSkin().getHBar();
+			VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
 			if(hbar.isVisible()){
 				//Last one blank and on top (z-order) of the others
 				label = getLabel(rowCount++);

@@ -42,14 +42,13 @@ import com.sun.javafx.scene.control.skin.TableRowSkin;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     
-    SpreadsheetView spreadsheetView;
+    SpreadsheetHandle handle;
     private TableView<ObservableList<SpreadsheetCell>> tableView;
     
-    public GridRowSkin(TableRow<ObservableList<SpreadsheetCell>> tableRow,
-            SpreadsheetView spreadsheetView) {
+    public GridRowSkin(SpreadsheetHandle handle, TableRow<ObservableList<SpreadsheetCell>> tableRow) {
         super(tableRow);
-        this.spreadsheetView = spreadsheetView;
-        this.tableView = (TableView<ObservableList<SpreadsheetCell>>) spreadsheetView.getCellsViewSkin().getNode();
+        this.handle = handle;
+        this.tableView = (TableView<ObservableList<SpreadsheetCell>>) handle.getCellsViewSkin().getNode();
     }
 
     /**
@@ -74,7 +73,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     @Override
     protected void layoutChildren(double x, final double y, final double w,
             final double h) {
-
+    	final SpreadsheetView spreadsheetView = handle.getView();
         /**
          * RT-26743:TreeTableView: Vertical Line looks unfinished. We used to
          * not do layout on cells whose row exceeded the number of items, but
@@ -147,7 +146,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
              * FOR FIXED COLUMNS
              */
             double tableCellX = 0;
-            final double hbarValue = spreadsheetView.getCellsViewSkin().getHBar().getValue();
+            final double hbarValue = handle.getCellsViewSkin().getHBar().getValue();
             
             //Virtualization of column
             final SpreadsheetCell cellSpan = grid.getRows().get(index).get(column);
@@ -294,6 +293,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 	}
     public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
 
+    	final SpreadsheetView spreadsheetView = handle.getView();
         final SpreadsheetCell cellSpan = tableView.getItems().get(row).get(col);
         final int infRow = cellSpan.getRow();
         final int supRow = infRow + cellSpan.getRowSpan();

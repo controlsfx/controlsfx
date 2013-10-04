@@ -50,7 +50,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * Private Fields                                                          *
      *                                                                         *
      **************************************************************************/
-    private final SpreadsheetView spreadsheetView;
+    private final SpreadsheetHandle handle;
     /**
      * This is the index used by the VirtualFlow
      * So the row can be with indexVirtualFlow at 32
@@ -65,9 +65,9 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-    public GridRow(SpreadsheetView spreadsheetView) {
+    public GridRow(SpreadsheetHandle handle) {
         super();
-        this.spreadsheetView = spreadsheetView;
+        this.handle = handle;
     }
 
     /***************************************************************************
@@ -153,7 +153,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      **************************************************************************/
 
     SpreadsheetView getSpreadsheetView() {
-        return spreadsheetView;
+        return handle.getView();
     }
 
     /**
@@ -207,7 +207,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new GridRowSkin(this,spreadsheetView);
+        return new GridRowSkin(handle, this);
     }
 
 }

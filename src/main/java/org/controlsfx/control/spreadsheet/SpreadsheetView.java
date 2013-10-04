@@ -30,6 +30,7 @@ import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.GridRow;
 import impl.org.controlsfx.spreadsheet.GridView;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -202,17 +203,34 @@ public class SpreadsheetView extends Control {
     private BitSet rowFix; // Compute if we can fix the rows or not.
     private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
     
+    final SpreadsheetHandle handle = new SpreadsheetHandle() {
+		@Override
+		protected SpreadsheetView getView() {
+			return SpreadsheetView.this;
+		}
+
+		@Override
+		protected GridViewSkin getCellsViewSkin() {
+			return SpreadsheetView.this.getCellsViewSkin();
+		}
+
+		@Override
+		protected GridView getCellsView() {
+			return SpreadsheetView.this.getCellsView();
+		}
+	};
+    
     /**
      * @return the inner table view skin
      */
-    public final GridViewSkin getCellsViewSkin() {
+    final GridViewSkin getCellsViewSkin() {
         return (GridViewSkin) (cellsView.getSkin());
     }
     
     /**
      * @return the inner table view
      */
-    public final GridView getCellsView() {
+    final GridView getCellsView() {
     	return cellsView;
     }
     
@@ -252,7 +270,7 @@ public class SpreadsheetView extends Control {
         	}
         });
 
-        this.cellsView = new GridView(this);
+        this.cellsView = new GridView(handle);
         getChildren().add(cellsView);
 
         //Add a listener to the selection model in order to edit the spanned cells when clicked
@@ -590,7 +608,7 @@ public class SpreadsheetView extends Control {
                 column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
                     @Override
                     public TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> call(TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new CellView();
+                        return new CellView(handle);
                     }
                 });
                 cellsView.getColumns().add(column);

@@ -933,18 +933,22 @@ public class SpreadsheetView extends Control {
         private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 GridViewSkin skin = (GridViewSkin)getCellsViewSkin();
-                
                 if (mouseEvent != null && !cellsView.contains(mouseEvent.getX(), mouseEvent.getY())) {
-                    if(mouseEvent.getSceneX() < cellsView.getLayoutX()) {
-                        skin.getHBar().decrement();
-                    }else if(mouseEvent.getSceneX() > cellsView.getLayoutX()+cellsView.getWidth()){
-                        skin.getHBar().increment();
-                    }
-                    else if(mouseEvent.getSceneY() < cellsView.getLayoutY()) {
-                        skin.getVBar().decrement();
-                    }else if(mouseEvent.getSceneY() > cellsView.getLayoutY()+cellsView.getHeight()) {
-                        skin.getVBar().increment();
-                    }
+                	double sceneX = mouseEvent.getSceneX();
+                	double sceneY = mouseEvent.getSceneY();
+                	double layoutX =cellsView.getLayoutX();
+                	double layoutY = cellsView.getLayoutY();
+                	double layoutXMax = layoutX+cellsView.getWidth();
+                	double layoutYMax = layoutY+cellsView.getHeight();
+                	
+                	if(sceneX > layoutXMax)
+                		skin.getHBar().increment();
+                	else if(sceneX < layoutX)
+                		skin.getHBar().decrement();
+                	if(sceneY > layoutYMax)
+                		skin.getVBar().increment();
+                	else if(sceneY < layoutY)
+                		skin.getVBar().decrement();
                 }
             }
         }));

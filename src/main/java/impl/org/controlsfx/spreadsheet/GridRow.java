@@ -56,9 +56,9 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * So the row can be with indexVirtualFlow at 32
      * But if it is situated in the header, his index will be 0 (or the row in the header)
      */
-    private Integer indexVirtualFlow = null;
+    private int indexVirtualFlow = -1;
     private boolean layoutFixedColumns = false;
-    private Boolean currentlyFixed = false;
+    private boolean currentlyFixed = false;
 
     /***************************************************************************
      *                                                                         *
@@ -77,7 +77,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      **************************************************************************/
 
     public int getIndexVirtualFlow(){
-        return indexVirtualFlow == null?getIndex():indexVirtualFlow;
+        return indexVirtualFlow < 0?getIndex():indexVirtualFlow;
     }
     
     public void setIndexVirtualFlow(int i){
@@ -92,7 +92,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 	 * Indicate that this row is bonded on the top.
 	 * @param currentlyFixed
 	 */
-	public void setCurrentlyFixed(Boolean currentlyFixed) {
+	public void setCurrentlyFixed(boolean currentlyFixed) {
 		this.currentlyFixed = currentlyFixed;
 	}
 	

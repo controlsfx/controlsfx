@@ -83,8 +83,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             @Override
             public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
                 final int row = getIndex();
-//                final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
-
                 if (getItem() == null) {
                     getTableRow().requestLayout();
                 // We only need to re-route if the rowSpan is large because
@@ -173,8 +171,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @param bc The SpreadsheetCell
      * @return
      */
-    
-    
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
     	SpreadsheetCellType<?> cellType = cell.getCellType();
     	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
@@ -183,15 +179,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (editor.isEditing()){
             return null;
         } else {
-        	editor.updateSpreadsheetView(spv);
         	editor.updateSpreadsheetCell(this);
         	editor.updateDataCell(cell);
         	editor.updateSpreadsheetCellEditor(cellEditor);
             return editor;
         }
     }
-    
-    
 
     @Override
     public void commitEdit(SpreadsheetCell newValue) {

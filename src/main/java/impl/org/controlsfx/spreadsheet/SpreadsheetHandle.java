@@ -33,7 +33,10 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  * Implementation vs public bridge.
  */
 public abstract class SpreadsheetHandle {
+	/** Access the main control. */
 	protected abstract SpreadsheetView getView();
-	protected abstract GridView getCellsView();
+	/** Accesses the grid (ie cell table) in the spreadsheet. */
+	protected abstract GridView getGridView();
+	/** Accesses the grid view (ie cell table view). */
 	protected abstract GridViewSkin getCellsViewSkin();
 }

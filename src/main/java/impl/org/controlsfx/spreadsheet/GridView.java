@@ -49,4 +49,8 @@ public class GridView extends TableView<ObservableList<SpreadsheetCell>> {
 	protected javafx.scene.control.Skin<?> createDefaultSkin() {
 		return new GridViewSkin(handle);
 	}
+	
+	public GridViewSkin getGridViewSkin() {
+		return handle.getCellsViewSkin();
+	}
 };

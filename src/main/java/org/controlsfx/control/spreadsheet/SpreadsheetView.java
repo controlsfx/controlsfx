@@ -202,7 +202,7 @@ public class SpreadsheetView extends Control {
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
     private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
-    
+    // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
 		@Override
 		protected SpreadsheetView getView() {
@@ -215,7 +215,7 @@ public class SpreadsheetView extends Control {
 		}
 
 		@Override
-		protected GridView getCellsView() {
+		protected GridView getGridView() {
 			return SpreadsheetView.this.getCellsView();
 		}
 	};

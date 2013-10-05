@@ -128,8 +128,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
         final SpreadsheetView spv = handle.getView();
-        final GridViewSkin sps = handle.getCellsViewSkin();
-        Grid grid = spv.getGrid();
+        final GridViewSkin gvs = handle.getCellsViewSkin();
+        final Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
         	
@@ -142,8 +142,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         	 */
         	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
-	        	for (int j = 0; j< sps.getCellsSize();j++ ) {
-	                    if(sps.getRow(j) == getTableRow()){
+	        	for (int j = 0; j< gvs.getCellsSize();j++ ) {
+	                    if(gvs.getRow(j) == getTableRow()){
 	                    	flag = true;
 	                    }
 	            }

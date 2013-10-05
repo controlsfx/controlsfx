@@ -11,52 +11,50 @@ import javafx.util.converter.DoubleStringConverter;
 /**
  * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will
  * condition which value the cell can accept, and which
- * {@link SpreadsheetCellEditor} it will use.
- * <br/>
+ * {@link SpreadsheetCellEditor} it will use. <br/>
  * 
- * <h3> Example </h3>
- * You can create several types which are using the same editor. 
- * Suppose you want to handle Double values. 
- * You will implement the {@link #getEditor(SpreadsheetView)} method and
- * use the {@link SpreadsheetCellEditor#createDoubleEditor(SpreadsheetView)}.
- * <br/>
+ * <h3>Example</h3> You can create several types which are using the same
+ * editor. Suppose you want to handle Double values. You will implement the
+ * {@link #createEditor(SpreadsheetView)} method and use the
+ * {@link SpreadsheetCellEditor#createDoubleEditor(SpreadsheetView)}. <br/>
  * 
- * Then for each type you will provide your own policy in {@link #convertValue(String)},
- * which most of the time will use your {@link #converter}.
- * If you only want to accept values between 0 and 10:
+ * Then for each type you will provide your own policy in
+ * {@link #convertValue(String)}, which most of the time will use your
+ * {@link #converter}. If you only want to accept values between 0 and 10:
+ * 
  * <pre>
- * converter = new DoubleStringConverter() {
- *				Override
- *				public String toString(Double item) {
- *					if (item == null || Double.isNaN(item)) {
- *						return "";
- *					} else {
- *						return super.toString(item);
- *					}
- *				}
- *
- *				Override
- *				public Double fromString(String str) {
- *					if (str == null || str.isEmpty() || "NaN".equals(str)) {
- *						return Double.NaN;
- *					} else {
- *						return super.fromString(str);
- *					}
- *				}
- *			});
- *			
- *Override
- *public Double convertValue(String value) {
- *	try {
- *			Double computedValue = converter.fromString(value);
- *			if(computedValue >=0 && computedValue <=10)
- *				return computedValue;
- *			else
- *				return null;
- *		} catch (Exception e) {
- *			return null;
- *		}
- *}
+ *  converter = new DoubleStringConverter() {
+ * 				Override
+ * 				public String toString(Double item) {
+ * 					if (item == null || Double.isNaN(item)) {
+ * 						return "";
+ * 					} else {
+ * 						return super.toString(item);
+ * 					}
+ * 				}
+ * 
+ * 				Override
+ * 				public Double fromString(String str) {
+ * 					if (str == null || str.isEmpty() || "NaN".equals(str)) {
+ * 						return Double.NaN;
+ * 					} else {
+ * 						return super.fromString(str);
+ * 					}
+ * 				}
+ * 			});
+ * 			
+ * Override
+ * public Double convertValue(String value) {
+ * 	try {
+ * 			Double computedValue = converter.fromString(value);
+ * 			if(computedValue >=0 && computedValue <=10)
+ * 				return computedValue;
+ * 			else
+ * 				return null;
+ * 		} catch (Exception e) {
+ * 			return null;
+ * 		}
+ * }
  * </pre>
  * 
  * @see SpreadsheetView
@@ -70,7 +68,8 @@ public abstract class SpreadsheetCellType<T> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param converter The converter to use
+	 * @param converter
+	 *            The converter to use
 	 */
 	public SpreadsheetCellType(StringConverter<T> converter) {
 		this.converter = converter;
@@ -96,20 +95,21 @@ public abstract class SpreadsheetCellType<T> {
 			final int rowSpan, final int columnSpan, final T value);
 
 	/**
-	 * Gets this type editor.
-	 * @param view
+	 * Creates an editor for this type of cells.
+	 * @param view the spreadsheet that will own this editor
 	 * @return the editor instance
 	 */
-	public abstract SpreadsheetCellEditor<T> getEditor(SpreadsheetView view);
+	public abstract SpreadsheetCellEditor<T> createEditor(SpreadsheetView view);
 
 	/**
-	 * Return a string representation of the given item for the 
+	 * Return a string representation of the given item for the
 	 * {@link SpreadsheetView} to display using the converter.
+	 * 
 	 * @param item
 	 * @return a string representation of the given item.
 	 */
 	public abstract String toString(T item);
-	
+
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
 	 * 
@@ -121,20 +121,21 @@ public abstract class SpreadsheetCellType<T> {
 	protected abstract void copy(SpreadsheetCell from, SpreadsheetCell to);
 
 	/**
-     * This method will be called when a commit is happening.<br/>
-     * You will then compute the value of the editor in order to determine
-     * if the current value is valid.
-     * @return null if not valid or the correct value otherwise.
-     */
-    public abstract T convertValue(String value);
-	
-    /**
-	 * The Object type instance.
+	 * This method will be called when a commit is happening.<br/>
+	 * You will then compute the value of the editor in order to determine if
+	 * the current value is valid.
+	 * 
+	 * @return null if not valid or the correct value otherwise.
+	 */
+	public abstract T convertValue(String value);
+
+	/**
+	 * The {@link SpreadsheetCell} {@link Object} type instance.
 	 */
 	public static final SpreadsheetCellType<Object> OBJECT = new ObjectType();
 
 	/**
-	 * The Object type base class.
+	 * The {@link SpreadsheetCell} {@link Object} type base class.
 	 */
 	public static class ObjectType extends SpreadsheetCellType<Object> {
 
@@ -174,8 +175,9 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		public SpreadsheetCellEditor<Object> getEditor(SpreadsheetView view) {
-				return SpreadsheetCellEditor.createObjectEditor(view);
+		@Override
+		public SpreadsheetCellEditor<Object> createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.ObjectEditor(view);
 		}
 
 		@Override
@@ -191,15 +193,14 @@ public abstract class SpreadsheetCellType<T> {
 	};
 
 	/**
-	 * The String type instance.
+	 * The {@link SpreadsheetCell} {@link String} type instance.
 	 */
 	public static final SpreadsheetCellType<String> STRING = new StringType();
 
 	/**
-	 * The String type base class.
+	 * The {@link SpreadsheetCell} {@link String} type base class.
 	 */
 	public static class StringType extends SpreadsheetCellType<String> {
-		protected transient SpreadsheetCellEditor<String> editor = null;
 
 		public StringType() {
 			this(new DefaultStringConverter());
@@ -228,8 +229,8 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<String> getEditor(SpreadsheetView view) {
-				return SpreadsheetCellEditor.createTextEditor(view);
+		public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.StringEditor(view);
 		}
 
 		@Override
@@ -245,15 +246,14 @@ public abstract class SpreadsheetCellType<T> {
 	};
 
 	/**
-	 * The Double type instance.
+	 * The {@link SpreadsheetCell} {@link Double} type instance.
 	 */
 	public static final SpreadsheetCellType<Double> DOUBLE = new DoubleType();
 
 	/**
-	 * The Double type base class.
+	 * The {@link SpreadsheetCell} {@link Double} type base class.
 	 */
 	public static class DoubleType extends SpreadsheetCellType<Double> {
-		protected transient SpreadsheetCellEditor<Double> editor = null;
 
 		public DoubleType() {
 			this(new DoubleStringConverter() {
@@ -296,8 +296,8 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<Double> getEditor(SpreadsheetView view) {
-				return SpreadsheetCellEditor.createDoubleEditor(view);
+		public SpreadsheetCellEditor<Double> createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
 		@Override
@@ -326,19 +326,21 @@ public abstract class SpreadsheetCellType<T> {
 
 	};
 
+	/**
+	 * Creates a {@link ListType}.
+	 * @param items the list items
+	 * @return the instance
+	 */
 	public static final SpreadsheetCellType<String> LIST(
 			final List<String> items) {
 		return new ListType(items);
 	}
 
 	/**
-	 * The List type base class.
-	 * 
-	 * @param items the list of acceptable values
+	 * The {@link SpreadsheetCell} {@link List} type base class.
 	 */
 	public static class ListType extends SpreadsheetCellType<String> {
 		protected final List<String> items;
-		protected transient SpreadsheetCellEditor<String> editor = null;
 
 		public ListType(final List<String> items) {
 			super(new DefaultStringConverter() {
@@ -376,8 +378,8 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<String> getEditor(SpreadsheetView view) {
-				return SpreadsheetCellEditor.createListEditor(view, items);
+		public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.ListEditor(view, items);
 		}
 
 		@Override
@@ -401,20 +403,23 @@ public abstract class SpreadsheetCellType<T> {
 	}
 
 	/**
-	 * The Date type instance.
+	 * The {@link SpreadsheetCell} {@link java.time.LocalDate} type instance.
 	 */
 	public static final SpreadsheetCellType<LocalDate> DATE = new DateType();
 
 	/**
-	 * The Date type base class.
+	 * The {@link SpreadsheetCell} {@link java.time.LocalDate} type base class.
 	 */
 	public static class DateType extends SpreadsheetCellType<LocalDate> {
-		protected transient SpreadsheetCellEditor<LocalDate> editor = null;
 
 		public DateType() {
 			this("dd/MM/yyyy");
 		}
 
+		/**
+		 * Creates a new DateType.
+		 * @param format the date format
+		 */
 		public DateType(final String format) {
 			this(new StringConverter<LocalDate>() {
 				@Override
@@ -453,8 +458,8 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCellEditor<LocalDate> getEditor(SpreadsheetView view) {
-				return SpreadsheetCellEditor.createDateEditor(view);
+		public SpreadsheetCellEditor<LocalDate> createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.DateEditor(view);
 		}
 
 		@Override
@@ -472,8 +477,7 @@ public abstract class SpreadsheetCellType<T> {
 		@Override
 		public LocalDate convertValue(String value) {
 			try {
-				LocalDate temp = converter.fromString(value);
-				return temp;
+				return converter.fromString(value);
 			} catch (Exception e) {
 				return null;
 			}
@@ -483,7 +487,5 @@ public abstract class SpreadsheetCellType<T> {
 		public String toString(LocalDate item) {
 			return converter.toString(item);
 		}
-
 	}
-
 }

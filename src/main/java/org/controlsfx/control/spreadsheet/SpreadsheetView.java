@@ -457,14 +457,14 @@ public class SpreadsheetView extends Control {
 
     /**
      * Return the editor associated with the CellType. 
-     * (defined in {@link SpreadsheetCellType#getEditor(SpreadsheetView)}.
+     * (defined in {@link SpreadsheetCellType#createEditor(SpreadsheetView)}.
      * @param cellType
      * @return the editor associated with the CellType.
      */
     public SpreadsheetCellEditor<?> getEditor(SpreadsheetCellType<?> cellType) {
     	SpreadsheetCellEditor<?> cellEditor = editors.get(cellType);
     	if (cellEditor == null) {
-    		cellEditor = cellType.getEditor(this);
+    		cellEditor = cellType.createEditor(this);
     		editors.put(cellType, cellEditor);
     	}
 		return cellEditor;

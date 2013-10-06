@@ -20,6 +20,9 @@ sourceSets {
         java {
             compileClasspath += main.output
             compileClasspath += configurations.jdk
+            runtimeClasspath += main.output
+            runtimeClasspath += configurations.jdk
+            runtimeClasspath += javadocJar.output
         }
     }
 }
@@ -105,15 +108,22 @@ artifacts {
 }
 
 // enumerate the samples at build time
-processSamplesResources << {
-    def samplesList = []
-    fileTree(dir:'src/samples/java').visit {
-        if (!it.directory && it.file.text.contains(' implements Sample ') && it.path.contains("samples")) {
-            samplesList += it.path
+task enumerateSamples() {
+    doLast {
+        def samplesList = []
+        sourceSets.samples.java.visit {
+            if (!it.directory && it.file.text.contains(' implements Sample ') && it.path.contains("samples")) {
+                samplesList += it.path
+            }
         }
+        File outputFile = new File(sourceSets.samples.output.resourcesDir, 'org/controlsfx/samples/samples.txt')
+        outputFile.parentFile.mkdirs()
+        outputFile.text = samplesList.join('\n')
     }
-    ('build/resources/samples/org/controlsfx/samples/samples.txt' as File).text = samplesList.join('\n')
-    println samplesList
+}
+processSamplesResources.dependsOn(enumerateSamples)
+gradle.taskGraph.whenReady {
+    enumerateSamples.enabled = gradle.taskGraph.hasTask(":jfxDeploy") 
 }
 
 

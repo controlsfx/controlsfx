@@ -27,12 +27,10 @@
 package org.controlsfx;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -278,6 +276,46 @@ public class HelloControlsFX extends Application {
 
 
 
+    /**
+     * Gets the list fo sample classes to load
+     *
+     * @param packageName The base package
+     * @return The classes
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    private static Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+        Class<?>[] results;
+        results = loadFromEnumeratedFile();
+        if (results == null) {
+            results = loadFromJarSniffing(packageName);
+        }
+        return results;
+    } 
+        
+    private static Class<?>[] loadFromEnumeratedFile() throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = HelloControlsFX.class.getClassLoader();
+        
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(
+                        HelloControlsFX.class.getResourceAsStream("samples/samples.txt")))) 
+        {
+            List<Class> classes = new ArrayList<>();
+            for (String sample = br.readLine(); sample != null; sample = br.readLine()) {
+                if (sample.endsWith(".java")) {
+                    sample = sample.substring(0, sample.length() - ".java".length());
+                    classes.add(classLoader.loadClass(sample.replace("/", ".")));
+                }
+
+            }
+            return classes.toArray(new Class[classes.size()]);
+        } catch (NullPointerException npe) {
+            // samples.txt doesn't exist
+            return null;
+        }
+    }
+
+
     // --- Following code taken from http://dzone.com/snippets/get-all-classes-within-package
     /**
      * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
@@ -287,23 +325,108 @@ public class HelloControlsFX extends Application {
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    private static Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
-        List<Class> classes = new ArrayList<>();
+    private static Class<?>[] loadFromJarSniffing(String packageName) throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        classLoader = HelloControlsFX.class.getClassLoader();
-        
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        HelloControlsFX.class.getResourceAsStream("samples/samples.txt")))) 
-        {
-            for (String sample = br.readLine(); sample != null; sample = br.readLine()) {
-                if (sample.endsWith(".java")) {
-                    sample = sample.substring(0, sample.length() - ".java".length());
-                    classes.add(classLoader.loadClass(sample.replace("/", ".")));
-                }
+        String path = packageName.replace('.', '/');
 
+        Enumeration<URL> resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList<>();
+        while (resources.hasMoreElements()) {
+            URL next = resources.nextElement();
+
+            // Only "file" and "jar" URLs are recognized, other schemes will be ignored.
+            String protocol = next.getProtocol().toLowerCase();
+            if ("file".equals(protocol)) {
+                dirs.add(new File(next.getFile()));
+            } else if ("jar".equals(protocol)) {
+                String fileName = new URL(next.getFile()).getFile();
+
+                // JAR URL specs must contain the string "!/" which separates the name
+                // of the JAR file from the path of the resource contained in it, even
+                // if the path is empty.
+                int sep = fileName.indexOf("!/");
+                if (sep > 0) {
+                    dirs.add(new File(fileName.substring(0, sep)));
+                }
+                // otherwise the URL was invalid
+            }
+        }
+        ArrayList<Class<?>> classes = new ArrayList<>();
+        for (File directory : dirs) {
+            String fullPath = directory.getAbsolutePath();
+
+            if (fullPath.toLowerCase().endsWith(".jar")) {
+                // scan the jar
+                classes.addAll(findClassesInJar(new File(fullPath), packageName));
+            } else {
+                // scan the classpath
+                classes.addAll(findClasses(directory, packageName));
             }
         }
         return classes.toArray(new Class[classes.size()]);
     }
+
+    /**
+     * Recursive method used to find all classes in a given directory and subdirs.
+     *
+     * @param directory   The base directory
+     * @param packageName The package name for classes found inside the base directory
+     * @return The classes
+     * @throws ClassNotFoundException
+     */
+    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<>();
+        if (!directory.exists()) {
+            System.out.println("Directory does not exist: " + directory.getAbsolutePath());
+            return classes;
+        }
+
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    assert !file.getName().contains(".");
+                    classes.addAll(findClasses(file, packageName + "." + file.getName()));
+                } else if (file.getName().endsWith(".class")) {
+                    String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+                    classes.add(Class.forName(className));
+                }
+            }
+        }
+        return classes;
+    }
+
+
+    private static List<Class<?>> findClassesInJar(File jarFile, String packageName) throws IOException, ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<>();
+        if (!jarFile.exists()) {
+            System.out.println("Jar file does not exist here: " + jarFile.getAbsolutePath());
+            return classes;
+        }
+
+        try (ZipInputStream zip = new ZipInputStream(new FileInputStream(jarFile))) {
+            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                if (entry.getName().endsWith(".class") && !entry.isDirectory()) {
+
+                    StringBuilder className = new StringBuilder();
+                    for (String part : entry.getName().split("/")) {
+                        if(className.length() != 0) {
+                            className.append(".");
+                        }
+
+                        className.append(part);
+
+                        if(part.endsWith(".class")) {
+                            className.setLength(className.length()-".class".length());
+                        }
+                    }
+
+                    if (className.toString().contains(packageName)) {
+                        classes.add(Class.forName(className.toString()));
+                    }
+                }
+            }
+        }
+        return classes;
+    }    
 }

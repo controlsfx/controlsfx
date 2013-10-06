@@ -129,6 +129,12 @@ gradle.taskGraph.whenReady {
 
 
 javafx {
+
+    try {
+        jfxrtJar = ext.jfxrtJar
+    } catch (MissingPropertyException pne) {
+        // ignore
+    }
     
     sourceSet = 'samples'
 

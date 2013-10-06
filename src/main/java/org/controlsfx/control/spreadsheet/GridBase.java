@@ -158,7 +158,7 @@ public class GridBase implements Grid {
      * @param colIndex
      */
     public void spanRow(int count, int rowIndex, int colIndex) {
-        final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
+        final SpreadsheetCell<?> cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = cell.getColumnSpan();
         final int rowSpan = count;
         cell.setRowSpan(rowSpan);

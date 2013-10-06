@@ -30,10 +30,13 @@ import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.GridRow;
 import impl.org.controlsfx.spreadsheet.GridView;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -101,7 +104,7 @@ import javafx.util.Duration;
  * 
  * <h3>Copy pasting </h3>
  * You can copy every cell you want to paste it elsewhere. Be aware that only the value inside will be pasted, not the style nor the type. 
- * Thus the value you're trying to paste must be compatible with the {@link CellType} of the receiving cell. Pasting a Double into a String will work but
+ * Thus the value you're trying to paste must be compatible with the {@link SpreadsheetCellType} of the receiving cell. Pasting a Double into a String will work but
  * the reverse operation will not. 
  * <br/>
  * A unique cell or a selection of several of them can be copied and pasted.
@@ -109,7 +112,7 @@ import javafx.util.Duration;
  * <br/><br/>
  * <h3>Code Samples</h3>
  * Just like the {@link TableView}, you instantiate the underlying model, a {@link Grid}.
- * You will create some {@link ObservableList<DataCell>} filled with {@link SpreadsheetCell}. 
+ * You will create some ObservableList<{@link SpreadsheetCell}> filled with {@link SpreadsheetCell}. 
  * 
  * <br/><br/>
  * 
@@ -196,21 +199,38 @@ public class SpreadsheetView extends Control {
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
-
+    private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
+    private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
+    // The handle that bridges with implementation.
+    final SpreadsheetHandle handle = new SpreadsheetHandle() {
+		@Override
+		protected SpreadsheetView getView() {
+			return SpreadsheetView.this;
+		}
 
+		@Override
+		protected GridViewSkin getCellsViewSkin() {
+			return SpreadsheetView.this.getCellsViewSkin();
+		}
+
+		@Override
+		protected GridView getGridView() {
+			return SpreadsheetView.this.getCellsView();
+		}
+	};
     
     /**
      * @return the inner table view skin
      */
-    public final GridViewSkin getCellsViewSkin() {
+    final GridViewSkin getCellsViewSkin() {
         return (GridViewSkin) (cellsView.getSkin());
     }
     
     /**
      * @return the inner table view
      */
-    public final GridView getCellsView() {
+    final GridView getCellsView() {
     	return cellsView;
     }
     
@@ -250,7 +270,7 @@ public class SpreadsheetView extends Control {
         	}
         });
 
-        this.cellsView = new GridView(this);
+        this.cellsView = new GridView(handle);
         getChildren().add(cellsView);
 
         //Add a listener to the selection model in order to edit the spanned cells when clicked
@@ -275,15 +295,23 @@ public class SpreadsheetView extends Control {
         };
         Platform.runLater(r);
         
-        //Handle copy Paste action, quite naive right now..
+        //Handle keyBoard action, maybe use accelerator
         this.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent arg0) {
-			if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
-				copyClipBoard();
-			else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
-				pasteClipboard();
-			}	
+				if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
+					copyClipBoard();
+				else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
+					pasteClipboard();
+				//We want to edit if the user is on a cell and typing
+				else if(!arg0.isShortcutDown() 
+						&& !arg0.isAltDown()
+						&& !arg0.isMetaDown()
+						&& arg0.getCode().compareTo(KeyCode.ESCAPE) != 0){
+					TablePosition<ObservableList<SpreadsheetCell>, ?> position = cellsView.getFocusModel().getFocusedCell();
+					cellsView.edit(position.getRow(), position.getTableColumn());
+				}
+			}
 		});
         initRowFix(grid);
 
@@ -316,7 +344,7 @@ public class SpreadsheetView extends Control {
 
     /**
      * Return the model Grid used by the SpreadsheetView
-     * @return
+     * @return the model Grid used by the SpreadsheetView
      */
     public final Grid getGrid(){
         return grid;
@@ -335,6 +363,10 @@ public class SpreadsheetView extends Control {
         showColumnHeader.setValue(b);
     }
     
+    /**
+     * Return if the Column Header is showing.
+     * @return a boolean telling if the column Header is being shown
+     */
     public final boolean isShowColumnHeader() {
         return showColumnHeader.get();
     }
@@ -358,13 +390,17 @@ public class SpreadsheetView extends Control {
         showRowHeader.setValue(b);
     }
     
+    /**
+     * Return if the row Header is showing.
+     * @return a boolean telling if the row Header is being shown
+     */
     public final boolean isShowRowHeader() {
         return showRowHeader.get();
     }
     
     /**
      * BooleanProperty associated with the row Header.
-     * @return
+     * @return the BooleanProperty associated with the row Header.
      */
     public final BooleanProperty showRowHeaderProperty() {
         return showRowHeader;
@@ -384,19 +420,12 @@ public class SpreadsheetView extends Control {
      * Indicate whether a row can be fixed or not.
      * Call that method before adding an item with {@link #getFixedRows()} .
      * @param row
-     * @return
+     * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row){
     	return row<rowFix.size()?rowFix.get(row): false;
     }
-//    /**
-//     * Return a SpreadsheetColumn
-//     * @param index
-//     * @return 
-//     */
-//    public SpreadsheetColumn<?> getColumn(int index){
-//    	return getColumns().get(index);
-//    }
+
     /**
      * You can fix or unfix a column by modifying this list.
      * Call {@link SpreadsheetColumn#isColumnFixable()} on the column before adding an item.
@@ -412,7 +441,7 @@ public class SpreadsheetView extends Control {
      * on it directly.
      * Call that method before adding an item with {@link #getFixedColumns()} .
      * @param columnIndex
-     * @return
+     * @return true if the column if fixable
      */
     public boolean isColumnFixable(int columnIndex){
     	return columnIndex<getColumns().size()?getColumns().get(columnIndex).isColumnFixable():null;
@@ -420,12 +449,34 @@ public class SpreadsheetView extends Control {
     
     /**
      * Return the selectionModel used by the SpreadsheetView.
-     * @return {@link SpreadsheetViewSelectionModel}
+     * @return {@link TableViewSelectionModel}
      */
     public TableViewSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
         return cellsView.getSelectionModel();
     }
 
+    /**
+     * Return the editor associated with the CellType. 
+     * (defined in {@link SpreadsheetCellType#createEditor(SpreadsheetView)}.
+     * @param cellType
+     * @return the editor associated with the CellType.
+     */
+    public SpreadsheetCellEditor<?> getEditor(SpreadsheetCellType<?> cellType) {
+    	SpreadsheetCellEditor<?> cellEditor = editors.get(cellType);
+    	if (cellEditor == null) {
+    		cellEditor = cellType.createEditor(this);
+    		editors.put(cellType, cellEditor);
+    	}
+		return cellEditor;
+	}
+    
+    /**
+     * Return a list of {@link SpreadsheetCell} that has been modified.
+     * @return a list of {@link SpreadsheetCell} that has been modified.
+     */
+    public ObservableList<SpreadsheetCell> getModifiedCells(){
+    	return modifiedCells;
+    }
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -486,7 +537,7 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return a list of {@code ObservableList<DataCell>} used by the SpreadsheetView.
+     * Return a list of {@code ObservableList<SpreadsheetCell>} used by the SpreadsheetView.
      * @return
      */
     private ObservableList<ObservableList<SpreadsheetCell>> getItems() {
@@ -557,7 +608,7 @@ public class SpreadsheetView extends Control {
                 column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
                     @Override
                     public TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> call(TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new CellView();
+                        return new CellView(handle);
                     }
                 });
                 cellsView.getColumns().add(column);
@@ -916,18 +967,22 @@ public class SpreadsheetView extends Control {
         private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 GridViewSkin skin = (GridViewSkin)getCellsViewSkin();
-                
                 if (mouseEvent != null && !cellsView.contains(mouseEvent.getX(), mouseEvent.getY())) {
-                    if(mouseEvent.getSceneX() < cellsView.getLayoutX()) {
-                        skin.getHBar().decrement();
-                    }else if(mouseEvent.getSceneX() > cellsView.getLayoutX()+cellsView.getWidth()){
-                        skin.getHBar().increment();
-                    }
-                    else if(mouseEvent.getSceneY() < cellsView.getLayoutY()) {
-                        skin.getVBar().decrement();
-                    }else if(mouseEvent.getSceneY() > cellsView.getLayoutY()+cellsView.getHeight()) {
-                        skin.getVBar().increment();
-                    }
+                	double sceneX = mouseEvent.getSceneX();
+                	double sceneY = mouseEvent.getSceneY();
+                	double layoutX =cellsView.getLayoutX();
+                	double layoutY = cellsView.getLayoutY();
+                	double layoutXMax = layoutX+cellsView.getWidth();
+                	double layoutYMax = layoutY+cellsView.getHeight();
+                	
+                	if(sceneX > layoutXMax)
+                		skin.getHBar().increment();
+                	else if(sceneX < layoutX)
+                		skin.getHBar().decrement();
+                	if(sceneY > layoutYMax)
+                		skin.getVBar().increment();
+                	else if(sceneY < layoutY)
+                		skin.getVBar().decrement();
                 }
             }
         }));

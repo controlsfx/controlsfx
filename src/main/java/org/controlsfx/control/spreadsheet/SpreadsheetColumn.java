@@ -128,7 +128,7 @@ public class SpreadsheetColumn<T> {
      **************************************************************************/
 	/**
 	 * Return whether this column is fixed or not.
-	 * @return
+	 * @return true if this column is fixed.
 	 */
 	public boolean isFixed() {
 //		return column.impl_isFixed();
@@ -158,7 +158,7 @@ public class SpreadsheetColumn<T> {
 	}
 	/**
 	 * Return the Actual width of the column
-	 * @return
+	 * @return {@link TableColumn#getWidth()}
 	 */
 	public double getWidth(){
 		return column.getWidth();
@@ -176,7 +176,7 @@ public class SpreadsheetColumn<T> {
 	 * Indicate whether this column can be fixed or not.
 	 * Call that method before calling {@link #setFixed(boolean)} or
 	 * adding an item to {@link SpreadsheetView#getFixedColumns()}.
-	 * @return
+	 * @return true if this column is fixable.
 	 */
 	public boolean isColumnFixable(){
 		return canFix;
@@ -189,7 +189,7 @@ public class SpreadsheetColumn<T> {
 	/**
      * Generate a context Menu in order to fix/unfix some column
      * It is shown when right-clicking on the column header
-     * @return
+     * @return a context menu.
      */
     private ContextMenu getColumnContextMenu(){
     	if(canFix){
@@ -221,7 +221,7 @@ public class SpreadsheetColumn<T> {
 	 * Right now, only a column without any cell spanning 
 	 * can be fixed.
 	 * 
-	 * @return
+	 * @return if it's fixable.
 	 */
 	private boolean initCanFix(){
 		for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {

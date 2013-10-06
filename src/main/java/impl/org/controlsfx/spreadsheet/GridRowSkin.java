@@ -42,14 +42,11 @@ import com.sun.javafx.scene.control.skin.TableRowSkin;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     
-    SpreadsheetView spreadsheetView;
-    private TableView<ObservableList<SpreadsheetCell>> tableView;
+    private final SpreadsheetHandle handle;
     
-    public GridRowSkin(TableRow<ObservableList<SpreadsheetCell>> tableRow,
-            SpreadsheetView spreadsheetView) {
-        super(tableRow);
-        this.spreadsheetView = spreadsheetView;
-        this.tableView = (TableView<ObservableList<SpreadsheetCell>>) spreadsheetView.getCellsViewSkin().getNode();
+    public GridRowSkin(SpreadsheetHandle handle, GridRow gridRow) {
+        super(gridRow);
+        this.handle = handle;
     }
 
     /**
@@ -74,7 +71,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     @Override
     protected void layoutChildren(double x, final double y, final double w,
             final double h) {
-
+    	final SpreadsheetView spreadsheetView = handle.getView();
+        final GridView gridView = (GridView) handle.getGridView();
+        final Grid grid = spreadsheetView.getGrid();
         /**
          * RT-26743:TreeTableView: Vertical Line looks unfinished. We used to
          * not do layout on cells whose row exceeded the number of items, but
@@ -83,9 +82,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
          */
         // I put that at the very beginning in the hope that I will not have
         // that extra row at the bottom layouting.
-        final TableRow<ObservableList<SpreadsheetCell>> control = (TableRow<ObservableList<SpreadsheetCell>>) getSkinnable();
+        final GridRow control = (GridRow) getSkinnable();
         final int index = control.getIndex();
-        if (index < 0 || index >= tableView.getItems().size()) {
+        if (index < 0 || index >= gridView.getItems().size()) {
             control.setOpacity(0);
             return;
         }
@@ -98,12 +97,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             super.layoutChildren(x, y, w, h);
             return;
         }
-
-     
         // determine the width of the visible portion of the table
-        double headerWidth =  tableView.getWidth();
+        double headerWidth =  gridView.getWidth();
         
-        Grid grid = spreadsheetView.getGrid();
         
         // layout the individual column cells
         double width;
@@ -114,7 +110,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                 + snappedRightInset();
         final double controlHeight = control.getHeight();
 
-        
         /**
          * FOR FIXED ROWS
          */
@@ -147,7 +142,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
              * FOR FIXED COLUMNS
              */
             double tableCellX = 0;
-            final double hbarValue = spreadsheetView.getCellsViewSkin().getHBar().getValue();
+            final double hbarValue = handle.getCellsViewSkin().getHBar().getValue();
             
             //Virtualization of column
             final SpreadsheetCell cellSpan = grid.getRows().get(index).get(column);
@@ -209,7 +204,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         // in case we modified the DataCell after that
                         // SpreadsheetCell was created
                         final TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView.getSelectionModel();
-                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableView.getColumns().get(column);
+                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = gridView.getColumns().get(column);
 
                         // In case this cell was selected before but we scroll
                         // up/down and it's invisible now.
@@ -294,6 +289,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 	}
     public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
 
+        final GridView tableView = (GridView) handle.getGridView();
+    	final SpreadsheetView spreadsheetView = handle.getView();
         final SpreadsheetCell cellSpan = tableView.getItems().get(row).get(col);
         final int infRow = cellSpan.getRow();
         final int supRow = infRow + cellSpan.getRowSpan();

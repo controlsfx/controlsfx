@@ -96,7 +96,7 @@
 	-fx-background-radius : 0 15 0 0;
 }
 
-/* HORIZONTAL HEADER */
+/* HORIZONTAL AND VERTICAL HEADER SELECTION */
 VerticalHeader > Label,
 .spreadsheet-cell.fixed {
    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
@@ -110,7 +110,7 @@ VerticalHeader > Label,
 }  
 
 VerticalHeader > Label.selected,
-Label.selected{
+HorizontalHeaderColumn > TableColumnHeader > Label.selected{
    -fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
@@ -120,9 +120,9 @@ Label.selected{
     -fx-alignment: center;
 }  
 
-/* FIXED COLUMNS  */
+/* FIXED HEADERS  */
 VerticalHeader > Label.fixed,
-Label.fixed{
+HorizontalHeaderColumn > TableColumnHeader > Label.fixed{
 	-fx-font-style : italic;
 }
 

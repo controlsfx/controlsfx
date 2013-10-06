@@ -24,33 +24,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package impl.org.controlsfx.spreadsheet;
 
-import javafx.collections.ObservableList;
-import javafx.scene.control.TableView;
-
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public class GridView extends TableView<ObservableList<SpreadsheetCell>> {
-	private final SpreadsheetHandle handle;
-
-	public GridView(SpreadsheetHandle handle) {
-		this.handle = handle;
-	}
-
-	@Override
-	protected String getUserAgentStylesheet() {
-		return SpreadsheetView.class.getResource("spreadsheet.css")
-				.toExternalForm();
-	}
-
-	@Override
-	protected javafx.scene.control.Skin<?> createDefaultSkin() {
-		return new GridViewSkin(handle);
-	}
-	
-	public GridViewSkin getGridViewSkin() {
-		return handle.getCellsViewSkin();
-	}
-};
+/**
+ * Implementation vs public bridge.
+ */
+public abstract class SpreadsheetHandle {
+	/** Access the main control. */
+	protected abstract SpreadsheetView getView();
+	/** Accesses the grid (ie cell table) in the spreadsheet. */
+	protected abstract GridView getGridView();
+	/** Accesses the grid view (ie cell table view). */
+	protected abstract GridViewSkin getCellsViewSkin();
+}

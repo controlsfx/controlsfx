@@ -88,6 +88,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             }
         };
         getVbar().valueProperty().addListener(listenerY);
+        // FIXME Until RT-31777 is resolved
+        getHbar().setUnitIncrement(10);
 
     }
 

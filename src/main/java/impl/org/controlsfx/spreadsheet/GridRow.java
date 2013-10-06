@@ -50,24 +50,24 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * Private Fields                                                          *
      *                                                                         *
      **************************************************************************/
-    private final SpreadsheetView spreadsheetView;
+    private final SpreadsheetHandle handle;
     /**
      * This is the index used by the VirtualFlow
      * So the row can be with indexVirtualFlow at 32
      * But if it is situated in the header, his index will be 0 (or the row in the header)
      */
-    private Integer indexVirtualFlow = null;
+    private int indexVirtualFlow = -1;
     private boolean layoutFixedColumns = false;
-    private Boolean currentlyFixed = false;
+    private boolean currentlyFixed = false;
 
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-    public GridRow(SpreadsheetView spreadsheetView) {
+    public GridRow(SpreadsheetHandle handle) {
         super();
-        this.spreadsheetView = spreadsheetView;
+        this.handle = handle;
     }
 
     /***************************************************************************
@@ -77,7 +77,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      **************************************************************************/
 
     public int getIndexVirtualFlow(){
-        return indexVirtualFlow == null?getIndex():indexVirtualFlow;
+        return indexVirtualFlow < 0?getIndex():indexVirtualFlow;
     }
     
     public void setIndexVirtualFlow(int i){
@@ -92,7 +92,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 	 * Indicate that this row is bonded on the top.
 	 * @param currentlyFixed
 	 */
-	public void setCurrentlyFixed(Boolean currentlyFixed) {
+	public void setCurrentlyFixed(boolean currentlyFixed) {
 		this.currentlyFixed = currentlyFixed;
 	}
 	
@@ -153,7 +153,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      **************************************************************************/
 
     SpreadsheetView getSpreadsheetView() {
-        return spreadsheetView;
+        return handle.getView();
     }
 
     /**
@@ -207,7 +207,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new GridRowSkin(this,spreadsheetView);
+        return new GridRowSkin(handle, this);
     }
 
 }

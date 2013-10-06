@@ -103,16 +103,6 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		grid.setVgap(5);
 		grid.setPadding(new Insets(5, 5, 5, 5));
 
-		/*final ChoiceBox<Integer> fixedRows = new ChoiceBox<>(FXCollections.observableArrayList(0, 1, 2));
-		fixedRows.getSelectionModel().select(0);
-		fixedRows.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0,
-					Number arg1, Number arg2) {
-				spv.fixRows(arg2.intValue());
-			}
-		});*/
-
 		final CheckBox rowHeader = new CheckBox("Row Header");
 		rowHeader.setSelected(true);
 		rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -169,8 +159,6 @@ public class HelloSpreadsheetView extends Application implements Sample {
 				}
 			}});
 		
-//		grid.add(new Label("Freeze Rows:"), 1, 1);
-//		grid.add(fixedRows, 1, 2);
 		grid.add(rowHeader, 1, 1);
 		grid.add(columnHeader, 1, 2);
 		grid.add(new Label("Span model:"), 1, 3);

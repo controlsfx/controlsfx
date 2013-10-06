@@ -34,9 +34,35 @@ import javafx.scene.Node;
 
 
 /**
- * Defines glyph font for FontAwesome. Automatically registered with {@link GlyphFontRegistry}.
- * <br/>
- * Currently the font is loaded from Bootstrap CDN 
+ * Defines a {@link GlyphFont} for the FontAwesome font set (see 
+ * <a href="http://fortawesome.github.io/Font-Awesome/">the FontAwesome website</a>
+ * for more details). Note that at present the FontAwesome font is not distributed
+ * with ControlsFX, and is instead loaded from Bootstrap CDN at runtime. 
+ * 
+ * <p>To use FontAwesome (or indeed any glyph font) in your JavaFX application,
+ * you firstly have to get access to the FontAwesome glyph font. You do this by
+ * doing the following:
+ * 
+ * <pre>GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");</pre>
+ * 
+ * <p>This code works because all glyph fonts are found dynamically at runtime
+ * by the {@link GlyphFontRegistry} class, so you can simply request the font
+ * set you want from there.
+ * 
+ * <p>Once the font set has been loaded, you can simply start creating 
+ * {@link Glyph} nodes and place them in your user interface. For example:
+ * 
+ * <pre>new Button("", fontAwesome.fontColor(Color.RED).create(&#92;uf013));</pre>
+ * 
+ * <p>Of course, this requires you to know that <code>&#92;uf013</code> maps to 
+ * a 'gear' icon, which is not always intuitive (especially when you re-read the 
+ * code in the future). A simpler approach is to do the following:
+ * 
+ * <pre>new Button("", FontAwesome.Glyph.GEAR.create());</pre>
+ * 
+ * @see GlyphFont
+ * @see GlyphFontRegistry
+ * @see Glyph
  */
 public class FontAwesome extends GlyphFont {
 
@@ -44,6 +70,9 @@ public class FontAwesome extends GlyphFont {
 	
 	private Map<String, Character> glyphs;
 	
+	/**
+	 * The individual glyphs offered by the FontAwesome font.
+	 */
 	public static enum Glyph {
 
 		GLASS('\uf000'),
@@ -440,8 +469,12 @@ public class FontAwesome extends GlyphFont {
 		}
 	};
 	
-	// FIXME only needs to be instantiated by the GlyphFontRegistry, so this
-	// constructor shouldn't really be called multiple times...
+	/**
+	 * Do not call this constructor directly - instead access the 
+	 * {@link FontAwesome.Glyph} public static enumeration (and call the 
+	 * {@link FontAwesome.Glyph#create()} method to create the glyph nodes), or
+	 * use the {@link GlyphFontRegistry} class to get access.
+	 */
 	public FontAwesome() {
 		
 		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf" ); 

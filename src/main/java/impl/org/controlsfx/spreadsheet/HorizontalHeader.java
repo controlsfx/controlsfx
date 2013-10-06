@@ -47,24 +47,24 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
  * The set of horizontal (column) headers.
  */
 public class HorizontalHeader extends TableHeaderRow {
-	final GridViewSkin spreadsheetViewSkin;
+	final GridViewSkin gridViewSkin;
     // Indicate whether the this TableHeaderRow is activated or not
     private boolean working = true;
     
     public HorizontalHeader(final GridViewSkin skin) {
         super(skin);
-        spreadsheetViewSkin = skin;
+        gridViewSkin = skin;
     }
     public void init() {
         final Runnable r = new Runnable() {
             @Override
             public void run() {
-            	SpreadsheetView view = spreadsheetViewSkin.spreadsheetView;
+            	SpreadsheetView view = gridViewSkin.spreadsheetView;
                 view.showRowHeaderProperty().addListener(rowHeaderListener);
-                spreadsheetViewSkin.getSelectedColumns().addListener(selectionListener);
+                gridViewSkin.getSelectedColumns().addListener(selectionListener);
                 view.getFixedColumns().addListener(fixedColumnsListener);
 
-                spreadsheetViewSkin.getTableMenuButtonVisibleProperty()
+                gridViewSkin.getTableMenuButtonVisibleProperty()
                         .addListener(new InvalidationListener() {
                             @Override
                             public void invalidated(Observable valueModel) {
@@ -88,7 +88,7 @@ public class HorizontalHeader extends TableHeaderRow {
                                 working = arg2;
                                 requestLayout();
                                 getRootHeader().layoutFixedColumns();
-                                updateHighlighSelection();
+                                updateHighlightSelection();
                             }
                         });
                 /*****************************************************************
@@ -106,10 +106,10 @@ public class HorizontalHeader extends TableHeaderRow {
         /*****************************************************************
          * MODIFIED BY NELLARMONIA
          *****************************************************************/
-        if (spreadsheetViewSkin != null
-                && spreadsheetViewSkin.spreadsheetView != null
-                && spreadsheetViewSkin.spreadsheetView.showRowHeaderProperty().get()) {
-            padding += spreadsheetViewSkin.getRowHeaderWidth();
+        if (gridViewSkin != null
+                && gridViewSkin.spreadsheetView != null
+                && gridViewSkin.spreadsheetView.showRowHeaderProperty().get()) {
+            padding += gridViewSkin.getRowHeaderWidth();
         }
 
         /*****************************************************************
@@ -156,14 +156,14 @@ public class HorizontalHeader extends TableHeaderRow {
 			while(arg0.next()){
 				//If we unfix a column
 				for (SpreadsheetColumn<?> remitem : arg0.getRemoved()) {
-                   removeStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(remitem));
+                   removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(remitem));
                 }
 				//If we fix one
                 for (SpreadsheetColumn<?> additem : arg0.getAddedSubList()) {
-                	addStyleHeader(spreadsheetViewSkin.spreadsheetView.getColumns().indexOf(additem));
+                	addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(additem));
                 }
 			}
-			 updateHighlighSelection();
+			 updateHighlightSelection();
 		}
 	}; 
 
@@ -192,19 +192,19 @@ public class HorizontalHeader extends TableHeaderRow {
     private final InvalidationListener selectionListener = new InvalidationListener() {
         @Override
         public void invalidated(Observable valueModel) {
-            updateHighlighSelection();
+            updateHighlightSelection();
         }
     };
     
     /**
      * Highlight the header Label when selection change.
      */
-    private void updateHighlighSelection() {
+    private void updateHighlightSelection() {
     	for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
             i.getChildrenUnmodifiable().get(0).getStyleClass().removeAll("selected");
 
         }
-        final List<Integer> selectedColumns = spreadsheetViewSkin.getSelectedColumns();
+        final List<Integer> selectedColumns = gridViewSkin.getSelectedColumns();
         // TODO Ugly hack to get access to the Label
         for (final Object i : selectedColumns) {
             getRootHeader().getColumnHeaders().get((Integer) i)

@@ -103,20 +103,22 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         return rowHeaderWidth;
     }
 
+    protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader rowHeader;
 
-    public GridViewSkin(final SpreadsheetView spreadsheetView) {
-        super(spreadsheetView.getCellsView());
-        this.spreadsheetView = spreadsheetView;
-        spreadsheetCellEditorImpl = new GridCellEditor();
-        TableView<ObservableList<SpreadsheetCell>> tableView = spreadsheetView.getCellsView();
+    public GridViewSkin(final SpreadsheetHandle handle) {
+        super(handle.getGridView());
+        this.handle = handle;
+        this.spreadsheetView = handle.getView();
+        spreadsheetCellEditorImpl = new GridCellEditor(handle);
+        TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
         tableView.setEditable(true);
 
         // Do nothing basically but give access to the Hover Property.
         tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
             @Override public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
-                return new GridRow(spreadsheetView);
+                return new GridRow(handle);
             }
         });
 
@@ -140,7 +142,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 	protected void init() {
         getFlow().getVerticalBar().valueProperty()
                 .addListener(vbarValueListener);
-        rowHeader = new VerticalHeader(this, spreadsheetView, rowHeaderWidth);
+        rowHeader = new VerticalHeader(handle, rowHeaderWidth);
         getChildren().addAll(rowHeader);
 
         rowHeader.init(this);
@@ -417,7 +419,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     public GridRow getRow(int index) {
-        return spreadsheetView.getCellsViewSkin().getCell(index);
+        return handle.getCellsViewSkin().getCell(index);
     }
     
     /**

@@ -44,8 +44,10 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
 
 /**
  *
@@ -53,7 +55,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  * It holds the {@link SpreadsheetCell}.
  */
 public class CellView extends TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
-
+	private final SpreadsheetHandle handle;
     /***************************************************************************
      *                                                                         *
      * Static Fields                                                           *
@@ -70,19 +72,17 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
     
-    
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-    public CellView() {
+    public CellView(SpreadsheetHandle handle) {
+    	this.handle = handle;
     	hoverProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
                 final int row = getIndex();
-//                final SpreadsheetView spv = ((SpreadsheetRow)getTableRow()).getSpreadsheetView();
-
                 if (getItem() == null) {
                     getTableRow().requestLayout();
                 // We only need to re-route if the rowSpan is large because
@@ -127,9 +127,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
-        final SpreadsheetView spv = getSpreadsheetView();
-        final GridViewSkin sps = spv.getCellsViewSkin();
-        Grid grid = spv.getGrid();
+        final SpreadsheetView spv = handle.getView();
+        final GridViewSkin gvs = handle.getCellsViewSkin();
+        final Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
         	
@@ -142,8 +142,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         	 */
         	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
-	        	for (int j = 0; j< sps.getCellsSize();j++ ) {
-	                    if(sps.getRow(j) == getTableRow()){
+	        	for (int j = 0; j< gvs.getCellsSize();j++ ) {
+	                    if(gvs.getRow(j) == getTableRow()){
 	                    	flag = true;
 	                    }
 	            }
@@ -173,19 +173,18 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
     	SpreadsheetCellType<?> cellType = cell.getCellType();
-    	GridCellEditor editor = spv.getCellsViewSkin().getSpreadsheetCellEditorImpl();
+    	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
+
+    	GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
         if (editor.isEditing()){
             return null;
         } else {
-        	editor.updateSpreadsheetView(spv);
         	editor.updateSpreadsheetCell(this);
         	editor.updateDataCell(cell);
-        	editor.updateSpreadsheetCellEditor(cellType.getEditor(spv));
+        	editor.updateSpreadsheetCellEditor(cellEditor);
             return editor;
         }
     }
-    
-    
 
     @Override
     public void commitEdit(SpreadsheetCell newValue) {
@@ -283,14 +282,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // TODO bind
         getStyleClass().addAll(item.getStyleClass());
         
-        // Style
-//        final ObservableList<String> css = getStyleClass();
-//        if (css.size() == 1) {
-//            css.set(0, item.getStyleCss());
-//        }else{
-//            css.clear();
-//            css.add(item.getStyleCss());
-//        }
     }
 
     public void show(){
@@ -328,8 +319,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private void hoverGridCell(SpreadsheetCell cell) {
         CellView gridCell;
         
-        final SpreadsheetView spv = getSpreadsheetView();
-        final GridViewSkin sps = spv.getCellsViewSkin();
+        final SpreadsheetView spv = handle.getView();
+        final GridViewSkin sps = handle.getCellsViewSkin();
         final GridRow row = sps.getRow(spv.getFixedRows().size());
         
         if (sps.getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
@@ -357,8 +348,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     private void unHoverGridCell() {
         //If the top of the spanned cell is visible, then no problem
-        final SpreadsheetView spv = getSpreadsheetView();
-        final GridViewSkin sps = spv.getCellsViewSkin();
+        final GridViewSkin sps = handle.getCellsViewSkin();
         GridCellEditor editor = sps.getSpreadsheetCellEditorImpl();
         CellView lastHover = editor.getLastHover();
         if(editor.getLastHover() != null){

@@ -14,6 +14,7 @@ public class GridCellEditor {
 	 * * Protected/Private Fields * *
 	 **************************************************************************/
 
+	private final SpreadsheetHandle handle;
 	// transient properties - these fields will change based on the current
 	// cell being edited.
 	private SpreadsheetCell modelCell;
@@ -24,7 +25,6 @@ public class GridCellEditor {
 	private InvalidationListener editorListener;
 	private InvalidationListener il;
 	private boolean editing = false;
-	private SpreadsheetView spreadsheetView;
 	private SpreadsheetCellEditor<?> spreadsheetCellEditor;
     private CellView lastHover = null;
 
@@ -35,7 +35,8 @@ public class GridCellEditor {
 	/**
 	 * Construct the SpreadsheetCellEditor.
 	 */
-	public GridCellEditor() {
+	public GridCellEditor(SpreadsheetHandle handle) {
+		this.handle = handle;
 		this.spreadsheetEditor = new SpreadsheetEditor();
 	}
 
@@ -58,13 +59,6 @@ public class GridCellEditor {
 		this.viewCell = cell;
 	}
 
-	/**
-	 * Update the SpreadsheetView
-	 * @param spreadsheet
-	 */
-	public void updateSpreadsheetView(SpreadsheetView spreadsheet) {
-		this.spreadsheetView = spreadsheet;
-	}
 	/**
 	 * Update the SpreadsheetCellEditor
 	 * @param spreadsheetCellEditor2
@@ -91,14 +85,19 @@ public class GridCellEditor {
 	 */
 	public void endEdit(boolean b){
 		if(b){
+			final SpreadsheetView view = handle.getView();
 			Object value = modelCell.getCellType().convertValue(spreadsheetCellEditor.getControlValue());
 			if(value != null && viewCell != null){
+				//We update the modified cells
+				if(!modelCell.getItem().equals(value) && !view.getModifiedCells().contains(modelCell))
+					view.getModifiedCells().add(modelCell);
+
 				modelCell.setItem(value);
 				viewCell.commitEdit(modelCell);
 				end();
 				spreadsheetCellEditor.end();
 			}
-		}else{
+		}else if(viewCell != null){
 			viewCell.cancelEdit();
 			end();
 			spreadsheetCellEditor.end();
@@ -146,16 +145,16 @@ public class GridCellEditor {
 				endEdit(false);
 			}
 		};
-		spreadsheetView.getCellsViewSkin().getVBar().valueProperty().addListener(editorListener);
+		handle.getCellsViewSkin().getVBar().valueProperty().addListener(editorListener);
 		//FIXME We need to REALLY find a way to stop edition when anything happen
 		// This is one way but it will need further investigation
-		spreadsheetView.disabledProperty().addListener(editorListener);
+		handle.getView().disabledProperty().addListener(editorListener);
 
+		viewCell.setGraphic(spreadsheetCellEditor.getEditor());
+		
 		//Then we call the user editor in order for it to be ready
 		Object value = modelCell.getItem();
 		spreadsheetCellEditor.startEdit(value);
-
-		viewCell.setGraphic(spreadsheetCellEditor.getEditor());
 	}
 
 
@@ -167,8 +166,8 @@ public class GridCellEditor {
 		}
 		il = null;
 
-		spreadsheetView.getCellsViewSkin().getVBar().valueProperty().removeListener(editorListener);
-		spreadsheetView.disabledProperty().removeListener(editorListener);
+		handle.getCellsViewSkin().getVBar().valueProperty().removeListener(editorListener);
+		handle.getView().disabledProperty().removeListener(editorListener);
 		editorListener = null;
 		this.modelCell = null;
 		this.viewCell = null;
@@ -184,11 +183,11 @@ public class GridCellEditor {
 		private boolean isMoved;
 
 		private int getCellCount() {
-			return spreadsheetView.getCellsViewSkin().getCellsSize();
+			return handle.getCellsViewSkin().getCellsSize();
 		}
 
 		private boolean addCell(CellView cell){
-			GridRow temp = spreadsheetView.getCellsViewSkin().getRow(getCellCount()-1-spreadsheetView.getFixedRows().size());
+			GridRow temp = handle.getCellsViewSkin().getRow(getCellCount()-1-handle.getView().getFixedRows().size());
 			if(temp != null){
 				temp.addCell(cell);
 				return true;

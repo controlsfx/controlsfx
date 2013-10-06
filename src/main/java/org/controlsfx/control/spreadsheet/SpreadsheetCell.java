@@ -43,68 +43,72 @@ import javafx.collections.ObservableMap;
  * 
  * <br/>
  * 
- * <h3>Type of SpreadsheetCell:</h3> 
+ * <h3>SpreadsheetCell Types</h3> 
  * Each SpreadsheetCell has its own {@link SpreadsheetCellType}.
- * Different {@link SpreadsheetCellType} are
+ * Different {@link SpreadsheetCellType SpreadsheetCellTypes} are
  * available depending on the data you want to represent in your
- * {@link SpreadsheetView}. MoreOver, each {@link SpreadsheetCellType} has its own {@link SpreadsheetCellEditor}
- * in order to control very closely the possible modifications. <br/>
+ * {@link SpreadsheetView}. MoreOver, each {@link SpreadsheetCellType} has its 
+ * own {@link SpreadsheetCellEditor} in order to control very closely the possible 
+ * modifications.
  * 
- * 
- * You can use the different static method provided in {@link SpreadsheetCellType} in order to
- * create the specialized SpreadsheetCell that suits your need: <br/>
+ * <p>You can use the different static method provided in 
+ * {@link SpreadsheetCellType} in order to create the specialized 
+ * SpreadsheetCell that suits your need:
  * 
  * <ul>
  * <li><b>String</b>: Accessible with
- * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)} .</li>
+ * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)}.</li>
  * <li><b>List</b>: Accessible with
- * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)} .
+ * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)}.
  * </li>
  * <li><b>Double</b>: Accessible with
- * {@link  SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)} .</li>
+ * {@link  SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)}.</li>
  * <li><b>Date</b>: Accessible with
- * {@link  SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}
- * .</li>
+ * {@link  SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}.</li>
  * </ul>
  * <br/>
  * 
- * If you want to create a SpreadsheetCell of your own, you simply have to create your own
- * {@link  SpreadsheetCellType} and implements the abstract method {@link  SpreadsheetCellType#createCell(int, int, int, int, Object)}.
- * You will also have to provide the custom {@link SpreadsheetCellEditor}.
- * <br/>
+ * <p>If you want to create a SpreadsheetCell of your own, you simply have to create 
+ * your own {@link  SpreadsheetCellType} and implement the abstract method 
+ * {@link  SpreadsheetCellType#createCell(int, int, int, int, Object)}.
+ * You will also have to provide a custom {@link SpreadsheetCellEditor}.
  * 
- * <h3>Configuration:</h3> You will have to indicate the coordinates of that
- * Cell together with the row and column Span. You can specify if you want that
- * cell to be editable or not using {@link #setEditable(boolean)}. Be advised
- * that a cell with a rowSpan means that the cell will replace all the cells
- * situated in the rowSpan range. Same with the column span. So the best way to
- * handle spanning is to fill your grid with unique cells, and then call
+ * <h3>Configuration</h3>
+ * You will have to indicate the coordinates of the cell together with the 
+ * {@link #setRowSpan(int) row} and {@link #setColumnSpan(int) column} span. You 
+ * can specify if you want the cell to be editable or not using 
+ * {@link #setEditable(boolean)}. Be advised that a cell with a rowSpan means 
+ * that the cell will replace all the cells situated in the rowSpan range. 
+ * Same with the column span. The best way to handle spanning is to fill your 
+ * grid with unique cells, and then call
  * {@link GridBase#spanColumn(int, int, int)} or
- * {@link GridBase#spanRow(int, int, int)}. <br/>
+ * {@link GridBase#spanRow(int, int, int)}.
  * 
  * 
- * <h3> Code samples </h3>
+ * <h3>Examples</h3>
  * Here is an example that uses all the pre-built {@link SpreadsheetCellType}
- * The generation is random here  and you'll probably use a switch instruction in your case.
- * <br/><br/>
+ * types. The generation is random here so you will want to replace the logic to
+ * suit your needs.
+ * 
  * <pre>
  * private SpreadsheetCell&lt;?&gt; generateCell(int row, int column, int rowSpan, int colSpan) {
- *		List&lt;String?&gt; stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
-		final double random = Math.random();
-		if (random &lt; 0.10) {
-			List&lt;String?&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
-			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
-		} else if (random ?&gt;= 0.10 && random &lt; 0.25) {
-			cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
-		}else if (random ?&gt;= 0.25 && random &lt; 0.75) {
-			cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
-		}else{
-			cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
-		}
-		return cell;
+ *     List&lt;String?&gt; stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
+ *     final double random = Math.random();
+ *     if (random &lt; 0.10) {
+ *         List&lt;String?&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
+ *         cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
+ *     } else if (random ?&gt;= 0.10 && random &lt; 0.25) {
+ *         cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+ *     } else if (random ?&gt;= 0.25 && random &lt; 0.75) {
+ *         cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+ *     } else {
+ *         cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+ *     }
+ *     return cell;
  * }
  * </pre>
- * When you are using {@link SpreadsheetCellType.DoubleType},
+ * 
+ * <p>When you are using {@link SpreadsheetCellType.DoubleType},
  * you will then be sure that your cells contain only {@link Double} value. If
  * the user wants to enter a {@link String}, the value will be ignored.
  * Moreover, the {@link SpreadsheetCellEditor} background color will turn red
@@ -136,7 +140,6 @@ public class SpreadsheetCell implements Serializable {
 	private transient int columnSpan;
 
 	private String text;
-	private transient BooleanProperty editable;
 
 	/**
 	 * Not serializable, it's transient right now because we don't need the
@@ -145,6 +148,8 @@ public class SpreadsheetCell implements Serializable {
 	 * http://www.oracle.com/technetwork/articles/java/javaserial-1536170.html
 	 */
 	private transient ObservableList<String> styleClass;
+	
+	
 
 	/***************************************************************************
 	 * 
@@ -181,10 +186,11 @@ public class SpreadsheetCell implements Serializable {
 		this.column = column;
 		this.rowSpan = rowSpan;
 		this.columnSpan = columnSpan;
-		this.type = (SpreadsheetCellType) type;
+		this.type = (SpreadsheetCellType<?>) type;
 		text = "";
-		editable = new SimpleBooleanProperty(true);
 	}
+	
+	
 
 	/***************************************************************************
 	 * 
@@ -202,6 +208,8 @@ public class SpreadsheetCell implements Serializable {
 	public void match(SpreadsheetCell cell) {
 		type.copy(cell, this);
 	}
+	
+	
 
 	/***************************************************************************
 	 * 
@@ -210,38 +218,66 @@ public class SpreadsheetCell implements Serializable {
 	 ***************************************************************************/
 
 	// --- item
-	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(
-			this, "item") {
-		@Override
-		protected void invalidated() {
+	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
+		@Override protected void invalidated() {
 			updateText();
 		}
 	};
 
-	/**
-	 * Set item
-	 * @param value
-	 */
+    // auto-generated JavaDoc
 	public final void setItem(Object value) {
 		item.set(value);
 	}
 
-	/**
-	 * 
-	 * @return the item
-	 */
+	// auto-generated JavaDoc
 	public final Object getItem() {
 		return item.get();
 	}
 
 	/**
-	 * 
-	 * @return ObjectProperty
+	 * The item property represents the currently-set value inside this
+	 * SpreadsheetCell instance.
 	 */
 	public final ObjectProperty<Object> itemProperty() {
 		return item;
 	}
+	
+	
+	// --- editable
+	private transient BooleanProperty editable;
+	
+	/**
+     * Return if this cell can be edited or not.
+     * 
+     * @return true if this cell is editable.
+     */
+    public final boolean isEditable() {
+        return editable == null ? true : editable.get();
+    }
 
+    /**
+     * Change the editable state of this cell
+     * 
+     * @param readOnly
+     */
+    public final void setEditable(boolean readOnly) {
+        editableProperty().set(readOnly);
+    }
+
+    /**
+     * The {@link BooleanProperty} linked with the editable state.
+     * 
+     * @return The {@link BooleanProperty} linked with the editable state.
+     */
+    public final BooleanProperty editableProperty() {
+        if (editable == null) {
+            editable = new SimpleBooleanProperty(this, "editable", true);
+        }
+        return editable;
+    }
+
+	
+	
 	/***************************************************************************
 	 * 
 	 * Public Methods
@@ -250,10 +286,10 @@ public class SpreadsheetCell implements Serializable {
 
 	/**
 	 * Return the String representation currently used for display
-	 * in the {@link SpreadsheetView}
+	 * in the {@link SpreadsheetView}.
 	 * @return text representation of the value.
 	 */
-	public String getText() {
+	public final String getText() {
 		return text;
 	}
 
@@ -262,7 +298,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @return the {@link SpreadsheetCellType} of this particular cell.
 	 */
-	public SpreadsheetCellType<?> getCellType() {
+	public final SpreadsheetCellType<?> getCellType() {
 		return type;
 	}
 
@@ -271,7 +307,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @return the row of this cell.
 	 */
-	public int getRow() {
+	public final int getRow() {
 		return row;
 	}
 
@@ -280,7 +316,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @return the column of this cell.
 	 */
-	public int getColumn() {
+	public final int getColumn() {
 		return column;
 	}
 
@@ -289,7 +325,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @return how much this cell is spanning in row, 1 is normal.
 	 */
-	public int getRowSpan() {
+	public final int getRowSpan() {
 		return rowSpan;
 	}
 
@@ -301,7 +337,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @param rowSpan
 	 */
-	public void setRowSpan(int rowSpan) {
+	public final void setRowSpan(int rowSpan) {
 		this.rowSpan = rowSpan;
 	}
 
@@ -309,7 +345,7 @@ public class SpreadsheetCell implements Serializable {
 	 * Return how much this cell is spanning in column, 1 is normal.
 	 * @return how much this cell is spanning in column, 1 is normal.
 	 */
-	public int getColumnSpan() {
+	public final int getColumnSpan() {
 		return columnSpan;
 	}
 
@@ -321,7 +357,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @param columnSpan
 	 */
-	public void setColumnSpan(int columnSpan) {
+	public final void setColumnSpan(int columnSpan) {
 		this.columnSpan = columnSpan;
 	}
 
@@ -332,39 +368,13 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @return an ObservableList of String of all the style class
 	 */
-	public ObservableList<String> getStyleClass() {
+	public final ObservableList<String> getStyleClass() {
 		if (styleClass == null) {
 			styleClass = FXCollections.observableArrayList();
 		}
 		return styleClass;
 	}
 
-	/**
-	 * Return if this cell can be edited or not.
-	 * 
-	 * @return true if this cell is editable.
-	 */
-	public boolean isEditable() {
-		return editable.get();
-	}
-
-	/**
-	 * Change the editable state of this cell
-	 * 
-	 * @param readOnly
-	 */
-	public void setEditable(boolean readOnly) {
-		editable.set(readOnly);
-	}
-
-	/**
-	 * The {@link BooleanProperty} linked with the editable state.
-	 * 
-	 * @return The {@link BooleanProperty} linked with the editable state.
-	 */
-	public BooleanProperty editableProperty() {
-		return editable;
-	}
 
 	// A map containing a set of properties for this cell
 	private transient ObservableMap<Object, Object> properties;
@@ -388,10 +398,12 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @return true if node has properties.
 	 */
-	public boolean hasProperties() {
+	public final boolean hasProperties() {
 		return properties != null && !properties.isEmpty();
 	}
 
+	
+	
 	/***************************************************************************
 	 * 
 	 * Overridden Methods
@@ -399,14 +411,12 @@ public class SpreadsheetCell implements Serializable {
 	 **************************************************************************/
 
 	/** {@inheritDoc} */
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
 	}
 
 	/** {@inheritDoc} */
-	@Override
-	public boolean equals(Object obj) {
+	@Override public boolean equals(Object obj) {
 		if (!(obj instanceof SpreadsheetCell))
 			return false;
 
@@ -419,6 +429,8 @@ public class SpreadsheetCell implements Serializable {
 		}
 	}
 
+	
+	
 	/***************************************************************************
 	 * 
 	 * Private Implementation

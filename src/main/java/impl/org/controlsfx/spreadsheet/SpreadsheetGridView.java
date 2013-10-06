@@ -32,10 +32,10 @@ import javafx.scene.control.TableView;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public class GridView extends TableView<ObservableList<SpreadsheetCell>> {
+public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
 	private final SpreadsheetHandle handle;
 
-	public GridView(SpreadsheetHandle handle) {
+	public SpreadsheetGridView(SpreadsheetHandle handle) {
 		this.handle = handle;
 	}
 

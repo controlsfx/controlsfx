@@ -28,7 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.GridRow;
-import impl.org.controlsfx.spreadsheet.GridView;
+import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 
@@ -191,7 +191,7 @@ public class SpreadsheetView extends Control {
      *                                                                         *
      **************************************************************************/
 
-    private final GridView cellsView;// The main cell container. 
+    private final SpreadsheetGridView cellsView;// The main cell container. 
     private Grid grid;
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();;
@@ -215,7 +215,7 @@ public class SpreadsheetView extends Control {
 		}
 
 		@Override
-		protected GridView getGridView() {
+		protected SpreadsheetGridView getGridView() {
 			return SpreadsheetView.this.getCellsView();
 		}
 	};
@@ -230,7 +230,7 @@ public class SpreadsheetView extends Control {
     /**
      * @return the inner table view
      */
-    final GridView getCellsView() {
+    final SpreadsheetGridView getCellsView() {
     	return cellsView;
     }
     
@@ -270,7 +270,7 @@ public class SpreadsheetView extends Control {
         	}
         });
 
-        this.cellsView = new GridView(handle);
+        this.cellsView = new SpreadsheetGridView(handle);
         getChildren().add(cellsView);
 
         //Add a listener to the selection model in order to edit the spanned cells when clicked
@@ -1009,7 +1009,7 @@ public class SpreadsheetView extends Control {
         
         public SpreadsheetViewSelectionModel(SpreadsheetView spreadsheetView) {
             super(spreadsheetView.cellsView);
-            final GridView cellsView = spreadsheetView.cellsView;
+            final SpreadsheetGridView cellsView = spreadsheetView.cellsView;
             cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {

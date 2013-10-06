@@ -36,7 +36,7 @@ public abstract class SpreadsheetHandle {
 	/** Access the main control. */
 	protected abstract SpreadsheetView getView();
 	/** Accesses the grid (ie cell table) in the spreadsheet. */
-	protected abstract GridView getGridView();
+	protected abstract SpreadsheetGridView getGridView();
 	/** Accesses the grid view (ie cell table view). */
 	protected abstract GridViewSkin getCellsViewSkin();
 }

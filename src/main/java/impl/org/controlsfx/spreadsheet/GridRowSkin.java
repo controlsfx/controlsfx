@@ -72,7 +72,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     protected void layoutChildren(double x, final double y, final double w,
             final double h) {
     	final SpreadsheetView spreadsheetView = handle.getView();
-        final GridView gridView = (GridView) handle.getGridView();
+        final SpreadsheetGridView gridView = (SpreadsheetGridView) handle.getGridView();
         final Grid grid = spreadsheetView.getGrid();
         /**
          * RT-26743:TreeTableView: Vertical Line looks unfinished. We used to
@@ -289,7 +289,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 	}
     public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
 
-        final GridView tableView = (GridView) handle.getGridView();
+        final SpreadsheetGridView tableView = (SpreadsheetGridView) handle.getGridView();
     	final SpreadsheetView spreadsheetView = handle.getView();
         final SpreadsheetCell cellSpan = tableView.getItems().get(row).get(col);
         final int infRow = cellSpan.getRow();

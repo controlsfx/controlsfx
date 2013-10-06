@@ -118,7 +118,7 @@ import javafx.collections.ObservableMap;
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
  */
-public class SpreadsheetCell implements Serializable {
+public class SpreadsheetCell<T> implements Serializable {
 
 	/***************************************************************************
 	 * 
@@ -126,6 +126,8 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 **************************************************************************/
 	private static final long serialVersionUID = -7648169794403402662L;
+	
+	
 
 	/***************************************************************************
 	 * 
@@ -133,7 +135,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 **************************************************************************/
 
-	private transient final SpreadsheetCellType type;
+	private transient final SpreadsheetCellType<T> type;
 	private final int row;
 	private final int column;
 	private transient int rowSpan;
@@ -166,9 +168,10 @@ public class SpreadsheetCell implements Serializable {
 	 * @param rowSpan
 	 * @param columnSpan
 	 */
-	public SpreadsheetCell(final int row, final int column, final int rowSpan,
+	@SuppressWarnings("unchecked")
+    public SpreadsheetCell(final int row, final int column, final int rowSpan,
 			final int columnSpan) {
-		this(row, column, rowSpan, columnSpan, SpreadsheetCellType.OBJECT);
+		this(row, column, rowSpan, columnSpan, (SpreadsheetCellType<T>)SpreadsheetCellType.OBJECT);
 	}
 
 	/**
@@ -181,12 +184,12 @@ public class SpreadsheetCell implements Serializable {
 	 * @param type
 	 */
 	public SpreadsheetCell(final int row, final int column, final int rowSpan,
-			final int columnSpan, final SpreadsheetCellType<?> type) {
+			final int columnSpan, final SpreadsheetCellType<T> type) {
 		this.row = row;
 		this.column = column;
 		this.rowSpan = rowSpan;
 		this.columnSpan = columnSpan;
-		this.type = (SpreadsheetCellType<?>) type;
+		this.type = type;
 		text = "";
 	}
 	
@@ -205,7 +208,7 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 * @param cell
 	 */
-	public void match(SpreadsheetCell cell) {
+	public void match(SpreadsheetCell<T> cell) {
 		type.copy(cell, this);
 	}
 	
@@ -218,19 +221,19 @@ public class SpreadsheetCell implements Serializable {
 	 ***************************************************************************/
 
 	// --- item
-	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
+	private transient ObjectProperty<T> item = new SimpleObjectProperty<T>(this, "item") {
 		@Override protected void invalidated() {
 			updateText();
 		}
 	};
 
     // auto-generated JavaDoc
-	public final void setItem(Object value) {
+	public final void setItem(T value) {
 		item.set(value);
 	}
 
 	// auto-generated JavaDoc
-	public final Object getItem() {
+	public final T getItem() {
 		return item.get();
 	}
 
@@ -238,7 +241,7 @@ public class SpreadsheetCell implements Serializable {
 	 * The item property represents the currently-set value inside this
 	 * SpreadsheetCell instance.
 	 */
-	public final ObjectProperty<Object> itemProperty() {
+	public final ObjectProperty<T> itemProperty() {
 		return item;
 	}
 	
@@ -420,7 +423,7 @@ public class SpreadsheetCell implements Serializable {
 		if (!(obj instanceof SpreadsheetCell))
 			return false;
 
-		final SpreadsheetCell cell = (SpreadsheetCell) obj;
+		final SpreadsheetCell<?> cell = (SpreadsheetCell<?>) obj;
 		if (cell != null && cell.getRow() == row && cell.getColumn() == column
 				&& cell.getText().equals(text)) {
 			return true;

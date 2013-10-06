@@ -10,10 +10,11 @@ import javafx.util.converter.DoubleStringConverter;
 
 /**
  * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will
- * condition which value the cell can accept, and which
- * {@link SpreadsheetCellEditor} it will use. <br/>
+ * specify which values the cell can accept as user input, and which
+ * {@link SpreadsheetCellEditor} it will use to receive user input.
  * 
- * <h3>Example</h3> You can create several types which are using the same
+ * <h3>Example</h3> 
+ * You can create several types which are using the same
  * editor. Suppose you want to handle Double values. You will implement the
  * {@link #createEditor(SpreadsheetView)} method and use the
  * {@link SpreadsheetCellEditor#createDoubleEditor(SpreadsheetView)}. <br/>
@@ -23,37 +24,34 @@ import javafx.util.converter.DoubleStringConverter;
  * {@link #converter}. If you only want to accept values between 0 and 10:
  * 
  * <pre>
- *  converter = new DoubleStringConverter() {
- * 				Override
- * 				public String toString(Double item) {
- * 					if (item == null || Double.isNaN(item)) {
- * 						return "";
- * 					} else {
- * 						return super.toString(item);
- * 					}
- * 				}
+ * converter = new DoubleStringConverter() {
+ *     &#64;Override public String toString(Double item) {
+ *         if (item == null || Double.isNaN(item)) {
+ *             return "";
+ *         } else {
+ *             return super.toString(item);
+ *         }
+ *    }
  * 
- * 				Override
- * 				public Double fromString(String str) {
- * 					if (str == null || str.isEmpty() || "NaN".equals(str)) {
- * 						return Double.NaN;
- * 					} else {
- * 						return super.fromString(str);
- * 					}
- * 				}
- * 			});
+ *     &#64;Override public Double fromString(String str) {
+ *         if (str == null || str.isEmpty() || "NaN".equals(str)) {
+ *             return Double.NaN;
+ *         } else {
+ *             return super.fromString(str);
+ *         }
+ *     }
+ * });
  * 			
- * Override
- * public Double convertValue(String value) {
- * 	try {
- * 			Double computedValue = converter.fromString(value);
- * 			if(computedValue >=0 && computedValue <=10)
- * 				return computedValue;
- * 			else
- * 				return null;
- * 		} catch (Exception e) {
- * 			return null;
- * 		}
+ * &#64;Override public Double convertValue(String value) {
+ *     try {
+ *         Double computedValue = converter.fromString(value);
+ *         if (computedValue >=0 && computedValue <=10) {
+ *             return computedValue;
+ *         } else {
+ *             return null;
+ *     } catch (Exception e) {
+ *         return null;
+ *     }
  * }
  * </pre>
  * 
@@ -91,7 +89,7 @@ public abstract class SpreadsheetCellType<T> {
 	 *            the value to display
 	 * @return a {@link SpreadsheetCell}
 	 */
-	public abstract SpreadsheetCell createCell(final int row, final int column,
+	public abstract SpreadsheetCell<T> createCell(final int row, final int column,
 			final int rowSpan, final int columnSpan, final T value);
 
 	/**
@@ -380,12 +378,12 @@ public abstract class SpreadsheetCellType<T> {
 	}
 
 	/**
-	 * The {@link SpreadsheetCell} {@link java.time.LocalDate} type instance.
+	 * The {@link SpreadsheetCell} {@link LocalDate} type instance.
 	 */
 	public static final SpreadsheetCellType<LocalDate> DATE = new DateType();
 
 	/**
-	 * The {@link SpreadsheetCell} {@link java.time.LocalDate} type base class.
+	 * The {@link SpreadsheetCell} {@link LocalDate} type base class.
 	 */
 	public static class DateType extends SpreadsheetCellType<LocalDate> {
 

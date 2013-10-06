@@ -40,24 +40,26 @@ import javafx.scene.control.TableColumn;
  * 
  * <h3>Configuration</h3>
  * SpreadsheetColumns are instantiated by the {@link SpreadsheetView} itself, so
- * there is no public constructor for this class.
- * <br/>
- * What you can do is modify some informations like the width of the column with {@link #setPrefWidth(double)} or
- * if you want it to be resizable with {@link #setResizable(boolean)}.
- * <br/>
- * You have the ability to fix this column at the left of the SpreadsheetView by calling {@link #setFixed(boolean)}. 
- * But you are strongly advised to check if it's possible with {@link #isColumnFixable()}.
+ * there is no public constructor for this class. To access the available 
+ * columns, you need to call {@link SpreadsheetView#getColumns()}.
+ * 
+ * <p>SpreadsheetColumn gives you the ability to modify some aspects of the 
+ * column, for example the {@link #setPrefWidth(double) width} or
+ * {@link #setResizable(boolean) resizability} of the column.
+ * 
+ * <p>You have the ability to fix this column at the left of the SpreadsheetView 
+ * by calling {@link #setFixed(boolean)}. But you are strongly advised to check 
+ * if it is possible with {@link #isColumnFixable()} before calling {@link #setFixed(boolean)}.
  * Take a look at the {@link SpreadsheetView} description to understand the fixing constraints.
  * 
- * <br/>
- * If the column can be fixed, a {@link ContextMenu} will appear if the user right-click on the header. 
- * If not, nothing will appear and the user will not have the possibility to fix it.
- * <br/>
+ * <p>If the column can be fixed, a {@link ContextMenu} will appear if the user 
+ * right-clicks on the header. If not, nothing will appear and the user will not 
+ * have the possibility to fix it.
  * 
- * <h3>Visual: </h3>
- * The column <b> A </b> is fixed and is covering column <b> B </b> and partially column <b> C </b>. 
- * <br/>
- * The context menu is being shown and offer the possibility to unfix the column.
+ * <h3>Screenshot</h3>
+ * The column <b>A</b> is fixed and is covering column <b>B</b> and partially 
+ * column <b>C</b>. The context menu is being shown and offers the possibility to 
+ * unfix the column.
  * 
  * <br/><br/>
  * <center><img src="fixedColumn.png"></center>
@@ -130,10 +132,8 @@ public class SpreadsheetColumn<T> {
 	}
 	
 	/**
-	 * Fix this column to the left if possible.
-	 * Call {@link #isColumnFixable()} before trying to fix a column.
-	 * Visual confirmation is Label in italic
-	 * @param fixed
+	 * Fix this column to the left if possible, although it is recommended that
+	 * you call {@link #isColumnFixable()} before trying to fix a column.
 	 */
 	public void setFixed(boolean fixed) {
 	    if (fixed) {
@@ -145,14 +145,13 @@ public class SpreadsheetColumn<T> {
 	
 	/**
 	 * Set the width of this column
-	 * @param arg0
 	 */
-	public void setPrefWidth(double arg0){
-		column.setPrefWidth(arg0);
+	public void setPrefWidth(double width){
+		column.setPrefWidth(width);
 	}
+	
 	/**
-	 * Return the Actual width of the column
-	 * @return {@link TableColumn#getWidth()}
+	 * Return the actual width of the column
 	 */
 	public double getWidth(){
 		return column.getWidth();
@@ -160,7 +159,6 @@ public class SpreadsheetColumn<T> {
 	
 	/**
 	 * If this column can be resized by the user
-	 * @param b
 	 */
 	public void setResizable(boolean b){
 		column.setResizable(b);

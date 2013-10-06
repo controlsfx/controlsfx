@@ -118,7 +118,7 @@ public abstract class SpreadsheetCellType<T> {
 	 * @param to
 	 *            the destination cell
 	 */
-	protected abstract void copy(SpreadsheetCell from, SpreadsheetCell to);
+	protected abstract void copy(SpreadsheetCell<T> from, SpreadsheetCell<T> to);
 
 	/**
 	 * This method will be called when a commit is happening.<br/>
@@ -157,36 +157,31 @@ public abstract class SpreadsheetCellType<T> {
 			super(converter);
 		}
 
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			return "object";
 		}
 
-		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
+		protected void copy(SpreadsheetCell<Object> from, SpreadsheetCell<Object> to) {
 			to.setItem(from.getText());
 		}
 
 		@Override
-		public SpreadsheetCell createCell(final int row, final int column,
+		public SpreadsheetCell<Object> createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final Object value) {
-			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-					columnSpan, this);
+			SpreadsheetCell<Object> cell = new SpreadsheetCell<>(row, column, rowSpan,columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
 
-		@Override
-		public SpreadsheetCellEditor<Object> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor<Object> createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.ObjectEditor(view);
 		}
 
-		@Override
-		public Object convertValue(String value) {
+		@Override public Object convertValue(String value) {
 			return converter.fromString(value);
 		}
 
-		@Override
-		public String toString(Object item) {
+		@Override public String toString(Object item) {
 			return converter.toString(item);
 		}
 
@@ -210,36 +205,31 @@ public abstract class SpreadsheetCellType<T> {
 			super(converter);
 		}
 
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			return "string";
 		}
 
-		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
-			to.setItem((String) from.getText());
+		protected void copy(SpreadsheetCell<String> from, SpreadsheetCell<String> to) {
+			to.setItem(from.getText());
 		}
 
 		@Override
-		public SpreadsheetCell createCell(final int row, final int column,
+		public SpreadsheetCell<String> createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final String value) {
-			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-					columnSpan, this);
+			SpreadsheetCell<String> cell = new SpreadsheetCell<>(row, column, rowSpan, columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
 
-		@Override
-		public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.StringEditor(view);
 		}
 
-		@Override
-		public String convertValue(String value) {
+		@Override public String convertValue(String value) {
 			return value;
 		}
 
-		@Override
-		public String toString(String item) {
+		@Override public String toString(String item) {
 			return converter.toString(item);
 		}
 
@@ -281,27 +271,23 @@ public abstract class SpreadsheetCellType<T> {
 			super(converter);
 		}
 
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			return "double";
 		}
 
 		@Override
-		public SpreadsheetCell createCell(final int row, final int column,
+		public SpreadsheetCell<Double> createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final Double value) {
-			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-					columnSpan, this);
+			SpreadsheetCell<Double> cell = new SpreadsheetCell<>(row, column, rowSpan,columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
 
-		@Override
-		public SpreadsheetCellEditor<Double> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor<Double> createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
-		@Override
-		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override protected void copy(SpreadsheetCell<Double> from, SpreadsheetCell<Double> to) {
 			try {
 				Double temp = converter.fromString(from.getText());
 				to.setItem(temp);
@@ -310,8 +296,7 @@ public abstract class SpreadsheetCellType<T> {
 			}
 		}
 
-		@Override
-		public Double convertValue(String value) {
+		@Override public Double convertValue(String value) {
 			try {
 				return converter.fromString(value);
 			} catch (Exception e) {
@@ -319,11 +304,9 @@ public abstract class SpreadsheetCellType<T> {
 			}
 		}
 
-		@Override
-		public String toString(Double item) {
+		@Override public String toString(Double item) {
 			return converter.toString(item);
 		}
-
 	};
 
 	/**
@@ -357,16 +340,14 @@ public abstract class SpreadsheetCellType<T> {
 			this.items = items;
 		}
 
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			return "list";
 		}
 
 		@Override
-		public SpreadsheetCell createCell(final int row, final int column,
+		public SpreadsheetCell<String> createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, String item) {
-			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-					columnSpan, this);
+			SpreadsheetCell<String> cell = new SpreadsheetCell<>(row, column, rowSpan, columnSpan, this);
 			if (items != null && items.size() > 0) {
 				if (item != null && items.contains(item)) {
 					cell.setItem(item);
@@ -377,26 +358,22 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override
-		public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.ListEditor(view, items);
 		}
 
-		@Override
-		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override protected void copy(SpreadsheetCell<String> from, SpreadsheetCell<String> to) {
 			String value = from.getText();
 			if (items.contains(value)) {
 				to.setItem(value);
 			}
 		}
 
-		@Override
-		public String convertValue(String value) {
+		@Override public String convertValue(String value) {
 			return converter.fromString(value);
 		}
 
-		@Override
-		public String toString(String item) {
+		@Override public String toString(String item) {
 			return converter.toString(item);
 		}
 
@@ -443,27 +420,23 @@ public abstract class SpreadsheetCellType<T> {
 			super(converter);
 		}
 
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			return "date";
 		}
 
 		@Override
-		public SpreadsheetCell createCell(final int row, final int column,
+		public SpreadsheetCell<LocalDate> createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final LocalDate value) {
-			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-					columnSpan, this);
+			SpreadsheetCell<LocalDate> cell = new SpreadsheetCell<>(row, column, rowSpan, columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
 
-		@Override
-		public SpreadsheetCellEditor<LocalDate> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor<LocalDate> createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.DateEditor(view);
 		}
 
-		@Override
-		protected void copy(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override protected void copy(SpreadsheetCell<LocalDate> from, SpreadsheetCell<LocalDate> to) {
 			try {
 				LocalDate temp = converter.fromString(from.getText());
 				if (temp != null) {

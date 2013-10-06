@@ -38,9 +38,9 @@ import javafx.scene.control.TableColumn;
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
  * 
- * <h3>Configuration: </h3>
- * 
- * SpreadsheetColumns are instantiated by the {@link SpreadsheetView} itself.
+ * <h3>Configuration</h3>
+ * SpreadsheetColumns are instantiated by the {@link SpreadsheetView} itself, so
+ * there is no public constructor for this class.
  * <br/>
  * What you can do is modify some informations like the width of the column with {@link #setPrefWidth(double)} or
  * if you want it to be resizable with {@link #setResizable(boolean)}.
@@ -71,18 +71,12 @@ public class SpreadsheetColumn<T> {
      *                                                                         *
      **************************************************************************/
 	private SpreadsheetView spreadsheetView;
-	private TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
+	private TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column;
 	private boolean canFix;
 	private Integer indexColumn;
 	private CheckMenuItem fixItem;
-	/**
-	 * if we have to fix some column together, how many columns we have to fix
-	 */
-//	private Integer columnSpanConstraint;
-	/**
-	 * if we have to fix some column together, the starting column
-	 */
-//	private Integer columnStart;
+
+	
 	
 	/***************************************************************************
      *                                                                         *
@@ -95,13 +89,11 @@ public class SpreadsheetColumn<T> {
 	 * @param spreadsheetView
 	 * @param indexColumn
 	 */
-	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
+	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell<T>>, SpreadsheetCell<T>> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
 		column.setMinWidth(30); 
 		this.indexColumn = indexColumn;
-//		this.columnSpanConstraint = 0;
-//		this.columnSpanConstraint = 0;
 		canFix = initCanFix();
 		
 		// The contextMenu creation must be on the JFX thread
@@ -114,24 +106,26 @@ public class SpreadsheetColumn<T> {
         Platform.runLater(r);
 		
 		//FIXME implement better listening after
-		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell>>(){
-			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell>> arg0) {
+		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell<?>>>(){
+			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell<?>>> arg0) {
 				initCanFix();
 			}
 		});
 	}
+	
+	
 	
 	/***************************************************************************
      *                                                                         *
      * Public Methods                                                          *
      *                                                                         *
      **************************************************************************/
+	
 	/**
 	 * Return whether this column is fixed or not.
 	 * @return true if this column is fixed.
 	 */
 	public boolean isFixed() {
-//		return column.impl_isFixed();
 		return spreadsheetView.getFixedColumns().contains(this);
 	}
 	
@@ -181,11 +175,15 @@ public class SpreadsheetColumn<T> {
 	public boolean isColumnFixable(){
 		return canFix;
 	}
+	
+	
+	
 	/***************************************************************************
      *                                                                         *
      * Private Methods                                               		   *
      *                                                                         *
      **************************************************************************/
+	
 	/**
      * Generate a context Menu in order to fix/unfix some column
      * It is shown when right-clicking on the column header
@@ -224,7 +222,7 @@ public class SpreadsheetColumn<T> {
 	 * @return if it's fixable.
 	 */
 	private boolean initCanFix(){
-		for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
+		for (ObservableList<SpreadsheetCell<?>> row : spreadsheetView.getGrid().getRows()) {
 			int columnSpan = row.get(indexColumn).getColumnSpan();
 			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
 				return false;

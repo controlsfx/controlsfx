@@ -118,7 +118,7 @@ import javafx.collections.ObservableMap;
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
  */
-public class SpreadsheetCell<T> implements Serializable {
+public class SpreadsheetCell implements Serializable {
 
 	/***************************************************************************
 	 * 
@@ -135,7 +135,8 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * 
 	 **************************************************************************/
 
-	private transient final SpreadsheetCellType<T> type;
+	@SuppressWarnings("rawtypes")
+	private transient final SpreadsheetCellType type;
 	private final int row;
 	private final int column;
 	private transient int rowSpan;
@@ -159,19 +160,10 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * 
 	 **************************************************************************/
 
-	/**
-	 * Constructs a SpreadsheetCell with the given configuration and a
-	 * {@link SpreadsheetCellType} set to {@link SpreadsheetCellType#OBJECT}.
-	 * 
-	 * @param row
-	 * @param column
-	 * @param rowSpan
-	 * @param columnSpan
-	 */
-	@SuppressWarnings("unchecked")
-    public SpreadsheetCell(final int row, final int column, final int rowSpan,
+	@SuppressWarnings("rawtypes")
+	public SpreadsheetCell(final int row, final int column, final int rowSpan,
 			final int columnSpan) {
-		this(row, column, rowSpan, columnSpan, (SpreadsheetCellType<T>)SpreadsheetCellType.OBJECT);
+		this(row, column, rowSpan, columnSpan, (SpreadsheetCellType)SpreadsheetCellType.OBJECT);
 	}
 
 	/**
@@ -184,7 +176,7 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * @param type
 	 */
 	public SpreadsheetCell(final int row, final int column, final int rowSpan,
-			final int columnSpan, final SpreadsheetCellType<T> type) {
+			final int columnSpan, final SpreadsheetCellType<?> type) {
 		this.row = row;
 		this.column = column;
 		this.rowSpan = rowSpan;
@@ -208,7 +200,7 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * 
 	 * @param cell
 	 */
-	public boolean match(SpreadsheetCell<T> cell) {
+	public boolean match(SpreadsheetCell cell) {
 		return type.copy(cell, this);
 	}
 	
@@ -221,19 +213,19 @@ public class SpreadsheetCell<T> implements Serializable {
 	 ***************************************************************************/
 
 	// --- item
-	private transient ObjectProperty<T> item = new SimpleObjectProperty<T>(this, "item") {
+	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
 		@Override protected void invalidated() {
 			updateText();
 		}
 	};
 
     // auto-generated JavaDoc
-	public final void setItem(T value) {
+	public final void setItem(Object value) {
 		item.set(value);
 	}
 
 	// auto-generated JavaDoc
-	public final T getItem() {
+	public final Object getItem() {
 		return item.get();
 	}
 
@@ -241,7 +233,7 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * The item property represents the currently-set value inside this
 	 * SpreadsheetCell instance.
 	 */
-	public final ObjectProperty<T> itemProperty() {
+	public final ObjectProperty<?> itemProperty() {
 		return item;
 	}
 	
@@ -423,7 +415,7 @@ public class SpreadsheetCell<T> implements Serializable {
 		if (!(obj instanceof SpreadsheetCell))
 			return false;
 
-		final SpreadsheetCell<?> cell = (SpreadsheetCell<?>) obj;
+		final SpreadsheetCell cell = (SpreadsheetCell) obj;
 		if (cell != null && cell.getRow() == row && cell.getColumn() == column
 				&& cell.getText().equals(text)) {
 			return true;
@@ -443,7 +435,9 @@ public class SpreadsheetCell<T> implements Serializable {
 	/**
 	 * Update the text for the SpreadsheetView.
 	 */
+	@SuppressWarnings("unchecked")
 	private void updateText() {
 		this.text = type.toString(getItem());
 	}
+
 }

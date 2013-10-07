@@ -89,7 +89,7 @@ public abstract class SpreadsheetCellType<T> {
 	 *            the value to display
 	 * @return a {@link SpreadsheetCell}
 	 */
-	public abstract SpreadsheetCell<T> createCell(final int row, final int column,
+	public abstract SpreadsheetCell createCell(final int row, final int column,
 			final int rowSpan, final int columnSpan, final T value);
 
 	/**
@@ -103,10 +103,10 @@ public abstract class SpreadsheetCellType<T> {
 	 * Return a string representation of the given item for the
 	 * {@link SpreadsheetView} to display using the converter.
 	 * 
-	 * @param item
+	 * @param object2
 	 * @return a string representation of the given item.
 	 */
-	public abstract String toString(T item);
+	public abstract String toString(T object2);
 
 	/**
 	 * Copies the value of a cell to another (copy/paste operations).
@@ -117,7 +117,7 @@ public abstract class SpreadsheetCellType<T> {
 	 *            the destination cell
 	 *	@return true if the copy has succeeded.
 	 */
-	protected abstract boolean copy(SpreadsheetCell<T> from, SpreadsheetCell<T> to);
+	protected abstract boolean copy(SpreadsheetCell from, SpreadsheetCell to);
 
 	/**
 	 * This method will be called when a commit is happening.<br/>
@@ -160,15 +160,15 @@ public abstract class SpreadsheetCellType<T> {
 			return "object";
 		}
 
-		protected boolean copy(SpreadsheetCell<Object> from, SpreadsheetCell<Object> to) {
+		protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
 			to.setItem(from.getText());
 			return true;
 		}
 
 		@Override
-		public SpreadsheetCell<Object> createCell(final int row, final int column,
+		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final Object value) {
-			SpreadsheetCell<Object> cell = new SpreadsheetCell<>(row, column, rowSpan,columnSpan, this);
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -209,15 +209,15 @@ public abstract class SpreadsheetCellType<T> {
 			return "string";
 		}
 
-		protected boolean copy(SpreadsheetCell<String> from, SpreadsheetCell<String> to) {
+		protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
 			to.setItem(from.getText());
 			return true;
 		}
 
 		@Override
-		public SpreadsheetCell<String> createCell(final int row, final int column,
+		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final String value) {
-			SpreadsheetCell<String> cell = new SpreadsheetCell<>(row, column, rowSpan, columnSpan, this);
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -227,7 +227,7 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override public String convertValue(String value) {
-			return value;
+			return converter.fromString(value);
 		}
 
 		@Override public String toString(String item) {
@@ -277,9 +277,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCell<Double> createCell(final int row, final int column,
+		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final Double value) {
-			SpreadsheetCell<Double> cell = new SpreadsheetCell<>(row, column, rowSpan,columnSpan, this);
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -288,7 +288,7 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
-		@Override protected boolean copy(SpreadsheetCell<Double> from, SpreadsheetCell<Double> to) {
+		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
 			try {
 				Double temp = converter.fromString(from.getText());
 				to.setItem(temp);
@@ -347,9 +347,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCell<String> createCell(final int row, final int column,
+		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, String item) {
-			SpreadsheetCell<String> cell = new SpreadsheetCell<>(row, column, rowSpan, columnSpan, this);
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
 			if (items != null && items.size() > 0) {
 				if (item != null && items.contains(item)) {
 					cell.setItem(item);
@@ -364,7 +364,7 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.ListEditor(view, items);
 		}
 
-		@Override protected boolean copy(SpreadsheetCell<String> from, SpreadsheetCell<String> to) {
+		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
 			String value = from.getText();
 			if (items.contains(value)) {
 				to.setItem(value);
@@ -429,9 +429,9 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override
-		public SpreadsheetCell<LocalDate> createCell(final int row, final int column,
+		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final LocalDate value) {
-			SpreadsheetCell<LocalDate> cell = new SpreadsheetCell<>(row, column, rowSpan, columnSpan, this);
+			SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
 			cell.setItem(value);
 			return cell;
 		}
@@ -440,7 +440,7 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.DateEditor(view);
 		}
 
-		@Override protected boolean copy(SpreadsheetCell<LocalDate> from, SpreadsheetCell<LocalDate> to) {
+		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
 			try {
 				LocalDate temp = converter.fromString(from.getText());
 				if (temp != null) {

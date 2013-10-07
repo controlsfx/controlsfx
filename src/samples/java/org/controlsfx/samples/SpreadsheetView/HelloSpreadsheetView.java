@@ -187,9 +187,9 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	}
 
 	private void normalGrid(GridBase grid) {
-		ArrayList<ObservableList<SpreadsheetCell<?>>> rows = new ArrayList<>(grid.getRowCount());
+		ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
 		for (int row = 0; row < grid.getRowCount(); ++row) {
-			final ObservableList<SpreadsheetCell<?>> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
+			final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
 			for (int column = 0; column < grid.getColumnCount(); ++column) {
 				dataRow.add(generateCell(row, column, 1, 1));
 			}

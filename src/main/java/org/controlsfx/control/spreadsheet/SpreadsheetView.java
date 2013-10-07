@@ -533,14 +533,14 @@ public class SpreadsheetView extends Control {
     
     private void verifyColumnSpan(Grid grid){
     	for(int i=0; i< grid.getRows().size();++i){
-    		ObservableList<SpreadsheetCell<?>> row = grid.getRows().get(i);
+    		ObservableList<SpreadsheetCell> row = grid.getRows().get(i);
     		int count = 0;
     		for(int j=0; j< row.size();++j){
     			if(row.get(j).getColumnSpan() == 1){
     				++count;
     			}else if(row.get(j).getColumnSpan() > 1){
     				++count;
-    				SpreadsheetCell<?> currentCell = row.get(j);
+    				SpreadsheetCell currentCell = row.get(j);
     				for(int k =j+1;k<currentCell.getColumn()+currentCell.getColumnSpan();++k){
     					if(!row.get(k).equals(currentCell)){
     						throw new IllegalStateException("\n At row "+i+" and column "+j
@@ -676,11 +676,11 @@ public class SpreadsheetView extends Control {
     }
 
     private void initRowFix(Grid grid){
-    	ObservableList< ObservableList<SpreadsheetCell<?>>> rows = grid.getRows();
+    	ObservableList< ObservableList<SpreadsheetCell>> rows = grid.getRows();
 		rowFix = new BitSet(rows.size());
 		rows : for(int r = 0; r < rows.size(); ++r){
-			ObservableList<SpreadsheetCell<?>> row = rows.get(r);
-			for(SpreadsheetCell<?> cell: row){
+			ObservableList<SpreadsheetCell> row = rows.get(r);
+			for(SpreadsheetCell cell: row){
 				if(cell.getRowSpan() >1){
 					continue rows;
 				}
@@ -791,7 +791,7 @@ public class SpreadsheetView extends Control {
                         && row+offsetRow >= 0 && column+offsetCol >=0 ){
                     final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
                     if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
-                    	SpreadsheetCell<?> cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
+                    	SpreadsheetCell cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
                     	Object item = cell.getItem();
                         boolean succeed =cell.match(row1);
                         if(succeed && !item.equals(cell.getItem()) && !getModifiedCells().contains(cell))
@@ -1432,7 +1432,7 @@ public class SpreadsheetView extends Control {
     		int indexColumn = getColumns().indexOf(element);
     	
     		String reason = "\n This column cannot be fixed.";
-    		for (ObservableList<SpreadsheetCell<?>> row : getGrid().getRows()) {
+    		for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
     			int columnSpan = row.get(indexColumn).getColumnSpan();
     			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1){
     				reason+= "The cell situated at line "+row.get(indexColumn).getRow()+" and column "+indexColumn

@@ -47,7 +47,7 @@ public class GridBase implements Grid {
      * Private Fields
      * 
      **************************************************************************/
-    private ObservableList<ObservableList<SpreadsheetCell<?>>> rows;
+    private ObservableList<ObservableList<SpreadsheetCell>> rows;
     private int rowCount;
     private int columnCount;
     
@@ -70,10 +70,10 @@ public class GridBase implements Grid {
      * Creates a grid with a fixed number of rows and columns.
      */
     public GridBase(int rowCount, int columnCount) {
-        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell<?>>> emptyObservableList());
+        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList());
     }
 
-    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell<?>>> rows) {
+    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.rows = rows;
@@ -88,7 +88,7 @@ public class GridBase implements Grid {
      **************************************************************************/
     
     /** {@inheritDoc} */
-    @Override public ObservableList<ObservableList<SpreadsheetCell<?>>> getRows() {
+    @Override public ObservableList<ObservableList<SpreadsheetCell>> getRows() {
         return rows;
     }
     
@@ -107,7 +107,7 @@ public class GridBase implements Grid {
         if (row < 0 || column < 0 || !containsRow(spv, row)) {
             return SpanType.NORMAL_CELL;
         }
-        final SpreadsheetCell<?> cellSpan = ((ObservableList<SpreadsheetCell<?>>)getRows().get(row)).get(column);
+        final SpreadsheetCell cellSpan = ((ObservableList<SpreadsheetCell>)getRows().get(row)).get(column);
         
         final int cellSpanColumn = cellSpan.getColumn();
         final int cellSpanRow = cellSpan.getRow();
@@ -158,7 +158,7 @@ public class GridBase implements Grid {
      * @param colIndex
      */
     public void spanRow(int count, int rowIndex, int colIndex) {
-        final SpreadsheetCell<?> cell = rows.get(rowIndex).get(colIndex);
+        final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = cell.getColumnSpan();
         final int rowSpan = count;
         cell.setRowSpan(rowSpan);
@@ -181,7 +181,7 @@ public class GridBase implements Grid {
      * @param colIndex
      */
     public void spanColumn(int count, int rowIndex, int colIndex) {
-        final SpreadsheetCell<?> cell = rows.get(rowIndex).get(colIndex);
+        final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = count;
         final int rowSpan = cell.getRowSpan();
         cell.setColumnSpan(colSpan);
@@ -198,9 +198,9 @@ public class GridBase implements Grid {
     /**
      * This method sets the rows used by the grid, and updates the rowCount.
      */
-    public void setRows(Collection<ObservableList<SpreadsheetCell<?>>> rows) {
+    public void setRows(Collection<ObservableList<SpreadsheetCell>> rows) {
         if (rows instanceof ObservableList) {
-            this.rows = (ObservableList<ObservableList<SpreadsheetCell<?>>>) rows;
+            this.rows = (ObservableList<ObservableList<SpreadsheetCell>>) rows;
         } else {
             this.rows = FXCollections.observableArrayList(rows);
         }

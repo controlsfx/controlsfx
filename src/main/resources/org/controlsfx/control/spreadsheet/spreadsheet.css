@@ -92,9 +92,9 @@
     -fx-background-insets: 0, 0 1 1 0;
     -fx-alignment: center;
 }
-.spreadsheet-cell:modified{
+/*.spreadsheet-cell.modified{
 	-fx-background-radius : 0 15 0 0;
-}
+}*/
 
 /* HORIZONTAL AND VERTICAL HEADER SELECTION */
 VerticalHeader > Label,

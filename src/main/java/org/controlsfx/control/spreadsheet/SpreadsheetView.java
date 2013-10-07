@@ -314,10 +314,13 @@ public class SpreadsheetView extends Control {
 			}
 		});
         initRowFix(grid);
-
+       
         setGrid(grid);
+        
+        //Listeners
         fixedRows.addListener(fixedRowsListener); 
         fixedColumns.addListener(fixedColumnsListener);
+        modifiedCells.addListener(modifiedCellsListener);
     }
 
     /***************************************************************************
@@ -770,7 +773,11 @@ public class SpreadsheetView extends Control {
                         && row+offsetRow >= 0 && column+offsetCol >=0 ){
                     final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
                     if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
-                        getGrid().getRows().get(row+offsetRow).get(column+offsetCol).match(row1);
+                    	SpreadsheetCell<?> cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
+                    	Object item = cell.getItem();
+                        boolean succeed =cell.match(row1);
+                        if(succeed && !item.equals(cell.getItem()) && !getModifiedCells().contains(cell))
+        					getModifiedCells().add(cell);
                     }
                 }
             }
@@ -1417,6 +1424,22 @@ public class SpreadsheetView extends Control {
     		}
     		return reason;
     	}
+    };
+    
+    private ListChangeListener<SpreadsheetCell> modifiedCellsListener = new ListChangeListener<SpreadsheetCell>(){
+
+		@Override
+		public void onChanged(Change<? extends SpreadsheetCell> arg0) {
+			while (arg0.next()) {
+                if (arg0.wasAdded()) {
+                	 List<? extends SpreadsheetCell> newRows = arg0.getAddedSubList();
+                     for (SpreadsheetCell cell : newRows) {
+                    	 if(!cell.getStyleClass().contains("modified"))
+                             cell.getStyleClass().add("modified");
+                     }
+                }
+			}
+		}
     };
 }
 

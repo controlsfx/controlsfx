@@ -208,8 +208,8 @@ public class SpreadsheetCell<T> implements Serializable {
 	 * 
 	 * @param cell
 	 */
-	public void match(SpreadsheetCell<T> cell) {
-		type.copy(cell, this);
+	public boolean match(SpreadsheetCell<T> cell) {
+		return type.copy(cell, this);
 	}
 	
 	

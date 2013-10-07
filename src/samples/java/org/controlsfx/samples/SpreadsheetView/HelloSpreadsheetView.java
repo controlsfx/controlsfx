@@ -127,7 +127,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 			@Override
 			public void changed(
 					ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				spv.setShowColumnHeader(arg2);
+//				spv.setShowColumnHeader(arg2);
 			}
 		});
 		//In order to change the span style more easily

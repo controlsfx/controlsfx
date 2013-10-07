@@ -274,7 +274,9 @@ public class SpreadsheetView extends Control {
         this.cellsView = new SpreadsheetGridView(handle);
         getChildren().add(cellsView);
 
-        //Add a listener to the selection model in order to edit the spanned cells when clicked
+        /**
+         * Add a listener to the selection model in order to edit the spanned cells when clicked
+         */
         SpreadsheetViewSelectionModel<?> selectionModel = new SpreadsheetViewSelectionModel<>(this);
         cellsView.setSelectionModel(selectionModel);
         selectionModel.setCellSelectionEnabled(true);
@@ -287,16 +289,9 @@ public class SpreadsheetView extends Control {
         // We add a listener on the focus model in order to catch when we are on a hidden cell
         cellsView.getFocusModel().focusedCellProperty().addListener((ChangeListener<TablePosition>)(ChangeListener<?>) new FocusModelListener(this));
 
-        // The contextMenu creation must be on the JFX thread
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-            	SpreadsheetView.this.setContextMenu(getSpreadsheetViewContextMenu());
-            }
-        };
-        Platform.runLater(r);
-        
-        //Handle keyBoard action, maybe use accelerator
+        /**
+         * Keyboard action, maybe use an accelerator
+         */
         this.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent arg0) {
@@ -314,7 +309,44 @@ public class SpreadsheetView extends Control {
 				}
 			}
 		});
-        initRowFix(grid);
+        
+       initRowFix(grid);
+       
+       /**
+        * ContextMenu handling.
+        */
+       this.contextMenuProperty().addListener(new ChangeListener<ContextMenu>(){
+			@Override
+			public void changed(ObservableValue<? extends ContextMenu> arg0,
+					ContextMenu arg1, final ContextMenu arg2) {
+				arg2.setOnShowing(new EventHandler<WindowEvent>() {
+					@Override
+					public void handle(WindowEvent arg0) {
+						// We don't want to open a contextMenu when editing because editors
+				        // have their own contextMenu
+						if(getEditingCell() != null){
+							// We're being reactive but we want to be pro-active so we may need a work-around.
+							final Runnable r = new Runnable() {
+		                        @Override
+		                        public void run() {
+		                        	arg2.hide();
+		                        }
+		                    };
+		                    Platform.runLater(r);
+						}
+					}
+				});
+			}
+       	});
+       // The contextMenu creation must be on the JFX thread
+       final Runnable r = new Runnable() {
+           @Override
+           public void run() {
+           	setContextMenu(getSpreadsheetViewContextMenu());
+           }
+       };
+       Platform.runLater(r);
+       
        
         setGrid(grid);
         
@@ -482,6 +514,7 @@ public class SpreadsheetView extends Control {
     public ObservableList<SpreadsheetCell> getModifiedCells(){
     	return modifiedCells;
     }
+    
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -671,23 +704,6 @@ public class SpreadsheetView extends Control {
     private ContextMenu getSpreadsheetViewContextMenu(){
         final ContextMenu contextMenu = new ContextMenu();
         
-        // We don't want to open a contextMenu when editing because editors
-        // have their own contextMenu
-        contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent arg0) {
-				if(getEditingCell() != null){
-					// We're being reactive but we want to be pro-active so we may need a work-around.
-					final Runnable r = new Runnable() {
-                        @Override
-                        public void run() {
-                        	contextMenu.hide();
-                        }
-                    };
-                    Platform.runLater(r);
-				}
-			}
-		});
         final MenuItem item1 = new MenuItem("Copy");
         item1.setOnAction(new EventHandler<ActionEvent>() {
             @Override

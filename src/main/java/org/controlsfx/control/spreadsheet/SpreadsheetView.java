@@ -42,6 +42,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -353,21 +354,22 @@ public class SpreadsheetView extends Control {
         return grid;
     }
     
-    
-    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader",true);
+    //Read only because this functionality is not yet supported, RT-32673
+    private final ReadOnlyBooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader",true);
     
     /**
      * Activate and deactivate the Column Header
      * @param b
      */
-    public final void setShowColumnHeader(final boolean b){
-        //TODO Need to do that again
-        //flow.recreateCells(); // Because otherwise we have at the bottom
-        showColumnHeader.setValue(b);
-    }
+//    public final void setShowColumnHeader(final boolean b){
+//        //TODO Need to do that again
+//        //flow.recreateCells(); // Because otherwise we have at the bottom
+//        showColumnHeader.setValue(b);
+//    }
     
     /**
      * Return if the Column Header is showing.
+     * Always true because it cannot be switched off yet.
      * @return a boolean telling if the column Header is being shown
      */
     public final boolean isShowColumnHeader() {
@@ -378,7 +380,7 @@ public class SpreadsheetView extends Control {
      * BooleanProperty associated with the column Header.
      * @return the BooleanProperty associated with the column Header.
      */
-    public final BooleanProperty showColumnHeaderProperty() {
+    public final ReadOnlyBooleanProperty showColumnHeaderProperty() {
         return showColumnHeader;
     }
 

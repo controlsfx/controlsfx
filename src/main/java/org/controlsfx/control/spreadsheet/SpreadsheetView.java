@@ -309,7 +309,6 @@ public class SpreadsheetView extends Control {
 				}
 			}
 		});
-        
        initRowFix(grid);
        
        /**
@@ -799,9 +798,7 @@ public class SpreadsheetView extends Control {
                     }
                 }
             }
-            //For layout
-            getSelectionModel().clearSelection();
-            requestLayout();
+            
         //To be improved
         }else if(clipboard.hasString()){
         	final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
@@ -809,9 +806,6 @@ public class SpreadsheetView extends Control {
         	SpreadsheetCell stringCell = SpreadsheetCellType.STRING.createCell(0, 0, 1, 1, clipboard.getString());
         	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(stringCell);
         	
-        	//For layout
-        	getSelectionModel().clearSelection();
-        	requestLayout();
         }
     }
 

@@ -36,6 +36,7 @@ import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
@@ -98,6 +99,20 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      **************************************************************************/
     public void init(SpreadsheetView spv) {
         this.spreadSheetView = spv;
+        
+        /**
+         * When copy/pasting, we are directly going to the SpreadsheetCell.
+         * So the view hasn't really a way of detecting that itself. We must force it
+         * that way.
+         */
+        spv.getModifiedCells().addListener(new ListChangeListener<SpreadsheetCell>() {
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends SpreadsheetCell> arg0) {
+						layoutTotal();		
+						layoutFixedRows();
+			}
+		});
     }
 
     @Override

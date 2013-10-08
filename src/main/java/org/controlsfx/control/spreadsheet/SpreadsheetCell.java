@@ -219,9 +219,14 @@ public class SpreadsheetCell implements Serializable {
 		}
 	};
 
-    // auto-generated JavaDoc
+    /**
+     * Sets the value of the property Item
+     * If {@link #isEditable()} return false, nothing is done.
+     * @param value
+     */
 	public final void setItem(Object value) {
-		item.set(value);
+		if(isEditable())
+			item.set(value);
 	}
 
 	// auto-generated JavaDoc

@@ -303,6 +303,7 @@ public class SpreadsheetView extends Control {
 				else if(!arg0.isShortcutDown() 
 						&& !arg0.isAltDown()
 						&& !arg0.isMetaDown()
+						&& !arg0.isShiftDown()
 						&& arg0.getCode().compareTo(KeyCode.ESCAPE) != 0){
 					TablePosition<ObservableList<SpreadsheetCell>, ?> position = cellsView.getFocusModel().getFocusedCell();
 					cellsView.edit(position.getRow(), position.getTableColumn());

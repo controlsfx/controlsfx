@@ -301,6 +301,7 @@ public class SpreadsheetView extends Control {
 					pasteClipboard();
 				//We want to edit if the user is on a cell and typing
 				else if(!arg0.isShortcutDown() 
+						&& !arg0.isControlDown()
 						&& !arg0.isAltDown()
 						&& !arg0.isMetaDown()
 						&& !arg0.isShiftDown()

@@ -461,7 +461,7 @@ public abstract class SpreadsheetCellEditor<T> {
 				cb.setValue(value.toString());
 			}
 			attachEnterEscapeEventHandler();
-
+			cb.show();
 			cb.requestFocus();
 		}
 

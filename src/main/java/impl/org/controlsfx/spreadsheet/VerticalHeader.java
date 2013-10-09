@@ -176,7 +176,7 @@ public class VerticalHeader extends StackPane {
 				}else if(spreadsheetView.isRowFixable(row.getIndexVirtualFlow())){
 					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+".");
 				}else{
-					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1));
+					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+" ");
 				}
 				label.resize(prefWidth, prefHeight);
 				label.relocate(x, y);

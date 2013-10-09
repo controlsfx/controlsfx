@@ -97,27 +97,35 @@
 }*/
 
 /* HORIZONTAL AND VERTICAL HEADER SELECTION */
-VerticalHeader > Label,
-.spreadsheet-cell.fixed {
-   -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+VerticalHeader > Label {
+   	-fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
     -fx-text-fill: -fx-selection-bar-text;
-    -fx-padding: 0.166667em;
-    -fx-alignment: center;
+    /*-fx-padding: 0.166667em;*/
+    -fx-label-padding:0 0 0 20;
+    /*-fx-alignment: center;*/
     -fx-font-style : normal;
 }  
 
-VerticalHeader > Label.selected,
 HorizontalHeaderColumn > TableColumnHeader > Label.selected{
-   -fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
+-fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
     -fx-text-fill: -fx-selection-bar-text;
-    -fx-padding: 0.166667em;
     -fx-alignment: center;
+}
+
+VerticalHeader > Label.selected{
+   	-fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
+    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
+    -fx-font-weight: bold;
+    -fx-size: 2em;
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-label-padding:0 0 0 20;
+    /*-fx-alignment: center;*/
 }  
 
 /* FIXED HEADERS  */

@@ -34,12 +34,17 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
@@ -166,12 +171,18 @@ public class VerticalHeader extends StackPane {
 					&& i < modelRowCount) {
 				row = skin.getCell(i);
 				label = getLabel(rowCount++);
-				label.setText(String.valueOf(row.getIndexVirtualFlow() + 1));
+				if(spreadsheetView.getFixedRows().contains(row.getIndexVirtualFlow())){
+					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+":");
+				}else if(spreadsheetView.isRowFixable(row.getIndexVirtualFlow())){
+					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+".");
+				}else{
+					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1));
+				}
 				label.resize(prefWidth, prefHeight);
 				label.relocate(x, y);
 				label.setContextMenu(getRowContextMenu(row
 						.getIndexVirtualFlow()));
-
+				
 				// We want to highlight selected rows
 				final ObservableList<String> css = label.getStyleClass();
 				if (skin.getSelectedRows().contains(row.getIndex())) {
@@ -194,11 +205,10 @@ public class VerticalHeader extends StackPane {
 					if (skin.getCell(i).getCurrentlyFixed()) {
 						label = getLabel(rowCount++);
 						label.setText(String.valueOf(spreadsheetView
-								.getFixedRows().get(i) + 1));
+								.getFixedRows().get(i) + 1)+":");
 						label.resize(prefWidth, prefHeight);
 						label.setContextMenu(getRowContextMenu(spreadsheetView
 								.getFixedRows().get(i)));
-
 						// If the columnHeader is here, we need to translate a
 						// bit
 						if (spreadsheetView.showColumnHeaderProperty().get()) {
@@ -272,6 +282,22 @@ public class VerticalHeader extends StackPane {
 			final Label label = new Label();
 			label.resize(prefWidth, prefHeight);
 			getChildren().add(label);
+			
+			// We want to select when clicking on header
+			label.setOnMousePressed(new EventHandler<MouseEvent>(){
+				@Override
+				public void handle(MouseEvent arg0) {
+					if(arg0.isPrimaryButtonDown()){
+						try{
+							int row = Integer.parseInt(label.getText().replace(".","").replace(":", ""));
+							TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView.getSelectionModel();
+							TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView().getFocusModel();
+							sm.clearAndSelect(row-1,fm.getFocusedCell().getTableColumn() );
+						}catch(NumberFormatException ex){
+							
+						}
+					}
+				}});
 			return label;
 		} else {
 			return (Label) getChildren().get(rowNumber);

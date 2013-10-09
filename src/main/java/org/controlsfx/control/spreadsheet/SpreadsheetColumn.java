@@ -106,7 +106,11 @@ public class SpreadsheetColumn<T> {
             }
         };
         Platform.runLater(r);
-		
+
+        // Visual Confirmation
+        if(canFix)
+        	column.setText(column.getText()+".");
+        
 		//FIXME implement better listening after
 		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell>>(){
 			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell>> arg0) {
@@ -174,6 +178,13 @@ public class SpreadsheetColumn<T> {
 		return canFix;
 	}
 	
+	public void setText(String text){
+		column.setText(text);
+	}
+	
+	public String getText(){
+		return column.getText();
+	}
 	
 	
 	/***************************************************************************

@@ -34,8 +34,14 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -94,6 +100,19 @@ public class HorizontalHeader extends TableHeaderRow {
                 /*****************************************************************
                  * END OF MODIFIED BY NELLARMONIA
                  *****************************************************************/
+                // We want to select when clicking on header
+                for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
+                    i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
+            			@Override
+            			public void handle(MouseEvent arg0) {
+            				if(arg0.isPrimaryButtonDown()){
+            					TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+            					TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
+            					sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
+            				}
+            			}
+            		});
+                }
             }
         };
         Platform.runLater(r);
@@ -157,10 +176,12 @@ public class HorizontalHeader extends TableHeaderRow {
 				//If we unfix a column
 				for (SpreadsheetColumn<?> remitem : arg0.getRemoved()) {
                    removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(remitem));
+                   remitem.setText(remitem.getText().replace(":", "."));
                 }
 				//If we fix one
                 for (SpreadsheetColumn<?> additem : arg0.getAddedSubList()) {
                 	addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(additem));
+                	additem.setText(additem.getText().replace(".", "")+":");
                 }
 			}
 			 updateHighlightSelection();

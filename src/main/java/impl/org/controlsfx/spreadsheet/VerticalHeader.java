@@ -289,12 +289,12 @@ public class VerticalHeader extends StackPane {
 				public void handle(MouseEvent arg0) {
 					if(arg0.isPrimaryButtonDown()){
 						try{
-							int row = Integer.parseInt(label.getText().replace(".","").replace(":", ""));
+							int row = Integer.parseInt(label.getText().substring(0, label.getText().length()-1));
 							TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView.getSelectionModel();
 							TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView().getFocusModel();
 							sm.clearAndSelect(row-1,fm.getFocusedCell().getTableColumn() );
 						}catch(NumberFormatException ex){
-							
+
 						}
 					}
 				}});

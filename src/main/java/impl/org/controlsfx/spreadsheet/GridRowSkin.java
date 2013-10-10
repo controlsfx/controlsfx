@@ -127,7 +127,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 
         double fixedColumnWidth = 0;
         for (int column = 0; column < cells.size(); column++) {
-
+	
             final CellView tableCell = (CellView) cells.get(column);
 
             // In case the node was treated previously
@@ -177,7 +177,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             if (isVisible) {
                 if (/*fixedCellSizeProperty().get() > 0
                         &&*/ tableCell.getParent() == null) {
-                    getChildren().add(0,tableCell);
+                    getChildren().add(tableCell);
                 }
 
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);

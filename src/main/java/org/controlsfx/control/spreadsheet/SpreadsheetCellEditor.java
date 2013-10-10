@@ -435,7 +435,7 @@ public abstract class SpreadsheetCellEditor<T> {
 		 **************************************************************************/
 		protected final List<String> itemList;
 		protected final ComboBox<String> cb;
-		protected ChangeListener<Number> cl;
+		private String originalValue;
 
 		/***************************************************************************
 		 * * Constructor * *
@@ -458,8 +458,10 @@ public abstract class SpreadsheetCellEditor<T> {
 				ObservableList<String> items = FXCollections
 						.observableList(itemList);
 				cb.setItems(items);
-				cb.setValue(value.toString());
+				originalValue = value.toString();
+				cb.setValue(originalValue);
 			}
+			
 			attachEnterEscapeEventHandler();
 			cb.show();
 			cb.requestFocus();
@@ -467,9 +469,7 @@ public abstract class SpreadsheetCellEditor<T> {
 
 		@Override
 		public void end() {
-			cb.getSelectionModel().selectedIndexProperty().removeListener(cl);
 			cb.setOnKeyPressed(null);
-			cl = null;
 		}
 
 		@Override
@@ -487,24 +487,19 @@ public abstract class SpreadsheetCellEditor<T> {
 		 **************************************************************************/
 
 		protected void attachEnterEscapeEventHandler() {
-			cl = new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> ov,
-						Number t, Number t1) {
-					endEdit(true);
-				}
-			};
-			cb.getSelectionModel().selectedIndexProperty().addListener(cl);
+			
 			cb.setOnKeyPressed(new EventHandler<KeyEvent>() {
 				@Override
 				public void handle(KeyEvent t) {
 					if (t.getCode() == KeyCode.ESCAPE) {
+						cb.setValue(originalValue);
 						endEdit(false);
+					}else if(t.getCode() == KeyCode.ENTER) {
+						endEdit(true);
 					}
 				}
 			});
 		}
-
 	}
 
 	/**
@@ -520,6 +515,7 @@ public abstract class SpreadsheetCellEditor<T> {
 		 **************************************************************************/
 		protected final DatePicker datePicker;
 		protected EventHandler<KeyEvent> eh;
+		protected ChangeListener<LocalDate> cl;
 
 		/***************************************************************************
 		 * * Constructor * *
@@ -538,7 +534,7 @@ public abstract class SpreadsheetCellEditor<T> {
 				datePicker.setValue((LocalDate) value);
 			}
 			attachEnterEscapeEventHandler();
-
+			datePicker.show();
 			datePicker.getEditor().requestFocus();
 		}
 		
@@ -548,6 +544,7 @@ public abstract class SpreadsheetCellEditor<T> {
 				datePicker.hide();
 			}
 			datePicker.removeEventFilter(KeyEvent.KEY_PRESSED, eh);
+			datePicker.valueProperty().removeListener(cl);
 		}
 
 		@Override
@@ -583,6 +580,16 @@ public abstract class SpreadsheetCellEditor<T> {
 			};
 
 			datePicker.addEventFilter(KeyEvent.KEY_PRESSED, eh);
+			
+			
+			cl = new ChangeListener<LocalDate>(){
+				@Override
+				public void changed(ObservableValue<? extends LocalDate> arg0,
+						LocalDate arg1, LocalDate arg2) {
+							endEdit(true);
+				}
+			};
+			datePicker.valueProperty().addListener(cl);
 		}
 
 	}

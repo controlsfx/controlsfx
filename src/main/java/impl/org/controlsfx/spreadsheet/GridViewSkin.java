@@ -27,6 +27,8 @@
 package impl.org.controlsfx.spreadsheet;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.util.List;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -36,12 +38,15 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -64,6 +69,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     /** Default height of a cell. */
 
     static final double DEFAULT_CELL_HEIGHT;
+    static final double DATE_CELL_MIN_WIDTH = 105;
     static {
         double cell_size = 24.0;
         try {
@@ -424,7 +430,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     
     /**
      * A list of Integer with the current selected Rows. This is useful for columnheader and
-     * RowHeader because they need to highligh when a selection is made.
+     * RowHeader because they need to highlight when a selection is made.
      */
     private final ObservableList<Integer> selectedRows = FXCollections.observableArrayList();
     public ObservableList<Integer> getSelectedRows() {
@@ -447,10 +453,74 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 	/**
 	 * Used in the HorizontalColumnHeader when we need to resize
 	 * in double click.
+	 * Keep in mind that resize is broken RT-31653
 	 * @param tc
 	 */
 	void resize(TableColumnBase<?, ?> tc){
 		resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
 	}
 
+	/**
+	 * We want to have extra space when displaying LocalDate because they will
+	 * use an editor that display a little icon on the right. Thus, that icon
+	 * is reducing the visibility of the date string.
+	 */
+	@Override protected void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
+        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
+        List<?> items = itemsProperty().get();
+        if (items == null || items.isEmpty()) return;
+    
+        Callback/*<TableColumn<T, ?>, TableCell<T,?>>*/ cellFactory = col.getCellFactory();
+        if (cellFactory == null) return;
+    
+        TableCell<ObservableList<SpreadsheetCell>,?> cell = (TableCell<ObservableList<SpreadsheetCell>, ?>) cellFactory.call(col);
+        if (cell == null) return;
+        
+        // set this property to tell the TableCell we want to know its actual
+        // preferred width, not the width of the associated TableColumnBase
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE);
+        
+        // determine cell padding
+        double padding = 10;
+        Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
+        if (n instanceof Region) {
+            Region r = (Region) n;
+            padding = r.snappedLeftInset() + r.snappedRightInset();
+        } 
+        
+        int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows);
+        double maxWidth = 0;
+        boolean datePresent = false;
+        boolean listPresent = false;
+        for (int row = 0; row < rows; row++) {
+            cell.updateTableColumn(col);
+            cell.updateTableView(handle.getGridView());
+            cell.updateIndex(row);
+            
+            if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
+                getChildren().add(cell);
+                
+                if(((SpreadsheetCell)cell.getItem()).getItem() instanceof LocalDate){
+                	datePresent = true;
+                } 
+                cell.impl_processCSS(false);
+                maxWidth = Math.max(maxWidth, cell.prefWidth(-1));
+                getChildren().remove(cell);
+            }
+        }
+
+        // dispose of the cell to prevent it retaining listeners (see RT-31015)
+        cell.updateIndex(-1);
+        
+        // RT-23486
+        double widthMax = maxWidth + padding;
+        if(handle.getGridView().getColumnResizePolicy() == TableView.CONSTRAINED_RESIZE_POLICY) {
+             widthMax = Math.max(widthMax, col.getWidth());
+        }
+        
+        if(datePresent && widthMax < DATE_CELL_MIN_WIDTH){
+        	widthMax = DATE_CELL_MIN_WIDTH;
+        }
+        col.impl_setWidth(widthMax); 
+    }
 }

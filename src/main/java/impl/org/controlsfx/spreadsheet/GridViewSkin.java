@@ -433,7 +433,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     /**
      * A list of Integer with the current selected Columns. This is useful for columnheader and
-     * RowHeader because they need to highligh when a selection is made.
+     * RowHeader because they need to highlight when a selection is made.
      */
     private final ObservableList<Integer> selectedColumns= FXCollections.observableArrayList();
     public ObservableList<Integer> getSelectedColumns() {
@@ -442,6 +442,15 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
 	public GridCellEditor getSpreadsheetCellEditorImpl() {
 		return spreadsheetCellEditorImpl;
+	}
+	
+	/**
+	 * Used in the HorizontalColumnHeader when we need to resize
+	 * in double click.
+	 * @param tc
+	 */
+	void resize(TableColumnBase<?, ?> tc){
+		resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
 	}
 
 }

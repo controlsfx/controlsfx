@@ -28,7 +28,9 @@ package impl.org.controlsfx.spreadsheet;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+import javafx.event.EventHandler;
 import javafx.scene.control.TableColumnBase;
+import javafx.scene.input.MouseEvent;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -45,11 +47,20 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     }
 
     @Override
-    protected TableColumnHeader createTableColumnHeader(TableColumnBase col) {
-        return col.getColumns().isEmpty()
-                ? new TableColumnHeader(getTableViewSkin(), col)
-                : new HorizontalHeaderColumn(getTableViewSkin(),
-                        col);
+    protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
+    	if(col.getColumns().isEmpty()){
+    		final TableColumnHeader columnHeader = new TableColumnHeader(getTableViewSkin(), col);
+    		columnHeader.setOnMousePressed(new EventHandler<MouseEvent>() {
+    			@Override
+    			public void handle(MouseEvent arg0) {
+    				 if (arg0.getClickCount() == 2 && arg0.isPrimaryButtonDown()) {
+    					 ((GridViewSkin) getTableViewSkin()).resize(col);
+    				 }
+    			}
+    		});
+    		return columnHeader;
+    	}else
+    		return new HorizontalHeaderColumn(getTableViewSkin(),col);
     }
 
     @Override

@@ -213,7 +213,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 		final double random = Math.random();
 		if (random < 0.10) {
 			List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
-			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
+			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int)(Math.random()*6)));
 		} else if (random >= 0.10 && random < 0.25) {
 			cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
 		}else if (random >= 0.25 && random < 0.75) {

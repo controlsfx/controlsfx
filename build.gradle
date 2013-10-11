@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 apply from: 'mavenPublish.gradle'
-apply from: 'javafx.plugin'
+//apply from: 'javafx.plugin'
 
 group = 'org.controlsfx'
 version = '8.0.2-SNAPSHOT'
@@ -127,9 +127,8 @@ gradle.taskGraph.whenReady {
 }
 
 
-
+/*
 javafx {
-
     try {
         jfxrtJar = ext.jfxrtJar
     } catch (MissingPropertyException pne) {
@@ -150,5 +149,5 @@ javafx {
     description = 'This is a sample of all of the ControlsFX controls'
     licenseType = '3 clause BSD'
     vendor = 'FX Experience'
-
 }
+*/

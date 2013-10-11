@@ -45,6 +45,12 @@ import javafx.scene.text.Font;
  *  <pre>
  *  Glyph glyph = fontAwesome.fontSize(28).fontColor(Color.RED).create('&#92;uf013'); //GEAR
  *  </pre>
+ *  
+ *  <p>Here's a screenshot of two font packs being used to render images into 
+ *  JavaFX Button controls:
+ *  
+ * <br>
+ * <center><img src="glyphFont.png"></center>
  */
 public abstract class GlyphFont {
     

@@ -5,7 +5,7 @@ apply from: 'mavenPublish.gradle'
 //apply from: 'javafx.plugin'
 
 group = 'org.controlsfx'
-version = '8.0.2-SNAPSHOT'
+version = '8.0.3-SNAPSHOT'
 
 configurations {
     samples.extendsFrom mainRuntime

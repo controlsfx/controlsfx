@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.controlsfx.samples.SpreadsheetView;
+package org.controlsfx.samples;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,7 +53,6 @@ import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
-import org.controlsfx.samples.Utils;
 
 /**
  *
@@ -169,7 +168,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 
 	@Override
 	public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/control/SpreadsheetView.html";
+		return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/SpreadsheetView.html";
 	}
 
 	@Override

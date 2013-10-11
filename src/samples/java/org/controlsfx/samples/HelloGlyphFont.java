@@ -74,10 +74,9 @@ public class HelloGlyphFont extends Application implements Sample {
 
 	@Override
 	public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE
-				+ "org/controlsfx/control/glyphfont/GlyphFont.html";
+		return Utils.JAVADOC_BASE + "org/controlsfx/glyphfont/GlyphFont.html";
 	}
-
+	
 	@Override
 	public boolean includeInSamples() {
 		return true;

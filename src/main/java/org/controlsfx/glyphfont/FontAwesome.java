@@ -60,6 +60,11 @@ import javafx.scene.Node;
  * 
  * <pre>new Button("", FontAwesome.Glyph.GEAR.create());</pre>
  * 
+ * It is possible to achieve the same result without creating a reference to icon font by simply using 
+ * {@link GlyphFontRegistry} methods
+ * 
+ * <pre>new Button("", GlyphFontRegistry.glyph("FontAwesome|GEAR");</pre>
+ * 
  * @see GlyphFont
  * @see GlyphFontRegistry
  * @see Glyph

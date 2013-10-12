@@ -39,7 +39,7 @@ import javafx.scene.Node;
  * glyph fonts manually using the provided 
  * {@link GlyphFontRegistry#register(GlyphFont)} method. 
  * 
- * <p>Once registered fonts and their glyphs can be requested by name using the
+ * <p>Once registered, fonts and their glyphs can be requested by name using the
  * {@link GlyphFontRegistry#glyph(String)} and
  * {@link GlyphFontRegistry#glyph(String, String)} methods. For example:
  * 

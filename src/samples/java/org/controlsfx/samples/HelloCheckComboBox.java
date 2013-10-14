@@ -49,14 +49,14 @@ public class HelloCheckComboBox extends Application implements Sample {
         
         // CheckBoxComboBox
         final CheckComboBox<String> cbcb = new CheckComboBox<String>(strings);
-        cbcb.getSelectedIndices().addListener(new ListChangeListener<Integer>() {
+        cbcb.getSelectionModel().getSelectedIndices().addListener(new ListChangeListener<Integer>() {
             @Override public void onChanged(ListChangeListener.Change<? extends Integer> c) {
-                System.out.println(cbcb.getSelectedIndices());
+                System.out.println(cbcb.getSelectionModel().getSelectedIndices());
             }
         });
-        cbcb.getSelectedItems().addListener(new ListChangeListener<String>() {
+        cbcb.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<String>() {
             @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
-                System.out.println(cbcb.getSelectedItems());
+                System.out.println(cbcb.getSelectionModel().getSelectedItems());
             }
         });
         grid.add(new Label("CheckComboBox: "), 0, row);

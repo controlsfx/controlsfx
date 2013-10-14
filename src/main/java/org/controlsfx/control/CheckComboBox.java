@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control;
 
+import impl.org.controlsfx.skin.CheckComboBoxSkin;
+
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +42,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
@@ -57,7 +60,7 @@ import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
  *
  * @param <T> The type of the data in the ComboBox.
  */
-public class CheckComboBox<T> extends ComboBox<T> {
+public class CheckComboBox<T> extends Control {
     
     /**************************************************************************
      * 
@@ -65,17 +68,15 @@ public class CheckComboBox<T> extends ComboBox<T> {
      * 
      **************************************************************************/
     
-    private ObservableList<T> items;
+    private final ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
     
-    private BitSet selectedIndices;
+    private final BitSet selectedIndices;
     
-    private ReadOnlyUnbackedObservableList<Integer> selectedIndicesList;
-    private ReadOnlyUnbackedObservableList<T> selectedItemsList;
+    private final ReadOnlyUnbackedObservableList<Integer> selectedIndicesList;
+    private final ReadOnlyUnbackedObservableList<T> selectedItemsList;
     
-    private ListCell<T> buttonCell;
 
-    
     
     /**************************************************************************
      * 
@@ -95,9 +96,8 @@ public class CheckComboBox<T> extends ComboBox<T> {
      * @param items
      */
     public CheckComboBox(final ObservableList<T> items) {
-        super(items);
+        final int initialSize = items == null ? 32 : items.size();
         
-        final int initialSize = items == null ? 32 : items.size(); 
         this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
         
         this.items = items == null ? FXCollections.<T>observableArrayList() : items;
@@ -152,17 +152,6 @@ public class CheckComboBox<T> extends ComboBox<T> {
             }
         };
         
-        // installs a custom CheckBoxListCell cell factory
-        setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
-            public ListCell<T> call(ListView<T> listView) {
-                return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
-                    @Override public ObservableValue<Boolean> call(T item) {
-                        return itemBooleanMap.get(item);
-                    }
-                });
-            };
-        });
-        
         final MappingChange.Map<Integer,T> map = new MappingChange.Map<Integer,T>() {
             @Override public T map(Integer f) {
                 return items.get(f);
@@ -174,31 +163,8 @@ public class CheckComboBox<T> extends ComboBox<T> {
                 // the observers of the selectedItems ObservableList.
                 selectedItemsList.callObservers(new MappingChange<Integer,T>(c, map, selectedItemsList));
                 c.reset();
-                
-                // we also update the display of the ComboBox button cell by
-                // just dumbly updating the index every time selection changes.
-                buttonCell.updateIndex(1);
             }
         });
-        
-        // we render the selection into a custom button cell, so that it can 
-        // be pretty printed (e.g. 'Item 1, Item 2, Item 10').
-        buttonCell = new ListCell<T>() {
-            @Override protected void updateItem(T item, boolean empty) {
-                // we ignore whatever item is selected, instead choosing
-                // to display the selected item text using commas to separate
-                // each item
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0, max = selectedItemsList.size(); i < max; i++) {
-                    sb.append(selectedItemsList.get(i));
-                    if (i < max - 1) {
-                        sb.append(", ");
-                    }
-                }
-                setText(sb.toString());
-            }
-        };
-        setButtonCell(buttonCell);
     }
     
     
@@ -211,12 +177,7 @@ public class CheckComboBox<T> extends ComboBox<T> {
     
     /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
-        return new ComboBoxListViewSkin<T>(this) {
-            // overridden to prevent the popup from disappearing
-            @Override protected boolean isHideOnClickEnabled() {
-                return false;
-            }
-        };
+        return new CheckComboBoxSkin<>(this);
     }
     
     /**
@@ -232,6 +193,20 @@ public class CheckComboBox<T> extends ComboBox<T> {
     public ObservableList<T> getSelectedItems() {
         return selectedItemsList;
     }
+    
+    public ObservableList<T> getItems() {
+        return items;
+    }
+    
+    public BooleanProperty getItemBooleanProperty(int index) {
+        if (index < 0 || index >= items.size()) return null;
+        return getItemBooleanProperty(getItems().get(index));
+    }
+    
+    public BooleanProperty getItemBooleanProperty(T item) {
+        return itemBooleanMap.get(item);
+    }
+    
     
     
     /**************************************************************************

@@ -124,7 +124,14 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         }else{
         	((GridRow)getSkinnable()).setCurrentlyFixed(false);
         }
-
+        /**
+         * We want to insert the removed tableCell in their correct position
+         * because otherwise we have some glitch with the fixed columns when
+         * scrolling fast to the left. This is happening because new cells added
+         * on the left are positioned at the end of the list, therefore layout
+         * at the end. 
+         */
+        int rightPlace = 0;
         double fixedColumnWidth = 0;
         for (int column = 0; column < cells.size(); column++) {
 	
@@ -159,27 +166,11 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                  }
             }
 
-            
-//            if (fixedCellSizeProperty().get() > 0) {
-                // we determine if the cell is visible, and if not we have the
-                // ability to take it out of the scenegraph to help improve
-                // performance. However, we only do this when there is a
-                // fixed cell length specified in the TableView. This is because
-                // when we have a fixed cell length it is possible to know with
-                // certainty the height of each TableCell - it is the fixed
-                // value
-                // provided by the developer, and this means that we do not have
-                // to concern ourselves with the possibility that the height
-                // may be variable and / or dynamic.
-//                isVisible = isColumnPartiallyOrFullyVisible(tableColumn);
-//            }
-
             if (isVisible) {
-                if (/*fixedCellSizeProperty().get() > 0
-                        &&*/ tableCell.getParent() == null) {
-                    getChildren().add(tableCell);
+                if (tableCell.getParent() == null) {
+                    getChildren().add(rightPlace,tableCell);
                 }
-
+                rightPlace++;
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
 
                 switch (spanType) {
@@ -229,9 +220,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         // to the width variable
                         for (int i = 1, colSpan = cellSpan.getColumnSpan(), max1 = cells
                                 .size() - column; i < colSpan && i < max1; i++) {
-                            // calculate the width
-//                            final Node adjacentNode = (Node) getChildren().get(
-//                                    column + i);
                             width += snapSize(spreadsheetView.getColumns().get(column+i).getWidth());//adjacentNode.maxWidth(-1));
                         }
                     }
@@ -259,13 +247,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 
                 // Request layout is here as (partial) fix for RT-28684
                 // tableCell.requestLayout();
-            } else {
-//                if (fixedCellSizeProperty().get() > 0) {
-                    // we only add/remove to the scenegraph if the fixed cell
-                    // length support is enabled - otherwise we keep all
-                    // TableCells in the scenegraph
-                    getChildren().remove(tableCell);
-//                }
+            }else{
+            	getChildren().remove(tableCell);
             }
             
             x += width;

@@ -101,9 +101,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private final double rowHeaderWidth = DEFAULT_ROWHEADER_WIDTH;
     
     //@Override
-    public static Skin<?> createCellSkin(CellView cell) {
+   /* public static Skin<?> createCellSkin(CellView cell) {
         return new TableCellSkin<>(cell);
-    }
+    }*/
     
     public double getRowHeaderWidth() {
         return rowHeaderWidth;
@@ -465,7 +465,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 	 * use an editor that display a little icon on the right. Thus, that icon
 	 * is reducing the visibility of the date string.
 	 */
-	@Override protected void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
+	@Override public void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
         List<?> items = itemsProperty().get();
         if (items == null || items.isEmpty()) return;

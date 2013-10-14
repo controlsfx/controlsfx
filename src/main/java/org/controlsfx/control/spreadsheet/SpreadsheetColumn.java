@@ -169,6 +169,16 @@ public class SpreadsheetColumn<T> {
 	}
 	
 	/**
+	 * If the column is resizable, it will compute the optimum 
+	 * width for all the visible cells to be visible.
+	 */
+	public void fitColumn(){
+		if(column.isResizable()){
+			spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, -1);
+		}
+	}
+	
+	/**
 	 * Indicate whether this column can be fixed or not.
 	 * Call that method before calling {@link #setFixed(boolean)} or
 	 * adding an item to {@link SpreadsheetView#getFixedColumns()}.

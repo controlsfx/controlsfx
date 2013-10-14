@@ -30,8 +30,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 
 import org.controlsfx.control.spreadsheet.Grid;

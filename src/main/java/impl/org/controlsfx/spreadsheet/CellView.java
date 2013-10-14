@@ -33,7 +33,6 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableSelectionModel;
@@ -295,20 +294,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * Protected Methods                                                          *
      *                                                                         *
      **************************************************************************/
-    @Override
+    /*@Override
     protected Skin<?> createDefaultSkin() {
-        return GridViewSkin.createCellSkin(this);
-    }
+        return new TableCellSkin<>(this);
+    }*/
 
     /***************************************************************************
      *                                                                         *
      * Private Methods                                                          *
      *                                                                         *
      **************************************************************************/
-    
-    private SpreadsheetView getSpreadsheetView() {
-        return ((GridRow)getTableRow()).getSpreadsheetView();
-    }
     
     /**
      * A SpreadsheetCell is being hovered and we need to re-route the signal.

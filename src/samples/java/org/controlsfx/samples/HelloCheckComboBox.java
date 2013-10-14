@@ -2,6 +2,7 @@ package org.controlsfx.samples;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -9,25 +10,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
-import org.controlsfx.control.CheckBoxComboBox;
-import org.controlsfx.control.CustomTextField;
-import org.controlsfx.control.TextFields;
+import org.controlsfx.control.CheckComboBox;
 
-public class HelloCheckBoxComboBox extends Application implements Sample {
+public class HelloCheckComboBox extends Application implements Sample {
     
     @Override public String getSampleName() {
-        return "CheckBoxComboBox";
+        return "CheckComboBox";
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckBoxComboBox.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckComboBox.html";
     }
     
     @Override public boolean includeInSamples() {
@@ -52,15 +48,25 @@ public class HelloCheckBoxComboBox extends Application implements Sample {
         grid.add(new ComboBox<String>(strings), 1, row++);
         
         // CheckBoxComboBox
-        CheckBoxComboBox<String> cbcb = new CheckBoxComboBox<String>(strings);
-        grid.add(new Label("CheckBox ComboBox: "), 0, row);
+        final CheckComboBox<String> cbcb = new CheckComboBox<String>(strings);
+        cbcb.getSelectedIndices().addListener(new ListChangeListener<Integer>() {
+            @Override public void onChanged(ListChangeListener.Change<? extends Integer> c) {
+                System.out.println(cbcb.getSelectedIndices());
+            }
+        });
+        cbcb.getSelectedItems().addListener(new ListChangeListener<String>() {
+            @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
+                System.out.println(cbcb.getSelectedItems());
+            }
+        });
+        grid.add(new Label("CheckComboBox: "), 0, row);
         grid.add(cbcb, 1, row++);
         
         return grid;
     }
     
     @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("CheckBox ComboBox Demo");
+        stage.setTitle("CheckComboBox Demo");
         
         
         Scene scene = new Scene((Parent) getPanel(stage), 550, 550);

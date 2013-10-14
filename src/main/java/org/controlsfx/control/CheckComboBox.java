@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2013, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control;
 
 import java.util.BitSet;
@@ -17,6 +43,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
 
 import com.sun.javafx.collections.MappingChange;
@@ -24,7 +51,19 @@ import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 
-public class CheckBoxComboBox<T> extends ComboBox<T> {
+/**
+ * A simple UI control that makes it possible to select zero or more items within
+ * a ComboBox-like way. Each row item shows a {@link CheckBox}.
+ *
+ * @param <T> The type of the data in the ComboBox.
+ */
+public class CheckComboBox<T> extends ComboBox<T> {
+    
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
     
     private ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
@@ -33,12 +72,29 @@ public class CheckBoxComboBox<T> extends ComboBox<T> {
     
     private ReadOnlyUnbackedObservableList<Integer> selectedIndicesList;
     private ReadOnlyUnbackedObservableList<T> selectedItemsList;
+    
+    private ListCell<T> buttonCell;
 
-    public CheckBoxComboBox() {
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
+    
+    /**
+     * 
+     */
+    public CheckComboBox() {
         this(null);
     }
     
-    public CheckBoxComboBox(final ObservableList<T> items) {
+    /**
+     * 
+     * @param items
+     */
+    public CheckComboBox(final ObservableList<T> items) {
         super(items);
         
         final int initialSize = items == null ? 32 : items.size(); 
@@ -96,7 +152,7 @@ public class CheckBoxComboBox<T> extends ComboBox<T> {
             }
         };
         
-        
+        // installs a custom CheckBoxListCell cell factory
         setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             public ListCell<T> call(ListView<T> listView) {
                 return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
@@ -118,31 +174,40 @@ public class CheckBoxComboBox<T> extends ComboBox<T> {
                 // the observers of the selectedItems ObservableList.
                 selectedItemsList.callObservers(new MappingChange<Integer,T>(c, map, selectedItemsList));
                 c.reset();
+                
+                // we also update the display of the ComboBox button cell by
+                // just dumbly updating the index every time selection changes.
+                buttonCell.updateIndex(1);
             }
         });
         
-        
-        
-        
-        // listening
-//        selectedIndicesList.addListener(new ListChangeListener<Integer>() {
-//            @Override
-//            public void onChanged(
-//                    javafx.collections.ListChangeListener.Change<? extends Integer> c) {
-//                System.out.println(selectedIndicesList);
-//            }
-//        });
-//        selectedItemsList.addListener(new ListChangeListener<T>() {
-//            @Override
-//            public void onChanged(
-//                    javafx.collections.ListChangeListener.Change<? extends T> c) {
-////                while (c.next()) {
-////                    System.out.println(c);
-////                }
-//                System.out.println(selectedItemsList);
-//            }
-//        });
+        // we render the selection into a custom button cell, so that it can 
+        // be pretty printed (e.g. 'Item 1, Item 2, Item 10').
+        buttonCell = new ListCell<T>() {
+            @Override protected void updateItem(T item, boolean empty) {
+                // we ignore whatever item is selected, instead choosing
+                // to display the selected item text using commas to separate
+                // each item
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0, max = selectedItemsList.size(); i < max; i++) {
+                    sb.append(selectedItemsList.get(i));
+                    if (i < max - 1) {
+                        sb.append(", ");
+                    }
+                }
+                setText(sb.toString());
+            }
+        };
+        setButtonCell(buttonCell);
     }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
     
     /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
@@ -153,7 +218,36 @@ public class CheckBoxComboBox<T> extends ComboBox<T> {
             }
         };
     }
+    
+    /**
+     * Returns a read-only list of the currently selected indices in the CheckBox.
+     */
+    public ObservableList<Integer> getSelectedIndices() {
+        return selectedIndicesList;
+    }
+    
+    /**
+     * Returns a read-only list of the currently selected items in the CheckBox.
+     */
+    public ObservableList<T> getSelectedItems() {
+        return selectedItemsList;
+    }
+    
+    
+    /**************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
 
+    
+    
+    /**************************************************************************
+     * 
+     * Implementation
+     * 
+     **************************************************************************/
+    
     private void updateMap(Change<? extends T> c) {
         if  (c == null) {
             // reset the map
@@ -165,6 +259,9 @@ public class CheckBoxComboBox<T> extends ComboBox<T> {
                 final BooleanProperty booleanProperty = new SimpleBooleanProperty(item, "selected", false);
                 itemBooleanMap.put(item, booleanProperty);
                 
+                // this is where we listen to changes to the boolean properties,
+                // updating the selected indices list (and therefore indirectly
+                // the selected items list) when the checkbox is toggled
                 booleanProperty.addListener(new InvalidationListener() {
                     @Override public void invalidated(Observable o) {
                         final int changeIndex = selectedIndicesList.indexOf(index);
@@ -184,4 +281,11 @@ public class CheckBoxComboBox<T> extends ComboBox<T> {
         }
     }
     
+    
+    
+    /**************************************************************************
+     * 
+     * Support classes
+     * 
+     **************************************************************************/
 }

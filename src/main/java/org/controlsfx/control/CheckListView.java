@@ -33,7 +33,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ListChangeListener.Change;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -86,7 +88,7 @@ public class CheckListView<T> extends ListView<T> {
         final int initialSize = items == null ? 32 : items.size();
         this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
         
-        setCheckModel(new CheckBitSetModelBase<T>(items, itemBooleanMap));
+        setCheckModel(new CheckListViewBitSetCheckModel<T>(items, itemBooleanMap));
         setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             public ListCell<T> call(ListView<T> listView) {
                 return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
@@ -128,27 +130,28 @@ public class CheckListView<T> extends ListView<T> {
             new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel");
     
     /**
-     * Sets the {@link SelectionModel} to be used in the CheckComboBox. 
-     * Note that, unlike other UI controls such as ListView, the SelectionModel
-     * in this instance is used to represent the items in the CheckComboBox that
-     * have had their {@link CheckBox} selected by the user.
+     * Sets the 'check model' to be used in the CheckListView - this is the
+     * code that is responsible for representing the selected state of each
+     * {@link CheckBox} (not to be confused with the 
+     * {@link #selectionModelProperty() selection model}, which represents the
+     * selection state of each row).. 
      */
     public final void setCheckModel(MultipleSelectionModel<T> value) {
         checkModelProperty().set(value);
     }
 
     /**
-     * Returns the currently installed selection model.
+     * Returns the currently installed check model.
      */
     public final MultipleSelectionModel<T> getCheckModel() {
         return checkModel == null ? null : checkModel.get();
     }
 
     /**
-     * The SelectionModel provides the API through which it is possible
-     * to select single or multiple items within a CheckComboBox, as  well as inspect
-     * which items have been selected by the user. Note that it has a generic
-     * type that must match the type of the CheckComboBox itself.
+     * The check model provides the API through which it is possible
+     * to check single or multiple items within a CheckListView, as  well as inspect
+     * which items have been checked by the user. Note that it has a generic
+     * type that must match the type of the CheckListView itself.
      */
     public final ObjectProperty<MultipleSelectionModel<T>> checkModelProperty() {
         return checkModel;
@@ -171,4 +174,55 @@ public class CheckListView<T> extends ListView<T> {
      * 
      **************************************************************************/
     
+    private static class CheckListViewBitSetCheckModel<T> extends CheckBitSetModelBase<T> {
+        
+        /***********************************************************************
+         *                                                                     *
+         * Internal properties                                                 *
+         *                                                                     *
+         **********************************************************************/
+        
+        private final ObservableList<T> items;
+        
+        
+        
+        /***********************************************************************
+         *                                                                     *
+         * Constructors                                                        *
+         *                                                                     *
+         **********************************************************************/
+        
+        CheckListViewBitSetCheckModel(final ObservableList<T> items, final Map<T, BooleanProperty> itemBooleanMap) {
+            super(itemBooleanMap);
+            
+            this.items = items;
+            this.items.addListener(new ListChangeListener<T>() {
+                @Override public void onChanged(Change<? extends T> c) {
+                    updateMap();
+                }
+            });
+            
+            updateMap();
+        }
+        
+        
+        
+        /***********************************************************************
+         *                                                                     *
+         * Implementing abstract API                                           *
+         *                                                                     *
+         **********************************************************************/
+
+        @Override public T getItem(int index) {
+            return items.get(index);
+        }
+        
+        @Override public int getItemCount() {
+            return items.size();
+        }
+        
+        @Override public int getItemIndex(T item) {
+            return items.indexOf(item);
+        }
+    }
 }

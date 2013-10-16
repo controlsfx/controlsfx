@@ -26,46 +26,27 @@
  */
 package org.controlsfx.control;
 
-import impl.org.controlsfx.skin.CheckComboBoxSkin;
-
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
-
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ListChangeListener.Change;
-import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.CheckBoxTreeItem.TreeModificationEvent;
 import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.Skin;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.util.Callback;
-
-import com.sun.javafx.collections.MappingChange;
-import com.sun.javafx.collections.NonIterableChange;
-import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.CheckBoxTreeCell;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within
- * a ComboBox-like way. Each row item shows a {@link CheckBox}, and the state
- * of each row can be queried via the {@link #checkModelProperty() check model}.
+ * a TreeView without the need to set a custom cell factory or manually create
+ * boolean properties for each row - simply use the 
+ * {@link #checkModelProperty() check model} to request the current selection 
+ * state.
  *
- * @param <T> The type of the data in the ComboBox.
+ * @param <T> The type of the data in the TreeView.
  */
-public class CheckComboBox<T> extends Control {
+public class CheckTreeView<T> extends TreeView<T> {
     
     /**************************************************************************
      * 
@@ -73,8 +54,6 @@ public class CheckComboBox<T> extends Control {
      * 
      **************************************************************************/
     
-    private final ObservableList<T> items;
-    private final Map<T, BooleanProperty> itemBooleanMap;
     
 
     
@@ -87,20 +66,18 @@ public class CheckComboBox<T> extends Control {
     /**
      * 
      */
-    public CheckComboBox() {
+    public CheckTreeView() {
         this(null);
     }
     
     /**
      * 
-     * @param items
      */
-    public CheckComboBox(final ObservableList<T> items) {
-        final int initialSize = items == null ? 32 : items.size();
+    public CheckTreeView(final CheckBoxTreeItem<T> root) {
+        super(root);
         
-        this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
-        this.items = items == null ? FXCollections.<T>observableArrayList() : items;
-        setCheckModel(new CheckComboBoxBitSetCheckModel<T>(items, itemBooleanMap));
+        setCheckModel(new CheckTreeViewBitSetCheckModel<T>(this));
+        setCellFactory(CheckBoxTreeCell.<T>forTreeView());
     }
     
     
@@ -111,23 +88,7 @@ public class CheckComboBox<T> extends Control {
      * 
      **************************************************************************/
     
-    /** {@inheritDoc} */
-    @Override protected Skin<?> createDefaultSkin() {
-        return new CheckComboBoxSkin<>(this);
-    }
     
-    public ObservableList<T> getItems() {
-        return items;
-    }
-    
-    public BooleanProperty getItemBooleanProperty(int index) {
-        if (index < 0 || index >= items.size()) return null;
-        return getItemBooleanProperty(getItems().get(index));
-    }
-    
-    public BooleanProperty getItemBooleanProperty(T item) {
-        return itemBooleanMap.get(item);
-    }
     
     
     
@@ -138,34 +99,34 @@ public class CheckComboBox<T> extends Control {
      **************************************************************************/
 
     // --- Check Model
-    private ObjectProperty<MultipleSelectionModel<T>> checkModel = 
-            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel");
+    private ObjectProperty<MultipleSelectionModel<TreeItem<T>>> checkModel = 
+            new SimpleObjectProperty<>(this, "checkModel");
     
     /**
-     * Sets the 'check model' to be used in the CheckComboBox - this is the
+     * Sets the 'check model' to be used in the CheckTreeView - this is the
      * code that is responsible for representing the selected state of each
      * {@link CheckBox} (not to be confused with the 
      * {@link #selectionModelProperty() selection model}, which represents the
      * selection state of each row).. 
      */
-    public final void setCheckModel(MultipleSelectionModel<T> value) {
+    public final void setCheckModel(MultipleSelectionModel<TreeItem<T>> value) {
         checkModelProperty().set(value);
     }
 
     /**
      * Returns the currently installed check model.
      */
-    public final MultipleSelectionModel<T> getCheckModel() {
+    public final MultipleSelectionModel<TreeItem<T>> getCheckModel() {
         return checkModel == null ? null : checkModel.get();
     }
 
     /**
      * The check model provides the API through which it is possible
-     * to check single or multiple items within a CheckComboBox, as  well as inspect
+     * to check single or multiple items within a CheckTreeView, as  well as inspect
      * which items have been checked by the user. Note that it has a generic
-     * type that must match the type of the CheckComboBox itself.
+     * type that must match the type of the CheckTreeView itself.
      */
-    public final ObjectProperty<MultipleSelectionModel<T>> checkModelProperty() {
+    public final ObjectProperty<MultipleSelectionModel<TreeItem<T>>> checkModelProperty() {
         return checkModel;
     }
     
@@ -186,7 +147,7 @@ public class CheckComboBox<T> extends Control {
      * 
      **************************************************************************/
     
-    private static class CheckComboBoxBitSetCheckModel<T> extends CheckBitSetModelBase<T> {
+    private static class CheckTreeViewBitSetCheckModel<T> extends CheckBitSetModelBase<TreeItem<T>> {
         
         /***********************************************************************
          *                                                                     *
@@ -194,7 +155,8 @@ public class CheckComboBox<T> extends Control {
          *                                                                     *
          **********************************************************************/
         
-        private final ObservableList<T> items;
+        private final CheckTreeView<T> treeView;
+        private final TreeItem<T> root;
         
         
         
@@ -204,17 +166,23 @@ public class CheckComboBox<T> extends Control {
          *                                                                     *
          **********************************************************************/
         
-        CheckComboBoxBitSetCheckModel(final ObservableList<T> items, final Map<T, BooleanProperty> itemBooleanMap) {
-            super(itemBooleanMap);
+        CheckTreeViewBitSetCheckModel(final CheckTreeView<T> treeView) {
+            super(null);
             
-            this.items = items;
-            this.items.addListener(new ListChangeListener<T>() {
-                @Override public void onChanged(Change<? extends T> c) {
-                    updateMap();
+            this.treeView = treeView;
+            this.root = treeView.getRoot();
+            this.root.addEventHandler(CheckBoxTreeItem.<T>checkBoxSelectionChangedEvent(), new EventHandler<TreeModificationEvent<T>>() {
+                public void handle(TreeModificationEvent<T> e) {
+                    CheckBoxTreeItem<T> treeItem = e.getTreeItem();
+                    
+                    final int index = getItemIndex(treeItem);
+                    if (treeItem.isSelected() && ! treeItem.isIndeterminate()) {
+                        select(index);
+                    } else { 
+                        clearSelection(index);
+                    }
                 }
             });
-            
-            updateMap();
         }
         
         
@@ -225,16 +193,28 @@ public class CheckComboBox<T> extends Control {
          *                                                                     *
          **********************************************************************/
 
-        @Override public T getItem(int index) {
-            return items.get(index);
+        @Override public TreeItem<T> getItem(int index) {
+            return treeView.getTreeItem(index);
         }
         
         @Override public int getItemCount() {
-            return items.size();
+            return treeView.getExpandedItemCount();
         }
         
-        @Override public int getItemIndex(T item) {
-            return items.indexOf(item);
+        @Override public int getItemIndex(TreeItem<T> item) {
+            return treeView.getRow(item);
+        }
+        
+        
+        
+        /***********************************************************************
+         *                                                                     *
+         * Overriding public API                                               *
+         *                                                                     *
+         **********************************************************************/
+        
+        @Override protected void updateMap() {
+            // no-op
         }
     }
 }

@@ -16,7 +16,7 @@ import com.sun.javafx.collections.MappingChange;
 import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 
-class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
+abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     
     /***********************************************************************
      *                                                                     *
@@ -24,7 +24,6 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
      *                                                                     *
      **********************************************************************/
 
-    private final ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
     
     private final BitSet selectedIndices;
@@ -39,22 +38,14 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
      *                                                                     *
      **********************************************************************/
 
-    CheckBitSetModelBase(final ObservableList<T> items, final Map<T, BooleanProperty> itemBooleanMap) {
-        this.items = items;
+    CheckBitSetModelBase(final Map<T, BooleanProperty> itemBooleanMap) {
         this.itemBooleanMap = itemBooleanMap;
-        
-        this.items.addListener(new ListChangeListener<T>() {
-            @Override public void onChanged(Change<? extends T> c) {
-                updateMap(c);
-            }
-        });
-        updateMap(null);
         
         this.selectedIndices = new BitSet();
         
         this.selectedIndicesList = new ReadOnlyUnbackedObservableList<Integer>() {
             @Override public Integer get(int index) {
-                if (index < 0 || index >= items.size()) return -1;
+                if (index < 0 || index >= getItemCount()) return -1;
 
                 for (int pos = 0, val = selectedIndices.nextSetBit(0);
                     val >= 0 || pos == index;
@@ -85,8 +76,8 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
         this.selectedItemsList = new ReadOnlyUnbackedObservableList<T>() {
             @Override public T get(int i) {
                 int pos = selectedIndicesList.get(i);
-                if (pos < 0 || pos >= items.size()) return null;
-                return items.get(pos);
+                if (pos < 0 || pos >= getItemCount()) return null;
+                return getItem(pos);
             }
 
             @Override public int size() {
@@ -96,7 +87,7 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
         
         final MappingChange.Map<Integer,T> map = new MappingChange.Map<Integer,T>() {
             @Override public T map(Integer f) {
-                return items.get(f);
+                return getItem(f);
             }
         };
         selectedIndicesList.addListener(new ListChangeListener<Integer>() {
@@ -108,7 +99,20 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
             }
         });
     }
+    
+    
+    
+    /***********************************************************************
+     *                                                                     *
+     * Abstract API                                                        *
+     *                                                                     *
+     **********************************************************************/
 
+    public abstract T getItem(int index);
+    
+    public abstract int getItemCount();
+    
+    public abstract int getItemIndex(T item);
     
     
     /***********************************************************************
@@ -133,7 +137,7 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
 
     /** {@inheritDoc} */
     @Override public void selectAll() {
-        for (int i = 0; i < items.size(); i++) {
+        for (int i = 0; i < getItemCount(); i++) {
             select(i);
         }
     }
@@ -153,7 +157,7 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
 
     /** {@inheritDoc} */
     @Override public void selectLast() {
-        select(items.size() - 1);
+        select(getItemCount() - 1);
     }
 
     /** {@inheritDoc} */
@@ -170,6 +174,9 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     /** {@inheritDoc} */
     @Override public void clearSelection(int index) {
         selectedIndices.clear(index);
+        
+        final int changeIndex = selectedIndicesList.indexOf(index);
+        selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
     }
     
     /** {@inheritDoc} */
@@ -186,11 +193,14 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     @Override public void select(int index) {
         if (index < 0 || index >= selectedIndices.size());
         selectedIndices.set(index);
+        
+        final int changeIndex = selectedIndicesList.indexOf(index);
+        selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));
     }
 
     /** {@inheritDoc} */
     @Override public void select(T item) {
-        int index = items.indexOf(item);
+        int index = getItemIndex(item);
         select(index);
     }
 
@@ -212,36 +222,32 @@ class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
      *                                                                     *
      **********************************************************************/
     
-    private void updateMap(Change<? extends T> c) {
-        if  (c == null) {
-            // reset the map
-            itemBooleanMap.clear();
-            for (int i = 0; i < items.size(); i++) {
-                final int index = i;
-                final T item = items.get(index);
-                
-                final BooleanProperty booleanProperty = new SimpleBooleanProperty(item, "selected", false);
-                itemBooleanMap.put(item, booleanProperty);
-                
-                // this is where we listen to changes to the boolean properties,
-                // updating the selected indices list (and therefore indirectly
-                // the selected items list) when the checkbox is toggled
-                booleanProperty.addListener(new InvalidationListener() {
-                    @Override public void invalidated(Observable o) {
-                        final int changeIndex = selectedIndicesList.indexOf(index);
-                        
-                        if (booleanProperty.get()) {
-                            selectedIndices.set(index);
-                            selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));                            
-                        } else {
-                            selectedIndices.clear(index);
-                            selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
-                        }
+    protected void updateMap() {
+        // reset the map
+        itemBooleanMap.clear();
+        for (int i = 0; i < getItemCount(); i++) {
+            final int index = i;
+            final T item = getItem(index);
+            
+            final BooleanProperty booleanProperty = new SimpleBooleanProperty(item, "selected", false);
+            itemBooleanMap.put(item, booleanProperty);
+            
+            // this is where we listen to changes to the boolean properties,
+            // updating the selected indices list (and therefore indirectly
+            // the selected items list) when the checkbox is toggled
+            booleanProperty.addListener(new InvalidationListener() {
+                @Override public void invalidated(Observable o) {
+                    final int changeIndex = selectedIndicesList.indexOf(index);
+                    
+                    if (booleanProperty.get()) {
+                        selectedIndices.set(index);
+                        selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));                            
+                    } else {
+                        selectedIndices.clear(index);
+                        selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
                     }
-                });
-            }
-        } else {
-            // TODO
+                }
+            });
         }
     }
 }

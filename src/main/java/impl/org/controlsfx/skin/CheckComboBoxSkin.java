@@ -91,8 +91,8 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         
         this.items = control.getItems();
         
-        selectedIndices = (ReadOnlyUnbackedObservableList<Integer>) control.getSelectionModel().getSelectedIndices();
-        selectedItems = (ReadOnlyUnbackedObservableList<T>) control.getSelectionModel().getSelectedItems();
+        selectedIndices = (ReadOnlyUnbackedObservableList<Integer>) control.getCheckModel().getSelectedIndices();
+        selectedItems = (ReadOnlyUnbackedObservableList<T>) control.getCheckModel().getSelectedItems();
         
         comboBox = new ComboBox<T>(items) {
             protected javafx.scene.control.Skin<?> createDefaultSkin() {

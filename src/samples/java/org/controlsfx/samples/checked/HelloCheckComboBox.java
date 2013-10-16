@@ -1,4 +1,4 @@
-package org.controlsfx.samples;
+package org.controlsfx.samples.checked;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.Sample;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.samples.Utils;
 
 public class HelloCheckComboBox extends Application implements Sample {
     
@@ -47,16 +48,16 @@ public class HelloCheckComboBox extends Application implements Sample {
         grid.add(new Label("Normal ComboBox: "), 0, row);
         grid.add(new ComboBox<String>(strings), 1, row++);
         
-        // CheckBoxComboBox
+        // CheckComboBox
         final CheckComboBox<String> cbcb = new CheckComboBox<String>(strings);
-        cbcb.getSelectionModel().getSelectedIndices().addListener(new ListChangeListener<Integer>() {
+        cbcb.getCheckModel().getSelectedIndices().addListener(new ListChangeListener<Integer>() {
             @Override public void onChanged(ListChangeListener.Change<? extends Integer> c) {
-                System.out.println(cbcb.getSelectionModel().getSelectedIndices());
+                System.out.println(cbcb.getCheckModel().getSelectedIndices());
             }
         });
-        cbcb.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<String>() {
+        cbcb.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
             @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
-                System.out.println(cbcb.getSelectionModel().getSelectedItems());
+                System.out.println(cbcb.getCheckModel().getSelectedItems());
             }
         });
         grid.add(new Label("CheckComboBox: "), 0, row);

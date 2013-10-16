@@ -26,45 +26,32 @@
  */
 package org.controlsfx.control;
 
-import impl.org.controlsfx.skin.CheckComboBoxSkin;
-
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.Skin;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
 
-import com.sun.javafx.collections.MappingChange;
-import com.sun.javafx.collections.NonIterableChange;
-import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
-
 /**
  * A simple UI control that makes it possible to select zero or more items within
- * a ComboBox-like way. Each row item shows a {@link CheckBox}, and the state
- * of each row can be queried via the {@link #checkModelProperty() check model}.
+ * a ListView without the need to set a custom cell factory or manually create
+ * boolean properties for each row - simply use the 
+ * {@link #checkModelProperty() check model} to request the current selection 
+ * state.
  *
- * @param <T> The type of the data in the ComboBox.
+ * @param <T> The type of the data in the ListView.
  */
-public class CheckComboBox<T> extends Control {
+public class CheckListView<T> extends ListView<T> {
     
     /**************************************************************************
      * 
@@ -72,7 +59,6 @@ public class CheckComboBox<T> extends Control {
      * 
      **************************************************************************/
     
-    private final ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
     
 
@@ -86,7 +72,7 @@ public class CheckComboBox<T> extends Control {
     /**
      * 
      */
-    public CheckComboBox() {
+    public CheckListView() {
         this(null);
     }
     
@@ -94,12 +80,22 @@ public class CheckComboBox<T> extends Control {
      * 
      * @param items
      */
-    public CheckComboBox(final ObservableList<T> items) {
-        final int initialSize = items == null ? 32 : items.size();
+    public CheckListView(final ObservableList<T> items) {
+        super(items);
         
+        final int initialSize = items == null ? 32 : items.size();
         this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
-        this.items = items == null ? FXCollections.<T>observableArrayList() : items;
+        
         setCheckModel(new CheckBitSetModelBase<T>(items, itemBooleanMap));
+        setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
+            public ListCell<T> call(ListView<T> listView) {
+                return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
+                    @Override public ObservableValue<Boolean> call(T item) {
+                        return getItemBooleanProperty(item);
+                    }
+                });
+            };
+        });
     }
     
     
@@ -110,17 +106,8 @@ public class CheckComboBox<T> extends Control {
      * 
      **************************************************************************/
     
-    /** {@inheritDoc} */
-    @Override protected Skin<?> createDefaultSkin() {
-        return new CheckComboBoxSkin<>(this);
-    }
-    
-    public ObservableList<T> getItems() {
-        return items;
-    }
-    
     public BooleanProperty getItemBooleanProperty(int index) {
-        if (index < 0 || index >= items.size()) return null;
+        if (index < 0 || index >= getItems().size()) return null;
         return getItemBooleanProperty(getItems().get(index));
     }
     

@@ -28,35 +28,19 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.CheckComboBoxSkin;
 
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Skin;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.util.Callback;
-
-import com.sun.javafx.collections.MappingChange;
-import com.sun.javafx.collections.NonIterableChange;
-import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within

@@ -62,60 +62,63 @@ public class HorizontalHeader extends TableHeaderRow {
         gridViewSkin = skin;
     }
     public void init() {
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-            	SpreadsheetView view = gridViewSkin.spreadsheetView;
-                view.showRowHeaderProperty().addListener(rowHeaderListener);
-                gridViewSkin.getSelectedColumns().addListener(selectionListener);
-                view.getFixedColumns().addListener(fixedColumnsListener);
-
-                gridViewSkin.getTableMenuButtonVisibleProperty()
-                        .addListener(new InvalidationListener() {
-                            @Override
-                            public void invalidated(Observable valueModel) {
-                                if (working) {
-                                    requestLayout();
-                                }
-                            }
-                        });
-
-                /*****************************************************************
-                 * MODIFIED BY NELLARMONIA
-                 *****************************************************************/
-                // We listen to the BooleanProperty linked with the CheckBox of
-                // the columnHeader
-                view.showColumnHeaderProperty()
-                        .addListener(new ChangeListener<Boolean>() {
-                            @Override
-                            public void changed(
-                                    ObservableValue<? extends Boolean> arg0,
-                                    Boolean arg1, Boolean arg2) {
-                                working = arg2;
-                                requestLayout();
-                                getRootHeader().layoutFixedColumns();
-                                updateHighlightSelection();
-                            }
-                        });
-                /*****************************************************************
-                 * END OF MODIFIED BY NELLARMONIA
-                 *****************************************************************/
-                // We want to select when clicking on header
-                for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-                    i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
-            			@Override
-            			public void handle(MouseEvent arg0) {
-            				if(arg0.isPrimaryButtonDown()){
-            					TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
-            					TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
-            					sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
-            				}
-            			}
-            		});
-                }
-            }
-        };
-        Platform.runLater(r);
+    	final Runnable r = new Runnable() {
+			@Override
+			public void run() {
+		    	SpreadsheetView view = gridViewSkin.spreadsheetView;
+		        view.showRowHeaderProperty().addListener(rowHeaderListener);
+		        gridViewSkin.getSelectedColumns().addListener(selectionListener);
+		        
+		        view.getFixedColumns().addListener(fixedColumnsListener);
+				for(SpreadsheetColumn<?> column: view.getFixedColumns()){
+					fixColumn(column);
+				}
+		        gridViewSkin.getTableMenuButtonVisibleProperty()
+		                .addListener(new InvalidationListener() {
+		                    @Override
+		                    public void invalidated(Observable valueModel) {
+		                        if (working) {
+		                            requestLayout();
+		                        }
+		                    }
+		                });
+		
+		        /*****************************************************************
+		         * MODIFIED BY NELLARMONIA
+		         *****************************************************************/
+		        // We listen to the BooleanProperty linked with the CheckBox of
+		        // the columnHeader
+		        view.showColumnHeaderProperty()
+		                .addListener(new ChangeListener<Boolean>() {
+		                    @Override
+		                    public void changed(
+		                            ObservableValue<? extends Boolean> arg0,
+		                            Boolean arg1, Boolean arg2) {
+		                        working = arg2;
+		                        requestLayout();
+		                        getRootHeader().layoutFixedColumns();
+		                        updateHighlightSelection();
+		                    }
+		                });
+		        /*****************************************************************
+		         * END OF MODIFIED BY NELLARMONIA
+		         *****************************************************************/
+		        // We want to select when clicking on header
+		        for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
+		            i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
+		    			@Override
+		    			public void handle(MouseEvent arg0) {
+		    				if(arg0.isPrimaryButtonDown()){
+		    					TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+		    					TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
+		    					sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
+		    				}
+		    			}
+		    		});
+		        }
+			}
+		};
+		Platform.runLater(r);
     }
 
     protected void updateTableWidth() {
@@ -175,19 +178,34 @@ public class HorizontalHeader extends TableHeaderRow {
 			while(arg0.next()){
 				//If we unfix a column
 				for (SpreadsheetColumn<?> remitem : arg0.getRemoved()) {
-                   removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(remitem));
-                   remitem.setText(remitem.getText().replace(":", "."));
+                  unfixColumn(remitem);
                 }
 				//If we fix one
                 for (SpreadsheetColumn<?> additem : arg0.getAddedSubList()) {
-                	addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(additem));
-                	additem.setText(additem.getText().replace(".", "")+":");
+                	fixColumn(additem);
                 }
 			}
 			 updateHighlightSelection();
 		}
 	}; 
 
+	/**
+	 * Fix this column regarding the style
+	 * @param column
+	 */
+	private void fixColumn(SpreadsheetColumn<?> column){
+		addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
+		column.setText(column.getText().replace(".", "")+":");
+	}
+	
+	/**
+	 * Unfix this column regarding the style
+	 * @param column
+	 */
+	private void unfixColumn(SpreadsheetColumn<?> column){
+		 removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
+		 column.setText(column.getText().replace(":", "."));
+	}
 	/**
 	 * Add the fix style of the header Label of the specified column
 	 * @param i

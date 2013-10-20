@@ -40,9 +40,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.AbstractAction;
+
+import fxsampler.Sample;
 
 public class HelloNotificationPane extends Application implements Sample {
     

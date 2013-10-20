@@ -39,8 +39,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.HyperlinkLabel;
+
+import fxsampler.Sample;
 
 public class HelloHyperlinkLabel extends Application implements Sample {
     

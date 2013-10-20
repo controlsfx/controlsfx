@@ -62,10 +62,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
+
+import fxsampler.Sample;
 
 public class HelloButtonBar extends Application implements Sample {
     

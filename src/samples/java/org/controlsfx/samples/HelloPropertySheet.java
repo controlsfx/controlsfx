@@ -50,7 +50,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
@@ -58,6 +57,8 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
+
+import fxsampler.Sample;
 
 public class HelloPropertySheet extends Application implements Sample {
 

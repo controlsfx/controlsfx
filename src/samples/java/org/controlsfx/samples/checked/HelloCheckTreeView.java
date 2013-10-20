@@ -40,9 +40,10 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.samples.Utils;
+
+import fxsampler.Sample;
 
 public class HelloCheckTreeView extends Application implements Sample {
     

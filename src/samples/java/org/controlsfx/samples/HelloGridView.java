@@ -42,7 +42,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.SegmentedButton;
@@ -50,6 +49,8 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.cell.ColorGridCell;
 import org.controlsfx.control.cell.ImageGridCell;
+
+import fxsampler.Sample;
 
 public class HelloGridView extends Application implements Sample {
 

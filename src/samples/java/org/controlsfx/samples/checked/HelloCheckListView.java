@@ -39,9 +39,10 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.samples.Utils;
+
+import fxsampler.Sample;
 
 public class HelloCheckListView extends Application implements Sample {
     

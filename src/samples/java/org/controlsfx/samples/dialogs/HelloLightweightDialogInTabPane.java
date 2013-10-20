@@ -46,9 +46,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.samples.Utils;
+
+import fxsampler.Sample;
 
 public class HelloLightweightDialogInTabPane extends Application implements Sample {
 

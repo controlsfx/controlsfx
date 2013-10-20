@@ -38,9 +38,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.CustomTextField;
 import org.controlsfx.control.TextFields;
+
+import fxsampler.Sample;
 
 public class HelloTextFields extends Application implements Sample {
     

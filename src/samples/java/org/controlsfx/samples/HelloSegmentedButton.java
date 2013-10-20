@@ -38,8 +38,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.SegmentedButton;
+
+import fxsampler.Sample;
 
 public class HelloSegmentedButton extends Application implements Sample {
     

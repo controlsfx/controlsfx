@@ -38,8 +38,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.RangeSlider;
+
+import fxsampler.Sample;
 
 public class HelloRangeSlider extends Application implements Sample {
     

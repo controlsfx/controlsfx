@@ -58,7 +58,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
@@ -70,6 +69,8 @@ import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
+
+import fxsampler.Sample;
 
 public class HelloDialog extends Application implements Sample {
 

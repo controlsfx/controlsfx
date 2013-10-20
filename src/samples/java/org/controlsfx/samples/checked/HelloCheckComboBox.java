@@ -39,9 +39,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.samples.Utils;
+
+import fxsampler.Sample;
 
 public class HelloCheckComboBox extends Application implements Sample {
     

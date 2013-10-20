@@ -34,8 +34,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import org.controlsfx.Sample;
+import fxsampler.Sample;
 
 public class SVGTest extends Application implements Sample {
     

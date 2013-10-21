@@ -54,12 +54,13 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
 /**
  *
  * Build the UI and launch the Application
  */
-public class HelloSpreadsheetView extends Application implements Sample {
+public class HelloSpreadsheetView extends SampleBase {
 
 	public static void main(String[] args) {
 		launch(args);
@@ -173,7 +174,7 @@ public class HelloSpreadsheetView extends Application implements Sample {
 	}
 
 	@Override
-	public boolean includeInSamples() {
+	public boolean isVisible() {
 		return true;
 	}
 

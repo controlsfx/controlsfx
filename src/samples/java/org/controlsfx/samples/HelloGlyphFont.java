@@ -47,8 +47,9 @@ import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloGlyphFont extends Application implements Sample {
+public class HelloGlyphFont extends SampleBase {
 
 	private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
@@ -79,7 +80,7 @@ public class HelloGlyphFont extends Application implements Sample {
 	}
 	
 	@Override
-	public boolean includeInSamples() {
+	public boolean isVisible() {
 		return true;
 	}
 

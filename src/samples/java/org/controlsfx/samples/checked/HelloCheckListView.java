@@ -43,8 +43,9 @@ import org.controlsfx.control.CheckListView;
 import org.controlsfx.samples.Utils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloCheckListView extends Application implements Sample {
+public class HelloCheckListView extends SampleBase {
     
     @Override public String getSampleName() {
         return "CheckListView";
@@ -54,7 +55,7 @@ public class HelloCheckListView extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckListView.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

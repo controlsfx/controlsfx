@@ -51,8 +51,9 @@ import org.controlsfx.control.cell.ColorGridCell;
 import org.controlsfx.control.cell.ImageGridCell;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloGridView extends Application implements Sample {
+public class HelloGridView extends SampleBase {
 
     private GridView<?> myGrid;
     private final VBox root = new VBox();
@@ -69,7 +70,7 @@ public class HelloGridView extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/GridView.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

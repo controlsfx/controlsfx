@@ -43,8 +43,9 @@ import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.samples.Utils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloCheckComboBox extends Application implements Sample {
+public class HelloCheckComboBox extends SampleBase {
     
     @Override public String getSampleName() {
         return "CheckComboBox";
@@ -54,7 +55,7 @@ public class HelloCheckComboBox extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckComboBox.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

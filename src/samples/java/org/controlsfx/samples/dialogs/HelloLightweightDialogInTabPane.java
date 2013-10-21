@@ -50,8 +50,9 @@ import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.samples.Utils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloLightweightDialogInTabPane extends Application implements Sample {
+public class HelloLightweightDialogInTabPane extends SampleBase {
 
     @Override public String getSampleName() {
         return "Lightweight Dialogs";
@@ -61,7 +62,7 @@ public class HelloLightweightDialogInTabPane extends Application implements Samp
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

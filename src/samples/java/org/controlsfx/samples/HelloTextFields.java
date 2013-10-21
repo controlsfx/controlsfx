@@ -42,8 +42,9 @@ import org.controlsfx.control.CustomTextField;
 import org.controlsfx.control.TextFields;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloTextFields extends Application implements Sample {
+public class HelloTextFields extends SampleBase {
     
     private static final Image image = new Image("/org/controlsfx/samples/security-low.png");
     
@@ -55,7 +56,7 @@ public class HelloTextFields extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/TextFields.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

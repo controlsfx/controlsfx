@@ -44,8 +44,9 @@ import javafx.stage.Stage;
 import org.controlsfx.control.Rating;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloRating extends Application implements Sample {
+public class HelloRating extends SampleBase {
     
     public static void main(String[] args) {
         launch(args);
@@ -59,7 +60,7 @@ public class HelloRating extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/Rating.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

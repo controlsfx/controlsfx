@@ -35,8 +35,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class SVGTest extends Application implements Sample {
+public class SVGTest extends SampleBase {
     
     private static final int IMAGE_HEIGHT = 175;
     private static final int IMAGE_SPACING = 0;
@@ -59,7 +60,7 @@ public class SVGTest extends Application implements Sample {
         return null;
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return false;
     }
     

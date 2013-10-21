@@ -44,8 +44,9 @@ import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.AbstractAction;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloNotificationPane extends Application implements Sample {
+public class HelloNotificationPane extends SampleBase {
     
     private NotificationPane notificationPane;
     private CheckBox cbUseDarkTheme;
@@ -63,7 +64,7 @@ public class HelloNotificationPane extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationPane.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

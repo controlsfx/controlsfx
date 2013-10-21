@@ -44,8 +44,9 @@ import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.samples.Utils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloCheckTreeView extends Application implements Sample {
+public class HelloCheckTreeView extends SampleBase {
     
     @Override public String getSampleName() {
         return "CheckTreeView";
@@ -55,7 +56,7 @@ public class HelloCheckTreeView extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckTreeView.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

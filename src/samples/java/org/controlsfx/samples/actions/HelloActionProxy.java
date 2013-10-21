@@ -66,8 +66,9 @@ import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
 import org.controlsfx.samples.Utils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloActionProxy extends Application implements Sample {
+public class HelloActionProxy extends SampleBase {
     
     private static final String imagePath = "/org/controlsfx/samples/security-low.png";
     private static final ImageView image = new ImageView(new Image(imagePath));
@@ -157,7 +158,7 @@ public class HelloActionProxy extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionProxy.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

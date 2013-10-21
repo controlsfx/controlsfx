@@ -67,8 +67,9 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloButtonBar extends Application implements Sample {
+public class HelloButtonBar extends SampleBase {
     
     @Override public String getSampleName() {
         return "ButtonBar";
@@ -78,7 +79,7 @@ public class HelloButtonBar extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/ButtonBar.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

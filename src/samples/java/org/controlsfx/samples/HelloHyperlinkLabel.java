@@ -42,8 +42,9 @@ import javafx.stage.Stage;
 import org.controlsfx.control.HyperlinkLabel;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloHyperlinkLabel extends Application implements Sample {
+public class HelloHyperlinkLabel extends SampleBase {
     
     private HyperlinkLabel label;
     
@@ -59,7 +60,7 @@ public class HelloHyperlinkLabel extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/HyperlinkLabel.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

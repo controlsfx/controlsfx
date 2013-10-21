@@ -41,8 +41,9 @@ import javafx.stage.Stage;
 import org.controlsfx.control.SegmentedButton;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloSegmentedButton extends Application implements Sample {
+public class HelloSegmentedButton extends SampleBase {
     
     @Override public String getSampleName() {
         return "SegmentedButton";
@@ -52,7 +53,7 @@ public class HelloSegmentedButton extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/SegmentedButton.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

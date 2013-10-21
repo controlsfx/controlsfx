@@ -41,8 +41,9 @@ import javafx.stage.Stage;
 import org.controlsfx.control.RangeSlider;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloRangeSlider extends Application implements Sample {
+public class HelloRangeSlider extends SampleBase {
     
     public static void main(String[] args) {
         launch(args);
@@ -56,7 +57,7 @@ public class HelloRangeSlider extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/RangeSlider.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

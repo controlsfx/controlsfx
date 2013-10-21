@@ -71,8 +71,9 @@ import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloDialog extends Application implements Sample {
+public class HelloDialog extends SampleBase {
 
     private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
     private final CheckBox cbUseNativeTitleBar = new CheckBox("Use Native TitleBar");
@@ -87,7 +88,7 @@ public class HelloDialog extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
     

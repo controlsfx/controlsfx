@@ -59,8 +59,9 @@ import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
 
 import fxsampler.Sample;
+import fxsampler.SampleBase;
 
-public class HelloPropertySheet extends Application implements Sample {
+public class HelloPropertySheet extends SampleBase {
 
     private static Map<String,Object> customDataMap = new LinkedHashMap<>();
     
@@ -92,7 +93,7 @@ public class HelloPropertySheet extends Application implements Sample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/PropertySheet.html";
     }
     
-    @Override public boolean includeInSamples() {
+    @Override public boolean isVisible() {
         return true;
     }
 

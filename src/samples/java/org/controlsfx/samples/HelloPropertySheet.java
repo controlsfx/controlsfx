@@ -86,6 +86,12 @@ public class HelloPropertySheet extends SampleBase {
         return "Property Sheet";
     }
     
+    @Override
+    public String getSampleDescription() {
+        return "The PropertySheet control is useful when you want to present a number"
+                + " of properties to a user for them to edit.";
+    }
+    
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/PropertySheet.html";
     }
@@ -183,9 +189,8 @@ public class HelloPropertySheet extends SampleBase {
         return propertySheet;
     }
     
-    @Override public Node getSidePanel() {
+    @Override public Node getControlPanel() {
         VBox infoPane = new VBox(10);
-        infoPane.setPadding( new Insets(20,20,20,20));
         
         Button button = new Button("Title");
         TextField textField = new TextField();
@@ -197,11 +202,11 @@ public class HelloPropertySheet extends SampleBase {
         segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         segmentedButton.getButtons().get(0).fire();
         
-        CheckBox toolbarModeVisible = new CheckBox("Toolbar Mode Visible");
+        CheckBox toolbarModeVisible = new CheckBox("Show Mode Buttons");
         toolbarModeVisible.selectedProperty().bindBidirectional( propertySheet.modeSwitcherVisibleProperty() );
         
 
-        CheckBox toolbarSeacrhVisible = new CheckBox("Toolbar Search Visible");
+        CheckBox toolbarSeacrhVisible = new CheckBox("Show Search Field");
         toolbarSeacrhVisible.selectedProperty().bindBidirectional( propertySheet.searchBoxVisibleProperty() );
         
         infoPane.getChildren().add(toolbarModeVisible);

@@ -118,17 +118,12 @@ public class HelloSpreadsheetView extends SampleBase {
 		final CheckBox columnHeader = new CheckBox("Column Header");
 		columnHeader.setSelected(true);
 		
-		/**
-		 * FIXME It's not working right now, see in SpreadsheetViewSkin in LayoutChildren
-		 */
-		columnHeader.setDisable(true);
-		
 		columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
 
 			@Override
 			public void changed(
 					ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-//				spv.setShowColumnHeader(arg2);
+				spv.setShowColumnHeader(arg2);
 			}
 		});
 		//In order to change the span style more easily

@@ -28,6 +28,7 @@ sourceSets {
 }
 
 dependencies {
+    runtime "fxsampler:fxsampler:1.0.0-SNAPSHOT"
     try {
         jdk files(jfxrtJar)
     } catch (MissingPropertyException pne) {

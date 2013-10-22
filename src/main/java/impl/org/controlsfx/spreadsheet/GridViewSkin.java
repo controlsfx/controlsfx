@@ -178,7 +178,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
             y += tableHeaderRowHeight;
         } else {
-            // FIXME try to hide the columnHeader
+        	// This is now handle in the HorizontalHeader with Css
         	// FIXME tweak open in RT-32673
         }
 
@@ -270,14 +270,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
-           /* while (c.next()) {
-                for (final Integer remitem : c.getRemoved()) {
-                    getFlow().getFixedRows().remove(remitem);
-                }
-                for (final Integer additem : c.getAddedSubList()) {
-                    getFlow().getFixedRows().add(additem);
-                }
-            }*/
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
@@ -298,14 +290,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                 }
             }
 
-            /*while (c.next()) {
-                for (final Integer remitem : c.getRemoved()) {
-                    getFlow().getFixedColumns().remove(remitem);
-                }
-                for (final Integer additem : c.getAddedSubList()) {
-                    getFlow().getFixedColumns().add(additem);
-                }
-            }*/
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }

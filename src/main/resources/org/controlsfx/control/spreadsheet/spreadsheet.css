@@ -128,5 +128,7 @@ HorizontalHeaderColumn > TableColumnHeader > Label.fixed{
 .text-field.error{
 	-fx-background-color: red;
 }
-    
+
+/* HORIZONTAL HEADER VISIBILITY */
+.column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 

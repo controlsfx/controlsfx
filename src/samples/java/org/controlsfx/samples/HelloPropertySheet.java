@@ -31,7 +31,6 @@ import java.time.Month;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -45,7 +44,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -58,7 +56,6 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
 
-import fxsampler.Sample;
 import fxsampler.SampleBase;
 
 public class HelloPropertySheet extends SampleBase {
@@ -97,14 +94,6 @@ public class HelloPropertySheet extends SampleBase {
         return true;
     }
 
-    @Override public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Property Sheet");
-        
-        Scene scene = new Scene( (Parent)getPanel(primaryStage), 800, 800);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-    
     class CustomPropertyItem implements Item {
 
         private String key;
@@ -191,7 +180,10 @@ public class HelloPropertySheet extends SampleBase {
     }
     
     @Override public Node getPanel(Stage stage) {
-        
+        return propertySheet;
+    }
+    
+    @Override public Node getSidePanel() {
         VBox infoPane = new VBox(10);
         infoPane.setPadding( new Insets(20,20,20,20));
         
@@ -218,12 +210,7 @@ public class HelloPropertySheet extends SampleBase {
         infoPane.getChildren().add(button);
         infoPane.getChildren().add(textField);
         
-        
-        
-        SplitPane pane = new SplitPane();
-        pane.getItems().addAll( infoPane, propertySheet );
-        
-        return pane;
+        return infoPane;
     }
     
     class ActionModeChange extends AbstractAction {

@@ -3,11 +3,11 @@ apply plugin: 'maven'
 apply plugin: 'application'
 
 apply from: 'mavenPublish.gradle'
-//apply from: 'javafx.plugin'
 
 group = 'org.controlsfx'
 version = '8.0.3-SNAPSHOT'
 
+applicationName = 'FXSampler'
 mainClassName = "fxsampler.FXSampler"
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -25,21 +25,30 @@ sourceSets {
         java {
             compileClasspath += main.output
             compileClasspath += configurations.jdk
+            compileClasspath += configurations.compile
+            runtimeClasspath += samples.output
             runtimeClasspath += main.output
             runtimeClasspath += configurations.jdk
             runtimeClasspath += javadocJar.output
+            runtimeClasspath += configurations.runtime
         }
     }
 }
 
 dependencies {
     runtime "fxsampler:fxsampler:1.0.0-SNAPSHOT"
+    compile "fxsampler:fxsampler:1.0.0-SNAPSHOT"
     try {
         jdk files(jfxrtJar)
     } catch (MissingPropertyException pne) {
         jdk files("${System.properties['java.home']}/lib/jfxrt.jar")
         jdk files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
     }
+}
+
+// Samples should be on the class path to run FXSampler
+run {
+  classpath += sourceSets.samples.output
 }
 
 javadoc {
@@ -97,7 +106,7 @@ task javadocJar(type: Jar) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.6'
+    gradleVersion = '1.8'
 }
 
 artifacts {
@@ -106,54 +115,8 @@ artifacts {
     archives jarSamples
 }
 
-['HelloControlsFX'/*, 'HelloGridView', 'HelloRangeSlider', 'HelloRating', 'HelloSegmentedButton', 'HelloToggleSwitch', 'SVGTest'*/].each { name ->
-    task "$name" (type: JavaExec) {
-        main = "org.controlsfx.$name"
-        classpath = sourceSets.samples.runtimeClasspath + sourceSets.main.runtimeClasspath + configurations.jdk
-    }
-}
-
-// enumerate the samples at build time
-task enumerateSamples() {
-    doLast {
-        def samplesList = []
-        sourceSets.samples.java.visit {
-            if (!it.directory && it.file.text.contains(' implements Sample ') && it.path.contains("samples")) {
-                samplesList += it.path
-            }
-        }
-        File outputFile = new File(sourceSets.samples.output.resourcesDir, 'org/controlsfx/samples/samples.txt')
-        outputFile.parentFile.mkdirs()
-        outputFile.text = samplesList.join('\n')
-    }
-}
-processSamplesResources.dependsOn(enumerateSamples)
-gradle.taskGraph.whenReady {
-    enumerateSamples.enabled = gradle.taskGraph.hasTask(":jfxDeploy") 
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
 }
 
 
-/*
-javafx {
-    try {
-        jfxrtJar = ext.jfxrtJar
-    } catch (MissingPropertyException pne) {
-        // ignore
-    }
-    
-    sourceSet = 'samples'
-
-    appID 'HelloControlsFX'
-    appName 'Hello ControlsFX'
-    mainClass 'org.controlsfx.HelloControlsFX'
-
-    javaRuntime = '<NO RUNTIME>' // for now don't bundle a VM
-
-    // deplpy/info attributes
-    category = 'JavaFX Demos'
-    copyright = 'Copyright (c) 2013 Jonathan Giles and others'
-    description = 'This is a sample of all of the ControlsFX controls'
-    licenseType = '3 clause BSD'
-    vendor = 'FX Experience'
-}
-*/

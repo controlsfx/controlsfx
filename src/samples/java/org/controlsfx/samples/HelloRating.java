@@ -26,7 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -43,10 +42,11 @@ import javafx.stage.Stage;
 
 import org.controlsfx.control.Rating;
 
-import fxsampler.Sample;
 import fxsampler.SampleBase;
 
 public class HelloRating extends SampleBase {
+    
+    private Rating rating;
     
     public static void main(String[] args) {
         launch(args);
@@ -60,14 +60,29 @@ public class HelloRating extends SampleBase {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/Rating.html";
     }
     
-    @Override public boolean isVisible() {
-        return true;
+    @Override public String getSampleDescription() {
+        return "TODO";
     }
+    
     
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));
-        final Rating rating = new Rating();
+        rating = new Rating();
+        root.getChildren().addAll(rating);
+        
+        rating.ratingProperty().addListener(new ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+                System.out.println("Rating = " + t1);
+            }
+        });
+        
+        return root;
+    }
+    
+    @Override public Node getControlPanel() {
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30, 30, 30, 30));
         
         // controls, row 1
         HBox controls_row1 = new HBox(5);
@@ -93,13 +108,7 @@ public class HelloRating extends SampleBase {
         CheckBox updateOnHover = new CheckBox("Update rating on hover");
         updateOnHover.selectedProperty().bindBidirectional(rating.updateOnHoverProperty());
         
-        root.getChildren().addAll(controls_row1, partialRating, updateOnHover, rating);
-        
-        rating.ratingProperty().addListener(new ChangeListener<Number>() {
-            @Override public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-                System.out.println("Rating = " + t1);
-            }
-        });
+        root.getChildren().addAll(controls_row1, partialRating, updateOnHover);
         
         return root;
     }

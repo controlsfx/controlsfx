@@ -71,6 +71,12 @@ public class HelloRangeSlider extends SampleBase {
         return root;
     }
     
+    @Override public String getSampleDescription() {
+        return "The Slider control in JavaFX is great for selecting a single "
+                + "value between a min and max value, but it isn't so great for "
+                + "letting users select a range - that's where RangeSlider comes in!";
+    }
+    
     @Override public void start(Stage stage) {
 //        setUserAgentStylesheet(STYLESHEET_CASPIAN);
         stage.setTitle("RangeSlider Demo");

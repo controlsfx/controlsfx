@@ -30,7 +30,9 @@ package org.controlsfx.samples;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -77,7 +79,8 @@ public class HelloSpreadsheetView extends SampleBase {
 		
 		int rowCount = 50;
 		int columnCount = 10;
-		GridBase grid = new GridBase(rowCount, columnCount);
+		
+		GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
 		normalGrid(grid);
 		buildBothGrid(grid);
 
@@ -90,6 +93,19 @@ public class HelloSpreadsheetView extends SampleBase {
 		return borderPane;
 	}
 	
+	/**
+	 * FIXME need to be removed afetr
+	 * Compute RowHeight for test
+	 * @return
+	 */
+	private Map<Integer,Double> generateRowHeight(){
+		Map<Integer,Double> rowHeight = new HashMap<>();
+		rowHeight.put(0, 50.0);
+		rowHeight.put(5, 50.0);
+		rowHeight.put(8, 70.0);
+		rowHeight.put(12, 40.0);
+		return rowHeight;
+	}
 	/**
 	 * Build a common control Grid with some options on the left to control the
 	 * SpreadsheetViewInternal
@@ -136,7 +152,7 @@ public class HelloSpreadsheetView extends SampleBase {
 				if(arg2.equals(0)){
 					int rowCount = 50;
 					int columnCount = 10;
-					GridBase grid = new GridBase(rowCount, columnCount);
+					GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
 					normalGrid(grid);
 					
 					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
@@ -145,7 +161,7 @@ public class HelloSpreadsheetView extends SampleBase {
 				}else{
 					int rowCount = 50;
 					int columnCount = 10;
-					GridBase grid = new GridBase(rowCount, columnCount);
+					GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
 					normalGrid(grid);
 					buildBothGrid(grid);
 					

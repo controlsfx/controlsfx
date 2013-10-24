@@ -132,12 +132,13 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
         	
-        	/* FIXME Currently we're adding a row two times if it's located in the fixedRows.
+        	/* THIS IS NOT ENTIRELY TRUE ANYMORE, will be fixed.
+        	 * (FIXME Currently we're adding a row two times if it's located in the fixedRows.
         	 * So we have a problem because some events, especially when editing
         	 * are received in double.
         	 * I don't know right now why this is happening but I have found a work-around.
         	 * I check if the current SpreadsheetRow is referenced in the SpreadsheetView,
-        	 * if not, then I know I can throw it away (setManaged(false) ?)
+        	 * if not, then I know I can throw it away (setManaged(false) ?) )
         	 */
         	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
 	        	boolean flag = false;
@@ -147,8 +148,18 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 	                    }
 	            }
 	        	if(!flag){
-	        		getTableRow().setManaged(false);
-	        		return;
+	        		//FIXME Still problem when de-fixing at the top
+	        		flag = false;
+	            	for (int j = 0; j< gvs.getCellsSize();j++ ) {
+	                    if(gvs.getRow(j).getIndex() == row){
+	                    	flag = true;
+	                    }
+	            	}
+	            	if(flag){
+//		        		System.out.println("non!");
+		        		getTableRow().setManaged(false);
+		        		return;
+	            	}
 	        	}
         	}
         	

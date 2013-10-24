@@ -39,7 +39,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
@@ -53,7 +52,6 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import com.sun.javafx.scene.control.skin.TableCellSkin;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
@@ -92,6 +90,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         }
         DEFAULT_CELL_HEIGHT = cell_size;
     }
+    
+    //FIXME This is not normal
     /** Default with of a "row header?". */
     private final double DEFAULT_ROWHEADER_WIDTH = 50.0;
     /** The editor. */
@@ -128,7 +128,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             }
         });
 
-        tableView.setFixedCellSize(getDefaultCellSize());
+//        tableView.setFixedCellSize(getDefaultCellSize());
 
         tableView.getStyleClass().add("cell-spreadsheet");
 

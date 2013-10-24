@@ -42,7 +42,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -675,11 +674,12 @@ public class SpreadsheetView extends Control {
     private void initRowFix(Grid grid){
     	ObservableList< ObservableList<SpreadsheetCell>> rows = grid.getRows();
 		rowFix = new BitSet(rows.size());
-		rows : for(int r = 0; r < rows.size(); ++r){
+		/*rows :*/ for(int r = 0; r < rows.size(); ++r){
 			ObservableList<SpreadsheetCell> row = rows.get(r);
 			for(SpreadsheetCell cell: row){
 				if(cell.getRowSpan() >1){
-					continue rows;
+					return;
+//					continue rows;
 				}
 			}
 			rowFix.set(r);

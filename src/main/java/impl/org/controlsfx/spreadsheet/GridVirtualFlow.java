@@ -26,9 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -68,7 +65,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * few cells in the addLeadingCell We need to add the remaining in the
      * addTrailingCell
      */
-    private int cellFixedAdded = 0;
+//    private int cellFixedAdded = 0;
     private boolean cellIndexCall = false;
 
     /**
@@ -91,7 +88,6 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         getVbar().valueProperty().addListener(listenerY);
         // FIXME Until RT-31777 is resolved
         getHbar().setUnitIncrement(10);
-
     }
 
     /***************************************************************************
@@ -202,9 +198,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     }
 
     protected T getAvailableCell(int prefIndex) {
-        cellIndexCall = true;
-        T tmp = super.getAvailableCell(prefIndex);
-        return tmp;
+	        cellIndexCall = true;
+	        T tmp = super.getAvailableCell(prefIndex);
+	        return tmp;
     }
 
     /**
@@ -251,13 +247,16 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         }
     }
 
-    @Override
+    /*@Override
     protected void addLeadingCells(int currentIndex, double startOffset) {
         addLeadingCells(new Helper<T>(this), currentIndex, startOffset);
     }
 
     private void addLeadingCells(Helper<T> ch, int currentIndex,
             double startOffset) {
+    	
+    	
+    	
         // The offset will keep track of the distance from the top of the
         // viewport to the top of the current index. We will increment it
         // as we lay out leading cells.
@@ -265,6 +264,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         // The index is the absolute index of the cell being laid out
         int index = currentIndex;
         
+        
+//        offset += spreadSheetView.getGrid().getRowHeight(index);
         // Offset should really be the bottom of the current index
         boolean first = true; // first time in, we just fudge the offset and let
         // it be the top of the current index then redefine
@@ -275,31 +276,57 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         // cells. If the offset is ever < 0, except in the case of the very
         // first cell, then we must quit.
         T cell = null;
-
+        
+//        cell = getAvailableCell(index);
+//        setCellIndex(cell, index);
+        
+        
+        cellFixedAdded = 0;
+        int numberOfCellsBelowIndex = 0;
+        boolean flag = false; // We only want to compute once
         // First pass to know how many cells we will add
         int cellToAdd = 0;
+        
+//        double myOffset = offset;
+//        while(numberOfCellsBelowIndex < spreadSheetView.getFixedRows().size()){
+//    		myOffset+=spreadSheetView.getGrid().getRowHeight(numberOfCellsBelowIndex);
+//    		++numberOfCellsBelowIndex;
+//        }
+        
+
         while (index >= 0 && (offset > 0 || first)) {
             if (first) {
                 first = false;
+                --index;
             } else {
-                // Careful here because I've seen that it could mess things up a
-                // bit
-                // Maybe use directly "fixedCellSize" if we're sure..
-                offset -= getCellLength(0);
+            	if(numberOfCellsBelowIndex < spreadSheetView.getFixedRows().size()){
+            		offset-=spreadSheetView.getGrid().getRowHeight(numberOfCellsBelowIndex);
+            		++numberOfCellsBelowIndex;
+            	}else{
+            		// Careful here because I've seen that it could mess things up a
+                    // bit
+                    // Maybe use directly "fixedCellSize" if we're sure..
+                    offset -= spreadSheetView.getGrid().getRowHeight(index);//getCellLength(0);
+                    --index;
+            	}
             }
-            --index;
+//            --index;
             ++cellToAdd;
         }
-
+        if(numberOfCellsBelowIndex  == spreadSheetView.getFixedRows().size())
+        	numberOfCellsBelowIndex--;
+        
+        System.out.println("celltoadd "+ cellToAdd);
+        
         // Now that we know how many cells we will add, we reset the variable
         offset = startOffset;
         index = currentIndex;
         first = true;
         cellFixedAdded = 0;
-        int numberOfCellsBelowIndex = 0;
-        boolean flag = false; // We only want to compute once
+//        numberOfCellsBelowIndex = 0;
+        flag = false; // We only want to compute once
         
-        while (index >= 0 && (offset > 0 || first)) {
+        while (index >= 0 && (offset > 0 || first)) {//cellToAdd >0){//index >= 0 && (offset > 0 || first)) {
             if (index >= getCellCount()) {
                 if (first) {
                     first = false;
@@ -309,6 +336,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 --index;
                 --cellToAdd;
             } else {
+            	*//**
+            	 * We now try to determine if the current index is superior of any
+            	 * index of our FixedRows. If so, we compute how many FixedRow index 
+            	 * are below the current index.
+            	 *//*
+            	//Si mon index devient plus grand ou égal qu'une ligne que je dois fixer
             	if(!flag && !getFixedRows().isEmpty() && index>=getFixedRows().get(cellFixedAdded)){
             		flag = true;
             		while(numberOfCellsBelowIndex < getFixedRows().size() && index >= getFixedRows().get(numberOfCellsBelowIndex) && numberOfCellsBelowIndex < cellToAdd){
@@ -319,13 +352,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             	
                 // If the number of remaining cells to add is the same of the fixedRows size
                 if (!getFixedRows().isEmpty() && cellToAdd <= getFixedRows().size()) {
-                	/**
-                	 * We now try to determine if the current index is superior of any
-                	 * index of our FixedRows. If so, we compute how many FixedRow index 
-                	 * are below the current index.
-                	 */
                 	
-                	if(flag && cellToAdd<= (numberOfCellsBelowIndex+1)){
+                	if(flag && numberOfCellsBelowIndex >=0 && cellToAdd<= (numberOfCellsBelowIndex+1)){
                 		
 	                    final int realIndex = getFixedRows().get(numberOfCellsBelowIndex);
 	                    cell = getAvailableCell(realIndex); // We grab the right one
@@ -353,8 +381,33 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                     cell = getAvailableCell(index);
                     setCellIndex(cell, index);
                 }
+            	
+                // If the remaining cells to add are in the header
+
+//                if (!getFixedRows().isEmpty() && cellToAdd <= getFixedRows().size()) {
+//                    final int realIndex = getFixedRows().get(numberOfCellsBelowIndex);
+//                    // System.out.println("JaddC"+realIndex+"/"+index);
+//                    cell = getAvailableCell(realIndex); // We grab the right one
+//                    setCellIndex(cell, realIndex); // the index is the real one
+//                    setCellIndexVirtualFlow(cell, index); // But the index for
+//                                                          // the Virtual Flow
+//                                                          // remain his (not the
+//                                                          // real one)
+//                    --numberOfCellsBelowIndex;
+//                    ++cellFixedAdded;
+//                } else {
+                    // System.out.println("JaddC"+index);
+            	if(index < spreadSheetView.getFixedRows().size()){
+            		bitSet.set(index, true);
+            	}
+                    cell = getAvailableCell(index);
+                    setCellIndex(cell, index);
+//                }
+//                System.out.println("je mets "+cell.getIndex());
                 resizeCellSize(cell); // resize must be after config
-                ch.addFirst(cell);
+//                if(index >= spreadSheetView.getFixedRows().size())
+                	ch.addFirst(cell);
+
 
                 // A little gross but better than alternatives because it
                 // reduces
@@ -378,6 +431,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 --cellToAdd;
             }
         }
+        
 
         // There are times when after laying out the cells we discover that
         // the top of the first cell which represents index 0 is below the top
@@ -396,6 +450,21 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 offset += getCellLength(cell);
             }
         }
+        
+    }
+    @Override
+    protected double getCellLength(T cell) {
+        if (cell == null) return 0;
+
+        return spreadSheetView.getGrid().getRowHeight(cell.getIndex());
+    }
+    
+    @Override
+    protected void resizeCellSize(T cell) {
+        if (cell == null) return;
+        
+        double width = cell.getWidth();
+        cell.resize(width, spreadSheetView.getGrid().getRowHeight(cell.getIndex()));
     }
 
     @Override
@@ -426,12 +495,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 if (!fillEmptyCells) { return filledWithNonEmpty; }
             }
             T cell = null;
-            /**
+            *//**
              * If we have a lot of rows in header, we need to add the remaining
              * in the trailingCells. I Added fillEmptyCells because it appears 
              * that when AddtrailingCells is called from adjustPixel,
              * we add several time the rows in fixedHeader...
-             */
+             *//*
             if (!getFixedRows().isEmpty() && cellFixedAdded < getFixedRows().size()
                     && fillEmptyCells ) {
             	if(index>=getFixedRows().get(cellFixedAdded)){
@@ -451,7 +520,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 // System.out.println("JaddD"+index);
                 cell = getAvailableCell(index);
                 setCellIndex(cell, index);
-            }
+//            }
             resizeCellSize(cell); // resize happens after config!
             ch.addLast(cell);
 
@@ -556,31 +625,31 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             }
 
         }
-
+        
         return filledWithNonEmpty;
-    }
+    }*/
 
-    protected void setCellIndex(T cell, int index) {
+   /* protected void setCellIndex(T cell, int index) {
         super.setCellIndex(cell, index);
         setCellIndexVirtualFlow(cell, index);
     }
 
-    /***************************************************************************
+    *//***************************************************************************
      * * Private Methods * *
-     **************************************************************************/
+     **************************************************************************//*
 
     private void setCellIndexVirtualFlow(T cell, int index) {
         if (cell == null) { return; }
 
         ((GridRow) cell).setIndexVirtualFlow(index);
-    }
+    }*/
 
     /**
      * Layout the fixed rows to position them correctly
      */
     private void layoutFixedRows() {
         sortRows();
-        if (!getCells().isEmpty() && !getFixedRows().isEmpty()) {
+       /* if (!getCells().isEmpty() && !getFixedRows().isEmpty()) {
             for (int i = getFixedRows().size() - 1; i >= 0; --i) {
                 GridRow cell = (GridRow) getCells().get(i);
                 if (cell != null && getFixedRows().contains(cell.getIndex())) {
@@ -588,9 +657,66 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                     cell.requestLayout();
                 }
             }
+        }*/
+        /**
+         * What I do is just going after the VirtualFlow in order to ADD
+         * (not replace like before) new rows at the top.
+         * 
+         * If the VirtualFlow has the row, then I will hide mine and let
+         * him handle. But if the row is missing, then I must show mine
+         * in order to have the fixed row.
+         *FIXME we can find a better solution instead of going 
+         *through all the rows of the VirtualFlow of course.
+         */
+        if(myCells.size() <spreadSheetView.getFixedRows().size()  && getFirstVisibleCellWithinViewPort() != null){
+        	 T cell = null;
+// 	            Helper ch = new Helper<T>(this);
+// 	            double offset = 0;
+ 	            for(Integer i :spreadSheetView.getFixedRows()){
+ 	            	boolean flag = true;
+ 	            	for(T cell2:getCells()){
+ 	            		if(cell2.getIndex() == i){
+ 	            			flag = false;
+ 	            			cell2.toFront();
+ 	            		}
+ 	            	}
+ 	            	if(flag && myCells.size() <= i){
+ 	            	cell = getAvailableCell(i);
+ 	            	setCellIndex(cell, i); 
+// 	                setCellIndexVirtualFlow(cell, fakeIndex);
+// 	                fakeIndex++;
+ 	                resizeCellSize(cell);
+// 	                ch.addLast(cell);
+// 	                positionCell(cell, offset);
+ 	                cell.setVisible(true);
+// 	                offset+=getCellLength(cell);
+ 	                cell.toFront();
+ 	                myCells.add(cell);
+// 	                cell.requestLayout();
+ 	            	}
+ 	            }
         }
+    	for(T cell:myCells){
+    		boolean flag = true;
+        	for(T cell2:getCells()){
+        		if(cell2.getIndex() == cell.getIndex()){
+        			flag = false;
+        			cell2.toFront();
+        		}
+        	}
+        	if(flag){
+        		cell.setVisible(true);
+//	        		setCellIndexVirtualFlow(cell, fakeIndex);
+        		cell.toFront();
+        		cell.requestLayout();
+        	}else{
+        		cell.setVisible(false);
+        	}
+    	}
     }
 
+    private ArrayList<T> myCells = new ArrayList<>();
+    
     /**
      * Sort the rows so that they stay in order for layout
      */
@@ -619,7 +745,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 /**
  * Helper class to workaround RT-31692
  */
-class Helper<T extends IndexedCell<?>> {
+/*class Helper<T extends IndexedCell<?>> {
     Object cells;
     static Field fcells;
     static Method getFirst;
@@ -760,4 +886,5 @@ class Helper<T extends IndexedCell<?>> {
             e.printStackTrace();
         }
     }
-}
+    
+}*/

@@ -36,6 +36,7 @@ import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+
 import com.sun.javafx.scene.control.skin.TableRowSkin;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
@@ -48,6 +49,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     }
 
     /**
+     * FIXME Look into and understand the deep cause of that
      * We need to override this since B105 because it's messing up our
      * fixedRows and also our rows CSS.. (kind of flicker)
      */
@@ -113,15 +115,25 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
          */
         double tableCellY = 0;
         int positionY = spreadsheetView.getFixedRows().indexOf(index);
-        //If true, this row is fixed
-        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= positionY * GridViewSkin.DEFAULT_CELL_HEIGHT) {
-        	//This row is a bit hidden on top so we translate then for it to be fully visible
-            tableCellY = positionY * GridViewSkin.DEFAULT_CELL_HEIGHT
-                    - getSkinnable().getLocalToParentTransform().getTy();
-            ((GridRow)getSkinnable()).setCurrentlyFixed(true);
-        }else{
-        	((GridRow)getSkinnable()).setCurrentlyFixed(false);
+        
+        //FIXME Integrate if fixedCellSize is enabled
+        //Computing how much space we need to translate
+        //because each row has different space.
+        double space = 0;
+        for(int o = 0;o< positionY; ++o){
+        	space += getTableRowHeight(spreadsheetView.getFixedRows().get(o));
         }
+        
+        
+        //If true, this row is fixed
+        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space){//positionY * GridViewSkin.DEFAULT_CELL_HEIGHT) {
+        	//This row is a bit hidden on top so we translate then for it to be fully visible
+            tableCellY = space//positionY * GridViewSkin.DEFAULT_CELL_HEIGHT
+                    - getSkinnable().getLocalToParentTransform().getTy();
+//            ((GridRow)getSkinnable()).setCurrentlyFixed(true);
+        }/*else{
+        	((GridRow)getSkinnable()).setCurrentlyFixed(false);
+        }*/
         /**
          * We want to insert the removed tableCell in their correct position
          * because otherwise we have some glitch with the fixed columns when
@@ -228,9 +240,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         // to the height variable
                         for (int i = 1; i < cellSpan.getRowSpan(); i++) {
                             // calculate the height
-                            final double rowHeight = GridViewSkin.DEFAULT_CELL_HEIGHT;// getTableRowHeight(index
-                                                                       // + i,
-                                                                       // getSkinnable());
+                            final double rowHeight = getTableRowHeight(index+ i);//GridViewSkin.DEFAULT_CELL_HEIGHT;// 
                             height += snapSize(rowHeight);
                         }
                     }
@@ -238,8 +248,13 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 
                 tableCell.resize(width, height);
                 // We want to place the layout always at the starting cell.
-                final double spaceBetweenTopAndMe = (index - cellSpan.getRow())
-                        * GridViewSkin.DEFAULT_CELL_HEIGHT;
+                //FIXME I don't understand why this is working.. Investigation will be done.
+                double spaceBetweenTopAndMe = (index - cellSpan.getRow())
+                 * GridViewSkin.DEFAULT_CELL_HEIGHT;
+               /* for(int p=cellSpan.getRow();p<index;++p){
+                	spaceBetweenTopAndMe+= getTableRowHeight(p);
+                }*/
+                		
                 tableCell.relocate(x + tableCellX, snappedTopInset()
                         - spaceBetweenTopAndMe + tableCellY);
 
@@ -255,6 +270,15 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     }
 
     /**
+     * Return the height of a row.
+     * @param i
+     * @return
+     */
+    private double getTableRowHeight(int i) {
+    	return handle.getView().getGrid().getRowHeight(i);
+	}
+
+	/**
      * Return true if the current cell is part of the sceneGraph.
      * 
      * @param x beginning of the cell

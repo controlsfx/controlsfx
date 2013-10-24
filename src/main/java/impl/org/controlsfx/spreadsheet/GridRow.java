@@ -58,7 +58,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      */
     private int indexVirtualFlow = -1;
     private boolean layoutFixedColumns = false;
-    private boolean currentlyFixed = false;
+//    private boolean currentlyFixed = false;
 
     /***************************************************************************
      *                                                                         *
@@ -84,17 +84,17 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         indexVirtualFlow = i;
     }
 
-    public Boolean getCurrentlyFixed() {
+    /*public Boolean getCurrentlyFixed() {
 		return currentlyFixed;
 	}
 
-	/**
+	*//**
 	 * Indicate that this row is bonded on the top.
 	 * @param currentlyFixed
-	 */
+	 *//*
 	public void setCurrentlyFixed(boolean currentlyFixed) {
 		this.currentlyFixed = currentlyFixed;
-	}
+	}*/
 	
     /**
      * For the fixed columns in order to just re-layout the fixed columns
@@ -205,6 +205,10 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         return null;
     }
 
+    @Override protected double computePrefHeight(double width) { 
+    	return handle.getView().getGrid().getRowHeight(getIndex());
+    }
+    
     @Override
     protected Skin<?> createDefaultSkin() {
         return new GridRowSkin(handle, this);

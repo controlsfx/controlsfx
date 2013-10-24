@@ -29,6 +29,8 @@ package org.controlsfx.control.spreadsheet;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -50,6 +52,7 @@ public class GridBase implements Grid {
     private ObservableList<ObservableList<SpreadsheetCell>> rows;
     private int rowCount;
     private int columnCount;
+    private Map<Integer,Double> rowHeight;
     
     
 
@@ -70,17 +73,20 @@ public class GridBase implements Grid {
      * Creates a grid with a fixed number of rows and columns.
      */
     public GridBase(int rowCount, int columnCount) {
-        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList());
+        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(), new HashMap<Integer,Double>());
     }
 
-    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows) {
+    public GridBase(int rowCount, int columnCount,  Map<Integer,Double> rowHeight) {
+        this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(), rowHeight);
+    }
+    
+    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows, Map<Integer,Double> rowHeight) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.rows = rows;
+        this.rowHeight = rowHeight;
     }
 
-    
-    
     /***************************************************************************
      * 
      * Public Methods (Inherited from Grid) 
@@ -141,7 +147,12 @@ public class GridBase implements Grid {
         }
     }
     
-    
+    @Override
+    public double getRowHeight(int i){
+    	Double value = rowHeight.get((Integer)i);
+    	//FIXME We must use a variable here instead
+    	return value == null? 24.0:value;
+    }
     
     /***************************************************************************
      * 

@@ -91,4 +91,11 @@ public interface Grid {
      * Return the {@link SpanType} for a given cell row/column intersection.
      */
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
+    
+    /**
+     * Return the height of a row.
+     * @param row
+     * @return
+     */
+    public double getRowHeight(int row);
 }

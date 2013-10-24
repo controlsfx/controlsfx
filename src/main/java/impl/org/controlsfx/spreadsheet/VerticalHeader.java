@@ -178,7 +178,7 @@ public class VerticalHeader extends StackPane {
 				}else{
 					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+" ");
 				}
-				label.resize(prefWidth, prefHeight);
+				label.resize(prefWidth, spreadsheetView.getGrid().getRowHeight(row.getIndexVirtualFlow()));
 				label.relocate(x, y);
 				label.setContextMenu(getRowContextMenu(row
 						.getIndexVirtualFlow()));
@@ -195,28 +195,29 @@ public class VerticalHeader extends StackPane {
 				} else {
 					css.removeAll("fixed");
 				}
-				y += prefHeight;
+				y += spreadsheetView.getGrid().getRowHeight(row.getIndexVirtualFlow());
 				++i;
 			}
-
+			
+			double spaceUsedByFixedRows = 0;
 			// Then we iterate over the FixedRows if any
 			if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
 				for (i = 0; i < spreadsheetView.getFixedRows().size(); ++i) {
-					if (skin.getCell(i).getCurrentlyFixed()) {
+//					if (skin.getCell(i).getCurrentlyFixed()) {
 						label = getLabel(rowCount++);
 						label.setText(String.valueOf(spreadsheetView
 								.getFixedRows().get(i) + 1)+":");
-						label.resize(prefWidth, prefHeight);
+						label.resize(prefWidth, spreadsheetView.getGrid().getRowHeight(spreadsheetView
+								.getFixedRows().get(i)));
 						label.setContextMenu(getRowContextMenu(spreadsheetView
 								.getFixedRows().get(i)));
 						// If the columnHeader is here, we need to translate a
 						// bit
 						if (spreadsheetView.showColumnHeaderProperty().get()) {
 							label.relocate(x, snappedTopInset() + prefHeight
-									* (i + 1));
+									+spaceUsedByFixedRows);
 						} else {
-							label.relocate(x, snappedTopInset() + prefHeight
-									* i);
+							label.relocate(x, snappedTopInset() + spaceUsedByFixedRows);
 						}
 						final ObservableList<String> css = label
 								.getStyleClass();
@@ -227,8 +228,11 @@ public class VerticalHeader extends StackPane {
 							css.removeAll("selected");
 						}
 						css.addAll("fixed");
-						y += prefHeight;
-					}
+						spaceUsedByFixedRows+=spreadsheetView.getGrid().getRowHeight(spreadsheetView
+								.getFixedRows().get(i));
+						y += spreadsheetView.getGrid().getRowHeight(spreadsheetView
+								.getFixedRows().get(i));
+//					}
 				}
 			}
 
@@ -321,11 +325,19 @@ public class VerticalHeader extends StackPane {
 						public void changed(
 								ObservableValue<? extends Boolean> arg0,
 								Boolean arg1, Boolean arg2) {
-
+							
 							if (spreadsheetView.getFixedRows().contains(i)) {
-								spreadsheetView.getFixedRows().remove(i);
+								spreadsheetView.getFixedRows().clear();
+								
+								for(int j=0;j<= i-1;++j){
+									spreadsheetView.getFixedRows().add(j);
+								}
 							} else {
-								spreadsheetView.getFixedRows().add(i);
+								spreadsheetView.getFixedRows().clear();
+								
+								for(int j=0;j<= i;++j){
+									spreadsheetView.getFixedRows().add(j);
+								}
 							}
 							// We MUST have the fixed rows sorted!
 							FXCollections.sort(spreadsheetView.getFixedRows());

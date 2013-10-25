@@ -73,13 +73,9 @@ public class VerticalHeader extends StackPane {
 	private final InvalidationListener layout = new InvalidationListener() {
 		@Override
 		public void invalidated(Observable arg0) {
-			final Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					requestLayout();
-				}
-			};
-			Platform.runLater(r);
+			if(working){
+				requestLayout();
+			}
 		}
 	};
 

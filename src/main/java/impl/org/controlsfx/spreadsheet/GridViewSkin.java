@@ -136,8 +136,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         verticalHeader = new VerticalHeader(handle, verticalHeaderWidth);
         getChildren().addAll(verticalHeader);
 
-        ((HorizontalHeader) getTableHeaderRow()).init();
         verticalHeader.init(this);
+        ((HorizontalHeader) getTableHeaderRow()).init();
+        
         getFlow().init(spreadsheetView);
     }
 

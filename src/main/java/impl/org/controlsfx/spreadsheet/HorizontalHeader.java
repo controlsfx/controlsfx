@@ -94,22 +94,28 @@ public class HorizontalHeader extends TableHeaderRow {
 			fixColumn(column);
 		}
 		
-	    /**
-	     * Clicking on header select the cell situated in that column.
-	     * This may be replaced by selecting the entire Column/Row.
-	     */
-	    for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-	        i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
-				@Override
-				public void handle(MouseEvent arg0) {
-					if(arg0.isPrimaryButtonDown()){
-						TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
-						TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
-						sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
-					}
-				}
-			});
-	    }
+		final Runnable r = new Runnable() {
+            @Override
+            public void run() {
+			    /**
+			     * Clicking on header select the cell situated in that column.
+			     * This may be replaced by selecting the entire Column/Row.
+			     */
+			    for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
+			        i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
+						@Override
+						public void handle(MouseEvent arg0) {
+							if(arg0.isPrimaryButtonDown()){
+								TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+								TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
+								sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
+							}
+						}
+					});
+			    }
+            }
+        };
+        Platform.runLater(r);
     }
     
     @Override

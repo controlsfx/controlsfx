@@ -5,7 +5,6 @@ import javafx.beans.Observable;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class GridCellEditor {
@@ -182,14 +181,24 @@ public class GridCellEditor {
 		private GridRow original;
 		private boolean isMoved;
 
+		/**
+		 * Number of rows currently displayed.
+		 * @return
+		 */
 		private int getCellCount() {
 			return handle.getCellsViewSkin().getCellsSize();
 		}
 
 		private boolean addCell(CellView cell){
-			GridRow temp = handle.getCellsViewSkin().getRow(getCellCount()-1-handle.getView().getFixedRows().size());
-			if(temp != null){
-				temp.addCell(cell);
+			GridRow lastRow = handle.getCellsViewSkin().getRow(getCellCount()-1);
+
+			//If the row returned is the extra one at the bottom (see RT-31503)
+			if(lastRow.getIndex() >= handle.getView().getGrid().getRowCount()){
+				lastRow = handle.getCellsViewSkin().getRow( handle.getView().getGrid().getRowCount()-1);
+			}
+			
+			if(lastRow != null){
+				lastRow.addCell(cell);
 				return true;
 			}
 			return false;

@@ -54,51 +54,74 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
  */
 public class HorizontalHeader extends TableHeaderRow {
 	final GridViewSkin gridViewSkin;
-    // Indicate whether the this TableHeaderRow is activated or not
+	
+    // Indicate whether the this HorizontalHeader is activated or not
     private boolean working = true;
     
+    /***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
     public HorizontalHeader(final GridViewSkin skin) {
         super(skin);
         gridViewSkin = skin;
     }
+    
+    /***************************************************************************
+     *                                                                         *
+     * Public Methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+    
     public void init() {
-	    	SpreadsheetView view = gridViewSkin.spreadsheetView;
-	    	
-	    	//Visibility of vertical Header listener
-	        view.showRowHeaderProperty().addListener(verticalHeaderListener);
-	        
-	        //Visibility of horizontal Header listener
-	        view.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
-	        
-	        //Selection listener to highlight header
-	        gridViewSkin.getSelectedColumns().addListener(selectionListener);
-	        
-	        //Fixed Column listener to change style of header
-	        view.getFixedColumns().addListener(fixedColumnsListener);
-	        
-	        //We are doing that because some columns may be already fixed.
-			for(SpreadsheetColumn<?> column: view.getFixedColumns()){
-				fixColumn(column);
-			}
-			
-	        /**
-	         * Clicking on header select the cell situated in that column.
-	         * This may be replaced by selecting the entire Column/Row.
-	         */
-	        for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-	            i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
-	    			@Override
-	    			public void handle(MouseEvent arg0) {
-	    				if(arg0.isPrimaryButtonDown()){
-	    					TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
-	    					TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
-	    					sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
-	    				}
-	    			}
-	    		});
-	        }
+		SpreadsheetView view = gridViewSkin.spreadsheetView;
+		
+		//Visibility of vertical Header listener
+	    view.showRowHeaderProperty().addListener(verticalHeaderListener);
+	    
+	    //Visibility of horizontal Header listener
+	    view.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
+	    
+	    //Selection listener to highlight header
+	    gridViewSkin.getSelectedColumns().addListener(selectionListener);
+	    
+	    //Fixed Column listener to change style of header
+	    view.getFixedColumns().addListener(fixedColumnsListener);
+	    
+	    //We are doing that because some columns may be already fixed.
+		for(SpreadsheetColumn<?> column: view.getFixedColumns()){
+			fixColumn(column);
+		}
+		
+	    /**
+	     * Clicking on header select the cell situated in that column.
+	     * This may be replaced by selecting the entire Column/Row.
+	     */
+	    for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
+	        i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>(){
+				@Override
+				public void handle(MouseEvent arg0) {
+					if(arg0.isPrimaryButtonDown()){
+						TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+						TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
+						sm.clearAndSelect(fm.getFocusedCell().getRow(),i.getTableColumn() );
+					}
+				}
+			});
+	    }
+    }
+    
+    @Override
+    public HorizontalHeaderColumn getRootHeader() {
+        return (HorizontalHeaderColumn) super.getRootHeader();
     }
 
+    /***************************************************************************
+     * 
+     * Protected Methods 
+     * 
+     **************************************************************************/
     @Override
     protected void updateTableWidth() {
         super.updateTableWidth();
@@ -125,7 +148,17 @@ public class HorizontalHeader extends TableHeaderRow {
         }
     }
 
+    @Override
+    protected NestedTableColumnHeader createRootHeader() {
+        return new HorizontalHeaderColumn(getTableSkin(), null);
+    }
 
+    /***************************************************************************
+     * 
+     * Private Methods 
+     * 
+     **************************************************************************/
+    
     /**
      *Whether the Vertical Header is showing, we need to update the width because some
      *space on the left will be available/used.
@@ -239,15 +272,4 @@ public class HorizontalHeader extends TableHeaderRow {
         }
 
     }
-
-    @Override
-    protected NestedTableColumnHeader createRootHeader() {
-        return new HorizontalHeaderColumn(getTableSkin(), null);
-    }
-
-    @Override
-    public HorizontalHeaderColumn getRootHeader() {
-        return (HorizontalHeaderColumn) super.getRootHeader();
-    }
-
 }

@@ -127,40 +127,21 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
         final SpreadsheetView spv = handle.getView();
-        final GridViewSkin gvs = handle.getCellsViewSkin();
         final Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
         if ( type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
         	
-        	/* THIS IS NOT ENTIRELY TRUE ANYMORE, will be fixed.
-        	 * (FIXME Currently we're adding a row two times if it's located in the fixedRows.
-        	 * So we have a problem because some events, especially when editing
-        	 * are received in double.
-        	 * I don't know right now why this is happening but I have found a work-around.
-        	 * I check if the current SpreadsheetRow is referenced in the SpreadsheetView,
-        	 * if not, then I know I can throw it away (setManaged(false) ?) )
+        	/**
+        	 * We may come to the situation where this methods is called two times.
+        	 * One time by the row inside the VirtualFlow. And another by the row
+        	 * inside myFixedCells used by our GridVirtualFlow. 
+        	 * 
+        	 * In that case, we have to give priority to the one used by the
+        	 * VirtualFlow. So we just check if the row is managed. If not, we
+        	 * know for sure that the our GridVirtualFlow has stepped out.
         	 */
-        	if(spv.getFixedRows().contains(row)){//row <= spv.getFixedRows().size()){
-	        	boolean flag = false;
-	        	for (int j = 0; j< gvs.getCellsSize();j++ ) {
-	                    if(gvs.getRow(j) == getTableRow()){
-	                    	flag = true;
-	                    }
-	            }
-	        	if(!flag){
-	        		//FIXME Still problem when de-fixing at the top
-	        		flag = false;
-	            	for (int j = 0; j< gvs.getCellsSize();j++ ) {
-	                    if(gvs.getRow(j).getIndex() == row){
-	                    	flag = true;
-	                    }
-	            	}
-	            	if(flag){
-//		        		System.out.println("non!");
-		        		getTableRow().setManaged(false);
-		        		return;
-	            	}
-	        	}
+        	if(!getTableRow().isManaged()){
+        		return;
         	}
         	
         	GridCellEditor editor = getEditor(getItem(), spv);
@@ -172,30 +153,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
     
-    /**
-     * Return an instance of Editor specific to the Cell type
-     * We are not using the build-in editor-Cell because we cannot know in advance
-     * which editor we will need. Furthermore, we want to control the behavior very closely
-     * in regards of the spanned cell (invisible etc).
-     * @param cell The SpreadsheetCell
-     * @param bc The SpreadsheetCell
-     * @return
-     */
-    private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
-    	SpreadsheetCellType<?> cellType = cell.getCellType();
-    	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
-
-    	GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
-        if (editor.isEditing()){
-            return null;
-        } else {
-        	editor.updateSpreadsheetCell(this);
-        	editor.updateDataCell(cell);
-        	editor.updateSpreadsheetCellEditor(cellEditor);
-            return editor;
-        }
-    }
-
     @Override
     public void commitEdit(SpreadsheetCell newValue) {
         if (! isEditing()) {
@@ -255,22 +212,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             if(isHover()){
             	setHoverPublic(false);
             }
-
         }
     }
     
-    /**
-     * Set this SpreadsheetCell hoverProperty
-     *
-     * @param hover
-     */
-    void setHoverPublic(boolean hover) {
-        this.setHover(hover);
-        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
-        //Otherwise it's will not be visible
-        ((GridRow) this.getTableRow()).setHoverPublic(hover);
-    }
-
     @Override
     public String toString(){
         return getItem().getRow()+"/"+getItem().getColumn();
@@ -302,19 +246,45 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     /***************************************************************************
      *                                                                         *
-     * Protected Methods                                                          *
+     * Private Methods                                                         *
      *                                                                         *
      **************************************************************************/
-    /*@Override
-    protected Skin<?> createDefaultSkin() {
-        return new TableCellSkin<>(this);
-    }*/
+    
+    /**
+     * Set this SpreadsheetCell hoverProperty
+     *
+     * @param hover
+     */
+    private void setHoverPublic(boolean hover) {
+        this.setHover(hover);
+        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in to be in Hover
+        //Otherwise it's will not be visible
+        ((GridRow) this.getTableRow()).setHoverPublic(hover);
+    }
+    
+    /**
+     * Return an instance of Editor specific to the Cell type
+     * We are not using the build-in editor-Cell because we cannot know in advance
+     * which editor we will need. Furthermore, we want to control the behavior very closely
+     * in regards of the spanned cell (invisible etc).
+     * @param cell The SpreadsheetCell
+     * @param bc The SpreadsheetCell
+     * @return
+     */
+    private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
+    	SpreadsheetCellType<?> cellType = cell.getCellType();
+    	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
 
-    /***************************************************************************
-     *                                                                         *
-     * Private Methods                                                          *
-     *                                                                         *
-     **************************************************************************/
+    	GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
+        if (editor.isEditing()){
+            return null;
+        } else {
+        	editor.updateSpreadsheetCell(this);
+        	editor.updateDataCell(cell);
+        	editor.updateSpreadsheetCellEditor(cellEditor);
+            return editor;
+        }
+    }
     
     /**
      * A SpreadsheetCell is being hovered and we need to re-route the signal.
@@ -325,14 +295,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private void hoverGridCell(SpreadsheetCell cell) {
         CellView gridCell;
         
-        final SpreadsheetView spv = handle.getView();
         final GridViewSkin sps = handle.getCellsViewSkin();
-        final GridRow row = sps.getRow(spv.getFixedRows().size());
+        final GridRow row = sps.getRow(0);//spv.getFixedRows().size());
         
         if (sps.getCellsSize() !=0  && row.getIndex() <= cell.getRow()) {
-        	final GridRow rightRow = sps.getRow(spv.getFixedRows().size()+cell.getRow() - row.getIndex());
-            // We want to get the top of the spanned cell, so we need
-            // to access the fixedRows.size plus the difference between where we want to go and the first visibleRow (header excluded)
+        	// We want to get the top of the spanned cell, so we need
+            // to access the difference between where we want to go and the first visibleRow
+        	final GridRow rightRow = sps.getRow(cell.getRow() - row.getIndex());
+           
             if( rightRow != null) {// Sometime when scrolling fast it's null so..
                 gridCell = rightRow.getGridCell(cell.getColumn());
             } else {

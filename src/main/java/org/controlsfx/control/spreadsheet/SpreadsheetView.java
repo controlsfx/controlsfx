@@ -585,7 +585,7 @@ public class SpreadsheetView extends Control {
      */
     private GridRow getNonFixedRow(int index){
         GridViewSkin skin = (GridViewSkin) cellsView.getSkin();
-        return skin.getCell(fixedRows.size()+index);
+        return skin.getRow(index);
     }
 
     /**
@@ -598,7 +598,7 @@ public class SpreadsheetView extends Control {
         GridViewSkin skin = (GridViewSkin) cellsView.getSkin();
         int size = skin.getCellsSize();
         for (int i = 0 ; i < size; ++i) {
-            if(skin.getCell(i).getIndex() == index)
+            if(skin.getRow(i).getIndex() == index)
                 return true;
         }
         return false;
@@ -725,7 +725,6 @@ public class SpreadsheetView extends Control {
     private void copyClipBoard(){
         checkFormat();
 
-        //		final ArrayList<ArrayList<DataCell>> temp = new ArrayList<>();
         final ArrayList<SpreadsheetCell> list = new ArrayList<SpreadsheetCell>();
         @SuppressWarnings("rawtypes")
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();

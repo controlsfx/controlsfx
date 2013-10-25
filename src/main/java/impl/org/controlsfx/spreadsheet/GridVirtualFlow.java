@@ -208,8 +208,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 			 temp.setVisible(false);
 			 temp.setManaged(false);
 		}
-		
-		if(spreadSheetView.getFixedRows().size() > 0){
+		//We must have a cell in ViewPort because otherwise
+		//we short-circuit the VirtualFlow.
+		if(spreadSheetView.getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null){
 			sortRows();
 	        /**
 	         * What I do is just going after the VirtualFlow in order to ADD

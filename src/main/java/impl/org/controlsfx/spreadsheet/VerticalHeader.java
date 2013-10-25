@@ -30,8 +30,6 @@ package impl.org.controlsfx.spreadsheet;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -142,8 +140,6 @@ public class VerticalHeader extends StackPane {
 		skin.getSelectedRows().addListener(layout);
 
 		blankContextMenu = new ContextMenu();
-		//requestLayout();
-
 	}
 
 	@Override
@@ -158,7 +154,7 @@ public class VerticalHeader extends StackPane {
 			// We add horizontalHeaderHeight because we need to 
 			// take the other header into account.
 			double y = snappedTopInset();
-			System.out.println(horizontalHeaderHeight);
+			
 			if (spreadsheetView.showColumnHeaderProperty().get()) {
 				y += horizontalHeaderHeight;
 			}

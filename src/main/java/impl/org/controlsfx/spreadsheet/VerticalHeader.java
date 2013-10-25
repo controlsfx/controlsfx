@@ -30,6 +30,8 @@ package impl.org.controlsfx.spreadsheet;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -60,7 +62,7 @@ public class VerticalHeader extends StackPane {
 	 **************************************************************************/
 	private final SpreadsheetHandle handle;
 	private final SpreadsheetView spreadsheetView;
-	private double horizontalHeaderHeight = 24.0;
+	private double horizontalHeaderHeight;
 	private double prefWidth = 50.0;
 	private boolean working = true; // Whether or not we are showing the
 									// verticalHeader
@@ -101,9 +103,12 @@ public class VerticalHeader extends StackPane {
             @Override
             public void run() {
             	horizontalHeaderHeight = handle.getCellsViewSkin().getTableHeaderRow().prefHeight(-1);
+            	requestLayout();
             }
         };
         Platform.runLater(r);
+        
+           
 		
 		// Clip property to stay within bounds
 		clip = new Rectangle(prefWidth, snapSize(skin.getSkinnable()
@@ -137,7 +142,7 @@ public class VerticalHeader extends StackPane {
 		skin.getSelectedRows().addListener(layout);
 
 		blankContextMenu = new ContextMenu();
-		requestLayout();
+		//requestLayout();
 
 	}
 
@@ -153,6 +158,7 @@ public class VerticalHeader extends StackPane {
 			// We add horizontalHeaderHeight because we need to 
 			// take the other header into account.
 			double y = snappedTopInset();
+			System.out.println(horizontalHeaderHeight);
 			if (spreadsheetView.showColumnHeaderProperty().get()) {
 				y += horizontalHeaderHeight;
 			}
@@ -284,7 +290,6 @@ public class VerticalHeader extends StackPane {
 	private Label getLabel(int rowNumber) {
 		if (getChildren().isEmpty() || getChildren().size() <= rowNumber) {
 			final Label label = new Label();
-			label.resize(prefWidth, horizontalHeaderHeight);
 			getChildren().add(label);
 			
 			// We want to select when clicking on header

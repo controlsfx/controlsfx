@@ -124,6 +124,11 @@ public class VerticalHeader extends StackPane {
 							ObservableValue<? extends Boolean> arg0,
 							Boolean arg1, Boolean arg2) {
 						working = arg2;
+						if(!working){
+							clip.setWidth(0);
+						}else{
+							clip.setWidth(prefWidth);
+						}
 						requestLayout();
 					}
 				});

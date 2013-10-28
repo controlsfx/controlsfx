@@ -76,7 +76,7 @@ public class HorizontalHeader extends TableHeaderRow {
     
     public void init() {
     	
-		SpreadsheetView view = gridViewSkin.spreadsheetView;
+		final SpreadsheetView view = gridViewSkin.spreadsheetView;
 		
 		//Visibility of vertical Header listener
 	    view.showRowHeaderProperty().addListener(verticalHeaderListener);
@@ -90,14 +90,15 @@ public class HorizontalHeader extends TableHeaderRow {
 	    //Fixed Column listener to change style of header
 	    view.getFixedColumns().addListener(fixedColumnsListener);
 	    
-	    //We are doing that because some columns may be already fixed.
-		for(SpreadsheetColumn<?> column: view.getFixedColumns()){
-			fixColumn(column);
-		}
+	   
 		
 		final Runnable r = new Runnable() {
             @Override
             public void run() {
+            	 //We are doing that because some columns may be already fixed.
+        		for(SpreadsheetColumn<?> column: view.getFixedColumns()){
+        			fixColumn(column);
+        		}
             	requestLayout();
 			    /**
 			     * Clicking on header select the cell situated in that column.

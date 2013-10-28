@@ -228,6 +228,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     public void show(final SpreadsheetCell item){
         //We reset the settings
         setText(item.getText());
+        
+        //We want the text to wrap onto another line
+        setWrapText(true);
         setEditable(item.isEditable());
         
         getStyleClass().clear();

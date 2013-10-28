@@ -110,7 +110,7 @@ public class GridBase implements Grid {
     
     /** {@inheritDoc} */
     @Override public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
-        if (row < 0 || column < 0 || !containsRow(spv, row)) {
+        if (row < 0 || column < 0 /*|| !containsRow(spv, row)*/) {
             return SpanType.NORMAL_CELL;
         }
         final SpreadsheetCell cellSpan = ((ObservableList<SpreadsheetCell>)getRows().get(row)).get(column);

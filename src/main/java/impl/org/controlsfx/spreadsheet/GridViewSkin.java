@@ -33,6 +33,8 @@ import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -92,17 +94,25 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
     
     /** Default with of the VerticalHeader. */
-    private final double DEFAULT_VERTICALHEADER_WIDTH = 40.0;
+    protected final double DEFAULT_VERTICALHEADER_WIDTH = 40.0;
     
+    private DoubleProperty verticalHeaderWidth = new SimpleDoubleProperty(DEFAULT_VERTICALHEADER_WIDTH);
+    
+    public DoubleProperty verticalHeaderWidthProperty() {
+        return verticalHeaderWidth;
+    }
+    
+    public void setVerticalHeaderWidth(double width){
+    	verticalHeaderWidth.set(width);
+    }
+    
+    public double getVerticalHeaderWidth(){
+    	return verticalHeaderWidth.get();
+    }
+
     /** The editor. */
     private GridCellEditor spreadsheetCellEditorImpl;
     
-    private final double verticalHeaderWidth = DEFAULT_VERTICALHEADER_WIDTH;
-    
-    public double getRowHeaderWidth() {
-        return verticalHeaderWidth;
-    }
-
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader verticalHeader;
@@ -136,8 +146,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         verticalHeader = new VerticalHeader(handle, verticalHeaderWidth);
         getChildren().addAll(verticalHeader);
 
-        verticalHeader.init(this);
-        ((HorizontalHeader) getTableHeaderRow()).init();
+        HorizontalHeader temp = ((HorizontalHeader) getTableHeaderRow()).init();
+        verticalHeader.init(this, temp);
         
         getFlow().init(spreadsheetView);
     }
@@ -146,8 +156,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected void layoutChildren(double x, double y, double w, final double h) {
         if (spreadsheetView == null) { return; }
         if (spreadsheetView.showRowHeaderProperty().get()) {
-            x += verticalHeaderWidth;
-            w -= verticalHeaderWidth;
+            x += getVerticalHeaderWidth();
+            w -= getVerticalHeaderWidth();
         }
 
         super.layoutChildren(x, y, w, h);
@@ -169,7 +179,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         }
 
         if (spreadsheetView.showRowHeaderProperty().get()) {
-            layoutInArea(verticalHeader, x - verticalHeaderWidth, y
+            layoutInArea(verticalHeader, x - getVerticalHeaderWidth(), y
                     - tableHeaderRowHeight, w, h, baselineOffset, HPos.CENTER,
                     VPos.CENTER);
         }

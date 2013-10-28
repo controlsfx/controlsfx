@@ -27,9 +27,9 @@
 
 package impl.org.controlsfx.spreadsheet;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -61,7 +61,8 @@ public class VerticalHeader extends StackPane {
 	private final SpreadsheetHandle handle;
 	private final SpreadsheetView spreadsheetView;
 	private double horizontalHeaderHeight;
-	private double prefWidth = 50.0;
+	private DoubleProperty verticalHeaderWidth;
+	private Double savedWidth;
 	private boolean working = true; // Whether or not we are showing the
 									// verticalHeader
 	private Rectangle clip; // Ensure that children do not go out of bounds
@@ -87,36 +88,38 @@ public class VerticalHeader extends StackPane {
 	 * @param rowHeaderWidth
 	 ******************************************************************/
 	public VerticalHeader(final SpreadsheetHandle handle,
-			final double rowHeaderWidth) {
+			DoubleProperty verticalHeaderWidth) {
 		this.handle = handle;
 		this.spreadsheetView = handle.getView();
-		prefWidth = rowHeaderWidth;
+		this.verticalHeaderWidth = verticalHeaderWidth;
 	}
 
 	/***************************************************************************
-	 * * Private/Protected Methods * *
+	 * * Private/Protected Methods * 
+	 * @param horizontalHeader *
 	 **************************************************************************/
-	void init(GridViewSkin skin) {
-		final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-            	horizontalHeaderHeight = handle.getCellsViewSkin().getTableHeaderRow().prefHeight(-1);
-            	requestLayout();
-            }
-        };
-        Platform.runLater(r);
-        
-           
+	
+	void init(final GridViewSkin skin, HorizontalHeader horizontalHeader) {
+		//Adjust position upon HorizontalHeader height
+		horizontalHeader.heightProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0,
+					Number arg1, Number arg2) {
+				horizontalHeaderHeight = arg2.doubleValue();
+				requestLayout();
+			}
+		});
 		
 		// Clip property to stay within bounds
-		clip = new Rectangle(prefWidth, snapSize(skin.getSkinnable()
+		clip = new Rectangle(verticalHeaderWidth.get(), snapSize(skin.getSkinnable()
 				.getHeight()));
 		clip.relocate(snappedTopInset(), snappedLeftInset());
 		clip.setSmooth(false);
 		clip.heightProperty().bind(skin.getSkinnable().heightProperty());
+		clip.widthProperty().bind(verticalHeaderWidth);
 		VerticalHeader.this.setClip(clip);
 
-		// We desactivate and activate the rowheader upon request
+		// We desactivate and activate the verticalHeader upon request
 		spreadsheetView.showRowHeaderProperty().addListener(
 				new ChangeListener<Boolean>() {
 					@Override
@@ -125,9 +128,10 @@ public class VerticalHeader extends StackPane {
 							Boolean arg1, Boolean arg2) {
 						working = arg2;
 						if(!working){
-							clip.setWidth(0);
+							savedWidth = verticalHeaderWidth.get();
+							verticalHeaderWidth.set(0);
 						}else{
-							clip.setWidth(prefWidth);
+							verticalHeaderWidth.set(savedWidth == null?skin.DEFAULT_VERTICALHEADER_WIDTH:savedWidth);
 						}
 						requestLayout();
 					}
@@ -187,7 +191,7 @@ public class VerticalHeader extends StackPane {
 				}else{
 					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+" ");
 				}
-				label.resize(prefWidth, spreadsheetView.getGrid().getRowHeight(row.getIndexVirtualFlow()));
+				label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndexVirtualFlow()));
 				label.relocate(x, y);
 				label.setContextMenu(getRowContextMenu(row
 						.getIndexVirtualFlow()));
@@ -215,7 +219,7 @@ public class VerticalHeader extends StackPane {
 						label = getLabel(rowCount++);
 						label.setText(String.valueOf(spreadsheetView
 								.getFixedRows().get(i) + 1)+":");
-						label.resize(prefWidth, spreadsheetView.getGrid().getRowHeight(spreadsheetView
+						label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(spreadsheetView
 								.getFixedRows().get(i)));
 						label.setContextMenu(getRowContextMenu(spreadsheetView
 								.getFixedRows().get(i)));
@@ -247,7 +251,7 @@ public class VerticalHeader extends StackPane {
 			if (spreadsheetView.showColumnHeaderProperty().get()) {
 				label = getLabel(rowCount++);
 				label.setText("");
-				label.resize(prefWidth, horizontalHeaderHeight);
+				label.resize(verticalHeaderWidth.get(), horizontalHeaderHeight);
 				label.relocate(x, 0);
 				label.getStyleClass().clear();
 				label.setContextMenu(blankContextMenu);
@@ -258,7 +262,7 @@ public class VerticalHeader extends StackPane {
 				// Last one blank and on top (z-order) of the others
 				label = getLabel(rowCount++);
 				label.setText("");
-				label.resize(prefWidth, hbar.getHeight());
+				label.resize(verticalHeaderWidth.get(), hbar.getHeight());
 				label.relocate(snappedLeftInset(),
 						getHeight() - hbar.getHeight());
 				label.getStyleClass().clear();

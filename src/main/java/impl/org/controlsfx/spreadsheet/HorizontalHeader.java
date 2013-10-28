@@ -74,7 +74,7 @@ public class HorizontalHeader extends TableHeaderRow {
      *                                                                         *
      **************************************************************************/
     
-    public void init() {
+    public HorizontalHeader init() {
 		SpreadsheetView view = gridViewSkin.spreadsheetView;
 		
 		//Visibility of vertical Header listener
@@ -116,6 +116,7 @@ public class HorizontalHeader extends TableHeaderRow {
             }
         };
         Platform.runLater(r);
+        return this;
     }
     
     @Override
@@ -137,7 +138,7 @@ public class HorizontalHeader extends TableHeaderRow {
         if (working && gridViewSkin != null
                 && gridViewSkin.spreadsheetView != null
                 && gridViewSkin.spreadsheetView.showRowHeaderProperty().get()) {
-            padding += gridViewSkin.getRowHeaderWidth();
+            padding += gridViewSkin.getVerticalHeaderWidth();
         }
 
         Rectangle clip = ((Rectangle) getClip());

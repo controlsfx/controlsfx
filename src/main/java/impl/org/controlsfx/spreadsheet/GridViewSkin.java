@@ -136,22 +136,22 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
-
+        	
         init();
     }
-
+    
 	protected void init() {
         getFlow().getVerticalBar().valueProperty()
                 .addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle, verticalHeaderWidth);
         getChildren().addAll(verticalHeader);
 
-        HorizontalHeader temp = ((HorizontalHeader) getTableHeaderRow()).init();
-        verticalHeader.init(this, temp);
+        ((HorizontalHeader) getTableHeaderRow()).init();
+        verticalHeader.init(this, (HorizontalHeader) getTableHeaderRow());
         
         getFlow().init(spreadsheetView);
     }
-
+	
     @Override
     protected void layoutChildren(double x, double y, double w, final double h) {
         if (spreadsheetView == null) { return; }

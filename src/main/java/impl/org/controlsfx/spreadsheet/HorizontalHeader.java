@@ -74,7 +74,8 @@ public class HorizontalHeader extends TableHeaderRow {
      *                                                                         *
      **************************************************************************/
     
-    public HorizontalHeader init() {
+    public void init() {
+    	
 		SpreadsheetView view = gridViewSkin.spreadsheetView;
 		
 		//Visibility of vertical Header listener
@@ -97,6 +98,7 @@ public class HorizontalHeader extends TableHeaderRow {
 		final Runnable r = new Runnable() {
             @Override
             public void run() {
+            	requestLayout();
 			    /**
 			     * Clicking on header select the cell situated in that column.
 			     * This may be replaced by selecting the entire Column/Row.
@@ -116,7 +118,7 @@ public class HorizontalHeader extends TableHeaderRow {
             }
         };
         Platform.runLater(r);
-        return this;
+
     }
     
     @Override

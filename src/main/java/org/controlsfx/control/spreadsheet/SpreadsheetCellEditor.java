@@ -216,7 +216,6 @@ public abstract class SpreadsheetCellEditor<T> {
 		public ObjectEditor(SpreadsheetView view) {
 			super(view);
 			tf = new TextField();
-			tf.setPrefHeight(20);
 		}
 
 		/***************************************************************************
@@ -227,7 +226,6 @@ public abstract class SpreadsheetCellEditor<T> {
 			if (value instanceof String) {
 				tf.setText(value.toString());
 			}
-			tf.setMaxHeight(20);
 			attachEnterEscapeEventHandler();
 
 			tf.requestFocus();
@@ -284,7 +282,6 @@ public abstract class SpreadsheetCellEditor<T> {
 		public StringEditor(SpreadsheetView view) {
 			super(view);
 			tf = new TextField();
-			tf.setPrefHeight(20);
 		}
 
 		/***************************************************************************
@@ -296,7 +293,6 @@ public abstract class SpreadsheetCellEditor<T> {
 			if (value instanceof String) {
 				tf.setText((String) value);
 			}
-			tf.setMaxHeight(20);
 			attachEnterEscapeEventHandler();
 
 			tf.requestFocus();
@@ -356,7 +352,6 @@ public abstract class SpreadsheetCellEditor<T> {
 		public DoubleEditor(SpreadsheetView view) {
 			super(view);
 			tf = new TextField();
-			tf.setPrefHeight(20);
 		}
 
 		/***************************************************************************
@@ -368,7 +363,6 @@ public abstract class SpreadsheetCellEditor<T> {
 				tf.setText(((Double) value).isNaN() ? "" : value.toString());
 			}
 			tf.getStyleClass().removeAll("error");
-			tf.setMaxHeight(20);
 			attachEnterEscapeEventHandler();
 
 			tf.requestFocus();

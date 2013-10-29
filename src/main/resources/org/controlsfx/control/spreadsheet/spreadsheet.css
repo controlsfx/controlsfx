@@ -137,3 +137,9 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.fixed{
 	-fx-background-color: red;
 	-fx-shape : "M 0 0 L -1 0 L 0 1 z";
 }
+
+/* TextField must squeeze tight, so no padding
+on top and bottom */
+.spreadsheet-cell TextField{
+	-fx-padding : 0 7 0 7 ;
+}

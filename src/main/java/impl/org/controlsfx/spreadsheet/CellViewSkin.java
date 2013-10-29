@@ -10,6 +10,7 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
 
 public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell>{
 
+	private static final  int TRIANGLE_SIZE = 6;
 	private Region commentTriangle = null;
 	
 	public CellViewSkin(
@@ -30,9 +31,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 				if(!getChildren().contains(commentTriangle)){
 					getChildren().add(commentTriangle);
 				}
-				commentTriangle.resize(6,6);
+				commentTriangle.resize(TRIANGLE_SIZE,TRIANGLE_SIZE);
 				commentTriangle.getStyleClass().add("comment");
-				commentTriangle.relocate(getSkinnable().getWidth()-6, snappedTopInset()-1);
+				commentTriangle.relocate(getSkinnable().getWidth()-TRIANGLE_SIZE, snappedTopInset()-1);
 			}else if(commentTriangle != null){
 				getChildren().remove(commentTriangle);
 				commentTriangle = null;

@@ -243,15 +243,14 @@ public class HorizontalHeader extends TableHeaderRow {
 	 * @param i
 	 */
 	private void removeStyleHeader(Integer i) {
-        	getRootHeader().getColumnHeaders().get(i).getChildrenUnmodifiable().get(0).getStyleClass().removeAll("fixed");
+        	getRootHeader().getColumnHeaders().get(i).getStyleClass().removeAll("fixed");
     }
 	/**
 	 * Remove the fix style of the header Label of the specified column
 	 * @param i
 	 */
 	private void addStyleHeader(Integer i) {
-            getRootHeader().getColumnHeaders().get((Integer) i)
-                    .getChildrenUnmodifiable().get(0).getStyleClass()
+            getRootHeader().getColumnHeaders().get((Integer) i).getStyleClass()
                     .addAll("fixed");
     }
     
@@ -270,14 +269,12 @@ public class HorizontalHeader extends TableHeaderRow {
      */
     private void updateHighlightSelection() {
     	for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-            i.getChildrenUnmodifiable().get(0).getStyleClass().removeAll("selected");
+            i.getStyleClass().removeAll("selected");
 
         }
         final List<Integer> selectedColumns = gridViewSkin.getSelectedColumns();
-        // TODO Ugly hack to get access to the Label
         for (final Object i : selectedColumns) {
-            getRootHeader().getColumnHeaders().get((Integer) i)
-                    .getChildrenUnmodifiable().get(0).getStyleClass()
+            getRootHeader().getColumnHeaders().get((Integer) i).getStyleClass()
                     .addAll("selected");
         }
 

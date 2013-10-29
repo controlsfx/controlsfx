@@ -404,4 +404,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
 
     }
+    @Override
+    protected javafx.scene.control.Skin<?> createDefaultSkin() {
+    	return new CellViewSkin(this);
+    };
 }

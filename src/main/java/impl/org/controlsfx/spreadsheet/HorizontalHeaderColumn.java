@@ -66,13 +66,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     @Override
     protected void layoutChildren() {
         super.layoutChildren();
-        /*****************************************************************
-         * MODIFIED BY NELLARMONIA
-         *****************************************************************/
         layoutFixedColumns();
-        /*****************************************************************
-         * END OF MODIFIED BY NELLARMONIA
-         *****************************************************************/
     }
 
     /**
@@ -92,7 +86,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         for (int j = 0, max = getColumnHeaders().size(); j < max; j++) {
         	final TableColumnHeader n = getColumnHeaders().get(j);
         	final double prefWidth = snapSize(n.prefWidth(-1));
-        	 
+        	n.setPrefHeight(24.0);
         	//If the column is fixed
         	if(spreadsheetView.getFixedColumns().indexOf(spreadsheetView.getColumns().get(j)) != -1){
                  double tableCellX = 0;
@@ -111,9 +105,4 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         }
 
     }
-
-    public void updateHeader() {
-        setHeadersNeedUpdate();
-    }
-
 }

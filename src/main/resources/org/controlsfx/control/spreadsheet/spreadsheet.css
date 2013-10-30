@@ -110,18 +110,19 @@ VerticalHeader > Label {
 }  
 
 VerticalHeader > Label.selected,
-HorizontalHeaderColumn > TableColumnHeader > Label.selected{
--fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
+	-fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
     -fx-text-fill: -fx-selection-bar-text;
     -fx-alignment: center;
+    -fx-border-color : #ffd700;
 }  
 
 /* FIXED HEADERS  */
 VerticalHeader > Label.fixed,
-HorizontalHeaderColumn > TableColumnHeader > Label.fixed{
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.fixed{
 	-fx-font-style : italic;
 }
 
@@ -132,3 +133,13 @@ HorizontalHeaderColumn > TableColumnHeader > Label.fixed{
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 
+.comment{
+	-fx-background-color: red;
+	-fx-shape : "M 0 0 L -1 0 L 0 1 z";
+}
+
+/* TextField must squeeze tight, so no padding
+on top and bottom */
+.spreadsheet-cell TextField{
+	-fx-padding : 0 7 0 7 ;
+}

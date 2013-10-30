@@ -126,14 +126,11 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         
         
         //If true, this row is fixed
-        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space){//positionY * GridViewSkin.DEFAULT_CELL_HEIGHT) {
+        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space){
         	//This row is a bit hidden on top so we translate then for it to be fully visible
             tableCellY = space//positionY * GridViewSkin.DEFAULT_CELL_HEIGHT
                     - getSkinnable().getLocalToParentTransform().getTy();
-//            ((GridRow)getSkinnable()).setCurrentlyFixed(true);
-        }/*else{
-        	((GridRow)getSkinnable()).setCurrentlyFixed(false);
-        }*/
+        }
         /**
          * We want to insert the removed tableCell in their correct position
          * because otherwise we have some glitch with the fixed columns when
@@ -234,26 +231,27 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         }
                     }
 
+                    /**
+                     * We need to span multiple rows, so we sum up
+                     * the height of all the rows. The height of the current
+                     * row is ignored and the whole value is computed.
+                     */
                     if (cellSpan.getRowSpan() > 1) {
-                        // we need to span multiple rows, so we sum up
-                        // the height of the additional rows, adding it
-                        // to the height variable
-                        for (int i = 1; i < cellSpan.getRowSpan(); i++) {
-                            // calculate the height
-                            final double rowHeight = getTableRowHeight(index+ i);//GridViewSkin.DEFAULT_CELL_HEIGHT;// 
-                            height += snapSize(rowHeight);
+                    	height = 0;
+                    	final int maxRow = cellSpan.getRow()+cellSpan.getRowSpan();
+                    	for (int i = cellSpan.getRow(); i < maxRow; ++i) {
+                            height += snapSize(getTableRowHeight(i));
                         }
                     }
                 }
 
                 tableCell.resize(width, height);
+                
                 // We want to place the layout always at the starting cell.
-                //FIXME I don't understand why this is working.. Investigation will be done.
-                double spaceBetweenTopAndMe = (index - cellSpan.getRow())
-                 * GridViewSkin.DEFAULT_CELL_HEIGHT;
-               /* for(int p=cellSpan.getRow();p<index;++p){
+                double spaceBetweenTopAndMe = 0;
+                for(int p=cellSpan.getRow();p<index;++p){
                 	spaceBetweenTopAndMe+= getTableRowHeight(p);
-                }*/
+                }
                 		
                 tableCell.relocate(x + tableCellX, snappedTopInset()
                         - spaceBetweenTopAndMe + tableCellY);

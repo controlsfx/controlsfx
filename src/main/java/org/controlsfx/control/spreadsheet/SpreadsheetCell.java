@@ -151,9 +151,9 @@ public class SpreadsheetCell implements Serializable {
 	 * http://www.oracle.com/technetwork/articles/java/javaserial-1536170.html
 	 */
 	private transient ObservableList<String> styleClass;
-	
-	
 
+	
+	
 	/***************************************************************************
 	 * 
 	 * Constructor
@@ -211,7 +211,7 @@ public class SpreadsheetCell implements Serializable {
 	 * Properties
 	 * 
 	 ***************************************************************************/
-
+	
 	// --- item
 	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
 		@Override protected void invalidated() {
@@ -276,8 +276,39 @@ public class SpreadsheetCell implements Serializable {
         return editable;
     }
 
+    // --- comment
+ 	private transient BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
+ 	
+ 	/**
+      * Return if this cell can be edited or not.
+      * 
+      * @return true if this cell is editable.
+      */
+     public final boolean isCommented() {
+         return commented == null ? true : commented.get();
+     }
+
+     /**
+      * Change the commented state of this cell.
+      * 
+      * @param flag
+      */
+     public final void setCommented(boolean flag) {
+    	 commentedProperty().set(flag);
+     }
+
+     /**
+      * The {@link BooleanProperty} linked with the commented state.
+      * 
+      * @return The {@link BooleanProperty} linked with the commented state.
+      */
+     public final BooleanProperty commentedProperty() {
+         return commented;
+     }
 	
 	
+	
+
 	/***************************************************************************
 	 * 
 	 * Public Methods

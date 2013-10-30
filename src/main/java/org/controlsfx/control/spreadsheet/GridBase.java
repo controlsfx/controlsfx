@@ -110,7 +110,7 @@ public class GridBase implements Grid {
     
     /** {@inheritDoc} */
     @Override public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
-        if (row < 0 || column < 0 || !containsRow(spv, row)) {
+        if (row < 0 || column < 0 /*|| !containsRow(spv, row)*/) {
             return SpanType.NORMAL_CELL;
         }
         final SpreadsheetCell cellSpan = ((ObservableList<SpreadsheetCell>)getRows().get(row)).get(column);
@@ -147,11 +147,11 @@ public class GridBase implements Grid {
         }
     }
     
+    /** {@inheritDoc} */
     @Override
-    public double getRowHeight(int i){
-    	Double value = rowHeight.get((Integer)i);
-    	//FIXME We must use a variable here instead
-    	return value == null? 24.0:value;
+    public double getRowHeight(int row){
+    	Double value = rowHeight.get((Integer)row);
+    	return value == null? GridViewSkin.DEFAULT_CELL_HEIGHT:value;
     }
     
     /***************************************************************************
@@ -252,7 +252,7 @@ public class GridBase implements Grid {
         GridViewSkin skin = spv.getCellsViewSkin();
         int size = skin.getCellsSize();
         for (int i = 0 ; i < size; ++i) {
-            if(skin.getCell(i).getIndex() == index)
+            if(skin.getRow(i).getIndex() == index)
                 return true;
         }
         return false;

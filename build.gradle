@@ -1,12 +1,16 @@
+apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'maven'
+
 apply from: 'mavenPublish.gradle'
 
 group = 'org.controlsfx'
-version = '8.0.2-SNAPSHOT'
+version = '8.0.3-SNAPSHOT'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 configurations {
-    samples.extendsFrom mainRuntime
     jdk
 }
 
@@ -14,20 +18,13 @@ sourceSets {
     main {
         compileClasspath += configurations.jdk
     }
-    samples {
-        java {
-            compileClasspath += main.output
-            compileClasspath += configurations.jdk
-        }
-    }
 }
 
 dependencies {
     try {
         jdk files(jfxrtJar)
     } catch (MissingPropertyException pne) {
-        jdk files("${System.properties['java.home']}/lib/jfxrt.jar")
-        jdk files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
+        // javafx plugin will provide in this case
     }
 }
 
@@ -40,6 +37,7 @@ javadoc {
     options.links("http://download.oracle.com/javase/7/docs/api/");
     options.links("http://docs.oracle.com/javafx/2/api/");
     options.addBooleanOption("Xdoclint:none").setValue(true);
+    options.overview("src/main/docs/overview.html");
     
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
@@ -60,18 +58,6 @@ jar {
     exclude '**/oxygen/svg/*'
 }
 
-task jarSamples (type: Jar) {
-    classifier='samples'
-    from sourceSets.samples.output
-    manifest {
-        attributes(
-            'Manifest-Version': '1.0',
-            "Main-Class": "org.controlsfx.HelloControlsFX",
-            "Class-Path": "controlsfx-${version}.jar"
-        )
-    }
-}
-
 task sourceJar(type: Jar) {
     from sourceSets.main.java
     from sourceSets.main.resources
@@ -85,18 +71,11 @@ task javadocJar(type: Jar) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.6'
+    gradleVersion = '1.8'
 }
 
 artifacts {
     archives sourceJar
     archives javadocJar
-    archives jarSamples
 }
 
-['HelloControlsFX'/*, 'HelloGridView', 'HelloRangeSlider', 'HelloRating', 'HelloSegmentedButton', 'HelloToggleSwitch', 'SVGTest'*/].each { name ->
-    task "$name" (type: JavaExec) {
-        main = "org.controlsfx.$name"
-        classpath = sourceSets.samples.runtimeClasspath + sourceSets.main.runtimeClasspath + configurations.jdk
-    }
-}

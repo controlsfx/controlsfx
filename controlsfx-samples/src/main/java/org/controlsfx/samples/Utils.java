@@ -24,17 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.tools;
+package org.controlsfx.samples;
 
-/**
- * An interface used in ControlsFX to represent something that can be duplicated,
- * as in the JavaFX scenegraph it is not possible to insert the same 
- * {@link Node} in multiple locations at the same time. Therefore, to work 
- * around this the node may implement this interface to duplicate itself.
- *
- * @param <T> The node type
- */
-@FunctionalInterface
-public interface Duplicatable<T> {
-   T duplicate();
+public class Utils {
+    private Utils() { } 
+    
+    public static final String JAVADOC_BASE = "http://docs.controlsfx.org/";
 }

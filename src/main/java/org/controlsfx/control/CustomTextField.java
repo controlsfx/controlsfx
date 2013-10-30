@@ -37,6 +37,19 @@ import javafx.scene.control.TextField;
  * A base class for people wanting to customize a {@link TextField} to contain nodes
  * inside the text field itself, without being on top of the users typed-in text.
  * 
+ * <h3>Screenshot</h3>
+ * <p>The following screenshot is taken from the HelloControlsFX sample application,
+ * and shows a normal TextField, with a {@link TextFields#createSearchField() search field},
+ * followed by three CustomTextFields. Note what happens with long text input - 
+ * it is prevented from going beneath the left and right graphics. Of course, if 
+ * the keyboard caret moves to the right, the text will become visible, but this
+ * is because it will all scroll to the left (as is the case in a normal {@link TextField}.
+ * 
+ * <br/>
+ * <center>
+ * <img src="customTextField.png" />
+ * </center>
+ * 
  * @see SearchField
  */
 public class CustomTextField extends TextField {

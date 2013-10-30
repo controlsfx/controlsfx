@@ -14,7 +14,10 @@ import javafx.util.Duration;
 /**
  * A class containing useful customisations for the JavaFX {@link TextField}.
  * Note that this class is experimental and the API may change in future 
- * releases.
+ * releases. Note also that this class makes use of the {@link CustomTextField}
+ * class.
+ * 
+ * @see CustomTextField
  */
 public class TextFields {
     private static final Duration FADE_DURATION = Duration.millis(350);

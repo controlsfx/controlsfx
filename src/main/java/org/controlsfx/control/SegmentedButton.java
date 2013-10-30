@@ -151,7 +151,10 @@ public class SegmentedButton extends Control {
     public SegmentedButton(ObservableList<ToggleButton> buttons) {
         getStyleClass().add("segmented-button");
         this.buttons = buttons == null ? FXCollections.<ToggleButton>observableArrayList() : buttons;
-        setFocusTraversable(true);
+        
+        // Fix for Issue #87:
+        // https://bitbucket.org/controlsfx/controlsfx/issue/87/segmentedbutton-keyboard-focus-traversal
+        setFocusTraversable(false);
     }
     
 

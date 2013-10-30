@@ -1,7 +1,7 @@
 apply plugin: 'signing'
 
 configurations {
-    samples.extendsFrom mainRuntime
+    samples { extendsFrom mainRuntime}
     jdk
     maven { extendsFrom archives }
     published { extendsFrom archives, signatures}
@@ -13,9 +13,9 @@ signing {
 }
 
 repositories {
-    mavenRepo url: 'https://oss.sonatype.org/content/groups/staging'
+    mavenLocal()
+    maven { url 'https://oss.sonatype.org/content/groups/staging' }
     mavenCentral()
-    mavenRepo url: new File(System.getProperty('user.home'), '.m2/repository').toURI().toString()
 }
 
 uploadPublished {
@@ -78,7 +78,7 @@ private configurePOM(def pom) {
     }
 }
 
-checkPasswords =  {
+ext.checkPasswords =  {
     try {
         def check = [sonatypeUsername, sonatypePassword]
         println "Using sonatype user $sonatypeUsername"

@@ -395,6 +395,7 @@ public class HelloDialog extends SampleBase {
                     @Override protected Object call() throws Exception {
                         for (int i=0; i<100; i++) {
                             updateProgress(i, 99);
+                            updateMessage("progress: " + i);
                             System.out.println("progress: " + i);
                             Thread.sleep(100);
                         }

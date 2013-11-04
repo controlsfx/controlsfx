@@ -1162,12 +1162,21 @@ public class SpreadsheetView extends Control {
         }
 
         private void updateScroll(TablePosition<ObservableList<SpreadsheetCell>, ?> posFinal) {
+        	
             //We try to make visible the rows that may be hidden by Fixed rows
-            // We don't want to do any scroll behavior when dragging
-            if(!drag && getCellsViewSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex()> posFinal.getRow() && !getFixedRows().contains(posFinal.getRow())) {
-                cellsView.scrollTo(posFinal.getRow());
+            // We don't want to do any scrollTo call when dragging
+            if(!drag && getCellsViewSkin().getCellsSize() != 0 && getFixedRows().size() != 0){
+				
+				int start = getCellsViewSkin().getRow(0).getIndex();
+				double posFinalOffset = 0;
+				for(int j=start; j<posFinal.getRow();++j){
+					posFinalOffset+=getGrid().getRowHeight(j);
+				}
+				
+				if(getCellsViewSkin().getFixedRowHeight()> posFinalOffset){
+					cellsView.scrollTo(posFinal.getRow());
+				}
             }
-
         }
 
 

@@ -60,6 +60,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * * Private Fields * *
      **************************************************************************/
     private SpreadsheetView spreadSheetView;
+    private GridViewSkin gridViewSkin;
     /**
      * Store the fixedRow in order to place them at the top when necessary.
      * That is to say, when the VirtualFlow has not already placed one.
@@ -69,8 +70,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     /***************************************************************************
      * * Constructor * *
      **************************************************************************/
-    public GridVirtualFlow() {
+    public GridVirtualFlow(GridViewSkin gridViewSkin) {
         super();
+        this.gridViewSkin = gridViewSkin;
         final ChangeListener<Number> listenerY = new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
@@ -113,10 +115,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
     @Override
     public void scrollTo(int index) {
-    	//FIXME This is not true anymore I think
-        if (!getCells().isEmpty()
-                && index < getCells().get(0 + spreadSheetView.getFixedRows().size()).getIndex()) {
-            index -= getCells().size() - spreadSheetView.getFixedRows().size();
+    	//If we have some fixedRows, we check if the selected row is not below them
+    	if(!getCells().isEmpty() && spreadSheetView.getFixedRows().size()>0){
+    		double offset = gridViewSkin.getFixedRowHeight();
+    		
+			while(offset >=0 && index >0){
+				index--;
+				offset-=spreadSheetView.getGrid().getRowHeight(index);
+			}
         }
         super.scrollTo(index);
 

@@ -116,7 +116,16 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader verticalHeader;
+    
+    /**
+     * The height of our fixedRows
+     */
+    private double fixedRowHeight = 0;
 
+    public double getFixedRowHeight(){
+    	return fixedRowHeight;
+    }
+    
     public GridViewSkin(final SpreadsheetHandle handle) {
         super(handle.getGridView());
         this.handle = handle;
@@ -136,8 +145,10 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
-        	
+       
         init();
+        //Because fixedRow Listener is not reacting first time.
+        computeFixedRowHeight();
     }
     
 	protected void init() {
@@ -264,12 +275,24 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
+        	computeFixedRowHeight();
+        	
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
 
     };
 
+    /**
+     * We compute the total height of the fixedRows so that 
+     * the selection can use it without performance regression.
+     */
+    private void computeFixedRowHeight(){
+    	fixedRowHeight = 0;
+		for(int i: spreadsheetView.getFixedRows()){
+			fixedRowHeight+= spreadsheetView.getGrid().getRowHeight(i);
+		}
+    }
     /**
      * We listen on the FixedColumns in order to do the modification in the
      * VirtualFlow
@@ -292,7 +315,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     @Override
     protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
-        return new GridVirtualFlow<TableRow<ObservableList<SpreadsheetCell>>>();
+        return new GridVirtualFlow<TableRow<ObservableList<SpreadsheetCell>>>(this);
     }
 
     protected TableHeaderRow createTableHeaderRow() {

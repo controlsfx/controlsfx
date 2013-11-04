@@ -71,11 +71,20 @@ public class GridBase implements Grid {
 
     /**
      * Creates a grid with a fixed number of rows and columns.
+     * @param rowCount
+     * @param columnCount
      */
     public GridBase(int rowCount, int columnCount) {
         this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(), new HashMap<Integer,Double>());
     }
 
+    /**
+     * Creates a grid with a fixed number of rows and columns. 
+     * Some height are specified int the Map.
+     * @param rowCount
+     * @param columnCount
+     * @param rowHeight
+     */
     public GridBase(int rowCount, int columnCount,  Map<Integer,Double> rowHeight) {
         this(rowCount, columnCount,FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(), rowHeight);
     }

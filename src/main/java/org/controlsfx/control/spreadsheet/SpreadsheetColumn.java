@@ -52,8 +52,9 @@ import javafx.scene.control.TableColumn;
  * if it is possible with {@link #isColumnFixable()} before calling {@link #setFixed(boolean)}.
  * Take a look at the {@link SpreadsheetView} description to understand the fixing constraints.
  * 
- * <p>If the column can be fixed, a {@link ContextMenu} will appear if the user 
- * right-clicks on the header. If not, nothing will appear and the user will not 
+ * <p>If the column can be fixed, a dot is displayed in the header and
+ *  a {@link ContextMenu} will appear if the user 
+ * right-clicks on it. If not, nothing will appear and the user will not 
  * have the possibility to fix it.
  * 
  * <h3>Screenshot</h3>

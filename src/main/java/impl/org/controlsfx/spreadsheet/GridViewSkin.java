@@ -488,7 +488,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows);
         double maxWidth = 0;
         boolean datePresent = false;
-        boolean listPresent = false;
         for (int row = 0; row < rows; row++) {
             cell.updateTableColumn(col);
             cell.updateTableView(handle.getGridView());

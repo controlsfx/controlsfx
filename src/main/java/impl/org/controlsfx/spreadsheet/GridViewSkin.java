@@ -519,5 +519,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         	widthMax = DATE_CELL_MIN_WIDTH;
         }
         col.impl_setWidth(widthMax); 
+        col.setPrefWidth(widthMax);
     }
 }

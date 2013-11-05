@@ -35,9 +35,9 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TablePositionBase;
-import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -358,13 +358,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             return;
         }
 
-        final TableSelectionModel<ObservableList<SpreadsheetCell>> sm = tableView.getSelectionModel();
+        final TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = tableView.getSelectionModel();
         if (sm == null) {
             return;
         }
 
         final int row = getIndex();
         final int column = tableView.getVisibleLeafIndex(getTableColumn());
+        
         // For spanned Cells
         final SpreadsheetCell cell = (SpreadsheetCell) getItem();
         final int rowCell = cell.getRow()+cell.getRowSpan()-1;
@@ -382,6 +383,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             // this cell/row (inclusive) to the current selection.
             final TablePositionBase<?> anchor = getAnchor(tableView, focusedCell);
 
+            /**
+             * FIXME We need to clarify how we want to select the cells. 
+             * If a spanned cell is in the way, which minRow/maxRow will be taken?
+             * Where the mouse is exactly? Or where the "motherCell" is? 
+             * This needs some thinking.
+             */
             // and then determine all row and columns which must be selected
             int minRow = Math.min(anchor.getRow(), row);
             minRow = Math.min(minRow, rowCell);
@@ -392,15 +399,19 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             int maxColumn = Math.max(anchor.getColumn(), column);
             maxColumn = Math.max(maxColumn, columnCell);
 
+            /*TableColumnBase<ObservableList<SpreadsheetCell>,SpreadsheetCell> minColumn = anchor.getColumn() < column ? anchor.getTableColumn() : ;
+            TableColumnBase<ObservableList<SpreadsheetCell>,SpreadsheetCell> maxColumn = anchor.getColumn() >= column ? anchor.getTableColumn() : tableColumn;*/
+
             // clear selection, but maintain the anchor
             sm.clearSelection();
 
             // and then perform the selection
-            for (int _row = minRow; _row <= maxRow; _row++) {
+            /*for (int _row = minRow; _row <= maxRow; _row++) {
                 for (int _col = minColumn; _col <= maxColumn; _col++) {
                     sm.select(_row, tableView.getVisibleLeafColumn(_col));
                 }
-            }
+            }*/
+            sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,  tableView.getColumns().get(maxColumn));
         }
 
     }

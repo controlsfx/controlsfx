@@ -56,6 +56,10 @@ public final class Borders {
         return new EmptyBorders(this);
     }
     
+    public EtchedBorders etchedBorder() {
+        return new EtchedBorders(this);
+    }
+    
     public LineBorders lineBorder() {
         return new LineBorders(this);
     }
@@ -108,6 +112,43 @@ public final class Borders {
         
         public Borders build() {
             parent.addBorder(new EmptyBorder(top, right, bottom, left));
+            return parent;
+        }
+    }
+    
+    public class EtchedBorders {
+        private final Borders parent;
+        
+        private boolean raised = false;
+        
+        private Color highlightColor = Color.DARKGRAY;
+        private Color shadowColor = Color.WHITE;
+        
+        private EtchedBorders(Borders parent) { 
+            this.parent = parent;
+        }
+        
+        public EtchedBorders highlight(Color highlight) {
+            this.highlightColor = highlight;
+            return this;
+        }
+        
+        public EtchedBorders shadow(Color shadow) {
+            this.shadowColor = shadow;
+            return this;
+        }
+        
+        public EtchedBorders raised() {
+            raised = true;
+            return this;
+        }
+        
+        public Borders build() {
+            Color inner = raised ? shadowColor : highlightColor;
+            Color outer = raised ? highlightColor : shadowColor;
+            BorderStroke innerStroke = new BorderStroke(inner, BorderStrokeStyle.SOLID, null, new BorderWidths(1));
+            BorderStroke outerStroke = new BorderStroke(outer, BorderStrokeStyle.SOLID, null, new BorderWidths(1), new Insets(1));
+            parent.addBorder(new LineBorder(innerStroke, outerStroke));
             return parent;
         }
     }
@@ -178,15 +219,18 @@ public final class Borders {
         }
         
         public Borders build() {
-            BorderStroke borderStroke = new BorderStroke(
+            parent.addBorder(new LineBorder(buildStroke()));
+            return parent;
+        }
+        
+        // only used internally
+        private BorderStroke buildStroke() {
+            return new BorderStroke(
                 topColor, rightColor, bottomColor, leftColor, 
                 strokeStyle, strokeStyle, strokeStyle, strokeStyle,  
                 new CornerRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius, false), 
                 new BorderWidths(topThickness, rightThickness, bottomThickness, leftThickness),
                 null);
-            
-            parent.addBorder(new LineBorder(borderStroke));
-            return parent;
         }
     }
     

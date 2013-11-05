@@ -60,9 +60,9 @@ public class HelloBorders extends SampleBase {
         Pane root = new Pane();
         
         Button button = new Button("Hello World!");
-        Node wrappedButton = Borders.wrap(button).addEmptyBorder(100)
-                                                 .addLineBorder(Color.RED)
-                                                 .addEmptyBorder(50)
+        Node wrappedButton = Borders.wrap(button).emptyBorder().padding(100).build()
+                                                 .lineBorder().color(Color.RED).thickness(1, 1, 1, 5).build()
+                                                 .emptyBorder().padding(50).build()
                                                  .build();
         root.getChildren().add(wrappedButton);
         

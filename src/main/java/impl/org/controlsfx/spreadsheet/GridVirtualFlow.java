@@ -62,6 +62,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     private SpreadsheetView spreadSheetView;
     private GridViewSkin gridViewSkin;
     /**
+     * Variable used for improvement;
+     */
+    private int firstIndex = -1;
+    private double previousHbarValue = -1;
+    private double previousHBarAmount = -1;
+    /**
      * Store the fixedRow in order to place them at the top when necessary.
      * That is to say, when the VirtualFlow has not already placed one.
      */
@@ -163,10 +169,22 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     protected void layoutTotal() {
         sortRows();
+        
         // When scrolling fast with fixed Rows, cells is empty and not recreated..
         if (getCells().isEmpty()) {
             reconfigureCells();
         }
+        //We do not need to layout if nothing has changed really..
+        //FIXME This will be improved for performance.
+        T firstCell = getFirstVisibleCellWithinViewPort();
+        int newFirstIndex = firstCell != null? firstCell.getIndex(): -2;
+        if(newFirstIndex == firstIndex && previousHbarValue == getHbar().getValue() && previousHBarAmount == getHbar().getVisibleAmount()){
+        	return;
+        }
+        
+        firstIndex = newFirstIndex;
+        previousHbarValue = getHbar().getValue();
+        previousHBarAmount = getHbar().getVisibleAmount();
         for (Cell<?> cell : getCells()) {
             if (cell != null) {
                 cell.requestLayout();

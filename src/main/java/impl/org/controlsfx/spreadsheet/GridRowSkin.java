@@ -37,6 +37,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 
+
 import com.sun.javafx.scene.control.skin.TableRowSkin;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
@@ -290,22 +291,38 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 			double headerWidth, int columnSpan) {
 		return (x+width <hbarValue && columnSpan == 1) || (x> hbarValue+headerWidth);
 	}
-    public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
-
+    /**
+     * FIXME This is currently the exact copy of the method
+     * in the SpreadsheetViewSelectionModel. But since it is a private implementation
+     * we cannot get back that method. 
+     * This will evolve in the future.
+     * @param row
+     * @param column
+     * @param col
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+	public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
+		if (column == null && row >=0) {
+			return null;
+		}
+    	 
         final SpreadsheetGridView tableView = (SpreadsheetGridView) handle.getGridView();
     	final SpreadsheetView spreadsheetView = handle.getView();
-        final SpreadsheetCell cellSpan = tableView.getItems().get(row).get(col);
-        final int infRow = cellSpan.getRow();
-        final int supRow = infRow + cellSpan.getRowSpan();
+    	
 
-        final int infCol = cellSpan.getColumn();
-        final int supCol = infCol + cellSpan.getColumnSpan();
-        for (Object tp : spreadsheetView.getSelectionModel().getSelectedCells()) {
-        	 TablePosition<ObservableList<SpreadsheetCell>, ?> tp1 = ( TablePosition<ObservableList<SpreadsheetCell>, ?>)tp;
-            if (tp1.getRow() >= infRow && tp1.getRow() < supRow && tp1.getColumn() >= infCol && tp1.getColumn() < supCol) {
-                return tp1;
-            }
-        }
-        return null;
+		final SpreadsheetCell cellSpan = tableView.getItems().get(row).get(col);
+		final int infRow = cellSpan.getRow();
+		final int supRow = infRow + cellSpan.getRowSpan();
+		
+		final int infCol = cellSpan.getColumn();
+		final int supCol = infCol + cellSpan.getColumnSpan();
+		
+		for (final TablePosition<ObservableList<SpreadsheetCell>, ?> tp : spreadsheetView.getSelectionModel().getSelectedCells()) {
+		    if (tp.getRow() >= infRow && tp.getRow() < supRow && tp.getColumn() >= infCol && tp.getColumn() < supCol) {
+		        return tp;
+		    }
+		}
+		return null;
     }
 }

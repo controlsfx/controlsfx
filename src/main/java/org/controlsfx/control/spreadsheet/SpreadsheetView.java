@@ -34,9 +34,16 @@ import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.sun.javafx.collections.MappingChange;
+import com.sun.javafx.collections.NonIterableChange;
+import com.sun.javafx.collections.NonIterableChange.GenericAddRemoveChange;
+import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
+import com.sun.javafx.scene.control.SelectedCellsMap;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -60,6 +67,7 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
@@ -280,7 +288,7 @@ public class SpreadsheetView extends Control {
         /**
          * Add a listener to the selection model in order to edit the spanned cells when clicked
          */
-        SpreadsheetViewSelectionModel<?> selectionModel = new SpreadsheetViewSelectionModel<>(this);
+        SpreadsheetViewSelectionModel selectionModel = new SpreadsheetViewSelectionModel(this);
         cellsView.setSelectionModel(selectionModel);
         selectionModel.setCellSelectionEnabled(true);
         selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
@@ -309,7 +317,8 @@ public class SpreadsheetView extends Control {
 						&& !arg0.isMetaDown()
 						&& !arg0.isShiftDown()
 						&& arg0.getCode().compareTo(KeyCode.ESCAPE) != 0){
-					TablePosition<ObservableList<SpreadsheetCell>, ?> position = cellsView.getFocusModel().getFocusedCell();
+					@SuppressWarnings("unchecked")
+					TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
 					cellsView.edit(position.getRow(), position.getTableColumn());
 				}
 			}
@@ -617,7 +626,7 @@ public class SpreadsheetView extends Control {
 
         // TODO move into a property
         if(grid.getRows() != null){
-            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = (ObservableList<ObservableList<SpreadsheetCell>>)(Object)FXCollections.observableArrayList(grid.getRows());
+            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections.observableArrayList(grid.getRows());
             cellsView.getItems().clear();
             cellsView.setItems(observableRows);
 
@@ -641,7 +650,6 @@ public class SpreadsheetView extends Control {
                         return new ReadOnlyObjectWrapper<SpreadsheetCell>(p.getValue().get(col));
                     }
                 });
-                final SpreadsheetView view = this;
                 // We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
                 column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
                     @Override
@@ -650,7 +658,7 @@ public class SpreadsheetView extends Control {
                     }
                 });
                 cellsView.getColumns().add(column);
-                final SpreadsheetColumn<?> spreadsheetColumns = new SpreadsheetColumn(column,this, i);
+                final SpreadsheetColumn<?> spreadsheetColumns = new SpreadsheetColumn<>(column,this, i);
                 columns.add(spreadsheetColumns);
             }
         }
@@ -974,14 +982,22 @@ public class SpreadsheetView extends Control {
      *
      * @param <S>
      */
-    private class SpreadsheetViewSelectionModel<S> extends TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
+    private class SpreadsheetViewSelectionModel extends TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
 
         private boolean ctrl = false;   // Register state of 'ctrl' key
         private boolean shift = false;  // Register state of 'shift' key
         private boolean key = false;    // Register if we last touch the keyboard or the mouse
         private boolean drag = false;	//register if we are dragging (no edition)
         private MouseEvent mouseEvent;
-
+        private boolean makeAtomic;
+        // the only 'proper' internal data structure, selectedItems and selectedIndices
+        // are both 'read-only and unbacked'.
+		private final SelectedCellsMap<TablePosition<ObservableList<SpreadsheetCell>,?>> selectedCellsMap;
+        
+		// we create a ReadOnlyUnbackedObservableList of selectedCells here so
+        // that we can fire custom list change events.
+        private final ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>,?>> selectedCellsSeq;
+        
         /**
          * Make the tableView move when selection operating outside bounds
          */
@@ -1018,8 +1034,6 @@ public class SpreadsheetView extends Control {
                 removeEventHandler(MouseEvent.MOUSE_RELEASED, this);
             }
         };
-
-        
         
         /***********************************************************************
          *                                                                     
@@ -1063,12 +1077,33 @@ public class SpreadsheetView extends Control {
                     mouseEvent = e;
                 }
             });
-            selectedCells = FXCollections.<TablePosition<ObservableList<SpreadsheetCell>,?>>observableArrayList();
+            
+            selectedCellsMap = new SelectedCellsMap<>(new ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>,?>>() {
+                @Override public void onChanged(final Change<? extends TablePosition<ObservableList<SpreadsheetCell>,?>> c) {
+                    handleSelectedCellsListChangeEvent(c);
+                }
+            });
+            
+            selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>,?>>() {
+                @Override public TablePosition<ObservableList<SpreadsheetCell>,?> get(int i) {
+                    return selectedCellsMap.get(i);
+                }
+
+                @Override public int size() {
+                    return selectedCellsMap.size();
+                }
+            };
         }
 
-     
-       
+        private void handleSelectedCellsListChangeEvent(ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
+           if (makeAtomic) {
+                return;
+            }
 
+            selectedCellsSeq.callObservers(new MappingChange<TablePosition<ObservableList<SpreadsheetCell>, ?>, TablePosition<ObservableList<SpreadsheetCell>, ?>>(c, MappingChange.NOOP_MAP, selectedCellsSeq));
+            c.reset();
+        }
+        
         /**
          * *********************************************************************
          *                                                                     *
@@ -1079,7 +1114,6 @@ public class SpreadsheetView extends Control {
 
         @Override
         public void select(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
-
             if (row < 0 || row >= getItemCount()) {
                 return;
             }
@@ -1149,9 +1183,7 @@ public class SpreadsheetView extends Control {
             }
             old = posFinal;
 
-            if (!getSelectedCells().contains(posFinal)) {
-            	getSelectedCells().add(posFinal);
-            }
+            selectedCellsMap.add(posFinal);
 
             updateScroll(posFinal);
             addSelectedRowsAndColumns(posFinal);
@@ -1165,9 +1197,12 @@ public class SpreadsheetView extends Control {
             getTableView().getFocusModel().focus(posFinal.getRow(), posFinal.getTableColumn());
         }
 
+        /**
+         * We try to make visible the rows that may be hidden by Fixed rows.
+         * @param posFinal
+         */
         private void updateScroll(TablePosition<ObservableList<SpreadsheetCell>, ?> posFinal) {
         	
-            //We try to make visible the rows that may be hidden by Fixed rows
             // We don't want to do any scrollTo call when dragging
             if(!drag && getCellsViewSkin().getCellsSize() != 0 && getFixedRows().size() != 0){
 				
@@ -1184,47 +1219,145 @@ public class SpreadsheetView extends Control {
         }
 
 
-        @Override
+        @SuppressWarnings("unchecked")
+		@Override
         public void clearSelection(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
+        	
             final TablePosition<ObservableList<SpreadsheetCell>, ?> tp = new TablePosition<>(getTableView(), row, column);
-            if (isSelectedRange(row, column, tp.getColumn()) != null) {
-                final TablePosition<ObservableList<SpreadsheetCell>, ?> tp1 = isSelectedRange(row, column, tp.getColumn());
-                getSelectedCells().remove(tp1);
+            TablePosition<ObservableList<SpreadsheetCell>, ?> tp1;
+            if ((tp1 = isSelectedRange(row, column, tp.getColumn())) != null) {
+                selectedCellsMap.remove(tp1);
                 removeSelectedRowsAndColumns(tp1);
                 focus(tp1.getRow());
             } else {
-
-                final boolean csMode = isCellSelectionEnabled();
-
-                for (final TablePosition<ObservableList<SpreadsheetCell>, ?> pos : getSelectedCells()) {
-                    if (!csMode && pos.getRow() == row || csMode && pos.equals(tp)) {
-                    	getSelectedCells().remove(pos);
+                for (TablePosition<ObservableList<SpreadsheetCell>, ?> pos : getSelectedCells()) {
+                    if (pos.equals(tp)) {
+                        selectedCellsMap.remove(pos);
                         removeSelectedRowsAndColumns(pos);
-
                         // give focus to this cell index
                         focus(row);
-
                         return;
                     }
                 }
             }
         }
 
+        @Override public void selectRange(int minRow, TableColumnBase<ObservableList<SpreadsheetCell>, ?> minColumn,
+                int maxRow, TableColumnBase<ObservableList<SpreadsheetCell>, ?> maxColumn) {
+			makeAtomic = true;
+			
+			final int itemCount = getItemCount();
+			final boolean isCellSelectionEnabled = isCellSelectionEnabled();
+			
+			final int minColumnIndex = getTableView().getVisibleLeafIndex((TableColumn<ObservableList<SpreadsheetCell>, ?>) minColumn);
+			final int maxColumnIndex = getTableView().getVisibleLeafIndex((TableColumn<ObservableList<SpreadsheetCell>, ?>)maxColumn);
+			final int _minColumnIndex = Math.min(minColumnIndex, maxColumnIndex);
+			final int _maxColumnIndex = Math.max(minColumnIndex, maxColumnIndex);
+			HashSet<Integer> selectedRows = new HashSet<>();
+			HashSet<Integer> selectedColumns = new HashSet<>();
+			
+			for (int _row = minRow; _row <= maxRow; _row++) {
+				for (int _col = _minColumnIndex; _col <= _maxColumnIndex; _col++) {
+					// begin copy/paste of select(int, column) method (with some
+					// slight modifications)
+					if (_row < 0 || _row >= itemCount) continue;
+					
+					final TableColumn<ObservableList<SpreadsheetCell>, ?> column = getTableView().getVisibleLeafColumn(_col);
+					
+					// if I'm in cell selection mode but the column is null, I don't want
+					// to select the whole row instead...
+					if (column == null && isCellSelectionEnabled) continue;
+					
+					TablePosition<ObservableList<SpreadsheetCell>, ?> pos = new TablePosition<>(getTableView(), _row, column);
+					
+					pos = getVisibleCell(_row, column, pos.getColumn());
+					
+					//We store all the selectedColumn and Rows, we will update just once at the end
+					final SpreadsheetCell cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
+		            for(int i=cell.getRow();i<cell.getRowSpan()+cell.getRow();++i){
+		            	selectedColumns.add(i);
+		                for(int j=cell.getColumn();j<cell.getColumnSpan()+cell.getColumn();++j){
+		                	selectedRows.add(j);
+		                }
+		            }
+					selectedCellsMap.add(pos);
+					
+					// end copy/paste
+				}
+			}
+			makeAtomic = false;
+			
+			//Then we update visuals just once
+			getSpreadsheetViewSkin().getSelectedRows().addAll(selectedColumns);
+			getSpreadsheetViewSkin().getSelectedColumns().addAll(selectedRows);
+			
+			// fire off events
+			setSelectedIndex(maxRow);
+            setSelectedItem(getModelItem(maxRow));
+            if (getTableView().getFocusModel() == null) {
+                return;
+            }
 
+            getTableView().getFocusModel().focus(maxRow, (TableColumn<ObservableList<SpreadsheetCell>, ?>) maxColumn);
+			
+            final int startChangeIndex = selectedCellsMap.indexOf(new TablePosition<>(getTableView(), minRow, (TableColumn<ObservableList<SpreadsheetCell>, ?>) minColumn));
+            final int endChangeIndex = selectedCellsMap.indexOf(new TablePosition<>(getTableView(), maxRow, (TableColumn<ObservableList<SpreadsheetCell>, ?>) maxColumn));
+            handleSelectedCellsListChangeEvent(new NonIterableChange.SimpleAddChange<>(startChangeIndex, endChangeIndex + 1, selectedCellsSeq));
+		}
+        
+        @Override public void selectAll() {
+            if (getSelectionMode() == SelectionMode.SINGLE) return;
+
+            quietClearSelection();
+
+            List<TablePosition<ObservableList<SpreadsheetCell>,?>> indices = new ArrayList<TablePosition<ObservableList<SpreadsheetCell>, ?>>();
+            TableColumn<ObservableList<SpreadsheetCell>, ?> column;
+            TablePosition<ObservableList<SpreadsheetCell>, ?> tp = null;
+			
+            for (int col = 0; col < getTableView().getVisibleLeafColumns().size(); col++) {
+                column = getTableView().getVisibleLeafColumns().get(col);
+                for (int row = 0; row < getItemCount(); row++) {
+                    tp = new TablePosition<>(getTableView(), row, column);
+                    indices.add(tp);
+                }
+            }
+            selectedCellsMap.setAll(indices);
+            
+            //Then we update visuals just once
+			ArrayList<Integer> selectedColumns = new ArrayList<>();
+			for (int col = 0; col < getGrid().getColumnCount(); col++) {
+				selectedColumns.add(col);
+			}
+
+			ArrayList<Integer> selectedRows = new ArrayList<>();
+			for (int row = 0; row < getGrid().getRowCount(); row++) {
+				selectedRows.add(row);
+            }
+			getSpreadsheetViewSkin().getSelectedRows().addAll(selectedRows);
+			getSpreadsheetViewSkin().getSelectedColumns().addAll(selectedColumns);
+			
+            if (tp != null) {
+                select(tp.getRow(), tp.getTableColumn());
+                getTableView().getFocusModel().focus(tp.getRow(), tp.getTableColumn());
+            }
+        }
+        
         @Override
         public boolean isSelected(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
             // When in cell selection mode, we currently do NOT support selecting
             // entire rows, so a isSelected(row, null)
             // should always return false.
-
-            if (isCellSelectionEnabled() && column == null || row <0) {
+            if (column == null || row <0) {
                 return false;
             }
-            final TablePosition<ObservableList<SpreadsheetCell>, ?> tp1 = new TablePosition<>(getTableView(), row, column);
-            if (isSelectedRange(row, column, tp1.getColumn()) != null) {
-                return true;
-            } else {
-                return false;
+            
+            int columnIndex = getTableView().getVisibleLeafIndex(column);
+            
+            if(getCellsViewSkin().getCellsSize() != 0){
+            	TablePosition<ObservableList<SpreadsheetCell>, ?> posFinal = getVisibleCell(row, column, columnIndex);
+            	return selectedCellsMap.isSelected(posFinal.getRow(), posFinal.getColumn());
+            }else{
+            	return selectedCellsMap.isSelected(row, columnIndex);
             }
         }
 
@@ -1236,9 +1369,10 @@ public class SpreadsheetView extends Control {
          * @param col
          * @return
          */
-        public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
+        @SuppressWarnings("unchecked")
+		public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
 
-            if (isCellSelectionEnabled() && column == null && row >=0) {
+            if (column == null && row >=0) {
                 return null;
             }
 
@@ -1250,8 +1384,6 @@ public class SpreadsheetView extends Control {
             final int supCol = infCol + cellSpan.getColumnSpan();
 
             for (final TablePosition<ObservableList<SpreadsheetCell>, ?> tp : getSelectedCells()) {
-                //boolean columnMatch = (column != null && column.equals(tp.getTableColumn()));
-
                 if (tp.getRow() >= infRow && tp.getRow() < supRow && tp.getColumn() >= infCol && tp.getColumn() < supCol) {
                     return tp;
                 }
@@ -1287,21 +1419,42 @@ public class SpreadsheetView extends Control {
         }
 
 		@Override
-		public void clearAndSelect(int arg0,
-				TableColumn<ObservableList<SpreadsheetCell>, ?> arg1) {
-			quietClearSelection();
-            select(arg0, arg1);
+		public void clearAndSelect(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
+			// RT-33558 if this method has been called with a given row/column
+            // intersection, and that row/column intersection is the only
+            // selection currently, then this method becomes a no-op.
+            if (getSelectedCells().size() == 1 && isSelected(row, column)) {
+                return;
+            }
+            
+			makeAtomic = true;
+			// firstly we make a copy of the selection, so that we can send out
+            // the correct details in the selection change event
+			List<TablePosition<ObservableList<SpreadsheetCell>, ?>> previousSelection = new ArrayList<>(selectedCellsMap.getSelectedCells());
 			
+			// then clear the current selection
+            clearSelection();
+            
+            // and select the new row
+            select(row, column);
+			
+            makeAtomic = false;
+            
+            // fire off a single add/remove/replace notification (rather than
+            // individual remove and add notifications) - see RT-33324
+            TableColumn<ObservableList<SpreadsheetCell>, ?> columnFinal = getTableView().getColumns().get(old.getColumn());
+            int changeIndex = selectedCellsSeq.indexOf(new TablePosition<>(getTableView(), old.getRow(), columnFinal));
+            GenericAddRemoveChange<TablePosition<ObservableList<SpreadsheetCell>, ?>> change = new NonIterableChange.GenericAddRemoveChange<>(
+                    changeIndex, changeIndex+1, previousSelection, selectedCellsSeq);
+            handleSelectedCellsListChangeEvent(change);
 		}
 
-		@Override
-		public ObservableList<TablePosition> getSelectedCells() {
-			 return (ObservableList<TablePosition>)(Object)selectedCells;
-		}
-
-		// the only 'proper' internal observableArrayList, selectedItems and selectedIndices
-        // are both 'read-only and unbacked'.
-        private final ObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCells;
+		/**
+		 * FIXME I don't understand why TablePosition is not parameterized in the API..
+		 */
+        @Override public ObservableList<TablePosition> getSelectedCells() {
+            return (ObservableList<TablePosition>)(Object)selectedCellsSeq;
+        }
         
 		@Override
 		public void selectAboveCell() {
@@ -1354,23 +1507,26 @@ public class SpreadsheetView extends Control {
 		
 		@Override
         public void clearSelection() {
-			setSelectedIndex(-1);
-            setSelectedItem(getModelItem(-1));
-            focus(-1);
+			 if (! makeAtomic) {
+				setSelectedIndex(-1);
+	            setSelectedItem(getModelItem(-1));
+	            focus(-1);
+			}
             quietClearSelection();
         }
 		
 		private void quietClearSelection() {
-            getSelectedCells().clear();
+			selectedCellsMap.clear();
             getSpreadsheetViewSkin().getSelectedRows().clear();
             getSpreadsheetViewSkin().getSelectedColumns().clear();
         }
 
+		@SuppressWarnings("unchecked")
 		private TablePosition<ObservableList<SpreadsheetCell>, ?> getFocusedCell() {
             if (getTableView().getFocusModel() == null) {
                 return new TablePosition<>(getTableView(), -1, null);
             }
-            return cellsView.getFocusModel().getFocusedCell();
+            return (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
         }
 		private TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> column, int offset) {
             final int columnIndex = getTableView().getVisibleLeafIndex(column);

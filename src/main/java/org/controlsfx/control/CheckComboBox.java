@@ -44,7 +44,7 @@ import javafx.scene.control.Skin;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within
- * a ComboBox-like way. Each row item shows a {@link CheckBox}, and the state
+ * a ComboBox-like control. Each row item shows a {@link CheckBox}, and the state
  * of each row can be queried via the {@link #checkModelProperty() check model}.
  *
  * @param <T> The type of the data in the ComboBox.

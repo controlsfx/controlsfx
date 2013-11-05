@@ -42,6 +42,7 @@ import com.sun.javafx.collections.MappingChange;
 import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 
+// not public API
 abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     
     /***********************************************************************

@@ -40,6 +40,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.util.StringConverter;
 
 /**
  * 
@@ -500,7 +501,7 @@ public abstract class SpreadsheetCellEditor<T> {
 	 * A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.DateType} typed cells.
 	 * It displays a {@link DatePicker} where the user can choose a date through a visual
 	 * calendar. The user can also type the date directly in the expected type format
-	 * (DD/MM/YYYY)
+	 * (dd/MM/yyyy)
 	 */
 	public static class DateEditor extends SpreadsheetCellEditor<LocalDate> {
 
@@ -514,9 +515,10 @@ public abstract class SpreadsheetCellEditor<T> {
 		/***************************************************************************
 		 * * Constructor * *
 		 **************************************************************************/
-		public DateEditor(SpreadsheetView view) {
+		public DateEditor(SpreadsheetView view, StringConverter<LocalDate> converter) {
 			super(view);
 			datePicker = new DatePicker();
+			datePicker.setConverter(converter);
 		}
 
 		/***************************************************************************

@@ -437,7 +437,7 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override public SpreadsheetCellEditor<LocalDate> createEditor(SpreadsheetView view) {
-			return new SpreadsheetCellEditor.DateEditor(view);
+			return new SpreadsheetCellEditor.DateEditor(view,converter);
 		}
 
 		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {

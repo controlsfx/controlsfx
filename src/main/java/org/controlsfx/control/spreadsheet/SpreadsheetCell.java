@@ -280,9 +280,9 @@ public class SpreadsheetCell implements Serializable {
  	private transient BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
  	
  	/**
-      * Return if this cell can be edited or not.
+      * Return if this cell has a comment or not.
       * 
-      * @return true if this cell is editable.
+      * @return true if this cell has a comment.
       */
      public final boolean isCommented() {
          return commented == null ? true : commented.get();

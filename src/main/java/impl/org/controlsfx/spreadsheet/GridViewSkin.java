@@ -111,7 +111,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     /** The editor. */
-    private GridCellEditor spreadsheetCellEditorImpl;
+    private GridCellEditor gridCellEditor;
     
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
@@ -130,7 +130,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         super(handle.getGridView());
         this.handle = handle;
         this.spreadsheetView = handle.getView();
-        spreadsheetCellEditorImpl = new GridCellEditor(handle);
+        gridCellEditor = new GridCellEditor(handle);
         TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
         tableView.setEditable(true);
 
@@ -444,7 +444,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
 	public GridCellEditor getSpreadsheetCellEditorImpl() {
-		return spreadsheetCellEditorImpl;
+		return gridCellEditor;
 	}
 	
 	/**

@@ -67,6 +67,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     private int firstIndex = -1;
     private double previousHbarValue = -1;
     private double previousHBarAmount = -1;
+    private boolean copyPaste = true;//We're copy/pasting so layout is necessary
     /**
      * Store the fixedRow in order to place them at the top when necessary.
      * That is to say, when the VirtualFlow has not already placed one.
@@ -86,6 +87,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             }
         };
         getVbar().valueProperty().addListener(listenerY);
+        
 
         // FIXME Until RT-31777 is resolved
         getHbar().setUnitIncrement(10);
@@ -106,8 +108,10 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 			@Override
 			public void onChanged(
 					javafx.collections.ListChangeListener.Change<? extends SpreadsheetCell> arg0) {
+						copyPaste = false;
 						layoutTotal();		
 						layoutFixedRows();
+						copyPaste = true;
 			}
 		});
     }
@@ -178,7 +182,10 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         //FIXME This will be improved for performance.
         T firstCell = getFirstVisibleCellWithinViewPort();
         int newFirstIndex = firstCell != null? firstCell.getIndex(): -2;
-        if(newFirstIndex == firstIndex && previousHbarValue == getHbar().getValue() && previousHBarAmount == getHbar().getVisibleAmount()){
+        if(copyPaste &&
+        		newFirstIndex == firstIndex 
+        		&& previousHbarValue == getHbar().getValue() 
+        		&& previousHBarAmount == getHbar().getVisibleAmount()){
         	return;
         }
         

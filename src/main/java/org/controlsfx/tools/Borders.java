@@ -40,6 +40,8 @@ import javafx.scene.paint.Color;
 
 public final class Borders {
     
+    private static final Color DEFAULT_BORDER_COLOR = Color.DARKGRAY;
+    
     private final Node node;
     private final List<Border> borders;
     
@@ -111,8 +113,22 @@ public final class Borders {
         }
         
         public Borders build() {
-            parent.addBorder(new EmptyBorder(top, right, bottom, left));
+            parent.addBorder(new StrokeBorder(buildStroke()));
             return parent;
+        }
+        
+        public Node buildAll() {
+            build();
+            return parent.build();
+        }
+        
+        private BorderStroke buildStroke() {
+            return new BorderStroke(
+                null, 
+                BorderStrokeStyle.NONE,
+                null, 
+                new BorderWidths(top, right, bottom, left),
+                Insets.EMPTY);
         }
     }
     
@@ -121,7 +137,7 @@ public final class Borders {
         
         private boolean raised = false;
         
-        private Color highlightColor = Color.DARKGRAY;
+        private Color highlightColor = DEFAULT_BORDER_COLOR;
         private Color shadowColor = Color.WHITE;
         
         private EtchedBorders(Borders parent) { 
@@ -148,8 +164,13 @@ public final class Borders {
             Color outer = raised ? highlightColor : shadowColor;
             BorderStroke innerStroke = new BorderStroke(inner, BorderStrokeStyle.SOLID, null, new BorderWidths(1));
             BorderStroke outerStroke = new BorderStroke(outer, BorderStrokeStyle.SOLID, null, new BorderWidths(1), new Insets(1));
-            parent.addBorder(new LineBorder(innerStroke, outerStroke));
+            parent.addBorder(new StrokeBorder(innerStroke, outerStroke));
             return parent;
+        }
+        
+        public Node buildAll() {
+            build();
+            return parent.build();
         }
     }
     
@@ -158,10 +179,15 @@ public final class Borders {
         
         private BorderStrokeStyle strokeStyle = BorderStrokeStyle.SOLID;
         
-        private Color topColor;
-        private Color rightColor;
-        private Color bottomColor;
-        private Color leftColor;
+        private Color topColor = DEFAULT_BORDER_COLOR;
+        private Color rightColor = DEFAULT_BORDER_COLOR;
+        private Color bottomColor = DEFAULT_BORDER_COLOR;
+        private Color leftColor = DEFAULT_BORDER_COLOR;
+        
+        private double topPadding = 20;
+        private double rightPadding = 20;
+        private double bottomPadding = 20;
+        private double leftPadding = 20;
         
         private double topThickness = 1;
         private double rightThickness = 1;
@@ -219,18 +245,24 @@ public final class Borders {
         }
         
         public Borders build() {
-            parent.addBorder(new LineBorder(buildStroke()));
+            BorderStroke borderStroke = new BorderStroke(
+                    topColor, rightColor, bottomColor, leftColor, 
+                    strokeStyle, strokeStyle, strokeStyle, strokeStyle,  
+                    new CornerRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius, false), 
+                    new BorderWidths(topThickness, rightThickness, bottomThickness, leftThickness),
+                    null);
+            
+            BorderStroke emptyStroke = new EmptyBorders(parent)
+                .padding(topPadding, rightPadding, bottomPadding, leftPadding)
+                .buildStroke();
+            
+            parent.addBorder(new StrokeBorder(emptyStroke, borderStroke));
             return parent;
         }
         
-        // only used internally
-        private BorderStroke buildStroke() {
-            return new BorderStroke(
-                topColor, rightColor, bottomColor, leftColor, 
-                strokeStyle, strokeStyle, strokeStyle, strokeStyle,  
-                new CornerRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius, false), 
-                new BorderWidths(topThickness, rightThickness, bottomThickness, leftThickness),
-                null);
+        public Node buildAll() {
+            build();
+            return parent.build();
         }
     }
     
@@ -251,30 +283,10 @@ public final class Borders {
     
     // --- Border implementations
     
-    private static class EmptyBorder implements Border {
-        private final double top;
-        private final double right;
-        private final double bottom;
-        private final double left;
-        
-        public EmptyBorder(double top, double right, double bottom, double left) {
-            this.top = top;
-            this.right = right;
-            this.bottom = bottom;
-            this.left = left;
-        }
-
-        @Override public Node wrap(Node n) {
-            StackPane stack = new StackPane(n);
-            stack.setPadding(new Insets(top, right, bottom, left));
-            return stack;
-        }
-    }
-    
-    private static class LineBorder implements Border {
+    private static class StrokeBorder implements Border {
         private final BorderStroke[] borderStrokes;
         
-        public LineBorder(BorderStroke... borderStrokes) {
+        public StrokeBorder(BorderStroke... borderStrokes) {
             this.borderStrokes = borderStrokes;
         }
 

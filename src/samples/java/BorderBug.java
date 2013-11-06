@@ -24,8 +24,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
 
+
+import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -49,55 +50,54 @@ import org.controlsfx.tools.Borders.EmptyBorders;
 
 import fxsampler.SampleBase;
 
-public class HelloBorders extends SampleBase {
+public class BorderBug extends Application {
     
     public static void main(String[] args) {
         launch(args);
     }
     
-    @Override public String getSampleName() {
-        return "Borders";
-    }
-    
-    @Override public String getJavaDocURL() {
-        return null; //Utils.JAVADOC_BASE + "org/controlsfx/tools/Borders.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
-    }
-    
-    @Override public Node getPanel(Stage stage) {
+    public Node getPanel(Stage stage) {
         Pane root = new Pane();
         
         Button button = new Button("Hello World!");
-        Node wrappedButton = Borders.wrap(button)
-                                                 .emptyBorder()
-                                                     .padding(20)
-                                                     .build()
-                                                 .lineBorder()
-                                                     .color(Color.GREEN)
-                                                     .thickness(1, 1, 1, 5)
-                                                     .radius(0, 5, 5, 0)
-                                                     .build()
-//                                                 .emptyBorder()
-//                                                     .padding(20)
-//                                                     .build()
-//                                                 .etchedBorder()
-//                                                     .build()
-//                                                 .emptyBorder()
-//                                                     .padding(20)
-//                                                     .build()
-                                                 .build();
         
+        StackPane wrappedButton = new StackPane(button);
+        wrappedButton.setTranslateX(20);
+        wrappedButton.setTranslateY(20);
+
+        BorderStroke emptyBorder1 = new BorderStroke(
+                Color.TRANSPARENT, 
+                BorderStrokeStyle.NONE,
+                null, 
+                new BorderWidths(50),
+                Insets.EMPTY);
+        
+        BorderStroke emptyBorder2 = new BorderStroke(
+                Color.TRANSPARENT, 
+                BorderStrokeStyle.SOLID,
+                null, 
+                new BorderWidths(80),
+                Insets.EMPTY);
+        
+        BorderStroke innerBorder = new BorderStroke(
+                Color.AQUA, 
+                BorderStrokeStyle.SOLID,  
+                new CornerRadii(0, false), 
+                new BorderWidths(5),
+                Insets.EMPTY);
+        
+        BorderStroke outerBorder = new BorderStroke(
+                Color.BLUE, 
+                BorderStrokeStyle.SOLID, 
+                null, 
+                new BorderWidths(1), 
+                Insets.EMPTY);
+        
+        wrappedButton.setBorder(new Border(emptyBorder2, innerBorder, emptyBorder1, outerBorder));
         
         root.getChildren().add(wrappedButton);
         
         return root;
-    }
-    
-    @Override public String getSampleDescription() {
-        return null;
     }
     
     @Override public void start(Stage stage) {

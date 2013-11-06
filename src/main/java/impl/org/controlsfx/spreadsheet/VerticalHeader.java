@@ -264,7 +264,7 @@ public class VerticalHeader extends StackPane {
 				label.setText("");
 				label.resize(verticalHeaderWidth.get(), hbar.getHeight());
 				label.relocate(snappedLeftInset(),
-						getHeight() - hbar.getHeight());
+						 snapSize(skin.getSkinnable().getHeight()) - hbar.getHeight());
 				label.getStyleClass().clear();
 				label.setContextMenu(blankContextMenu);
 			}

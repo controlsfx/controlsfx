@@ -48,6 +48,7 @@ import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Region;
+import javafx.stage.Screen;
 import javafx.util.Callback;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -69,7 +70,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     /** Default height of a row. */
     public static final double DEFAULT_CELL_HEIGHT;
     
-    static final double DATE_CELL_MIN_WIDTH = 105;
+    static final double DATE_CELL_MIN_WIDTH = 200-Screen.getPrimary().getDpi();
     static {
         double cell_size = 24.0;
         try {

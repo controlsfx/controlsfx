@@ -405,7 +405,11 @@ public abstract class SpreadsheetCellType<T> {
 			this(new StringConverter<LocalDate>() {
 				@Override
 				public String toString(LocalDate item) {
-					return item.format(DateTimeFormatter.ofPattern(format));
+					if (item != null) {
+						return item.format(DateTimeFormatter.ofPattern(format));
+					}else{
+						return "";
+					}
 				}
 
 				@Override

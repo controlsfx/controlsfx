@@ -193,9 +193,15 @@ public class GridCellEditor {
 			viewCell.selectedProperty().removeListener(il);
 		}
 		il = null;
-
-		handle.getCellsViewSkin().getVBar().valueProperty().removeListener(editorListener);
-		handle.getView().disabledProperty().removeListener(editorListener);
+		/**
+		 * editorListener is never supposed to be null here.
+		 * But if several events are fired by mistake, we should just
+		 * let it go smootly instead of throwing exceptions.
+		 */
+		if(editorListener != null){
+			handle.getCellsViewSkin().getVBar().valueProperty().removeListener(editorListener);
+			handle.getView().disabledProperty().removeListener(editorListener);
+		}
 		editorListener = null;
 		this.modelCell = null;
 		this.viewCell = null;

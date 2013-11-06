@@ -508,9 +508,15 @@ public abstract class SpreadsheetCellEditor<T> {
 		/***************************************************************************
 		 * * Protected Fields * *
 		 **************************************************************************/
-		protected final DatePicker datePicker;
-		protected EventHandler<KeyEvent> eh;
-		protected ChangeListener<LocalDate> cl;
+		private final DatePicker datePicker;
+		private EventHandler<KeyEvent> eh;
+		private ChangeListener<LocalDate> cl;
+		/**
+		 * This is needed because "endEdit" will call our "end" method
+		 * too late when pressing enter, so several "endEdit" will be called.
+		 * So this prevent that to happen.
+		 */
+		private boolean ending = false; 
 
 		/***************************************************************************
 		 * * Constructor * *
@@ -568,7 +574,9 @@ public abstract class SpreadsheetCellEditor<T> {
 				@Override
 				public void handle(KeyEvent t) {
 					if (t.getCode() == KeyCode.ENTER) {
+						ending = true;
 						endEdit(true);
+						ending = false;
 					} else if (t.getCode() == KeyCode.ESCAPE) {
 						endEdit(false);
 					}
@@ -582,7 +590,8 @@ public abstract class SpreadsheetCellEditor<T> {
 				@Override
 				public void changed(ObservableValue<? extends LocalDate> arg0,
 						LocalDate arg1, LocalDate arg2) {
-							endEdit(true);
+							if(!ending)
+								endEdit(true);
 				}
 			};
 			datePicker.valueProperty().addListener(cl);

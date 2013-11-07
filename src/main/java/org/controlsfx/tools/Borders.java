@@ -29,14 +29,23 @@ package org.controlsfx.tools;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotResult;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 public final class Borders {
     
@@ -113,7 +122,7 @@ public final class Borders {
         }
         
         public Borders build() {
-            parent.addBorder(new StrokeBorder(buildStroke()));
+            parent.addBorder(new StrokeBorder(null, buildStroke()));
             return parent;
         }
         
@@ -135,6 +144,7 @@ public final class Borders {
     public class EtchedBorders {
         private final Borders parent;
         
+        private String title;
         private boolean raised = false;
         
         private Color highlightColor = DEFAULT_BORDER_COLOR;
@@ -159,12 +169,17 @@ public final class Borders {
             return this;
         }
         
+        public EtchedBorders title(String title) {
+            this.title = title;
+            return this;
+        }
+        
         public Borders build() {
             Color inner = raised ? shadowColor : highlightColor;
             Color outer = raised ? highlightColor : shadowColor;
             BorderStroke innerStroke = new BorderStroke(inner, BorderStrokeStyle.SOLID, null, new BorderWidths(1));
             BorderStroke outerStroke = new BorderStroke(outer, BorderStrokeStyle.SOLID, null, new BorderWidths(1), new Insets(1));
-            parent.addBorder(new StrokeBorder(innerStroke, outerStroke));
+            parent.addBorder(new StrokeBorder(title, innerStroke, outerStroke));
             return parent;
         }
         
@@ -177,6 +192,8 @@ public final class Borders {
     public class LineBorders {
         private final Borders parent;
         
+        private String title;
+        
         private BorderStrokeStyle strokeStyle = BorderStrokeStyle.SOLID;
         
         private Color topColor = DEFAULT_BORDER_COLOR;
@@ -184,10 +201,10 @@ public final class Borders {
         private Color bottomColor = DEFAULT_BORDER_COLOR;
         private Color leftColor = DEFAULT_BORDER_COLOR;
         
-        private double topPadding = 20;
-        private double rightPadding = 20;
-        private double bottomPadding = 20;
-        private double leftPadding = 20;
+        private double topPadding = 10;
+        private double rightPadding = 10;
+        private double bottomPadding = 10;
+        private double leftPadding = 10;
         
         private double topThickness = 1;
         private double rightThickness = 1;
@@ -244,6 +261,11 @@ public final class Borders {
             return this;
         }
         
+        public LineBorders title(String title) {
+            this.title = title;
+            return this;
+        }
+        
         public Borders build() {
             BorderStroke borderStroke = new BorderStroke(
                     topColor, rightColor, bottomColor, leftColor, 
@@ -252,11 +274,16 @@ public final class Borders {
                     new BorderWidths(topThickness, rightThickness, bottomThickness, leftThickness),
                     null);
             
-            BorderStroke emptyStroke = new EmptyBorders(parent)
+            BorderStroke outerPadding = new EmptyBorders(parent)
                 .padding(topPadding, rightPadding, bottomPadding, leftPadding)
                 .buildStroke();
             
-            parent.addBorder(new StrokeBorder(emptyStroke, borderStroke));
+            BorderStroke innerPadding = new EmptyBorders(parent).padding(15).buildStroke();
+            
+            parent.addBorder(new StrokeBorder(null, outerPadding));
+            parent.addBorder(new StrokeBorder(title, borderStroke));
+            parent.addBorder(new StrokeBorder(null, innerPadding));
+            
             return parent;
         }
         
@@ -284,17 +311,100 @@ public final class Borders {
     // --- Border implementations
     
     private static class StrokeBorder implements Border {
+        private static final int TITLE_PADDING = 3;
+        
+        private final String title;
         private final BorderStroke[] borderStrokes;
         
-        public StrokeBorder(BorderStroke... borderStrokes) {
+        public StrokeBorder(String title, BorderStroke... borderStrokes) {
+            this.title = title;
             this.borderStrokes = borderStrokes;
         }
 
-        @Override public Node wrap(Node n) {
-            StackPane stack = new StackPane(n);
-            stack.setBorder(new javafx.scene.layout.Border(borderStrokes));
-//            stack.setPadding(new Insets(5));
-            return stack;
+        @Override public Node wrap(final Node n) {
+            StackPane pane = new StackPane() {
+                Label titleLabel;
+                
+                {
+                    // add in the node we are wrapping
+                    getChildren().add(n);
+                    
+                    
+                    // if the title string is set, then also add in the title label
+                    if (title != null) {
+                        titleLabel = new Label(title);
+                        updateTitleLabelFill();
+                        
+                        // when the scene changes, we should update the title
+                        // label fill (although realistically, this only ever 
+                        // happens on startup).
+                        n.sceneProperty().addListener(new InvalidationListener() {
+                            @Override public void invalidated(Observable o) {
+                                updateTitleLabelFill();
+                            }
+                        });
+    
+                        // give the text a bit of space on the left...
+                        titleLabel.setPadding(new Insets(0, 0, 0, TITLE_PADDING));
+                        getChildren().add(titleLabel);
+                    }
+                }
+                
+                @Override protected void layoutChildren() {
+                    super.layoutChildren();
+                    
+                    // layout the title label
+                    if (titleLabel != null) {
+                        final double labelHeight = titleLabel.prefHeight(-1);
+                        final double labelWidth = titleLabel.prefWidth(labelHeight) + TITLE_PADDING;
+                        titleLabel.resize(labelWidth, labelHeight);
+                        titleLabel.relocate(TITLE_PADDING * 2, -labelHeight / 2.0 - 1);
+                    }
+                }
+                
+                private void updateTitleLabelFill() {
+                    final Scene s = n.getScene();
+                    
+                    if (s == null) {
+                        BackgroundFill fill = new BackgroundFill(Color.TRANSPARENT, null, null);
+                        titleLabel.setBackground(new Background(fill));
+                    } else {
+                        updateTitleLabelFillFromScene(s);
+                        s.fillProperty().addListener(new InvalidationListener() {
+                            @Override public void invalidated(Observable arg0) {
+                                updateTitleLabelFillFromScene(s);
+                            }
+                        });
+                    }
+                }
+                
+                private void updateTitleLabelFillFromScene(Scene s) {
+                    s.snapshot(new Callback<SnapshotResult, Void>() {
+                        @Override public Void call(SnapshotResult result) {
+                            // determine the bounds of the scene and the location
+                            // of the titleLabel node
+                            Bounds b = titleLabel.localToScene(titleLabel.getBoundsInLocal());
+                            int minX = (int) Math.max(0, b.getMinX());
+                            int minY = (int) Math.max(0, b.getMinY());
+                            //int maxX = (int) Math.min(s.getWidth(), b.getMaxX());
+                            //int maxY = (int) Math.max(s.getHeight(), b.getMaxY());
+                            
+                            // for now we just pick out one color (hoping there isn't a gradient)
+                            Color c = result.getImage().getPixelReader().getColor(minX, minY);
+                            
+                            // with that color we can set the background fill 
+                            // of the titleLabel to perfectly blend in
+                            BackgroundFill fill = new BackgroundFill(c, null, null);
+                            titleLabel.setBackground(new Background(fill));
+                            
+                            return null;
+                        }
+                    }, null);
+                }
+            };
+            
+            pane.setBorder(new javafx.scene.layout.Border(borderStrokes));
+            return pane;
         }
     }
 }

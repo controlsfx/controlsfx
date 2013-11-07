@@ -26,26 +26,15 @@
  */
 package org.controlsfx.samples;
 
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
-import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 
 import org.controlsfx.tools.Borders;
-import org.controlsfx.tools.Borders.EmptyBorders;
 
 import fxsampler.SampleBase;
 
@@ -72,22 +61,25 @@ public class HelloBorders extends SampleBase {
         
         Button button = new Button("Hello World!");
         Node wrappedButton = Borders.wrap(button)
+//                                                 .emptyBorder()
+//                                                     .padding(20)
+//                                                     .build()
+                                                 .lineBorder()
+                                                     .title("Line")
+//                                                     .color(Color.GREEN)
+//                                                     .thickness(1, 0, 0, 0)
+                                                     .thickness(1)
+                                                     .radius(0, 5, 5, 0)
+                                                     .build()
                                                  .emptyBorder()
                                                      .padding(20)
                                                      .build()
-                                                 .lineBorder()
-                                                     .color(Color.GREEN)
-                                                     .thickness(1, 1, 1, 5)
-                                                     .radius(0, 5, 5, 0)
+                                                 .etchedBorder()
+                                                     .title("Etched")
                                                      .build()
-//                                                 .emptyBorder()
-//                                                     .padding(20)
-//                                                     .build()
-//                                                 .etchedBorder()
-//                                                     .build()
-//                                                 .emptyBorder()
-//                                                     .padding(20)
-//                                                     .build()
+                                                 .emptyBorder()
+                                                     .padding(20)
+                                                     .build()
                                                  .build();
         
         

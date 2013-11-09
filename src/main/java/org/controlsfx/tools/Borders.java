@@ -29,6 +29,8 @@ package org.controlsfx.tools;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.geometry.Bounds;
@@ -47,6 +49,19 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
+/**
+ * A utility class that allows you to wrap JavaFX {@link Node Nodes} with a border,
+ * in a way somewhat analogous to the Swing {@link BorderFactory} (although with
+ * less options as a lot of what the Swing BorderFactory offers resulted in 
+ * ugly borders!).
+ * 
+ * <p>The Borders class provides a fluent API for specifying the properties of
+ * each border. It is possible to create multiple borders around a Node simply
+ * by continuing to call additional methods before you call the final 
+ * {@link Borders#build()} method. To use the Borders class, you simply call
+ * {@link Borders#wrap(Node)}, passing in the Node you wish to wrap the border(s)
+ * around.
+ */
 public final class Borders {
     
     private static final Color DEFAULT_BORDER_COLOR = Color.DARKGRAY;
@@ -63,18 +78,43 @@ public final class Borders {
         this.borders = new ArrayList<>();
     }
     
+    /**
+     * Often times it is useful to have a bit of whitespace around a Node, to 
+     * separate it from what it is next to. Call this method to begin building
+     * a border that will wrap the node with a given amount of whitespace 
+     * (which can vary between the top, right, bottom, and left sides).
+     */
     public EmptyBorders emptyBorder() {
         return new EmptyBorders(this);
     }
     
+    /**
+     * The etched border look is essentially equivalent to the {@link #lineBorder()}
+     * look, except rather than one line, there are two. What is commonly done in
+     * this circumstance is that one of the lines is a very light colour (commonly
+     * white), which gives a nice etched look. Refer to the API in {@link EtchedBorders}
+     * for more information.
+     */
     public EtchedBorders etchedBorder() {
         return new EtchedBorders(this);
     }
     
+    /**
+     * Creates a nice, simple border around the node. Note that there are many
+     * configuration options in {@link LineBorders}, so explore it carefully.
+     */
     public LineBorders lineBorder() {
         return new LineBorders(this);
     }
     
+    /**
+     * Allows for developers to develop custom {@link Border} implementations,
+     * and to wrap them around a Node. Note that of course this is mostly 
+     * redundant (as you could just call {@link Border#wrap(Node)} directly).
+     * The only benefit is if you're creating a compound border consisting of 
+     * multiple borders, and you want your custom border included as part of 
+     * this.
+     */
     public Borders addBorder(Border border) {
         borders.add(border);
         return this;
@@ -96,7 +136,11 @@ public final class Borders {
     }
     
     
-    
+    /**
+     * A fluent API that is only indirectly instantiable via the {@link Borders} 
+     * fluent API, and which allows for an {@link Borders#emptyBorder() empty border}
+     * to be wrapped around a given Node.
+     */
     public class EmptyBorders {
         private final Borders parent;
         
@@ -105,14 +149,24 @@ public final class Borders {
         private double bottom;
         private double left;
         
+        // private on purpose - this class is not directly instantiable.
         private EmptyBorders(Borders parent) { 
             this.parent = parent;
         }
         
+        /**
+         * Specifies that the wrapped Node should have the given padding around
+         * all four sides of itself.
+         */
         public EmptyBorders padding(double padding) {
             return padding(padding, padding, padding, padding);
         }
-        
+
+        /**
+         * Specifies that the wrapped Node should be wrapped with the given
+         * padding for each of its four sides, going in the order top, right,
+         * bottom, and finally left.
+         */
         public EmptyBorders padding(double top, double right, double bottom, double left) {
             this.top = top;
             this.right = right;
@@ -121,11 +175,22 @@ public final class Borders {
             return this;
         }
         
+        /**
+         * Builds the {@link Border} and {@link Borders#addBorder(Border) adds it}
+         * to the list of borders to wrap around the given Node (which will be
+         * constructed and returned when {@link Borders#build()} is called.
+         */
         public Borders build() {
             parent.addBorder(new StrokeBorder(null, buildStroke()));
             return parent;
         }
         
+        /**
+         * A convenience method, this is equivalent to calling 
+         * {@link #build()} followed by {@link Borders#build()}. In other words,
+         * calling this will return the original Node wrapped in all its borders 
+         * specified.
+         */
         public Node buildAll() {
             build();
             return parent.build();
@@ -141,6 +206,11 @@ public final class Borders {
         }
     }
     
+    /**
+     * A fluent API that is only indirectly instantiable via the {@link Borders} 
+     * fluent API, and which allows for an {@link Borders#etchedBorder() etched border}
+     * to be wrapped around a given Node.
+     */
     public class EtchedBorders {
         private final Borders parent;
         
@@ -150,30 +220,51 @@ public final class Borders {
         private Color highlightColor = DEFAULT_BORDER_COLOR;
         private Color shadowColor = Color.WHITE;
         
+        // private on purpose - this class is not directly instantiable.
         private EtchedBorders(Borders parent) { 
             this.parent = parent;
         }
         
+        /**
+         * Specifies the highlight colour to use in the etched border.
+         */
         public EtchedBorders highlight(Color highlight) {
             this.highlightColor = highlight;
             return this;
         }
         
+        /**
+         * Specifies the shadow colour to use in the etched border.
+         */
         public EtchedBorders shadow(Color shadow) {
             this.shadowColor = shadow;
             return this;
         }
         
+        /**
+         * Specifies the order in which the highlight and shadow colours are
+         * placed. A raised etched border has the shadow colour on the outside
+         * of the border, whereas a non-raised (or lowered) etched border has 
+         * the shadow colour on the inside of the border.
+         */
         public EtchedBorders raised() {
             raised = true;
             return this;
         }
         
+        /**
+         * If desired, this specifies the title text to show in this border.
+         */
         public EtchedBorders title(String title) {
             this.title = title;
             return this;
         }
         
+        /**
+         * Builds the {@link Border} and {@link Borders#addBorder(Border) adds it}
+         * to the list of borders to wrap around the given Node (which will be
+         * constructed and returned when {@link Borders#build()} is called.
+         */
         public Borders build() {
             Color inner = raised ? shadowColor : highlightColor;
             Color outer = raised ? highlightColor : shadowColor;
@@ -183,12 +274,23 @@ public final class Borders {
             return parent;
         }
         
+        /**
+         * A convenience method, this is equivalent to calling 
+         * {@link #build()} followed by {@link Borders#build()}. In other words,
+         * calling this will return the original Node wrapped in all its borders 
+         * specified.
+         */
         public Node buildAll() {
             build();
             return parent.build();
         }
     }
     
+    /**
+     * A fluent API that is only indirectly instantiable via the {@link Borders} 
+     * fluent API, and which allows for a {@link Borders#lineBorder() line border}
+     * to be wrapped around a given Node.
+     */
     public class LineBorders {
         private final Borders parent;
         
@@ -216,14 +318,23 @@ public final class Borders {
         private double bottomRightRadius = 0;
         private double bottomLeftRadius = 0;
         
+        // private on purpose - this class is not directly instantiable.
         private LineBorders(Borders parent) { 
             this.parent = parent;
         }
         
+        /**
+         * Specifies the colour to use for all four sides of this border.
+         */
         public LineBorders color(Color color) {
             return color(color, color, color, color);
         }
-        
+
+        /**
+         * Specifies that the wrapped Node should be wrapped with the given
+         * colours for each of its four sides, going in the order top, right,
+         * bottom, and finally left.
+         */
         public LineBorders color(Color topColor, Color rightColor, Color bottomColor, Color leftColor) {
             this.topColor = topColor;
             this.rightColor = rightColor;
@@ -232,15 +343,31 @@ public final class Borders {
             return this;
         }
         
+        /**
+         * Specifies which {@link BorderStrokeStyle} to use for this line border.
+         * By default this is {@link BorderStrokeStyle#SOLID}, but you can use
+         * any other style (such as {@link BorderStrokeStyle#DASHED}, 
+         * {@link BorderStrokeStyle#DOTTED}, or a custom style built using
+         * {@link BorderStrokeStyle#BorderStrokeStyle(javafx.scene.shape.StrokeType, javafx.scene.shape.StrokeLineJoin, javafx.scene.shape.StrokeLineCap, double, double, List)}.
+         */
         public LineBorders strokeStyle(BorderStrokeStyle strokeStyle) {
             this.strokeStyle = strokeStyle;
             return this;
         }
         
+        /**
+         * Specifies the thickness of the line to use on all four sides of this
+         * border.
+         */
         public LineBorders thickness(double thickness) {
             return thickness(thickness, thickness, thickness, thickness);
         }
         
+        /**
+         * Specifies that the wrapped Node should be wrapped with the given
+         * line thickness for each of its four sides, going in the order top, right,
+         * bottom, and finally left.
+         */
         public LineBorders thickness(double topThickness, double rightThickness, double bottomThickness, double leftThickness) {
             this.topThickness = topThickness;
             this.rightThickness = rightThickness;
@@ -249,10 +376,18 @@ public final class Borders {
             return this;
         }
         
+        /**
+         * Specifies the radius of the four corners of the line of this border.
+         */
         public LineBorders radius(double radius) {
             return radius(radius, radius, radius, radius);
         }
         
+        /**
+         * Specifies that the line wrapping the node should have corner radii
+         * as specified, with each radius being independently configured, going 
+         * in the order top-left, top-right, bottom-right, and finally bottom-left.
+         */
         public LineBorders radius(double topLeft, double topRight, double bottomRight, double bottomLeft) {
             this.topLeftRadius = topLeft;
             this.topRightRadius = topRight;
@@ -261,11 +396,19 @@ public final class Borders {
             return this;
         }
         
+        /**
+         * If desired, this specifies the title text to show in this border.
+         */
         public LineBorders title(String title) {
             this.title = title;
             return this;
         }
         
+        /**
+         * Builds the {@link Border} and {@link Borders#addBorder(Border) adds it}
+         * to the list of borders to wrap around the given Node (which will be
+         * constructed and returned when {@link Borders#build()} is called.
+         */
         public Borders build() {
             BorderStroke borderStroke = new BorderStroke(
                     topColor, rightColor, bottomColor, leftColor, 
@@ -287,6 +430,12 @@ public final class Borders {
             return parent;
         }
         
+        /**
+         * A convenience method, this is equivalent to calling 
+         * {@link #build()} followed by {@link Borders#build()}. In other words,
+         * calling this will return the original Node wrapped in all its borders 
+         * specified.
+         */
         public Node buildAll() {
             build();
             return parent.build();
@@ -294,8 +443,23 @@ public final class Borders {
     }
     
     
-    
+    /**
+     * The public interface used by the {@link Borders} API to wrap nodes with
+     * zero or more Border implementations. ControlsFX ships with a few 
+     * Border implementations (current {@link EmptyBorders}, {@link LineBorders},
+     * and {@link EtchedBorders}). As noted in {@link Borders#addBorder(Border)},
+     * this interface is relatively pointless, unless you plan to wrap a node
+     * with multiple borders and you want to use a custom {@link Border} 
+     * implementation for at least one border. In this case, you can simply 
+     * call {@link Borders#addBorder(Border)} with your custom border, when 
+     * appropriate.
+     */
     public static interface Border {
+        
+        /**
+         * Given a {@link Node}, this method should return a Node that contains
+         * the original Node and also has wrapped it with an appropriate border.
+         */
         public Node wrap(Node n);
     }
     

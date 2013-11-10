@@ -70,15 +70,17 @@ public class CheckListView<T> extends ListView<T> {
      **************************************************************************/
     
     /**
-     * 
+     * Creates a new CheckListView instance with an empty list of choices.
      */
     public CheckListView() {
         this(null);
     }
     
     /**
+     * Creates a new CheckListView instance with the given items available as
+     * choices.
      * 
-     * @param items
+     * @param items The items to display within the CheckListView.
      */
     public CheckListView(final ObservableList<T> items) {
         super(items);
@@ -106,11 +108,19 @@ public class CheckListView<T> extends ListView<T> {
      * 
      **************************************************************************/
     
+    /**
+     * Returns the {@link BooleanProperty} for a given item index in the 
+     * CheckListView. This is useful if you want to bind to the property.
+     */
     public BooleanProperty getItemBooleanProperty(int index) {
         if (index < 0 || index >= getItems().size()) return null;
         return getItemBooleanProperty(getItems().get(index));
     }
     
+    /**
+     * Returns the {@link BooleanProperty} for a given item in the 
+     * CheckListView. This is useful if you want to bind to the property.
+     */
     public BooleanProperty getItemBooleanProperty(T item) {
         return itemBooleanMap.get(item);
     }

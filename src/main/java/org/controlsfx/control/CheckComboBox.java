@@ -69,15 +69,17 @@ public class CheckComboBox<T> extends Control {
      **************************************************************************/
     
     /**
-     * 
+     * Creates a new CheckComboBox instance with an empty list of choices.
      */
     public CheckComboBox() {
         this(null);
     }
     
     /**
+     * Creates a new CheckComboBox instance with the given items available as
+     * choices.
      * 
-     * @param items
+     * @param items The items to display within the CheckComboBox.
      */
     public CheckComboBox(final ObservableList<T> items) {
         final int initialSize = items == null ? 32 : items.size();
@@ -100,15 +102,27 @@ public class CheckComboBox<T> extends Control {
         return new CheckComboBoxSkin<>(this);
     }
     
+    /**
+     * Represents the list of choices available to the user, from which they can
+     * select zero or more items.
+     */
     public ObservableList<T> getItems() {
         return items;
     }
     
+    /**
+     * Returns the {@link BooleanProperty} for a given item index in the 
+     * CheckComboBox. This is useful if you want to bind to the property.
+     */
     public BooleanProperty getItemBooleanProperty(int index) {
         if (index < 0 || index >= items.size()) return null;
         return getItemBooleanProperty(getItems().get(index));
     }
     
+    /**
+     * Returns the {@link BooleanProperty} for a given item in the 
+     * CheckComboBox. This is useful if you want to bind to the property.
+     */
     public BooleanProperty getItemBooleanProperty(T item) {
         return itemBooleanMap.get(item);
     }

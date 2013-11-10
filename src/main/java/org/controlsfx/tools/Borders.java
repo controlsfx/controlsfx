@@ -64,19 +64,57 @@ import javafx.util.Callback;
  */
 public final class Borders {
     
+    /**************************************************************************
+     * 
+     * Static fields
+     * 
+     **************************************************************************/
+    
     private static final Color DEFAULT_BORDER_COLOR = Color.DARKGRAY;
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Internal fields
+     * 
+     **************************************************************************/
     
     private final Node node;
     private final List<Border> borders;
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Fluent API entry method(s)
+     * 
+     **************************************************************************/
     
     public static Borders wrap(Node n) {
         return new Borders(n);
     }
     
+    
+    
+    /**************************************************************************
+     * 
+     * Private Constructor
+     * 
+     **************************************************************************/
+    
     private Borders(Node n) { 
         this.node = n;
         this.borders = new ArrayList<>();
     }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Fluent API
+     * 
+     **************************************************************************/
     
     /**
      * Often times it is useful to have a bit of whitespace around a Node, to 
@@ -120,7 +158,6 @@ public final class Borders {
         return this;
     }
 
-    
     /**
      * Returns the original node wrapped in zero or more borders, as specified
      * using the fluent API.
@@ -135,6 +172,13 @@ public final class Borders {
         return bundle;
     }
     
+    
+    
+    /**************************************************************************
+     * 
+     * Support classes
+     * 
+     **************************************************************************/
     
     /**
      * A fluent API that is only indirectly instantiable via the {@link Borders} 
@@ -443,6 +487,13 @@ public final class Borders {
     }
     
     
+    
+    /**************************************************************************
+     * 
+     * Support interfaces
+     * 
+     **************************************************************************/
+    
     /**
      * The public interface used by the {@link Borders} API to wrap nodes with
      * zero or more Border implementations. ControlsFX ships with a few 
@@ -465,15 +516,13 @@ public final class Borders {
     
     
     
-    
-    
-    
-    
-    
-    
+    /**************************************************************************
+     * 
+     * Private support classes
+     * 
+     **************************************************************************/
     
     // --- Border implementations
-    
     private static class StrokeBorder implements Border {
         private static final int TITLE_PADDING = 3;
         

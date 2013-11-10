@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
@@ -64,14 +65,17 @@ public class CheckTreeView<T> extends TreeView<T> {
      **************************************************************************/
     
     /**
-     * 
+     * Creates a new CheckTreeView instance with an empty tree of choices.
      */
     public CheckTreeView() {
         this(null);
     }
     
     /**
+     * Creates a new CheckTreeView instance with the given CheckBoxTreeItem set
+     * as the tree root.
      * 
+     * @param root The root tree item to display in the CheckTreeView.
      */
     public CheckTreeView(final CheckBoxTreeItem<T> root) {
         super(root);
@@ -88,7 +92,14 @@ public class CheckTreeView<T> extends TreeView<T> {
      * 
      **************************************************************************/
     
-    
+    /**
+     * Returns the {@link BooleanProperty} for a given item index in the 
+     * CheckTreeView. This is useful if you want to bind to the property.
+     */
+    public BooleanProperty getItemBooleanProperty(int index) {
+        CheckBoxTreeItem<T> treeItem = (CheckBoxTreeItem<T>) getTreeItem(index);
+        return treeItem.selectedProperty();
+    }
     
     
     

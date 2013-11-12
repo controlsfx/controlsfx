@@ -212,6 +212,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = isSelectedRange(index, col, column);
                         // If the selected cell is in the same row, no need to re-select it
                         if (selectedPosition != null
+                        		//When shift selecting, all cells become ROW_VISIBLE so
+                        		//We avoid loop selecting here
+                        		&& handle.getCellsViewSkin().containsRow(index)
                                 && selectedPosition.getRow() != index) {
                             sm.clearSelection(selectedPosition.getRow(),
                                     selectedPosition.getTableColumn());

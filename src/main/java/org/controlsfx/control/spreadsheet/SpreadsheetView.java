@@ -1423,9 +1423,11 @@ public class SpreadsheetView extends Control {
 			// RT-33558 if this method has been called with a given row/column
             // intersection, and that row/column intersection is the only
             // selection currently, then this method becomes a no-op.
-            if (getSelectedCells().size() == 1 && isSelected(row, column)) {
+			
+			//This is understandable but not compatible with spanning selection.
+            /*if (getSelectedCells().size() == 1 && isSelected(row, column)) {
                 return;
-            }
+            }*/
             
 			makeAtomic = true;
 			// firstly we make a copy of the selection, so that we can send out

@@ -414,6 +414,20 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         return (GridRow) getFlow().getCells().get(index);
     }
     
+    /**
+     * Indicate whether or not the row at the specified index is currently 
+     * being displayed.
+     * @param index
+     * @return
+     */
+    public final boolean containsRow(int index){
+        for(Object obj : getFlow().getCells()){
+        	if(((GridRow) obj).getIndex() == index)
+        		return true;
+        }
+        return false;
+    }
+    
     public int getCellsSize() {
         return getFlow().getCells().size();
     }

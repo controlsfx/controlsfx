@@ -128,7 +128,7 @@ public class GridBase implements Grid {
         final int cellSpanRow = cellSpan.getRow();
         final int cellSpanRowSpan = cellSpan.getRowSpan();
         final int cellSpanColumnSpan = cellSpan.getColumnSpan();
-        final boolean containsRowMinusOne = containsRow(spv, row-1);
+        final boolean containsRowMinusOne = spv.getCellsViewSkin().containsRow(row-1);
         
         if (cellSpanColumn == column
                 && cellSpanRow == row
@@ -142,7 +142,7 @@ public class GridBase implements Grid {
             return SpanType.BOTH_INVISIBLE;
         } else if (cellSpanRowSpan > 1
                 && cellSpanColumn == column) {
-            if (cellSpanRow == row || !containsRowMinusOne) {
+            if ((cellSpanRow == row || !containsRowMinusOne)) {
                 return SpanType.ROW_VISIBLE;
             } else {
                 return SpanType.ROW_SPAN_INVISIBLE;
@@ -249,21 +249,5 @@ public class GridBase implements Grid {
      */
     private void setColumnCount(int columnCount) {
         this.columnCount = columnCount;
-    }
-    
-    /**
-     * Indicate whether or not the row at the specified index is currently 
-     * being displayed.
-     * @param index
-     * @return
-     */
-    private final boolean containsRow(final SpreadsheetView spv, int index){
-        GridViewSkin skin = spv.getCellsViewSkin();
-        int size = skin.getCellsSize();
-        for (int i = 0 ; i < size; ++i) {
-            if(skin.getRow(i).getIndex() == index)
-                return true;
-        }
-        return false;
     }
 }

@@ -109,15 +109,14 @@ public abstract class SpreadsheetCellType<T> {
 	public abstract String toString(T object2);
 
 	/**
-	 * Copies the value of a cell to another (copy/paste operations).
+	 * Verify that the upcoming cell value can be set to the current cell.
+	 *  (copy/paste operations).
 	 * 
-	 * @param from
-	 *            the source cell
-	 * @param to
-	 *            the destination cell
-	 *	@return true if the copy has succeeded.
+	 * 	@param from the source cell
+	 *	@param to the destination cell
+	 *	@return true if it matches.
 	 */
-	protected abstract boolean copy(SpreadsheetCell from, SpreadsheetCell to);
+	protected abstract boolean match(SpreadsheetCell from, SpreadsheetCell to);
 
 	/**
 	 * This method will be called when a commit is happening.<br/>
@@ -160,8 +159,8 @@ public abstract class SpreadsheetCellType<T> {
 			return "object";
 		}
 
-		protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
-			to.setItem(from.getText());
+		protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
+//			to.setItem(from.getText());
 			return true;
 		}
 
@@ -209,8 +208,8 @@ public abstract class SpreadsheetCellType<T> {
 			return "string";
 		}
 
-		protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
-			to.setItem(from.getText());
+		protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
+//			to.setItem(from.getText());
 			return true;
 		}
 
@@ -288,10 +287,10 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
-		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
 			try {
-				Double temp = converter.fromString(from.getText());
-				to.setItem(temp);
+				/*Double temp = */converter.fromString(from.getText());
+//				to.setItem(temp);
 				return true;
 			} catch (Exception e) {
 				return false;
@@ -364,10 +363,10 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.ListEditor(view, items);
 		}
 
-		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
 			String value = from.getText();
 			if (items.contains(value)) {
-				to.setItem(value);
+//				to.setItem(value);
 				return true;
 			}
 			return false;
@@ -444,7 +443,7 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.DateEditor(view,converter);
 		}
 
-		@Override protected boolean copy(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
 			try {
 				LocalDate temp = converter.fromString(from.getText());
 				if (temp != null) {

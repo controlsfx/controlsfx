@@ -194,14 +194,13 @@ public class SpreadsheetCell implements Serializable {
 	 **************************************************************************/
 
 	/**
-	 * Verify that the upcoming cell value can be set to the current cell. If
-	 * it's possible, the cell's value is changed. If not, nothing is done. This
-	 * is currently used by the Copy/Paste.
+	 * Verify that the upcoming cell value can be set to the current cell.
+	 * This is currently used by the Copy/Paste.
 	 * 
 	 * @param cell
 	 */
 	public boolean match(SpreadsheetCell cell) {
-		return type.copy(cell, this);
+		return type.match(cell, this);
 	}
 	
 	
@@ -220,7 +219,9 @@ public class SpreadsheetCell implements Serializable {
 	};
 
     /**
-     * Sets the value of the property Item
+     * Sets the value of the property Item.
+     * This should be used only at initialization. Prefer {@link Grid#setCellValue(int, int, Object)}
+     * after because it will compute correctly the modifiedCell.
      * If {@link #isEditable()} return false, nothing is done.
      * @param value
      */
@@ -320,10 +321,9 @@ public class SpreadsheetCell implements Serializable {
 	 * in the {@link SpreadsheetView}.
 	 * @return text representation of the value.
 	 */
-	public final String getText() {
+	public final String getText(){
 		return text;
 	}
-
 	/**
 	 * Return the {@link SpreadsheetCellType} of this particular cell.
 	 * 
@@ -453,7 +453,7 @@ public class SpreadsheetCell implements Serializable {
 
 		final SpreadsheetCell cell = (SpreadsheetCell) obj;
 		if (cell != null && cell.getRow() == row && cell.getColumn() == column
-				&& cell.getText().equals(text)) {
+				&& cell.getText().equals(getText())) {
 			return true;
 		} else {
 			return false;

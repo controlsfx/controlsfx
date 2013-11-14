@@ -56,6 +56,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -213,7 +214,7 @@ public class SpreadsheetView extends Control {
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
-    private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
+    //private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
 		@Override
@@ -324,7 +325,7 @@ public class SpreadsheetView extends Control {
 			}
 		});
        initRowFix(grid);
-       
+
        /**
         * ContextMenu handling.
         */
@@ -362,11 +363,12 @@ public class SpreadsheetView extends Control {
        
        
         setGrid(grid);
-        
+        setEditable(true);
+
         //Listeners
         fixedRows.addListener(fixedRowsListener); 
         fixedColumns.addListener(fixedColumnsListener);
-        modifiedCells.addListener(modifiedCellsListener);
+        grid.getModifiedCells().addListener(modifiedCellsListener);
     }
 
     /***************************************************************************
@@ -520,9 +522,9 @@ public class SpreadsheetView extends Control {
      * Return a list of {@link SpreadsheetCell} that has been modified.
      * @return a list of {@link SpreadsheetCell} that has been modified.
      */
-    public ObservableList<SpreadsheetCell> getModifiedCells(){
+    /*public ObservableList<SpreadsheetCell> getModifiedCells(){
     	return modifiedCells;
-    }
+    }*/
     
     /**
      * Sets the value of the property editable.
@@ -826,10 +828,13 @@ public class SpreadsheetView extends Control {
                     final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
                     if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
                     	SpreadsheetCell cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
-                    	Object item = cell.getItem();
+                    	//Object item = cell.getItem();
                         boolean succeed =cell.match(row1);
-                        if(succeed && !item.equals(cell.getItem()) && !getModifiedCells().contains(cell))
-        					getModifiedCells().add(cell);
+                        if(succeed){
+                        	grid.setCellValue(cell.getRow(), cell.getColumn(), row1.getText());
+                        }
+                        /*if(succeed && !item.equals(cell.getItem()) && !getModifiedCells().contains(cell))
+        					getModifiedCells().add(cell);*/
                     }
                 }
             }
@@ -1632,18 +1637,17 @@ public class SpreadsheetView extends Control {
     	}
     };
     
-    private ListChangeListener<SpreadsheetCell> modifiedCellsListener = new ListChangeListener<SpreadsheetCell>(){
+    private SetChangeListener<SpreadsheetCell> modifiedCellsListener = new SetChangeListener<SpreadsheetCell>(){
 
 		@Override
 		public void onChanged(Change<? extends SpreadsheetCell> arg0) {
-			while (arg0.next()) {
                 if (arg0.wasAdded()) {
-                	 List<? extends SpreadsheetCell> newRows = arg0.getAddedSubList();
-                     for (SpreadsheetCell cell : newRows) {
+                	SpreadsheetCell cell = arg0.getElementAdded();
+                     //for (SpreadsheetCell cell : newRows) {
                     	 if(!cell.getStyleClass().contains("modified"))
                              cell.getStyleClass().add("modified");
-                     }
-                }
+                     //}
+                
 			}
 		}
     };

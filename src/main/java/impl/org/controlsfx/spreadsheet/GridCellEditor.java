@@ -115,10 +115,11 @@ public class GridCellEditor {
 			Object value = modelCell.getCellType().convertValue(spreadsheetCellEditor.getControlValue());
 			if(value != null && viewCell != null){
 				//We update the modified cells
-				if(!modelCell.getItem().equals(value) && !view.getModifiedCells().contains(modelCell))
-					view.getModifiedCells().add(modelCell);
+				/*if(!modelCell.getItem().equals(value) && !view.getModifiedCells().contains(modelCell))
+					view.getModifiedCells().add(modelCell);*/
 
-				modelCell.setItem(value);
+				//modelCell.setItem(value);
+				view.getGrid().setCellValue(modelCell.getRow(), modelCell.getColumn(), value);
 				viewCell.commitEdit(modelCell);
 				end();
 				spreadsheetCellEditor.end();

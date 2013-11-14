@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import java.util.Map;
 
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
@@ -84,11 +85,33 @@ public interface Grid {
     public int getColumnCount();
     
     /**
-     * Returns an ObservableList of ObservableList of {@link SpreadsheetCell}
+     * Return an ObservableList of ObservableList of {@link SpreadsheetCell}
      * instances. Refer to the {@link Grid} class javadoc for more detail.
      */
     public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
+    /**
+     * Return an obsObservableList of the modified {@link SpreadsheetCell}.
+     * @return
+     */
+    public ObservableSet<SpreadsheetCell> getModifiedCells();
+    
+    /**
+     * Change the value situated at the intersection if possible.
+     * @param row
+     * @param column
+     * @param value
+     */
+    public void setCellValue(int row, int column, Object value);
+    
+    /**
+     * Change the value situated at the intersection if possible.
+     * @param row
+     * @param column
+     * @param value
+     */
+    public void setCellValue(int row, int column, String value);
+    
     /**
      * Return the {@link SpanType} for a given cell row/column intersection.
      */

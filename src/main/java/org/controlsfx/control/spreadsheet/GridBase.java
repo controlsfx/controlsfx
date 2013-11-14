@@ -34,6 +34,7 @@ import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
@@ -50,6 +51,7 @@ public class GridBase implements Grid {
      * 
      **************************************************************************/
     private ObservableList<ObservableList<SpreadsheetCell>> rows;
+    private ObservableSet<SpreadsheetCell> modifiedCells;
     private int rowCount;
     private int columnCount;
     private Map<Integer,Double> rowHeight;
@@ -80,7 +82,7 @@ public class GridBase implements Grid {
 
     /**
      * Creates a grid with a fixed number of rows and columns. 
-     * Some height are specified int the Map.
+     * Some height are specified in the Map.
      * @param rowCount
      * @param columnCount
      * @param rowHeight
@@ -90,10 +92,11 @@ public class GridBase implements Grid {
     }
     
     public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows, Map<Integer,Double> rowHeight) {
-        this.rowCount = rowCount;
-        this.columnCount = columnCount;
+    	this.rowCount = rowCount;
+    	this.columnCount = columnCount;
         this.rows = rows;
         this.rowHeight = rowHeight;
+        modifiedCells = FXCollections.observableSet();
     }
 
     /***************************************************************************
@@ -107,6 +110,9 @@ public class GridBase implements Grid {
         return rows;
     }
     
+    public ObservableSet<SpreadsheetCell> getModifiedCells(){
+    	return modifiedCells;
+    }
     /** {@inheritDoc} */
     @Override public int getRowCount() {
         return rowCount;
@@ -224,10 +230,31 @@ public class GridBase implements Grid {
         } else {
             this.rows = FXCollections.observableArrayList(rows);
         }
+        
         setRowCount(rows.size());
     }
     
+    /** {@inheritDoc} */
+    public void setCellValue(int row,int column,Object value){
+    	if(row < rowCount && column < columnCount){
+    		SpreadsheetCell cell = getRows().get(row).get(column);
+    		Object item = cell.getItem();
+    		cell.setItem(value);
+    		if(!item.equals(cell.getItem()))
+				getModifiedCells().add(cell);
+    	}
+    }
     
+    /** {@inheritDoc} */
+    public void setCellValue(int row,int column,String value){
+    	if(row < rowCount && column < columnCount){
+    		SpreadsheetCell cell = getRows().get(row).get(column);
+    		Object item = cell.getItem();
+    		cell.setItem(cell.getCellType().converter.fromString(value));
+    		if(!item.equals(cell.getItem()))
+				getModifiedCells().add(cell);
+    	}
+    }
     
     /***************************************************************************
      * 

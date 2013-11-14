@@ -35,6 +35,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
@@ -104,14 +105,16 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
          * So the view hasn't really a way of detecting that itself. We must force it
          * that way.
          */
-        spv.getModifiedCells().addListener(new ListChangeListener<SpreadsheetCell>() {
+        spv.getGrid().getModifiedCells().addListener(new SetChangeListener<SpreadsheetCell>() {
+
 			@Override
 			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends SpreadsheetCell> arg0) {
-						copyPaste = false;
-						layoutTotal();		
-						layoutFixedRows();
-						copyPaste = true;
+					javafx.collections.SetChangeListener.Change<? extends SpreadsheetCell> arg0) {
+					copyPaste = false;
+					layoutTotal();		
+					layoutFixedRows();
+					copyPaste = true;
+					
 			}
 		});
     }

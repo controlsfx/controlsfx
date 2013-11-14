@@ -133,7 +133,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         this.spreadsheetView = handle.getView();
         gridCellEditor = new GridCellEditor(handle);
         TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
-        tableView.setEditable(true);
 
         // Do nothing basically but give access to the Hover Property.
         tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {

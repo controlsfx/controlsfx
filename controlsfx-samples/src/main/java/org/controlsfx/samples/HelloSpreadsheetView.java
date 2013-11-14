@@ -85,7 +85,7 @@ public class HelloSpreadsheetView extends SampleBase {
 		buildBothGrid(grid);
 
 		SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
-		
+
 		borderPane.setCenter(spreadSheetView);
 
 		borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Both"));
@@ -142,6 +142,11 @@ public class HelloSpreadsheetView extends SampleBase {
 				spv.setShowColumnHeader(arg2);
 			}
 		});
+		
+		final CheckBox editable = new CheckBox("Editable");
+		editable.setSelected(true);
+		spv.editableProperty().bind(editable.selectedProperty());
+		
 		//In order to change the span style more easily
 		final ChoiceBox<String> typeOfGrid = new ChoiceBox<String>(FXCollections.observableArrayList("Normal", "Both"));
 		typeOfGrid.setValue(gridType);
@@ -173,8 +178,9 @@ public class HelloSpreadsheetView extends SampleBase {
 		
 		grid.add(rowHeader, 1, 1);
 		grid.add(columnHeader, 1, 2);
-		grid.add(new Label("Span model:"), 1, 3);
-		grid.add(typeOfGrid, 1, 4);
+		grid.add(editable, 1, 3);
+		grid.add(new Label("Span model:"), 1, 4);
+		grid.add(typeOfGrid, 1, 5);
 
 		return grid;
 	}

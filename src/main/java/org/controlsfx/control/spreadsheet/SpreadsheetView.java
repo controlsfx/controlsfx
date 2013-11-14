@@ -524,6 +524,32 @@ public class SpreadsheetView extends Control {
     	return modifiedCells;
     }
     
+    /**
+     * Sets the value of the property editable.
+     * @param b
+     */
+    public final void setEditable(final boolean b){
+    	cellsView.setEditable(b);
+    }
+    
+    /**
+     * Gets the value of the property editable.
+     * @return a boolean telling if the SpreadsheetView is editable.
+     */
+    public final boolean isEditable() {
+        return cellsView.isEditable();
+    }
+    
+    /**
+     * Specifies whether this SpreadsheetView is editable - 
+     * only if the SpreadsheetView, and the {@link SpreadsheetCell} within it are both editable 
+     * will a {@link SpreadsheetCell} be able to go into its editing state.
+     * @return the BooleanProperty associated with the editableProperty.
+     */
+    public final BooleanProperty editableProperty() {
+        return cellsView.editableProperty();
+    }
+    
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *

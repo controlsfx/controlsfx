@@ -26,13 +26,15 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -118,16 +120,8 @@ import javafx.collections.ObservableMap;
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
  */
-public class SpreadsheetCell implements Serializable {
+public class SpreadsheetCell {
 
-	/***************************************************************************
-	 * 
-	 * Static Fields
-	 * 
-	 **************************************************************************/
-	private static final long serialVersionUID = -7648169794403402662L;
-	
-	
 
 	/***************************************************************************
 	 * 
@@ -136,13 +130,13 @@ public class SpreadsheetCell implements Serializable {
 	 **************************************************************************/
 
 	@SuppressWarnings("rawtypes")
-	private transient final SpreadsheetCellType type;
+	private final SpreadsheetCellType type;
 	private final int row;
 	private final int column;
-	private transient int rowSpan;
-	private transient int columnSpan;
+	private int rowSpan;
+	private int columnSpan;
 
-	private String text;
+	private StringProperty text;
 
 	/**
 	 * Not serializable, it's transient right now because we don't need the
@@ -150,7 +144,7 @@ public class SpreadsheetCell implements Serializable {
 	 * for that :
 	 * http://www.oracle.com/technetwork/articles/java/javaserial-1536170.html
 	 */
-	private transient ObservableList<String> styleClass;
+	private ObservableList<String> styleClass;
 
 	
 	
@@ -182,7 +176,7 @@ public class SpreadsheetCell implements Serializable {
 		this.rowSpan = rowSpan;
 		this.columnSpan = columnSpan;
 		this.type = type;
-		text = "";
+		text = new SimpleStringProperty("");
 	}
 	
 	
@@ -316,13 +310,21 @@ public class SpreadsheetCell implements Serializable {
 	 * 
 	 **************************************************************************/
 
+     /**
+      * Return the StringProperty of the representation of the value.
+      * @return
+      */
+     public final ReadOnlyStringProperty textProperty(){
+    	 return text;
+     }
+     
 	/**
 	 * Return the String representation currently used for display
 	 * in the {@link SpreadsheetView}.
 	 * @return text representation of the value.
 	 */
 	public final String getText(){
-		return text;
+		return text.get();
 	}
 	/**
 	 * Return the {@link SpreadsheetCellType} of this particular cell.
@@ -473,7 +475,7 @@ public class SpreadsheetCell implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	private void updateText() {
-		this.text = type.toString(getItem());
+		text.setValue(type.toString(getItem()));
 	}
 
 }

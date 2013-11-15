@@ -519,14 +519,6 @@ public class SpreadsheetView extends Control {
 	}
     
     /**
-     * Return a list of {@link SpreadsheetCell} that has been modified.
-     * @return a list of {@link SpreadsheetCell} that has been modified.
-     */
-    /*public ObservableList<SpreadsheetCell> getModifiedCells(){
-    	return modifiedCells;
-    }*/
-    
-    /**
      * Sets the value of the property editable.
      * @param b
      */
@@ -764,13 +756,20 @@ public class SpreadsheetView extends Control {
      */
     private void copyClipBoard(){
         checkFormat();
-
-        final ArrayList<SpreadsheetCell> list = new ArrayList<SpreadsheetCell>();
+        
+        //FIXME Maybe move editableProperty to the model..
+        if(!isEditable())
+        	return;
+        
+        final ArrayList<SpreadsheetCellChange> list = new ArrayList<SpreadsheetCellChange>();
         @SuppressWarnings("rawtypes")
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
         for (final TablePosition<?,?> p : posList) {
-            list.add(getGrid().getRows().get(p.getRow()).get(p.getColumn()));
+        	SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
+        	//Using SpreadsheetCell change to stock the information
+        	//FIXME a dedicated class should be used
+            list.add(new SpreadsheetCellChange(cell.getRow(), cell.getColumn(), null, cell.getText()));
         }
 
         final ClipboardContent content = new ClipboardContent();
@@ -789,13 +788,13 @@ public class SpreadsheetView extends Control {
         if(clipboard.getContent(fmt) != null){
 
             @SuppressWarnings("unchecked")
-            final ArrayList<SpreadsheetCell> list = (ArrayList<SpreadsheetCell>) clipboard.getContent(fmt);
+            final ArrayList<SpreadsheetCellChange> list = (ArrayList<SpreadsheetCellChange>) clipboard.getContent(fmt);
             //TODO algorithm very bad
-            int minRow=grid.getRowCount();
-            int minCol=grid.getColumnCount();
+            int minRow=getGrid().getRowCount();
+            int minCol=getGrid().getColumnCount();
             int maxRow=0;
             int maxCol=0;
-            for (final SpreadsheetCell p : list) {
+            for (final SpreadsheetCellChange p : list) {
                 final int tempcol = p.getColumn();
                 final int temprow = p.getRow();
                 if(tempcol<minCol) {
@@ -820,21 +819,19 @@ public class SpreadsheetView extends Control {
             int column;
 
 
-            for (final SpreadsheetCell row1 : list) {
-                row = row1.getRow();
-                column = row1.getColumn();
+            for (final SpreadsheetCellChange change : list) {
+                row = change.getRow();
+                column = change.getColumn();
                 if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()
                         && row+offsetRow >= 0 && column+offsetCol >=0 ){
                     final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
                     if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
                     	SpreadsheetCell cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
-                    	//Object item = cell.getItem();
-                        boolean succeed =cell.match(row1);
+                    	SpreadsheetCell refCell = getGrid().getRows().get(row).get(column);
+                        boolean succeed =cell.match(refCell);
                         if(succeed){
-                        	grid.setCellValue(cell.getRow(), cell.getColumn(), row1.getText());
+                        	getGrid().setCellValue(cell.getRow(), cell.getColumn(),cell.getCellType().convertValue( (String) change.getNewValue()));
                         }
-                        /*if(succeed && !item.equals(cell.getItem()) && !getModifiedCells().contains(cell))
-        					getModifiedCells().add(cell);*/
                     }
                 }
             }

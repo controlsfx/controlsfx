@@ -28,6 +28,8 @@ package org.controlsfx.control.spreadsheet;
 
 import java.util.Map;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
@@ -97,20 +99,22 @@ public interface Grid {
     public ObservableSet<SpreadsheetCell> getModifiedCells();
     
     /**
+     * Return and {@link ObjectProperty} wrapping a {@link SpreadsheetCellChange}
+     * containing the last modification on the grid.
+     * @return
+     */
+    public ReadOnlyObjectProperty<SpreadsheetCellChange> getLastSpreadsheetCellChange();
+    
+    /**
      * Change the value situated at the intersection if possible.
+     * Verification and conversion of the value should be done before 
+     * with {@link SpreadsheetCellType#match(SpreadsheetCell, SpreadsheetCell)}
+     * and {@link SpreadsheetCellType#convertValue(String)}.
      * @param row
      * @param column
      * @param value
      */
     public void setCellValue(int row, int column, Object value);
-    
-    /**
-     * Change the value situated at the intersection if possible.
-     * @param row
-     * @param column
-     * @param value
-     */
-    public void setCellValue(int row, int column, String value);
     
     /**
      * Return the {@link SpanType} for a given cell row/column intersection.

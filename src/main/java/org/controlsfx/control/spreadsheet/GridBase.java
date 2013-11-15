@@ -32,6 +32,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -55,7 +60,7 @@ public class GridBase implements Grid {
     private int rowCount;
     private int columnCount;
     private Map<Integer,Double> rowHeight;
-    
+    private ObjectProperty<SpreadsheetCellChange> lastSpreadsheetCellChange;
     
 
     /***************************************************************************
@@ -96,7 +101,18 @@ public class GridBase implements Grid {
     	this.columnCount = columnCount;
         this.rows = rows;
         this.rowHeight = rowHeight;
+        lastSpreadsheetCellChange = new SimpleObjectProperty<>();
         modifiedCells = FXCollections.observableSet();
+        
+        lastSpreadsheetCellChange.addListener(new ChangeListener<SpreadsheetCellChange>() {
+			@Override
+			public void changed(ObservableValue<? extends SpreadsheetCellChange> arg0,
+					SpreadsheetCellChange arg1, SpreadsheetCellChange arg2) {
+				if(arg2 != null){
+					modifiedCells.add(getRows().get(arg2.getRow()).get(arg2.getColumn()));
+				}
+			}
+		});
     }
 
     /***************************************************************************
@@ -110,9 +126,16 @@ public class GridBase implements Grid {
         return rows;
     }
     
+    /** {@inheritDoc} */
     public ObservableSet<SpreadsheetCell> getModifiedCells(){
     	return modifiedCells;
     }
+    
+    /** {@inheritDoc} */
+    @Override public ReadOnlyObjectProperty<SpreadsheetCellChange> getLastSpreadsheetCellChange() {
+		return lastSpreadsheetCellChange;
+	}
+    
     /** {@inheritDoc} */
     @Override public int getRowCount() {
         return rowCount;
@@ -240,19 +263,10 @@ public class GridBase implements Grid {
     		SpreadsheetCell cell = getRows().get(row).get(column);
     		Object item = cell.getItem();
     		cell.setItem(value);
-    		if(!item.equals(cell.getItem()))
-				getModifiedCells().add(cell);
-    	}
-    }
-    
-    /** {@inheritDoc} */
-    public void setCellValue(int row,int column,String value){
-    	if(row < rowCount && column < columnCount){
-    		SpreadsheetCell cell = getRows().get(row).get(column);
-    		Object item = cell.getItem();
-    		cell.setItem(cell.getCellType().converter.fromString(value));
-    		if(!item.equals(cell.getItem()))
-				getModifiedCells().add(cell);
+    		if(!item.equals(cell.getItem())){
+    			SpreadsheetCellChange cellChange = new SpreadsheetCellChange(row, column, item, value);
+    			lastSpreadsheetCellChange.setValue(cellChange);
+    		}
     	}
     }
     
@@ -277,4 +291,5 @@ public class GridBase implements Grid {
     private void setColumnCount(int columnCount) {
         this.columnCount = columnCount;
     }
+
 }

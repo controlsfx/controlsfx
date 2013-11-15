@@ -68,7 +68,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     private int firstIndex = -1;
     private double previousHbarValue = -1;
     private double previousHBarAmount = -1;
-    private boolean copyPaste = true;//We're copy/pasting so layout is necessary
+//    private boolean copyPaste = true;//We're copy/pasting so layout is necessary
     /**
      * Store the fixedRow in order to place them at the top when necessary.
      * That is to say, when the VirtualFlow has not already placed one.
@@ -105,7 +105,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
          * So the view hasn't really a way of detecting that itself. We must force it
          * that way.
          */
-        spv.getGrid().getModifiedCells().addListener(new SetChangeListener<SpreadsheetCell>() {
+        /*spv.getGrid().getModifiedCells().addListener(new SetChangeListener<SpreadsheetCell>() {
 
 			@Override
 			public void onChanged(
@@ -116,7 +116,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 					copyPaste = true;
 					
 			}
-		});
+		});*/
     }
 
     @Override
@@ -185,7 +185,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         //FIXME This will be improved for performance.
         T firstCell = getFirstVisibleCellWithinViewPort();
         int newFirstIndex = firstCell != null? firstCell.getIndex(): -2;
-        if(copyPaste &&
+        if(/*copyPaste &&*/
         		newFirstIndex == firstIndex 
         		&& previousHbarValue == getHbar().getValue() 
         		&& previousHBarAmount == getHbar().getVisibleAmount()){

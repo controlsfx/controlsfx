@@ -32,8 +32,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -60,7 +62,8 @@ public class GridBase implements Grid {
     private int rowCount;
     private int columnCount;
     private Map<Integer,Double> rowHeight;
-    private ObjectProperty<SpreadsheetCellChange> lastSpreadsheetCellChange;
+    private ObjectProperty<GridChange> lastSpreadsheetCellChange;
+    private BooleanProperty lock;
     
 
     /***************************************************************************
@@ -101,13 +104,15 @@ public class GridBase implements Grid {
     	this.columnCount = columnCount;
         this.rows = rows;
         this.rowHeight = rowHeight;
+        lock = new SimpleBooleanProperty(false);
+        
         lastSpreadsheetCellChange = new SimpleObjectProperty<>();
         modifiedCells = FXCollections.observableSet();
         
-        lastSpreadsheetCellChange.addListener(new ChangeListener<SpreadsheetCellChange>() {
+        lastSpreadsheetCellChange.addListener(new ChangeListener<GridChange>() {
 			@Override
-			public void changed(ObservableValue<? extends SpreadsheetCellChange> arg0,
-					SpreadsheetCellChange arg1, SpreadsheetCellChange arg2) {
+			public void changed(ObservableValue<? extends GridChange> arg0,
+					GridChange arg1, GridChange arg2) {
 				if(arg2 != null){
 					modifiedCells.add(getRows().get(arg2.getRow()).get(arg2.getColumn()));
 				}
@@ -132,9 +137,22 @@ public class GridBase implements Grid {
     }
     
     /** {@inheritDoc} */
-    @Override public ReadOnlyObjectProperty<SpreadsheetCellChange> getLastSpreadsheetCellChange() {
+    @Override public ReadOnlyObjectProperty<GridChange> getLastSpreadsheetCellChange() {
 		return lastSpreadsheetCellChange;
 	}
+    
+    /** {@inheritDoc} */
+    public void setCellValue(int row,int column,Object value){
+    	if(row < rowCount && column < columnCount && !isLock()){
+    		SpreadsheetCell cell = getRows().get(row).get(column);
+    		Object item = cell.getItem();
+    		cell.setItem(value);
+    		if(!item.equals(cell.getItem())){
+    			GridChange cellChange = new GridChange(row, column, item, value);
+    			lastSpreadsheetCellChange.setValue(cellChange);
+    		}
+    	}
+    }
     
     /** {@inheritDoc} */
     @Override public int getRowCount() {
@@ -199,6 +217,32 @@ public class GridBase implements Grid {
      **************************************************************************/
 
     /**
+     * Return a BooleanProperty associated with the lock. 
+     * It means that the Grid is in a read-only mode and 
+     * that no SpreadsheetCell can be modified, no regards
+     * for their own {@link SpreadsheetCell#editableProperty()}.
+     * @return
+     */
+    public BooleanProperty lockProperty(){
+    	return lock;
+    }
+    
+    /**
+     * Return whether this Grid id locked or not.
+     * @return
+     */
+    public boolean isLock(){
+    	return lock.get();
+    }
+    
+    /**
+     * Lock or unlock this Grid.
+     * @param b
+     */
+    public void setLock(Boolean b){
+    	lock.setValue(b);
+    }
+    /**
      * Span in row the cell situated at rowIndex and colIndex by the number
      * count
      * 
@@ -255,19 +299,6 @@ public class GridBase implements Grid {
         }
         
         setRowCount(rows.size());
-    }
-    
-    /** {@inheritDoc} */
-    public void setCellValue(int row,int column,Object value){
-    	if(row < rowCount && column < columnCount){
-    		SpreadsheetCell cell = getRows().get(row).get(column);
-    		Object item = cell.getItem();
-    		cell.setItem(value);
-    		if(!item.equals(cell.getItem())){
-    			SpreadsheetCellChange cellChange = new SpreadsheetCellChange(row, column, item, value);
-    			lastSpreadsheetCellChange.setValue(cellChange);
-    		}
-    	}
     }
     
     /***************************************************************************

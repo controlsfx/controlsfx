@@ -99,11 +99,11 @@ public interface Grid {
     public ObservableSet<SpreadsheetCell> getModifiedCells();
     
     /**
-     * Return and {@link ObjectProperty} wrapping a {@link SpreadsheetCellChange}
+     * Return and {@link ObjectProperty} wrapping a {@link GridChange}
      * containing the last modification on the grid.
      * @return
      */
-    public ReadOnlyObjectProperty<SpreadsheetCellChange> getLastSpreadsheetCellChange();
+    public ReadOnlyObjectProperty<GridChange> getLastSpreadsheetCellChange();
     
     /**
      * Change the value situated at the intersection if possible.

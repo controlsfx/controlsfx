@@ -740,6 +740,7 @@ public class SpreadsheetView extends Control {
                 copyClipBoard();
             }
         });
+        
         final MenuItem item2 = new MenuItem("Paste");
         item2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -761,7 +762,7 @@ public class SpreadsheetView extends Control {
         if(!isEditable())
         	return;
         
-        final ArrayList<SpreadsheetCellChange> list = new ArrayList<SpreadsheetCellChange>();
+        final ArrayList<GridChange> list = new ArrayList<GridChange>();
         @SuppressWarnings("rawtypes")
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
@@ -769,7 +770,7 @@ public class SpreadsheetView extends Control {
         	SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
         	//Using SpreadsheetCell change to stock the information
         	//FIXME a dedicated class should be used
-            list.add(new SpreadsheetCellChange(cell.getRow(), cell.getColumn(), null, cell.getText()));
+            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getText()));
         }
 
         final ClipboardContent content = new ClipboardContent();
@@ -788,13 +789,13 @@ public class SpreadsheetView extends Control {
         if(clipboard.getContent(fmt) != null){
 
             @SuppressWarnings("unchecked")
-            final ArrayList<SpreadsheetCellChange> list = (ArrayList<SpreadsheetCellChange>) clipboard.getContent(fmt);
+            final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
             //TODO algorithm very bad
             int minRow=getGrid().getRowCount();
             int minCol=getGrid().getColumnCount();
             int maxRow=0;
             int maxCol=0;
-            for (final SpreadsheetCellChange p : list) {
+            for (final GridChange p : list) {
                 final int tempcol = p.getColumn();
                 final int temprow = p.getRow();
                 if(tempcol<minCol) {
@@ -819,7 +820,7 @@ public class SpreadsheetView extends Control {
             int column;
 
 
-            for (final SpreadsheetCellChange change : list) {
+            for (final GridChange change : list) {
                 row = change.getRow();
                 column = change.getColumn();
                 if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()

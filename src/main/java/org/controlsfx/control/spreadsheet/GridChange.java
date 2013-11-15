@@ -32,7 +32,7 @@ import java.io.Serializable;
  * 
  * This class represents a single change happening in a {@link Grid}.
  */
-public class SpreadsheetCellChange implements Serializable{
+public class GridChange implements Serializable{
 
 	/***************************************************************************
      *                                                                         *
@@ -55,7 +55,7 @@ public class SpreadsheetCellChange implements Serializable{
      *                                                                         *
      * Constructor                                                                      *
      **************************************************************************/
-	public SpreadsheetCellChange(int row,int column,Object oldValue,Object newValue){
+	public GridChange(int row,int column,Object oldValue,Object newValue){
 		this.row = row;
 		this.column = column;
 		this.oldValue = oldValue;

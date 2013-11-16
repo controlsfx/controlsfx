@@ -42,6 +42,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     public GridRowSkin(GridRow<T> control) {
         super(control, new CellBehaviorBase<GridRow<T>>(control, Collections.<KeyBinding> emptyList()));
 
+        // Remove any children before creating cells (by default a LabeledText exist and we don't need it)
+        getChildren().clear();
         updateCells();
         
         registerChangeListener(getSkinnable().indexProperty(), "INDEX");
@@ -61,38 +63,61 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
         }
     }
 
-    public void updateCells() {
-        // TODO we can cache the cells locally like in TableRowSkinBase
-        getChildren().clear();
-
-        GridView gridView = getSkinnable().getGridView();
-        int maxCellsInRow = ((GridViewSkin)gridView.getSkin()).computeMaxCellsInRow();
-        int rowIndex = getSkinnable().indexProperty().get();
-        int startCellIndex = rowIndex * maxCellsInRow;
-        int endCellIndex = startCellIndex + maxCellsInRow - 1;
-
-        if (rowIndex >= 0) {
-            for (int cellIndex = startCellIndex; cellIndex <= endCellIndex; cellIndex++) {
-                if (cellIndex < gridView.getItems().size()) {
-                    GridCell<T> cell = createCell();
-//                    cell.setGridRow(getSkinnable());
-                    cell.updateGridView(gridView);
-                    cell.updateIndex(cellIndex);
-                    getChildren().add(cell);
-                }
-            }
+    /**
+     *  Returns a cell element at a desired index
+     *  @param index The index of the wanted cell element
+     *  @return Cell element if exist else null
+     */
+    public GridCell<T> getCellAtIndex(int index) {
+        if( index < getChildren().size() ) {
+            return (GridCell<T>)getChildren().get(index);
         }
+        return null;
+    }
+        
+    /**
+     *  Update all cells
+     *  <p>Cells are only created when needed and re-used when possible.</p>
+     */
+    public void updateCells() {
+        int rowIndex = getSkinnable().getIndex();
+        if (rowIndex >= 0) {
+            GridView<T> gridView = getSkinnable().getGridView();
+            int maxCellsInRow = ((GridViewSkin)gridView.getSkin()).computeMaxCellsInRow();
+            int totalCellsInGrid = gridView.getItems().size();
+            int startCellIndex = rowIndex * maxCellsInRow;
+            int endCellIndex = startCellIndex + maxCellsInRow - 1;
+            int cacheIndex = 0;
 
-        getSkinnable().requestLayout();
+            for (int cellIndex = startCellIndex; cellIndex <= endCellIndex; cellIndex++, cacheIndex++) {
+                if (cellIndex < totalCellsInGrid) {
+                    // Check if we can re-use a cell at this index or create a new one
+                    GridCell<T> cell = getCellAtIndex(cacheIndex);
+                    if( cell == null ) {
+                        cell = createCell();
+                        getChildren().add(cell);
+                    }
+                    cell.updateIndex(cellIndex);
+                }
+                // we are going out of bounds -> exist the loop
+                else { break; }
+            }
+            
+            // In case we are re-using a row that previously had more cells than
+            // this one, we need to remove the extra cells that remain
+            getChildren().remove(cacheIndex, getChildren().size());
+        }
     }
 
     private GridCell<T> createCell() {
+        GridView<T> gridView = getSkinnable().gridViewProperty().get();
         GridCell<T> cell;
-        if (getSkinnable().gridViewProperty().get().getCellFactory() != null) {
-            cell = getSkinnable().gridViewProperty().get().getCellFactory().call(getSkinnable().gridViewProperty().get());
+        if (gridView.getCellFactory() != null) {
+            cell = gridView.getCellFactory().call(gridView);
         } else {
             cell = createDefaultCellImpl();
         }
+        cell.updateGridView(gridView);
         return cell;
     }
 

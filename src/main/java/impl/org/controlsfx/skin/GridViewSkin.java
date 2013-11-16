@@ -75,6 +75,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         registerChangeListener(control.horizontalCellSpacingProperty(), "HORIZONZAL_CELL_SPACING");
         registerChangeListener(control.verticalCellSpacingProperty(), "VERTICAL_CELL_SPACING");
         registerChangeListener(control.widthProperty(), "WIDTH_PROPERTY");
+        registerChangeListener(control.heightProperty(), "HEIGHT_PROPERTY");
     }
 
     @Override protected void handleControlPropertyChanged(String p) {
@@ -97,7 +98,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
             if (getSkinnable().getParent() != null && getSkinnable().isVisible()) {
                 getSkinnable().requestLayout();
             }
-        } else if (p == "WIDTH_PROPERTY") {
+        } else if (p == "WIDTH_PROPERTY" || p == "HEIGHT_PROPERTY") {
             updateRowCount();
         }
     }

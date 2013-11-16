@@ -65,15 +65,18 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
         // TODO we can cache the cells locally like in TableRowSkinBase
         getChildren().clear();
 
-        int startCellIndex = getSkinnable().indexProperty().get() * computeMaxCellsInRow();
-        int endCellIndex = startCellIndex + computeMaxCellsInRow() - 1;
+        GridView gridView = getSkinnable().getGridView();
+        int maxCellsInRow = ((GridViewSkin)gridView.getSkin()).computeMaxCellsInRow();
+        int rowIndex = getSkinnable().indexProperty().get();
+        int startCellIndex = rowIndex * maxCellsInRow;
+        int endCellIndex = startCellIndex + maxCellsInRow - 1;
 
-        if (getSkinnable().indexProperty().get() >= 0) {
+        if (rowIndex >= 0) {
             for (int cellIndex = startCellIndex; cellIndex <= endCellIndex; cellIndex++) {
-                if (cellIndex < getSkinnable().gridViewProperty().get().getItems().size()) {
+                if (cellIndex < gridView.getItems().size()) {
                     GridCell<T> cell = createCell();
 //                    cell.setGridRow(getSkinnable());
-                    cell.updateGridView(getSkinnable().getGridView());
+                    cell.updateGridView(gridView);
                     cell.updateIndex(cellIndex);
                     getChildren().add(cell);
                 }
@@ -117,18 +120,6 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
     @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         GridView<T> gv = getSkinnable().gridViewProperty().get();
         return gv.getCellHeight() + gv.getVerticalCellSpacing() * 2;
-    }
-
-    public int computeMaxCellsInRow() {
-        return computeMaxCellsInRow(getSkinnable().getWidth());
-    }
-
-    protected int computeMaxCellsInRow(double width) {
-        return Math.max((int) Math.floor(width / computeCellWidth()), 1);
-    }
-
-    protected double computeCellWidth() {
-        return getSkinnable().gridViewProperty().get().cellWidthProperty().doubleValue() + getSkinnable().gridViewProperty().get().horizontalCellSpacingProperty().doubleValue() + getSkinnable().gridViewProperty().get().horizontalCellSpacingProperty().doubleValue();
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {

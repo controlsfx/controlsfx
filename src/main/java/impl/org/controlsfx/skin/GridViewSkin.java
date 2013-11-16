@@ -147,18 +147,46 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         return row;
     }
 
+    /**
+     *  Returns the number of row needed to display the whole set of cells
+     *  @return GridView row count
+     */
     @Override public int getItemCount() {
-        final GridView<?> gv = getSkinnable();
-        final ObservableList<?> items = gv.getItems();
-        return items == null ? 0 : (items.size() / computeMaxCellsInRow(gv.getWidth()));
+        final ObservableList<?> items = getSkinnable().getItems();
+        // Fix for #98 : int division should be cast to get the result as
+        // double and ceiled to get the max int of it (as we are looking for
+        // the max number of necessary row)
+        return items == null ? 0 : (int)Math.ceil((double)items.size() / computeMaxCellsInRow());
     }
 
-    public int computeMaxCellsInRow(double width) {
-        return Math.max((int) Math.floor(width / computeCellWidth()), 1);
+    /**
+     *  Returns the max number of cell per row
+     *  @return Max cell number per row 
+     */
+    public int computeMaxCellsInRow() {
+        return Math.max((int) Math.floor(computeRowWidth() / computeCellWidth()), 1);
     }
 
+    /**
+     *  Returns the width of a row
+     *  (should be GridView.width - GridView.Scrollbar.width)
+     *  @return Computed width of a row 
+     */
+    protected double computeRowWidth() {
+        // Fix for #98 : width calculation should take the scrollbar size
+        // into account
+        
+        // TODO: need to figure out how to get the real scrollbar width and
+        // replace the 18 value
+        return getSkinnable().getWidth() - 18;
+    }
+
+    /**
+     *  Returns the width of a cell
+     *  @return Computed width of a cell 
+     */
     protected double computeCellWidth() {
-        return getSkinnable().cellWidthProperty().doubleValue() + getSkinnable().horizontalCellSpacingProperty().doubleValue() + getSkinnable().horizontalCellSpacingProperty().doubleValue();
+        return getSkinnable().cellWidthProperty().doubleValue() + (getSkinnable().horizontalCellSpacingProperty().doubleValue() * 2);
     }
 
     protected void updateRows(int rowCount) {

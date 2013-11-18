@@ -1232,8 +1232,11 @@ public class SpreadsheetView extends Control {
          */
         private void updateScroll(TablePosition<ObservableList<SpreadsheetCell>, ?> posFinal) {
         	
-            // We don't want to do any scrollTo call when dragging
-            if(!drag && getCellsViewSkin().getCellsSize() != 0 && getFixedRows().size() != 0){
+            /**
+             * We don't want to do any scroll when dragging or selecting with click. 
+             * Only keyboard action arrow action.
+             */
+            if(!drag && key &&  getCellsViewSkin().getCellsSize() != 0 && getFixedRows().size() != 0){
 				
 				int start = getCellsViewSkin().getRow(0).getIndex();
 				double posFinalOffset = 0;
@@ -1641,12 +1644,13 @@ public class SpreadsheetView extends Control {
 		public void onChanged(Change<? extends SpreadsheetCell> arg0) {
                 if (arg0.wasAdded()) {
                 	SpreadsheetCell cell = arg0.getElementAdded();
-                     //for (SpreadsheetCell cell : newRows) {
                     	 if(!cell.getStyleClass().contains("modified"))
                              cell.getStyleClass().add("modified");
-                     //}
-                
-			}
+                }else if(arg0.wasRemoved()){
+                	SpreadsheetCell cell = arg0.getElementRemoved();
+               	 	if(cell.getStyleClass().contains("modified"))
+                        cell.getStyleClass().remove("modified");
+                }
 		}
     };
 }

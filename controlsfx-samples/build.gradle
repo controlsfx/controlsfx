@@ -3,8 +3,8 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'application'
 
-apply from: '../mavenPublish.gradle'
-apply from: '../javafx.plugin'
+apply from: 'mavenPublish.gradle'
+apply from: 'javafx.plugin'
 
 group = 'org.controlsfx'
 version = '8.0.3-SNAPSHOT'
@@ -25,7 +25,7 @@ sourceSets {
 }
 
 dependencies {
-    compile "fxsampler:fxsampler:1.0.0-SNAPSHOT"
+    compile "org.controlsfx:fxsampler:1.0.0-SNAPSHOT"
     compile "org.controlsfx:controlsfx:8.0.3-SNAPSHOT"
 
     try {
@@ -45,6 +45,10 @@ task sourceJar(type: Jar) {
 artifacts {
     archives sourceJar
     //archives javadocJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
 }
 
 // enumerate the samples at build time
@@ -91,7 +95,7 @@ javafx {
 
     javaRuntime = '<NO RUNTIME>' // for now don't bundle a VM
 
-    // deplpy/info attributes
+    // deploy/info attributes
     category = 'JavaFX Demos'
     copyright = 'Copyright (c) 2013 Jonathan Giles and others'
     description = 'This is a sample of all of the ControlsFX controls'

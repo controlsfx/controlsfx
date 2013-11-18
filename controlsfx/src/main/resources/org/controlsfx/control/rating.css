@@ -1,0 +1,15 @@
+.rating > .container {
+    -fx-spacing: 4;
+}
+.rating > .container > .button {
+    -fx-background-color: transparent;
+    -fx-background-image: url("unselected-star.png");
+    -fx-padding: 16 16; 
+    -fx-background-image-repeat: no-repeat;
+}
+.rating > .container > .button.strong {
+    -fx-background-image: url("selected-star.png");
+}
+.rating > .container > .button:hover {
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
+}

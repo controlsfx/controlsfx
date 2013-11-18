@@ -1,0 +1,86 @@
+
+/*******************************************************************************
+ *                                                                             *
+ * RangeSlider                                                                 *
+ * (Largely derived from Modena styles)                                        *
+ *                                                                             *
+ ******************************************************************************/
+
+.range-slider .low-thumb, 
+.range-slider .high-thumb {
+    -fx-background-color: 
+        linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)),
+        -fx-inner-border,
+        -fx-body-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 1.0em; /* makes sure this remains circular */
+    -fx-padding: 0.583333em;  /* 7 */
+    -fx-effect: dropshadow(two-pass-box , rgba(0, 0, 0, 0.1), 5, 0.0 , 0, 2);
+}
+
+.range-slider:focused .low-thumb,
+.range-slider:focused .high-thumb {
+    -fx-background-radius: 1.0em; /* makes sure this remains circular */
+}
+
+.range-slider .low-thumb:focused, 
+.range-slider .high-thumb:focused {
+    -fx-background-color:
+        -fx-focus-color,
+        derive(-fx-color,-36%),
+        derive(-fx-color,73%),
+        linear-gradient(to bottom, derive(-fx-color,-19%),derive(-fx-color,61%));
+    -fx-background-insets: -1.4, 0, 1, 2;
+    -fx-background-radius: 1.0em; /* makes sure this remains circular */
+}
+
+.range-slider .low-thumb:hover, 
+.range-slider .high-thumb:hover {
+    -fx-color: -fx-hover-base;
+}
+
+.range-slider .range-bar {
+    -fx-background-color: -fx-focus-color;
+}
+
+.range-slider .low-thumb:pressed,
+.range-slider .high-thumb:pressed {
+    -fx-color: -fx-pressed-base;
+}
+
+.range-slider .track {
+    -fx-background-color: 
+          -fx-shadow-highlight-color,
+          linear-gradient(to bottom, derive(-fx-text-box-border, -10%), -fx-text-box-border),
+          linear-gradient(to bottom, 
+            derive(-fx-control-inner-background, -9%),
+            derive(-fx-control-inner-background, 0%),
+            derive(-fx-control-inner-background, -5%),
+            derive(-fx-control-inner-background, -12%)
+          );
+    -fx-background-insets: 0 0 -1 0, 0, 1;
+    -fx-background-radius: 0.25em, 0.25em, 0.166667em; /* 3 3 2 */
+    -fx-padding: 0.25em; /* 3 */
+}
+
+.range-slider:vertical .track {
+    -fx-background-color: 
+          -fx-shadow-highlight-color,
+          -fx-text-box-border,
+          linear-gradient(to right, 
+            derive(-fx-control-inner-background, -9%),
+            -fx-control-inner-background,
+            derive(-fx-control-inner-background, -9%)
+          );
+}
+
+.range-slider .axis {
+    -fx-tick-label-fill: derive(-fx-text-background-color, 30%);
+    -fx-tick-length: 5px;
+    -fx-minor-tick-length: 3px;
+    -fx-border-color: null;
+}
+
+.range-slider:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}

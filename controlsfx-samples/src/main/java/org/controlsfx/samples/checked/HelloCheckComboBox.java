@@ -26,26 +26,21 @@
  */
 package org.controlsfx.samples.checked;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.samples.Utils;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloCheckComboBox extends SampleBase {
+public class HelloCheckComboBox extends ControlsFXSample {
     
     @Override public String getSampleName() {
         return "CheckComboBox";
@@ -53,10 +48,6 @@ public class HelloCheckComboBox extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckComboBox.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -92,15 +83,6 @@ public class HelloCheckComboBox extends SampleBase {
         grid.add(cbcb, 1, row++);
         
         return grid;
-    }
-    
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("CheckComboBox Demo");
-        
-        
-        Scene scene = new Scene((Parent) getPanel(stage), 550, 550);
-        stage.setScene(scene);
-        stage.show();
     }
     
     public static void main(String[] args) {

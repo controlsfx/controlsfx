@@ -26,13 +26,10 @@
  */
 package org.controlsfx.samples.checked;
 
-import javafx.application.Application;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
@@ -40,13 +37,11 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.samples.Utils;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloCheckTreeView extends SampleBase {
+public class HelloCheckTreeView extends ControlsFXSample {
     
     @Override public String getSampleName() {
         return "CheckTreeView";
@@ -60,6 +55,7 @@ public class HelloCheckTreeView extends SampleBase {
         return true;
     }
     
+    @SuppressWarnings("unchecked")
     @Override public Node getPanel(Stage stage) {
         GridPane grid = new GridPane();
         grid.setVgap(10);
@@ -112,17 +108,8 @@ public class HelloCheckTreeView extends SampleBase {
         }
         label.setText(sb.toString());
     }
-
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("CheckTreeView Demo");
-        
-        Scene scene = new Scene((Parent) getPanel(stage), 550, 550);
-        stage.setScene(scene);
-        stage.show();
-    }
     
     public static void main(String[] args) {
         launch(args);
     }
-    
 }

@@ -26,11 +26,8 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -38,12 +35,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SegmentedButton;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloSegmentedButton extends SampleBase {
+public class HelloSegmentedButton extends ControlsFXSample {
     
     @Override public String getSampleName() {
         return "SegmentedButton";
@@ -51,10 +46,6 @@ public class HelloSegmentedButton extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/SegmentedButton.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -106,18 +97,7 @@ public class HelloSegmentedButton extends SampleBase {
         return grid;
     }
     
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("SegmentedButton Demo");
-        
-        
-        Scene scene = new Scene((Parent) getPanel(stage), 350, 150);
-//        scene.getStylesheets().addAll(SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm());
-        stage.setScene(scene);
-        stage.show();
-    }
-    
     public static void main(String[] args) {
         launch(args);
     }
-    
 }

@@ -33,8 +33,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
@@ -43,16 +41,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.samples.Utils;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloLightweightDialogInTabPane extends SampleBase {
+public class HelloLightweightDialogInTabPane extends ControlsFXSample {
 
     @Override public String getSampleName() {
         return "Lightweight Dialogs";
@@ -61,13 +56,6 @@ public class HelloLightweightDialogInTabPane extends SampleBase {
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
     }
-    
-    @Override public boolean isVisible() {
-        return true;
-    }
-    
-    private Stage stage;
-    
     
     @Override public Node getPanel(final Stage stage) {
         final Tab tab1 = new Tab("Tab 1");
@@ -148,23 +136,6 @@ public class HelloLightweightDialogInTabPane extends SampleBase {
         tab2.setContent(grid);
     }
 
-    @Override public void start(final Stage stage) {
-        // setUserAgentStylesheet(STYLESHEET_MODENA);
-        this.stage = stage;
-
-        stage.setTitle("Lightweight Dialogs Sample");
-
-        Scene scene = new Scene((Parent)getPanel(stage), 800, 400);
-        scene.setFill(Color.WHITE);
-
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    /**
-     * @param args
-     *            the command line arguments
-     */
     public static void main(String[] args) {
         Application.launch(args);
     }

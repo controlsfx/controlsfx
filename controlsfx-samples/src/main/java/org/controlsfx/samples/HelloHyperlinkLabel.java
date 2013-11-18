@@ -26,25 +26,20 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.beans.binding.StringBinding;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.HyperlinkLabel;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloHyperlinkLabel extends SampleBase {
+public class HelloHyperlinkLabel extends ControlsFXSample {
     
     private HyperlinkLabel label;
     
@@ -58,10 +53,6 @@ public class HelloHyperlinkLabel extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/HyperlinkLabel.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -103,16 +94,5 @@ public class HelloHyperlinkLabel extends SampleBase {
         root.getChildren().add(label);
         
         return root;
-    }
-    
-    @Override public void start(Stage stage) {
-        stage.setTitle("HyperlinkLabel Demo");
-
-        Scene scene = new Scene((Parent) getPanel(stage), 520, 360);
-
-        stage.setScene(scene);
-        stage.show();
-        
-        label.requestFocus();
     }
 }

@@ -39,7 +39,6 @@ import static org.controlsfx.control.ButtonBar.ButtonType.OK_DONE;
 import static org.controlsfx.control.ButtonBar.ButtonType.OTHER;
 import static org.controlsfx.control.ButtonBar.ButtonType.RIGHT;
 import static org.controlsfx.control.ButtonBar.ButtonType.YES;
-import javafx.application.Application;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,8 +46,6 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -59,17 +56,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloButtonBar extends SampleBase {
+public class HelloButtonBar extends ControlsFXSample {
     
     @Override public String getSampleName() {
         return "ButtonBar";
@@ -77,10 +71,6 @@ public class HelloButtonBar extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/ButtonBar.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     private ToggleButton createToggle( final String caption, final ButtonBar buttonBar, final String buttonBarOrder ) {
@@ -175,16 +165,6 @@ public class HelloButtonBar extends SampleBase {
         VBox.setVgrow(sp, Priority.ALWAYS);
         
         return root;
-    }
-    
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("ButtonBar Demo");
-        
-        Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
-        scene.setFill(Color.WHITE);
-        
-        stage.setScene(scene);
-        stage.show();
     }
      
     private Button createButton( String title, ButtonType type) {

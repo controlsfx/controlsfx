@@ -26,18 +26,15 @@
  */
 package org.controlsfx.samples;
 
-import java.net.URL;
-
-import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import fxsampler.Sample;
-import fxsampler.SampleBase;
 
-public class SVGTest extends SampleBase {
+import org.controlsfx.ControlsFXSample;
+
+public class SVGTest extends ControlsFXSample {
     
     private static final int IMAGE_HEIGHT = 175;
     private static final int IMAGE_SPACING = 0;
@@ -90,8 +87,8 @@ public class SVGTest extends SampleBase {
     }
     
     private void loadImage(final String filename, final VBox container) throws Exception {
-        final URL pathToFile = SVGTest.class.getResource(filename).toURI().toURL();
-
+//        final URL pathToFile = SVGTest.class.getResource(filename).toURI().toURL();
+//
 //        SVGLoader.loadSVGImage(pathToFile, IMAGE_HEIGHT, -1, new Callback<ImageView, Void>() {
 //            @Override public Void call(ImageView image) {
 //                container.getChildren().addAll(image);

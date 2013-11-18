@@ -31,15 +31,12 @@ import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -49,9 +46,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
@@ -59,10 +56,7 @@ import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
 import org.controlsfx.samples.Utils;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloActionGroup extends SampleBase {
+public class HelloActionGroup extends ControlsFXSample {
     
     private static final ImageView image = new ImageView( new Image("/org/controlsfx/samples/security-low.png"));
     
@@ -81,7 +75,6 @@ public class HelloActionGroup extends SampleBase {
     );
     
     static class DummyAction extends AbstractAction {
-
         public DummyAction(String name, Node image) {
             super(name);
             setGraphic(image);
@@ -98,12 +91,9 @@ public class HelloActionGroup extends SampleBase {
         @Override public String toString() {
             return getText();
         }
-
-        
     }
     
     private ObservableList<Action> flatten( Collection<? extends Action> actions, ObservableList<Action> dest ) {
-        
         for (Action a : actions) {
            if ( a == null || a == ActionUtils.ACTION_SEPARATOR ) continue;
            dest.add(a); 
@@ -115,17 +105,12 @@ public class HelloActionGroup extends SampleBase {
         return dest;
     }
     
-    
     @Override public String getSampleName() {
         return "Action Group";
     }
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionGroup.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(final Stage stage) {
@@ -195,19 +180,8 @@ public class HelloActionGroup extends SampleBase {
     	VBox.setMargin(control, insets);
     	return control;
     }
-    
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Action Group Demo");
-        
-        Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
-        scene.setFill(Color.WHITE);
-        
-        stage.setScene(scene);
-        stage.show();
-    }
      
     public static void main(String[] args) {
         launch(args);
     }
-    
 }

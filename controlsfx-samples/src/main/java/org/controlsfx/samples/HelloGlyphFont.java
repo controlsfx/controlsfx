@@ -30,11 +30,8 @@ import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
 
 import java.util.Map;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
@@ -42,14 +39,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloGlyphFont extends SampleBase {
+public class HelloGlyphFont extends ControlsFXSample {
 
 	private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
@@ -77,11 +72,6 @@ public class HelloGlyphFont extends SampleBase {
 	@Override
 	public String getJavaDocURL() {
 		return Utils.JAVADOC_BASE + "org/controlsfx/glyphfont/GlyphFont.html";
-	}
-	
-	@Override
-	public boolean isVisible() {
-		return true;
 	}
 
 	@Override
@@ -111,19 +101,7 @@ public class HelloGlyphFont extends SampleBase {
 
 	}
 
-	@Override
-	public void start(Stage stage) throws Exception {
-		stage.setTitle("Glyph Font Demo");
-
-		Scene scene = new Scene((Parent) getPanel(stage), 1300, 300);
-		scene.setFill(Color.WHITE);
-
-		stage.setScene(scene);
-		stage.show();
-	}
-
 	public static void main(String[] args) {
 		launch(args);
 	}
-
 }

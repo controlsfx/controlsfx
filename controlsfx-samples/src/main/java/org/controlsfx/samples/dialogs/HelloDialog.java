@@ -42,8 +42,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -54,10 +52,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
@@ -70,10 +68,7 @@ import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloDialog extends SampleBase {
+public class HelloDialog extends ControlsFXSample {
 
     private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
     private final CheckBox cbUseNativeTitleBar = new CheckBox("Use Native TitleBar");
@@ -520,23 +515,6 @@ public class HelloDialog extends SampleBase {
         return dialog;
     }
 
-    @Override public void start(final Stage stage) {
-        // setUserAgentStylesheet(STYLESHEET_MODENA);
-        this.stage = stage;
-
-        stage.setTitle("Dialog Sample");
-
-        Scene scene = new Scene((Parent)getPanel(stage), 800, 400);
-        scene.setFill(Color.WHITE);
-
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    /**
-     * @param args
-     *            the command line arguments
-     */
     public static void main(String[] args) {
         Application.launch(args);
     }

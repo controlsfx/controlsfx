@@ -32,19 +32,16 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.Rating;
 
-import fxsampler.SampleBase;
-
-public class HelloRating extends SampleBase {
+public class HelloRating extends ControlsFXSample {
     
     private Rating rating;
     
@@ -63,7 +60,6 @@ public class HelloRating extends SampleBase {
     @Override public String getSampleDescription() {
         return "TODO";
     }
-    
     
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(20);
@@ -111,14 +107,5 @@ public class HelloRating extends SampleBase {
         root.getChildren().addAll(controls_row1, partialRating, updateOnHover);
         
         return root;
-    }
-    
-    @Override public void start(Stage stage) {
-        stage.setTitle("Rating Demo");
-
-        Scene scene = new Scene((Parent) getPanel(stage), 520, 360);
-
-        stage.setScene(scene);
-        stage.show();
     }
 }

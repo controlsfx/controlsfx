@@ -38,16 +38,14 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
@@ -56,9 +54,7 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanPropertyUtils;
 
-import fxsampler.SampleBase;
-
-public class HelloPropertySheet extends SampleBase {
+public class HelloPropertySheet extends ControlsFXSample {
 
     private static Map<String,Object> customDataMap = new LinkedHashMap<>();
     
@@ -96,10 +92,6 @@ public class HelloPropertySheet extends SampleBase {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/PropertySheet.html";
     }
     
-    @Override public boolean isVisible() {
-        return true;
-    }
-
     class CustomPropertyItem implements Item {
 
         private String key;

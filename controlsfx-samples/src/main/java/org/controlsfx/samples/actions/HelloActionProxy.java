@@ -26,12 +26,13 @@
  */
 package org.controlsfx.samples.actions;
 
+import static org.controlsfx.control.action.ActionMap.action;
+import static org.controlsfx.control.action.ActionMap.actions;
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,23 +53,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionMap;
-
-import static org.controlsfx.control.action.ActionMap.action;
-import static org.controlsfx.control.action.ActionMap.actions;
-
 import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
 import org.controlsfx.samples.Utils;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloActionProxy extends SampleBase {
+public class HelloActionProxy extends ControlsFXSample {
     
     private static final String imagePath = "/org/controlsfx/samples/security-low.png";
     private static final ImageView image = new ImageView(new Image(imagePath));
@@ -229,19 +224,8 @@ public class HelloActionProxy extends SampleBase {
     	VBox.setMargin(control, insets);
     	return control;
     }
-    
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("Action Proxy Demo");
-        
-        Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
-        scene.setFill(Color.WHITE);
-        
-        stage.setScene(scene);
-        stage.show();
-    }
      
     public static void main(String[] args) {
         launch(args);
     }
-    
 }

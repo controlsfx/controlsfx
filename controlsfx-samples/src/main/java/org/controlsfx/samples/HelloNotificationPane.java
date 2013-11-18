@@ -26,13 +26,10 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -40,13 +37,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.AbstractAction;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloNotificationPane extends SampleBase {
+public class HelloNotificationPane extends ControlsFXSample {
     
     private NotificationPane notificationPane;
     private CheckBox cbUseDarkTheme;
@@ -62,10 +57,6 @@ public class HelloNotificationPane extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationPane.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -135,14 +126,5 @@ public class HelloNotificationPane extends SampleBase {
             notificationPane.setText("Hello World! Using the light theme");
             notificationPane.getStyleClass().remove(NotificationPane.STYLE_CLASS_DARK);
         }
-    }
-    
-    @Override public void start(Stage stage) {
-        stage.setTitle("NotificationPane Demo");
-
-        Scene scene = new Scene((Parent) getPanel(stage), 520, 360);
-
-        stage.setScene(scene);
-        stage.show();
     }
 }

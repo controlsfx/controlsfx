@@ -26,24 +26,19 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.RangeSlider;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloRangeSlider extends SampleBase {
+public class HelloRangeSlider extends ControlsFXSample {
     
     public static void main(String[] args) {
         launch(args);
@@ -55,10 +50,6 @@ public class HelloRangeSlider extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/RangeSlider.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -75,16 +66,6 @@ public class HelloRangeSlider extends SampleBase {
         return "The Slider control in JavaFX is great for selecting a single "
                 + "value between a min and max value, but it isn't so great for "
                 + "letting users select a range - that's where RangeSlider comes in!";
-    }
-    
-    @Override public void start(Stage stage) {
-//        setUserAgentStylesheet(STYLESHEET_CASPIAN);
-        stage.setTitle("RangeSlider Demo");
-
-        Scene scene = new Scene((Parent)getPanel(stage), 520, 360);
-
-        stage.setScene(scene);
-        stage.show();
     }
     
     Region createHorizontalSlider() {

@@ -26,11 +26,8 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -38,13 +35,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CustomTextField;
 import org.controlsfx.control.TextFields;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloTextFields extends SampleBase {
+public class HelloTextFields extends ControlsFXSample {
     
     private static final Image image = new Image("/org/controlsfx/samples/security-low.png");
     
@@ -54,10 +49,6 @@ public class HelloTextFields extends SampleBase {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/TextFields.html";
-    }
-    
-    @Override public boolean isVisible() {
-        return true;
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -101,16 +92,6 @@ public class HelloTextFields extends SampleBase {
         grid.add(customTextField3, 1, row++);
         
         return grid;
-    }
-    
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("CustomTextField Demo");
-        
-        
-        Scene scene = new Scene((Parent) getPanel(stage), 550, 550);
-//        scene.getStylesheets().addAll(SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm());
-        stage.setScene(scene);
-        stage.show();
     }
     
     public static void main(String[] args) {

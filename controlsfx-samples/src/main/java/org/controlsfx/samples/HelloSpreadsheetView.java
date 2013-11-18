@@ -34,15 +34,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -50,19 +47,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
 /**
  *
  * Build the UI and launch the Application
  */
-public class HelloSpreadsheetView extends SampleBase {
+public class HelloSpreadsheetView extends ControlsFXSample {
 
 	public static void main(String[] args) {
 		launch(args);
@@ -188,20 +183,6 @@ public class HelloSpreadsheetView extends SampleBase {
 	@Override
 	public String getJavaDocURL() {
 		return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/SpreadsheetView.html";
-	}
-
-	@Override
-	public boolean isVisible() {
-		return true;
-	}
-
-	@Override
-	public void start(Stage primaryStage) {
-		primaryStage.setTitle("SpreadsheetView");
-
-		final Scene scene = new Scene((Parent) getPanel(primaryStage), 600, 400);
-		primaryStage.setScene(scene);
-		primaryStage.show();
 	}
 
 	private void normalGrid(GridBase grid) {

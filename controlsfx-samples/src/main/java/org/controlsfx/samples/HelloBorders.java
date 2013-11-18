@@ -27,18 +27,14 @@
 package org.controlsfx.samples;
 
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.tools.Borders;
 
-import fxsampler.SampleBase;
-
-public class HelloBorders extends SampleBase {
+public class HelloBorders extends ControlsFXSample {
     
     public static void main(String[] args) {
         launch(args);
@@ -49,7 +45,7 @@ public class HelloBorders extends SampleBase {
     }
     
     @Override public String getJavaDocURL() {
-        return null; //Utils.JAVADOC_BASE + "org/controlsfx/tools/Borders.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/tools/Borders.html";
     }
     
     @Override public boolean isVisible() {
@@ -89,15 +85,21 @@ public class HelloBorders extends SampleBase {
     }
     
     @Override public String getSampleDescription() {
-        return null;
+        return "A utility class that allows you to wrap JavaFX Nodes with a border, "
+                + "in a way somewhat analogous to the Swing BorderFactory (although "
+                + "with less options as a lot of what the Swing BorderFactory offers "
+                + "resulted in ugly borders!)."
+                + "\n\nThe Borders class provides a fluent API for specifying the "
+                + "properties of each border. It is possible to create multiple "
+                + "borders around a Node simply by continuing to call additional "
+                + "methods before you call the final build() method. To use the "
+                + "Borders class, you simply call wrap(Node), passing in the Node "
+                + "you wish to wrap the border(s) around.";
     }
     
-    @Override public void start(Stage stage) {
-        stage.setTitle("Borders Demo");
-
-        Scene scene = new Scene((Parent)getPanel(stage), 520, 360);
-
-        stage.setScene(scene);
-        stage.show();
+    @Override
+    public Node getControlPanel() {
+        // TODO Auto-generated method stub
+        return super.getControlPanel();
     }
 }

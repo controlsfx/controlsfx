@@ -28,13 +28,10 @@ package org.controlsfx.samples;
 
 import java.util.Random;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
@@ -42,6 +39,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.SegmentedButton;
@@ -50,10 +48,7 @@ import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.cell.ColorGridCell;
 import org.controlsfx.control.cell.ImageGridCell;
 
-import fxsampler.Sample;
-import fxsampler.SampleBase;
-
-public class HelloGridView extends SampleBase {
+public class HelloGridView extends ControlsFXSample {
 
     private GridView<?> myGrid;
     private final VBox root = new VBox();
@@ -69,11 +64,6 @@ public class HelloGridView extends SampleBase {
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/GridView.html";
     }
-    
-    @Override public boolean isVisible() {
-        return true;
-    }
-    
     
     private GridView<?> getColorGrid() {
         final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
@@ -121,13 +111,6 @@ public class HelloGridView extends SampleBase {
         root.getChildren().add(new ToolBar(selector));
         selector.getButtons().get(0).fire();
         return root;
-    }
-
-    @Override public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("GridView");
-        Scene scene = new Scene((Parent) getPanel(primaryStage), 540, 210);
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
     
     class ActionShowGrid extends AbstractAction {

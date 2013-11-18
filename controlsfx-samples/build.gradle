@@ -25,7 +25,7 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.controlsfx:fxsampler:1.0.0-SNAPSHOT"
+    compile "org.controlsfx:fxsampler:1.0.1"
     compile "org.controlsfx:controlsfx:8.0.3-SNAPSHOT"
 
     try {

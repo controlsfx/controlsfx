@@ -33,11 +33,21 @@ public class SampleScanner {
     
     private static Map<String, String> packageToProjectMap = new HashMap<String, String>();
     static {
+        System.out.println("Initialising FXSampler sample scanner...");
+        System.out.println("\tDiscovering projects...");
         // find all projects on the classpath that expose a FXSamplerProject
         // service. These guys are our friends....
         ServiceLoader<FXSamplerProject> loader = ServiceLoader.load(FXSamplerProject.class);
         for (FXSamplerProject project : loader) {
-            packageToProjectMap.put(project.getSampleBasePackage(), project.getProjectName());
+            final String projectName = project.getProjectName();
+            final String basePackage = project.getSampleBasePackage();
+            packageToProjectMap.put(basePackage, projectName);
+            System.out.println("\t\tFound project '" + projectName + 
+                    "', with sample base package '" + basePackage + "'");
+        }
+        
+        if (packageToProjectMap.isEmpty()) {
+            System.out.println("\tError: Did not find any projects!");
         }
     }
     

@@ -80,8 +80,8 @@ public class FXSampler extends Application {
 
 
     public static void main(String[] args) {
-    	System.out.println(System.getProperty("user.dir"));
-    	System.out.println(System.getProperty("java.class.path"));
+//    	System.out.println(System.getProperty("user.dir"));
+//    	System.out.println(System.getProperty("java.class.path"));
         launch(args);
     }
 
@@ -166,7 +166,7 @@ public class FXSampler extends Application {
 
         // put it all together
         Scene scene = new Scene(grid);
-//        scene.getStylesheets().add(getClass().getResource("fxsampler.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("fxsampler.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(600);

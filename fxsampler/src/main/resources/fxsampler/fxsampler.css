@@ -3,10 +3,13 @@
 }
 
 .search-box {
+    
 }
 
 .samples-tree {
-    
+    -fx-background-color: -fx-outer-border, -fx-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 2, 0;
 }
 
 .right-panel {

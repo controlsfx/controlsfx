@@ -26,7 +26,8 @@
     -fx-text-alignment: justify;
 }
 
-.right-panel > * > .project-name-title {
+.right-panel > * > .project-name-title, 
+.right-panel > * > .property {
     -fx-font-weight: bold;
 }
 

@@ -34,6 +34,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
@@ -41,6 +42,9 @@ import org.controlsfx.control.CheckListView;
 import org.controlsfx.samples.Utils;
 
 public class HelloCheckListView extends ControlsFXSample {
+    
+    private Label checkedItemsLabel;
+    private Label selectedItemsLabel;
     
     @Override public String getSampleName() {
         return "CheckListView";
@@ -50,20 +54,20 @@ public class HelloCheckListView extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckListView.html";
     }
     
+    @Override public String getSampleDescription() {
+        return "A simple UI control that makes it possible to select zero or "
+                + "more items within a ListView without the need to set a custom "
+                + "cell factory or manually create boolean properties for each "
+                + "row - simply use the check model property to request the "
+                + "current selection state.";
+    }
+    
     @Override public Node getPanel(Stage stage) {
-        GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(30, 30, 0, 30));
-        
         final ObservableList<String> strings = FXCollections.observableArrayList();
         for (int i = 0; i <= 100; i++) {
             strings.add("Item " + i);
         }
         
-        final Label checkedItemsLabel = new Label();
-        final Label selectedItemsLabel = new Label();
-
         // CheckListView
         final CheckListView<String> checkListView = new CheckListView<>(strings);
         checkListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -77,27 +81,49 @@ public class HelloCheckListView extends ControlsFXSample {
                 updateText(checkedItemsLabel, c.getList());
             }
         });
-        grid.add(checkListView, 0, 0, 1, 3);
         
-        // labels displaying state
-        grid.add(new Label("Checked items: "), 1, 0);
-        grid.add(checkedItemsLabel, 2, 0);
+        StackPane stackPane = new StackPane(checkListView);
+        stackPane.setPadding(new Insets(30));
+        return stackPane;
+    }
+    
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
         
-        grid.add(new Label("Selected items: "), 1, 1);
-        grid.add(selectedItemsLabel, 2, 1);
+        Label label1 = new Label("Checked items: ");
+        label1.getStyleClass().add("property");
+        grid.add(label1, 0, 0);
+        checkedItemsLabel = new Label();
+        grid.add(checkedItemsLabel, 1, 0);
+        updateText(checkedItemsLabel, null);
+        
+        Label label2 = new Label("Selected items: ");
+        label2.getStyleClass().add("property");
+        grid.add(label2, 0, 1);
+        selectedItemsLabel = new Label();
+        grid.add(selectedItemsLabel, 1, 1);
+        updateText(selectedItemsLabel, null);
         
         return grid;
     }
     
     protected void updateText(Label label, ObservableList<? extends String> list) {
         final StringBuilder sb = new StringBuilder();
-        for (int i = 0, max = list.size(); i < max; i++) {
-            sb.append(list.get(i));
-            if (i < max - 1) {
-                sb.append(", ");
+        
+        if (list != null) {
+            for (int i = 0, max = list.size(); i < max; i++) {
+                sb.append(list.get(i));
+                if (i < max - 1) {
+                    sb.append(", ");
+                }
             }
         }
-        label.setText(sb.toString());
+        
+        final String str = sb.toString();
+        label.setText(str.isEmpty() ? "<empty>" : str);
     }
     
     public static void main(String[] args) {

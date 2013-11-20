@@ -48,8 +48,38 @@ import javafx.util.Callback;
  * boolean properties for each row - simply use the 
  * {@link #checkModelProperty() check model} to request the current selection 
  * state.
+ * 
+ * <h3>Screenshot</h3>
+ * <p>The following screenshot shows the CheckListView with some sample data:
+ * 
+ * <br/>
+ * <img src="checkListView.png"/>
+ * 
+ * <h3>Code Example:</h3>
+ * <p>To create the CheckListView shown in the screenshot, simply do the 
+ * following:
+ * 
+ * <pre>
+ * {@code
+ * // create the data to show in the CheckListView 
+ * final ObservableList<String> strings = FXCollections.observableArrayList();
+ * for (int i = 0; i <= 100; i++) {
+ *     strings.add("Item " + i);
+ * }
+ * 
+ * // Create the CheckListView with the data 
+ * final CheckListView<String> checkListView = new CheckListView<>(strings);
+ *       
+ * // and listen to the relevant events (e.g. when the selected indices or 
+ * // selected items change).
+ * checkListView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
+ *     public void onChanged(ListChangeListener.Change<? extends String> c) {
+ *         System.out.println(checkListView.getCheckModel().getSelectedItems());
+ *     }
+ * });
+ * </pre>
  *
- * @param <T> The type of the data in the ListView.
+ * @param <T> The type of the data in the CheckListView.
  */
 public class CheckListView<T> extends ListView<T> {
     

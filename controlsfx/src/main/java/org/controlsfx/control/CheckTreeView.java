@@ -29,6 +29,7 @@ package org.controlsfx.control;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
@@ -44,6 +45,39 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
  * boolean properties for each row - simply use the 
  * {@link #checkModelProperty() check model} to request the current selection 
  * state.
+ * 
+ * <h3>Screenshot</h3>
+ * <p>The following screenshot shows the CheckTreeView with some sample data:
+ * 
+ * <br/>
+ * <img src="checkTreeView.png"/>
+ * 
+ * <h3>Code Example:</h3>
+ * <p>To create the CheckTreeView shown in the screenshot, simply do the 
+ * following:
+ * 
+ * <pre>
+ * {@code
+ * // create the data to show in the CheckTreeView 
+ * CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>("Root");
+ * root.setExpanded(true);
+ * root.getChildren().addAll(
+ *               new CheckBoxTreeItem<String>("Jonathan"),
+ *               new CheckBoxTreeItem<String>("Eugene"),
+ *               new CheckBoxTreeItem<String>("Henri"),
+ *               new CheckBoxTreeItem<String>("Samir"));
+ * 
+ * // Create the CheckTreeView with the data 
+ * final CheckTreeView<String> checkTreeView = new CheckTreeView<>(root);
+ *       
+ * // and listen to the relevant events (e.g. when the selected indices or 
+ * // selected items change).
+ * checkTreeView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
+ *     public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
+ *         System.out.println(checkListView.getCheckModel().getSelectedIndices());
+ *     }
+ * });
+ * </pre>
  *
  * @param <T> The type of the data in the TreeView.
  */

@@ -57,6 +57,30 @@ public class HelloLightweightDialogInTabPane extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
     }
     
+    @Override public String getSampleDescription() {
+        return "The ControlsFX dialogs API supports a distinction between "
+                + "heavyweight and lightweight dialogs. In short, a heavyweight "
+                + "dialog is rendered in its own JavaFX window, allowing for it "
+                + "to appear outside the bounds of the application. This is the "
+                + "most common style of dialog, and is therefore the default behavior"
+                + " when creating dialogs in ControlsFX. However, in some case, "
+                + "lightweight dialogs make more sense."
+                + "\n\n"
+                + "Lightweight dialogs are rendered within the scenegraph (and "
+                + "can't leave the window). Other than this limitation, "
+                + "lightweight dialogs otherwise render exactly the same as "
+                + "heavyweight dialogs (except a lightweight dialog normally"
+                + " inserts an opaque overlay into the scene so that the dialog "
+                + "sticks out visually). Lightweight dialogs are commonly useful "
+                + "in environments where a windowing system is unavailable "
+                + "(e.g. tablet devices), and also when you only want to block "
+                + "execution (and access to) a portion of your user interface. For"
+                + " example, you could create a lightweight dialog with an owner "
+                + "of a single Tab in a TabPane, and this will only block on "
+                + "that one tab - all other tabs will continue to be interactive "
+                + "and execute as per usual.";
+    }
+    
     @Override public Node getPanel(final Stage stage) {
         final Tab tab1 = new Tab("Tab 1");
         buildTab1(tab1);

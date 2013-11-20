@@ -83,8 +83,13 @@ public class HelloDialog extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/dialog/Dialogs.html";
     }
     
-    @Override public boolean isVisible() {
-        return true;
+    @Override public String getSampleDescription() {
+        return "The Dialogs class is a simple (yet flexible) API for showing the most common forms of "
+                + "(modal) UI dialogs. This class contains a fluent API to make "
+                + "building and customizing the pre-built dialogs really easy, "
+                + "but for those developers who want complete control, you may "
+                + "be interested in instead using the Dialog class (which "
+                + "is what all of these pre-built dialogs use as well).";
     }
     
     private static final String WINDOWS = "Windows";
@@ -119,33 +124,7 @@ public class HelloDialog extends ControlsFXSample {
         grid.setHgap(10);
         grid.setVgap(10);
 
-//        StackPane root = new StackPane();
-//        root.getChildren().add(grid);
-//        Scene scene = new Scene(root, 800, 300);
-//        scene.setFill(Color.WHITE);
-
         int row = 0;
-
-        // *******************************************************************
-        // Information Dialog
-        // *******************************************************************
-
-        grid.add(createLabel("Operating system button placement: "), 0, 0);
-
-        final ToggleButton windowsBtn = createToggle(WINDOWS);
-        final ToggleButton macBtn = createToggle(MAC_OS);
-        final ToggleButton linuxBtn = createToggle(LINUX);
-        windowsBtn.selectedProperty().set(true);
-        
-        SegmentedButton operatingSystem = new SegmentedButton(FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
-        
-        grid.add(operatingSystem, 1, row, 3, 1);
-
-        row++;
-        grid.add(createLabel("Common Dialog attributes: "), 0, 1);
-        grid.add(new HBox(10, cbUseLightweightDialog, cbUseNativeTitleBar, cbShowMasthead, cbSetOwner), 1, row);
-
-        row++;
 
         // *******************************************************************
         // Information Dialog
@@ -514,14 +493,61 @@ public class HelloDialog extends ControlsFXSample {
         
         return dialog;
     }
+    
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        int row = 0;
+
+        // operating system button order
+        grid.add(createLabel("Operating system button order: ", "property"), 0, 0);
+        final ToggleButton windowsBtn = createToggle(WINDOWS);
+        final ToggleButton macBtn = createToggle(MAC_OS);
+        final ToggleButton linuxBtn = createToggle(LINUX);
+        windowsBtn.selectedProperty().set(true);
+        SegmentedButton operatingSystem = new SegmentedButton(
+                FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
+        grid.add(operatingSystem, 1, row);
+        row++;
+        
+        // use lightweight dialogs
+        grid.add(createLabel("Lightweight dialogs: ", "property"), 0, row);
+        grid.add(cbUseLightweightDialog, 1, row);
+        row++;
+        
+        // use native titlebar
+        grid.add(createLabel("Native titlebar: ", "property"), 0, row);
+        grid.add(cbUseNativeTitleBar, 1, row);
+        row++;
+        
+        // show masthead
+        grid.add(createLabel("Show masthead: ", "property"), 0, row);
+        grid.add(cbShowMasthead, 1, row);
+        row++;
+        
+        // set owner
+        grid.add(createLabel("Set dialog owner: ", "property"), 0, row);
+        grid.add(cbSetOwner, 1, row);
+        row++;
+        
+        return grid;
+    }
 
     public static void main(String[] args) {
         Application.launch(args);
     }
 
-    private Node createLabel(String text) {
+    private Node createLabel(String text, String... styleclass) {
         Label label = new Label(text);
-        label.setFont(Font.font(13));
+        
+        if (styleclass == null || styleclass.length == 0) {
+            label.setFont(Font.font(13)); 
+        } else {
+            label.getStyleClass().addAll(styleclass);
+        }
         return label;
     }
 

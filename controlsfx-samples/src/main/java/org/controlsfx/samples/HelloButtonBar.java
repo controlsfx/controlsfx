@@ -44,7 +44,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -52,6 +51,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -65,6 +65,8 @@ import org.controlsfx.control.SegmentedButton;
 
 public class HelloButtonBar extends ControlsFXSample {
     
+    private ButtonBar buttonBar;
+
     @Override public String getSampleName() {
         return "ButtonBar";
     }
@@ -73,61 +75,20 @@ public class HelloButtonBar extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/ButtonBar.html";
     }
     
-    private ToggleButton createToggle( final String caption, final ButtonBar buttonBar, final String buttonBarOrder ) {
-        final ToggleButton btn = new ToggleButton(caption);
-        btn.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
-                if ( newValue) buttonBar.setButtonOrder(buttonBarOrder);
-            }});
-        return btn;
+    @Override public String getSampleDescription() {
+        return "The ButtonBar allows for buttons to be positioned" +
+                " in a way that is OS-specific (or in any way that suits your use case." +
+                " For example, try toggling the OS toggle buttons below (note, you'll want " +
+                "to increase the width of this window first!)";
     }
-    
     
     @Override public Node getPanel(final Stage stage) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
         
-        final ButtonBar buttonBar = new ButtonBar();
-        
-        // explanation text
-        Label details = new Label("The ButtonBar allows for buttons to be positioned" +
-        		" in a way that is OS-specific (or in any way that suits your use case." +
-        		" For example, try toggling the OS toggle buttons below (note, you'll want " +
-        		"to increase the width of this window first!)\n\n");
-        details.setWrapText(true);
-        root.getChildren().add(details);
-        
-        final ToggleButton windowsBtn = createToggle("Windows", buttonBar, ButtonBar.BUTTON_ORDER_WINDOWS);
-        final ToggleButton macBtn = createToggle("Mac OS", buttonBar, ButtonBar.BUTTON_ORDER_MAC_OS);
-        final ToggleButton linuxBtn = createToggle("Linux", buttonBar, ButtonBar.BUTTON_ORDER_LINUX);
-        windowsBtn.selectedProperty().set(true);
-        
-        SegmentedButton osChoice = new SegmentedButton(FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
-        root.getChildren().add(osChoice);
-        VBox.setVgrow(osChoice, Priority.NEVER);
-        
-        // uniform size
-        final CheckBox uniformButtonBtn = new CheckBox("Set all buttons to a uniform size");
-        uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
-        root.getChildren().add( uniformButtonBtn);
-        
-        // minimum size slider / label
-        final Slider minSizeSlider = new Slider(0, 200, 0);
-        Label pixelCountLabel = new Label();
-        pixelCountLabel.textProperty().bind(new StringBinding() {
-            { bind(minSizeSlider.valueProperty()); }
-            
-            @Override protected String computeValue() {
-                return (int)minSizeSlider.getValue() + "px";
-            }
-        });
-        HBox minSizeBox = new HBox(10, new Label("Button min size:"), minSizeSlider, pixelCountLabel);
-        minSizeBox.setAlignment(Pos.BASELINE_LEFT);
-        buttonBar.buttonMinWidthProperty().bind(minSizeSlider.valueProperty());
-        root.getChildren().add(minSizeBox);
-        
-        
+        buttonBar = new ButtonBar();
+
         // spacer to push button bar to bottom
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
@@ -165,6 +126,67 @@ public class HelloButtonBar extends ControlsFXSample {
         VBox.setVgrow(sp, Priority.ALWAYS);
         
         return root;
+    }
+    
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        int row = 0;
+
+        // operating system button order
+        Label osChoiceLabel = new Label("Operating system button order: ");
+        osChoiceLabel.getStyleClass().add("property");
+        grid.add(osChoiceLabel, 0, 0);
+        final ToggleButton windowsBtn = createToggle("Windows", buttonBar, ButtonBar.BUTTON_ORDER_WINDOWS);
+        final ToggleButton macBtn = createToggle("Mac OS", buttonBar, ButtonBar.BUTTON_ORDER_MAC_OS);
+        final ToggleButton linuxBtn = createToggle("Linux", buttonBar, ButtonBar.BUTTON_ORDER_LINUX);
+        windowsBtn.selectedProperty().set(true);
+        SegmentedButton operatingSystem = new SegmentedButton(
+                FXCollections.observableArrayList(windowsBtn, macBtn, linuxBtn));
+        grid.add(operatingSystem, 1, row);
+        row++;
+        
+        // uniform size
+        Label uniformSizeLabel = new Label("Set all buttons to a uniform size: ");
+        uniformSizeLabel.getStyleClass().add("property");
+        grid.add(uniformSizeLabel, 0, row);
+        final CheckBox uniformButtonBtn = new CheckBox();
+        uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
+        grid.add(uniformButtonBtn, 1, row);
+        row++;
+        
+        // minimum size slider / label
+        Label minSizeLabel = new Label("Button min size: ");
+        minSizeLabel.getStyleClass().add("property");
+        grid.add(minSizeLabel, 0, row);
+        
+        final Slider minSizeSlider = new Slider(0, 200, 0);
+        Label pixelCountLabel = new Label();
+        pixelCountLabel.textProperty().bind(new StringBinding() {
+            { bind(minSizeSlider.valueProperty()); }
+            
+            @Override protected String computeValue() {
+                return (int)minSizeSlider.getValue() + "px";
+            }
+        });
+        HBox minSizeBox = new HBox(10, minSizeSlider, pixelCountLabel);
+        buttonBar.buttonMinWidthProperty().bind(minSizeSlider.valueProperty());
+        grid.add(minSizeBox, 1, row);
+        row++;
+        
+        return grid;
+    }
+    
+    private ToggleButton createToggle( final String caption, final ButtonBar buttonBar, final String buttonBarOrder ) {
+        final ToggleButton btn = new ToggleButton(caption);
+        btn.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+                if ( newValue) buttonBar.setButtonOrder(buttonBarOrder);
+            }});
+        return btn;
     }
      
     private Button createButton( String title, ButtonType type) {

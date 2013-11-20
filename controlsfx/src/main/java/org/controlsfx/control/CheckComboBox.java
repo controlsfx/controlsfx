@@ -46,6 +46,36 @@ import javafx.scene.control.Skin;
  * A simple UI control that makes it possible to select zero or more items within
  * a ComboBox-like control. Each row item shows a {@link CheckBox}, and the state
  * of each row can be queried via the {@link #checkModelProperty() check model}.
+ * 
+ * <h3>Screenshot</h3>
+ * <p>The following screenshot shows the CheckComboBox with some sample data:
+ * 
+ * <br/>
+ * <img src="checkComboBox.png"/>
+ * 
+ * <h3>Code Example:</h3>
+ * <p>To create the CheckComboBox shown in the screenshot, simply do the 
+ * following:
+ * 
+ * <pre>
+ * {@code
+ * // create the data to show in the CheckComboBox 
+ * final ObservableList<String> strings = FXCollections.observableArrayList();
+ * for (int i = 0; i <= 100; i++) {
+ *     strings.add("Item " + i);
+ * }
+ * 
+ * // Create the CheckComboBox with the data 
+ * final CheckComboBox<String> checkComboBox = new CheckComboBox<String>(strings);
+ * 
+ * // and listen to the relevant events (e.g. when the selected indices or 
+ * // selected items change).
+ * checkComboBox.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
+ *     public void onChanged(ListChangeListener.Change<? extends String> c) {
+ *         System.out.println(checkComboBox.getCheckModel().getSelectedItems());
+ *     }
+ * });}
+ * </pre>
  *
  * @param <T> The type of the data in the ComboBox.
  */

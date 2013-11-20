@@ -42,12 +42,22 @@ import org.controlsfx.samples.Utils;
 
 public class HelloCheckComboBox extends ControlsFXSample {
     
+    private Label checkedItemsLabel;
+    
     @Override public String getSampleName() {
         return "CheckComboBox";
     }
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/CheckComboBox.html";
+    }
+    
+    @Override public String getSampleDescription() {
+        return "A simple UI control that makes it possible to select zero or "
+                + "more items within a ComboBox without the need to set a custom "
+                + "cell factory or manually create boolean properties for each "
+                + "row - simply use the check model property to request the "
+                + "current selection state.";
     }
     
     @Override public Node getPanel(Stage stage) {
@@ -68,21 +78,48 @@ public class HelloCheckComboBox extends ControlsFXSample {
         grid.add(new ComboBox<String>(strings), 1, row++);
         
         // CheckComboBox
-        final CheckComboBox<String> cbcb = new CheckComboBox<String>(strings);
-        cbcb.getCheckModel().getSelectedIndices().addListener(new ListChangeListener<Integer>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends Integer> c) {
-                System.out.println(cbcb.getCheckModel().getSelectedIndices());
-            }
-        });
-        cbcb.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
+        final CheckComboBox<String> checkComboBox = new CheckComboBox<String>(strings);
+        checkComboBox.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
             @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
-                System.out.println(cbcb.getCheckModel().getSelectedItems());
+                updateText(checkedItemsLabel, c.getList());
             }
         });
         grid.add(new Label("CheckComboBox: "), 0, row);
-        grid.add(cbcb, 1, row++);
+        grid.add(checkComboBox, 1, row++);
         
         return grid;
+    }
+    
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        Label label1 = new Label("Checked items: ");
+        label1.getStyleClass().add("property");
+        grid.add(label1, 0, 0);
+        checkedItemsLabel = new Label();
+        grid.add(checkedItemsLabel, 1, 0);
+        updateText(checkedItemsLabel, null);
+        
+        return grid;
+    }
+    
+    protected void updateText(Label label, ObservableList<? extends String> list) {
+        final StringBuilder sb = new StringBuilder();
+        
+        if (list != null) {
+            for (int i = 0, max = list.size(); i < max; i++) {
+                sb.append(list.get(i));
+                if (i < max - 1) {
+                    sb.append(", ");
+                }
+            }
+        }
+        
+        final String str = sb.toString();
+        label.setText(str.isEmpty() ? "<empty>" : str);
     }
     
     public static void main(String[] args) {

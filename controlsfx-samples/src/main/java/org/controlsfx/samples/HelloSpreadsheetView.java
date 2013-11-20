@@ -43,8 +43,8 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
@@ -59,207 +59,212 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  */
 public class HelloSpreadsheetView extends ControlsFXSample {
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+    public static void main(String[] args) {
+        launch(args);
+    }
 
-	@Override
-	public String getSampleName() {
-		return "SpreadsheetView";
-	}
+    private SpreadsheetView spreadSheetView;
+    private StackPane centerPane;
 
-	@Override
-	public Node getPanel(Stage stage) {
-		BorderPane borderPane = new BorderPane();
-		
-		int rowCount = 50;
-		int columnCount = 10;
-		
-		GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-		normalGrid(grid);
-		buildBothGrid(grid);
+    @Override public String getSampleName() {
+        return "SpreadsheetView";
+    }
 
-		SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
+    @Override
+    public Node getPanel(Stage stage) {
+        centerPane = new StackPane();
+        centerPane.setPadding(new Insets(30));
 
-		borderPane.setCenter(spreadSheetView);
+        int rowCount = 50;
+        int columnCount = 10;
 
-		borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Both"));
-		
-		return borderPane;
-	}
-	
-	/**
-	 * FIXME need to be removed afetr
-	 * Compute RowHeight for test
-	 * @return
-	 */
-	private Map<Integer,Double> generateRowHeight(){
-		Map<Integer,Double> rowHeight = new HashMap<>();
-		rowHeight.put(0, 50.0);
-		rowHeight.put(5, 50.0);
-		rowHeight.put(8, 70.0);
-		rowHeight.put(12, 40.0);
-		return rowHeight;
-	}
-	/**
-	 * Build a common control Grid with some options on the left to control the
-	 * SpreadsheetViewInternal
-	 * @param gridType 
-	 *
-	 * @param spreadsheetView
-	 * @return
-	 */
-	private GridPane buildCommonControlGrid(final SpreadsheetView spv,final BorderPane borderPane, String gridType) {
-		final GridPane grid = new GridPane();
-		grid.setHgap(5);
-		grid.setVgap(5);
-		grid.setPadding(new Insets(5, 5, 5, 5));
+        GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+        normalGrid(grid);
+        buildBothGrid(grid);
 
-		final CheckBox rowHeader = new CheckBox("Row Header");
-		rowHeader.setSelected(true);
-		rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
+        spreadSheetView = new SpreadsheetView(grid);
 
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0,
-					Boolean arg1, Boolean arg2) {
-				spv.setShowRowHeader(arg2);
-			}
-		});
+        centerPane.getChildren().setAll(spreadSheetView);
 
-		final CheckBox columnHeader = new CheckBox("Column Header");
-		columnHeader.setSelected(true);
-		
-		columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
+        return centerPane;
+    }
 
-			@Override
-			public void changed(
-					ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				spv.setShowColumnHeader(arg2);
-			}
-		});
-		
-		final CheckBox editable = new CheckBox("Editable");
-		editable.setSelected(true);
-		spv.editableProperty().bind(editable.selectedProperty());
-		
-		//In order to change the span style more easily
-		final ChoiceBox<String> typeOfGrid = new ChoiceBox<String>(FXCollections.observableArrayList("Normal", "Both"));
-		typeOfGrid.setValue(gridType);
-		typeOfGrid.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>(){
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0,
-					Number arg1, Number arg2) {
-				if(arg2.equals(0)){
-					int rowCount = 50;
-					int columnCount = 10;
-					GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-					normalGrid(grid);
-					
-					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
-					borderPane.setCenter(spreadSheetView);
-					borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Normal"));
-				}else{
-					int rowCount = 50;
-					int columnCount = 10;
-					GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-					normalGrid(grid);
-					buildBothGrid(grid);
-					
-					SpreadsheetView spreadSheetView = new SpreadsheetView(grid);
-					borderPane.setCenter(spreadSheetView);
-					borderPane.setLeft(buildCommonControlGrid(spreadSheetView, borderPane,"Both"));
-				}
-			}});
-		
-		grid.add(rowHeader, 1, 1);
-		grid.add(columnHeader, 1, 2);
-		grid.add(editable, 1, 3);
-		grid.add(new Label("Span model:"), 1, 4);
-		grid.add(typeOfGrid, 1, 5);
+    /**
+     * FIXME need to be removed afetr
+     * Compute RowHeight for test
+     * @return
+     */
+    private Map<Integer,Double> generateRowHeight(){
+        Map<Integer,Double> rowHeight = new HashMap<>();
+        rowHeight.put(0, 50.0);
+        rowHeight.put(5, 50.0);
+        rowHeight.put(8, 70.0);
+        rowHeight.put(12, 40.0);
+        return rowHeight;
+    }
 
-		return grid;
-	}
+    @Override
+    public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/SpreadsheetView.html";
+    }
 
-	@Override
-	public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/SpreadsheetView.html";
-	}
+    private void normalGrid(GridBase grid) {
+        ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
+        for (int row = 0; row < grid.getRowCount(); ++row) {
+            final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
+            for (int column = 0; column < grid.getColumnCount(); ++column) {
+                dataRow.add(generateCell(row, column, 1, 1));
+            }
+            rows.add(dataRow);
+        }
+        grid.setRows(rows);
+    }
 
-	private void normalGrid(GridBase grid) {
-		ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
-		for (int row = 0; row < grid.getRowCount(); ++row) {
-			final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
-			for (int column = 0; column < grid.getColumnCount(); ++column) {
-				dataRow.add(generateCell(row, column, 1, 1));
-			}
-			rows.add(dataRow);
-		}
-		grid.setRows(rows);
-	}
+    /**
+     * Randomly generate a dataCell(list or text)
+     */
+    private SpreadsheetCell generateCell(int row, int column, int rowSpan, int colSpan) {
+        SpreadsheetCell cell;
+        List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
+        final double random = Math.random();
+        if (random < 0.10) {
+            List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
+            cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int)(Math.random()*6)));
+        } else if (random >= 0.10 && random < 0.25) {
+            cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+        }else if (random >= 0.25 && random < 0.75) {
+            cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+        }else{
+            cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+        }
 
-	/**
-	 * Randomly generate a dataCell(list or text)
-	 *
-	 * @param row
-	 * @param column
-	 * @param rowSpan
-	 * @param colSpan
-	 * @return
-	 */
-	private SpreadsheetCell generateCell(int row, int column, int rowSpan, int colSpan) {
-		SpreadsheetCell cell;
-		List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
-		final double random = Math.random();
-		if (random < 0.10) {
-			List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
-			cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int)(Math.random()*6)));
-		} else if (random >= 0.10 && random < 0.25) {
-			cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
-		}else if (random >= 0.25 && random < 0.75) {
-			cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
-		}else{
-			cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
-		}
+        // Styling for preview
+        if(row%5 ==0){
+            cell.getStyleClass().add("five_rows");
+        }
+        if(column == 0 && rowSpan == 1){
+            cell.getStyleClass().add("row_header");
+        }
+        if(row == 0) {
+            cell.getStyleClass().add("col_header");
+        }
+        return cell;
+    }
 
-		// Styling for preview
-		if(row%5 ==0){
-			cell.getStyleClass().add("five_rows");
-		}
-		if(column == 0 && rowSpan == 1){
-			cell.getStyleClass().add("row_header");
-		}
-		if(row == 0) {
-			cell.getStyleClass().add("col_header");
-		}
-		return cell;
-	}
-	
-	/**
-	 * Build a sample RowSpan and ColSpan grid
-	 * @param grid
-	 */
-	private void buildBothGrid(GridBase grid) {
-		grid.spanRow(2, 2, 2);
-		grid.spanColumn(2, 2, 2);
+    /**
+     * Build a sample RowSpan and ColSpan grid
+     * @param grid
+     */
+    private void buildBothGrid(GridBase grid) {
+        grid.spanRow(2, 2, 2);
+        grid.spanColumn(2, 2, 2);
 
-		grid.spanRow(4, 2, 4);
+        grid.spanRow(4, 2, 4);
 
-		grid.spanColumn(5, 8, 2);
+        grid.spanColumn(5, 8, 2);
 
-		grid.spanRow(15, 3, 8);
+        grid.spanRow(15, 3, 8);
 
-		grid.spanRow(3, 5, 5);
-		grid.spanColumn(3, 5, 5);
+        grid.spanRow(3, 5, 5);
+        grid.spanColumn(3, 5, 5);
 
-		grid.spanRow(2, 10, 4);
-		grid.spanColumn(3, 10, 4);
+        grid.spanRow(2, 10, 4);
+        grid.spanColumn(3, 10, 4);
 
-		grid.spanRow(2, 12, 3);
-		grid.spanColumn(3, 22, 3);
+        grid.spanRow(2, 12, 3);
+        grid.spanColumn(3, 22, 3);
 
-		grid.spanRow(1, 27, 4);
+        grid.spanRow(1, 27, 4);
 
-		grid.spanColumn(4, 30, 3);
-		grid.spanRow(4, 30, 3);
-	}
+        grid.spanColumn(4, 30, 3);
+        grid.spanRow(4, 30, 3);
+    }
+
+    @Override public Node getControlPanel() {
+        return buildCommonControlGrid(spreadSheetView,"Both");
+    }
+    
+    /**
+     * Build a common control Grid with some options on the left to control the
+     * SpreadsheetViewInternal
+     * @param gridType 
+     *
+     * @param spreadsheetView
+     * @return
+     */
+    private GridPane buildCommonControlGrid(final SpreadsheetView spv, String gridType) {
+        final GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(5);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+        
+        int row = 0;
+
+        // row header
+        Label rowHeaderLabel = new Label("Row header: ");
+        rowHeaderLabel.getStyleClass().add("property");
+        grid.add(rowHeaderLabel, 0, row);
+        final CheckBox rowHeader = new CheckBox();
+        grid.add(rowHeader, 1, row++);
+        rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+                spv.setShowRowHeader(arg2);
+            }
+        });
+
+        // column header
+        Label columnHeaderLabel = new Label("Column header: ");
+        columnHeaderLabel.getStyleClass().add("property");
+        grid.add(columnHeaderLabel, 0, row);
+        final CheckBox columnHeader = new CheckBox();
+        columnHeader.setSelected(true);
+        grid.add(columnHeader, 1, row++);
+        columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+                spv.setShowColumnHeader(arg2);
+            }
+        });
+
+        // editable
+        Label editableLabel = new Label("Editable: ");
+        editableLabel.getStyleClass().add("property");
+        grid.add(editableLabel, 0, row);
+        final CheckBox editable = new CheckBox();
+        editable.setSelected(true);
+        grid.add(editable, 1, row++);
+        spv.editableProperty().bind(editable.selectedProperty());
+
+        // span style
+        Label spanModelLabel = new Label("Span model: ");
+        spanModelLabel.getStyleClass().add("property");
+        grid.add(spanModelLabel, 0, row);
+        
+        final ChoiceBox<String> typeOfGrid = new ChoiceBox<String>(FXCollections.observableArrayList("Normal", "Both"));
+        typeOfGrid.setValue(gridType);
+        typeOfGrid.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                if(arg2.equals(0)) {
+                    int rowCount = 50;
+                    int columnCount = 10;
+                    GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+                    normalGrid(grid);
+
+                    spreadSheetView = new SpreadsheetView(grid);
+                    centerPane.getChildren().setAll(spreadSheetView);
+                } else {
+                    int rowCount = 50;
+                    int columnCount = 10;
+                    GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+                    normalGrid(grid);
+                    buildBothGrid(grid);
+
+                    spreadSheetView = new SpreadsheetView(grid);
+                    centerPane.getChildren().setAll(spreadSheetView);
+                }
+            }
+        });
+        grid.add(typeOfGrid, 1, row++);
+
+        return grid;
+    }
 }

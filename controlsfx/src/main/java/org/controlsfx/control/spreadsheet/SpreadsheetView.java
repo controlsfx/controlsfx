@@ -544,6 +544,101 @@ public class SpreadsheetView extends Control {
         return cellsView.editableProperty();
     }
     
+    /**
+     * Put the current selection into the ClipBoard.
+     */
+    public void copyClipBoard(){
+        checkFormat();
+        
+        //FIXME Maybe move editableProperty to the model..
+        if(!isEditable())
+        	return;
+        
+        final ArrayList<GridChange> list = new ArrayList<GridChange>();
+        @SuppressWarnings("rawtypes")
+        final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
+
+        for (final TablePosition<?,?> p : posList) {
+        	SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
+        	//Using SpreadsheetCell change to stock the information
+        	//FIXME a dedicated class should be used
+            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getText()));
+        }
+
+        final ClipboardContent content = new ClipboardContent();
+        content.put(fmt,list);
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
+    /**
+     * Try to paste the clipBoard to the specified position.
+     * Try to paste the current selection into the Grid. If the two contents are
+     * not matchable, then it's not pasted.
+     */
+    public void pasteClipboard(){
+        checkFormat();
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        if(clipboard.getContent(fmt) != null){
+
+            @SuppressWarnings("unchecked")
+            final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
+            //TODO algorithm very bad
+            int minRow=getGrid().getRowCount();
+            int minCol=getGrid().getColumnCount();
+            int maxRow=0;
+            int maxCol=0;
+            for (final GridChange p : list) {
+                final int tempcol = p.getColumn();
+                final int temprow = p.getRow();
+                if(tempcol<minCol) {
+                    minCol = tempcol;
+                }
+                if(tempcol>maxCol) {
+                    maxCol = tempcol;
+                }
+                if(temprow<minRow) {
+                    minRow = temprow;
+                }
+                if(temprow>maxRow) {
+                    maxRow =temprow;
+                }
+            }
+
+            final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
+
+            final int offsetRow = p.getRow()-minRow;
+            final int offsetCol = p.getColumn()-minCol;
+            int row;
+            int column;
+
+
+            for (final GridChange change : list) {
+                row = change.getRow();
+                column = change.getColumn();
+                if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()
+                        && row+offsetRow >= 0 && column+offsetCol >=0 ){
+                    final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
+                    if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
+                    	SpreadsheetCell cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
+                    	SpreadsheetCell refCell = getGrid().getRows().get(row).get(column);
+                        boolean succeed =cell.match(refCell);
+                        if(succeed){
+                        	getGrid().setCellValue(cell.getRow(), cell.getColumn(),cell.getCellType().convertValue( (String) change.getNewValue()));
+                        }
+                    }
+                }
+            }
+            
+        //To be improved
+        }else if(clipboard.hasString()){
+        	final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
+        	
+        	SpreadsheetCell stringCell = SpreadsheetCellType.STRING.createCell(0, 0, 1, 1, clipboard.getString());
+        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(stringCell);
+        	
+        }
+    }
+
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -604,14 +699,6 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return a list of {@code ObservableList<SpreadsheetCell>} used by the SpreadsheetView.
-     * @return
-     */
-    private ObservableList<ObservableList<SpreadsheetCell>> getItems() {
-        return cellsView.getItems();
-    }
-    
-    /**
      * Return the {@link GridRow} at the specified index
      * @param index
      * @return
@@ -619,22 +706,6 @@ public class SpreadsheetView extends Control {
     private GridRow getNonFixedRow(int index){
         GridViewSkin skin = (GridViewSkin) cellsView.getSkin();
         return skin.getRow(index);
-    }
-
-    /**
-     * Indicate whether or not the row at the specified index is currently 
-     * being displayed.
-     * @param index
-     * @return
-     */
-    private final boolean containsRow(int index){
-        GridViewSkin skin = (GridViewSkin) cellsView.getSkin();
-        int size = skin.getCellsSize();
-        for (int i = 0 ; i < size; ++i) {
-            if(skin.getRow(i).getIndex() == index)
-                return true;
-        }
-        return false;
     }
 
     /**
@@ -750,101 +821,6 @@ public class SpreadsheetView extends Control {
         });
         contextMenu.getItems().addAll(item1, item2);
         return contextMenu;
-    }
-
-    /**
-     * Put the current selection into the ClipBoard
-     */
-    private void copyClipBoard(){
-        checkFormat();
-        
-        //FIXME Maybe move editableProperty to the model..
-        if(!isEditable())
-        	return;
-        
-        final ArrayList<GridChange> list = new ArrayList<GridChange>();
-        @SuppressWarnings("rawtypes")
-        final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
-
-        for (final TablePosition<?,?> p : posList) {
-        	SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
-        	//Using SpreadsheetCell change to stock the information
-        	//FIXME a dedicated class should be used
-            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getText()));
-        }
-
-        final ClipboardContent content = new ClipboardContent();
-        content.put(fmt,list);
-        Clipboard.getSystemClipboard().setContent(content);
-    }
-
-    /**
-     * Try to paste the clipBoard to the specified position
-     * Try to paste the current selection into the Grid. If the two contents are
-     * not matchable, then it's not pasted.
-     */
-    private void pasteClipboard(){
-        checkFormat();
-        final Clipboard clipboard = Clipboard.getSystemClipboard();
-        if(clipboard.getContent(fmt) != null){
-
-            @SuppressWarnings("unchecked")
-            final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
-            //TODO algorithm very bad
-            int minRow=getGrid().getRowCount();
-            int minCol=getGrid().getColumnCount();
-            int maxRow=0;
-            int maxCol=0;
-            for (final GridChange p : list) {
-                final int tempcol = p.getColumn();
-                final int temprow = p.getRow();
-                if(tempcol<minCol) {
-                    minCol = tempcol;
-                }
-                if(tempcol>maxCol) {
-                    maxCol = tempcol;
-                }
-                if(temprow<minRow) {
-                    minRow = temprow;
-                }
-                if(temprow>maxRow) {
-                    maxRow =temprow;
-                }
-            }
-
-            final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
-
-            final int offsetRow = p.getRow()-minRow;
-            final int offsetCol = p.getColumn()-minCol;
-            int row;
-            int column;
-
-
-            for (final GridChange change : list) {
-                row = change.getRow();
-                column = change.getColumn();
-                if(row+offsetRow < getGrid().getRowCount() && column+offsetCol < getGrid().getColumnCount()
-                        && row+offsetRow >= 0 && column+offsetCol >=0 ){
-                    final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
-                    if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
-                    	SpreadsheetCell cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
-                    	SpreadsheetCell refCell = getGrid().getRows().get(row).get(column);
-                        boolean succeed =cell.match(refCell);
-                        if(succeed){
-                        	getGrid().setCellValue(cell.getRow(), cell.getColumn(),cell.getCellType().convertValue( (String) change.getNewValue()));
-                        }
-                    }
-                }
-            }
-            
-        //To be improved
-        }else if(clipboard.hasString()){
-        	final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
-        	
-        	SpreadsheetCell stringCell = SpreadsheetCellType.STRING.createCell(0, 0, 1, 1, clipboard.getString());
-        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(stringCell);
-        	
-        }
     }
 
 
@@ -1279,7 +1255,6 @@ public class SpreadsheetView extends Control {
 			makeAtomic = true;
 			
 			final int itemCount = getItemCount();
-			final boolean isCellSelectionEnabled = isCellSelectionEnabled();
 			
 			final int minColumnIndex = getTableView().getVisibleLeafIndex((TableColumn<ObservableList<SpreadsheetCell>, ?>) minColumn);
 			final int maxColumnIndex = getTableView().getVisibleLeafIndex((TableColumn<ObservableList<SpreadsheetCell>, ?>)maxColumn);
@@ -1298,7 +1273,7 @@ public class SpreadsheetView extends Control {
 					
 					// if I'm in cell selection mode but the column is null, I don't want
 					// to select the whole row instead...
-					if (column == null && isCellSelectionEnabled) continue;
+					if (column == null) continue;
 					
 					TablePosition<ObservableList<SpreadsheetCell>, ?> pos = new TablePosition<>(getTableView(), _row, column);
 					

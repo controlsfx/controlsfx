@@ -73,10 +73,10 @@ public class SpreadsheetColumn<T> {
      * Private Fields                                                          *
      *                                                                         *
      **************************************************************************/
-	private SpreadsheetView spreadsheetView;
-	private TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
-	private boolean canFix;
-	private Integer indexColumn;
+	private final SpreadsheetView spreadsheetView;
+	private final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
+	private final boolean canFix;
+	private final Integer indexColumn;
 	private CheckMenuItem fixItem;
 
 	
@@ -139,6 +139,7 @@ public class SpreadsheetColumn<T> {
 	/**
 	 * Fix this column to the left if possible, although it is recommended that
 	 * you call {@link #isColumnFixable()} before trying to fix a column.
+         * @param fixed
 	 */
 	public void setFixed(boolean fixed) {
 	    if (fixed) {
@@ -149,14 +150,16 @@ public class SpreadsheetColumn<T> {
 	}
 	
 	/**
-	 * Set the width of this column
+	 * Set the width of this column.
+         * @param width
 	 */
 	public void setPrefWidth(double width){
 		column.setPrefWidth(width);
 	}
 	
 	/**
-	 * Return the actual width of the column
+	 * Return the actual width of the column.
+         * @return the actual width of the column
 	 */
 	public double getWidth(){
 		return column.getWidth();
@@ -164,6 +167,7 @@ public class SpreadsheetColumn<T> {
 	
 	/**
 	 * If this column can be resized by the user
+         * @param b
 	 */
 	public void setResizable(boolean b){
 		column.setResizable(b);

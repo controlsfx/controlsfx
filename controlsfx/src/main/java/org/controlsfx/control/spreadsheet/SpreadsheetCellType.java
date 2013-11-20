@@ -112,17 +112,28 @@ public abstract class SpreadsheetCellType<T> {
 	 * Verify that the upcoming cell value can be set to the current cell.
 	 *  (copy/paste operations).
 	 * 
-	 * 	@param from the source cell
-	 *	@param to the destination cell
+	 * 	@param cell the cell containing the value to test
 	 *	@return true if it matches.
 	 */
-	protected abstract boolean match(SpreadsheetCell from, SpreadsheetCell to);
+	public final boolean match(SpreadsheetCell cell){
+		return match(cell.getText());
+	}
 
+	/**
+	 * Verify that the upcoming value can be set to the current cell.
+	 *  (copy/paste operations).
+	 * 
+	 * 	@param value String value to test
+	 *	@return true if it matches.
+	 */
+	public abstract boolean match(String value);
+	
 	/**
 	 * This method will be called when a commit is happening.<br/>
 	 * You will then compute the value of the editor in order to determine if
 	 * the current value is valid.
 	 * 
+         * @param value
 	 * @return null if not valid or the correct value otherwise.
 	 */
 	public abstract T convertValue(String value);
@@ -159,8 +170,7 @@ public abstract class SpreadsheetCellType<T> {
 			return "object";
 		}
 
-		protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
-//			to.setItem(from.getText());
+		@Override public boolean match(String value) {
 			return true;
 		}
 
@@ -208,8 +218,7 @@ public abstract class SpreadsheetCellType<T> {
 			return "string";
 		}
 
-		protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
-//			to.setItem(from.getText());
+		@Override public boolean match(String value) {
 			return true;
 		}
 
@@ -226,7 +235,11 @@ public abstract class SpreadsheetCellType<T> {
 		}
 
 		@Override public String convertValue(String value) {
-			return converter.fromString(value);
+			String convertedValue = converter.fromString(value);
+			if(convertedValue == null || convertedValue.equals("")){
+				return null;
+			}
+			return convertedValue;
 		}
 
 		@Override public String toString(String item) {
@@ -287,10 +300,9 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
-		@Override protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override public boolean match(String value) {
 			try {
-				/*Double temp = */converter.fromString(from.getText());
-//				to.setItem(temp);
+				converter.fromString(value);
 				return true;
 			} catch (Exception e) {
 				return false;
@@ -363,13 +375,8 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.ListEditor(view, items);
 		}
 
-		@Override protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
-			String value = from.getText();
-			if (items.contains(value)) {
-//				to.setItem(value);
-				return true;
-			}
-			return false;
+		@Override public boolean match(String value) {
+			return items.contains(value);
 		}
 
 		@Override public String convertValue(String value) {
@@ -443,14 +450,10 @@ public abstract class SpreadsheetCellType<T> {
 			return new SpreadsheetCellEditor.DateEditor(view,converter);
 		}
 
-		@Override protected boolean match(SpreadsheetCell from, SpreadsheetCell to) {
+		@Override public boolean match(String value) {
 			try {
-				LocalDate temp = converter.fromString(from.getText());
-				if (temp != null) {
-					to.setItem(temp);
-					return true;
-				}
-				return false;
+				LocalDate temp = converter.fromString(value);
+				return temp != null;
 			} catch (Exception e) {
 				return false;
 			}

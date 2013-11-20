@@ -89,6 +89,8 @@ public interface Grid {
     /**
      * Return an ObservableList of ObservableList of {@link SpreadsheetCell}
      * instances. Refer to the {@link Grid} class javadoc for more detail.
+     * @return an ObservableList of ObservableList of {@link SpreadsheetCell}
+     * instances
      */
     public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
@@ -118,6 +120,10 @@ public interface Grid {
     
     /**
      * Return the {@link SpanType} for a given cell row/column intersection.
+     * @param spv
+     * @param row
+     * @param column
+     * @return the {@link SpanType} for a given cell row/column intersection.
      */
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
     

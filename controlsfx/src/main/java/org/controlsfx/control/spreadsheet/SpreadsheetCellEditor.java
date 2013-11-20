@@ -291,7 +291,7 @@ public abstract class SpreadsheetCellEditor<T> {
 		@Override
 		public void startEdit(Object value) {
 
-			if (value instanceof String) {
+			if (value instanceof String || value == null) {
 				tf.setText((String) value);
 			}
 			attachEnterEscapeEventHandler();
@@ -363,6 +363,7 @@ public abstract class SpreadsheetCellEditor<T> {
 			if (value instanceof Double) {
 				tf.setText(((Double) value).isNaN() ? "" : value.toString());
 			}
+			
 			tf.getStyleClass().removeAll("error");
 			attachEnterEscapeEventHandler();
 

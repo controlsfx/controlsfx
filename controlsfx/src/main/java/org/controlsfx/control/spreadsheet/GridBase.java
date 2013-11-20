@@ -142,12 +142,12 @@ public class GridBase implements Grid {
 	}
     
     /** {@inheritDoc} */
-    public void setCellValue(int row,int column,Object value){
+    @Override public void setCellValue(int row,int column,Object value){
     	if(row < rowCount && column < columnCount && !isLock()){
     		SpreadsheetCell cell = getRows().get(row).get(column);
     		Object item = cell.getItem();
     		cell.setItem(value);
-    		if(!item.equals(cell.getItem())){
+    		if(item != value && (item == null || !item.equals(cell.getItem()))){
     			GridChange cellChange = new GridChange(row, column, item, value);
     			lastSpreadsheetCellChange.setValue(cellChange);
     		}

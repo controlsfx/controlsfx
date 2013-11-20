@@ -192,9 +192,10 @@ public class SpreadsheetCell {
 	 * This is currently used by the Copy/Paste.
 	 * 
 	 * @param cell
+     * @return true if the upcoming cell value can be set to the current cell.
 	 */
 	public boolean match(SpreadsheetCell cell) {
-		return type.match(cell, this);
+		return type.match(cell);
 	}
 	
 	
@@ -206,7 +207,7 @@ public class SpreadsheetCell {
 	 ***************************************************************************/
 	
 	// --- item
-	private transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
+	private final transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
 		@Override protected void invalidated() {
 			updateText();
 		}
@@ -232,6 +233,7 @@ public class SpreadsheetCell {
 	/**
 	 * The item property represents the currently-set value inside this
 	 * SpreadsheetCell instance.
+     * @return 
 	 */
 	public final ObjectProperty<?> itemProperty() {
 		return item;
@@ -272,7 +274,7 @@ public class SpreadsheetCell {
     }
 
     // --- comment
- 	private transient BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
+ 	private final transient BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
  	
  	/**
       * Return if this cell has a comment or not.
@@ -454,12 +456,8 @@ public class SpreadsheetCell {
 			return false;
 
 		final SpreadsheetCell cell = (SpreadsheetCell) obj;
-		if (cell != null && cell.getRow() == row && cell.getColumn() == column
-				&& cell.getText().equals(getText())) {
-			return true;
-		} else {
-			return false;
-		}
+            return cell != null && cell.getRow() == row && cell.getColumn() == column
+                    && cell.getText().equals(getText());
 	}
 
 	

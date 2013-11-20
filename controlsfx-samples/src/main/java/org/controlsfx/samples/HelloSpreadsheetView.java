@@ -205,6 +205,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         rowHeaderLabel.getStyleClass().add("property");
         grid.add(rowHeaderLabel, 0, row);
         final CheckBox rowHeader = new CheckBox();
+        rowHeader.setSelected(true);
         grid.add(rowHeader, 1, row++);
         rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {

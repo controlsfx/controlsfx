@@ -112,13 +112,12 @@ public class GridCellEditor {
 	public void endEdit(boolean b){
 		if(b){
 			final SpreadsheetView view = handle.getView();
-			Object value = modelCell.getCellType().convertValue(spreadsheetCellEditor.getControlValue());
-			if(value != null && viewCell != null){
-				//We update the modified cells
-				/*if(!modelCell.getItem().equals(value) && !view.getModifiedCells().contains(modelCell))
-					view.getModifiedCells().add(modelCell);*/
-
-				//modelCell.setItem(value);
+			boolean match = modelCell.getCellType().match(spreadsheetCellEditor.getControlValue());
+			
+			if(match && viewCell != null){
+				Object value = modelCell.getCellType().convertValue(spreadsheetCellEditor.getControlValue());
+				
+				//We update the value
 				view.getGrid().setCellValue(modelCell.getRow(), modelCell.getColumn(), value);
 				viewCell.commitEdit(modelCell);
 				end();

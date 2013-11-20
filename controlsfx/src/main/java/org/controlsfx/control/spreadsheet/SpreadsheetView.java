@@ -554,7 +554,7 @@ public class SpreadsheetView extends Control {
         if(!isEditable())
         	return;
         
-        final ArrayList<GridChange> list = new ArrayList<GridChange>();
+        final ArrayList<GridChange> list = new ArrayList<>();
         @SuppressWarnings("rawtypes")
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
@@ -691,7 +691,6 @@ public class SpreadsheetView extends Control {
      * @return
      */
     private SpanType getSpanType(final int row, final int column) {
-        Grid grid = getGrid();
         if (grid == null) {
             return SpanType.NORMAL_CELL;
         }
@@ -738,7 +737,7 @@ public class SpreadsheetView extends Control {
                 column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell>, ObservableValue<SpreadsheetCell>>() {
                     @Override
                     public ObservableValue<SpreadsheetCell> call(TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new ReadOnlyObjectWrapper<SpreadsheetCell>(p.getValue().get(col));
+                        return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
                     }
                 });
                 // We create a SpreadsheetCell for each DataCell in order to specify how to represent the DataCell(VIEW)
@@ -1105,7 +1104,7 @@ public class SpreadsheetView extends Control {
                 return;
             }
 
-            selectedCellsSeq.callObservers(new MappingChange<TablePosition<ObservableList<SpreadsheetCell>, ?>, TablePosition<ObservableList<SpreadsheetCell>, ?>>(c, MappingChange.NOOP_MAP, selectedCellsSeq));
+            selectedCellsSeq.callObservers(new MappingChange<>(c, MappingChange.NOOP_MAP, selectedCellsSeq));
             c.reset();
         }
         
@@ -1317,7 +1316,7 @@ public class SpreadsheetView extends Control {
 
             quietClearSelection();
 
-            List<TablePosition<ObservableList<SpreadsheetCell>,?>> indices = new ArrayList<TablePosition<ObservableList<SpreadsheetCell>, ?>>();
+            List<TablePosition<ObservableList<SpreadsheetCell>,?>> indices = new ArrayList<>();
             TableColumn<ObservableList<SpreadsheetCell>, ?> column;
             TablePosition<ObservableList<SpreadsheetCell>, ?> tp = null;
 			

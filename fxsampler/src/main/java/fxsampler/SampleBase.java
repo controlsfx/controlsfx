@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -66,6 +67,7 @@ public abstract class SampleBase extends Application implements Sample {
         
         final VBox rightPanel = new VBox();
         rightPanel.getStyleClass().add("right-panel");
+        rightPanel.setMaxHeight(Double.MAX_VALUE);
 
         boolean addRightPanel = false;
         
@@ -103,12 +105,15 @@ public abstract class SampleBase extends Application implements Sample {
             
             controlPanel.getStyleClass().add("control-panel");
             rightPanel.getChildren().add(controlPanel);
+            VBox.setVgrow(controlPanel, Priority.ALWAYS);
             addRightPanel = true;
         }
         
         if (addRightPanel) {
             ScrollPane scrollPane = new ScrollPane(rightPanel);
+            scrollPane.setMaxHeight(Double.MAX_VALUE);
             scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
             splitPane.getItems().add(scrollPane);
         }
         

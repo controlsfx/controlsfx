@@ -95,7 +95,7 @@ public class SpreadsheetColumn<T> {
 	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
 		this.spreadsheetView = spreadsheetView;
 		this.column = column;
-//		column.setMinWidth(30); 
+		column.setMinWidth(0); 
 		this.indexColumn = indexColumn;
 		canFix = initCanFix();
 		

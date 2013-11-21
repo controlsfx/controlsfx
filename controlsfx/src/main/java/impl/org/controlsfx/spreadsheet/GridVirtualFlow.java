@@ -35,7 +35,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.SetChangeListener;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
@@ -65,9 +64,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     /**
      * Variable used for improvement;
      */
-    private int firstIndex = -1;
-    private double previousHbarValue = -1;
-    private double previousHBarAmount = -1;
+//    private int firstIndex = -1;
+//    private double previousHbarValue = -1;
+//    private double previousHBarAmount = -1;
 //    private boolean copyPaste = true;//We're copy/pasting so layout is necessary
     /**
      * Store the fixedRow in order to place them at the top when necessary.
@@ -99,24 +98,27 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      **************************************************************************/
     public void init(SpreadsheetView spv) {
         this.spreadSheetView = spv;
-        
-        /**
-         * When copy/pasting, we are directly going to the SpreadsheetCell.
-         * So the view hasn't really a way of detecting that itself. We must force it
-         * that way.
-         */
-        /*spv.getGrid().getModifiedCells().addListener(new SetChangeListener<SpreadsheetCell>() {
-
+       
+        spv.getFixedRows().addListener(new ListChangeListener<Integer>(){
 			@Override
-			public void onChanged(
-					javafx.collections.SetChangeListener.Change<? extends SpreadsheetCell> arg0) {
-					copyPaste = false;
-					layoutTotal();		
-					layoutFixedRows();
-					copyPaste = true;
-					
+			public void onChanged(javafx.collections.ListChangeListener.Change<? extends Integer> arg0) {
+				while(arg0.next()){
+					if(arg0.wasRemoved()){
+						List<? extends Integer> list = arg0.getRemoved();
+						for(Integer i:list){
+							for(T cell:myFixedCells){
+								if(cell.getIndex() == i){
+									cell.setManaged(false);
+									cell.setVisible(false);
+									myFixedCells.remove(cell);
+									break;
+								}
+							}
+						}
+					}
+				}
 			}
-		});*/
+		});
     }
 
     @Override
@@ -181,11 +183,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         if (getCells().isEmpty()) {
             reconfigureCells();
         }
-        //We do not need to layout if nothing has changed really..
+        
+        //FIXME This is put on hold until performance review.
+        
+        /*//We do not need to layout if nothing has changed really..
         //FIXME This will be improved for performance.
         T firstCell = getFirstVisibleCellWithinViewPort();
         int newFirstIndex = firstCell != null? firstCell.getIndex(): -2;
-        if(/*copyPaste &&*/
+        if(copyPaste &&
         		newFirstIndex == firstIndex 
         		&& previousHbarValue == getHbar().getValue() 
         		&& previousHBarAmount == getHbar().getVisibleAmount()){
@@ -194,7 +199,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         
         firstIndex = newFirstIndex;
         previousHbarValue = getHbar().getValue();
-        previousHBarAmount = getHbar().getVisibleAmount();
+        previousHBarAmount = getHbar().getVisibleAmount();*/
+        
         for (Cell<?> cell : getCells()) {
             if (cell != null) {
                 cell.requestLayout();
@@ -214,16 +220,6 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         return super.getCells();
     }
 
-    /**
-     * Return the index for a given cell. This allows subclasses to customize
-     * how cell indices are retrieved.
-     */
-    @Override
-    protected int getCellIndex(T cell) {
-            return cell.getIndex();
-    }
-
-
     /***************************************************************************
      * * Private Methods * *
      **************************************************************************/
@@ -232,78 +228,77 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * Layout the fixed rows to position them correctly
      */
     private void layoutFixedRows() {
-       
-        /**
-         * We want myFixedCells to follow the fixedRows. We don't want to have
-         * some rows hanging out in they're useless.
-         */
-		while(myFixedCells.size()>spreadSheetView.getFixedRows().size()){
-			T temp = myFixedCells.remove(myFixedCells.size()-1);
-			 temp.setVisible(false);
-			 temp.setManaged(false);
-		}
+
 		//We must have a cell in ViewPort because otherwise
-		//we short-circuit the VirtualFlow.
-		if(spreadSheetView.getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null){
-			sortRows();
-	        /**
-	         * What I do is just going after the VirtualFlow in order to ADD
-	         * (not replace like before) new rows at the top.
-	         * 
-	         * If the VirtualFlow has the row, then I will hide mine and let
-	         * him handle. But if the row is missing, then I must show mine
-	         * in order to have the fixed row.
-	         */
-	        if(myFixedCells.size() <spreadSheetView.getFixedRows().size()){
-	        	 T cell = null;
-	 	            for(Integer fixedRowIndex :spreadSheetView.getFixedRows()){
-	 	            	boolean flag = true;
-	 	            	//We see if the row is laid out by the VirtualFlow
-	 	            	for(T virtualFlowCells:getCells()){
-	 	            		if(virtualFlowCells.getIndex() == fixedRowIndex){
-	 	            			flag = false;
-	 	            			virtualFlowCells.toFront();
-	 	            			break;
-	 	            		}else if(virtualFlowCells.getIndex() >fixedRowIndex){
-	 	            			break;
-	 	            		}
-	 	            	}
-	 	            	//If not, we take over and layout it
-	 	            	if(flag && myFixedCells.size() <= fixedRowIndex){
-		 	            	cell = getAvailableCell(fixedRowIndex);
-		 	            	setCellIndex(cell, fixedRowIndex); 
-		 	                resizeCellSize(cell);
-		 	                cell.setVisible(true);
-		 	                cell.toFront();
-		 	                myFixedCells.add(cell);
-	 	            	}
-	 	            }
-	        }
-	        // We just check if we need to interfere
-	    	for(T cell:myFixedCells){
-	    		boolean flag = true;
-	        	for(T virtualFlowCells:getCells()){
-	        		if(virtualFlowCells.getIndex() == cell.getIndex()){
-	        			flag = false;
-	        			virtualFlowCells.toFront();
-	        			break;
-	        		}else if(virtualFlowCells.getIndex() >cell.getIndex()){
-	         			break;
-	         		}
-	        	}
-	        	if(flag){
-	        		cell.setVisible(true);
-	        		cell.setManaged(true);
-	        		cell.toFront();
-	        		cell.requestLayout();
-	        	}else{
-	        		cell.setVisible(false);
-	        		cell.setManaged(false);
-	        	}
-	    	}
-		}
+        //we short-circuit the VirtualFlow.
+        if (spreadSheetView.getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null) {
+            sortRows();
+            /**
+             * What I do is just going after the VirtualFlow in order to ADD
+             * (not replace like before) new rows at the top.
+             *
+             * If the VirtualFlow has the row, then I will hide mine and let him
+             * handle. But if the row is missing, then I must show mine in order
+             * to have the fixed row.
+             */
+            T cell = null;
+            Integer fixedRowIndex;
+            
+            rows:
+            for (int i = spreadSheetView.getFixedRows().size() - 1; i >= 0; i--) {
+                fixedRowIndex = spreadSheetView.getFixedRows().get(i);
+                //If the fixed row is out of bounds
+                if (fixedRowIndex > getLastVisibleCellWithinViewPort().getIndex()) {
+                    if (cell != null) {
+                        cell.setVisible(false);
+                        cell.setManaged(false);
+                    }
+                    continue rows;
+                }
+
+                //We see if the row is laid out by the VirtualFlow
+                for (T virtualFlowCells : getCells()) {
+                	if (virtualFlowCells.getIndex() > fixedRowIndex) {
+                        break;
+                    }else if (virtualFlowCells.getIndex() == fixedRowIndex) {
+                        cell = containsRows(fixedRowIndex);
+                        if (cell != null) {
+                            cell.setVisible(false);
+                            cell.setManaged(false);
+                        }
+                        virtualFlowCells.toFront();
+                        continue rows;
+                    }
+                }
+                
+                cell = containsRows(fixedRowIndex);
+                if (cell == null) {
+                	cell = getAvailableCell(fixedRowIndex);
+                    setCellIndex(cell, fixedRowIndex);
+                    resizeCellSize(cell);
+                    myFixedCells.add(cell);
+                }
+                
+                cell.setVisible(true);
+                cell.setManaged(true);
+                cell.toFront();
+                cell.requestLayout();
+            }
+        }
     }
 
+    /**
+     * Verify if the row has been added to myFixedCell
+     * @param i
+     * @return
+     */
+    private T containsRows(int i){
+    	for(T cell:myFixedCells){
+    		if(cell.getIndex() == i)
+    			return cell;
+    	}
+    	return null;
+    }
     /**
      * Sort the rows so that they stay in order for layout
      */

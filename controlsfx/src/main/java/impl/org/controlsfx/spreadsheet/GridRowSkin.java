@@ -125,12 +125,14 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         	space += getTableRowHeight(spreadsheetView.getFixedRows().get(o));
         }
         
-        
         //If true, this row is fixed
         if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space){
         	//This row is a bit hidden on top so we translate then for it to be fully visible
             tableCellY = space//positionY * GridViewSkin.DEFAULT_CELL_HEIGHT
                     - getSkinnable().getLocalToParentTransform().getTy();
+            handle.getCellsViewSkin().getCurrentlyFixedRow().add(index);
+        }else{
+        	handle.getCellsViewSkin().getCurrentlyFixedRow().remove(index);
         }
         /**
          * We want to insert the removed tableCell in their correct position

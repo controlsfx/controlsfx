@@ -90,7 +90,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     }
 
     /**
-     * FIXME need to be removed afetr
+     * FIXME need to be removed after
      * Compute RowHeight for test
      * @return
      */

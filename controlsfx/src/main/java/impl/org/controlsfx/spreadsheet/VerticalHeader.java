@@ -32,7 +32,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckMenuItem;
@@ -184,17 +183,17 @@ public class VerticalHeader extends StackPane {
 					&& i < modelRowCount) {
 				row = skin.getRow(i);
 				label = getLabel(rowCount++);
-				if(spreadsheetView.getFixedRows().contains(row.getIndexVirtualFlow())){
-					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+":");
-				}else if(spreadsheetView.isRowFixable(row.getIndexVirtualFlow())){
-					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+".");
+				if(spreadsheetView.getFixedRows().contains(row.getIndex())){
+					label.setText(String.valueOf(row.getIndex() + 1)+":");
+				}else if(spreadsheetView.isRowFixable(row.getIndex())){
+					label.setText(String.valueOf(row.getIndex() + 1)+".");
 				}else{
-					label.setText(String.valueOf(row.getIndexVirtualFlow() + 1)+" ");
+					label.setText(String.valueOf(row.getIndex() + 1)+" ");
 				}
-				label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndexVirtualFlow()));
+				label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndex()));
 				label.relocate(x, y);
 				label.setContextMenu(getRowContextMenu(row
-						.getIndexVirtualFlow()));
+						.getIndex()));
 				
 				// We want to highlight selected rows
 				final ObservableList<String> css = label.getStyleClass();
@@ -208,23 +207,24 @@ public class VerticalHeader extends StackPane {
 				} else {
 					css.removeAll("fixed");
 				}
-				y += spreadsheetView.getGrid().getRowHeight(row.getIndexVirtualFlow());
+				y += spreadsheetView.getGrid().getRowHeight(row.getIndex());
 				++i;
 			}
-			
 			double spaceUsedByFixedRows = 0;
 			// Then we iterate over the FixedRows if any
 			if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
-				for (i = 0; i < spreadsheetView.getFixedRows().size(); ++i) {
+				for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
+					if(!handle.getCellsViewSkin().getCurrentlyFixedRow().contains(spreadsheetView
+								.getFixedRows().get(j)))
+							break;
 						label = getLabel(rowCount++);
 						label.setText(String.valueOf(spreadsheetView
-								.getFixedRows().get(i) + 1)+":");
+								.getFixedRows().get(j) + 1)+":");
 						label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(spreadsheetView
-								.getFixedRows().get(i)));
+								.getFixedRows().get(j)));
 						label.setContextMenu(getRowContextMenu(spreadsheetView
-								.getFixedRows().get(i)));
-						// If the columnHeader is here, we need to translate a
-						// bit
+								.getFixedRows().get(j)));
+						// If the columnHeader is here, we need to translate a bit
 						if (spreadsheetView.showColumnHeaderProperty().get()) {
 							label.relocate(x, snappedTopInset() + horizontalHeaderHeight
 									+spaceUsedByFixedRows);
@@ -234,16 +234,16 @@ public class VerticalHeader extends StackPane {
 						final ObservableList<String> css = label
 								.getStyleClass();
 						if (skin.getSelectedRows().contains(
-								spreadsheetView.getFixedRows().get(i))) {
+								spreadsheetView.getFixedRows().get(j))) {
 							css.addAll("selected");
 						} else {
 							css.removeAll("selected");
 						}
 						css.addAll("fixed");
 						spaceUsedByFixedRows+=spreadsheetView.getGrid().getRowHeight(spreadsheetView
-								.getFixedRows().get(i));
+								.getFixedRows().get(j));
 						y += spreadsheetView.getGrid().getRowHeight(spreadsheetView
-								.getFixedRows().get(i));
+								.getFixedRows().get(j));
 				}
 			}
 
@@ -332,23 +332,14 @@ public class VerticalHeader extends StackPane {
 			fixItem.selectedProperty().addListener(
 					new ChangeListener<Boolean>() {
 						@Override
-						public void changed(
-								ObservableValue<? extends Boolean> arg0,
+						public void changed(ObservableValue<? extends Boolean> arg0,
 								Boolean arg1, Boolean arg2) {
-							int row = i;
-							//If we are unfixing, we will fix everything except this one.
+							
 							if (spreadsheetView.getFixedRows().contains(i)) {
-								row -=1;
-							} 
-							
-							spreadsheetView.getFixedRows().clear();
-							
-							for(int j=0;j<= row;++j){
-								spreadsheetView.getFixedRows().add(j);
+								spreadsheetView.getFixedRows().remove(i);
+							}else{
+								spreadsheetView.getFixedRows().add(i);
 							}
-							
-							// We MUST have the fixed rows sorted!
-							FXCollections.sort(spreadsheetView.getFixedRows());
 						}
 					});
 			contextMenu.getItems().addAll(fixItem);

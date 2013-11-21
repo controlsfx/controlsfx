@@ -51,14 +51,6 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      *                                                                         *
      **************************************************************************/
     private final SpreadsheetHandle handle;
-    /**
-     * This is the index used by the VirtualFlow
-     * So the row can be with indexVirtualFlow at 32
-     * But if it is situated in the header, his index will be 0 (or the row in the header)
-     */
-    private int indexVirtualFlow = -1;
-    private boolean layoutFixedColumns = false;
-//    private boolean currentlyFixed = false;
 
     /***************************************************************************
      *                                                                         *
@@ -75,38 +67,6 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * Public Methods                                                          *
      *                                                                         *
      **************************************************************************/
-
-    public int getIndexVirtualFlow(){
-        return indexVirtualFlow < 0?getIndex():indexVirtualFlow;
-    }
-    
-    public void setIndexVirtualFlow(int i){
-        indexVirtualFlow = i;
-    }
-
-    /*public Boolean getCurrentlyFixed() {
-		return currentlyFixed;
-	}
-
-	*//**
-	 * Indicate that this row is bonded on the top.
-	 * @param currentlyFixed
-	 *//*
-	public void setCurrentlyFixed(boolean currentlyFixed) {
-		this.currentlyFixed = currentlyFixed;
-	}*/
-	
-    /**
-     * For the fixed columns in order to just re-layout the fixed columns
-     * @param b
-     */
-    public void setLayoutFixedColumns(boolean b){
-        layoutFixedColumns = b;
-    }
-
-    public boolean getLayoutFixedColumns(){
-        return layoutFixedColumns;
-    }
 
     /**
      * When unfixing some Columns, we need to put the previously FixedColumns back
@@ -172,28 +132,6 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * @return the corresponding SpreadsheetCell
      */
     CellView getGridCell(int col){
-    	
-    	// Too much complication for a minor effect, simple is better.
- 	/*	final int max = getChildrenUnmodifiable().size()-1;
- 		int j = max;
- 		while(j>= 0 && ((SpreadsheetCellImpl<?>)getChildrenUnmodifiable().get(j)).getItem().getColumn() != max){
- 			--j;
- 		}
- 		
-    	int fixedColSize = j == -1? 0:max -j;
-    	
-    	//If any cells was moved to the end
-        if(fixedColSize != 0){
-        	//if the requested column is fixed
-            if(spreadsheetView.getColumns().get(col).getCurrentlyFixed()){
-            	final int indexCol = spreadsheetView.getFixedColumns().indexOf(col);
-                return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() + indexCol - fixedColSize);
-            } else {
-                return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get( col- fixedColSize );
-            }
-        }else{
-            return (SpreadsheetCellImpl<?>) getChildrenUnmodifiable().get(col);
-        }*/
     	
         for(Node node:getChildrenUnmodifiable()){
         	CellView cellView = (CellView) node;

@@ -28,6 +28,7 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
@@ -38,6 +39,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -119,12 +122,21 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected VerticalHeader verticalHeader;
     
     /**
-     * The height of our fixedRows
+     * The height of the currently fixedRows
      */
     private double fixedRowHeight = 0;
 
     public double getFixedRowHeight(){
     	return fixedRowHeight;
+    }
+    
+    /**
+     * The currently fixedRow
+     */
+    private ObservableSet<Integer> currentlyFixedRow = FXCollections.observableSet(new HashSet<Integer>());
+    
+    protected ObservableSet<Integer> getCurrentlyFixedRow(){
+    	return currentlyFixedRow;
     }
     
     public GridViewSkin(final SpreadsheetHandle handle) {
@@ -143,6 +155,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         tableView.getStyleClass().add("cell-spreadsheet");
 
+		getCurrentlyFixedRow().addListener(currentlyFixedRowListener);
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
        
@@ -275,8 +288,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
-        	computeFixedRowHeight();
-        	
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
@@ -284,12 +295,21 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     };
 
     /**
+     * We listen on the currentlyFixedRow in order to do the modification in the FixedRowHeight
+     */
+    private final SetChangeListener<? super Integer> currentlyFixedRowListener = new SetChangeListener<Integer>(){
+		@Override
+		public void onChanged(javafx.collections.SetChangeListener.Change<? extends Integer> arg0) {
+			computeFixedRowHeight();
+		}
+    };
+    /**
      * We compute the total height of the fixedRows so that 
      * the selection can use it without performance regression.
      */
     private void computeFixedRowHeight(){
     	fixedRowHeight = 0;
-		for(int i: spreadsheetView.getFixedRows()){
+		for(int i: getCurrentlyFixedRow()){
 			fixedRowHeight+= spreadsheetView.getGrid().getRowHeight(i);
 		}
     }
@@ -306,11 +326,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                             .putFixedColumnToBack();
                 }
             }
-
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
-
     };
 
     @Override

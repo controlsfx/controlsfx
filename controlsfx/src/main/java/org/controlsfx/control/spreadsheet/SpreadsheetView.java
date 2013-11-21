@@ -776,12 +776,11 @@ public class SpreadsheetView extends Control {
     private void initRowFix(Grid grid){
     	ObservableList< ObservableList<SpreadsheetCell>> rows = grid.getRows();
 		rowFix = new BitSet(rows.size());
-		/*rows :*/ for(int r = 0; r < rows.size(); ++r){
+		rows : for(int r = 0; r < rows.size(); ++r){
 			ObservableList<SpreadsheetCell> row = rows.get(r);
 			for(SpreadsheetCell cell: row){
 				if(cell.getRowSpan() >1){
-					return;
-//					continue rows;
+					continue rows;
 				}
 			}
 			rowFix.set(r);
@@ -1556,7 +1555,7 @@ public class SpreadsheetView extends Control {
     private ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
         @Override public void onChanged(Change<? extends Integer> c) {
             while (c.next()) {
-                if (c.wasAdded()) {
+                if (c.wasAdded() || c.wasRemoved()) {
                     List<? extends Integer> newRows = c.getAddedSubList();
                     for (int row : newRows) {
                         if(! isRowFixable(row)){
@@ -1585,13 +1584,12 @@ public class SpreadsheetView extends Control {
         @Override public void onChanged(Change<? extends SpreadsheetColumn<?>> c) {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    List<? extends SpreadsheetColumn<?>> newRows = c.getAddedSubList();
-                    for (SpreadsheetColumn<?> row : newRows) {
-                        if(! row.isColumnFixable()){
-                            throw new IllegalArgumentException(computeReason(row)); 
+                    List<? extends SpreadsheetColumn<?>> newColumns = c.getAddedSubList();
+                    for (SpreadsheetColumn<?> column : newColumns) {
+                        if(! column.isColumnFixable()){
+                            throw new IllegalArgumentException(computeReason(column)); 
                         }
                     }
-                    FXCollections.sort(fixedRows);
                 }
             }
         }

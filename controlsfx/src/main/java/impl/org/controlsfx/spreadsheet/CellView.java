@@ -412,7 +412,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     sm.select(_row, tableView.getVisibleLeafColumn(_col));
                 }
             }*/
-            sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,  tableView.getColumns().get(maxColumn));
+            if(minColumn != -1 && maxColumn != -1)
+            	sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,  tableView.getColumns().get(maxColumn));
         }
 
     }

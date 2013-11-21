@@ -33,12 +33,15 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -328,21 +331,19 @@ public class VerticalHeader extends StackPane {
 		if (spreadsheetView.isRowFixable(i)) {
 			final ContextMenu contextMenu = new ContextMenu();
 
-			CheckMenuItem fixItem = new CheckMenuItem("Fix");
-			fixItem.selectedProperty().addListener(
-					new ChangeListener<Boolean>() {
-						@Override
-						public void changed(ObservableValue<? extends Boolean> arg0,
-								Boolean arg1, Boolean arg2) {
-							
-							if (spreadsheetView.getFixedRows().contains(i)) {
-								spreadsheetView.getFixedRows().remove(i);
-							}else{
-								spreadsheetView.getFixedRows().add(i);
-							}
-						}
-					});
-			contextMenu.getItems().addAll(fixItem);
+			MenuItem fixItem = new MenuItem("Fix");
+			fixItem.setGraphic(new ImageView(new Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+			fixItem.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent arg0) {
+					if (spreadsheetView.getFixedRows().contains(i)) {
+						spreadsheetView.getFixedRows().remove(i);
+					}else{
+						spreadsheetView.getFixedRows().add(i);
+					}
+				}
+			});
+			contextMenu.getItems().add(fixItem);
 
 			return contextMenu;
 		} else {

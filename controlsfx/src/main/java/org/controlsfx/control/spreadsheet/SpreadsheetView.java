@@ -72,6 +72,8 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -801,22 +803,24 @@ public class SpreadsheetView extends Control {
     private ContextMenu getSpreadsheetViewContextMenu(){
         final ContextMenu contextMenu = new ContextMenu();
         
-        final MenuItem item1 = new MenuItem("Copy");
-        item1.setOnAction(new EventHandler<ActionEvent>() {
+        final MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("copySpreadsheetView.png"))));
+        copyItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 copyClipBoard();
             }
         });
         
-        final MenuItem item2 = new MenuItem("Paste");
-        item2.setOnAction(new EventHandler<ActionEvent>() {
+        final MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pasteSpreadsheetView.png"))));
+        pasteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 pasteClipboard();
             }
         });
-        contextMenu.getItems().addAll(item1, item2);
+        contextMenu.getItems().addAll(copyItem, pasteItem);
         return contextMenu;
     }
 

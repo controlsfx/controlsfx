@@ -27,13 +27,15 @@
 package org.controlsfx.control.spreadsheet;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.control.CheckMenuItem;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
@@ -77,7 +79,7 @@ public class SpreadsheetColumn<T> {
 	private final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
 	private final boolean canFix;
 	private final Integer indexColumn;
-	private CheckMenuItem fixItem;
+	private MenuItem fixItem;
 
 	
 	
@@ -217,19 +219,18 @@ public class SpreadsheetColumn<T> {
     	if(canFix){
 	    	final ContextMenu contextMenu = new ContextMenu();
 	
-	    	this.fixItem = new CheckMenuItem("Fix");
-	    	fixItem.selectedProperty().addListener(new ChangeListener<Boolean>(){
+	    	this.fixItem = new MenuItem("Fix");
+	    	fixItem.setGraphic(new ImageView(new Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+	    	fixItem.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0,
-						Boolean arg1, Boolean arg2) {
-					
-						if(!isFixed()){
-							setFixed(true);
-						}else{
-							setFixed(false);
-						}
+				public void handle(ActionEvent arg0) {
+					if(!isFixed()){
+						setFixed(true);
+					}else{
+						setFixed(false);
+					}
 				}
-	        });
+			});
 	        contextMenu.getItems().addAll(fixItem);
 	        
 	        return contextMenu;

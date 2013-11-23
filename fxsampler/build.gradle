@@ -7,7 +7,7 @@ apply from: 'mavenPublish.gradle'
 //apply from: 'javafx.plugin'
 
 group = 'org.controlsfx'
-version = '1.0.2-SNAPSHOT'
+version = '1.0.3-SNAPSHOT'
 
 
 configurations {

@@ -86,7 +86,7 @@ public class FXSampler extends Application {
     }
 
     @Override public void start(final Stage primaryStage) throws Exception {
-        primaryStage.getIcons().add(new Image("/org/controlsfx/samples/controlsfx-logo.png"));
+//        primaryStage.getIcons().add(new Image("/org/controlsfx/samples/controlsfx-logo.png"));
 
         projectsMap = new SampleScanner().discoverSamples();
         buildSampleTree(null);

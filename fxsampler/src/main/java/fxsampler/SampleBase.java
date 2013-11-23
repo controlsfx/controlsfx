@@ -76,9 +76,9 @@ public abstract class SampleBase extends Application implements Sample {
         rightPanel.getChildren().add(sampleName);
         
         // --- project name
-        final String projectName = sample.getProjectName();
+        final String projectName = String.format( "%s v%s", sample.getProjectName(), sample.getProjectVersion());
         if (projectName != null && ! projectName.isEmpty()) {
-            Label projectNameTitleLabel = new Label("Project Name: ");
+            Label projectNameTitleLabel = new Label("Project: ");
             projectNameTitleLabel.getStyleClass().add("project-name-title");
             
             Label projectNameLabel = new Label(projectName);

@@ -23,6 +23,11 @@ public class EmptySample implements Sample {
         return null;
     }
 
+	@Override
+	public String getProjectVersion() {
+		return null;
+	}
+	
     @Override public Node getPanel(Stage stage) {
         return null;
     }
@@ -38,4 +43,5 @@ public class EmptySample implements Sample {
     @Override public Node getControlPanel() {
         return null;
     }
+
 }

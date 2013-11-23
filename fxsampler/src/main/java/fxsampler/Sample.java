@@ -49,6 +49,13 @@ public interface Sample {
      */
     public String getProjectName();
     
+    
+    
+    /**
+     * Returns the version of the project that this sample belongs to (e.g. '1.0.0')
+     */
+    public String getProjectVersion();
+    
     /**
      * Returns the main sample panel.
      */

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.*
+
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'java'
@@ -57,6 +59,18 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
+    
+    manifest {
+       attributes("Implementation-Title": "ControlsFX", "Implementation-Version": version)
+    }
+    
+}
+
+
+afterEvaluate {
+    processResources {
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.version])
+    }
 }
 
 task sourceJar(type: Jar) {

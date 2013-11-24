@@ -505,6 +505,7 @@ public final class Borders {
      * call {@link Borders#addBorder(Border)} with your custom border, when 
      * appropriate.
      */
+    @FunctionalInterface
     public static interface Border {
         
         /**

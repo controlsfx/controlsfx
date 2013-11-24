@@ -4,10 +4,13 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 apply from: 'mavenPublish.gradle'
-//apply from: 'javafx.plugin'
+apply from: 'javafx.plugin'
 
-group = 'org.controlsfx'
-version = '1.0.3-SNAPSHOT'
+Properties commons = new Properties()
+commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+
+group = commons.controlsfx_group
+version = commons.fxsampler_version
 
 
 configurations {
@@ -52,7 +55,6 @@ javadoc {
 }
 
 jar {
-
 }
 
 task sourceJar(type: Jar) {
@@ -75,4 +77,8 @@ artifacts {
     archives sourceJar
     archives javadocJar
     //archives jarSamples
+}
+
+javafx {
+    mainClass commons.fxsampler_mainClass
 }

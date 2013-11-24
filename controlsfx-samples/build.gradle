@@ -1,5 +1,5 @@
 import org.apache.tools.ant.filters.*
-
+apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'maven'
@@ -8,11 +8,15 @@ apply plugin: 'application'
 apply from: 'mavenPublish.gradle'
 apply from: 'javafx.plugin'
 
-group = 'org.controlsfx'
-version = '8.0.3-SNAPSHOT'
+
+Properties commons = new Properties()
+commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+
+group = commons.controlsfx_group
+version = commons.controlsfx_version
 
 applicationName = 'FXSampler'
-mainClassName = "fxsampler.FXSampler"
+mainClassName = commons.fxsampler_mainClass
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -27,8 +31,8 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.controlsfx:fxsampler:1.0.3-SNAPSHOT"
-    compile "org.controlsfx:controlsfx:8.0.3-SNAPSHOT"
+    compile group+":fxsampler:"+commons.fxsampler_version
+    compile group+":controlsfx:"+commons.controlsfx_version
 
     try {
         jdk files(jfxrtJar)

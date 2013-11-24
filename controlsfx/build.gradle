@@ -7,8 +7,11 @@ apply plugin: 'maven'
 
 apply from: 'mavenPublish.gradle'
 
-group = 'org.controlsfx'
-version = '8.0.3-SNAPSHOT'
+Properties commons = new Properties()
+commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+
+group = commons.controlsfx_group
+version = commons.controlsfx_version
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -59,18 +62,13 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
-    
-    manifest {
-       attributes("Implementation-Title": "ControlsFX", "Implementation-Version": version)
-    }
-    
 }
 
 
 afterEvaluate {
     processResources {
         filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.version])
-    }
+   }
 }
 
 task sourceJar(type: Jar) {

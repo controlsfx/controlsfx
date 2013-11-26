@@ -400,18 +400,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             int maxColumn = Math.max(anchor.getColumn(), column);
             maxColumn = Math.max(maxColumn, columnCell);
 
-            /*TableColumnBase<ObservableList<SpreadsheetCell>,SpreadsheetCell> minColumn = anchor.getColumn() < column ? anchor.getTableColumn() : ;
-            TableColumnBase<ObservableList<SpreadsheetCell>,SpreadsheetCell> maxColumn = anchor.getColumn() >= column ? anchor.getTableColumn() : tableColumn;*/
-
             // clear selection, but maintain the anchor
-            sm.clearSelection();
+            if(!e.isShortcutDown())
+                sm.clearSelection();
 
-            // and then perform the selection
-            /*for (int _row = minRow; _row <= maxRow; _row++) {
-                for (int _col = minColumn; _col <= maxColumn; _col++) {
-                    sm.select(_row, tableView.getVisibleLeafColumn(_col));
-                }
-            }*/
             if(minColumn != -1 && maxColumn != -1)
             	sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,  tableView.getColumns().get(maxColumn));
         }

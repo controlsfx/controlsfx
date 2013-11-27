@@ -56,6 +56,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -215,7 +216,7 @@ public class SpreadsheetView extends Control {
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
-    //private ObservableList<SpreadsheetCell> modifiedCells = FXCollections.observableArrayList();
+    private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
 		@Override
@@ -366,10 +367,17 @@ public class SpreadsheetView extends Control {
         setGrid(grid);
         setEditable(true);
 
-        //Listeners
+        //Listeners & handlers
         fixedRows.addListener(fixedRowsListener); 
         fixedColumns.addListener(fixedColumnsListener);
-        grid.getModifiedCells().addListener(modifiedCellsListener);
+        
+        grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, new EventHandler<GridChange>() {
+            @Override
+            public void handle(GridChange change) {
+                modifiedCells.add(grid.getRows().get(change.getRow()).get(change.getColumn()));
+            }
+        });
+        getModifiedCells().addListener(modifiedCellsListener);
     }
 
     /***************************************************************************
@@ -518,6 +526,14 @@ public class SpreadsheetView extends Control {
     	}
 		return cellEditor;
 	}
+    
+    /**
+     * Return an ObservableSet of the modified {@link SpreadsheetCell}.
+     * @return an ObservableSet of the modified {@link SpreadsheetCell}.
+     */
+    public ObservableSet<SpreadsheetCell> getModifiedCells(){
+        return modifiedCells;
+    }
     
     /**
      * Sets the value of the property editable.

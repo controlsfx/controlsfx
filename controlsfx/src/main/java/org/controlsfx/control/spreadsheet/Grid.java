@@ -28,10 +28,9 @@ package org.controlsfx.control.spreadsheet;
 
 import java.util.Map;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
@@ -95,19 +94,6 @@ public interface Grid {
     public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
     /**
-     * Return an obsObservableList of the modified {@link SpreadsheetCell}.
-     * @return
-     */
-    public ObservableSet<SpreadsheetCell> getModifiedCells();
-    
-    /**
-     * Return and {@link ObjectProperty} wrapping a {@link GridChange}
-     * containing the last modification on the grid.
-     * @return
-     */
-    public ReadOnlyObjectProperty<GridChange> getLastSpreadsheetCellChange();
-    
-    /**
      * Change the value situated at the intersection if possible.
      * Verification and conversion of the value should be done before 
      * with {@link SpreadsheetCellType#match(SpreadsheetCell, SpreadsheetCell)}
@@ -135,4 +121,27 @@ public interface Grid {
      * @return the height of a row.
      */
     public double getRowHeight(int row);
+    
+    /**
+     * Registers an event handler to this Grid. The Grid class allows 
+     * registration of listeners which will be notified as a {@link SpreadsheetCell}'s value 
+     * will change.
+     *
+     * @param eventType the type of the events to receive by the handler
+     * @param eventHandler the handler to register
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public <E extends GridChange> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler);
+    
+    /**
+     * Unregisters a previously registered event handler from this Grid. One
+     * handler might have been registered for different event types, so the
+     * caller needs to specify the particular event type from which to
+     * unregister the handler.
+     *
+     * @param eventType the event type from which to unregister
+     * @param eventHandler the handler to unregister
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public <E extends GridChange> void removeEventHandler(EventType<E> eventType, EventHandler<E> eventHandler);
 }

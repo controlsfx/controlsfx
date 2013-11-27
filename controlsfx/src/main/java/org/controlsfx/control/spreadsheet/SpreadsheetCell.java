@@ -138,12 +138,6 @@ public class SpreadsheetCell {
 
 	private StringProperty text;
 
-	/**
-	 * Not serializable, it's transient right now because we don't need the
-	 * style in copy/paste. But that option will be provided in the future. Help
-	 * for that :
-	 * http://www.oracle.com/technetwork/articles/java/javaserial-1536170.html
-	 */
 	private ObservableList<String> styleClass;
 
 	

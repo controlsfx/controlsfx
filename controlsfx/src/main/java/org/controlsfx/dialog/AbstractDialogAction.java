@@ -30,7 +30,9 @@ public abstract class AbstractDialogAction extends AbstractAction implements Dia
      */
     public AbstractDialogAction(String text, ActionTrait... traits) {
         super(text);
-        this.traits = EnumSet.copyOf(Arrays.asList(traits));
+        this.traits = (traits == null || traits.length == 0) ? 
+                EnumSet.noneOf(ActionTrait.class) : 
+                EnumSet.copyOf(Arrays.asList(traits));
     }
 
     /**

@@ -110,49 +110,52 @@ public class HelloBorders extends ControlsFXSample {
     @Override
     public Node getControlPanel() {
 
-        // current borders
-        ListView<String> currentBordersListView = new ListView<String>();
-        currentBordersListView.setPrefHeight(100);
-        Node borderedListView = Borders.wrap(currentBordersListView)
-                .etchedBorder()
-                    .title("Current Borders:")
-                    .build()
-                .emptyBorder()
-                    .padding(5)
-                    .build()
-                .build();
+        return null;
         
-        
-        // add new borders
-        Tab lineBorderTab = buildLineBorderTab();
-        
-        Tab etchedBorderTab = new Tab("Etched");
-        Tab emptyBorderTab = new Tab("Empty");
-        
-        TabPane tabPane = new TabPane();
-        tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
-        tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-        tabPane.setMaxHeight(Double.MAX_VALUE);
-        tabPane.getTabs().addAll(lineBorderTab, etchedBorderTab, emptyBorderTab);
-        Region borderedTabPane = (Region) Borders.wrap(tabPane)
-            .lineBorder()
-                .thickness(1, 0, 0, 0)
-                .title("Add a Border:")
-                .build()
-//            .emptyBorder()
-//                .padding(5, 0, 0, 0)
+        // TODO
+//        // current borders
+//        ListView<String> currentBordersListView = new ListView<String>();
+//        currentBordersListView.setPrefHeight(100);
+//        Node borderedListView = Borders.wrap(currentBordersListView)
+//                .etchedBorder()
+//                    .title("Current Borders:")
+//                    .build()
+//                .emptyBorder()
+//                    .padding(5)
+//                    .build()
+//                .build();
+//        
+//        
+//        // add new borders
+//        Tab lineBorderTab = buildLineBorderTab();
+//        
+//        Tab etchedBorderTab = new Tab("Etched");
+//        Tab emptyBorderTab = new Tab("Empty");
+//        
+//        TabPane tabPane = new TabPane();
+//        tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
+//        tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+//        tabPane.setMaxHeight(Double.MAX_VALUE);
+//        tabPane.getTabs().addAll(lineBorderTab, etchedBorderTab, emptyBorderTab);
+//        Region borderedTabPane = (Region) Borders.wrap(tabPane)
+//            .lineBorder()
+//                .thickness(1, 0, 0, 0)
+//                .title("Add a Border:")
 //                .build()
-            .build();
-        borderedTabPane.setMaxHeight(Double.MAX_VALUE);
-        
-        VBox vbox = new VBox(borderedListView, borderedTabPane);
-        vbox.setMaxHeight(Double.MAX_VALUE);
-        vbox.setSpacing(10);
-        
-        StackPane stackPane = new StackPane(tabPane);
-        stackPane.setMaxHeight(Double.MAX_VALUE);
-        
-        return stackPane;
+////            .emptyBorder()
+////                .padding(5, 0, 0, 0)
+////                .build()
+//            .build();
+//        borderedTabPane.setMaxHeight(Double.MAX_VALUE);
+//        
+//        VBox vbox = new VBox(borderedListView, borderedTabPane);
+//        vbox.setMaxHeight(Double.MAX_VALUE);
+//        vbox.setSpacing(10);
+//        
+//        StackPane stackPane = new StackPane(tabPane);
+//        stackPane.setMaxHeight(Double.MAX_VALUE);
+//        
+//        return stackPane;
     }
 
     private Tab buildLineBorderTab() {

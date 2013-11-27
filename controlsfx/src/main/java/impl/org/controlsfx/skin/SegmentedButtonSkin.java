@@ -41,15 +41,17 @@ import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
-public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>>{
+public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>> {
+    
+    private static final String ONLY_BUTTON = "only-button";
+    private static final String LEFT_PILL   = "left-button";
+    private static final String CENTER_PILL = "center-button";
+    private static final String RIGHT_PILL  = "right-pill";
 
     private final ToggleGroup group;
     
     private final HBox container;
 
-    /**
-     * 
-     */
     public SegmentedButtonSkin(SegmentedButton control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
@@ -73,21 +75,25 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
     private void updateButtons() {
         ObservableList<ToggleButton> buttons = getButtons();
         
+        container.getChildren().clear();
+        
         for (int i = 0; i < getButtons().size(); i++) {
             ToggleButton t = buttons.get(i);
             t.setToggleGroup(group);
+            
+            t.getStyleClass().removeAll(ONLY_BUTTON, LEFT_PILL, CENTER_PILL, RIGHT_PILL);
             container.getChildren().add(t);
 
             if (i == buttons.size() - 1) {
-                if(i == 0) {
-                    t.getStyleClass().add("only-button");
+                if (i == 0) {
+                    t.getStyleClass().add(ONLY_BUTTON);
                 } else {
-                    t.getStyleClass().add("right-pill");
+                    t.getStyleClass().add(RIGHT_PILL);
                 }
             } else if (i == 0) {
-                t.getStyleClass().add("left-pill");
+                t.getStyleClass().add(LEFT_PILL);
             } else {
-                t.getStyleClass().add("center-pill");
+                t.getStyleClass().add(CENTER_PILL);
             }
         }
     }

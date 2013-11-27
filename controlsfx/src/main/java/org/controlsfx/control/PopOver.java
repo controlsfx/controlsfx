@@ -58,10 +58,18 @@ import javafx.util.Duration;
  * popup window. The popup window has a very lightweight appearance (no default
  * window decorations) and an arrow pointing at the owner. Due to the nature of
  * popup windows the PopOver will move around with the parent window when the
- * user drags it. The PopOver can be detached from the owning node by dragging
- * it away from the owner.
- * 
- * @author Dirk Lemmermann
+ * user drags it. <br>
+ * <center> <img src="popover.png"/> </center> <br>
+ * The PopOver can be detached from the owning node by dragging it away from the
+ * owner. It stops displaying an arrow and starts displaying a title and a close
+ * icon. <br>
+ * <br>
+ * <center> <img src="popover-detached.png"/> </center> <br>
+ * The following image shows a popover with an accordion content node. PopOver
+ * controls are automatically resizing themselves when the content node changes
+ * its size.<br>
+ * <br>
+ * <center> <img src="popover-accordion.png"/> </center> <br>
  */
 public class PopOver extends Control {
 

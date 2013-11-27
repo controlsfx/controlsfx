@@ -33,24 +33,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
+import javafx.event.Event;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
+import javafx.event.EventType;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
+
+import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * A base implementation of the {@link Grid} interface.
  * 
  * @see Grid
  */
-public class GridBase implements Grid {
+public class GridBase implements Grid, EventTarget {
 
     /***************************************************************************
      * 
@@ -58,13 +59,12 @@ public class GridBase implements Grid {
      * 
      **************************************************************************/
     private ObservableList<ObservableList<SpreadsheetCell>> rows;
-    private ObservableSet<SpreadsheetCell> modifiedCells;
+    
     private int rowCount;
     private int columnCount;
     private Map<Integer,Double> rowHeight;
-    private ObjectProperty<GridChange> lastSpreadsheetCellChange;
-    private BooleanProperty lock;
-    
+    private final BooleanProperty locked;
+    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     /***************************************************************************
      * 
@@ -104,20 +104,7 @@ public class GridBase implements Grid {
     	this.columnCount = columnCount;
         this.rows = rows;
         this.rowHeight = rowHeight;
-        lock = new SimpleBooleanProperty(false);
-        
-        lastSpreadsheetCellChange = new SimpleObjectProperty<>();
-        modifiedCells = FXCollections.observableSet();
-        
-        lastSpreadsheetCellChange.addListener(new ChangeListener<GridChange>() {
-			@Override
-			public void changed(ObservableValue<? extends GridChange> arg0,
-					GridChange arg1, GridChange arg2) {
-				if(arg2 != null){
-					modifiedCells.add(getRows().get(arg2.getRow()).get(arg2.getColumn()));
-				}
-			}
-		});
+        locked = new SimpleBooleanProperty(false);
     }
 
     /***************************************************************************
@@ -132,24 +119,15 @@ public class GridBase implements Grid {
     }
     
     /** {@inheritDoc} */
-    public ObservableSet<SpreadsheetCell> getModifiedCells(){
-    	return modifiedCells;
-    }
-    
-    /** {@inheritDoc} */
-    @Override public ReadOnlyObjectProperty<GridChange> getLastSpreadsheetCellChange() {
-		return lastSpreadsheetCellChange;
-	}
-    
-    /** {@inheritDoc} */
     @Override public void setCellValue(int row,int column,Object value){
-    	if(row < rowCount && column < columnCount && !isLock()){
+    	if(row < rowCount && column < columnCount && !isLocked()){
     		SpreadsheetCell cell = getRows().get(row).get(column);
     		Object item = cell.getItem();
     		cell.setItem(value);
     		if(item != value && (item == null || !item.equals(cell.getItem()))){
     			GridChange cellChange = new GridChange(row, column, item, value);
-    			lastSpreadsheetCellChange.setValue(cellChange);
+    			Event.fireEvent(this, cellChange);
+//    			lastSpreadsheetCellChange.setValue(cellChange);
     		}
     	}
     }
@@ -217,30 +195,30 @@ public class GridBase implements Grid {
      **************************************************************************/
 
     /**
-     * Return a BooleanProperty associated with the lock. 
+     * Return a BooleanProperty associated with the locked. 
      * It means that the Grid is in a read-only mode and 
      * that no SpreadsheetCell can be modified, no regards
      * for their own {@link SpreadsheetCell#editableProperty()}.
      * @return
      */
-    public BooleanProperty lockProperty(){
-    	return lock;
+    public BooleanProperty lockedProperty(){
+    	return locked;
     }
     
     /**
      * Return whether this Grid id locked or not.
      * @return
      */
-    public boolean isLock(){
-    	return lock.get();
+    public boolean isLocked(){
+    	return locked.get();
     }
     
     /**
      * Lock or unlock this Grid.
      * @param b
      */
-    public void setLock(Boolean b){
-    	lock.setValue(b);
+    public void setLocked(Boolean b){
+    	locked.setValue(b);
     }
     /**
      * Span in row the cell situated at rowIndex and colIndex by the number
@@ -301,6 +279,23 @@ public class GridBase implements Grid {
         setRowCount(rows.size());
     }
     
+    /** {@inheritDoc} */
+    @Override
+    public <E extends GridChange> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {
+        eventHandlerManager.addEventHandler(eventType, eventHandler);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public <E extends GridChange> void removeEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {
+        eventHandlerManager.removeEventHandler(eventType, eventHandler);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
+        return tail.append(eventHandlerManager);
+    }
     /***************************************************************************
      * 
      * Private implementation
@@ -322,5 +317,4 @@ public class GridBase implements Grid {
     private void setColumnCount(int columnCount) {
         this.columnCount = columnCount;
     }
-
 }

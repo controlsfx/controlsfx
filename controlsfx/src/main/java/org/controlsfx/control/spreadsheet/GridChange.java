@@ -27,11 +27,17 @@ package org.controlsfx.control.spreadsheet;
 
 import java.io.Serializable;
 
+import javafx.event.Event;
+import javafx.event.EventType;
+
 /**
  *
  * This class represents a single change happening in a {@link Grid}.
  */
-public class GridChange implements Serializable {
+public class GridChange extends Event implements Serializable {
+    
+    public static final EventType<GridChange> GRID_CHANGE_EVENT
+    = new EventType<>(Event.ANY, "GridChange");
 
     /**
      * *************************************************************************
@@ -68,6 +74,7 @@ public class GridChange implements Serializable {
      * @param newValue
      */
     public GridChange(int row, int column, Object oldValue, Object newValue) {
+        super(GRID_CHANGE_EVENT);
         this.row = row;
         this.column = column;
         this.oldValue = oldValue;

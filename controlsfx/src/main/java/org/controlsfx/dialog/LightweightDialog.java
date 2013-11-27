@@ -235,6 +235,10 @@ class LightweightDialog extends FXDialog {
         }
         return resizable;
     }
+    
+    @Override public Window getWindow() {
+        return scene.getWindow();
+    }
 
     @Override public Node getRoot() {
         return lightweightDialog;

@@ -60,6 +60,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Window;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
@@ -330,6 +331,15 @@ public class Dialog {
         dialog.hide();
     }
     
+    /**
+     * Returns this dialog's window. For lightweight dialogs,
+     * this is the window in which this dialog is displayed. 
+     * @return
+     */
+    public Window getWindow() {
+        return dialog.getWindow();
+    }
+
     /**
      * Assigns the resulting action. If action is a {@link DialogAction} and has either CANCEL or CLOSING traits
      * the dialog will be closed.

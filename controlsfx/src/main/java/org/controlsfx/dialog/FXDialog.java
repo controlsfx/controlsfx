@@ -48,6 +48,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Window;
 
 import org.controlsfx.tools.Platform;
 
@@ -220,6 +221,8 @@ abstract class FXDialog {
     public abstract void show();
     
     public abstract void hide();
+    
+    public abstract Window getWindow();
     
     public abstract void sizeToScene();
     

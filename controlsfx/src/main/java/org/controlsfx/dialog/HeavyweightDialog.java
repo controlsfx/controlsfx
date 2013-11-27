@@ -245,6 +245,10 @@ class HeavyweightDialog extends FXDialog {
         stage.hide();
     }
     
+    @Override public Window getWindow() {
+        return stage;
+    }
+    
     @Override public Node getRoot() {
         return stage.getScene().getRoot();
     }

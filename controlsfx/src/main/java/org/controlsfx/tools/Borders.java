@@ -38,6 +38,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotResult;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -60,7 +61,58 @@ import javafx.util.Callback;
  * by continuing to call additional methods before you call the final 
  * {@link Borders#build()} method. To use the Borders class, you simply call
  * {@link Borders#wrap(Node)}, passing in the Node you wish to wrap the border(s)
- * around.
+ * around. 
+ * 
+ * <h3>Examples</h3>
+ * <p>Firstly, lets wrap a JavaFX Button node with a simple line border that looks
+ * like the following:
+ * 
+ * <br>
+ * <center><img src="borders-lineBorder.png" /></center>
+ * 
+ * <p>Here's the code:</p>
+ * 
+ * <pre>
+ * {@code
+ * Button button = new Button("Hello World!");
+ * Node wrappedButton = Borders.wrap(button).lineBorder().buildAll();
+ * }</pre>
+ * 
+ * <p>Easy, isn't it!? You can make the border look a little nicer by replacing
+ * the line border with an {@link EtchedBorders etched border}. An etched border
+ * has a subtle inner (or outer) line that makes the border stand out a bit more,
+ * like this:
+ * 
+ * <br>
+ * <center><img src="borders-etchedBorder.png" /></center>
+ * 
+ * <p>Now that's one good looking border! Here's the code:</p>
+ * 
+ * <pre>
+ * {@code
+ * Button button = new Button("Hello World!");
+ * Node wrappedButton = Borders.wrap(button).etchedBorder().buildAll();
+ * }</pre>
+ * 
+ * <p>In some circumstances you want to have multiple borders. For example,
+ * you might two line borders. That's easy:
+ * 
+ * <br>
+ * <center><img src="borders-twoLines.png" /></center>
+ * 
+ * <pre>
+ * {@code
+ * Node wrappedButton = Borders.wrap(button)
+ *     .lineBorder().color(Color.RED).build()
+ *     .lineBorder().color(Color.GREEN).build()
+ *     .build();
+ * }</pre>
+ * 
+ * <p>You simply chain the borders together, going from inside to outside!</p>
+ * 
+ * <p>Because of all the configuration options it isn't possible to list all the 
+ * functionality of all the border types, so refer to the rest of the javadocs 
+ * for inspiration.</p>
  */
 public final class Borders {
     
@@ -261,6 +313,16 @@ public final class Borders {
         private String title;
         private boolean raised = false;
         
+        private double topPadding = 10;
+        private double rightPadding = 10;
+        private double bottomPadding = 10;
+        private double leftPadding = 10;
+        
+        private double topLeftRadius = 0;
+        private double topRightRadius = 0;
+        private double bottomRightRadius = 0;
+        private double bottomLeftRadius = 0;
+        
         private Color highlightColor = DEFAULT_BORDER_COLOR;
         private Color shadowColor = Color.WHITE;
         
@@ -305,6 +367,26 @@ public final class Borders {
         }
         
         /**
+         * Specifies the radius of the four corners of the lines of this border.
+         */
+        public EtchedBorders radius(double radius) {
+            return radius(radius, radius, radius, radius);
+        }
+        
+        /**
+         * Specifies that the etched line wrapping the node should have corner radii
+         * as specified, with each radius being independently configured, going 
+         * in the order top-left, top-right, bottom-right, and finally bottom-left.
+         */
+        public EtchedBorders radius(double topLeft, double topRight, double bottomRight, double bottomLeft) {
+            this.topLeftRadius = topLeft;
+            this.topRightRadius = topRight;
+            this.bottomRightRadius = bottomRight;
+            this.bottomLeftRadius = bottomLeft;
+            return this;
+        }
+        
+        /**
          * Builds the {@link Border} and {@link Borders#addBorder(Border) adds it}
          * to the list of borders to wrap around the given Node (which will be
          * constructed and returned when {@link Borders#build()} is called.
@@ -312,9 +394,28 @@ public final class Borders {
         public Borders build() {
             Color inner = raised ? shadowColor : highlightColor;
             Color outer = raised ? highlightColor : shadowColor;
-            BorderStroke innerStroke = new BorderStroke(inner, BorderStrokeStyle.SOLID, null, new BorderWidths(1));
-            BorderStroke outerStroke = new BorderStroke(outer, BorderStrokeStyle.SOLID, null, new BorderWidths(1), new Insets(1));
+            BorderStroke innerStroke = new BorderStroke(
+                    inner, 
+                    BorderStrokeStyle.SOLID, 
+                    new CornerRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius, false), 
+                    new BorderWidths(1));
+            BorderStroke outerStroke = new BorderStroke(
+                    outer, 
+                    BorderStrokeStyle.SOLID, 
+                    new CornerRadii(topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius, false), 
+                    new BorderWidths(1), 
+                    new Insets(1));
+            
+            BorderStroke outerPadding = new EmptyBorders(parent)
+                .padding(topPadding, rightPadding, bottomPadding, leftPadding)
+                .buildStroke();
+            
+            BorderStroke innerPadding = new EmptyBorders(parent).padding(15).buildStroke();
+            
+            parent.addBorder(new StrokeBorder(null, outerPadding));
             parent.addBorder(new StrokeBorder(title, innerStroke, outerStroke));
+            parent.addBorder(new StrokeBorder(null, innerPadding));
+            
             return parent;
         }
         

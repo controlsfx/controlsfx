@@ -18,8 +18,8 @@ import org.controlsfx.control.PropertySheet.Item;
  * {@link PropertySheet#propertyEditorFactory() property editor factory}. By 
  * default this is the implementation used by PropertySheet, but developers may
  * choose to provide their own, or more likely, extend this implementation
- * and override the {@link #call(Item)} method to add in support for additional
- * editor types.
+ * and override the {@link DefaultPropertyEditorFactory#call(Item)} method to 
+ * add in support for additional editor types.
  *
  * @see PropertySheet
  */

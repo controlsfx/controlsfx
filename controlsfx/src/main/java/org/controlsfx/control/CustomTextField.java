@@ -50,7 +50,7 @@ import javafx.scene.control.TextField;
  * <img src="customTextField.png" />
  * </center>
  * 
- * @see SearchField
+ * @see TextFields
  */
 public class CustomTextField extends TextField {
 

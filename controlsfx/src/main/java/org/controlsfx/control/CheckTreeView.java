@@ -77,7 +77,7 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
  *         System.out.println(checkListView.getCheckModel().getSelectedIndices());
  *     }
  * });
- * </pre>
+ * }</pre>
  *
  * @param <T> The type of the data in the TreeView.
  */
@@ -150,9 +150,10 @@ public class CheckTreeView<T> extends TreeView<T> {
     /**
      * Sets the 'check model' to be used in the CheckTreeView - this is the
      * code that is responsible for representing the selected state of each
-     * {@link CheckBox} (not to be confused with the 
-     * {@link #selectionModelProperty() selection model}, which represents the
-     * selection state of each row).. 
+     * {@link CheckBox} - that is, whether each {@link CheckBox} is checked or 
+     * not (and not to be confused with the 
+     * selection model concept, which is used in the TreeView control to 
+     * represent the selection state of each row).. 
      */
     public final void setCheckModel(MultipleSelectionModel<TreeItem<T>> value) {
         checkModelProperty().set(value);

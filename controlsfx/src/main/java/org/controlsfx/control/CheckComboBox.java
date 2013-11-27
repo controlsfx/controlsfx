@@ -75,7 +75,7 @@ import javafx.scene.control.Skin;
  *         System.out.println(checkComboBox.getCheckModel().getSelectedItems());
  *     }
  * });}
- * </pre>
+ * }</pre>
  *
  * @param <T> The type of the data in the ComboBox.
  */
@@ -172,9 +172,10 @@ public class CheckComboBox<T> extends Control {
     /**
      * Sets the 'check model' to be used in the CheckComboBox - this is the
      * code that is responsible for representing the selected state of each
-     * {@link CheckBox} (not to be confused with the 
-     * {@link #selectionModelProperty() selection model}, which represents the
-     * selection state of each row).. 
+     * {@link CheckBox} - that is, whether each {@link CheckBox} is checked or 
+     * not (and not to be confused with the 
+     * selection model concept, which is used in the ComboBox control to 
+     * represent the selection state of each row).. 
      */
     public final void setCheckModel(MultipleSelectionModel<T> value) {
         checkModelProperty().set(value);

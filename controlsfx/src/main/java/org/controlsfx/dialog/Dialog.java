@@ -694,8 +694,12 @@ public class Dialog {
         CANCEL
     }
     
-    public void setTitle(String s){
-        this.dialog.titleProperty().set(s);
+    /**
+     * Change the Title of the dialog.
+     * @param title
+     */
+    public void setTitle(String title){
+        this.dialog.titleProperty().set(title);
     }
     
     /**************************************************************************

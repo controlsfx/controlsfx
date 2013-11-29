@@ -694,6 +694,9 @@ public class Dialog {
         CANCEL
     }
     
+    public void setTitle(String s){
+        this.dialog.titleProperty().set(s);
+    }
     
     /**************************************************************************
      * 

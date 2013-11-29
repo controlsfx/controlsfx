@@ -695,6 +695,19 @@ public class Dialog {
     }
     
     /**
+     * Return the titleProperty of the dialog.
+     */
+    public StringProperty titleProperty(){
+        return this.dialog.titleProperty();
+    }
+    
+    /**
+     * Return the title of the dialog.
+     */
+    public String getTitle(){
+        this.dialog.titleProperty().get();
+    }
+    /**
      * Change the Title of the dialog.
      * @param title
      */

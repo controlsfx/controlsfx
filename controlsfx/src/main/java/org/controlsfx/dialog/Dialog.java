@@ -705,7 +705,7 @@ public class Dialog {
      * Return the title of the dialog.
      */
     public String getTitle(){
-        this.dialog.titleProperty().get();
+        return this.dialog.titleProperty().get();
     }
     /**
      * Change the Title of the dialog.

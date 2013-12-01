@@ -350,7 +350,7 @@ public final class Dialogs {
     private String masthead;
     private boolean lightweight;
     private boolean nativeTitleBar;
-    private Set<Action> actions = new HashSet<>();
+    private Set<Action> actions = new LinkedHashSet<>();
 
     /**
      * Creates the initial dialog

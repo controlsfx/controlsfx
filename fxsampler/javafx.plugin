@@ -27,7 +27,12 @@ buildscript {
     dependencies {
         classpath 'org.bitbucket.shemnon.javafxplugin:gradle-javafx-plugin:0.4.0-SNAPSHOT'
         classpath project.files("${System.properties['java.home']}/../lib/ant-javafx.jar")
-        classpath project.files("${System.properties['java.home']}/lib/jfxrt.jar")
+        
+        try {
+            classpath files(jfxrtJar)
+        } catch (MissingPropertyException pne) {
+            classpath project.files("${System.properties['java.home']}/lib/jfxrt.jar")
+        }
     }
 }
 

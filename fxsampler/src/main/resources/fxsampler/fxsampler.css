@@ -2,10 +2,6 @@
     -fx-padding: 5 5 5 5;
 }
 
-.search-box {
-    
-}
-
 .samples-tree {
     -fx-background-color: -fx-outer-border, -fx-background;
     -fx-background-insets: 0, 1;

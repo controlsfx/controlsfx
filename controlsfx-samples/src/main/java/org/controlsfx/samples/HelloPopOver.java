@@ -169,6 +169,13 @@ public class HelloPopOver extends ControlsFXSample {
         stackPane.getChildren().add(label);
         BorderPane.setMargin(stackPane, new Insets(10));
 
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(stackPane);
+
+        return borderPane;
+    }
+    
+    @Override public Node getControlPanel() {
         Slider arrowSize = new Slider(0, 50, masterArrowSize.getValue());
         masterArrowSize.bind(arrowSize.valueProperty());
         GridPane.setFillWidth(arrowSize, true);
@@ -252,12 +259,8 @@ public class HelloPopOver extends ControlsFXSample {
         Bindings.bindBidirectional(masterArrowLocation,
                 locationBox.valueProperty());
         controls.add(locationBox, 1, 3);
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(stackPane);
-        borderPane.setBottom(controls);
-
-        return borderPane;
+        
+        return controls;
     }
 
     private PopOver createPopOver() {

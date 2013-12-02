@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control;
 
+import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import impl.org.controlsfx.skin.PopOverSkin;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
@@ -104,7 +105,6 @@ public class PopOver extends PopupControl {
          */
         Label label = new Label("<No Content>");
         label.setPadding(new Insets(4));
-        label.setPrefSize(200, 200);
         setContentNode(label);
 
         ChangeListener<Object> repositionListener = new ChangeListener<Object>() {
@@ -142,7 +142,7 @@ public class PopOver extends PopupControl {
     // Content support.
 
     private final ObjectProperty<Node> contentNode = new SimpleObjectProperty<Node>(
-            this, "content") {
+            this, "contentNode") {
         @Override
         public void setValue(Node node) {
             if (node == null) {
@@ -303,15 +303,17 @@ public class PopOver extends PopupControl {
                  * The user clicked somewhere into the transparent background.
                  * If this is the case the hide the window (when attached).
                  */
-                getScene().setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent evt) {
-                        if (evt.getTarget().equals(getScene().getRoot())) {
-                            if (!isDetached()) {
-                                hide();
-                            }
-                        }
-                    };
-                });
+                getScene().addEventHandler(MOUSE_CLICKED,
+                        new EventHandler<MouseEvent>() {
+                            public void handle(MouseEvent evt) {
+                                if (evt.getTarget()
+                                        .equals(getScene().getRoot())) {
+                                    if (!isDetached()) {
+                                        hide();
+                                    }
+                                }
+                            };
+                        });
 
                 /*
                  * Move the window so that the arrow will end up pointing at the

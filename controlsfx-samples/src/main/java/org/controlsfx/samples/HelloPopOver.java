@@ -65,12 +65,7 @@ public class HelloPopOver extends ControlsFXSample {
 
     private PopOver popOver = new PopOver();
 
-    /*
-     * TODO: we want to allow the user to also change the arrow size in the
-     * demo, but unfortuntely this seems to cause an infinite property update
-     * loop (probably because the window size of the popup changes).
-     */
-    // private DoubleProperty masterArrowSize;
+    private DoubleProperty masterArrowSize;
     private DoubleProperty masterArrowIndent;
     private DoubleProperty masterCornerRadius;
     private ObjectProperty<ArrowLocation> masterArrowLocation;
@@ -85,8 +80,8 @@ public class HelloPopOver extends ControlsFXSample {
         final Rectangle rect = new Rectangle();
         rect.setStroke(Color.BLACK);
         rect.setFill(Color.CORAL);
-        rect.setWidth(200);
-        rect.setHeight(200);
+        rect.setWidth(220);
+        rect.setHeight(220);
         group.getChildren().add(rect);
 
         final Circle circle = new Circle();
@@ -108,7 +103,7 @@ public class HelloPopOver extends ControlsFXSample {
          * will be applied to all popovers that are currently visible (this
          * includes the detached ones).
          */
-        // masterArrowSize = new SimpleDoubleProperty(popOver.getArrowSize());
+        masterArrowSize = new SimpleDoubleProperty(popOver.getArrowSize());
         masterArrowIndent = new SimpleDoubleProperty(popOver.getArrowIndent());
         masterCornerRadius = new SimpleDoubleProperty(popOver.getCornerRadius());
         masterArrowLocation = new SimpleObjectProperty<>(
@@ -174,9 +169,9 @@ public class HelloPopOver extends ControlsFXSample {
         stackPane.getChildren().add(label);
         BorderPane.setMargin(stackPane, new Insets(10));
 
-        // Slider arrowSize = new Slider(0, 50, masterArrowSize.getValue());
-        // masterArrowSize.bind(arrowSize.valueProperty());
-        // GridPane.setFillWidth(arrowSize, true);
+        Slider arrowSize = new Slider(0, 50, masterArrowSize.getValue());
+        masterArrowSize.bind(arrowSize.valueProperty());
+        GridPane.setFillWidth(arrowSize, true);
 
         Slider arrowIndent = new Slider(0, 30, masterArrowIndent.getValue());
         masterArrowIndent.bind(arrowIndent.valueProperty());
@@ -193,10 +188,10 @@ public class HelloPopOver extends ControlsFXSample {
         BorderPane.setMargin(controls, new Insets(10));
         BorderPane.setAlignment(controls, Pos.BOTTOM_CENTER);
 
-        // Label arrowSizeLabel = new Label("Arrow Size:");
-        // GridPane.setHalignment(arrowSizeLabel, HPos.RIGHT);
-        // controls.add(arrowSizeLabel, 0, 0);
-        // controls.add(arrowSize, 1, 0);
+        Label arrowSizeLabel = new Label("Arrow Size:");
+        GridPane.setHalignment(arrowSizeLabel, HPos.RIGHT);
+        controls.add(arrowSizeLabel, 0, 0);
+        controls.add(arrowSize, 1, 0);
 
         Label arrowIndentLabel = new Label("Arrow Indent:");
         GridPane.setHalignment(arrowIndentLabel, HPos.RIGHT);
@@ -220,14 +215,14 @@ public class HelloPopOver extends ControlsFXSample {
         GridPane.setHalignment(cornerRadiusValue, HPos.RIGHT);
         controls.add(cornerRadiusValue, 2, 2);
 
-        // arrowSize.valueProperty().addListener(new ChangeListener<Number>() {
-        // @Override
-        // public void changed(ObservableValue<? extends Number> value,
-        // Number oldSize, Number newSize) {
-        // arrowSizeValue.setText(NumberFormat.getIntegerInstance()
-        // .format(newSize));
-        // }
-        // });
+        arrowSize.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> value,
+                    Number oldSize, Number newSize) {
+                arrowSizeValue.setText(NumberFormat.getIntegerInstance()
+                        .format(newSize));
+            }
+        });
 
         arrowIndent.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -265,17 +260,16 @@ public class HelloPopOver extends ControlsFXSample {
         return borderPane;
     }
 
-    public PopOver getPopOver() {
-        return popOver;
-    }
-
     private PopOver createPopOver() {
         PopOver popOver = new PopOver();
-        popOver.setPrefSize(200, 200);
-        // popOver.arrowSizeProperty().bind(masterArrowSize);
+        popOver.arrowSizeProperty().bind(masterArrowSize);
         popOver.arrowIndentProperty().bind(masterArrowIndent);
         popOver.arrowLocationProperty().bind(masterArrowLocation);
         popOver.cornerRadiusProperty().bind(masterCornerRadius);
+        return popOver;
+    }
+
+    public PopOver getPopOver() {
         return popOver;
     }
 

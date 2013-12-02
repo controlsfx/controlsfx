@@ -16,9 +16,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import fxsampler.FXSampler;
 import fxsampler.FXSamplerProject;
@@ -30,6 +32,12 @@ import fxsampler.model.Project;
  * All the code related to classpath scanning, etc for samples.
  */
 public class SampleScanner {
+    
+    private static List<String> ILLEGAL_CLASS_NAMES = new ArrayList<>();
+    static {
+        ILLEGAL_CLASS_NAMES.add("/com/javafx/main/Main.class");
+        ILLEGAL_CLASS_NAMES.add("/com/javafx/main/NoJavaFXFallback.class");
+    }
     
     private static Map<String, String> packageToProjectMap = new HashMap<String, String>();
     static {
@@ -66,7 +74,7 @@ public class SampleScanner {
         try {
             results = loadFromEnumeratedFile();
             if (results == null) {
-                results = loadFromJarSniffing();
+                results = loadFromPathScanning();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,56 +143,80 @@ public class SampleScanner {
 
 
     /**
-     * Scans all classes accessible from the context class loader which belong 
-     * to the given package and subpackages.
+     * Scans all classes.
      *
      * @return The classes
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    private Class<?>[] loadFromJarSniffing() throws ClassNotFoundException, IOException {
+    private Class<?>[] loadFromPathScanning() throws ClassNotFoundException, IOException {
+        final List<File> dirs = new ArrayList<>();
+        final List<File> jars = new ArrayList<>();
+        
+        // scan the classpath
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-//        String path = "META-INF/MANIFEST.MF";//packageName.replace('.', '/');
-        String path = "";//packageName.replace('.', '/');
-
+        String path = "";
         Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<>();
         while (resources.hasMoreElements()) {
-            URL next = resources.nextElement();
-            if (next.toExternalForm().contains("/jre/")) continue;
-
+            URL url = resources.nextElement();
+            
+            if (url.toExternalForm().contains("/jre/")) continue;
+            
             // Only "file" and "jar" URLs are recognized, other schemes will be ignored.
-            String protocol = next.getProtocol().toLowerCase();
+            String protocol = url.getProtocol().toLowerCase();
             if ("file".equals(protocol)) {
-                dirs.add(new File(next.getFile()));
+                dirs.add(new File(url.getFile()));
             } else if ("jar".equals(protocol)) {
-                String fileName = new URL(next.getFile()).getFile();
-
+                String fileName = new URL(url.getFile()).getFile();
+                
                 // JAR URL specs must contain the string "!/" which separates the name
                 // of the JAR file from the path of the resource contained in it, even
                 // if the path is empty.
                 int sep = fileName.indexOf("!/");
                 if (sep > 0) {
-                    dirs.add(new File(fileName.substring(0, sep)));
+                    jars.add(new File(fileName.substring(0, sep)));
                 }
-                // otherwise the URL was invalid
             }
         }
-        ArrayList<Class<?>> classes = new ArrayList<>();
-        for (File directory : dirs) {
-            String fullPath = directory.getAbsolutePath();
-            
-            if (fullPath.endsWith("jfxrt.jar")) continue;
 
-            if (fullPath.toLowerCase().endsWith(".jar")) {
-                // scan the jar
-                classes.addAll(findClassesInJar(new File(fullPath)));
-            } else {
-                // scan the classpath
-                classes.addAll(findClassesInDirectory(directory));
-            }
+        // and also scan the current working directory
+        final Path workingDirectory = new File("").toPath();
+        scanPath(workingDirectory, dirs, jars);
+        
+        // process directories first, then jars, so that classes take precedence
+        // over built jars (it makes rapid development easier in the IDE)
+        final Set<Class<?>> classes = new LinkedHashSet<>();
+        for (File directory : dirs) {
+            classes.addAll(findClassesInDirectory(directory));
         }
+        for (File jar : jars) {
+            String fullPath = jar.getAbsolutePath();
+            if (fullPath.endsWith("jfxrt.jar")) continue;
+            classes.addAll(findClassesInJar(new File(fullPath)));
+        }
+        
         return classes.toArray(new Class[classes.size()]);
+    }
+
+    private void scanPath(Path workingDirectory, List<File> dirs, List<File> jars) throws IOException {
+        Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
+            @Override public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                final File file = path.toFile();
+                final String fullPath = file.getAbsolutePath();
+                final String name = file.toString();
+                
+                if (fullPath.endsWith("jfxrt.jar") || name.contains("jre")) {
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                if (file.isDirectory()) {
+                    dirs.add(file);
+                } else if (name.toLowerCase().endsWith(".jar")) {
+                    jars.add(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     private List<Class<?>> findClassesInDirectory(File directory) throws IOException {
@@ -193,7 +225,7 @@ public class SampleScanner {
             System.out.println("Directory does not exist: " + directory.getAbsolutePath());
             return classes;
         }
-
+        
         processPath(directory.toPath(), classes);
         return classes;
     }
@@ -216,7 +248,7 @@ public class SampleScanner {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 String name = file.toString();
-                if (name.endsWith(".class")) {
+                if (name.endsWith(".class") && ! ILLEGAL_CLASS_NAMES.contains(name)) {
                     
                     // remove root path to make class name correct in all cases
                     name = name.substring(root.length());
@@ -257,9 +289,9 @@ public class SampleScanner {
             clazz = Class.forName(className);
         } catch (Throwable e) {
             // Throwable, could be all sorts of bad reasons the class won't instantiate
-            System.out.println("Class name: " + className);
-            System.out.println("Initial filename: " + name);
-            e.printStackTrace();
+            System.out.println("ERROR: Class name: " + className);
+            System.out.println("ERROR: Initial filename: " + name);
+//            e.printStackTrace();
         }
         return clazz;
     } 

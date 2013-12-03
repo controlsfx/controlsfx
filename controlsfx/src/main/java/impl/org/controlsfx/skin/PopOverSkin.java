@@ -55,10 +55,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.SkinBase;
+import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -76,7 +77,7 @@ import javafx.stage.Window;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
-public class PopOverSkin extends SkinBase<PopOver> {
+public class PopOverSkin implements Skin<PopOver> {
 
     private static final String DETACHED_STYLE_CLASS = "detached";
 
@@ -91,11 +92,37 @@ public class PopOverSkin extends SkinBase<PopOver> {
     private Path path;
     private BorderPane content;
     private StackPane titlePane;
+    private StackPane stackPane;
 
     private Point2D dragStartLocation;
 
+    private PopOver popOver;
+
     public PopOverSkin(final PopOver popOver) {
-        super(popOver);
+
+        this.popOver = popOver;
+
+        stackPane = new StackPane();
+        stackPane.getStylesheets().add(
+                PopOver.class.getResource("popover.css").toExternalForm());
+        stackPane.setPickOnBounds(false);
+        stackPane.getStyleClass().add("popover");
+        stackPane.setCache(true);
+        stackPane.setCacheHint(CacheHint.SCALE);
+
+        /*
+         * The min width and height equal 2 * corner radius + 2 * arrow indent +
+         * 2 * arrow size.
+         */
+        stackPane.minWidthProperty().bind(
+                Bindings.add(Bindings.multiply(2, popOver.arrowSizeProperty()),
+                        Bindings.add(
+                                Bindings.multiply(2,
+                                        popOver.cornerRadiusProperty()),
+                                Bindings.multiply(2,
+                                        popOver.arrowIndentProperty()))));
+
+        stackPane.minHeightProperty().bind(stackPane.minWidthProperty());
 
         title = new Label();
         title.textProperty().bind(popOver.detachedTitleProperty());
@@ -124,7 +151,7 @@ public class PopOverSkin extends SkinBase<PopOver> {
         titlePane.getStyleClass().add("title");
 
         content = new BorderPane();
-        content.setCenter(popOver.getContent());
+        content.setCenter(popOver.getContentNode());
         content.getStyleClass().add("content");
 
         if (popOver.isDetached()) {
@@ -146,7 +173,7 @@ public class PopOverSkin extends SkinBase<PopOver> {
 
         popOver.arrowLocationProperty().addListener(updatePathListener);
 
-        popOver.contentProperty().addListener(new ChangeListener<Node>() {
+        popOver.contentNodeProperty().addListener(new ChangeListener<Node>() {
             @Override
             public void changed(ObservableValue<? extends Node> value,
                     Node oldContent, Node newContent) {
@@ -174,8 +201,8 @@ public class PopOverSkin extends SkinBase<PopOver> {
         });
 
         path = new Path();
-        path.setManaged(false);
         path.getStyleClass().add("border");
+        path.setManaged(false);
 
         createPathElements();
         updatePath();
@@ -228,13 +255,26 @@ public class PopOverSkin extends SkinBase<PopOver> {
             };
         };
 
-        getChildren().add(path);
-        getChildren().add(content);
+        stackPane.setOnMousePressed(mousePressedHandler);
+        stackPane.setOnMouseDragged(mouseDragHandler);
+        stackPane.setOnMouseReleased(mouseReleasedHandler);
 
-        getSkinnable().setPickOnBounds(false);
-        getSkinnable().setOnMousePressed(mousePressedHandler);
-        getSkinnable().setOnMouseDragged(mouseDragHandler);
-        getSkinnable().setOnMouseReleased(mouseReleasedHandler);
+        stackPane.getChildren().add(path);
+        stackPane.getChildren().add(content);
+    }
+
+    @Override
+    public Node getNode() {
+        return stackPane;
+    }
+
+    @Override
+    public PopOver getSkinnable() {
+        return popOver;
+    }
+
+    @Override
+    public void dispose() {
     }
 
     private Node createCloseIcon() {
@@ -308,10 +348,8 @@ public class PopOverSkin extends SkinBase<PopOver> {
         DoubleProperty arrowIndentProperty = getSkinnable()
                 .arrowIndentProperty();
 
-        centerYProperty.bind(Bindings
-                .divide(getSkinnable().heightProperty(), 2));
-        centerXProperty
-                .bind(Bindings.divide(getSkinnable().widthProperty(), 2));
+        centerYProperty.bind(Bindings.divide(stackPane.heightProperty(), 2));
+        centerXProperty.bind(Bindings.divide(stackPane.widthProperty(), 2));
 
         leftEdgePlusRadiusProperty.bind(Bindings.add(leftEdgeProperty,
                 getSkinnable().cornerRadiusProperty()));
@@ -319,11 +357,11 @@ public class PopOverSkin extends SkinBase<PopOver> {
         topEdgePlusRadiusProperty.bind(Bindings.add(topEdgeProperty,
                 getSkinnable().cornerRadiusProperty()));
 
-        rightEdgeProperty.bind(getSkinnable().widthProperty());
+        rightEdgeProperty.bind(stackPane.widthProperty());
         rightEdgeMinusRadiusProperty.bind(Bindings.subtract(rightEdgeProperty,
                 getSkinnable().cornerRadiusProperty()));
 
-        bottomEdgeProperty.bind(getSkinnable().heightProperty());
+        bottomEdgeProperty.bind(stackPane.heightProperty());
         bottomEdgeMinusRadiusProperty.bind(Bindings.subtract(
                 bottomEdgeProperty, getSkinnable().cornerRadiusProperty()));
 
@@ -672,66 +710,4 @@ public class PopOverSkin extends SkinBase<PopOver> {
 
         path.getElements().setAll(elements);
     }
-
-    /*
-     * LEAVE IN FOR NOW. TODO: This code will be needed when autofix is
-     * completely implemented. Autofix for the PopOver is an advanced version of
-     * the regular autofix as the arrow needs to be updated when the location
-     * was autofixed by the code of PopupWindow.
-     */
-    // private ArrowLocation computeArrowLocation(Point2D targetLocation,
-    // Point2D windowLocation) {
-    //
-    // Window window = getPopupWindow();
-    // double h = window.getHeight();
-    // double w = window.getWidth();
-    //
-    // double radius = getSkinnable().getCornerRadius();
-    // double indent = getSkinnable().getArrowIndent();
-    // double arrow = getSkinnable().getArrowSize();
-    //
-    // double offset = radius + indent + arrow;
-    //
-    // System.out.println("window is located at " + windowLocation);
-    // System.out.println("-> "
-    // + (new Point2D(1416, 449)).distance(new Point2D(1416, 450)));
-    // Point2D[] points = new Point2D[ArrowLocation.values().length];
-    //
-    // points[ArrowLocation.LEFT_TOP.ordinal()] = new Point2D(0, offset);
-    // points[ArrowLocation.LEFT_CENTER.ordinal()] = new Point2D(0, h / 2);
-    // points[ArrowLocation.LEFT_BOTTOM.ordinal()] = new Point2D(0, h - offset);
-    //
-    // points[ArrowLocation.RIGHT_TOP.ordinal()] = new Point2D(w, offset);
-    // points[ArrowLocation.RIGHT_CENTER.ordinal()] = new Point2D(w, h / 2);
-    // points[ArrowLocation.RIGHT_BOTTOM.ordinal()] = new Point2D(w, h
-    // - offset);
-    //
-    // points[ArrowLocation.TOP_LEFT.ordinal()] = new Point2D(offset, 0);
-    // points[ArrowLocation.TOP_CENTER.ordinal()] = new Point2D(w / 2, 0);
-    // points[ArrowLocation.TOP_RIGHT.ordinal()] = new Point2D(w - offset, 0);
-    //
-    // points[ArrowLocation.BOTTOM_LEFT.ordinal()] = new Point2D(offset, h);
-    // points[ArrowLocation.BOTTOM_CENTER.ordinal()] = new Point2D(w / 2, h);
-    // points[ArrowLocation.BOTTOM_RIGHT.ordinal()] = new Point2D(w - offset,
-    // h);
-    //
-    // ArrowLocation arrowLocation = null;
-    // double minDistance = Double.MAX_VALUE;
-    //
-    // for (ArrowLocation location : ArrowLocation.values()) {
-    // Point2D point = points[location.ordinal()].add(windowLocation);
-    //
-    // double distance = point.distance(targetLocation);
-    //
-    // System.out.println(location + " at " + point
-    // + " has a distance of " + distance + " to "
-    // + targetLocation);
-    // if (distance < minDistance) {
-    // arrowLocation = location;
-    // minDistance = distance;
-    // }
-    // }
-    //
-    // return arrowLocation;
-    // }
 }

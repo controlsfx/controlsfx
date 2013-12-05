@@ -367,6 +367,27 @@ public final class Borders {
         }
         
         /**
+         * Specifies the padding of the four lines of this border.
+         */
+        public EtchedBorders padding(double padding) {
+            return padding(padding, padding, padding, padding);
+        }
+        
+        /**
+         * Specifies that the line wrapping the node should have padding
+         * as specified, with each padding being independently configured, going 
+         * in the order top, right, bottom, and left.
+         */
+        public EtchedBorders padding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
+			this.topPadding = topPadding;
+			this.rightPadding = rightPadding;
+			this.bottomPadding = bottomPadding;
+			this.leftPadding = leftPadding;
+			
+            return this;
+        }
+        
+        /**
          * Specifies the radius of the four corners of the lines of this border.
          */
         public EtchedBorders radius(double radius) {
@@ -499,6 +520,28 @@ public final class Borders {
             this.strokeStyle = strokeStyle;
             return this;
         }
+        
+        /**
+         * Specifies the padding of the four lines of this border.
+         */
+        public LineBorders padding(double padding) {
+            return padding(padding, padding, padding, padding);
+        }
+        
+        /**
+         * Specifies that the line wrapping the node should have padding
+         * as specified, with each padding being independently configured, going 
+         * in the order top, right, bottom, and left.
+         */
+        public LineBorders padding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
+			this.topPadding = topPadding;
+			this.rightPadding = rightPadding;
+			this.bottomPadding = bottomPadding;
+			this.leftPadding = leftPadding;
+			
+            return this;
+        }
+        
         
         /**
          * Specifies the thickness of the line to use on all four sides of this

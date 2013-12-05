@@ -13,6 +13,7 @@ import javafx.util.converter.DoubleStringConverter;
  * specify which values the cell can accept as user input, and which
  * {@link SpreadsheetCellEditor} it will use to receive user input.
  * 
+ * FIXME Modify description
  * <h3>Example</h3> 
  * You can create several types which are using the same
  * editor. Suppose you want to handle Double values. You will implement the
@@ -97,7 +98,7 @@ public abstract class SpreadsheetCellType<T> {
 	 * @param view the spreadsheet that will own this editor
 	 * @return the editor instance
 	 */
-	public abstract SpreadsheetCellEditor<T> createEditor(SpreadsheetView view);
+	public abstract SpreadsheetCellEditor createEditor(SpreadsheetView view);
 
 	/**
 	 * Return a string representation of the given item for the
@@ -110,7 +111,9 @@ public abstract class SpreadsheetCellType<T> {
 
 	/**
 	 * Verify that the upcoming cell value can be set to the current cell.
-	 *  (copy/paste operations).
+	 * This is the first level of verification to prevent affecting
+	 * a text to a double or a double to a date.
+	 * For closer verification, use {@link #isError(Object)}.
 	 * 
 	 * 	@param cell the cell containing the value to test
 	 *	@return true if it matches.
@@ -121,12 +124,24 @@ public abstract class SpreadsheetCellType<T> {
 
 	/**
 	 * Verify that the upcoming value can be set to the current cell.
-	 *  (copy/paste operations).
+     * This is the first level of verification to prevent affecting
+     * a text in a double or a double in a date.
+     * For closer verification, use {@link #isError(Object)}.
 	 * 
 	 * 	@param value String value to test
 	 *	@return true if it matches.
 	 */
 	public abstract boolean match(String value);
+	
+    /**
+     * Returns true if the value is an error regarding the specification
+     * of its type.
+     * @param value
+     * @return  true if the value is an error.
+     */
+	public boolean isError(T value){
+	    return false;
+	}
 	
 	/**
 	 * This method will be called when a commit is happening.<br/>
@@ -182,7 +197,7 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<Object> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.ObjectEditor(view);
 		}
 
@@ -230,7 +245,7 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.StringEditor(view);
 		}
 
@@ -296,7 +311,7 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<Double> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
@@ -371,8 +386,8 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
-			return new SpreadsheetCellEditor.ListEditor(view, items);
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.ListEditor<String>(view, items);
 		}
 
 		@Override public boolean match(String value) {
@@ -446,7 +461,7 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<LocalDate> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.DateEditor(view,converter);
 		}
 

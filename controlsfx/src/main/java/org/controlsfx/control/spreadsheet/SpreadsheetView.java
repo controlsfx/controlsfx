@@ -214,7 +214,7 @@ public class SpreadsheetView extends Control {
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
-    private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
+    private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
     private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
     // The handle that bridges with implementation.
@@ -518,8 +518,8 @@ public class SpreadsheetView extends Control {
      * @param cellType
      * @return the editor associated with the CellType.
      */
-    public SpreadsheetCellEditor<?> getEditor(SpreadsheetCellType<?> cellType) {
-    	SpreadsheetCellEditor<?> cellEditor = editors.get(cellType);
+    public SpreadsheetCellEditor getEditor(SpreadsheetCellType<?> cellType) {
+    	SpreadsheetCellEditor cellEditor = editors.get(cellType);
     	if (cellEditor == null) {
     		cellEditor = cellType.createEditor(this);
     		editors.put(cellType, cellEditor);

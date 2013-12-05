@@ -50,7 +50,7 @@ public class GridCellEditor {
 	private InvalidationListener editorListener;
 	private InvalidationListener il;
 	private boolean editing = false;
-	private SpreadsheetCellEditor<?> spreadsheetCellEditor;
+	private SpreadsheetCellEditor spreadsheetCellEditor;
     private CellView lastHover = null;
     private static final double MAX_EDITOR_HEIGHT = 50.0;
 
@@ -89,7 +89,7 @@ public class GridCellEditor {
 	 * Update the SpreadsheetCellEditor
 	 * @param spreadsheetCellEditor2
 	 */
-	public void updateSpreadsheetCellEditor(final SpreadsheetCellEditor<?> spreadsheetCellEditor2) {
+	public void updateSpreadsheetCellEditor(final SpreadsheetCellEditor spreadsheetCellEditor2) {
 		this.spreadsheetCellEditor = spreadsheetCellEditor2;
 	}
     

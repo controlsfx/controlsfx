@@ -130,7 +130,7 @@ import javafx.util.StringConverter;
  * @see SpreadsheetView
  * @see SpreadsheetCell
  */
-public abstract class SpreadsheetCellEditor<T> {
+public abstract class SpreadsheetCellEditor{
 	SpreadsheetView view;
 
 	/***************************************************************************
@@ -204,7 +204,7 @@ public abstract class SpreadsheetCellEditor<T> {
 	 * A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.ObjectType} typed cells.
 	 * It displays a {@link TextField} where the user can type different values.
 	 */
-	public static class ObjectEditor extends SpreadsheetCellEditor<Object> {
+	public static class ObjectEditor extends SpreadsheetCellEditor {
 
 		/***************************************************************************
 		 * * Protected Fields * *
@@ -271,7 +271,7 @@ public abstract class SpreadsheetCellEditor<T> {
 	 * A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.StringType} typed cells.
 	 * It displays a {@link TextField} where the user can type different values.
 	 */
-	public static class StringEditor extends SpreadsheetCellEditor<String> {
+	public static class StringEditor extends SpreadsheetCellEditor {
 		/***************************************************************************
 		 * * Protected Fields * *
 		 **************************************************************************/
@@ -340,7 +340,7 @@ public abstract class SpreadsheetCellEditor<T> {
 	 * Moreover, the {@link TextField} will turn red if the value currently
 	 * entered if incorrect.
 	 */
-	public static class DoubleEditor extends SpreadsheetCellEditor<Double> {
+	public static class DoubleEditor extends SpreadsheetCellEditor {
 
 		/***************************************************************************
 		 * * Protected Fields * *
@@ -425,7 +425,7 @@ public abstract class SpreadsheetCellEditor<T> {
 	 * A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.ListType} typed cells.
 	 * It displays a {@link ComboBox} where the user can choose a value.
 	 */
-	public static class ListEditor extends SpreadsheetCellEditor<String> {
+	public static class ListEditor<R> extends SpreadsheetCellEditor {
 		/***************************************************************************
 		 * * Protected Fields * *
 		 **************************************************************************/
@@ -504,7 +504,7 @@ public abstract class SpreadsheetCellEditor<T> {
 	 * calendar. The user can also type the date directly in the expected type format
 	 * (dd/MM/yyyy)
 	 */
-	public static class DateEditor extends SpreadsheetCellEditor<LocalDate> {
+	public static class DateEditor extends SpreadsheetCellEditor {
 
 		/***************************************************************************
 		 * * Protected Fields * *

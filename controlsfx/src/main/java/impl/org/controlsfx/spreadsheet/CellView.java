@@ -277,7 +277,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
     	SpreadsheetCellType<?> cellType = cell.getCellType();
-    	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
+    	SpreadsheetCellEditor cellEditor = spv.getEditor(cellType);
 
     	GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
         if (editor.isEditing()){

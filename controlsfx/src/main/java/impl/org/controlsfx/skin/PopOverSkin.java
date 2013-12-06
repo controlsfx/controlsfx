@@ -55,7 +55,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -107,8 +106,6 @@ public class PopOverSkin implements Skin<PopOver> {
                 PopOver.class.getResource("popover.css").toExternalForm());
         stackPane.setPickOnBounds(false);
         stackPane.getStyleClass().add("popover");
-        stackPane.setCache(true);
-        stackPane.setCacheHint(CacheHint.SCALE);
 
         /*
          * The min width and height equal 2 * corner radius + 2 * arrow indent +

@@ -372,14 +372,14 @@ public final class Borders {
         }
         
         /**
-         * Specifies the inner padding of the four lines of this border.
+         * Specifies the outer padding of the four lines of this border.
          */
         public EtchedBorders outerPadding(double padding) {
             return outerPadding(padding, padding, padding, padding);
         }
         
         /**
-         * Specifies that the line wrapping the node should have inner padding
+         * Specifies that the line wrapping the node should have outer padding
          * as specified, with each padding being independently configured, going 
          * in the order top, right, bottom, and left.
          */
@@ -562,7 +562,7 @@ public final class Borders {
         }
         
         /**
-         * Specifies that the line wrapping the node should have inner padding
+         * Specifies that the line wrapping the node should have outer padding
          * as specified, with each padding being independently configured, going 
          * in the order top, right, bottom, and left.
          */
@@ -576,7 +576,7 @@ public final class Borders {
         }
         
         /**
-         * Specifies the inner padding of the four lines of this border.
+         * Specifies the outer padding of the four lines of this border.
          */
         public LineBorders innerPadding(double padding) {
             return innerPadding(padding, padding, padding, padding);

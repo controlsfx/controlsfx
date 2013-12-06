@@ -251,7 +251,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     }
 
     @Override public Node getControlPanel() {
-        return buildCommonControlGrid(spreadSheetView,"Both");
+        return buildCommonControlGrid("Both");
     }
     
     /**
@@ -262,7 +262,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      * @param spreadsheetView
      * @return
      */
-    private GridPane buildCommonControlGrid(final SpreadsheetView spv, String gridType) {
+    private GridPane buildCommonControlGrid(String gridType) {
         final GridPane grid = new GridPane();
         grid.setHgap(5);
         grid.setVgap(5);
@@ -279,7 +279,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         grid.add(rowHeader, 1, row++);
         rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                spv.setShowRowHeader(arg2);
+                spreadSheetView.setShowRowHeader(arg2);
             }
         });
 
@@ -292,7 +292,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         grid.add(columnHeader, 1, row++);
         columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                spv.setShowColumnHeader(arg2);
+                spreadSheetView.setShowColumnHeader(arg2);
             }
         });
 
@@ -303,7 +303,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         final CheckBox editable = new CheckBox();
         editable.setSelected(true);
         grid.add(editable, 1, row++);
-        spv.editableProperty().bind(editable.selectedProperty());
+        spreadSheetView.editableProperty().bind(editable.selectedProperty());
 
         // span style
         Label spanModelLabel = new Label("Span model: ");

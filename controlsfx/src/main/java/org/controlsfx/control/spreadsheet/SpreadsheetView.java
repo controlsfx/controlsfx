@@ -320,12 +320,7 @@ public class SpreadsheetView extends Control {
 				        cellsView.getSelectionModel().clearAndSelect(position.getRow()+1, position.getTableColumn());
 				    }
 				//We want to edit if the user is on a cell and typing
-				}else if(!arg0.isShortcutDown() 
-						&& !arg0.isControlDown()
-						&& !arg0.isAltDown()
-						&& !arg0.isMetaDown()
-						&& !arg0.isShiftDown()
-						&& arg0.getCode().compareTo(KeyCode.ESCAPE) != 0){
+				}else if(arg0.getCode().isLetterKey() || arg0.getCode().isDigitKey() || arg0.getCode().isKeypadKey()){
 					@SuppressWarnings("unchecked")
 					TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
 					cellsView.edit(position.getRow(), position.getTableColumn());

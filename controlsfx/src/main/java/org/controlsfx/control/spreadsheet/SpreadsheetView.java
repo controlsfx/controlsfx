@@ -1470,11 +1470,13 @@ public class SpreadsheetView extends Control {
             
             // fire off a single add/remove/replace notification (rather than
             // individual remove and add notifications) - see RT-33324
-            TableColumn<ObservableList<SpreadsheetCell>, ?> columnFinal = getTableView().getColumns().get(old.getColumn());
-            int changeIndex = selectedCellsSeq.indexOf(new TablePosition<>(getTableView(), old.getRow(), columnFinal));
-            GenericAddRemoveChange<TablePosition<ObservableList<SpreadsheetCell>, ?>> change = new NonIterableChange.GenericAddRemoveChange<>(
-                    changeIndex, changeIndex+1, previousSelection, selectedCellsSeq);
-            handleSelectedCellsListChangeEvent(change);
+            if(old != null){
+                TableColumn<ObservableList<SpreadsheetCell>, ?> columnFinal = getTableView().getColumns().get(old.getColumn());
+                int changeIndex = selectedCellsSeq.indexOf(new TablePosition<>(getTableView(), old.getRow(), columnFinal));
+                GenericAddRemoveChange<TablePosition<ObservableList<SpreadsheetCell>, ?>> change = new NonIterableChange.GenericAddRemoveChange<>(
+                        changeIndex, changeIndex+1, previousSelection, selectedCellsSeq);
+                handleSelectedCellsListChangeEvent(change);
+            }
 		}
 
 		/**

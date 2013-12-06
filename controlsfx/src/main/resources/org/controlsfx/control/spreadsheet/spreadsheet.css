@@ -143,3 +143,7 @@ on top and bottom */
 .spreadsheet-cell TextField{
 	-fx-padding : 0 7 0 7 ;
 }
+
+.indicationLabel{
+	-fx-font-style : italic;
+}

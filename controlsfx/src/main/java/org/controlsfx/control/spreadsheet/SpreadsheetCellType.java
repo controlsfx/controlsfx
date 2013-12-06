@@ -1,5 +1,6 @@
 package org.controlsfx.control.spreadsheet;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -7,12 +8,14 @@ import java.util.List;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 /**
  * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will
  * specify which values the cell can accept as user input, and which
  * {@link SpreadsheetCellEditor} it will use to receive user input.
  * 
+ * FIXME Modify description
  * <h3>Example</h3> 
  * You can create several types which are using the same
  * editor. Suppose you want to handle Double values. You will implement the
@@ -61,7 +64,7 @@ import javafx.util.converter.DoubleStringConverter;
  */
 public abstract class SpreadsheetCellType<T> {
 	/** An instance of converter from string to cell type. */
-	protected transient StringConverter<T> converter;
+	protected StringConverter<T> converter;
 
 	/**
 	 * Default constructor.
@@ -97,47 +100,62 @@ public abstract class SpreadsheetCellType<T> {
 	 * @param view the spreadsheet that will own this editor
 	 * @return the editor instance
 	 */
-	public abstract SpreadsheetCellEditor<T> createEditor(SpreadsheetView view);
+	public abstract SpreadsheetCellEditor createEditor(SpreadsheetView view);
 
+	/**
+     * Return a string representation of the given item for the
+     * {@link SpreadsheetView} to display using the 
+     * inner {@link SpreadsheetCellType#converter} and the
+     * specified format.
+     * 
+     * @param object
+     * @param format
+     * @return a string representation of the given item.
+     */
+	public String toString(T object, String format){
+	    return toString(object);
+	}
 	/**
 	 * Return a string representation of the given item for the
-	 * {@link SpreadsheetView} to display using the converter.
+	 * {@link SpreadsheetView} to display using the 
+	 * inner {@link SpreadsheetCellType#converter}.
 	 * 
-	 * @param object2
+	 * @param object
 	 * @return a string representation of the given item.
 	 */
-	public abstract String toString(T object2);
-
-	/**
-	 * Verify that the upcoming cell value can be set to the current cell.
-	 *  (copy/paste operations).
-	 * 
-	 * 	@param cell the cell containing the value to test
-	 *	@return true if it matches.
-	 */
-	public final boolean match(SpreadsheetCell cell){
-		return match(cell.getText());
-	}
+	public abstract String toString(T object);
 
 	/**
 	 * Verify that the upcoming value can be set to the current cell.
-	 *  (copy/paste operations).
+	 * This is the first level of verification to prevent affecting
+	 * a text to a double or a double to a date.
+	 * For closer verification, use {@link #isError(Object)}.
 	 * 
-	 * 	@param value String value to test
+	 * 	@param value the value to test
 	 *	@return true if it matches.
 	 */
-	public abstract boolean match(String value);
+	public abstract boolean match(Object value);
+
+    /**
+     * Returns true if the value is an error regarding the specification
+     * of its type.
+     * @param value
+     * @return  true if the value is an error.
+     */
+	public boolean isError(T value){
+	    return false;
+	}
 	
 	/**
-	 * This method will be called when a commit is happening.<br/>
-	 * You will then compute the value of the editor in order to determine if
-	 * the current value is valid.
-	 * 
-         * @param value
-	 * @return null if not valid or the correct value otherwise.
-	 */
-	public abstract T convertValue(String value);
-
+     * This method will be called when a commit is happening.<br/>
+     * This method will try to convert the value, be sure to call 
+     * {@link #match(Object)} before to see if this method will succeed.
+     * 
+     * @param value
+     * @return null if not valid or the correct value otherwise.
+     */
+	public abstract T convertValue(Object value);
+	
 	/**
 	 * The {@link SpreadsheetCell} {@link Object} type instance.
 	 */
@@ -170,10 +188,10 @@ public abstract class SpreadsheetCellType<T> {
 			return "object";
 		}
 
-		@Override public boolean match(String value) {
-			return true;
-		}
-
+		@Override public boolean match(Object value) {
+            return true;
+        }
+		
 		@Override
 		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final Object value) {
@@ -182,14 +200,14 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<Object> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.ObjectEditor(view);
 		}
 
-		@Override public Object convertValue(String value) {
-			return converter.fromString(value);
-		}
-
+		@Override public Object convertValue(Object value) {
+            return value;
+        }
+		
 		@Override public String toString(Object item) {
 			return converter.toString(item);
 		}
@@ -218,10 +236,10 @@ public abstract class SpreadsheetCellType<T> {
 			return "string";
 		}
 
-		@Override public boolean match(String value) {
-			return true;
-		}
-
+		@Override public boolean match(Object value) {
+            return true;
+        }
+		
 		@Override
 		public SpreadsheetCell createCell(final int row, final int column,
 				final int rowSpan, final int columnSpan, final String value) {
@@ -230,18 +248,18 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.StringEditor(view);
 		}
 
-		@Override public String convertValue(String value) {
-			String convertedValue = converter.fromString(value);
-			if(convertedValue == null || convertedValue.equals("")){
-				return null;
-			}
-			return convertedValue;
-		}
-
+		@Override public String convertValue(Object value) {
+		    String convertedValue = converter.fromString(value.toString());
+            if(convertedValue == null || convertedValue.equals("")){
+                return null;
+            }
+            return convertedValue;
+        }
+		
 		@Override public String toString(String item) {
 			return converter.toString(item);
 		}
@@ -296,32 +314,140 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<Double> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.DoubleEditor(view);
 		}
 
-		@Override public boolean match(String value) {
-			try {
-				converter.fromString(value);
-				return true;
-			} catch (Exception e) {
-				return false;
-			}
-		}
-
-		@Override public Double convertValue(String value) {
-			try {
-				return converter.fromString(value);
-			} catch (Exception e) {
-				return null;
-			}
-		}
-
+		@Override public boolean match(Object value) {
+		    if(value instanceof Double)
+		        return true;
+		    else{
+		        try {
+	                converter.fromString(value.toString());
+	                return true;
+	            } catch (Exception e) {
+	                return false;
+	            }
+		    }
+        }
+		
+		@Override public Double convertValue(Object value) {
+		    if(value instanceof Double)
+                return (Double)value;
+            else{
+                try {
+                    return converter.fromString(value.toString());
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+		
 		@Override public String toString(Double item) {
 			return converter.toString(item);
 		}
+		
+		@Override public String toString(Double item, String format) {
+            return toStringFormat(item, format);
+        }
+		
+		private String toStringFormat(Double item, String format) {
+            if (item != null) {
+                return new DecimalFormat(format).format(item);
+            }else{
+                return "";
+            }
+        }
 	};
 
+	/**
+     * The {@link SpreadsheetCell} {@link Integer} type instance.
+     */
+    public static final SpreadsheetCellType<Integer> INTEGER = new IntegerType();
+
+    /**
+     * The {@link SpreadsheetCell} {@link Integer} type base class.
+     */
+    public static class IntegerType extends SpreadsheetCellType<Integer> {
+
+        public IntegerType() {
+            this(new IntegerStringConverter() {
+                @Override
+                public String toString(Integer item) {
+                    if (item == null || Double.isNaN(item)) {
+                        return "";
+                    } else {
+                        return super.toString(item);
+                    }
+                }
+
+                @Override
+                public Integer fromString(String str) {
+                    if (str == null || str.isEmpty() || "NaN".equals(str)) {
+                        return null;
+                    } else {
+                        //We try to integrate Double if possible by truncating them
+                        try{
+                            Double temp = Double.parseDouble(str);
+                            return temp.intValue();
+                        }catch(Exception e){
+                            return super.fromString(str);
+                        }
+                    }
+                }
+            });
+        }
+
+        public IntegerType(IntegerStringConverter converter) {
+            super(converter);
+        }
+
+        @Override public String toString() {
+            return "Integer";
+        }
+
+        @Override
+        public SpreadsheetCell createCell(final int row, final int column,
+                final int rowSpan, final int columnSpan, final Integer value) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,columnSpan, this);
+            cell.setItem(value);
+            return cell;
+        }
+
+        @Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
+            return new SpreadsheetCellEditor.IntegerEditor(view);
+        }
+
+        @Override public boolean match(Object value) {
+            if(value instanceof Integer)
+                return true;
+            else {
+                try {
+                    converter.fromString(value.toString());
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        }
+        
+        @Override public Integer convertValue(Object value) {
+            if(value instanceof Integer)
+                return (Integer)value;
+            else{
+                try {
+                    return converter.fromString(value.toString());
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+        
+        @Override public String toString(Integer item) {
+            return converter.toString(item);
+        }
+    };
+    
 	/**
 	 * Creates a {@link ListType}.
 	 * @param items the list items
@@ -371,22 +497,24 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<String> createEditor(SpreadsheetView view) {
-			return new SpreadsheetCellEditor.ListEditor(view, items);
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
+			return new SpreadsheetCellEditor.ListEditor<String>(view, items);
 		}
 
-		@Override public boolean match(String value) {
-			return items.contains(value);
-		}
-
-		@Override public String convertValue(String value) {
-			return converter.fromString(value);
-		}
-
+		@Override public boolean match(Object value) {
+            if(value instanceof String && items.contains(value))
+                return true;
+            else
+                return items.contains(value.toString());
+        }
+		
+		@Override public String convertValue(Object value) {
+		    return converter.fromString(value.toString());
+        }
+		
 		@Override public String toString(String item) {
 			return converter.toString(item);
 		}
-
 	}
 
 	/**
@@ -399,20 +527,16 @@ public abstract class SpreadsheetCellType<T> {
 	 */
 	public static class DateType extends SpreadsheetCellType<LocalDate> {
 
-		public DateType() {
-			this("dd/MM/yyyy");
-		}
 
 		/**
 		 * Creates a new DateType.
-		 * @param format the date format
 		 */
-		public DateType(final String format) {
+		public DateType() {
 			this(new StringConverter<LocalDate>() {
 				@Override
 				public String toString(LocalDate item) {
 					if (item != null) {
-						return item.format(DateTimeFormatter.ofPattern(format));
+						return item.toString();
 					}else{
 						return "";
 					}
@@ -421,8 +545,7 @@ public abstract class SpreadsheetCellType<T> {
 				@Override
 				public LocalDate fromString(String str) {
 					try {
-						return LocalDate.parse(str,
-								DateTimeFormatter.ofPattern(format));
+						return LocalDate.parse(str);
 					} catch (Exception e) {
 						return null;
 					}
@@ -446,31 +569,51 @@ public abstract class SpreadsheetCellType<T> {
 			return cell;
 		}
 
-		@Override public SpreadsheetCellEditor<LocalDate> createEditor(SpreadsheetView view) {
+		@Override public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
 			return new SpreadsheetCellEditor.DateEditor(view,converter);
 		}
 
-		@Override public boolean match(String value) {
-			try {
-				LocalDate temp = converter.fromString(value);
-				return temp != null;
-			} catch (Exception e) {
-				return false;
-			}
-		}
-
-		@Override
-		public LocalDate convertValue(String value) {
-			try {
-				return converter.fromString(value);
-			} catch (Exception e) {
-				return null;
-			}
-		}
-
+		@Override public boolean match(Object value) {
+            if(value instanceof LocalDate)
+                return true;
+            else{
+                try {
+                    LocalDate temp = converter.fromString(value.toString());
+                    return temp != null;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        }
+		
+		@Override public LocalDate convertValue(Object value) {
+            if(value instanceof LocalDate)
+                return (LocalDate)value;
+            else{
+                try {
+                    return converter.fromString(value.toString());
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+		
 		@Override
 		public String toString(LocalDate item) {
 			return converter.toString(item);
 		}
+		
+		@Override
+        public String toString(LocalDate item, String format) {
+            return toStringFormat(item, format);
+        }
+		
+		private String toStringFormat(LocalDate item, String format) {
+            if (item != null) {
+                return item.format(DateTimeFormatter.ofPattern(format));
+            }else{
+                return "";
+            }
+        }
 	}
 }

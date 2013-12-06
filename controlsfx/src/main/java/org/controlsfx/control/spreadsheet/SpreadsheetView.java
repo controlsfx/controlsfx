@@ -214,7 +214,7 @@ public class SpreadsheetView extends Control {
 
     //Properties needed by the SpreadsheetView and managed by the skin (source is the VirtualFlow)
     private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
-    private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor<?>> editors = new IdentityHashMap<>();
+    private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
     private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
     // The handle that bridges with implementation.
@@ -306,15 +306,21 @@ public class SpreadsheetView extends Control {
         /**
          * Keyboard action, maybe use an accelerator
          */
-        this.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent arg0) {
 				if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
 					copyClipBoard();
 				else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
 					pasteClipboard();
+				else if(arg0.getCode().compareTo(KeyCode.ENTER) == 0){
+				    cellsView.setEditWithEnter(true);
+				    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
+				    if(position != null){
+				        cellsView.getSelectionModel().clearAndSelect(position.getRow()+1, position.getTableColumn());
+				    }
 				//We want to edit if the user is on a cell and typing
-				else if(!arg0.isShortcutDown() 
+				}else if(!arg0.isShortcutDown() 
 						&& !arg0.isControlDown()
 						&& !arg0.isAltDown()
 						&& !arg0.isMetaDown()
@@ -326,6 +332,7 @@ public class SpreadsheetView extends Control {
 				}
 			}
 		});
+        
        initRowFix(grid);
 
        /**
@@ -515,11 +522,12 @@ public class SpreadsheetView extends Control {
     /**
      * Return the editor associated with the CellType. 
      * (defined in {@link SpreadsheetCellType#createEditor(SpreadsheetView)}.
+     * FIXME Maybe keep the editor references inside the SpreadsheetCellType
      * @param cellType
      * @return the editor associated with the CellType.
      */
-    public SpreadsheetCellEditor<?> getEditor(SpreadsheetCellType<?> cellType) {
-    	SpreadsheetCellEditor<?> cellEditor = editors.get(cellType);
+    public SpreadsheetCellEditor getEditor(SpreadsheetCellType<?> cellType) {
+    	SpreadsheetCellEditor cellEditor = editors.get(cellType);
     	if (cellEditor == null) {
     		cellEditor = cellType.createEditor(this);
     		editors.put(cellType, cellEditor);
@@ -579,7 +587,7 @@ public class SpreadsheetView extends Control {
         	SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
         	//Using SpreadsheetCell change to stock the information
         	//FIXME a dedicated class should be used
-            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getText()));
+            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getItem()));
         }
 
         final ClipboardContent content = new ClipboardContent();
@@ -637,10 +645,9 @@ public class SpreadsheetView extends Control {
                     final SpanType type = getSpanType(row+offsetRow, column+offsetCol);
                     if(type == SpanType.NORMAL_CELL || type== SpanType.ROW_VISIBLE) {
                     	SpreadsheetCell cell = getGrid().getRows().get(row+offsetRow).get(column+offsetCol);
-                    	SpreadsheetCell refCell = getGrid().getRows().get(row).get(column);
-                        boolean succeed =cell.match(refCell);
+                        boolean succeed = cell.getCellType().match(change.getNewValue());
                         if(succeed){
-                        	getGrid().setCellValue(cell.getRow(), cell.getColumn(),cell.getCellType().convertValue( (String) change.getNewValue()));
+                        	getGrid().setCellValue(cell.getRow(), cell.getColumn(), cell.getCellType().convertValue(change.getNewValue()));
                         }
                     }
                 }
@@ -648,10 +655,10 @@ public class SpreadsheetView extends Control {
             
         //To be improved
         }else if(clipboard.hasString()){
-        	final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
-        	
-        	SpreadsheetCell stringCell = SpreadsheetCellType.STRING.createCell(0, 0, 1, 1, clipboard.getString());
-        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(stringCell);
+//        	final TablePosition<?,?> p = cellsView.getFocusModel().getFocusedCell();
+//        	
+//        	SpreadsheetCell stringCell = SpreadsheetCellType.STRING.createCell(0, 0, 1, 1, clipboard.getString());
+//        	getGrid().getRows().get(p.getRow()).get(p.getColumn()).match(stringCell);
         	
         }
     }

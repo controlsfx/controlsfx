@@ -34,7 +34,15 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
 	private final SpreadsheetHandle handle;
-
+	/**
+	 * We want to go to the next row when enter is pressed.
+	 * But the tableView wants to go in edition. 
+	 * So this flag will be set to true when that happens
+	 * in order for the TableCell not to go in edition.
+	 * SEE RT-34753
+	 */
+	private boolean editWithEnter = false;
+	
 	public SpreadsheetGridView(SpreadsheetHandle handle) {
 		this.handle = handle;
 	}
@@ -52,5 +60,13 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 	
 	public GridViewSkin getGridViewSkin() {
 		return handle.getCellsViewSkin();
+	}
+	
+	public boolean getEditWithEnter(){
+	    return editWithEnter;
+	}
+	
+	public void setEditWithEnter(boolean b){
+	    editWithEnter = b;
 	}
 };

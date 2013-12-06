@@ -121,8 +121,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     public void startEdit() {
         if(!isEditable()) {
             return;
+        }else if(handle.getGridView().getEditWithEnter()){
+            handle.getGridView().setEditWithEnter(false);
+            return;
         }
-
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         //We start to edit only if the Cell is a normal Cell (aka visible).
@@ -277,7 +279,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
     	SpreadsheetCellType<?> cellType = cell.getCellType();
-    	SpreadsheetCellEditor<?> cellEditor = spv.getEditor(cellType);
+    	SpreadsheetCellEditor cellEditor = spv.getEditor(cellType);
 
     	GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
         if (editor.isEditing()){

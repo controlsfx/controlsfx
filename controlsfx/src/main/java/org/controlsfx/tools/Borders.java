@@ -313,10 +313,15 @@ public final class Borders {
         private String title;
         private boolean raised = false;
         
-        private double topPadding = 10;
-        private double rightPadding = 10;
-        private double bottomPadding = 10;
-        private double leftPadding = 10;
+        private double outerTopPadding = 10;
+        private double outerRightPadding = 10;
+        private double outerBottomPadding = 10;
+        private double outerLeftPadding = 10;
+        
+        private double innerTopPadding = 15;
+        private double innerRightPadding = 15;
+        private double innerBottomPadding = 15;
+        private double innerLeftPadding = 15;
         
         private double topLeftRadius = 0;
         private double topRightRadius = 0;
@@ -367,23 +372,44 @@ public final class Borders {
         }
         
         /**
-         * Specifies the padding of the four lines of this border.
+         * Specifies the inner padding of the four lines of this border.
          */
-        public EtchedBorders padding(double padding) {
-            return padding(padding, padding, padding, padding);
+        public EtchedBorders outerPadding(double padding) {
+            return outerPadding(padding, padding, padding, padding);
         }
         
         /**
-         * Specifies that the line wrapping the node should have padding
+         * Specifies that the line wrapping the node should have inner padding
          * as specified, with each padding being independently configured, going 
          * in the order top, right, bottom, and left.
          */
-        public EtchedBorders padding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
-			this.topPadding = topPadding;
-			this.rightPadding = rightPadding;
-			this.bottomPadding = bottomPadding;
-			this.leftPadding = leftPadding;
-			
+        public EtchedBorders outerPadding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
+            this.outerTopPadding = topPadding;
+            this.outerRightPadding = rightPadding;
+            this.outerBottomPadding = bottomPadding;
+            this.outerLeftPadding = leftPadding;
+            
+            return this;
+        }
+        
+        /**
+         * Specifies the inner padding of the four lines of this border.
+         */
+        public EtchedBorders innerPadding(double padding) {
+            return innerPadding(padding, padding, padding, padding);
+        }
+        
+        /**
+         * Specifies that the line wrapping the node should have inner padding
+         * as specified, with each padding being independently configured, going 
+         * in the order top, right, bottom, and left.
+         */
+        public EtchedBorders innerPadding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
+            this.innerTopPadding = topPadding;
+            this.innerRightPadding = rightPadding;
+            this.innerBottomPadding = bottomPadding;
+            this.innerLeftPadding = leftPadding;
+            
             return this;
         }
         
@@ -428,10 +454,12 @@ public final class Borders {
                     new Insets(1));
             
             BorderStroke outerPadding = new EmptyBorders(parent)
-                .padding(topPadding, rightPadding, bottomPadding, leftPadding)
+                .padding(outerTopPadding, outerRightPadding, outerBottomPadding, outerLeftPadding)
                 .buildStroke();
             
-            BorderStroke innerPadding = new EmptyBorders(parent).padding(15).buildStroke();
+            BorderStroke innerPadding = new EmptyBorders(parent)
+                .padding(innerTopPadding, innerRightPadding, innerBottomPadding, innerLeftPadding)
+                .buildStroke();
             
             parent.addBorder(new StrokeBorder(null, outerPadding));
             parent.addBorder(new StrokeBorder(title, innerStroke, outerStroke));
@@ -469,10 +497,15 @@ public final class Borders {
         private Color bottomColor = DEFAULT_BORDER_COLOR;
         private Color leftColor = DEFAULT_BORDER_COLOR;
         
-        private double topPadding = 10;
-        private double rightPadding = 10;
-        private double bottomPadding = 10;
-        private double leftPadding = 10;
+        private double outerTopPadding = 10;
+        private double outerRightPadding = 10;
+        private double outerBottomPadding = 10;
+        private double outerLeftPadding = 10;
+        
+        private double innerTopPadding = 15;
+        private double innerRightPadding = 15;
+        private double innerBottomPadding = 15;
+        private double innerLeftPadding = 15;
         
         private double topThickness = 1;
         private double rightThickness = 1;
@@ -522,26 +555,46 @@ public final class Borders {
         }
         
         /**
-         * Specifies the padding of the four lines of this border.
+         * Specifies the inner padding of the four lines of this border.
          */
-        public LineBorders padding(double padding) {
-            return padding(padding, padding, padding, padding);
+        public LineBorders outerPadding(double padding) {
+            return outerPadding(padding, padding, padding, padding);
         }
         
         /**
-         * Specifies that the line wrapping the node should have padding
+         * Specifies that the line wrapping the node should have inner padding
          * as specified, with each padding being independently configured, going 
          * in the order top, right, bottom, and left.
          */
-        public LineBorders padding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
-			this.topPadding = topPadding;
-			this.rightPadding = rightPadding;
-			this.bottomPadding = bottomPadding;
-			this.leftPadding = leftPadding;
-			
+        public LineBorders outerPadding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
+            this.outerTopPadding = topPadding;
+            this.outerRightPadding = rightPadding;
+            this.outerBottomPadding = bottomPadding;
+            this.outerLeftPadding = leftPadding;
+            
             return this;
         }
         
+        /**
+         * Specifies the inner padding of the four lines of this border.
+         */
+        public LineBorders innerPadding(double padding) {
+            return innerPadding(padding, padding, padding, padding);
+        }
+        
+        /**
+         * Specifies that the line wrapping the node should have inner padding
+         * as specified, with each padding being independently configured, going 
+         * in the order top, right, bottom, and left.
+         */
+        public LineBorders innerPadding(double topPadding, double rightPadding, double bottomPadding, double leftPadding) {
+            this.innerTopPadding = topPadding;
+            this.innerRightPadding = rightPadding;
+            this.innerBottomPadding = bottomPadding;
+            this.innerLeftPadding = leftPadding;
+            
+            return this;
+        }
         
         /**
          * Specifies the thickness of the line to use on all four sides of this
@@ -606,10 +659,12 @@ public final class Borders {
                     null);
             
             BorderStroke outerPadding = new EmptyBorders(parent)
-                .padding(topPadding, rightPadding, bottomPadding, leftPadding)
+                .padding(outerTopPadding, outerRightPadding, outerBottomPadding, outerLeftPadding)
                 .buildStroke();
             
-            BorderStroke innerPadding = new EmptyBorders(parent).padding(15).buildStroke();
+            BorderStroke innerPadding = new EmptyBorders(parent)
+                .padding(innerTopPadding, innerRightPadding, innerBottomPadding, innerLeftPadding)
+                .buildStroke();
             
             parent.addBorder(new StrokeBorder(null, outerPadding));
             parent.addBorder(new StrokeBorder(title, borderStroke));

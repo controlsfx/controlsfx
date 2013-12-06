@@ -65,6 +65,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
 
     private SpreadsheetView spreadSheetView;
     private StackPane centerPane;
+    private int typeOfCell = 0;
 
     @Override public String getSampleName() {
         return "SpreadsheetView";
@@ -79,8 +80,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         int columnCount = 10;
 
         GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-        normalGrid(grid);
-        buildBothGrid(grid);
+        buildGrid(grid,1);//Build both Grid
 
         spreadSheetView = new SpreadsheetView(grid);
 
@@ -108,34 +108,29 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/spreadsheet/SpreadsheetView.html";
     }
 
-    private void normalGrid(GridBase grid) {
-        ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
-        for (int row = 0; row < grid.getRowCount(); ++row) {
-            final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
-            for (int column = 0; column < grid.getColumnCount(); ++column) {
-                dataRow.add(generateCell(row, column, 1, 1));
-            }
-            rows.add(dataRow);
-        }
-        grid.setRows(rows);
-    }
-
     /**
-     * Randomly generate a dataCell(list or text)
+     * Randomly generate a {@link SpreadsheetCell}.
+     * Also use the value inside {@link #typeOfCell} to display all cells, only numbers or only dates.
      */
     private SpreadsheetCell generateCell(int row, int column, int rowSpan, int colSpan) {
         SpreadsheetCell cell;
-        List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
-        final double random = Math.random();
-        if (random < 0.10) {
-            List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
-            cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int)(Math.random()*6)));
-        } else if (random >= 0.10 && random < 0.25) {
-            cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
-        }else if (random >= 0.25 && random < 0.75) {
-            cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+        if(typeOfCell == 0){
+            List<String> stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
+            final double random = Math.random();
+            if (random < 0.25) {
+                List<String> stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
+                cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int)(Math.random()*6)));
+            } else if (random >= 0.25 && random < 0.5) {
+                cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
+            }else if (random >= 0.5 && random < 0.75) {
+               cell = generateNumberCell(row, column, rowSpan, colSpan);
+            }else{
+               cell = generateDateCell(row, column, rowSpan, colSpan);
+            }
+        }else if(typeOfCell == 1){
+            cell = generateNumberCell(row, column, rowSpan, colSpan);
         }else{
-            cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+            cell = generateDateCell(row, column, rowSpan, colSpan);
         }
 
         // Styling for preview
@@ -150,7 +145,82 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         }
         return cell;
     }
+    
+    /**
+     * Generate a Date Cell with a random format.
+     * @param row
+     * @param column
+     * @param rowSpan
+     * @param colSpan
+     * @return
+     */
+    private SpreadsheetCell generateDateCell(int row, int column, int rowSpan, int colSpan) {
+        SpreadsheetCell cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));
+        final double random = Math.random();
+        if(random < 0.25){
+            cell.setFormat("EEEE d");
+        }else if (random < 0.5){
+            cell.setFormat("dd/MM :YY");
+        }else{
+            cell.setFormat("dd/MM/YYYY");
+        }
+        return cell;
+    }
 
+    /**
+     * Generate a Number Cell with a random format.
+     * @param row
+     * @param column
+     * @param rowSpan
+     * @param colSpan
+     * @return
+     */
+    private SpreadsheetCell generateNumberCell(int row, int column, int rowSpan, int colSpan) {
+        final double random = Math.random();
+        SpreadsheetCell cell;
+        if(random < 0.3){
+            cell = SpreadsheetCellType.INTEGER.createCell(row, column, rowSpan, colSpan,Math.round((float)Math.random()*100));
+        }else{
+            cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
+            final double randomFormat = Math.random();
+            if(randomFormat < 0.25){
+                cell.setFormat("#,##0.00€");
+            }else if (randomFormat < 0.5){
+                cell.setFormat("0.###E0 km/h");
+            }else{
+                cell.setFormat("0.###E0");
+            }
+        }
+        return cell;
+    }
+
+    /**
+     * Build the grid with the type specifying for normal(0) or Both span(1).
+     * @param grid
+     * @param type
+     */
+    private void buildGrid(GridBase grid, int type){
+        normalGrid(grid);
+        if(type == 0){
+            buildBothGrid(grid);
+        }
+    }
+    /**
+     * Build the grid with no span.
+     * @param grid
+     */
+    private void normalGrid(GridBase grid) {
+        ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
+        for (int row = 0; row < grid.getRowCount(); ++row) {
+            final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); //new DataRow(row, grid.getColumnCount());
+            for (int column = 0; column < grid.getColumnCount(); ++column) {
+                dataRow.add(generateCell(row, column, 1, 1));
+            }
+            rows.add(dataRow);
+        }
+        grid.setRows(rows);
+    }
+    
     /**
      * Build a sample RowSpan and ColSpan grid
      * @param grid
@@ -244,28 +314,51 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         typeOfGrid.setValue(gridType);
         typeOfGrid.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                if(arg2.equals(0)) {
                     int rowCount = 50;
                     int columnCount = 10;
                     GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-                    normalGrid(grid);
+                    buildGrid(grid, arg2.intValue());
 
                     spreadSheetView = new SpreadsheetView(grid);
                     centerPane.getChildren().setAll(spreadSheetView);
-                } else {
-                    int rowCount = 50;
-                    int columnCount = 10;
-                    GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-                    normalGrid(grid);
-                    buildBothGrid(grid);
-
-                    spreadSheetView = new SpreadsheetView(grid);
-                    centerPane.getChildren().setAll(spreadSheetView);
-                }
             }
         });
         grid.add(typeOfGrid, 1, row++);
+        
+        Label typeOfCellLabel = new Label("Type of cell: ");
+        typeOfCellLabel.getStyleClass().add("property");
+        grid.add(typeOfCellLabel, 0, row);
+        
+        final Label indicationLabel = new Label("This mode displays all kind of different values with different formats.");
+        indicationLabel.setWrapText(true);
+        indicationLabel.getStyleClass().add("indicationLabel");
+        final ChoiceBox<String> cellChoices = new ChoiceBox<String>(FXCollections.observableArrayList("All", "Numbers", "Date"));
+        cellChoices.setValue("All");
+        cellChoices.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                    typeOfCell = arg2.intValue();
+                    if(typeOfCell == 0){
+                        indicationLabel.setText("This mode displays all kind of different values with different formats.");
+                    }else if(typeOfCell == 1){
+                        indicationLabel.setText("This mode displays Numbers (Integer and Double) with different formats."
+                                + "Copy pasting is working independently of the format.");
+                    }else{
+                        indicationLabel.setText("This mode displays dates with different formats."
+                                + "Copy pasting is working independently of the format.");
+                    }
+                    int rowCount = 50;
+                    int columnCount = 10;
+                    GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+                    
+                    buildGrid(grid, typeOfGrid.getSelectionModel().getSelectedIndex());
 
+                    spreadSheetView = new SpreadsheetView(grid);
+                    centerPane.getChildren().setAll(spreadSheetView);
+            }
+        });
+        grid.add(cellChoices, 1, row++);
+        grid.add(indicationLabel, 0, row++);
+        GridPane.setColumnSpan(indicationLabel, 2);
         return grid;
     }
 }

@@ -127,7 +127,6 @@ public class GridBase implements Grid, EventTarget {
     		if(item != value && (item == null || !item.equals(cell.getItem()))){
     			GridChange cellChange = new GridChange(row, column, item, value);
     			Event.fireEvent(this, cellChange);
-//    			lastSpreadsheetCellChange.setValue(cellChange);
     		}
     	}
     }

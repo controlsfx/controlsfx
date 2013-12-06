@@ -35,6 +35,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -44,7 +46,7 @@ import javafx.collections.ObservableMap;
  * You will provide them when constructing a {@link Grid}.
  * 
  * <br/>
- * 
+ * FIXME Add Format description
  * <h3>SpreadsheetCell Types</h3> 
  * Each SpreadsheetCell has its own {@link SpreadsheetCellType}.
  * Different {@link SpreadsheetCellType SpreadsheetCellTypes} are
@@ -135,8 +137,9 @@ public class SpreadsheetCell {
 	private final int column;
 	private int rowSpan;
 	private int columnSpan;
+	private final StringProperty format;
 
-	private StringProperty text;
+	private final StringProperty text;
 
 	private ObservableList<String> styleClass;
 
@@ -171,6 +174,14 @@ public class SpreadsheetCell {
 		this.columnSpan = columnSpan;
 		this.type = type;
 		text = new SimpleStringProperty("");
+		format = new SimpleStringProperty("");
+		format.addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> arg0,
+                    String arg1, String arg2) {
+                updateText();
+            }
+        });
 	}
 	
 	
@@ -201,7 +212,7 @@ public class SpreadsheetCell {
 	 ***************************************************************************/
 	
 	// --- item
-	private final transient ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
+	private final ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
 		@Override protected void invalidated() {
 			updateText();
 		}
@@ -235,7 +246,7 @@ public class SpreadsheetCell {
 	
 	
 	// --- editable
-	private transient BooleanProperty editable;
+	private BooleanProperty editable;
 	
 	/**
      * Return if this cell can be edited or not.
@@ -268,7 +279,7 @@ public class SpreadsheetCell {
     }
 
     // --- comment
- 	private final transient BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
+ 	private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
  	
  	/**
       * Return if this cell has a comment or not.
@@ -296,9 +307,36 @@ public class SpreadsheetCell {
      public final BooleanProperty commentedProperty() {
          return commented;
      }
-	
-	
-	
+     
+     /**
+      * The {@link StringProperty} linked with the format.
+      * 
+      * @return The {@link StringProperty} linked with the format state.
+      */
+     public final StringProperty formatProperty() {
+         return format;
+     }
+     
+     /**
+       * Return the format of this cell or an empty string
+       * if no format has been specified.
+       * 
+       * @return Return the format of this cell or an empty string
+       * if no format has been specified.
+       */
+      public final String getFormat() {
+          return format.get();
+      }
+
+      /**
+       * Set a new format for this Cell.
+       * You can specify how to represent the value in the cell.
+       * @param format
+       */
+      public final void setFormat(String format) {
+          formatProperty().set(format);
+      }
+
 
 	/***************************************************************************
 	 * 
@@ -406,7 +444,7 @@ public class SpreadsheetCell {
 
 
 	// A map containing a set of properties for this cell
-	private transient ObservableMap<Object, Object> properties;
+	private ObservableMap<Object, Object> properties;
 
 	/**
 	 * Returns an observable map of properties on this node for use primarily by
@@ -467,7 +505,11 @@ public class SpreadsheetCell {
 	 */
 	@SuppressWarnings("unchecked")
 	private void updateText() {
-		text.setValue(type.toString(getItem()));
+	    if(getFormat() != ""){
+	        text.setValue(type.toString(getItem(), getFormat()));
+	    }else{
+	        text.setValue(type.toString(getItem()));
+	    }
 	}
 
 }

@@ -421,6 +421,92 @@ public abstract class SpreadsheetCellEditor{
 	}
 
 	/**
+     *  A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.DoubleType} typed cells.
+     *  It displays a {@link TextField} where the user can type different numbers.
+     *  Only numbers will be stored. <br/>
+     * Moreover, the {@link TextField} will turn red if the value currently
+     * entered if incorrect.
+     */
+    public static class IntegerEditor extends SpreadsheetCellEditor {
+
+        /***************************************************************************
+         * * Protected Fields * *
+         **************************************************************************/
+        protected final TextField tf;
+
+        /***************************************************************************
+         * * Constructor * *
+         **************************************************************************/
+        public IntegerEditor(SpreadsheetView view) {
+            super(view);
+            tf = new TextField();
+        }
+
+        /***************************************************************************
+         * * Public Methods * *
+         **************************************************************************/
+        @Override
+        public void startEdit(Object value) {
+            if (value instanceof Integer) {
+                tf.setText(Integer.toString((Integer)value));
+            }
+            
+            tf.getStyleClass().removeAll("error");
+            attachEnterEscapeEventHandler();
+
+            tf.requestFocus();
+            tf.end();
+        }
+
+        @Override
+        public void end() {
+            tf.setOnKeyPressed(null);
+        }
+
+        @Override
+        public TextField getEditor() {
+            return tf;
+        }
+
+        @Override
+        public String getControlValue() {
+            return tf.getText();
+        }
+
+        /***************************************************************************
+         * * Protected Methods * *
+         **************************************************************************/
+
+        protected void attachEnterEscapeEventHandler() {
+            tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent t) {
+                    if (t.getCode() == KeyCode.ENTER) {
+                        endEdit(true);
+                    } else if (t.getCode() == KeyCode.ESCAPE) {
+                        endEdit(false);
+                    }
+                }
+            });
+            tf.setOnKeyReleased(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent t) {
+                    try {
+                        if (tf.getText().equals("")) {
+                            tf.getStyleClass().removeAll("error");
+                        } else {
+                            Integer.parseInt(tf.getText());
+                            tf.getStyleClass().removeAll("error");
+                        }
+                    } catch (Exception e) {
+                        tf.getStyleClass().add("error");
+                    }
+                }
+            });
+        }
+    }
+    
+	/**
 	 * 
 	 * A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.ListType} typed cells.
 	 * It displays a {@link ComboBox} where the user can choose a value.
@@ -501,8 +587,7 @@ public abstract class SpreadsheetCellEditor{
 	/**
 	 * A {@link SpreadsheetCellEditor} for {@link SpreadsheetCellType.DateType} typed cells.
 	 * It displays a {@link DatePicker} where the user can choose a date through a visual
-	 * calendar. The user can also type the date directly in the expected type format
-	 * (dd/MM/yyyy)
+	 * calendar.
 	 */
 	public static class DateEditor extends SpreadsheetCellEditor {
 

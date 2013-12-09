@@ -30,6 +30,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
@@ -61,6 +62,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      *                                                                         *
      **************************************************************************/
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
+//    private static final PseudoClass DEFAULT_CLASS = PseudoClass.getPseudoClass("DEFAULT");
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ?
@@ -229,19 +231,20 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     public void show(final SpreadsheetCell item){
         //We reset the settings
-//        setText(item.getText());
     	textProperty().bind(item.textProperty());
         
         //We want the text to wrap onto another line
         setWrapText(true);
         setEditable(item.isEditable());
         
+        //FIXME How to bind this list to the item's one?
         getStyleClass().clear();
-        getStyleClass().add("spreadsheet-cell");
+        getStyleClass().setAll(item.getStyleClass());
         
-        // TODO bind
-        getStyleClass().addAll(item.getStyleClass());
-        
+        if(item.getPseudoClass() != null){
+            pseudoClassStateChanged(PseudoClass.getPseudoClass(item.getPseudoClass()), true);
+        }
+       
     }
 
     public void show(){

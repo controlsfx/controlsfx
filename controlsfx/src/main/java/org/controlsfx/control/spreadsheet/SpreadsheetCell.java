@@ -138,8 +138,8 @@ public class SpreadsheetCell {
 	private int rowSpan;
 	private int columnSpan;
 	private final StringProperty format;
-
 	private final StringProperty text;
+	private final StringProperty pseudoClass;
 
 	private ObservableList<String> styleClass;
 
@@ -175,6 +175,7 @@ public class SpreadsheetCell {
 		this.type = type;
 		text = new SimpleStringProperty("");
 		format = new SimpleStringProperty("");
+		pseudoClass = new SimpleStringProperty();
 		format.addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> arg0,
@@ -182,6 +183,7 @@ public class SpreadsheetCell {
                 updateText();
             }
         });
+		getStyleClass().add("spreadsheet-cell");
 	}
 	
 	
@@ -337,6 +339,27 @@ public class SpreadsheetCell {
           formatProperty().set(format);
       }
 
+      /**
+       * @return the pseudoClass
+       */
+      public StringProperty pseudoClassProperties() {
+          return pseudoClass;
+      }
+      
+      public final String getPseudoClass() {
+          return pseudoClass.get();
+      }
+
+      /**
+       * Set a new format for this Cell.
+       * You can specify how to represent the value in the cell.
+       * @param format
+       */
+      public final void setPseudoClass(String pseudo) {
+          pseudoClass.set(pseudo);
+      }
+      
+      
 
 	/***************************************************************************
 	 * 
@@ -511,5 +534,4 @@ public class SpreadsheetCell {
 	        text.setValue(type.toString(getItem()));
 	    }
 	}
-
 }

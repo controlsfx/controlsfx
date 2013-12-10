@@ -57,7 +57,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -379,7 +378,7 @@ public class SpreadsheetView extends Control {
                 modifiedCells.add(grid.getRows().get(change.getRow()).get(change.getColumn()));
             }
         });
-        getModifiedCells().addListener(modifiedCellsListener);
+//        getModifiedCells().addListener(modifiedCellsListener);
     }
 
     /***************************************************************************
@@ -1633,21 +1632,26 @@ public class SpreadsheetView extends Control {
     	}
     };
     
-    private SetChangeListener<SpreadsheetCell> modifiedCellsListener = new SetChangeListener<SpreadsheetCell>(){
+    /*private SetChangeListener<SpreadsheetCell> modifiedCellsListener = new SetChangeListener<SpreadsheetCell>(){
 
 		@Override
 		public void onChanged(Change<? extends SpreadsheetCell> arg0) {
                 if (arg0.wasAdded()) {
                 	SpreadsheetCell cell = arg0.getElementAdded();
-                    	 if(!cell.getStyleClass().contains("modified"))
-                             cell.getStyleClass().add("modified");
+//                	cell.getPseudoClass().remove("DEFAULT");
+//                	cell.getPseudoClass().add("MODIFIED");
+//                    	 if(!cell.getStyleClass().contains("modified"))
+//                             cell.getStyleClass().add("modified");
                 }else if(arg0.wasRemoved()){
-                	SpreadsheetCell cell = arg0.getElementRemoved();
-               	 	if(cell.getStyleClass().contains("modified"))
-                        cell.getStyleClass().remove("modified");
+                    SpreadsheetCell cell = arg0.getElementRemoved();
+//                    cell.getPseudoClass().remove("MODIFIED");
+//                    cell.getPseudoClass().add("DEFAULT");
+//                	SpreadsheetCell cell = arg0.getElementRemoved();
+//               	 	if(cell.getStyleClass().contains("modified"))
+//                        cell.getStyleClass().remove("modified");
                 }
 		}
-    };
+    };*/
 }
 
 

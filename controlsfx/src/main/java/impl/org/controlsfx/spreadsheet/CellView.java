@@ -30,8 +30,9 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
+import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
 import javafx.scene.control.TableCell;
@@ -62,7 +63,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      *                                                                         *
      **************************************************************************/
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
-//    private static final PseudoClass DEFAULT_CLASS = PseudoClass.getPseudoClass("DEFAULT");
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ?
@@ -164,8 +164,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
         super.commitEdit(newValue);
 
-        setContentDisplay(ContentDisplay.TEXT_ONLY);
-
+        setContentDisplay(ContentDisplay.LEFT);
         updateItem(newValue, false);
 
     }
@@ -178,7 +177,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
         super.cancelEdit();
 
-        setContentDisplay(ContentDisplay.TEXT_ONLY);
+        setContentDisplay(ContentDisplay.LEFT);
+        updateItem(getItem(), false);
+        
         final Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -211,6 +212,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             setContentDisplay(null);
         } else if (!isEditing() && item != null) {
             show(item);
+            setGraphic(item.getGraphic());
+            item.graphicProperty().addListener(graphicListener);
+            
             //Sometimes the hoverProperty is not called on exit. So the cell is affected to a new Item but
             // the hover is still activated. So we fix it now.
             if(isHover()){
@@ -218,6 +222,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
         }
     }
+    
+    ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
+        @Override
+        public void changed(ObservableValue<? extends Node> arg0,
+                Node arg1, Node arg2) {
+            setGraphic(arg2);
+        }
+    };
     
     @Override
     public String toString(){
@@ -237,16 +249,23 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setWrapText(true);
         setEditable(item.isEditable());
         
-        //FIXME How to bind this list to the item's one?
         getStyleClass().clear();
         getStyleClass().setAll(item.getStyleClass());
         
-        if(item.getPseudoClass() != null){
-            pseudoClassStateChanged(PseudoClass.getPseudoClass(item.getPseudoClass()), true);
-        }
-       
+        item.getStyleClass().addListener(styleClassListener);
     }
 
+    private SetChangeListener<String> styleClassListener = new SetChangeListener<String>(){
+        @Override
+        public void onChanged(javafx.collections.SetChangeListener.Change<? extends String> arg0) {
+            if(arg0.wasAdded()){
+                getStyleClass().add(arg0.getElementAdded());
+            }else if(arg0.wasRemoved()){
+                getStyleClass().remove(arg0.getElementRemoved());
+            }
+        }
+    };
+    
     public void show(){
         if (getItem() != null){
             show(getItem());

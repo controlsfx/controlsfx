@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
 
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -38,8 +39,9 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
+import javafx.scene.Node;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br/>
@@ -138,10 +140,11 @@ public class SpreadsheetCell {
 	private int rowSpan;
 	private int columnSpan;
 	private final StringProperty format;
-
 	private final StringProperty text;
+	private final ObservableSet<String> pseudoClass;
+	private final ObjectProperty<Node> graphic;
 
-	private ObservableList<String> styleClass;
+	private ObservableSet<String> styleClass;
 
 	
 	
@@ -175,6 +178,8 @@ public class SpreadsheetCell {
 		this.type = type;
 		text = new SimpleStringProperty("");
 		format = new SimpleStringProperty("");
+		pseudoClass = FXCollections.observableSet();
+		graphic = new SimpleObjectProperty<>();
 		format.addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> arg0,
@@ -182,6 +187,7 @@ public class SpreadsheetCell {
                 updateText();
             }
         });
+		getStyleClass().add("spreadsheet-cell");
 	}
 	
 	
@@ -337,6 +343,9 @@ public class SpreadsheetCell {
           formatProperty().set(format);
       }
 
+      public final ObservableSet<String> getPseudoClass() {
+          return pseudoClass;
+      }
 
 	/***************************************************************************
 	 * 
@@ -435,9 +444,9 @@ public class SpreadsheetCell {
 	 * 
 	 * @return an ObservableList of String of all the style class
 	 */
-	public final ObservableList<String> getStyleClass() {
+	public final ObservableSet<String> getStyleClass() {
 		if (styleClass == null) {
-			styleClass = FXCollections.observableArrayList();
+			styleClass = FXCollections.observableSet();
 		}
 		return styleClass;
 	}
@@ -469,6 +478,26 @@ public class SpreadsheetCell {
 		return properties != null && !properties.isEmpty();
 	}
 
+	public ObjectProperty<Node> graphicProperty(){
+	    return graphic;
+	}
+	
+	/**
+	 * Set a graphic for this cell to display aside with the text.
+	 * @param graphic
+	 */
+	public void setGraphic(Node graphic){
+	    this.graphic.set(graphic);
+	}
+	
+	/**
+	 * Return the graphic node associated with this cell. 
+	 * Return null if nothing has been associated.
+	 * @return
+	 */
+	public Node getGraphic(){
+	    return graphic.get();
+	}
 	
 	
 	/***************************************************************************
@@ -511,5 +540,4 @@ public class SpreadsheetCell {
 	        text.setValue(type.toString(getItem()));
 	    }
 	}
-
 }

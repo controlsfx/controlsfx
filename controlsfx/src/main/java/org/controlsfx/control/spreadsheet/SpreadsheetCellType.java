@@ -142,7 +142,7 @@ public abstract class SpreadsheetCellType<T> {
      * @param value
      * @return  true if the value is an error.
      */
-	public boolean isError(T value){
+	public boolean isError(Object value){
 	    return false;
 	}
 	

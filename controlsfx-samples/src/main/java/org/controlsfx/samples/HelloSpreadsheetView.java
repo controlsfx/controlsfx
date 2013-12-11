@@ -77,7 +77,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     @Override
     public Node getPanel(Stage stage) {
         centerPane = new StackPane();
-        centerPane.setPadding(new Insets(30));
+        centerPane.setPadding(new Insets(15));
 
         int rowCount = 50;
         int columnCount = 10;

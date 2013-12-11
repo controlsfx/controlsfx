@@ -111,6 +111,27 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             public void handle(MouseEvent arg0) {
                 dragSelect(arg0);
             }});
+        this.itemProperty().addListener(new ChangeListener<SpreadsheetCell>() {
+
+            @Override
+            public void changed(
+                    ObservableValue<? extends SpreadsheetCell> arg0,
+                    SpreadsheetCell oldItem, SpreadsheetCell newItem) {
+                if(oldItem != null){
+                    oldItem.getStyleClass().removeListener(styleClassListener);
+                    oldItem.graphicProperty().removeListener(graphicListener);
+                }
+                if(newItem != null){
+                    getStyleClass().clear();
+                    getStyleClass().setAll(newItem.getStyleClass());
+                    
+                    newItem.getStyleClass().addListener(styleClassListener);
+                    
+                    setGraphic(newItem.getGraphic());
+                    newItem.graphicProperty().addListener(graphicListener);
+                }
+            }
+        });
 
     }
 
@@ -213,8 +234,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else if (!isEditing() && item != null) {
             show(item);
             setGraphic(item.getGraphic());
-            item.graphicProperty().addListener(graphicListener);
-            
             //Sometimes the hoverProperty is not called on exit. So the cell is affected to a new Item but
             // the hover is still activated. So we fix it now.
             if(isHover()){
@@ -222,14 +241,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
         }
     }
-    
-    ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
-        @Override
-        public void changed(ObservableValue<? extends Node> arg0,
-                Node arg1, Node arg2) {
-            setGraphic(arg2);
-        }
-    };
     
     @Override
     public String toString(){
@@ -249,23 +260,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setWrapText(true);
         setEditable(item.isEditable());
         
-        getStyleClass().clear();
-        getStyleClass().setAll(item.getStyleClass());
-        
-        item.getStyleClass().addListener(styleClassListener);
     }
 
-    private SetChangeListener<String> styleClassListener = new SetChangeListener<String>(){
-        @Override
-        public void onChanged(javafx.collections.SetChangeListener.Change<? extends String> arg0) {
-            if(arg0.wasAdded()){
-                getStyleClass().add(arg0.getElementAdded());
-            }else if(arg0.wasRemoved()){
-                getStyleClass().remove(arg0.getElementRemoved());
-            }
-        }
-    };
-    
     public void show(){
         if (getItem() != null){
             show(getItem());
@@ -359,6 +355,25 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         	lastHover.setHoverPublic(false);
         }
     }
+    
+    private ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
+        @Override
+        public void changed(ObservableValue<? extends Node> arg0,
+                Node arg1, Node arg2) {
+            setGraphic(arg2);
+        }
+    };
+    
+    private SetChangeListener<String> styleClassListener = new SetChangeListener<String>(){
+        @Override
+        public void onChanged(javafx.collections.SetChangeListener.Change<? extends String> arg0) {
+            if(arg0.wasAdded()){
+                getStyleClass().add(arg0.getElementAdded());
+            }else if(arg0.wasRemoved()){
+                getStyleClass().remove(arg0.getElementRemoved());
+            }
+        }
+    };
     
     
     /**

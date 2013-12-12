@@ -308,18 +308,26 @@ public class SpreadsheetView extends Control {
         cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent arg0) {
+			    //Copy
 				if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
 					copyClipBoard();
+				//Paste
 				else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
 					pasteClipboard();
+				//Go to the next row
 				else if(arg0.getCode().compareTo(KeyCode.ENTER) == 0){
 				    cellsView.setEditWithEnter(true);
 				    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
 				    if(position != null){
 				        cellsView.getSelectionModel().clearAndSelect(position.getRow()+1, position.getTableColumn());
 				    }
+				//We want to erase values when delete key is pressed.
+				}else if(arg0.getCode().compareTo(KeyCode.DELETE) == 0){
+				   for(TablePosition<ObservableList<SpreadsheetCell>,?> position:getSelectionModel().getSelectedCells()){
+				       grid.setCellValue(position.getRow(), position.getColumn(), null);
+				   }
 				//We want to edit if the user is on a cell and typing
-				}else if(arg0.getCode().isLetterKey() || arg0.getCode().isDigitKey() || arg0.getCode().isKeypadKey()){
+				} else if(arg0.getCode().isLetterKey() || arg0.getCode().isDigitKey() || arg0.getCode().isKeypadKey()){
 					@SuppressWarnings("unchecked")
 					TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
 					cellsView.edit(position.getRow(), position.getTableColumn());

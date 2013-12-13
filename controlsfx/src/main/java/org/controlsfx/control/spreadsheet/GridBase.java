@@ -123,9 +123,10 @@ public class GridBase implements Grid, EventTarget {
     	if(row < rowCount && column < columnCount && !isLocked()){
     		SpreadsheetCell cell = getRows().get(row).get(column);
     		Object item = cell.getItem();
-    		cell.setItem(value);
+    		Object convertedValue= cell.getCellType().convertValue(value);
+    		cell.setItem(convertedValue);
     		if(item != value && (item == null || !item.equals(cell.getItem()))){
-    			GridChange cellChange = new GridChange(row, column, item, value);
+    			GridChange cellChange = new GridChange(row, column, item, convertedValue);
     			Event.fireEvent(this, cellChange);
     		}
     	}

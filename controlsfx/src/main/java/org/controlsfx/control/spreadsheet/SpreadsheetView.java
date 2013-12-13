@@ -310,7 +310,7 @@ public class SpreadsheetView extends Control {
 			public void handle(KeyEvent arg0) {
 			    //Copy
 				if(arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
-					copyClipBoard();
+					copyClipboard();
 				//Paste
 				else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
 					pasteClipboard();
@@ -322,12 +322,13 @@ public class SpreadsheetView extends Control {
 				        cellsView.getSelectionModel().clearAndSelect(position.getRow()+1, position.getTableColumn());
 				    }
 				//We want to erase values when delete key is pressed.
-				}else if(arg0.getCode().compareTo(KeyCode.DELETE) == 0){
-				   for(TablePosition<ObservableList<SpreadsheetCell>,?> position:getSelectionModel().getSelectedCells()){
-				       grid.setCellValue(position.getRow(), position.getColumn(), null);
-				   }
+				}else if(arg0.getCode().compareTo(KeyCode.DELETE) == 0)
+				    deleteSelectedCells();
 				//We want to edit if the user is on a cell and typing
-				} else if(arg0.getCode().isLetterKey() || arg0.getCode().isDigitKey() || arg0.getCode().isKeypadKey()){
+				else if((arg0.getCode().isLetterKey() 
+				        || arg0.getCode().isDigitKey() 
+				        || arg0.getCode().isKeypadKey())
+				        && !arg0.isShortcutDown()){
 					@SuppressWarnings("unchecked")
 					TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>)cellsView.getFocusModel().getFocusedCell();
 					cellsView.edit(position.getRow(), position.getTableColumn());
@@ -367,7 +368,7 @@ public class SpreadsheetView extends Control {
        final Runnable r = new Runnable() {
            @Override
            public void run() {
-           	setContextMenu(getSpreadsheetViewContextMenu());
+           	    setContextMenu(getSpreadsheetViewContextMenu());
            }
        };
        Platform.runLater(r);
@@ -528,7 +529,7 @@ public class SpreadsheetView extends Control {
      * @param cellType
      * @return the editor associated with the CellType.
      */
-    public SpreadsheetCellEditor getEditor(SpreadsheetCellType<?> cellType) {
+    public final SpreadsheetCellEditor getEditor(SpreadsheetCellType<?> cellType) {
     	SpreadsheetCellEditor cellEditor = editors.get(cellType);
     	if (cellEditor == null) {
     		cellEditor = cellType.createEditor(this);
@@ -573,8 +574,9 @@ public class SpreadsheetView extends Control {
     
     /**
      * Put the current selection into the ClipBoard.
+     * This can be overridden by developers for custom behavior.
      */
-    public void copyClipBoard(){
+    public void copyClipboard(){
         checkFormat();
         
         //FIXME Maybe move editableProperty to the model..
@@ -601,6 +603,7 @@ public class SpreadsheetView extends Control {
      * Try to paste the clipBoard to the specified position.
      * Try to paste the current selection into the Grid. If the two contents are
      * not matchable, then it's not pasted.
+     * This can be overridden by developers for custom behavior.
      */
     public void pasteClipboard(){
         checkFormat();
@@ -664,7 +667,48 @@ public class SpreadsheetView extends Control {
         	
         }
     }
+    
+    /**
+     * Create a menu on rightClick with two options: Copy/Paste
+     * This can be overridden by developers for custom behavior.
+     * @return
+     */
+    public ContextMenu getSpreadsheetViewContextMenu(){
+        final ContextMenu contextMenu = new ContextMenu();
+        
+        final MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("copySpreadsheetView.png"))));
+        copyItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                copyClipboard();
+            }
+        });
+        
+        final MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pasteSpreadsheetView.png"))));
+        pasteItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                pasteClipboard();
+            }
+        });
+        contextMenu.getItems().addAll(copyItem, pasteItem);
+        return contextMenu;
+    }
 
+    
+    /**
+     * This method is called when pressing the "delete" key on the SpreadsheetView.
+     * This will erase the values of selected cells. 
+     * This can be overridden by developers for custom behavior.
+     */
+    public void deleteSelectedCells(){
+        for(TablePosition<ObservableList<SpreadsheetCell>,?> position:getSelectionModel().getSelectedCells()){
+          grid.setCellValue(position.getRow(), position.getColumn(), null);
+        }
+    }
+    
     /***************************************************************************
      *                                                                         *
      * Private/Protected Implementation                                        *
@@ -821,34 +865,6 @@ public class SpreadsheetView extends Control {
             fmt = new DataFormat("shuttle");
         }
     }
-    /**
-     * Create a menu on rightClick with two options: Copy/Paste
-     * @return
-     */
-    private ContextMenu getSpreadsheetViewContextMenu(){
-        final ContextMenu contextMenu = new ContextMenu();
-        
-        final MenuItem copyItem = new MenuItem("Copy");
-        copyItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("copySpreadsheetView.png"))));
-        copyItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                copyClipBoard();
-            }
-        });
-        
-        final MenuItem pasteItem = new MenuItem("Paste");
-        pasteItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pasteSpreadsheetView.png"))));
-        pasteItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                pasteClipboard();
-            }
-        });
-        contextMenu.getItems().addAll(copyItem, pasteItem);
-        return contextMenu;
-    }
-
 
     /**************************************************************************
      * 

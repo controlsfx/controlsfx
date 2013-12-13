@@ -220,7 +220,7 @@ public class SpreadsheetColumn<T> {
 	    	final ContextMenu contextMenu = new ContextMenu();
 	
 	    	this.fixItem = new MenuItem("Fix");
-	    	fixItem.setGraphic(new ImageView(new Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+//	    	fixItem.setGraphic(new ImageView(new Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
 	    	fixItem.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {

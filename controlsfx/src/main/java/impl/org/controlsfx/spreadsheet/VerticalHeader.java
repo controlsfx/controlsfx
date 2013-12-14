@@ -261,13 +261,13 @@ public class VerticalHeader extends StackPane {
 			}
 
 			VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
-			if (hbar.isVisible()) {
+			if (handle.getCellsViewSkin().getVBar().isVisible()) {
 				// Last one blank and on top (z-order) of the others
 				label = getLabel(rowCount++);
 				label.setText("");
 				label.resize(verticalHeaderWidth.get(), hbar.getHeight());
 				label.relocate(snappedLeftInset(),
-						 snapSize(skin.getSkinnable().getHeight()) - hbar.getHeight());
+						 skin.getSkinnable().getHeight() - hbar.getHeight());
 				label.getStyleClass().clear();
 				label.setContextMenu(blankContextMenu);
 			}
@@ -310,7 +310,7 @@ public class VerticalHeader extends StackPane {
 							TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView.getSelectionModel();
 							TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView().getFocusModel();
 							sm.clearAndSelect(row-1,fm.getFocusedCell().getTableColumn() );
-						}catch(NumberFormatException ex){
+						}catch(NumberFormatException | StringIndexOutOfBoundsException ex){
 
 						}
 					}
@@ -332,7 +332,8 @@ public class VerticalHeader extends StackPane {
 			final ContextMenu contextMenu = new ContextMenu();
 
 			MenuItem fixItem = new MenuItem("Fix");
-			fixItem.setGraphic(new ImageView(new Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+			
+//			fixItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));
 			fixItem.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {

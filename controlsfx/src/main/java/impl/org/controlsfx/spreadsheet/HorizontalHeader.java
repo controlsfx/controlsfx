@@ -75,7 +75,8 @@ public class HorizontalHeader extends TableHeaderRow {
      **************************************************************************/
     
     public void init() {
-    	
+        updateHorizontalHeaderVisibility(gridViewSkin.spreadsheetView.isShowColumnHeader());
+        
 		final SpreadsheetView view = gridViewSkin.spreadsheetView;
 		
 		//Visibility of vertical Header listener
@@ -186,16 +187,7 @@ public class HorizontalHeader extends TableHeaderRow {
     private final ChangeListener<Boolean> horizontalHeaderVisibilityListener = new ChangeListener<Boolean>() {
         @Override
         public void changed(ObservableValue<? extends Boolean> arg0,Boolean arg1, Boolean arg2) {
-        	working = arg2;
-        	setManaged(working);
-        	if(!arg2){
-        		getStyleClass().add("invisible");
-        	}else{
-        		getStyleClass().remove("invisible");
-                requestLayout();
-                getRootHeader().layoutFixedColumns();
-                updateHighlightSelection();
-        	}
+        	updateHorizontalHeaderVisibility(arg2);
         }
     };
     
@@ -278,5 +270,18 @@ public class HorizontalHeader extends TableHeaderRow {
                     .addAll("selected");
         }
 
+    }
+    
+    private void updateHorizontalHeaderVisibility(boolean visible){
+        working = visible;
+        setManaged(working);
+        if(!visible){
+            getStyleClass().add("invisible");
+        }else{
+            getStyleClass().remove("invisible");
+            requestLayout();
+            getRootHeader().layoutFixedColumns();
+            updateHighlightSelection();
+        }
     }
 }

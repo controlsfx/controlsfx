@@ -40,8 +40,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -85,15 +83,15 @@ public class VerticalHeader extends StackPane {
 	/******************************************************************
 	 * CONSTRUCTOR
 	 * 
-	 * @param skin
-	 * @param spreadsheetView
-	 * @param rowHeaderWidth
+	 * @param handle
+	 * @param verticalHeaderWidth
 	 ******************************************************************/
 	public VerticalHeader(final SpreadsheetHandle handle,
 			DoubleProperty verticalHeaderWidth) {
 		this.handle = handle;
 		this.spreadsheetView = handle.getView();
 		this.verticalHeaderWidth = verticalHeaderWidth;
+		working = spreadsheetView.showRowHeaderProperty().get();
 	}
 
 	/***************************************************************************
@@ -122,20 +120,18 @@ public class VerticalHeader extends StackPane {
 		VerticalHeader.this.setClip(clip);
 
 		// We desactivate and activate the verticalHeader upon request
-		spreadsheetView.showRowHeaderProperty().addListener(
-				new ChangeListener<Boolean>() {
+		spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
 					@Override
 					public void changed(
-							ObservableValue<? extends Boolean> arg0,
-							Boolean arg1, Boolean arg2) {
-						working = arg2;
-						if(!working){
-							savedWidth = verticalHeaderWidth.get();
-							verticalHeaderWidth.set(0);
-						}else{
-							verticalHeaderWidth.set(savedWidth == null?skin.DEFAULT_VERTICALHEADER_WIDTH:savedWidth);
-						}
-						requestLayout();
+							ObservableValue<? extends Boolean> arg0,Boolean arg1, Boolean arg2) {
+					    working = arg2;
+				        if(!working){
+				            savedWidth = verticalHeaderWidth.get();
+				            verticalHeaderWidth.set(0);
+				        }else{
+				            verticalHeaderWidth.set(savedWidth == null?skin.DEFAULT_VERTICALHEADER_WIDTH:savedWidth);
+				        }
+				        requestLayout();
 					}
 				});
 
@@ -351,5 +347,4 @@ public class VerticalHeader extends StackPane {
 			return blankContextMenu;
 		}
 	}
-
 }

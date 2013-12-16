@@ -77,6 +77,9 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     public void layoutFixedColumns() {
     	SpreadsheetHandle handle = ((GridViewSkin) getTableViewSkin()).handle;
     	final SpreadsheetView spreadsheetView = handle.getView();
+    	if(handle.getCellsViewSkin() == null){
+    	    return;
+    	}
         double hbarValue = handle.getCellsViewSkin().getHBar().getValue();
         
         final int labelHeight = (int) getChildren().get(0).prefHeight(-1);

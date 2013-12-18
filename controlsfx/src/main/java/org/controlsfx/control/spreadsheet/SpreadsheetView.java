@@ -602,7 +602,6 @@ public class SpreadsheetView extends Control {
      * This can be overridden by developers for custom behavior.
      */
     public void pasteClipboard(){
-        
         //FIXME Maybe move editableProperty to the model..
         if(!isEditable())
             return;

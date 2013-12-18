@@ -55,296 +55,290 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
  */
 public class VerticalHeader extends StackPane {
 
-	/***************************************************************************
-	 * * Private Fields * *
-	 **************************************************************************/
-	private final SpreadsheetHandle handle;
-	private final SpreadsheetView spreadsheetView;
-	private double horizontalHeaderHeight;
-	private DoubleProperty verticalHeaderWidth;
-	private Double savedWidth;
-	private boolean working = true; // Whether or not we are showing the
-									// verticalHeader
-	private Rectangle clip; // Ensure that children do not go out of bounds
-	private ContextMenu blankContextMenu;
+    /***************************************************************************
+     * * Private Fields * *
+     **************************************************************************/
+    private final SpreadsheetHandle handle;
+    private final SpreadsheetView spreadsheetView;
+    private double horizontalHeaderHeight;
+    private DoubleProperty verticalHeaderWidth;
+    private Double savedWidth;
+    private boolean working = true; // Whether or not we are showing the
+                                    // verticalHeader
+    private Rectangle clip; // Ensure that children do not go out of bounds
+    private ContextMenu blankContextMenu;
 
-	/***************************************************************************
-	 * * Listeners * *
-	 **************************************************************************/
-	private final InvalidationListener layout = new InvalidationListener() {
-		@Override
-		public void invalidated(Observable arg0) {
-			if(working){
-				requestLayout();
-			}
-		}
-	};
+    /***************************************************************************
+     * * Listeners * *
+     **************************************************************************/
+    private final InvalidationListener layout = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable arg0) {
+            if (working) {
+                requestLayout();
+            }
+        }
+    };
 
-	/******************************************************************
-	 * CONSTRUCTOR
-	 * 
-	 * @param handle
-	 * @param verticalHeaderWidth
-	 ******************************************************************/
-	public VerticalHeader(final SpreadsheetHandle handle,
-			DoubleProperty verticalHeaderWidth) {
-		this.handle = handle;
-		this.spreadsheetView = handle.getView();
-		this.verticalHeaderWidth = verticalHeaderWidth;
-		working = spreadsheetView.showRowHeaderProperty().get();
-	}
+    /******************************************************************
+     * CONSTRUCTOR
+     * 
+     * @param handle
+     * @param verticalHeaderWidth
+     ******************************************************************/
+    public VerticalHeader(final SpreadsheetHandle handle, DoubleProperty verticalHeaderWidth) {
+        this.handle = handle;
+        this.spreadsheetView = handle.getView();
+        this.verticalHeaderWidth = verticalHeaderWidth;
+        working = spreadsheetView.showRowHeaderProperty().get();
+    }
 
-	/***************************************************************************
-	 * * Private/Protected Methods * 
-	 * @param horizontalHeader *
-	 **************************************************************************/
-	
-	void init(final GridViewSkin skin, HorizontalHeader horizontalHeader) {
-		//Adjust position upon HorizontalHeader height
-		horizontalHeader.heightProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0,
-					Number arg1, Number arg2) {
-				horizontalHeaderHeight = arg2.doubleValue();
-				requestLayout();
-			}
-		});
-		
-		// Clip property to stay within bounds
-		clip = new Rectangle(verticalHeaderWidth.get(), snapSize(skin.getSkinnable()
-				.getHeight()));
-		clip.relocate(snappedTopInset(), snappedLeftInset());
-		clip.setSmooth(false);
-		clip.heightProperty().bind(skin.getSkinnable().heightProperty());
-		clip.widthProperty().bind(verticalHeaderWidth);
-		VerticalHeader.this.setClip(clip);
+    /***************************************************************************
+     * * Private/Protected Methods *
+     * 
+     * @param horizontalHeader
+     *            *
+     **************************************************************************/
 
-		// We desactivate and activate the verticalHeader upon request
-		spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends Boolean> arg0,Boolean arg1, Boolean arg2) {
-					    working = arg2;
-				        if(!working){
-				            savedWidth = verticalHeaderWidth.get();
-				            verticalHeaderWidth.set(0);
-				        }else{
-				            verticalHeaderWidth.set(savedWidth == null?skin.DEFAULT_VERTICALHEADER_WIDTH:savedWidth);
-				        }
-				        requestLayout();
-					}
-				});
+    void init(final GridViewSkin skin, HorizontalHeader horizontalHeader) {
+        // Adjust position upon HorizontalHeader height
+        horizontalHeader.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> arg0, Number oldHeight, Number newHeight) {
+                horizontalHeaderHeight = newHeight.doubleValue();
+                requestLayout();
+            }
+        });
 
-		// When the Column header is showing or not, we need to update the
-		// position of the verticalHeader
-		spreadsheetView.showColumnHeaderProperty().addListener(layout);
-		spreadsheetView.getFixedRows().addListener(layout);
-		
-		// In case we resize the view in any manners
-		spreadsheetView.heightProperty().addListener(layout);
+        // Clip property to stay within bounds
+        clip = new Rectangle(verticalHeaderWidth.get(), snapSize(skin.getSkinnable().getHeight()));
+        clip.relocate(snappedTopInset(), snappedLeftInset());
+        clip.setSmooth(false);
+        clip.heightProperty().bind(skin.getSkinnable().heightProperty());
+        clip.widthProperty().bind(verticalHeaderWidth);
+        VerticalHeader.this.setClip(clip);
 
-		// For layout properly the verticalHeader when there are some selected items
-		skin.getSelectedRows().addListener(layout);
+        // We desactivate and activate the verticalHeader upon request
+        spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+                working = newValue;
+                if (!working) {
+                    savedWidth = verticalHeaderWidth.get();
+                    verticalHeaderWidth.set(0);
+                } else {
+                    verticalHeaderWidth.set(savedWidth == null ? skin.DEFAULT_VERTICALHEADER_WIDTH : savedWidth);
+                }
+                requestLayout();
+            }
+        });
 
-		blankContextMenu = new ContextMenu();
-	}
+        // When the Column header is showing or not, we need to update the
+        // position of the verticalHeader
+        spreadsheetView.showColumnHeaderProperty().addListener(layout);
+        spreadsheetView.getFixedRows().addListener(layout);
 
-	@Override
-	protected void layoutChildren() {
-		if (working) {
+        // In case we resize the view in any manners
+        spreadsheetView.heightProperty().addListener(layout);
 
-			final GridViewSkin skin = handle.getCellsViewSkin();
+        // For layout properly the verticalHeader when there are some selected
+        // items
+        skin.getSelectedRows().addListener(layout);
 
-			final double x = snappedLeftInset();
-			final int cellSize = skin.getCellsSize();
+        blankContextMenu = new ContextMenu();
+    }
 
-			// We add horizontalHeaderHeight because we need to 
-			// take the other header into account.
-			double y = snappedTopInset();
-			
-			if (spreadsheetView.showColumnHeaderProperty().get()) {
-				y += horizontalHeaderHeight;
-			}
+    @Override
+    protected void layoutChildren() {
+        if (working) {
 
-			// The Labels must be aligned with the rows
-			if (cellSize != 0) {
-				y += skin.getRow(0).getLocalToParentTransform().getTy();
-			}
+            final GridViewSkin skin = handle.getCellsViewSkin();
 
-			int rowCount = 0;
-			Label label;
-			int i = 0;
-			// We don't want to add Label if there are no rows associated with.
-			final int modelRowCount = spreadsheetView.getGrid().getRowCount();
-			GridRow row;
-			// We iterate over the visibleRows
-			while (cellSize != 0 && skin.getRow(i) != null
-					&& i < modelRowCount) {
-				row = skin.getRow(i);
-				label = getLabel(rowCount++);
-				if(spreadsheetView.getFixedRows().contains(row.getIndex())){
-					label.setText(String.valueOf(row.getIndex() + 1)+":");
-				}else if(spreadsheetView.isRowFixable(row.getIndex())){
-					label.setText(String.valueOf(row.getIndex() + 1)+".");
-				}else{
-					label.setText(String.valueOf(row.getIndex() + 1)+" ");
-				}
-				label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndex()));
-				label.relocate(x, y);
-				label.setContextMenu(getRowContextMenu(row
-						.getIndex()));
-				
-				// We want to highlight selected rows
-				final ObservableList<String> css = label.getStyleClass();
-				if (skin.getSelectedRows().contains(row.getIndex())) {
-					css.addAll("selected");
-				} else {
-					css.removeAll("selected");
-				}
-				if (spreadsheetView.getFixedRows().contains(row.getIndex())) {
-					css.addAll("fixed");
-				} else {
-					css.removeAll("fixed");
-				}
-				y += spreadsheetView.getGrid().getRowHeight(row.getIndex());
-				++i;
-			}
-			double spaceUsedByFixedRows = 0;
-			// Then we iterate over the FixedRows if any
-			if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
-				for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
-					if(!handle.getCellsViewSkin().getCurrentlyFixedRow().contains(spreadsheetView
-								.getFixedRows().get(j)))
-							break;
-						label = getLabel(rowCount++);
-						label.setText(String.valueOf(spreadsheetView
-								.getFixedRows().get(j) + 1)+":");
-						label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(spreadsheetView
-								.getFixedRows().get(j)));
-						label.setContextMenu(getRowContextMenu(spreadsheetView
-								.getFixedRows().get(j)));
-						// If the columnHeader is here, we need to translate a bit
-						if (spreadsheetView.showColumnHeaderProperty().get()) {
-							label.relocate(x, snappedTopInset() + horizontalHeaderHeight
-									+spaceUsedByFixedRows);
-						} else {
-							label.relocate(x, snappedTopInset() + spaceUsedByFixedRows);
-						}
-						final ObservableList<String> css = label
-								.getStyleClass();
-						if (skin.getSelectedRows().contains(
-								spreadsheetView.getFixedRows().get(j))) {
-							css.addAll("selected");
-						} else {
-							css.removeAll("selected");
-						}
-						css.addAll("fixed");
-						spaceUsedByFixedRows+=spreadsheetView.getGrid().getRowHeight(spreadsheetView
-								.getFixedRows().get(j));
-						y += spreadsheetView.getGrid().getRowHeight(spreadsheetView
-								.getFixedRows().get(j));
-				}
-			}
+            final double x = snappedLeftInset();
+            final int cellSize = skin.getCellsSize();
 
-			// First one blank and on top (z-order) of the others
-			if (spreadsheetView.showColumnHeaderProperty().get()) {
-				label = getLabel(rowCount++);
-				label.setText("");
-				label.resize(verticalHeaderWidth.get(), horizontalHeaderHeight);
-				label.relocate(x, 0);
-				label.getStyleClass().clear();
-				label.setContextMenu(blankContextMenu);
-			}
+            // We add horizontalHeaderHeight because we need to
+            // take the other header into account.
+            double y = snappedTopInset();
 
-			VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
-			if (handle.getCellsViewSkin().getVBar().isVisible()) {
-				// Last one blank and on top (z-order) of the others
-				label = getLabel(rowCount++);
-				label.setText("");
-				label.resize(verticalHeaderWidth.get(), hbar.getHeight());
-				label.relocate(snappedLeftInset(),
-						 skin.getSkinnable().getHeight() - hbar.getHeight());
-				label.getStyleClass().clear();
-				label.setContextMenu(blankContextMenu);
-			}
-			// Flush the rest of the children if any
-			while (getChildren().size() > rowCount) {
-				getChildren().remove(rowCount);
-			}
-		} else {
-			getChildren().clear();
-		}
-	}
+            if (spreadsheetView.showColumnHeaderProperty().get()) {
+                y += horizontalHeaderHeight;
+            }
 
-	/**
-	 * Called when value of vertical scrollbar change
-	 */
-	void updateScrollY() {
-		if (working) {
-			requestLayout();
-		}
-	}
+            // The Labels must be aligned with the rows
+            if (cellSize != 0) {
+                y += skin.getRow(0).getLocalToParentTransform().getTy();
+            }
 
-	/**
-	 * Create a new label and put it in the pile or just grab one from the pile.
-	 * 
-	 * @param rowNumber
-	 * @return
-	 */
-	private Label getLabel(int rowNumber) {
-		if (getChildren().isEmpty() || getChildren().size() <= rowNumber) {
-			final Label label = new Label();
-			getChildren().add(label);
-			
-			// We want to select when clicking on header
-			label.setOnMousePressed(new EventHandler<MouseEvent>(){
-				@Override
-				public void handle(MouseEvent arg0) {
-					if(arg0.isPrimaryButtonDown()){
-						try{
-							int row = Integer.parseInt(label.getText().substring(0, label.getText().length()-1));
-							TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView.getSelectionModel();
-							TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView().getFocusModel();
-							sm.clearAndSelect(row-1,fm.getFocusedCell().getTableColumn() );
-						}catch(NumberFormatException | StringIndexOutOfBoundsException ex){
+            int rowCount = 0;
+            Label label;
+            int i = 0;
+            // We don't want to add Label if there are no rows associated with.
+            final int modelRowCount = spreadsheetView.getGrid().getRowCount();
+            GridRow row;
+            // We iterate over the visibleRows
+            while (cellSize != 0 && skin.getRow(i) != null && i < modelRowCount) {
+                row = skin.getRow(i);
+                label = getLabel(rowCount++);
+                if (spreadsheetView.getFixedRows().contains(row.getIndex())) {
+                    label.setText(String.valueOf(row.getIndex() + 1) + ":");
+                } else if (spreadsheetView.isRowFixable(row.getIndex())) {
+                    label.setText(String.valueOf(row.getIndex() + 1) + ".");
+                } else {
+                    label.setText(String.valueOf(row.getIndex() + 1) + " ");
+                }
+                label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndex()));
+                label.relocate(x, y);
+                label.setContextMenu(getRowContextMenu(row.getIndex()));
 
-						}
-					}
-				}});
-			return label;
-		} else {
-			return (Label) getChildren().get(rowNumber);
-		}
-	}
+                // We want to highlight selected rows
+                final ObservableList<String> css = label.getStyleClass();
+                if (skin.getSelectedRows().contains(row.getIndex())) {
+                    css.addAll("selected");
+                } else {
+                    css.removeAll("selected");
+                }
+                if (spreadsheetView.getFixedRows().contains(row.getIndex())) {
+                    css.addAll("fixed");
+                } else {
+                    css.removeAll("fixed");
+                }
+                y += spreadsheetView.getGrid().getRowHeight(row.getIndex());
+                ++i;
+            }
+            double spaceUsedByFixedRows = 0;
+            // Then we iterate over the FixedRows if any
+            if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
+                for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
+                    if (!handle.getCellsViewSkin().getCurrentlyFixedRow()
+                            .contains(spreadsheetView.getFixedRows().get(j)))
+                        break;
+                    label = getLabel(rowCount++);
+                    label.setText(String.valueOf(spreadsheetView.getFixedRows().get(j) + 1) + ":");
+                    label.resize(verticalHeaderWidth.get(),
+                            spreadsheetView.getGrid().getRowHeight(spreadsheetView.getFixedRows().get(j)));
+                    label.setContextMenu(getRowContextMenu(spreadsheetView.getFixedRows().get(j)));
+                    // If the columnHeader is here, we need to translate a bit
+                    if (spreadsheetView.showColumnHeaderProperty().get()) {
+                        label.relocate(x, snappedTopInset() + horizontalHeaderHeight + spaceUsedByFixedRows);
+                    } else {
+                        label.relocate(x, snappedTopInset() + spaceUsedByFixedRows);
+                    }
+                    final ObservableList<String> css = label.getStyleClass();
+                    if (skin.getSelectedRows().contains(spreadsheetView.getFixedRows().get(j))) {
+                        css.addAll("selected");
+                    } else {
+                        css.removeAll("selected");
+                    }
+                    css.addAll("fixed");
+                    spaceUsedByFixedRows += spreadsheetView.getGrid().getRowHeight(
+                            spreadsheetView.getFixedRows().get(j));
+                    y += spreadsheetView.getGrid().getRowHeight(spreadsheetView.getFixedRows().get(j));
+                }
+            }
 
-	/**
-	 * Return a contextMenu for fixing a row if possible.
-	 * 
-	 * @param i
-	 * @return
-	 */
-	private ContextMenu getRowContextMenu(final Integer i) {
-		if (spreadsheetView.isRowFixable(i)) {
-			final ContextMenu contextMenu = new ContextMenu();
+            // First one blank and on top (z-order) of the others
+            if (spreadsheetView.showColumnHeaderProperty().get()) {
+                label = getLabel(rowCount++);
+                label.setText("");
+                label.resize(verticalHeaderWidth.get(), horizontalHeaderHeight);
+                label.relocate(x, 0);
+                label.getStyleClass().clear();
+                label.setContextMenu(blankContextMenu);
+            }
 
-			MenuItem fixItem = new MenuItem("Fix");
-			
-//			fixItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));
-			fixItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent arg0) {
-					if (spreadsheetView.getFixedRows().contains(i)) {
-						spreadsheetView.getFixedRows().remove(i);
-					}else{
-						spreadsheetView.getFixedRows().add(i);
-					}
-				}
-			});
-			contextMenu.getItems().add(fixItem);
+            VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
+            if (handle.getCellsViewSkin().getVBar().isVisible()) {
+                // Last one blank and on top (z-order) of the others
+                label = getLabel(rowCount++);
+                label.setText("");
+                label.resize(verticalHeaderWidth.get(), hbar.getHeight());
+                label.relocate(snappedLeftInset(), skin.getSkinnable().getHeight() - hbar.getHeight());
+                label.getStyleClass().clear();
+                label.setContextMenu(blankContextMenu);
+            }
+            // Flush the rest of the children if any
+            while (getChildren().size() > rowCount) {
+                getChildren().remove(rowCount);
+            }
+        } else {
+            getChildren().clear();
+        }
+    }
 
-			return contextMenu;
-		} else {
-			return blankContextMenu;
-		}
-	}
+    /**
+     * Called when value of vertical scrollbar change
+     */
+    void updateScrollY() {
+        if (working) {
+            requestLayout();
+        }
+    }
+
+    /**
+     * Create a new label and put it in the pile or just grab one from the pile.
+     * 
+     * @param rowNumber
+     * @return
+     */
+    private Label getLabel(int rowNumber) {
+        if (getChildren().isEmpty() || getChildren().size() <= rowNumber) {
+            final Label label = new Label();
+            getChildren().add(label);
+
+            // We want to select when clicking on header
+            label.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent arg0) {
+                    if (arg0.isPrimaryButtonDown()) {
+                        try {
+                            int row = Integer.parseInt(label.getText().substring(0, label.getText().length() - 1));
+                            TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
+                                    .getSelectionModel();
+                            TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView()
+                                    .getFocusModel();
+                            sm.clearAndSelect(row - 1, fm.getFocusedCell().getTableColumn());
+                        } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
+
+                        }
+                    }
+                }
+            });
+            return label;
+        } else {
+            return (Label) getChildren().get(rowNumber);
+        }
+    }
+
+    /**
+     * Return a contextMenu for fixing a row if possible.
+     * 
+     * @param i
+     * @return
+     */
+    private ContextMenu getRowContextMenu(final Integer i) {
+        if (spreadsheetView.isRowFixable(i)) {
+            final ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem fixItem = new MenuItem("Fix");
+
+            // fixItem.setGraphic(new ImageView(new
+            // Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));
+            fixItem.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent arg0) {
+                    if (spreadsheetView.getFixedRows().contains(i)) {
+                        spreadsheetView.getFixedRows().remove(i);
+                    } else {
+                        spreadsheetView.getFixedRows().add(i);
+                    }
+                }
+            });
+            contextMenu.getItems().add(fixItem);
+
+            return contextMenu;
+        } else {
+            return blankContextMenu;
+        }
+    }
 }

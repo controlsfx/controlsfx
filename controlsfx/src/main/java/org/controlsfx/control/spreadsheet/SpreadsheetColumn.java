@@ -34,8 +34,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.

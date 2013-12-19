@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2013, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control.spreadsheet;
 
 import java.text.DecimalFormat;
@@ -66,6 +92,12 @@ public abstract class SpreadsheetCellType<T> {
 
     /**
      * Default constructor.
+     */
+    public SpreadsheetCellType(){
+        
+    }
+    /**
+     * Constructor with the StringConverter directly provided.
      * 
      * @param converter
      *            The converter to use
@@ -90,8 +122,8 @@ public abstract class SpreadsheetCellType<T> {
      *            the value to display
      * @return a {@link SpreadsheetCell}
      */
-    public abstract SpreadsheetCell createCell(final int row, final int column,
-            final int rowSpan, final int columnSpan, final T value);
+    public abstract SpreadsheetCell createCell(final int row, final int column, final int rowSpan,
+            final int columnSpan, final T value);
 
     /**
      * Creates an editor for this type of cells.
@@ -169,7 +201,7 @@ public abstract class SpreadsheetCellType<T> {
     public static class ObjectType extends SpreadsheetCellType<Object> {
 
         public ObjectType() {
-            this(new StringConverter<Object>() {
+            this(new StringConverterWithFormat<Object>() {
                 @Override
                 public Object fromString(String arg0) {
                     return arg0;
@@ -182,7 +214,7 @@ public abstract class SpreadsheetCellType<T> {
             });
         }
 
-        public ObjectType(StringConverter<Object> converter) {
+        public ObjectType(StringConverterWithFormat<Object> converter) {
             super(converter);
         }
 
@@ -197,10 +229,9 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public SpreadsheetCell createCell(final int row, final int column,
-                final int rowSpan, final int columnSpan, final Object value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-                    columnSpan, this);
+        public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
+                final Object value) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -251,10 +282,9 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public SpreadsheetCell createCell(final int row, final int column,
-                final int rowSpan, final int columnSpan, final String value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-                    columnSpan, this);
+        public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
+                final String value) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -266,8 +296,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String convertValue(Object value) {
-            String convertedValue = converter.fromString(value == null ? null
-                    : value.toString());
+            String convertedValue = converter.fromString(value == null ? null : value.toString());
             if (convertedValue == null || convertedValue.equals("")) {
                 return null;
             }
@@ -292,14 +321,11 @@ public abstract class SpreadsheetCellType<T> {
     public static class DoubleType extends SpreadsheetCellType<Double> {
 
         public DoubleType() {
-            this(new DoubleStringConverter() {
+
+            this(new StringConverterWithFormat<Double>(new DoubleStringConverter()) {
                 @Override
                 public String toString(Double item) {
-                    if (item == null || Double.isNaN(item)) {
-                        return "";
-                    } else {
-                        return super.toString(item);
-                    }
+                    return toStringFormat(item, "");
                 }
 
                 @Override
@@ -307,13 +333,26 @@ public abstract class SpreadsheetCellType<T> {
                     if (str == null || str.isEmpty() || "NaN".equals(str)) {
                         return Double.NaN;
                     } else {
-                        return super.fromString(str);
+                        return myConverter.fromString(str);
+                    }
+                }
+
+                @Override
+                public String toStringFormat(Double item, String format) {
+                    try {
+                        if (item == null || Double.isNaN(item)) {
+                            return "";
+                        } else {
+                            return new DecimalFormat(format).format(item);
+                        }
+                    } catch (Exception ex) {
+                        return myConverter.toString(item);
                     }
                 }
             });
         }
 
-        public DoubleType(DoubleStringConverter converter) {
+        public DoubleType(StringConverter<Double> converter) {
             super(converter);
         }
 
@@ -323,10 +362,9 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public SpreadsheetCell createCell(final int row, final int column,
-                final int rowSpan, final int columnSpan, final Double value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-                    columnSpan, this);
+        public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
+                final Double value) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -342,8 +380,7 @@ public abstract class SpreadsheetCellType<T> {
                 return true;
             else {
                 try {
-                    converter.fromString(value == null ? null : value
-                            .toString());
+                    converter.fromString(value == null ? null : value.toString());
                     return true;
                 } catch (Exception e) {
                     return false;
@@ -357,8 +394,7 @@ public abstract class SpreadsheetCellType<T> {
                 return (Double) value;
             else {
                 try {
-                    return converter.fromString(value == null ? null : value
-                            .toString());
+                    return converter.fromString(value == null ? null : value.toString());
                 } catch (Exception e) {
                     return null;
                 }
@@ -372,15 +408,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString(Double item, String format) {
-            return toStringFormat(item, format);
-        }
-
-        private String toStringFormat(Double item, String format) {
-            if (item != null && !Double.isNaN(item)) {
-                return new DecimalFormat(format).format(item);
-            } else {
-                return "";
-            }
+            return ((StringConverterWithFormat<Double>) converter).toStringFormat(item, format);
         }
     };
 
@@ -433,10 +461,9 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public SpreadsheetCell createCell(final int row, final int column,
-                final int rowSpan, final int columnSpan, final Integer value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-                    columnSpan, this);
+        public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
+                final Integer value) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -452,8 +479,7 @@ public abstract class SpreadsheetCellType<T> {
                 return true;
             else {
                 try {
-                    converter.fromString(value == null ? null : value
-                            .toString());
+                    converter.fromString(value == null ? null : value.toString());
                     return true;
                 } catch (Exception e) {
                     return false;
@@ -467,8 +493,7 @@ public abstract class SpreadsheetCellType<T> {
                 return (Integer) value;
             else {
                 try {
-                    return converter.fromString(value == null ? null : value
-                            .toString());
+                    return converter.fromString(value == null ? null : value.toString());
                 } catch (Exception e) {
                     return null;
                 }
@@ -488,8 +513,7 @@ public abstract class SpreadsheetCellType<T> {
      *            the list items
      * @return the instance
      */
-    public static final SpreadsheetCellType<String> LIST(
-            final List<String> items) {
+    public static final SpreadsheetCellType<String> LIST(final List<String> items) {
         return new ListType(items);
     }
 
@@ -520,10 +544,9 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public SpreadsheetCell createCell(final int row, final int column,
-                final int rowSpan, final int columnSpan, String item) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-                    columnSpan, this);
+        public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
+                String item) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
             if (items != null && items.size() > 0) {
                 if (item != null && items.contains(item)) {
                     cell.setItem(item);
@@ -549,8 +572,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String convertValue(Object value) {
-            return converter
-                    .fromString(value == null ? null : value.toString());
+            return converter.fromString(value == null ? null : value.toString());
         }
 
         @Override
@@ -573,14 +595,10 @@ public abstract class SpreadsheetCellType<T> {
          * Creates a new DateType.
          */
         public DateType() {
-            this(new StringConverter<LocalDate>() {
+            this(new StringConverterWithFormat<LocalDate>() {
                 @Override
                 public String toString(LocalDate item) {
-                    if (item != null) {
-                        return item.toString();
-                    } else {
-                        return "";
-                    }
+                    return toStringFormat(item, "");
                 }
 
                 @Override
@@ -589,6 +607,17 @@ public abstract class SpreadsheetCellType<T> {
                         return LocalDate.parse(str);
                     } catch (Exception e) {
                         return null;
+                    }
+                }
+
+                @Override
+                public String toStringFormat(LocalDate item, String format) {
+                    if (("").equals(format)) {
+                        return item.toString();
+                    } else if (item != null) {
+                        return item.format(DateTimeFormatter.ofPattern(format));
+                    } else {
+                        return "";
                     }
                 }
             });
@@ -604,10 +633,9 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public SpreadsheetCell createCell(final int row, final int column,
-                final int rowSpan, final int columnSpan, final LocalDate value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan,
-                    columnSpan, this);
+        public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
+                final LocalDate value) {
+            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -623,8 +651,7 @@ public abstract class SpreadsheetCellType<T> {
                 return true;
             else {
                 try {
-                    LocalDate temp = converter.fromString(value == null ? null
-                            : value.toString());
+                    LocalDate temp = converter.fromString(value == null ? null : value.toString());
                     return temp != null;
                 } catch (Exception e) {
                     return false;
@@ -638,8 +665,7 @@ public abstract class SpreadsheetCellType<T> {
                 return (LocalDate) value;
             else {
                 try {
-                    return converter.fromString(value == null ? null : value
-                            .toString());
+                    return converter.fromString(value == null ? null : value.toString());
                 } catch (Exception e) {
                     return null;
                 }
@@ -653,15 +679,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString(LocalDate item, String format) {
-            return toStringFormat(item, format);
-        }
-
-        private String toStringFormat(LocalDate item, String format) {
-            if (item != null) {
-                return item.format(DateTimeFormatter.ofPattern(format));
-            } else {
-                return "";
-            }
+            return ((StringConverterWithFormat<LocalDate>) converter).toStringFormat(item, format);
         }
     }
 }

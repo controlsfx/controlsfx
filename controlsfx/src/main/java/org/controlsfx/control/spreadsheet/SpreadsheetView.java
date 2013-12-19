@@ -579,10 +579,6 @@ public class SpreadsheetView extends Control {
     public void copyClipboard(){
         checkFormat();
         
-        //FIXME Maybe move editableProperty to the model..
-        if(!isEditable())
-        	return;
-        
         final ArrayList<GridChange> list = new ArrayList<>();
         @SuppressWarnings("rawtypes")
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
@@ -606,6 +602,10 @@ public class SpreadsheetView extends Control {
      * This can be overridden by developers for custom behavior.
      */
     public void pasteClipboard(){
+        //FIXME Maybe move editableProperty to the model..
+        if(!isEditable())
+            return;
+        
         checkFormat();
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         if(clipboard.getContent(fmt) != null){

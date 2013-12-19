@@ -28,7 +28,6 @@ package org.controlsfx.control.spreadsheet;
 
 import java.time.LocalDate;
 
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -48,47 +47,48 @@ import javafx.scene.Node;
  * You will provide them when constructing a {@link Grid}.
  * 
  * <br/>
- * FIXME Add Format description
- * <h3>SpreadsheetCell Types</h3> 
- * Each SpreadsheetCell has its own {@link SpreadsheetCellType}.
- * Different {@link SpreadsheetCellType SpreadsheetCellTypes} are
- * available depending on the data you want to represent in your
- * {@link SpreadsheetView}. MoreOver, each {@link SpreadsheetCellType} has its 
- * own {@link SpreadsheetCellEditor} in order to control very closely the possible 
- * modifications.
+ * FIXME Add Format description <h3>SpreadsheetCell Types</h3> Each
+ * SpreadsheetCell has its own {@link SpreadsheetCellType}. Different
+ * {@link SpreadsheetCellType SpreadsheetCellTypes} are available depending on
+ * the data you want to represent in your {@link SpreadsheetView}. MoreOver,
+ * each {@link SpreadsheetCellType} has its own {@link SpreadsheetCellEditor} in
+ * order to control very closely the possible modifications.
  * 
- * <p>You can use the different static method provided in 
- * {@link SpreadsheetCellType} in order to create the specialized 
+ * <p>
+ * You can use the different static method provided in
+ * {@link SpreadsheetCellType} in order to create the specialized
  * SpreadsheetCell that suits your need:
  * 
  * <ul>
  * <li><b>String</b>: Accessible with
- * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)}.</li>
+ * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)}
+ * .</li>
  * <li><b>List</b>: Accessible with
- * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)}.
- * </li>
+ * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)}.</li>
  * <li><b>Double</b>: Accessible with
- * {@link  SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)}.</li>
+ * {@link SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)}
+ * .</li>
  * <li><b>Date</b>: Accessible with
- * {@link  SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}.</li>
+ * {@link SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}
+ * .</li>
  * </ul>
  * <br/>
  * 
- * <p>If you want to create a SpreadsheetCell of your own, you simply have to create 
- * your own {@link  SpreadsheetCellType} and implement the abstract method 
- * {@link  SpreadsheetCellType#createCell(int, int, int, int, Object)}.
- * You will also have to provide a custom {@link SpreadsheetCellEditor}.
+ * <p>
+ * If you want to create a SpreadsheetCell of your own, you simply have to
+ * create your own {@link SpreadsheetCellType} and implement the abstract method
+ * {@link SpreadsheetCellType#createCell(int, int, int, int, Object)}. You will
+ * also have to provide a custom {@link SpreadsheetCellEditor}.
  * 
  * <h3>Configuration</h3>
- * You will have to indicate the coordinates of the cell together with the 
- * {@link #setRowSpan(int) row} and {@link #setColumnSpan(int) column} span. You 
- * can specify if you want the cell to be editable or not using 
- * {@link #setEditable(boolean)}. Be advised that a cell with a rowSpan means 
- * that the cell will replace all the cells situated in the rowSpan range. 
- * Same with the column span. The best way to handle spanning is to fill your 
- * grid with unique cells, and then call
- * {@link GridBase#spanColumn(int, int, int)} or
- * {@link GridBase#spanRow(int, int, int)}.
+ * You will have to indicate the coordinates of the cell together with the
+ * {@link #setRowSpan(int) row} and {@link #setColumnSpan(int) column} span. You
+ * can specify if you want the cell to be editable or not using
+ * {@link #setEditable(boolean)}. Be advised that a cell with a rowSpan means
+ * that the cell will replace all the cells situated in the rowSpan range. Same
+ * with the column span. The best way to handle spanning is to fill your grid
+ * with unique cells, and then call {@link GridBase#spanColumn(int, int, int)}
+ * or {@link GridBase#spanRow(int, int, int)}.
  * 
  * 
  * <h3>Examples</h3>
@@ -114,147 +114,140 @@ import javafx.scene.Node;
  * }
  * </pre>
  * 
- * <p>When you are using {@link SpreadsheetCellType.DoubleType},
- * you will then be sure that your cells contain only {@link Double} value. If
- * the user wants to enter a {@link String}, the value will be ignored.
- * Moreover, the {@link SpreadsheetCellEditor} background color will turn red
- * when the value is incorrect to notify the user that his value will not be be
- * saved.
+ * <p>
+ * When you are using {@link SpreadsheetCellType.DoubleType}, you will then be
+ * sure that your cells contain only {@link Double} value. If the user wants to
+ * enter a {@link String}, the value will be ignored. Moreover, the
+ * {@link SpreadsheetCellEditor} background color will turn red when the value
+ * is incorrect to notify the user that his value will not be be saved.
  * 
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
  */
 public class SpreadsheetCell {
 
+    /***************************************************************************
+     * 
+     * Private Fields
+     * 
+     **************************************************************************/
 
-	/***************************************************************************
-	 * 
-	 * Private Fields
-	 * 
-	 **************************************************************************/
+    @SuppressWarnings("rawtypes")
+    private final SpreadsheetCellType type;
+    private final int row;
+    private final int column;
+    private int rowSpan;
+    private int columnSpan;
+    private final StringProperty format;
+    private final StringProperty text;
+    private final ObservableSet<String> pseudoClass;
+    private final ObjectProperty<Node> graphic;
 
-	@SuppressWarnings("rawtypes")
-	private final SpreadsheetCellType type;
-	private final int row;
-	private final int column;
-	private int rowSpan;
-	private int columnSpan;
-	private final StringProperty format;
-	private final StringProperty text;
-	private final ObservableSet<String> pseudoClass;
-	private final ObjectProperty<Node> graphic;
+    private ObservableSet<String> styleClass;
 
-	private ObservableSet<String> styleClass;
+    /***************************************************************************
+     * 
+     * Constructor
+     * 
+     **************************************************************************/
 
-	
-	
-	/***************************************************************************
-	 * 
-	 * Constructor
-	 * 
-	 **************************************************************************/
+    @SuppressWarnings("rawtypes")
+    public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan) {
+        this(row, column, rowSpan, columnSpan, (SpreadsheetCellType) SpreadsheetCellType.OBJECT);
+    }
 
-	@SuppressWarnings("rawtypes")
-	public SpreadsheetCell(final int row, final int column, final int rowSpan,
-			final int columnSpan) {
-		this(row, column, rowSpan, columnSpan, (SpreadsheetCellType)SpreadsheetCellType.OBJECT);
-	}
-
-	/**
-	 * Constructs a SpreadsheetCell with the given configuration.
-	 * 
-	 * @param row
-	 * @param column
-	 * @param rowSpan
-	 * @param columnSpan
-	 * @param type
-	 */
-	public SpreadsheetCell(final int row, final int column, final int rowSpan,
-			final int columnSpan, final SpreadsheetCellType<?> type) {
-		this.row = row;
-		this.column = column;
-		this.rowSpan = rowSpan;
-		this.columnSpan = columnSpan;
-		this.type = type;
-		text = new SimpleStringProperty("");
-		format = new SimpleStringProperty("");
-		pseudoClass = FXCollections.observableSet();
-		graphic = new SimpleObjectProperty<>();
-		format.addListener(new ChangeListener<String>() {
+    /**
+     * Constructs a SpreadsheetCell with the given configuration.
+     * 
+     * @param row
+     * @param column
+     * @param rowSpan
+     * @param columnSpan
+     * @param type
+     */
+    public SpreadsheetCell(final int row, final int column, final int rowSpan, final int columnSpan,
+            final SpreadsheetCellType<?> type) {
+        this.row = row;
+        this.column = column;
+        this.rowSpan = rowSpan;
+        this.columnSpan = columnSpan;
+        this.type = type;
+        text = new SimpleStringProperty("");
+        format = new SimpleStringProperty("");
+        pseudoClass = FXCollections.observableSet();
+        graphic = new SimpleObjectProperty<>();
+        format.addListener(new ChangeListener<String>() {
             @Override
-            public void changed(ObservableValue<? extends String> arg0,
-                    String arg1, String arg2) {
+            public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
                 updateText();
             }
         });
-		getStyleClass().add("spreadsheet-cell");
-	}
-	
-	
+        getStyleClass().add("spreadsheet-cell");
+    }
 
-	/***************************************************************************
-	 * 
-	 * Abstract Methods
-	 * 
-	 **************************************************************************/
-
-	/**
-	 * Verify that the upcoming cell value can be set to the current cell.
-	 * This is currently used by the Copy/Paste.
-	 * 
-	 * @param cell
-     * @return true if the upcoming cell value can be set to the current cell.
-	 */
-	public boolean match(SpreadsheetCell cell) {
-		return type.match(cell);
-	}
-	
-	
-
-	/***************************************************************************
-	 * 
-	 * Properties
-	 * 
-	 ***************************************************************************/
-	
-	// --- item
-	private final ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
-		@Override protected void invalidated() {
-			updateText();
-		}
-	};
+    /***************************************************************************
+     * 
+     * Abstract Methods
+     * 
+     **************************************************************************/
 
     /**
-     * Sets the value of the property Item.
-     * This should be used only at initialization. Prefer {@link Grid#setCellValue(int, int, Object)}
-     * after because it will compute correctly the modifiedCell.
-     * If {@link #isEditable()} return false, nothing is done.
+     * Verify that the upcoming cell value can be set to the current cell. This
+     * is currently used by the Copy/Paste.
+     * 
+     * @param cell
+     * @return true if the upcoming cell value can be set to the current cell.
+     */
+    public boolean match(SpreadsheetCell cell) {
+        return type.match(cell);
+    }
+
+    /***************************************************************************
+     * 
+     * Properties
+     * 
+     ***************************************************************************/
+
+    // --- item
+    private final ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
+        @Override
+        protected void invalidated() {
+            updateText();
+        }
+    };
+
+    /**
+     * Sets the value of the property Item. This should be used only at
+     * initialization. Prefer {@link Grid#setCellValue(int, int, Object)} after
+     * because it will compute correctly the modifiedCell. If
+     * {@link #isEditable()} return false, nothing is done.
+     * 
      * @param value
      */
-	public final void setItem(Object value) {
-		if(isEditable())
-			item.set(value);
-	}
+    public final void setItem(Object value) {
+        if (isEditable())
+            item.set(value);
+    }
 
-	// auto-generated JavaDoc
-	public final Object getItem() {
-		return item.get();
-	}
+    // auto-generated JavaDoc
+    public final Object getItem() {
+        return item.get();
+    }
 
-	/**
-	 * The item property represents the currently-set value inside this
-	 * SpreadsheetCell instance.
-     * @return 
-	 */
-	public final ObjectProperty<?> itemProperty() {
-		return item;
-	}
-	
-	
-	// --- editable
-	private BooleanProperty editable;
-	
-	/**
+    /**
+     * The item property represents the currently-set value inside this
+     * SpreadsheetCell instance.
+     * 
+     * @return
+     */
+    public final ObjectProperty<?> itemProperty() {
+        return item;
+    }
+
+    // --- editable
+    private BooleanProperty editable;
+
+    /**
      * Return if this cell can be edited or not.
      * 
      * @return true if this cell is editable.
@@ -285,259 +278,263 @@ public class SpreadsheetCell {
     }
 
     // --- comment
- 	private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
- 	
- 	/**
-      * Return if this cell has a comment or not.
-      * 
-      * @return true if this cell has a comment.
-      */
-     public final boolean isCommented() {
-         return commented == null ? true : commented.get();
-     }
+    private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
 
-     /**
-      * Change the commented state of this cell.
-      * 
-      * @param flag
-      */
-     public final void setCommented(boolean flag) {
-    	 commentedProperty().set(flag);
-     }
+    /**
+     * Return if this cell has a comment or not.
+     * 
+     * @return true if this cell has a comment.
+     */
+    public final boolean isCommented() {
+        return commented == null ? true : commented.get();
+    }
 
-     /**
-      * The {@link BooleanProperty} linked with the commented state.
-      * 
-      * @return The {@link BooleanProperty} linked with the commented state.
-      */
-     public final BooleanProperty commentedProperty() {
-         return commented;
-     }
-     
-     /**
-      * The {@link StringProperty} linked with the format.
-      * 
-      * @return The {@link StringProperty} linked with the format state.
-      */
-     public final StringProperty formatProperty() {
-         return format;
-     }
-     
-     /**
-       * Return the format of this cell or an empty string
-       * if no format has been specified.
-       * 
-       * @return Return the format of this cell or an empty string
-       * if no format has been specified.
-       */
-      public final String getFormat() {
-          return format.get();
-      }
+    /**
+     * Change the commented state of this cell.
+     * 
+     * @param flag
+     */
+    public final void setCommented(boolean flag) {
+        commentedProperty().set(flag);
+    }
 
-      /**
-       * Set a new format for this Cell.
-       * You can specify how to represent the value in the cell.
-       * @param format
-       */
-      public final void setFormat(String format) {
-          formatProperty().set(format);
-      }
+    /**
+     * The {@link BooleanProperty} linked with the commented state.
+     * 
+     * @return The {@link BooleanProperty} linked with the commented state.
+     */
+    public final BooleanProperty commentedProperty() {
+        return commented;
+    }
 
-      public final ObservableSet<String> getPseudoClass() {
-          return pseudoClass;
-      }
+    /**
+     * The {@link StringProperty} linked with the format.
+     * 
+     * @return The {@link StringProperty} linked with the format state.
+     */
+    public final StringProperty formatProperty() {
+        return format;
+    }
 
-	/***************************************************************************
-	 * 
-	 * Public Methods
-	 * 
-	 **************************************************************************/
+    /**
+     * Return the format of this cell or an empty string if no format has been
+     * specified.
+     * 
+     * @return Return the format of this cell or an empty string if no format
+     *         has been specified.
+     */
+    public final String getFormat() {
+        return format.get();
+    }
 
-     /**
-      * Return the StringProperty of the representation of the value.
-      * @return
-      */
-     public final ReadOnlyStringProperty textProperty(){
-    	 return text;
-     }
-     
-	/**
-	 * Return the String representation currently used for display
-	 * in the {@link SpreadsheetView}.
-	 * @return text representation of the value.
-	 */
-	public final String getText(){
-		return text.get();
-	}
-	/**
-	 * Return the {@link SpreadsheetCellType} of this particular cell.
-	 * 
-	 * @return the {@link SpreadsheetCellType} of this particular cell.
-	 */
-	public final SpreadsheetCellType<?> getCellType() {
-		return type;
-	}
+    /**
+     * Set a new format for this Cell. You can specify how to represent the
+     * value in the cell.
+     * 
+     * @param format
+     */
+    public final void setFormat(String format) {
+        formatProperty().set(format);
+    }
 
-	/**
-	 * Return the row of this cell.
-	 * 
-	 * @return the row of this cell.
-	 */
-	public final int getRow() {
-		return row;
-	}
+    public final ObservableSet<String> getPseudoClass() {
+        return pseudoClass;
+    }
 
-	/**
-	 * Return the column of this cell.
-	 * 
-	 * @return the column of this cell.
-	 */
-	public final int getColumn() {
-		return column;
-	}
+    /***************************************************************************
+     * 
+     * Public Methods
+     * 
+     **************************************************************************/
 
-	/**
-	 * Return how much this cell is spanning in row, 1 is normal.
-	 * 
-	 * @return how much this cell is spanning in row, 1 is normal.
-	 */
-	public final int getRowSpan() {
-		return rowSpan;
-	}
+    /**
+     * Return the StringProperty of the representation of the value.
+     * 
+     * @return
+     */
+    public final ReadOnlyStringProperty textProperty() {
+        return text;
+    }
 
-	/**
-	 * Sets how much this cell is spanning in row. See {@link SpreadsheetCell}
-	 * description for information. You should use
-	 * {@link GridBase#spanRow(int, int, int)} instead of using this method
-	 * directly.
-	 * 
-	 * @param rowSpan
-	 */
-	public final void setRowSpan(int rowSpan) {
-		this.rowSpan = rowSpan;
-	}
+    /**
+     * Return the String representation currently used for display in the
+     * {@link SpreadsheetView}.
+     * 
+     * @return text representation of the value.
+     */
+    public final String getText() {
+        return text.get();
+    }
 
-	/**
-	 * Return how much this cell is spanning in column, 1 is normal.
-	 * @return how much this cell is spanning in column, 1 is normal.
-	 */
-	public final int getColumnSpan() {
-		return columnSpan;
-	}
+    /**
+     * Return the {@link SpreadsheetCellType} of this particular cell.
+     * 
+     * @return the {@link SpreadsheetCellType} of this particular cell.
+     */
+    public final SpreadsheetCellType<?> getCellType() {
+        return type;
+    }
 
-	/**
-	 * Sets how much this cell is spanning in column. See
-	 * {@link SpreadsheetCell} description for information. You should use
-	 * {@link GridBase#spanColumn(int, int, int)} instead of using this method
-	 * directly.
-	 * 
-	 * @param columnSpan
-	 */
-	public final void setColumnSpan(int columnSpan) {
-		this.columnSpan = columnSpan;
-	}
+    /**
+     * Return the row of this cell.
+     * 
+     * @return the row of this cell.
+     */
+    public final int getRow() {
+        return row;
+    }
 
-	/**
-	 * Return an ObservableList of String of all the style class associated with
-	 * this cell. You can easily modify its appearance by adding a style class
-	 * (previously set in CSS).
-	 * 
-	 * @return an ObservableList of String of all the style class
-	 */
-	public final ObservableSet<String> getStyleClass() {
-		if (styleClass == null) {
-			styleClass = FXCollections.observableSet();
-		}
-		return styleClass;
-	}
+    /**
+     * Return the column of this cell.
+     * 
+     * @return the column of this cell.
+     */
+    public final int getColumn() {
+        return column;
+    }
 
+    /**
+     * Return how much this cell is spanning in row, 1 is normal.
+     * 
+     * @return how much this cell is spanning in row, 1 is normal.
+     */
+    public final int getRowSpan() {
+        return rowSpan;
+    }
 
-	// A map containing a set of properties for this cell
-	private ObservableMap<Object, Object> properties;
+    /**
+     * Sets how much this cell is spanning in row. See {@link SpreadsheetCell}
+     * description for information. You should use
+     * {@link GridBase#spanRow(int, int, int)} instead of using this method
+     * directly.
+     * 
+     * @param rowSpan
+     */
+    public final void setRowSpan(int rowSpan) {
+        this.rowSpan = rowSpan;
+    }
 
-	/**
-	 * Returns an observable map of properties on this node for use primarily by
-	 * application developers.
-	 * 
-	 * @return an observable map of properties on this node for use primarily by
-	 *         application developers
-	 */
-	public final ObservableMap<Object, Object> getProperties() {
-		if (properties == null) {
-			properties = FXCollections.observableHashMap();
-		}
-		return properties;
-	}
+    /**
+     * Return how much this cell is spanning in column, 1 is normal.
+     * 
+     * @return how much this cell is spanning in column, 1 is normal.
+     */
+    public final int getColumnSpan() {
+        return columnSpan;
+    }
 
-	/**
-	 * Tests if Node has properties.
-	 * 
-	 * @return true if node has properties.
-	 */
-	public final boolean hasProperties() {
-		return properties != null && !properties.isEmpty();
-	}
+    /**
+     * Sets how much this cell is spanning in column. See
+     * {@link SpreadsheetCell} description for information. You should use
+     * {@link GridBase#spanColumn(int, int, int)} instead of using this method
+     * directly.
+     * 
+     * @param columnSpan
+     */
+    public final void setColumnSpan(int columnSpan) {
+        this.columnSpan = columnSpan;
+    }
 
-	public ObjectProperty<Node> graphicProperty(){
-	    return graphic;
-	}
-	
-	/**
-	 * Set a graphic for this cell to display aside with the text.
-	 * @param graphic
-	 */
-	public void setGraphic(Node graphic){
-	    this.graphic.set(graphic);
-	}
-	
-	/**
-	 * Return the graphic node associated with this cell. 
-	 * Return null if nothing has been associated.
-	 * @return
-	 */
-	public Node getGraphic(){
-	    return graphic.get();
-	}
-	
-	
-	/***************************************************************************
-	 * 
-	 * Overridden Methods
-	 * 
-	 **************************************************************************/
+    /**
+     * Return an ObservableList of String of all the style class associated with
+     * this cell. You can easily modify its appearance by adding a style class
+     * (previously set in CSS).
+     * 
+     * @return an ObservableList of String of all the style class
+     */
+    public final ObservableSet<String> getStyleClass() {
+        if (styleClass == null) {
+            styleClass = FXCollections.observableSet();
+        }
+        return styleClass;
+    }
 
-	/** {@inheritDoc} */
-	@Override public String toString() {
-		return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
-	}
+    // A map containing a set of properties for this cell
+    private ObservableMap<Object, Object> properties;
 
-	/** {@inheritDoc} */
-	@Override public boolean equals(Object obj) {
-		if (!(obj instanceof SpreadsheetCell))
-			return false;
+    /**
+     * Returns an observable map of properties on this node for use primarily by
+     * application developers.
+     * 
+     * @return an observable map of properties on this node for use primarily by
+     *         application developers
+     */
+    public final ObservableMap<Object, Object> getProperties() {
+        if (properties == null) {
+            properties = FXCollections.observableHashMap();
+        }
+        return properties;
+    }
 
-		final SpreadsheetCell cell = (SpreadsheetCell) obj;
-            return cell != null && cell.getRow() == row && cell.getColumn() == column
-                    && cell.getText().equals(getText());
-	}
+    /**
+     * Tests if Node has properties.
+     * 
+     * @return true if node has properties.
+     */
+    public final boolean hasProperties() {
+        return properties != null && !properties.isEmpty();
+    }
 
-	
-	
-	/***************************************************************************
-	 * 
-	 * Private Implementation
-	 * 
-	 **************************************************************************/
+    public ObjectProperty<Node> graphicProperty() {
+        return graphic;
+    }
 
-	/**
-	 * Update the text for the SpreadsheetView.
-	 */
-	@SuppressWarnings("unchecked")
-	private void updateText() {
-	    if(getFormat() != ""){
-	        text.setValue(type.toString(getItem(), getFormat()));
-	    }else{
-	        text.setValue(type.toString(getItem()));
-	    }
-	}
+    /**
+     * Set a graphic for this cell to display aside with the text.
+     * 
+     * @param graphic
+     */
+    public void setGraphic(Node graphic) {
+        this.graphic.set(graphic);
+    }
+
+    /**
+     * Return the graphic node associated with this cell. Return null if nothing
+     * has been associated.
+     * 
+     * @return
+     */
+    public Node getGraphic() {
+        return graphic.get();
+    }
+
+    /***************************************************************************
+     * 
+     * Overridden Methods
+     * 
+     **************************************************************************/
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SpreadsheetCell))
+            return false;
+
+        final SpreadsheetCell cell = (SpreadsheetCell) obj;
+        return cell != null && cell.getRow() == row && cell.getColumn() == column && cell.getText().equals(getText());
+    }
+
+    /***************************************************************************
+     * 
+     * Private Implementation
+     * 
+     **************************************************************************/
+
+    /**
+     * Update the text for the SpreadsheetView.
+     */
+    @SuppressWarnings("unchecked")
+    private void updateText() {
+        if (!("").equals(getFormat())) {
+            text.setValue(type.toString(getItem(), getFormat()));
+        } else {
+            text.setValue(type.toString(getItem()));
+        }
+    }
 }

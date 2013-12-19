@@ -532,7 +532,7 @@ public abstract class SpreadsheetCellEditor {
             super(view);
             this.itemList = itemList;
             cb = new ComboBox<String>();
-            cb.setVisibleRowCount(3);
+            cb.setVisibleRowCount(5);
         }
 
         /***************************************************************************

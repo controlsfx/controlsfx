@@ -69,6 +69,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     private CheckBox rowHeader = new CheckBox();
     private CheckBox columnHeader = new CheckBox();
     private CheckBox editable = new CheckBox();
+    private CheckBox spanPresent = new CheckBox();
     
     @Override public String getSampleName() {
         return "SpreadsheetView";
@@ -77,13 +78,12 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     @Override
     public Node getPanel(Stage stage) {
         centerPane = new StackPane();
-        centerPane.setPadding(new Insets(15));
 
         int rowCount = 50;
         int columnCount = 10;
 
         GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-        buildGrid(grid,1);//Build both Grid
+        buildGrid(grid, true);//Build both Grid
 
         generateSpreadsheetView(grid);
         centerPane.getChildren().setAll(spreadSheetView);
@@ -208,9 +208,9 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      * @param grid
      * @param type
      */
-    private void buildGrid(GridBase grid, int type){
+    private void buildGrid(GridBase grid, boolean span){
         normalGrid(grid);
-        if(type == 0){
+        if(span){
             buildBothGrid(grid);
         }
     }
@@ -317,24 +317,25 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.editableProperty().bind(editable.selectedProperty());
 
         // span style
-        Label spanModelLabel = new Label("Span model: ");
+        Label spanModelLabel = new Label("Span : ");
         spanModelLabel.getStyleClass().add("property");
         grid.add(spanModelLabel, 0, row);
+        spanPresent = new CheckBox();
+        spanPresent.setSelected(true);
         
-        final ChoiceBox<String> typeOfGrid = new ChoiceBox<String>(FXCollections.observableArrayList("Normal", "Both"));
-        typeOfGrid.setValue(gridType);
-        typeOfGrid.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+        spanPresent.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
                     int rowCount = 50;
                     int columnCount = 10;
                     GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
-                    buildGrid(grid, arg2.intValue());
+                    buildGrid(grid, arg2);
 
                     generateSpreadsheetView(grid);
                     centerPane.getChildren().setAll(spreadSheetView);
             }
         });
-        grid.add(typeOfGrid, 1, row++);
+        
+        grid.add(spanPresent, 1, row++);
         
         Label typeOfCellLabel = new Label("Type of cell: ");
         typeOfCellLabel.getStyleClass().add("property");
@@ -361,7 +362,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
                     int columnCount = 10;
                     GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
                     
-                    buildGrid(grid, typeOfGrid.getSelectionModel().getSelectedIndex());
+                    buildGrid(grid, spanPresent.isSelected());
 
                     generateSpreadsheetView(grid);
                     centerPane.getChildren().setAll(spreadSheetView);

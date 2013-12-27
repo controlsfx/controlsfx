@@ -48,6 +48,8 @@ import com.sun.javafx.scene.control.SelectedCellsMap;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -223,11 +225,11 @@ public class SpreadsheetView extends Control {
     private Grid grid;
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();;
-    private final ObservableList<SpreadsheetColumn<?>> fixedColumns = FXCollections.observableArrayList();;
+    private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();;
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
-    private ObservableList<SpreadsheetColumn<?>> columns = FXCollections.observableArrayList();
+    private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
     private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
@@ -431,7 +433,7 @@ public class SpreadsheetView extends Control {
      * 
      * @return An unmodifiable observableList.
      */
-    public ObservableList<SpreadsheetColumn<?>> getColumns() {
+    public ObservableList<SpreadsheetColumn> getColumns() {
         return FXCollections.unmodifiableObservableList(columns);
     }
 
@@ -531,7 +533,7 @@ public class SpreadsheetView extends Control {
      * 
      * @return an ObservableList of the fixed columns.
      */
-    public ObservableList<SpreadsheetColumn<?>> getFixedColumns() {
+    public ObservableList<SpreadsheetColumn> getFixedColumns() {
         return fixedColumns;
     }
 
@@ -755,6 +757,34 @@ public class SpreadsheetView extends Control {
         }
     }
 
+    public SpreadsheetViewState saveState() {
+        return new SpreadsheetViewState(this);
+    }
+
+    public void restoreState(final SpreadsheetViewState state) {
+        if (state == null)
+            return;
+        setShowRowHeader(state.showRowHeader);
+        setShowColumnHeader(state.showColumnHeader);
+
+        // The skin is not set in place right after the initialization
+        // So we have to use this trick in order to be sure to affect the VBar
+        // value
+        cellsView.skinProperty().addListener(new ChangeListener<Skin<?>>() {
+            @Override
+            public void changed(ObservableValue<? extends Skin<?>> arg0, Skin<?> oldSkin, final Skin<?> newSkin) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((GridViewSkin) newSkin).getVBar().setValue(state.vBarValue);
+                        ((GridViewSkin) newSkin).getHBar().setValue(state.hBarValue);
+                    }
+                });
+                cellsView.skinProperty().removeListener(this);
+            }
+        });
+    }
+
     /***************************************************************************
      * * Private/Protected Implementation * *
      **************************************************************************/
@@ -872,7 +902,7 @@ public class SpreadsheetView extends Control {
                     }
                 });
                 cellsView.getColumns().add(column);
-                final SpreadsheetColumn<?> spreadsheetColumns = new SpreadsheetColumn<>(column, this, i);
+                final SpreadsheetColumn spreadsheetColumns = new SpreadsheetColumn(column, this, i);
                 columns.add(spreadsheetColumns);
             }
         }
@@ -1738,13 +1768,13 @@ public class SpreadsheetView extends Control {
         }
     };
 
-    private ListChangeListener<SpreadsheetColumn<?>> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn<?>>() {
+    private ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
         @Override
-        public void onChanged(Change<? extends SpreadsheetColumn<?>> c) {
+        public void onChanged(Change<? extends SpreadsheetColumn> c) {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    List<? extends SpreadsheetColumn<?>> newColumns = c.getAddedSubList();
-                    for (SpreadsheetColumn<?> column : newColumns) {
+                    List<? extends SpreadsheetColumn> newColumns = c.getAddedSubList();
+                    for (SpreadsheetColumn column : newColumns) {
                         if (!column.isColumnFixable()) {
                             throw new IllegalArgumentException(computeReason(column));
                         }
@@ -1753,7 +1783,7 @@ public class SpreadsheetView extends Control {
             }
         }
 
-        private String computeReason(SpreadsheetColumn<?> element) {
+        private String computeReason(SpreadsheetColumn element) {
             int indexColumn = getColumns().indexOf(element);
 
             String reason = "\n This column cannot be fixed.";

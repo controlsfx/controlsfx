@@ -317,9 +317,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * We listen on the FixedColumns in order to do the modification in the
      * VirtualFlow
      */
-    private final ListChangeListener<SpreadsheetColumn<?>> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn<?>>() {
+    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
         @Override
-        public void onChanged(Change<? extends SpreadsheetColumn<?>> c) {
+        public void onChanged(Change<? extends SpreadsheetColumn> c) {
             if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
                 for (int i = 0; i < getFlow().getCells().size(); ++i) {
                     ((GridRow) getFlow().getCells().get(i))

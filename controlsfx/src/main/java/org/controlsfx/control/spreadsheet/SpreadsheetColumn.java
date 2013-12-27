@@ -72,7 +72,7 @@ import javafx.scene.control.TableColumn;
  * 
  * @see SpreadsheetView
  */
-public class SpreadsheetColumn<T> {
+public class SpreadsheetColumn {
 
     /***************************************************************************
      * * Private Fields * *

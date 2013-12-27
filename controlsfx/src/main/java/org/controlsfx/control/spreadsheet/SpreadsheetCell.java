@@ -335,6 +335,7 @@ public class SpreadsheetCell {
      */
     public final void setFormat(String format) {
         formatProperty().set(format);
+        updateText();
     }
 
     public final ObservableSet<String> getPseudoClass() {

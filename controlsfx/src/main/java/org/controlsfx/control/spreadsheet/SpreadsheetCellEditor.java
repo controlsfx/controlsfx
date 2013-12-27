@@ -396,7 +396,16 @@ public abstract class SpreadsheetCellEditor {
                 @Override
                 public void handle(KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
-                        endEdit(true);
+                        try {
+                            if (tf.getText().equals("")) {
+                                endEdit(true);
+                            } else {
+                                Double.parseDouble(tf.getText());
+                                endEdit(true);
+                            }
+                        } catch (Exception e) {
+                        }
+
                     } else if (t.getCode() == KeyCode.ESCAPE) {
                         endEdit(false);
                     }
@@ -486,7 +495,16 @@ public abstract class SpreadsheetCellEditor {
                 @Override
                 public void handle(KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
-                        endEdit(true);
+                        try {
+                            if (tf.getText().equals("")) {
+                                endEdit(true);
+                            } else {
+                                Integer.parseInt(tf.getText());
+                                endEdit(true);
+                            }
+                        } catch (Exception e) {
+                        }
+
                     } else if (t.getCode() == KeyCode.ESCAPE) {
                         endEdit(false);
                     }
@@ -546,8 +564,7 @@ public abstract class SpreadsheetCellEditor {
             } else {
                 originalValue = null;
             }
-            ObservableList<String> items = FXCollections
-                    .observableList(itemList);
+            ObservableList<String> items = FXCollections.observableList(itemList);
             cb.setItems(items);
             cb.setValue(originalValue);
 
@@ -614,8 +631,7 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
-        public DateEditor(SpreadsheetView view,
-                StringConverter<LocalDate> converter) {
+        public DateEditor(SpreadsheetView view, StringConverter<LocalDate> converter) {
             super(view);
             datePicker = new DatePicker();
             datePicker.setConverter(converter);
@@ -681,8 +697,7 @@ public abstract class SpreadsheetCellEditor {
 
             cl = new ChangeListener<LocalDate>() {
                 @Override
-                public void changed(ObservableValue<? extends LocalDate> arg0,
-                        LocalDate arg1, LocalDate arg2) {
+                public void changed(ObservableValue<? extends LocalDate> arg0, LocalDate arg1, LocalDate arg2) {
                     if (!ending)
                         endEdit(true);
                 }

@@ -123,7 +123,8 @@ public class GridCellEditor {
 				end();
 				spreadsheetCellEditor.end();
 			}
-		}else if(viewCell != null){
+		}
+		if(viewCell != null){
 			viewCell.cancelEdit();
 			end();
 			spreadsheetCellEditor.end();
@@ -158,7 +159,7 @@ public class GridCellEditor {
 		il = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable observable) {
-				endEdit(false);
+				endEdit(true);
 			}
 		};
 
@@ -168,7 +169,7 @@ public class GridCellEditor {
 		editorListener = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable arg0) {
-				endEdit(false);
+				endEdit(true);
 			}
 		};
 		handle.getCellsViewSkin().getVBar().valueProperty().addListener(editorListener);

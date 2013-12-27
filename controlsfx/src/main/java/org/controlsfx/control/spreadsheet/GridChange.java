@@ -31,27 +31,24 @@ import javafx.event.Event;
 import javafx.event.EventType;
 
 /**
- *
+ * 
  * This class represents a single change happening in a {@link Grid}.
  */
 public class GridChange extends Event implements Serializable {
-    
-    public static final EventType<GridChange> GRID_CHANGE_EVENT
-    = new EventType<>(Event.ANY, "GridChange");
+
+    public static final EventType<GridChange> GRID_CHANGE_EVENT = new EventType<>(Event.ANY, "GridChange");
 
     /**
      * *************************************************************************
-     *                                                                         *
-     * Static field * *
-     *************************************************************************
+     * * Static field * *
+     ************************************************************************* 
      */
     private static final long serialVersionUID = 210644901287223524L;
 
     /**
      * *************************************************************************
-     *                                                                         *
-     * Private Fields * *
-     *************************************************************************
+     * * Private Fields * *
+     ************************************************************************* 
      */
     private final int row;
     private final int column;
@@ -60,14 +57,13 @@ public class GridChange extends Event implements Serializable {
 
     /**
      * *************************************************************************
-     *                                                                         *
-     * Constructor *
-     *************************************************************************
+     * * Constructor *
+     ************************************************************************* 
      */
     /**
      * Constructor of a GridChange when a change inside a
      * {@link SpreadsheetCell} is happening.
-     *
+     * 
      * @param row
      * @param column
      * @param oldValue
@@ -83,13 +79,12 @@ public class GridChange extends Event implements Serializable {
 
     /**
      * *************************************************************************
-     *                                                                         *
-     * Public methods * *
-     *************************************************************************
+     * * Public methods * *
+     ************************************************************************* 
      */
     /**
      * Return the row number of this change.
-     *
+     * 
      * @return the row number of this change.
      */
     public int getRow() {
@@ -98,7 +93,7 @@ public class GridChange extends Event implements Serializable {
 
     /**
      * Return the column number of this change.
-     *
+     * 
      * @return the column number of this change.
      */
     public int getColumn() {
@@ -107,7 +102,7 @@ public class GridChange extends Event implements Serializable {
 
     /**
      * Return the value before the change.
-     *
+     * 
      * @return the value before the change.
      */
     public Object getOldValue() {
@@ -116,7 +111,7 @@ public class GridChange extends Event implements Serializable {
 
     /**
      * Return the value after the change.
-     *
+     * 
      * @return the value after the change.
      */
     public Object getNewValue() {

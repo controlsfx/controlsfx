@@ -93,9 +93,10 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * Default constructor.
      */
-    public SpreadsheetCellType(){
-        
+    public SpreadsheetCellType() {
+
     }
+
     /**
      * Constructor with the StringConverter directly provided.
      * 

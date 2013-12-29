@@ -62,13 +62,10 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
-}
 
-
-afterEvaluate {
-    processResources {
-        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.version])
-   }
+    manifest {
+        attributes 'Implementation-Title': 'ControlsFX', 'Implementation-Version': project.version
+    }
 }
 
 task sourceJar(type: Jar) {

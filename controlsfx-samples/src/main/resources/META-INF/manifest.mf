@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: ControlsFX-Samples
-Implementation-Version: @version@
-

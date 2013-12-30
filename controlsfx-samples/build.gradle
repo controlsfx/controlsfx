@@ -41,6 +41,11 @@ dependencies {
     }
 }
 
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'ControlsFX-Samples', 'Implementation-Version': project.version
+    }
+}
 
 task sourceJar(type: Jar) {
     from sourceSets.main.java
@@ -77,12 +82,6 @@ task enumerateSamples() {
 processResources.dependsOn(enumerateSamples)
 gradle.taskGraph.whenReady {
     enumerateSamples.enabled = gradle.taskGraph.hasTask(":$project.name:jfxDeploy")
-}
-
-afterEvaluate {
-    processResources {
-        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.version])
-    }
 }
 
 jfxJar {

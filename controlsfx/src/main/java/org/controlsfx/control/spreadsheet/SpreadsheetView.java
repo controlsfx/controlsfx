@@ -48,11 +48,11 @@ import com.sun.javafx.scene.control.SelectedCellsMap;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -222,10 +222,10 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     private final SpreadsheetGridView cellsView;// The main cell container.
-    private Grid grid;
+    private SimpleObjectProperty<Grid> gridProperty = new SimpleObjectProperty<>();
     private DataFormat fmt;
-    private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();;
-    private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();;
+    private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
+    private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -360,8 +360,6 @@ public class SpreadsheetView extends Control {
             }
         });
 
-        initRowFix(grid);
-
         /**
          * ContextMenu handling.
          */
@@ -405,18 +403,99 @@ public class SpreadsheetView extends Control {
         fixedRows.addListener(fixedRowsListener);
         fixedColumns.addListener(fixedColumnsListener);
 
-        grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, new EventHandler<GridChange>() {
-            @Override
-            public void handle(GridChange change) {
-                modifiedCells.add(grid.getRows().get(change.getRow()).get(change.getColumn()));
-            }
-        });
         // getModifiedCells().addListener(modifiedCellsListener);
     }
 
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
+
+    /**
+     * Set a new Grid for the SpreadsheetView. This will be called by default by
+     * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
+     * refresh your SpreadsheetView with a new model. This will keep the state
+     * of your SpreadsheetView (position of the bar, number of fixedRows etc).
+     * 
+     * @param Grid
+     *            the new Grid
+     */
+    public final void setGrid(Grid grid) {
+        gridProperty.set(grid);
+        initRowFix(grid);
+
+        /**
+         * We need to verify that the previous fixedRows are still compatible
+         * with our new model
+         */
+        List<Integer> rowsToBeRemoved = new ArrayList<>();
+        for (Integer rowFixed : getFixedRows()) {
+            if (!isRowFixable(rowFixed)) {
+                rowsToBeRemoved.add(rowFixed);
+            }
+        }
+        getFixedRows().removeAll(rowsToBeRemoved);
+
+        /**
+         * We need to store the index of the fixedColumns and clear then because
+         * we will keep reference to SpreadsheetColumn that no longer exist.
+         */
+        List<Integer> columnsFixed = new ArrayList<>();
+        for (SpreadsheetColumn column : getFixedColumns()) {
+            columnsFixed.add(getColumns().indexOf(column));
+        }
+        getFixedColumns().clear();
+
+        // TODO move into a property
+        if (grid.getRows() != null) {
+            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
+                    .observableArrayList(grid.getRows());
+            cellsView.getItems().clear();
+            cellsView.getColumns().clear();
+            cellsView.setItems(observableRows);
+
+            final int columnCount = grid.getColumnCount();
+            columns.clear();
+            for (int i = 0; i < columnCount; ++i) {
+                final int col = i;
+
+                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
+                        getEquivColumn(col));
+
+                column.setEditable(true);
+                // We don't want to sort the column
+                column.setSortable(false);
+
+                column.impl_setReorderable(false);
+
+                // We assign a DataCell for each Cell needed (MODEL).
+                column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell>, ObservableValue<SpreadsheetCell>>() {
+                    @Override
+                    public ObservableValue<SpreadsheetCell> call(
+                            TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
+                        return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
+                    }
+                });
+                // We create a SpreadsheetCell for each DataCell in order to
+                // specify how to represent the DataCell(VIEW)
+                column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
+                    @Override
+                    public TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> call(
+                            TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
+                        return new CellView(handle);
+                    }
+                });
+                cellsView.getColumns().add(column);
+                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
+                columns.add(spreadsheetColumn);
+                // We verify if this column was fixed before and try to re-fix
+                // it.
+                if (columnsFixed.contains((Integer) i) && spreadsheetColumn.isColumnFixable()) {
+                    spreadsheetColumn.setFixed(true);
+                }
+            }
+            grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, gridChangeEventHandler);
+        }
+    }
 
     /**
      * Return a {@link TablePosition} of cell being currently edited.
@@ -443,7 +522,11 @@ public class SpreadsheetView extends Control {
      * @return the model Grid used by the SpreadsheetView
      */
     public final Grid getGrid() {
-        return grid;
+        return gridProperty.get();
+    }
+
+    public final ReadOnlyObjectProperty<Grid> gridProperty() {
+        return gridProperty;
     }
 
     private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true);
@@ -753,36 +836,8 @@ public class SpreadsheetView extends Control {
      */
     public void deleteSelectedCells() {
         for (TablePosition<ObservableList<SpreadsheetCell>, ?> position : getSelectionModel().getSelectedCells()) {
-            grid.setCellValue(position.getRow(), position.getColumn(), null);
+            getGrid().setCellValue(position.getRow(), position.getColumn(), null);
         }
-    }
-
-    public SpreadsheetViewState saveState() {
-        return new SpreadsheetViewState(this);
-    }
-
-    public void restoreState(final SpreadsheetViewState state) {
-        if (state == null)
-            return;
-        setShowRowHeader(state.showRowHeader);
-        setShowColumnHeader(state.showColumnHeader);
-
-        // The skin is not set in place right after the initialization
-        // So we have to use this trick in order to be sure to affect the VBar
-        // value
-        cellsView.skinProperty().addListener(new ChangeListener<Skin<?>>() {
-            @Override
-            public void changed(ObservableValue<? extends Skin<?>> arg0, Skin<?> oldSkin, final Skin<?> newSkin) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((GridViewSkin) newSkin).getVBar().setValue(state.vBarValue);
-                        ((GridViewSkin) newSkin).getHBar().setValue(state.hBarValue);
-                    }
-                });
-                cellsView.skinProperty().removeListener(this);
-            }
-        });
     }
 
     /***************************************************************************
@@ -838,10 +893,10 @@ public class SpreadsheetView extends Control {
      * @return
      */
     private SpanType getSpanType(final int row, final int column) {
-        if (grid == null) {
+        if (getGrid() == null) {
             return SpanType.NORMAL_CELL;
         }
-        return grid.getSpanType(this, row, column);
+        return getGrid().getSpanType(this, row, column);
     }
 
     /**
@@ -853,59 +908,6 @@ public class SpreadsheetView extends Control {
     private GridRow getNonFixedRow(int index) {
         GridViewSkin skin = (GridViewSkin) cellsView.getSkin();
         return skin.getRow(index);
-    }
-
-    /**
-     * Set a grid for the SpreadsheetView.
-     * 
-     * @param grid
-     */
-    private final void setGrid(Grid grid) {
-        this.grid = grid;
-
-        // TODO move into a property
-        if (grid.getRows() != null) {
-            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
-                    .observableArrayList(grid.getRows());
-            cellsView.getItems().clear();
-            cellsView.setItems(observableRows);
-
-            final int columnCount = grid.getColumnCount();
-            columns.clear();
-            for (int i = 0; i < columnCount; ++i) {
-                final int col = i;
-
-                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
-                        getEquivColumn(col));
-
-                column.setEditable(true);
-                // We don't want to sort the column
-                column.setSortable(false);
-
-                column.impl_setReorderable(false);
-
-                // We assign a DataCell for each Cell needed (MODEL).
-                column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell>, ObservableValue<SpreadsheetCell>>() {
-                    @Override
-                    public ObservableValue<SpreadsheetCell> call(
-                            TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
-                    }
-                });
-                // We create a SpreadsheetCell for each DataCell in order to
-                // specify how to represent the DataCell(VIEW)
-                column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
-                    @Override
-                    public TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> call(
-                            TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new CellView(handle);
-                    }
-                });
-                cellsView.getColumns().add(column);
-                final SpreadsheetColumn spreadsheetColumns = new SpreadsheetColumn(column, this, i);
-                columns.add(spreadsheetColumns);
-            }
-        }
     }
 
     /**
@@ -1799,21 +1801,10 @@ public class SpreadsheetView extends Control {
         }
     };
 
-    /*
-     * private SetChangeListener<SpreadsheetCell> modifiedCellsListener = new
-     * SetChangeListener<SpreadsheetCell>(){
-     * 
-     * @Override public void onChanged(Change<? extends SpreadsheetCell> arg0) {
-     * if (arg0.wasAdded()) { SpreadsheetCell cell = arg0.getElementAdded(); //
-     * cell.getPseudoClass().remove("DEFAULT"); //
-     * cell.getPseudoClass().add("MODIFIED"); //
-     * if(!cell.getStyleClass().contains("modified")) //
-     * cell.getStyleClass().add("modified"); }else if(arg0.wasRemoved()){
-     * SpreadsheetCell cell = arg0.getElementRemoved(); //
-     * cell.getPseudoClass().remove("MODIFIED"); //
-     * cell.getPseudoClass().add("DEFAULT"); // SpreadsheetCell cell =
-     * arg0.getElementRemoved(); //
-     * if(cell.getStyleClass().contains("modified")) //
-     * cell.getStyleClass().remove("modified"); } } };
-     */
+    private EventHandler<GridChange> gridChangeEventHandler = new EventHandler<GridChange>() {
+        @Override
+        public void handle(GridChange change) {
+            modifiedCells.add(getGrid().getRows().get(change.getRow()).get(change.getColumn()));
+        }
+    };
 }

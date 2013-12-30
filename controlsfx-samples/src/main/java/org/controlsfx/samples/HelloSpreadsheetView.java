@@ -52,7 +52,6 @@ import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
-import org.controlsfx.control.spreadsheet.SpreadsheetViewState;
 
 /**
  * 
@@ -71,7 +70,6 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     private CheckBox columnHeader = new CheckBox();
     private CheckBox editable = new CheckBox();
     private CheckBox spanPresent = new CheckBox();
-    private SpreadsheetViewState state;
 
     @Override
     public String getSampleName() {
@@ -88,7 +86,11 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
         buildGrid(grid, true);// Build both Grid
 
-        generateSpreadsheetView(grid);
+        spreadSheetView = new SpreadsheetView(grid);
+        spreadSheetView.setShowRowHeader(rowHeader.isSelected());
+        spreadSheetView.setShowColumnHeader(columnHeader.isSelected());
+        spreadSheetView.setEditable(editable.isSelected());
+        
         centerPane.getChildren().setAll(spreadSheetView);
 
         return centerPane;
@@ -206,16 +208,6 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             }
         }
         return cell;
-    }
-
-    private void generateSpreadsheetView(GridBase grid) {
-        if (spreadSheetView != null)
-            state = spreadSheetView.saveState();
-        spreadSheetView = new SpreadsheetView(grid);
-        spreadSheetView.setShowRowHeader(rowHeader.isSelected());
-        spreadSheetView.setShowColumnHeader(columnHeader.isSelected());
-        spreadSheetView.setEditable(editable.isSelected());
-        spreadSheetView.restoreState(state);
     }
 
     /**
@@ -356,7 +348,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
                 GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
                 buildGrid(grid, arg2);
 
-                generateSpreadsheetView(grid);
+                spreadSheetView.setGrid(grid);
                 centerPane.getChildren().setAll(spreadSheetView);
             }
         });
@@ -393,7 +385,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
 
                 buildGrid(grid, spanPresent.isSelected());
 
-                generateSpreadsheetView(grid);
+                spreadSheetView.setGrid(grid);
                 centerPane.getChildren().setAll(spreadSheetView);
             }
         });

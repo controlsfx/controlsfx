@@ -44,6 +44,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
+import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -106,6 +107,14 @@ public class VerticalHeader extends StackPane {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number oldHeight, Number newHeight) {
                 horizontalHeaderHeight = newHeight.doubleValue();
+                requestLayout();
+            }
+        });
+        
+        //When the Grid is changing, we need to update our information.
+        skin.handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
+            @Override
+            public void changed(ObservableValue<? extends Grid> arg0, Grid arg1, Grid arg2) {
                 requestLayout();
             }
         });

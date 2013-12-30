@@ -31,11 +31,16 @@ import javafx.event.Event;
 import javafx.event.EventType;
 
 /**
- * 
  * This class represents a single change happening in a {@link Grid}.
+ * 
+ * @see Grid
+ * @see GridBase
  */
 public class GridChange extends Event implements Serializable {
 
+    /**
+     * This is the event used by {@link GridChange}.
+     */
     public static final EventType<GridChange> GRID_CHANGE_EVENT = new EventType<>(Event.ANY, "GridChange");
 
     /**

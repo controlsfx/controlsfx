@@ -47,11 +47,11 @@ import javafx.scene.Node;
  * You will provide them when constructing a {@link Grid}.
  * 
  * <br/>
- * FIXME Add Format description <h3>SpreadsheetCell Types</h3> Each
- * SpreadsheetCell has its own {@link SpreadsheetCellType}. Different
- * {@link SpreadsheetCellType SpreadsheetCellTypes} are available depending on
- * the data you want to represent in your {@link SpreadsheetView}. MoreOver,
- * each {@link SpreadsheetCellType} has its own {@link SpreadsheetCellEditor} in
+ * <h3>SpreadsheetCell Types</h3> Each SpreadsheetCell has its own
+ * {@link SpreadsheetCellType}. Different {@link SpreadsheetCellType
+ * SpreadsheetCellTypes} are available depending on the data you want to
+ * represent in your {@link SpreadsheetView}. MoreOver, each
+ * {@link SpreadsheetCellType} has its own {@link SpreadsheetCellEditor} in
  * order to control very closely the possible modifications.
  * 
  * <p>
@@ -80,7 +80,7 @@ import javafx.scene.Node;
  * {@link SpreadsheetCellType#createCell(int, int, int, int, Object)}. You will
  * also have to provide a custom {@link SpreadsheetCellEditor}.
  * 
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * You will have to indicate the coordinates of the cell together with the
  * {@link #setRowSpan(int) row} and {@link #setColumnSpan(int) column} span. You
  * can specify if you want the cell to be editable or not using
@@ -88,8 +88,66 @@ import javafx.scene.Node;
  * that the cell will replace all the cells situated in the rowSpan range. Same
  * with the column span. The best way to handle spanning is to fill your grid
  * with unique cells, and then call {@link GridBase#spanColumn(int, int, int)}
- * or {@link GridBase#spanRow(int, int, int)}.
+ * or {@link GridBase#spanRow(int, int, int)}. <br>
  * 
+ * <h3>Format</h3>
+ * Your cell can have its very own format. If you want to display some dates
+ * with different format, you just have to create a unique
+ * {@link SpreadsheetCellType} and then specify for each cell their format with
+ * {@link #setFormat(String)}. You will then have the guaranty that all your
+ * cell will have a LocalDate as a value, but the value will be displayed
+ * differently for each cell. This will also guaranty that copy/paste and other
+ * operation will be compatible since every cell will share the same
+ * {@link SpreadsheetCellType}. <br>
+ * Here an example : <br>
+ * 
+ * 
+ * <pre>
+ * SpreadsheetCell cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan,
+ *         LocalDate.now().plusDays((int) (Math.random() * 10)));
+ * final double random = Math.random();
+ * if (random &lt; 0.25) {
+ *     cell.setFormat(&quot;EEEE d&quot;);
+ * } else if (random &lt; 0.5) {
+ *     cell.setFormat(&quot;dd/MM :YY&quot;);
+ * } else {
+ *     cell.setFormat(&quot;dd/MM/YYYY&quot;);
+ * }
+ * </pre>
+ * 
+ * <center><img src="dateFormat.png"></center>
+ * 
+ * <h3>Graphic</h3>
+ * Each cell can have a graphic to display next to the text in the cells. Just
+ * use the {@link #setGraphic(Node)} in order to specify the graphic you want,
+ * for example :
+ * 
+ * <pre>
+ * cell.setGraphic(new ImageView(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;))));
+ * </pre>
+ * 
+ * <center><img src="graphicNodeToCell.png"></center>
+ * 
+ * <h3>Style with CSS</h3>
+ * You can style your cell by specifying some styleClass with
+ * {@link #getStyleClass()}. You just have to create and custom that class in
+ * your CSS stylesheet associated with your {@link SpreadsheetView}. Also note
+ * that all {@link SpreadsheetCell} have a "spreadsheet-cell" styleClass added
+ * by default. Here is a example :<br>
+ * 
+ * <pre>
+ * cell.getStyleClass().add(&quot;row_header&quot;);
+ * </pre>
+ * 
+ * And in the CSS:
+ * 
+ * <pre>
+ *  .spreadsheet-cell.row_header{
+ *     -fx-background-color: #b4d4ad ;
+ *     -fx-background-insets: 0, 0 1 1 0;
+ *     -fx-alignment: center;
+ * }
+ * </pre>
  * 
  * <h3>Examples</h3>
  * Here is an example that uses all the pre-built {@link SpreadsheetCellType}
@@ -123,6 +181,7 @@ import javafx.scene.Node;
  * 
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor
+ * @see SpreadsheetCellType
  */
 public class SpreadsheetCell {
 
@@ -140,7 +199,6 @@ public class SpreadsheetCell {
     private int columnSpan;
     private final StringProperty format;
     private final StringProperty text;
-    private final ObservableSet<String> pseudoClass;
     private final ObjectProperty<Node> graphic;
 
     private ObservableSet<String> styleClass;
@@ -174,7 +232,6 @@ public class SpreadsheetCell {
         this.type = type;
         text = new SimpleStringProperty("");
         format = new SimpleStringProperty("");
-        pseudoClass = FXCollections.observableSet();
         graphic = new SimpleObjectProperty<>();
         format.addListener(new ChangeListener<String>() {
             @Override
@@ -336,10 +393,6 @@ public class SpreadsheetCell {
     public final void setFormat(String format) {
         formatProperty().set(format);
         updateText();
-    }
-
-    public final ObservableSet<String> getPseudoClass() {
-        return pseudoClass;
     }
 
     /***************************************************************************

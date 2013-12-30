@@ -416,7 +416,7 @@ public class SpreadsheetView extends Control {
      * refresh your SpreadsheetView with a new model. This will keep the state
      * of your SpreadsheetView (position of the bar, number of fixedRows etc).
      * 
-     * @param Grid
+     * @param grid
      *            the new Grid
      */
     public final void setGrid(Grid grid) {
@@ -801,7 +801,7 @@ public class SpreadsheetView extends Control {
      * Create a menu on rightClick with two options: Copy/Paste This can be
      * overridden by developers for custom behavior.
      * 
-     * @return
+     * @return the ContextMenu to use.
      */
     public ContextMenu getSpreadsheetViewContextMenu() {
         final ContextMenu contextMenu = new ContextMenu();

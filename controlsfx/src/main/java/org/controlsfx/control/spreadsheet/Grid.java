@@ -57,11 +57,12 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
  * within each row. Therefore, if you are wanting to iterate through all columns
  * in every row of the grid, you would do something like this:
  * 
+ * 
  * <h3> Code Sample </h3>
  * <pre>
  * Grid grid = ...
  * for (int row = 0; row < grid.getRowCount(); row++) {
- *     for (int column = 0; column < grid.getColumnCount(); column++) {
+ *     for (int column = 0; column &lt; grid.getColumnCount(); column++) {
  *         SpreadsheetCell&lt;?&gt; cell = getRows().get(row).get(column);
  *         doStuff(cell);
  *     }

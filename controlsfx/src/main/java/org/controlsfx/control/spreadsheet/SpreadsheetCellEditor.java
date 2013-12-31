@@ -51,11 +51,12 @@ import javafx.util.StringConverter;
  * or press enter in an editable cell ( see
  * {@link SpreadsheetCell#setEditable(boolean)} ). <br/>
  * If the user does anything outside the editor, the editor <b> will be forced
- * </b> to cancel the edition and close itself. The editor is just here to allow
- * communication between the user and the {@link SpreadsheetView}. It will just
- * be given a value, and it will just give back another one after. The policy
- * regarding validation of a given value is defined in
- * {@link SpreadsheetCellType#convertValue(String)}.
+ * </b> to try to commit the edition and close itself. If the value is not
+ * valid, the editor will cancel the value and close itself. The editor is just
+ * here to allow communication between the user and the {@link SpreadsheetView}.
+ * It will just be given a value, and it will just give back another one after.
+ * The policy regarding validation of a given value is defined in
+ * {@link SpreadsheetCellType#match(Object)}.
  * 
  * If the value doesn't meet the requirements when saving the cell, nothing
  * happens and the editor keeps editing. <br/>
@@ -71,6 +72,9 @@ import javafx.util.StringConverter;
  * </li>
  * <li> {@link DoubleEditor}: Display a {@link TextField} which accepts only
  * double value. If the entered value is incorrect, the background will turn red
+ * so that the user will know in advance if the data will be saved or not.</li>
+ * <li> {@link IntegerEditor}: Display a {@link TextField} which accepts only
+ * Integer value. If the entered value is incorrect, the background will turn red
  * so that the user will know in advance if the data will be saved or not.</li>
  * <li> {@link DateEditor}: Display a {@link DatePicker}.</li>
  * <li> {@link ObjectEditor}: Display a {@link TextField} , accept an Object.</li>
@@ -126,6 +130,7 @@ import javafx.util.StringConverter;
  * 
  * @see SpreadsheetView
  * @see SpreadsheetCell
+ * @see SpreadsheetCellType
  */
 public abstract class SpreadsheetCellEditor {
     SpreadsheetView view;
@@ -149,7 +154,7 @@ public abstract class SpreadsheetCellEditor {
     /**
      * Whenever you want to stop the edition, you call that method.<br/>
      * True means you're trying to commit the value, then
-     * {@link SpreadsheetCellType#convertValue(String)} will be called in order
+     * {@link SpreadsheetCellType#convertValue(Object)} will be called in order
      * to verify that the value is correct.<br/>
      * False means you're trying to cancel the value and it will be follow by
      * {@link #end()}.<br/>
@@ -183,7 +188,7 @@ public abstract class SpreadsheetCellEditor {
 
     /**
      * Return the value within your editor as a string. This will be used by the
-     * {@link SpreadsheetCellType#convertValue(String)} in order to compute
+     * {@link SpreadsheetCellType#convertValue(Object)} in order to compute
      * whether the value is valid regarding the {@link SpreadsheetCellType}
      * policy.
      * 

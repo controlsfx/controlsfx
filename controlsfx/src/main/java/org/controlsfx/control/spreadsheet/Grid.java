@@ -97,8 +97,8 @@ public interface Grid {
     /**
      * Change the value situated at the intersection if possible.
      * Verification and conversion of the value should be done before 
-     * with {@link SpreadsheetCellType#match(SpreadsheetCell, SpreadsheetCell)}
-     * and {@link SpreadsheetCellType#convertValue(String)}.
+     * with {@link SpreadsheetCellType#match(Object)}
+     * and {@link SpreadsheetCellType#convertValue(Object)}.
      * @param row
      * @param column
      * @param value

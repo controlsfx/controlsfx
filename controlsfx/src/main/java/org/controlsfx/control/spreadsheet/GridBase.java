@@ -51,7 +51,7 @@ import com.sun.javafx.event.EventHandlerManager;
  * 
  * You can specify some row height in the constructor for some of your rows.
  * Just give a Map of Integer (the number of the concerned row) and Double (the
- * height, default is 24.0). 
+ * height, default is 24.0).
  * 
  * <h3>Cell values</h3>
  * <p>
@@ -81,6 +81,7 @@ import com.sun.javafx.event.EventHandlerManager;
  * 
  * 
  * @see Grid
+ * @see GridChange
  */
 public class GridBase implements Grid, EventTarget {
 
@@ -227,11 +228,12 @@ public class GridBase implements Grid, EventTarget {
      **************************************************************************/
 
     /**
-     * Return a BooleanProperty associated with the locked. It means that the
-     * Grid is in a read-only mode and that no SpreadsheetCell can be modified,
-     * no regards for their own {@link SpreadsheetCell#editableProperty()}.
+     * Return a BooleanProperty associated with the locked grid state. It means
+     * that the Grid is in a read-only mode and that no SpreadsheetCell can be
+     * modified, no regards for their own
+     * {@link SpreadsheetCell#editableProperty()}.
      * 
-     * @return
+     * @return a BooleanProperty associated with the locked grid state.
      */
     public BooleanProperty lockedProperty() {
         return locked;
@@ -240,7 +242,7 @@ public class GridBase implements Grid, EventTarget {
     /**
      * Return whether this Grid id locked or not.
      * 
-     * @return
+     * @return whether this Grid id locked or not.
      */
     public boolean isLocked() {
         return locked.get();

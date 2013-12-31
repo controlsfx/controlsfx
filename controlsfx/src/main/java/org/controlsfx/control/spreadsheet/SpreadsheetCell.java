@@ -26,8 +26,6 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import java.time.LocalDate;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -48,30 +46,18 @@ import javafx.scene.Node;
  * 
  * <br/>
  * <h3>SpreadsheetCell Types</h3> Each SpreadsheetCell has its own
- * {@link SpreadsheetCellType}. Different {@link SpreadsheetCellType
- * SpreadsheetCellTypes} are available depending on the data you want to
- * represent in your {@link SpreadsheetView}. MoreOver, each
- * {@link SpreadsheetCellType} has its own {@link SpreadsheetCellEditor} in
+ * {@link SpreadsheetCellType} which has its own {@link SpreadsheetCellEditor} in
  * order to control very closely the possible modifications.
  * 
  * <p>
+ * Different {@link SpreadsheetCellType
+ * SpreadsheetCellTypes} are available depending on the data you want to
+ * represent in your {@link SpreadsheetView}.
  * You can use the different static method provided in
  * {@link SpreadsheetCellType} in order to create the specialized
- * SpreadsheetCell that suits your need:
+ * SpreadsheetCell that suits your need.
  * 
- * <ul>
- * <li><b>String</b>: Accessible with
- * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)}
- * .</li>
- * <li><b>List</b>: Accessible with
- * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)}.</li>
- * <li><b>Double</b>: Accessible with
- * {@link SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)}
- * .</li>
- * <li><b>Date</b>: Accessible with
- * {@link SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}
- * .</li>
- * </ul>
+ * 
  * <br/>
  * 
  * <p>
@@ -95,7 +81,7 @@ import javafx.scene.Node;
  * with different format, you just have to create a unique
  * {@link SpreadsheetCellType} and then specify for each cell their format with
  * {@link #setFormat(String)}. You will then have the guaranty that all your
- * cell will have a LocalDate as a value, but the value will be displayed
+ * cells will have a LocalDate as a value, but the value will be displayed
  * differently for each cell. This will also guaranty that copy/paste and other
  * operation will be compatible since every cell will share the same
  * {@link SpreadsheetCellType}. <br>
@@ -104,7 +90,7 @@ import javafx.scene.Node;
  * 
  * <pre>
  * SpreadsheetCell cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan,
- *         LocalDate.now().plusDays((int) (Math.random() * 10)));
+ *         LocalDate.now().plusDays((int) (Math.random() * 10))); //Random value given here
  * final double random = Math.random();
  * if (random &lt; 0.25) {
  *     cell.setFormat(&quot;EEEE d&quot;);
@@ -127,12 +113,28 @@ import javafx.scene.Node;
  * </pre>
  * 
  * <center><img src="graphicNodeToCell.png"></center>
+ * <br>
+ * In addition to that, you can also specify another graphic property to your
+ * cell with {@link #commentedProperty()}. This allow you to specify whether
+ * this cell has or not a unique property (here a comment). Therefore, you will
+ * have a visual feedback for every cell that has that property set to true.
+ * Right now it's a little red triangle but you can modify this in your CSS by
+ * using the "<b>comment</b>" style class.
+ * 
+ * <pre>
+ * .comment{
+ *     -fx-background-color: red;
+ *     -fx-shape : "M 0 0 L -1 0 L 0 1 z";
+ * }
+ * </pre>
+ * 
+ * <center><img src="triangleCell.png"></center>
  * 
  * <h3>Style with CSS</h3>
  * You can style your cell by specifying some styleClass with
  * {@link #getStyleClass()}. You just have to create and custom that class in
  * your CSS stylesheet associated with your {@link SpreadsheetView}. Also note
- * that all {@link SpreadsheetCell} have a "spreadsheet-cell" styleClass added
+ * that all {@link SpreadsheetCell} have a "<b>spreadsheet-cell</b>" styleClass added
  * by default. Here is a example :<br>
  * 
  * <pre>
@@ -286,7 +288,10 @@ public class SpreadsheetCell {
             item.set(value);
     }
 
-    // auto-generated JavaDoc
+    /**
+     * Return the value contained in the cell.
+     * @return the value contained in the cell.
+     */
     public final Object getItem() {
         return item.get();
     }
@@ -295,7 +300,7 @@ public class SpreadsheetCell {
      * The item property represents the currently-set value inside this
      * SpreadsheetCell instance.
      * 
-     * @return
+     * @return the item property which contains the value.
      */
     public final ObjectProperty<?> itemProperty() {
         return item;
@@ -404,7 +409,7 @@ public class SpreadsheetCell {
     /**
      * Return the StringProperty of the representation of the value.
      * 
-     * @return
+     * @return the StringProperty of the representation of the value.
      */
     public final ReadOnlyStringProperty textProperty() {
         return text;
@@ -546,7 +551,7 @@ public class SpreadsheetCell {
      * Return the graphic node associated with this cell. Return null if nothing
      * has been associated.
      * 
-     * @return
+     * @return the graphic node associated with this cell.
      */
     public Node getGraphic() {
         return graphic.get();

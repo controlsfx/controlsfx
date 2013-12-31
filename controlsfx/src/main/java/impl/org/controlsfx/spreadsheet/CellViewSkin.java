@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.Region;
@@ -36,50 +38,75 @@ import com.sun.javafx.scene.control.skin.TableCellSkin;
 
 /**
  * 
- * This is the skin for the {@link CellView}. 
+ * This is the skin for the {@link CellView}.
  * 
- * Its main goal is to draw an object (a triangle) on cells which 
- * have their {@link SpreadsheetCell#commentedProperty()} set to true.
- *
+ * Its main goal is to draw an object (a triangle) on cells which have their
+ * {@link SpreadsheetCell#commentedProperty()} set to true.
+ * 
  */
-public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell>{
+public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
 
-	/**
-	 * The size of the edge of the triangle
-	 * FIXME Handling of static variable will be changed.
-	 */
-	private static final  int TRIANGLE_SIZE = 6;
-	/**
-	 * The region we will add on the cell when necessary.
-	 */
-	private Region commentTriangle = null;
-	
-	public CellViewSkin(
-			TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> arg0) {
-		super(arg0);
-	}
-	
-	@Override
-	protected void layoutChildren(double x, final double y, final double w,
-            final double h) {
-		super.layoutChildren(x, y, w, h);
-		
-		if(getSkinnable().getItem() != null){
-			if( getSkinnable().getItem().isCommented()){
-				if(commentTriangle == null){
-					commentTriangle = new Region();
-				}
-				if(!getChildren().contains(commentTriangle)){
-					getChildren().add(commentTriangle);
-				}
-				commentTriangle.resize(TRIANGLE_SIZE,TRIANGLE_SIZE);
-				//Setting the style class is important for the shape.
-				commentTriangle.getStyleClass().add("comment");
-				commentTriangle.relocate(getSkinnable().getWidth()-TRIANGLE_SIZE, snappedTopInset()-1);
-			}else if(commentTriangle != null){
-				getChildren().remove(commentTriangle);
-				commentTriangle = null;
-			}
-		}
-	}
+    /**
+     * The size of the edge of the triangle FIXME Handling of static variable
+     * will be changed.
+     */
+    private static final int TRIANGLE_SIZE = 8;
+    /**
+     * The region we will add on the cell when necessary.
+     */
+    private Region commentTriangle = null;
+
+    public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
+        super(tableCell);
+        tableCell.itemProperty().addListener(new ChangeListener<SpreadsheetCell>() {
+            @Override
+            public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
+                    SpreadsheetCell newCell) {
+                if (oldCell != null) {
+                    oldCell.commentedProperty().removeListener(triangleListener);
+                }
+                if (newCell != null) {
+                    newCell.commentedProperty().addListener(triangleListener);
+                }
+            }
+        });
+
+        if (tableCell.getItem() != null) {
+            tableCell.getItem().commentedProperty().addListener(triangleListener);
+        }
+    }
+
+    @Override
+    protected void layoutChildren(double x, final double y, final double w, final double h) {
+        super.layoutChildren(x, y, w, h);
+        if (getSkinnable().getItem() != null) {
+            layoutTriangle(getSkinnable().getItem().isCommented());
+        }
+    }
+
+    private void layoutTriangle(boolean isCommented) {
+        if (isCommented) {
+            if (commentTriangle == null) {
+                commentTriangle = new Region();
+            }
+            if (!getChildren().contains(commentTriangle)) {
+                getChildren().add(commentTriangle);
+            }
+            commentTriangle.resize(TRIANGLE_SIZE, TRIANGLE_SIZE);
+            // Setting the style class is important for the shape.
+            commentTriangle.getStyleClass().add("comment");
+            commentTriangle.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, snappedTopInset() - 1);
+        } else if (commentTriangle != null) {
+            getChildren().remove(commentTriangle);
+            commentTriangle = null;
+        }
+        getSkinnable().requestLayout();
+    }
+
+    private ChangeListener<Boolean> triangleListener = new ChangeListener<Boolean>() {
+        @Override
+        public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+            getSkinnable().requestLayout();
+        }
+    };
 }

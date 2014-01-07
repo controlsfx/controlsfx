@@ -113,7 +113,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         }
 
         updateRowCount();
-
+        flow.recreateCells();
         getSkinnable().requestLayout();
     }
 

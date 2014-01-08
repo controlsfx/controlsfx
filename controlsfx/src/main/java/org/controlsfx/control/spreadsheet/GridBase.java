@@ -30,6 +30,7 @@ import impl.org.controlsfx.spreadsheet.GridViewSkin;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
@@ -97,6 +98,8 @@ public class GridBase implements Grid, EventTarget {
     private Map<Integer, Double> rowHeight;
     private final BooleanProperty locked;
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
+    private List<String> rowsHeader;
+    private List<String> columnsHeader;
 
     /***************************************************************************
      * 
@@ -227,6 +230,52 @@ public class GridBase implements Grid, EventTarget {
      * 
      **************************************************************************/
 
+    public void setRowHeight(Map<Integer, Double> rowHeight) {
+        this.rowHeight = rowHeight;
+    }
+
+    /**
+     * Set a new List of String to use for row header. The length of the list
+     * must be equal to {@link #getRowCount()}.
+     * 
+     * @param rowsHeader
+     */
+    public void setRowsHeader(List<String> rowsHeader) {
+        // FIXME update verticalHeader when changed
+        this.rowsHeader = rowsHeader;
+    }
+
+    /**
+     * Set a new List of String to use for column header. The length of the list
+     * must be equal to {@link #getColumnCount()}.
+     * 
+     * @param columnsHeader
+     */
+    public void setColumnsHeader(List<String> columnsHeader) {
+        // FIXME update horizontallHeader when changed
+        this.columnsHeader = columnsHeader;
+    }
+
+    /**
+     * Returns the String displayed in the header at the specified line.
+     * 
+     * @param rowIndex
+     * @return
+     */
+    public String getRowHeader(int rowIndex) {
+        return rowsHeader == null ? String.valueOf(rowIndex + 1) : rowsHeader.get(rowIndex);
+    }
+
+    /**
+     * Return the String displayed in the header at the specified column.
+     * 
+     * @param columnIndex
+     * @return
+     */
+    public String getColumnHeader(int columnIndex) {
+        return columnsHeader == null ? getEquivColumn(columnIndex) : columnsHeader.get(columnIndex);
+    }
+
     /**
      * Return a BooleanProperty associated with the locked grid state. It means
      * that the Grid is in a read-only mode and that no SpreadsheetCell can be
@@ -312,6 +361,7 @@ public class GridBase implements Grid, EventTarget {
         }
 
         setRowCount(rows.size());
+        setColumnCount(rowCount == 0 ? 0 : this.rows.get(0).size());
     }
 
     /** {@inheritDoc} */
@@ -354,5 +404,24 @@ public class GridBase implements Grid, EventTarget {
      */
     private void setColumnCount(int columnCount) {
         this.columnCount = columnCount;
+    }
+
+    /**
+     * Give the column letter in excel mode with the given number
+     * 
+     * @param number
+     * @return
+     */
+    private final String getEquivColumn(int number) {
+        String converted = "";
+        // Repeatedly divide the number by 26 and convert the
+        // remainder into the appropriate letter.
+        while (number >= 0) {
+            final int remainder = number % 26;
+            converted = (char) (remainder + 'A') + converted;
+            number = number / 26 - 1;
+        }
+
+        return converted;
     }
 }

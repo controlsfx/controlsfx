@@ -233,7 +233,7 @@ public class SpreadsheetView extends Control {
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
-    private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
+//    private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
         @Override
@@ -286,7 +286,8 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid) {
         super();
-        verifyGrid(grid);
+        //Reactivate that after
+        //verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
@@ -428,13 +429,14 @@ public class SpreadsheetView extends Control {
          * We need to verify that the previous fixedRows are still compatible
          * with our new model
          */
-        List<Integer> rowsToBeRemoved = new ArrayList<>();
+        
+        List<Integer> newFixedRows = new ArrayList<>();
         for (Integer rowFixed : getFixedRows()) {
-            if (!isRowFixable(rowFixed)) {
-                rowsToBeRemoved.add(rowFixed);
+            if (isRowFixable(rowFixed)) {
+                newFixedRows.add(rowFixed);
             }
         }
-        getFixedRows().removeAll(rowsToBeRemoved);
+        getFixedRows().setAll(newFixedRows);
 
         /**
          * We need to store the index of the fixedColumns and clear then because
@@ -459,8 +461,7 @@ public class SpreadsheetView extends Control {
             for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
-                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
-                        getEquivColumn(col));
+                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(((GridBase)grid).getColumnHeader(i));
 
                 column.setEditable(true);
                 // We don't want to sort the column
@@ -494,7 +495,7 @@ public class SpreadsheetView extends Control {
                     spreadsheetColumn.setFixed(true);
                 }
             }
-            grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, gridChangeEventHandler);
+//            grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, gridChangeEventHandler);
         }
     }
 
@@ -665,9 +666,9 @@ public class SpreadsheetView extends Control {
      * 
      * @return an ObservableSet of the modified {@link SpreadsheetCell}.
      */
-    public ObservableSet<SpreadsheetCell> getModifiedCells() {
-        return modifiedCells;
-    }
+//    public ObservableSet<SpreadsheetCell> getModifiedCells() {
+//        return modifiedCells;
+//    }
 
     /**
      * Sets the value of the property editable.
@@ -911,24 +912,6 @@ public class SpreadsheetView extends Control {
         return skin.getRow(index);
     }
 
-    /**
-     * Give the column letter in excel mode with the given number
-     * 
-     * @param number
-     * @return
-     */
-    private final String getEquivColumn(int number) {
-        String converted = "";
-        // Repeatedly divide the number by 26 and convert the
-        // remainder into the appropriate letter.
-        while (number >= 0) {
-            final int remainder = number % 26;
-            converted = (char) (remainder + 'A') + converted;
-            number = number / 26 - 1;
-        }
-
-        return converted;
-    }
 
     private void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
@@ -1802,10 +1785,10 @@ public class SpreadsheetView extends Control {
         }
     };
 
-    private EventHandler<GridChange> gridChangeEventHandler = new EventHandler<GridChange>() {
+    /*private EventHandler<GridChange> gridChangeEventHandler = new EventHandler<GridChange>() {
         @Override
         public void handle(GridChange change) {
             modifiedCells.add(getGrid().getRows().get(change.getRow()).get(change.getColumn()));
         }
-    };
+    };*/
 }

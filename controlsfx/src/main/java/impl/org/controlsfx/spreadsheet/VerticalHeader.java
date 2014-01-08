@@ -45,6 +45,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.spreadsheet.Grid;
+import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -184,17 +185,17 @@ public class VerticalHeader extends StackPane {
             int i = 0;
             // We don't want to add Label if there are no rows associated with.
             final int modelRowCount = spreadsheetView.getGrid().getRowCount();
-            GridRow row;
+            GridRow row = skin.getRow(i);
             // We iterate over the visibleRows
-            while (cellSize != 0 && skin.getRow(i) != null && i < modelRowCount) {
-                row = skin.getRow(i);
+            while (cellSize != 0 && row != null && row.getIndex() < modelRowCount) {
+//                row = skin.getRow(i);
                 label = getLabel(rowCount++);
                 if (spreadsheetView.getFixedRows().contains(row.getIndex())) {
-                    label.setText(String.valueOf(row.getIndex() + 1) + ":");
+                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(row.getIndex()) + ":");
                 } else if (spreadsheetView.isRowFixable(row.getIndex())) {
-                    label.setText(String.valueOf(row.getIndex() + 1) + ".");
+                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(row.getIndex()) + ".");
                 } else {
-                    label.setText(String.valueOf(row.getIndex() + 1) + " ");
+                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(row.getIndex()) + " ");
                 }
                 label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndex()));
                 label.relocate(x, y);
@@ -213,7 +214,8 @@ public class VerticalHeader extends StackPane {
                     css.removeAll("fixed");
                 }
                 y += spreadsheetView.getGrid().getRowHeight(row.getIndex());
-                ++i;
+//                ++i;
+                row =skin.getRow(++i) ;
             }
             double spaceUsedByFixedRows = 0;
             // Then we iterate over the FixedRows if any
@@ -223,7 +225,8 @@ public class VerticalHeader extends StackPane {
                             .contains(spreadsheetView.getFixedRows().get(j)))
                         break;
                     label = getLabel(rowCount++);
-                    label.setText(String.valueOf(spreadsheetView.getFixedRows().get(j) + 1) + ":");
+                    
+                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(spreadsheetView.getFixedRows().get(j)) + ":");
                     label.resize(verticalHeaderWidth.get(),
                             spreadsheetView.getGrid().getRowHeight(spreadsheetView.getFixedRows().get(j)));
                     label.setContextMenu(getRowContextMenu(spreadsheetView.getFixedRows().get(j)));
@@ -257,7 +260,7 @@ public class VerticalHeader extends StackPane {
             }
 
             VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
-            if (handle.getCellsViewSkin().getVBar().isVisible()) {
+            if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
                 label = getLabel(rowCount++);
                 label.setText("");

@@ -265,7 +265,7 @@ public class GridBase implements Grid, EventTarget {
      * @return
      */
     public ObservableList<String> getRowsHeader() {
-        return rowsHeader == null ? FXCollections.<String> emptyObservableList() : rowsHeader;
+        return rowsHeader;
     }
 
     /**
@@ -275,7 +275,7 @@ public class GridBase implements Grid, EventTarget {
      * @return
      */
     public ObservableList<String> getColumnsHeader() {
-        return columnsHeader == null ? FXCollections.<String> emptyObservableList() : columnsHeader;
+        return columnsHeader;
     }
 
     /**

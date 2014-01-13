@@ -111,8 +111,8 @@ public class VerticalHeader extends StackPane {
                 requestLayout();
             }
         });
-        
-        //When the Grid is changing, we need to update our information.
+
+        // When the Grid is changing, we need to update our information.
         skin.handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
             @Override
             public void changed(ObservableValue<? extends Grid> arg0, Grid arg1, Grid arg2) {
@@ -188,14 +188,14 @@ public class VerticalHeader extends StackPane {
             GridRow row = skin.getRow(i);
             // We iterate over the visibleRows
             while (cellSize != 0 && row != null && row.getIndex() < modelRowCount) {
-//                row = skin.getRow(i);
+                // row = skin.getRow(i);
                 label = getLabel(rowCount++);
                 if (spreadsheetView.getFixedRows().contains(row.getIndex())) {
-                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(row.getIndex()) + ":");
+                    label.setText(getRowHeader(row.getIndex()) + ":");
                 } else if (spreadsheetView.isRowFixable(row.getIndex())) {
-                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(row.getIndex()) + ".");
+                    label.setText(getRowHeader(row.getIndex()) + ".");
                 } else {
-                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(row.getIndex()) + " ");
+                    label.setText(getRowHeader(row.getIndex()) + " ");
                 }
                 label.resize(verticalHeaderWidth.get(), spreadsheetView.getGrid().getRowHeight(row.getIndex()));
                 label.relocate(x, y);
@@ -214,8 +214,8 @@ public class VerticalHeader extends StackPane {
                     css.removeAll("fixed");
                 }
                 y += spreadsheetView.getGrid().getRowHeight(row.getIndex());
-//                ++i;
-                row =skin.getRow(++i) ;
+                // ++i;
+                row = skin.getRow(++i);
             }
             double spaceUsedByFixedRows = 0;
             // Then we iterate over the FixedRows if any
@@ -225,8 +225,8 @@ public class VerticalHeader extends StackPane {
                             .contains(spreadsheetView.getFixedRows().get(j)))
                         break;
                     label = getLabel(rowCount++);
-                    
-                    label.setText(((GridBase)spreadsheetView.getGrid()).getRowHeader(spreadsheetView.getFixedRows().get(j)) + ":");
+
+                    label.setText(getRowHeader(spreadsheetView.getFixedRows().get(j)) + ":");
                     label.resize(verticalHeaderWidth.get(),
                             spreadsheetView.getGrid().getRowHeight(spreadsheetView.getFixedRows().get(j)));
                     label.setContextMenu(getRowContextMenu(spreadsheetView.getFixedRows().get(j)));
@@ -352,5 +352,16 @@ public class VerticalHeader extends StackPane {
         } else {
             return blankContextMenu;
         }
+    }
+
+    /**
+     * Return the String header associated with this row index.
+     * 
+     * @param index
+     * @return
+     */
+    private String getRowHeader(int index) {
+        return ((GridBase) spreadsheetView.getGrid()).getRowsHeader().size() > index ? ((GridBase) spreadsheetView
+                .getGrid()).getRowsHeader().get(index) : String.valueOf(index + 1);
     }
 }

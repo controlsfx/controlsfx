@@ -461,7 +461,8 @@ public class SpreadsheetView extends Control {
             for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
-                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(((GridBase)grid).getColumnHeader(i));
+                String columnHeader = ((GridBase)grid).getColumnsHeader().size() > i? ((GridBase)grid).getColumnsHeader().get(i): getEquivColumn(i);
+                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(columnHeader);
 
                 column.setEditable(true);
                 // We don't want to sort the column
@@ -1785,6 +1786,24 @@ public class SpreadsheetView extends Control {
         }
     };
 
+    /**
+     * Give the column letter in excel mode with the given number
+     * 
+     * @param number
+     * @return
+     */
+    static final String getEquivColumn(int number) {
+        String letter = "";
+        // Repeatedly divide the number by 26 and convert the
+        // remainder into the appropriate letter.
+        while (number >= 0) {
+            final int remainder = number % 26;
+            letter = (char) (remainder + 'A') + letter;
+            number = number / 26 - 1;
+        }
+
+        return letter;
+    }
     /*private EventHandler<GridChange> gridChangeEventHandler = new EventHandler<GridChange>() {
         @Override
         public void handle(GridChange change) {

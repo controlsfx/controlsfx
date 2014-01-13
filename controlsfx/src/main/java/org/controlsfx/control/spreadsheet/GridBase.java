@@ -42,6 +42,7 @@ import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
+import javafx.util.Callback;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
@@ -95,11 +96,11 @@ public class GridBase implements Grid, EventTarget {
 
     private int rowCount;
     private int columnCount;
-    private Map<Integer, Double> rowHeight;
+    private Callback<Integer, Double> rowHeightFactory;
     private final BooleanProperty locked;
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
-    private List<String> rowsHeader;
-    private List<String> columnsHeader;
+    private final ObservableList<String> rowsHeader;
+    private final ObservableList<String> columnsHeader;
 
     /***************************************************************************
      * 
@@ -131,19 +132,22 @@ public class GridBase implements Grid, EventTarget {
      * 
      * @param rowCount
      * @param columnCount
-     * @param rowHeight
+     * @param rowHeightFactory
      */
     public GridBase(int rowCount, int columnCount, Map<Integer, Double> rowHeight) {
-        this(rowCount, columnCount, FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(), rowHeight);
+        this(rowCount, columnCount, FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(),
+                new HashMap<Integer, Double>());
     }
 
     public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows,
-            Map<Integer, Double> rowHeight) {
+            Map<Integer, Double> rowHeightMap) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.rows = rows;
-        this.rowHeight = rowHeight;
+        rowsHeader = FXCollections.observableArrayList();
+        columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
+        rowHeightFactory = new MapBasedRowHeightFactory(rowHeightMap);
     }
 
     /***************************************************************************
@@ -220,8 +224,7 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public double getRowHeight(int row) {
-        Double value = rowHeight.get((Integer) row);
-        return value == null ? GridViewSkin.DEFAULT_CELL_HEIGHT : value;
+        return rowHeightFactory.call((Integer) row);
     }
 
     /***************************************************************************
@@ -230,8 +233,8 @@ public class GridBase implements Grid, EventTarget {
      * 
      **************************************************************************/
 
-    public void setRowHeight(Map<Integer, Double> rowHeight) {
-        this.rowHeight = rowHeight;
+    public void setRowHeight(Callback<Integer, Double> rowHeight) {
+        this.rowHeightFactory = rowHeight;
     }
 
     /**
@@ -241,8 +244,8 @@ public class GridBase implements Grid, EventTarget {
      * @param rowsHeader
      */
     public void setRowsHeader(List<String> rowsHeader) {
-        // FIXME update verticalHeader when changed
-        this.rowsHeader = rowsHeader;
+        this.rowsHeader.setAll(rowsHeader.subList(0, rowsHeader.size()));
+
     }
 
     /**
@@ -252,8 +255,7 @@ public class GridBase implements Grid, EventTarget {
      * @param columnsHeader
      */
     public void setColumnsHeader(List<String> columnsHeader) {
-        // FIXME update horizontallHeader when changed
-        this.columnsHeader = columnsHeader;
+        this.columnsHeader.setAll(columnsHeader.subList(0, columnsHeader.size()));
     }
 
     /**
@@ -262,8 +264,8 @@ public class GridBase implements Grid, EventTarget {
      * @param rowIndex
      * @return
      */
-    public String getRowHeader(int rowIndex) {
-        return rowsHeader == null ? String.valueOf(rowIndex + 1) : rowsHeader.get(rowIndex);
+    public ObservableList<String> getRowsHeader() {
+        return rowsHeader == null ? FXCollections.<String> emptyObservableList() : rowsHeader;
     }
 
     /**
@@ -272,8 +274,8 @@ public class GridBase implements Grid, EventTarget {
      * @param columnIndex
      * @return
      */
-    public String getColumnHeader(int columnIndex) {
-        return columnsHeader == null ? getEquivColumn(columnIndex) : columnsHeader.get(columnIndex);
+    public ObservableList<String> getColumnsHeader() {
+        return columnsHeader == null ? FXCollections.<String> emptyObservableList() : columnsHeader;
     }
 
     /**
@@ -406,22 +408,18 @@ public class GridBase implements Grid, EventTarget {
         this.columnCount = columnCount;
     }
 
-    /**
-     * Give the column letter in excel mode with the given number
-     * 
-     * @param number
-     * @return
-     */
-    private final String getEquivColumn(int number) {
-        String converted = "";
-        // Repeatedly divide the number by 26 and convert the
-        // remainder into the appropriate letter.
-        while (number >= 0) {
-            final int remainder = number % 26;
-            converted = (char) (remainder + 'A') + converted;
-            number = number / 26 - 1;
+    private class MapBasedRowHeightFactory implements Callback<Integer, Double> {
+        private Map<Integer, Double> rowHeightMap;
+
+        public MapBasedRowHeightFactory(Map<Integer, Double> rowHeightMap) {
+            this.rowHeightMap = rowHeightMap;
         }
 
-        return converted;
+        @Override
+        public Double call(Integer index) {
+            Double value = rowHeightMap.get(index);
+            return value == null ? GridViewSkin.DEFAULT_CELL_HEIGHT : value;
+        }
+
     }
 }

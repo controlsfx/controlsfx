@@ -26,7 +26,11 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.List;
+
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -94,7 +98,7 @@ public class SpreadsheetColumn {
      * @param indexColumn
      */
     SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column,
-            SpreadsheetView spreadsheetView, Integer indexColumn) {
+            final SpreadsheetView spreadsheetView, final Integer indexColumn) {
         this.spreadsheetView = spreadsheetView;
         this.column = column;
         column.setMinWidth(0);
@@ -114,10 +118,31 @@ public class SpreadsheetColumn {
         if (canFix)
             column.setText(column.getText() + ".");
 
-        // FIXME implement better listening after
-        spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell>>() {
+        // When changing FixedColumns, we set header in order to add "." or ":"
+        spreadsheetView.getFixedColumns().addListener(new InvalidationListener() {
             @Override
-            public void onChanged(Change<? extends ObservableList<SpreadsheetCell>> arg0) {
+            public void invalidated(Observable arg0) {
+                setText(getText());
+            }
+        });
+
+        // When ColumnsHeaders are changing, we update the text
+        ((GridBase) spreadsheetView.getGrid()).getColumnsHeader().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable arg0) {
+                List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnsHeader();
+                if (columnsHeader.size() <= indexColumn) {
+                    setText(SpreadsheetView.getEquivColumn(indexColumn));
+                } else if (!columnsHeader.get(indexColumn).equals(getText())) {
+                    setText(columnsHeader.get(indexColumn));
+                }
+            }
+        });
+
+        // When changing rows, we re-calculate if this columns can be fixed.
+        spreadsheetView.getGrid().getRows().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable arg0) {
                 initCanFix();
             }
         });
@@ -198,17 +223,24 @@ public class SpreadsheetColumn {
         return canFix;
     }
 
-    public void setText(String text) {
-        column.setText(text);
-    }
-
-    public String getText() {
-        return column.getText();
-    }
-
     /***************************************************************************
      * * Private Methods * *
      **************************************************************************/
+
+    private void setText(String text) {
+        if (!canFix) {
+            column.setText(text);
+        } else if (spreadsheetView.getFixedColumns().contains(this)) {
+            column.setText(text + ":");
+        } else {
+            column.setText(text + ".");
+        }
+
+    }
+
+    private String getText() {
+        return column.getText().replace(".", "").replace(":", "");
+    }
 
     /**
      * Generate a context Menu in order to fix/unfix some column It is shown

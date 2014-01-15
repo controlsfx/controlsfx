@@ -122,24 +122,11 @@ public class GridBase implements Grid, EventTarget {
      * @param columnCount
      */
     public GridBase(int rowCount, int columnCount) {
-        this(rowCount, columnCount, new HashMap<Integer, Double>());
-    }
-
-    /**
-     * Creates a grid with a fixed number of rows and columns. Some height are
-     * specified in the Map.
-     * 
-     * @param rowCount
-     * @param columnCount
-     * @param rowHeightMap
-     */
-    public GridBase(int rowCount, int columnCount, Map<Integer, Double> rowHeightMap) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         rowsHeader = FXCollections.observableArrayList();
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
-        rowHeightFactory = new MapBasedRowHeightFactory(rowHeightMap);
     }
 
     /***************************************************************************

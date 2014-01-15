@@ -83,7 +83,8 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         int rowCount = 50;
         int columnCount = 10;
 
-        GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+        GridBase grid = new GridBase(rowCount, columnCount);
+        grid.setRowHeightCallback(new GridBase.MapBasedRowHeightFactory(generateRowHeight()));
         buildGrid(grid, true);// Build both Grid
 
         spreadSheetView = new SpreadsheetView(grid);
@@ -345,7 +346,8 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
                 int rowCount = 50;
                 int columnCount = 10;
-                GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+                GridBase grid = new GridBase(rowCount, columnCount);
+                grid.setRowHeightCallback(new GridBase.MapBasedRowHeightFactory(generateRowHeight()));
                 buildGrid(grid, arg2);
 
                 spreadSheetView.setGrid(grid);
@@ -381,7 +383,8 @@ public class HelloSpreadsheetView extends ControlsFXSample {
                 }
                 int rowCount = 50;
                 int columnCount = 10;
-                GridBase grid = new GridBase(rowCount, columnCount, generateRowHeight());
+                GridBase grid = new GridBase(rowCount, columnCount);
+                grid.setRowHeightCallback(new GridBase.MapBasedRowHeightFactory(generateRowHeight()));
 
                 buildGrid(grid, spanPresent.isSelected());
 

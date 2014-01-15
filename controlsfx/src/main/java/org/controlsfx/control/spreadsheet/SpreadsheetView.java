@@ -100,7 +100,7 @@ import javafx.util.Duration;
  * they are always visible on screen. Only columns without any spanning cells
  * can be fixed.</li>
  * <li>A row header can be switched on in order to display the row number.</li>
- * <li> Both row and column header can be visible or invisible. </li>
+ * <li>Both row and column header can be visible or invisible.</li>
  * <li>Selection of several cells can be made with a click and drag.</li>
  * <li>A copy/paste context menu is accessible with a right-click or the usual
  * shortcuts.</li>
@@ -233,7 +233,8 @@ public class SpreadsheetView extends Control {
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
-//    private ObservableSet<SpreadsheetCell> modifiedCells = FXCollections.observableSet();
+    // private ObservableSet<SpreadsheetCell> modifiedCells =
+    // FXCollections.observableSet();
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
         @Override
@@ -286,8 +287,8 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid) {
         super();
-        //Reactivate that after
-        //verifyGrid(grid);
+        // Reactivate that after
+        // verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
@@ -429,7 +430,7 @@ public class SpreadsheetView extends Control {
          * We need to verify that the previous fixedRows are still compatible
          * with our new model
          */
-        
+
         List<Integer> newFixedRows = new ArrayList<>();
         for (Integer rowFixed : getFixedRows()) {
             if (isRowFixable(rowFixed)) {
@@ -461,8 +462,10 @@ public class SpreadsheetView extends Control {
             for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
-                String columnHeader = ((GridBase)grid).getColumnsHeader().size() > i? ((GridBase)grid).getColumnsHeader().get(i): getEquivColumn(i);
-                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(columnHeader);
+                String columnHeader = ((GridBase) grid).getColumnHeader().size() > i ? ((GridBase) grid)
+                        .getColumnHeader().get(i) : getExcelLetterFromNumber(i);
+                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
+                        columnHeader);
 
                 column.setEditable(true);
                 // We don't want to sort the column
@@ -496,7 +499,8 @@ public class SpreadsheetView extends Control {
                     spreadsheetColumn.setFixed(true);
                 }
             }
-//            grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, gridChangeEventHandler);
+            // grid.addEventHandler(GridChange.GRID_CHANGE_EVENT,
+            // gridChangeEventHandler);
         }
     }
 
@@ -667,9 +671,9 @@ public class SpreadsheetView extends Control {
      * 
      * @return an ObservableSet of the modified {@link SpreadsheetCell}.
      */
-//    public ObservableSet<SpreadsheetCell> getModifiedCells() {
-//        return modifiedCells;
-//    }
+    // public ObservableSet<SpreadsheetCell> getModifiedCells() {
+    // return modifiedCells;
+    // }
 
     /**
      * Sets the value of the property editable.
@@ -912,7 +916,6 @@ public class SpreadsheetView extends Control {
         GridViewSkin skin = (GridViewSkin) cellsView.getSkin();
         return skin.getRow(index);
     }
-
 
     private void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
@@ -1787,12 +1790,23 @@ public class SpreadsheetView extends Control {
     };
 
     /**
-     * Give the column letter in excel mode with the given number
+     * Return a letter (just like Excel) associated with the number. When the
+     * number is under 26, a simple letter is returned. When the number is
+     * superior, concatenated letters are returned.
+     * 
+     * 
+     * For example: 
+     * 0    ->  A 
+     * 1    ->  B 
+     * 26   ->  AA 
+     * 32   ->  AG 
+     * 45   ->  AT
+     * 
      * 
      * @param number
-     * @return
+     * @return a letter (like) associated with the number.
      */
-    static final String getEquivColumn(int number) {
+    static final String getExcelLetterFromNumber(int number) {
         String letter = "";
         // Repeatedly divide the number by 26 and convert the
         // remainder into the appropriate letter.
@@ -1804,10 +1818,12 @@ public class SpreadsheetView extends Control {
 
         return letter;
     }
-    /*private EventHandler<GridChange> gridChangeEventHandler = new EventHandler<GridChange>() {
-        @Override
-        public void handle(GridChange change) {
-            modifiedCells.add(getGrid().getRows().get(change.getRow()).get(change.getColumn()));
-        }
-    };*/
+    /*
+     * private EventHandler<GridChange> gridChangeEventHandler = new
+     * EventHandler<GridChange>() {
+     * 
+     * @Override public void handle(GridChange change) {
+     * modifiedCells.add(getGrid
+     * ().getRows().get(change.getRow()).get(change.getColumn())); } };
+     */
 }

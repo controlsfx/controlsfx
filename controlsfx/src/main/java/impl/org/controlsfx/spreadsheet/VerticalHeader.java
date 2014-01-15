@@ -361,7 +361,7 @@ public class VerticalHeader extends StackPane {
      * @return
      */
     private String getRowHeader(int index) {
-        return ((GridBase) spreadsheetView.getGrid()).getRowsHeader().size() > index ? ((GridBase) spreadsheetView
-                .getGrid()).getRowsHeader().get(index) : String.valueOf(index + 1);
+        return ((GridBase) spreadsheetView.getGrid()).getRowHeader().size() > index ? ((GridBase) spreadsheetView
+                .getGrid()).getRowHeader().get(index) : String.valueOf(index + 1);
     }
 }

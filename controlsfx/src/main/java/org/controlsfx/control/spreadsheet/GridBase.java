@@ -122,8 +122,7 @@ public class GridBase implements Grid, EventTarget {
      * @param columnCount
      */
     public GridBase(int rowCount, int columnCount) {
-        this(rowCount, columnCount, FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(),
-                new HashMap<Integer, Double>());
+        this(rowCount, columnCount, new HashMap<Integer, Double>());
     }
 
     /**
@@ -132,18 +131,11 @@ public class GridBase implements Grid, EventTarget {
      * 
      * @param rowCount
      * @param columnCount
-     * @param rowHeightFactory
+     * @param rowHeightMap
      */
-    public GridBase(int rowCount, int columnCount, Map<Integer, Double> rowHeight) {
-        this(rowCount, columnCount, FXCollections.<ObservableList<SpreadsheetCell>> emptyObservableList(),
-                new HashMap<Integer, Double>());
-    }
-
-    public GridBase(int rowCount, int columnCount, ObservableList<ObservableList<SpreadsheetCell>> rows,
-            Map<Integer, Double> rowHeightMap) {
+    public GridBase(int rowCount, int columnCount, Map<Integer, Double> rowHeightMap) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
-        this.rows = rows;
         rowsHeader = FXCollections.observableArrayList();
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
@@ -233,29 +225,8 @@ public class GridBase implements Grid, EventTarget {
      * 
      **************************************************************************/
 
-    public void setRowHeight(Callback<Integer, Double> rowHeight) {
+    public void setRowHeightCallback(Callback<Integer, Double> rowHeight) {
         this.rowHeightFactory = rowHeight;
-    }
-
-    /**
-     * Set a new List of String to use for row header. The length of the list
-     * must be equal to {@link #getRowCount()}.
-     * 
-     * @param rowsHeader
-     */
-    public void setRowsHeader(List<String> rowsHeader) {
-        this.rowsHeader.setAll(rowsHeader.subList(0, rowsHeader.size()));
-
-    }
-
-    /**
-     * Set a new List of String to use for column header. The length of the list
-     * must be equal to {@link #getColumnCount()}.
-     * 
-     * @param columnsHeader
-     */
-    public void setColumnsHeader(List<String> columnsHeader) {
-        this.columnsHeader.setAll(columnsHeader.subList(0, columnsHeader.size()));
     }
 
     /**
@@ -264,7 +235,7 @@ public class GridBase implements Grid, EventTarget {
      * @param rowIndex
      * @return
      */
-    public ObservableList<String> getRowsHeader() {
+    public ObservableList<String> getRowHeader() {
         return rowsHeader;
     }
 
@@ -274,7 +245,7 @@ public class GridBase implements Grid, EventTarget {
      * @param columnIndex
      * @return
      */
-    public ObservableList<String> getColumnsHeader() {
+    public ObservableList<String> getColumnHeader() {
         return columnsHeader;
     }
 
@@ -408,7 +379,7 @@ public class GridBase implements Grid, EventTarget {
         this.columnCount = columnCount;
     }
 
-    private class MapBasedRowHeightFactory implements Callback<Integer, Double> {
+    public static class MapBasedRowHeightFactory implements Callback<Integer, Double> {
         private Map<Integer, Double> rowHeightMap;
 
         public MapBasedRowHeightFactory(Map<Integer, Double> rowHeightMap) {

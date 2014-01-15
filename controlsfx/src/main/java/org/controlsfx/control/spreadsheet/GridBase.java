@@ -230,22 +230,22 @@ public class GridBase implements Grid, EventTarget {
     }
 
     /**
-     * Returns the String displayed in the header at the specified line.
+     * Returns an ObservableList of string to display in the row headers.
      * 
      * @param rowIndex
-     * @return
+     * @return an ObservableList of string to display in the row headers.
      */
-    public ObservableList<String> getRowHeader() {
+    public ObservableList<String> getRowHeaders() {
         return rowsHeader;
     }
 
     /**
-     * Return the String displayed in the header at the specified column.
+     * Returns an ObservableList of string to display in the column headers.
      * 
      * @param columnIndex
-     * @return
+     * @return an ObservableList of string to display in the column headers.
      */
-    public ObservableList<String> getColumnHeader() {
+    public ObservableList<String> getColumnHeaders() {
         return columnsHeader;
     }
 
@@ -273,10 +273,10 @@ public class GridBase implements Grid, EventTarget {
     /**
      * Lock or unlock this Grid.
      * 
-     * @param b
+     * @param lock
      */
-    public void setLocked(Boolean b) {
-        locked.setValue(b);
+    public void setLocked(Boolean lock) {
+        locked.setValue(lock);
     }
 
     /**
@@ -379,6 +379,11 @@ public class GridBase implements Grid, EventTarget {
         this.columnCount = columnCount;
     }
 
+    /**
+     * This class serves as a bridge between row height Callback needed by the
+     * GridBase and a Map<Integer,Double> that one could have (each Integer
+     * specify a row index and its associated height).
+     */
     public static class MapBasedRowHeightFactory implements Callback<Integer, Double> {
         private Map<Integer, Double> rowHeightMap;
 

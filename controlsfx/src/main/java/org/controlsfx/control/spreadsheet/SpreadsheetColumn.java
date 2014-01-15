@@ -127,10 +127,10 @@ public class SpreadsheetColumn {
         });
 
         // When ColumnsHeaders are changing, we update the text
-        ((GridBase) spreadsheetView.getGrid()).getColumnHeader().addListener(new InvalidationListener() {
+        ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable arg0) {
-                List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeader();
+                List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeaders();
                 if (columnsHeader.size() <= indexColumn) {
                     setText(SpreadsheetView.getExcelLetterFromNumber(indexColumn));
                 } else if (!columnsHeader.get(indexColumn).equals(getText())) {

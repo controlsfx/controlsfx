@@ -49,6 +49,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -58,7 +59,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -227,6 +227,8 @@ public class SpreadsheetView extends Control {
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
+    private final BooleanProperty fixedRowsFrozenProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty fixedColumnsFrozenProperty = new SimpleBooleanProperty(false);
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -613,7 +615,31 @@ public class SpreadsheetView extends Control {
      * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row) {
-        return row < rowFix.size() ? rowFix.get(row) : false;
+        return row < rowFix.size() && !isFixedRowsFrozen() ? rowFix.get(row) : false;
+    }
+
+    /**
+     * Return whether change to Fixed rows are allowed.
+     * @return whether change to Fixed rows are allowed.
+     */
+    public boolean isFixedRowsFrozen() {
+        return fixedRowsFrozenProperty.get();
+    }
+
+    /**
+     * If set to true, change to fixed rows will be permitted.
+     * @param b
+     */
+    public void setFixedRowsFrozen(boolean b) {
+        fixedRowsFrozenProperty.set(b);
+    }
+
+    /**
+     * Return the Boolean property associated with the frozen fixed rows.
+     * @return the Boolean property associated with the frozen fixed rows.
+     */
+    public ReadOnlyBooleanProperty fixedRowsFrozenProperty() {
+        return fixedRowsFrozenProperty;
     }
 
     /**
@@ -640,6 +666,30 @@ public class SpreadsheetView extends Control {
         return columnIndex < getColumns().size() ? getColumns().get(columnIndex).isColumnFixable() : null;
     }
 
+    /**
+     * Return whether change to Fixed columns are allowed.
+     * @return whether change to Fixed columns are allowed.
+     */
+    public boolean isFixedColumnsFrozen() {
+        return fixedColumnsFrozenProperty.get();
+    }
+
+    /**
+     * If set to true, change to fixed columns will be permitted.
+     * @param b
+     */
+    public void setFixedColumnsFrozen(boolean b) {
+        fixedColumnsFrozenProperty.set(b);
+    }
+
+    /**
+     * Return the Boolean property associated with the frozen fixed columns.
+     * @return the Boolean property associated with the frozen fixed columns.
+     */
+    public ReadOnlyBooleanProperty fixedColumnsFrozenProperty() {
+        return fixedColumnsFrozenProperty;
+    }
+    
     /**
      * Return the selectionModel used by the SpreadsheetView.
      * 
@@ -1795,12 +1845,7 @@ public class SpreadsheetView extends Control {
      * superior, concatenated letters are returned.
      * 
      * 
-     * For example: 
-     * 0    ->  A 
-     * 1    ->  B 
-     * 26   ->  AA 
-     * 32   ->  AG 
-     * 45   ->  AT
+     * For example: 0 -> A 1 -> B 26 -> AA 32 -> AG 45 -> AT
      * 
      * 
      * @param number

@@ -198,7 +198,7 @@ public class SampleScanner {
         return classes.toArray(new Class[classes.size()]);
     }
 
-    private void scanPath(Path workingDirectory, List<File> dirs, List<File> jars) throws IOException {
+    private void scanPath(Path workingDirectory, final List<File> dirs, final List<File> jars) throws IOException {
         Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
             @Override public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
                 final File file = path.toFile();
@@ -242,8 +242,8 @@ public class SampleScanner {
         return classes;
     }
     
-    private void processPath(Path path, List<Class<?>> classes) throws IOException {
-        String root = path.toString();
+    private void processPath(Path path, final List<Class<?>> classes) throws IOException {
+        final String root = path.toString();
         
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

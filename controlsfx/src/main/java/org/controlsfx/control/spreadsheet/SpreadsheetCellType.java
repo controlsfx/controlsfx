@@ -39,45 +39,135 @@ import javafx.util.converter.IntegerStringConverter;
 /**
  * When instantiating a {@link SpreadsheetCell}, its SpreadsheetCellType will
  * specify which values the cell can accept as user input, and which
- * {@link SpreadsheetCellEditor} it will use to receive user input.
+ * {@link SpreadsheetCellEditor} it will use to receive user input. <br>
+ * Different static methods are provided in order to give you access to basic
+ * types, and to create {@link SpreadsheetCell} easily:
+ * <ul>
+ * <li><b>String</b>: Accessible with
+ * {@link SpreadsheetCellType.StringType#createCell(int, int, int, int, String)}
+ * .</li>
+ * <li><b>List</b>: Accessible with
+ * {@link SpreadsheetCellType.ListType#createCell(int, int, int, int, String)}.</li>
+ * <li><b>Double</b>: Accessible with
+ * {@link SpreadsheetCellType.DoubleType#createCell(int, int, int, int, Double)}
+ * .</li>
+ * <li><b>Integer</b>: Accessible with
+ * {@link SpreadsheetCellType.IntegerType#createCell(int, int, int, int, Integer)}
+ * .</li>
+ * <li><b>Date</b>: Accessible with
+ * {@link SpreadsheetCellType.DateType#createCell(int, int, int, int, LocalDate)}
+ * .</li>
+ * </ul>
  * 
- * FIXME Modify description <h3>Example</h3> You can create several types which
- * are using the same editor. Suppose you want to handle Double values. You will
- * implement the {@link #createEditor(SpreadsheetView)} method and use the
- * {@link SpreadsheetCellEditor#createDoubleEditor(SpreadsheetView)}. <br/>
+ * <h3>Value verification</h3> You can specify two levels of verification in your
+ * types. <br>
+ * <ul>
+ * <li>The first one is defined by {@link #match(Object)}. It is the first level
+ * that tells whether or not the given value should be accepted or not. Trying
+ * to set a String into a Double will return false for example. This method will
+ * be use by the {@link SpreadsheetView} when trying to set values for example.
+ * <br>
+ * </li>
+ * <li>The second level is defined by {@link #isError(Object)}. This is more
+ * subtle and allow you to tell whether the given value is coherent or not
+ * regarding the policy you gave. You can just make a {@link SpreadsheetCell}
+ * call this method when its value has changed in order to react accordingly if
+ * the value is in error. (see example below).</li>
+ * </ul>
+ * <h3>Converter</h3> You will have to specify a converter for your type. It
+ * will handle all the conversion between your real value type (Double, Integer,
+ * LocalDate etc) and its string representation for the cell. <br>
+ * You can either use a pre-built {@link StringConverter} or our
+ * {@link StringConverterWithFormat}. This one just add one method (
+ * {@link StringConverterWithFormat#toStringFormat(Object, String)} which will
+ * convert your value with a String format (found in
+ * {@link SpreadsheetCell#getFormat()}).
  * 
- * Then for each type you will provide your own policy in
- * {@link #convertValue(String)}, which most of the time will use your
- * {@link #converter}. If you only want to accept values between 0 and 10:
+ * <h3>Example</h3> You can create several types which are using the same
+ * editor. Suppose you want to handle Double values. You will implement the
+ * {@link #createEditor(SpreadsheetView)} method and use the
+ * {@link SpreadsheetCellEditor.DoubleEditor}. <br/>
+ * 
+ * Then for each type you will provide your own policy in {@link #match(Object)}
+ * and in {@link #isError(Object)}, which most of the time will use your
+ * {@link #converter}. <br>
+ * 
+ * Here is an example of how to create a {@link StringConverterWithFormat} :
+ * 
+ * 
  * 
  * <pre>
- * converter = new DoubleStringConverter() {
- *     &#64;Override public String toString(Double item) {
- *         if (item == null || Double.isNaN(item)) {
- *             return "";
- *         } else {
- *             return super.toString(item);
- *         }
- *    }
  * 
- *     &#64;Override public Double fromString(String str) {
- *         if (str == null || str.isEmpty() || "NaN".equals(str)) {
- *             return Double.NaN;
- *         } else {
- *             return super.fromString(str);
+ * StringConverterWithFormat specialConverter = new StringConverterWithFormat&lt;Double&gt;(new DoubleStringConverter()) {
+ *            &#64;Override
+ *             public String toString(Double item) {
+ *                  //We just redirect to the other method.
+ *                 return toStringFormat(item, "");
+ *             }
+ * 
+ *             &#64;Override
+ *             public String toStringFormat(Double item, String format) {
+ *                 if (item == null || Double.isNaN(item)) {
+ *                     return missingLabel; // For example return something else that an empty cell.
+ *                 } else{
+ *                     if (!("").equals(format) && !Double.isNaN(item)) {
+ *                     //We format here the value
+ *                         return new DecimalFormat(format).format(item);
+ *                     } else {
+ *                     //We call the DoubleStringConverter that we gave in argument
+ *                         return myConverter.toString(item);
+ *                     }
+ *                 }
+ *             }
+ * 
+ *            &#64;Override
+ *             public Double fromString(String str) {
+ *                 if (str == null || str.isEmpty()) {
+ *                     return Double.NaN;
+ *                 } else {
+ *                     try {
+ *                         //Just returning the value
+ *                         Double myDouble = Double.parseDouble(str);
+ *                         return myDouble;
+ * 
+ *                     } catch (NumberFormatException e) {
+ *                         return myConverter.fromString(str);
+ *                     }
+ *                 }
+ *             }
  *         }
+ * 
+ * </pre>
+ * 
+ * And then suppose you only want to accept double values between 0 and 100, and
+ * that a value superior to 10 is abnormal. <br>
+ * 
+ * <pre>
+ * &#064;Override
+ * public boolean isError(Object value) {
+ *     if (value instanceof Double) {
+ *         if ((Double) value &gt; 0 &amp;&amp; (Double) value &lt; 10) {
+ *             return false;
+ *         }
+ *         return true;
  *     }
- * });
- * 			
- * &#64;Override public Double convertValue(String value) {
- *     try {
- *         Double computedValue = converter.fromString(value);
- *         if (computedValue >=0 && computedValue <=10) {
- *             return computedValue;
- *         } else {
- *             return null;
- *     } catch (Exception e) {
- *         return null;
+ *     return true;
+ * }
+ * 
+ * &#064;Override
+ * public boolean match(Object value) {
+ *     if (value instanceof Double) {
+ *         return true;
+ *     } else {
+ *         try {
+ *             Double convertedValue = converter.fromString(value == null ? null : value.toString());
+ *             if (convertedValue &gt;= 0 &amp;&amp; convertedValue &lt;= 100)
+ *                 return true;
+ *             else
+ *                 return false;
+ *         } catch (Exception e) {
+ *             return false;
+ *         }
  *     }
  * }
  * </pre>
@@ -93,9 +183,10 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * Default constructor.
      */
-    public SpreadsheetCellType(){
-        
+    public SpreadsheetCellType() {
+
     }
+
     /**
      * Constructor with the StringConverter directly provided.
      * 

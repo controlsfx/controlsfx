@@ -26,7 +26,11 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.List;
+
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,224 +40,256 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 
 /**
- * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn} instances.
+ * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn}
+ * instances.
  * 
- * <h3>Configuration</h3>
- * SpreadsheetColumns are instantiated by the {@link SpreadsheetView} itself, so
- * there is no public constructor for this class. To access the available 
- * columns, you need to call {@link SpreadsheetView#getColumns()}.
+ * <h3>Configuration</h3> SpreadsheetColumns are instantiated by the
+ * {@link SpreadsheetView} itself, so there is no public constructor for this
+ * class. To access the available columns, you need to call
+ * {@link SpreadsheetView#getColumns()}.
  * 
- * <p>SpreadsheetColumn gives you the ability to modify some aspects of the 
- * column, for example the {@link #setPrefWidth(double) width} or
+ * <p>
+ * SpreadsheetColumn gives you the ability to modify some aspects of the column,
+ * for example the {@link #setPrefWidth(double) width} or
  * {@link #setResizable(boolean) resizability} of the column.
  * 
- * <p>You have the ability to fix this column at the left of the SpreadsheetView 
- * by calling {@link #setFixed(boolean)}. But you are strongly advised to check 
- * if it is possible with {@link #isColumnFixable()} before calling {@link #setFixed(boolean)}.
- * Take a look at the {@link SpreadsheetView} description to understand the fixing constraints.
+ * <p>
+ * You have the ability to fix this column at the left of the SpreadsheetView by
+ * calling {@link #setFixed(boolean)}. But you are strongly advised to check if
+ * it is possible with {@link #isColumnFixable()} before calling
+ * {@link #setFixed(boolean)}. Take a look at the {@link SpreadsheetView}
+ * description to understand the fixing constraints.
  * 
- * <p>If the column can be fixed, a dot is displayed in the header and
- *  a {@link ContextMenu} will appear if the user 
- * right-clicks on it. If not, nothing will appear and the user will not 
- * have the possibility to fix it.
+ * <p>
+ * If the column can be fixed, a dot is displayed in the header and a
+ * {@link ContextMenu} will appear if the user right-clicks on it. If not,
+ * nothing will appear and the user will not have the possibility to fix it.
  * 
  * <h3>Screenshot</h3>
- * The column <b>A</b> is fixed and is covering column <b>B</b> and partially 
- * column <b>C</b>. The context menu is being shown and offers the possibility to 
- * unfix the column.
+ * The column <b>A</b> is fixed and is covering column <b>B</b> and partially
+ * column <b>C</b>. The context menu is being shown and offers the possibility
+ * to unfix the column.
  * 
- * <br/><br/>
+ * <br/>
+ * <br/>
  * <center><img src="fixedColumn.png"></center>
+ * 
  * @see SpreadsheetView
  */
-public class SpreadsheetColumn<T> {
+public class SpreadsheetColumn {
 
-	/***************************************************************************
-     *                                                                         *
-     * Private Fields                                                          *
-     *                                                                         *
+    /***************************************************************************
+     * * Private Fields * *
      **************************************************************************/
-	private final SpreadsheetView spreadsheetView;
-	private final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
-	private final boolean canFix;
-	private final Integer indexColumn;
-	private MenuItem fixItem;
+    private final SpreadsheetView spreadsheetView;
+    private final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
+    private final boolean canFix;
+    private final Integer indexColumn;
+    private MenuItem fixItem;
 
-	
-	
-	/***************************************************************************
-     *                                                                         *
-     * Constructor                                                             *
-     *                                                                         *
+    /***************************************************************************
+     * * Constructor * *
      **************************************************************************/
-	/**
-	 * Creates a new SpreadsheetColumn with a minimum width of 30.
-	 * @param column
-	 * @param spreadsheetView
-	 * @param indexColumn
-	 */
-	SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column, SpreadsheetView spreadsheetView, Integer indexColumn) {
-		this.spreadsheetView = spreadsheetView;
-		this.column = column;
-		column.setMinWidth(0); 
-		this.indexColumn = indexColumn;
-		canFix = initCanFix();
-		
-		// The contextMenu creation must be on the JFX thread
-		final Runnable r = new Runnable() {
+    /**
+     * Creates a new SpreadsheetColumn with a minimum width of 30.
+     * 
+     * @param column
+     * @param spreadsheetView
+     * @param indexColumn
+     */
+    SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column,
+            final SpreadsheetView spreadsheetView, final Integer indexColumn) {
+        this.spreadsheetView = spreadsheetView;
+        this.column = column;
+        column.setMinWidth(0);
+        this.indexColumn = indexColumn;
+        canFix = initCanFix();
+
+        // The contextMenu creation must be on the JFX thread
+        final Runnable r = new Runnable() {
             @Override
             public void run() {
-            	column.setContextMenu(getColumnContextMenu());
+                column.setContextMenu(getColumnContextMenu());
             }
         };
         Platform.runLater(r);
 
         // Visual Confirmation
-        if(canFix)
-        	column.setText(column.getText()+".");
-        
-		//FIXME implement better listening after
-		spreadsheetView.getGrid().getRows().addListener(new ListChangeListener<ObservableList<SpreadsheetCell>>(){
-			@Override public void onChanged(Change<? extends ObservableList<SpreadsheetCell>> arg0) {
-				initCanFix();
-			}
-		});
-	}
-	
-	
-	
-	/***************************************************************************
-     *                                                                         *
-     * Public Methods                                                          *
-     *                                                                         *
+        if (canFix)
+            column.setText(column.getText() + ".");
+
+        // When changing FixedColumns, we set header in order to add "." or ":"
+        spreadsheetView.getFixedColumns().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable arg0) {
+                setText(getText());
+            }
+        });
+
+        // When ColumnsHeaders are changing, we update the text
+        ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable arg0) {
+                List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeaders();
+                if (columnsHeader.size() <= indexColumn) {
+                    setText(SpreadsheetView.getExcelLetterFromNumber(indexColumn));
+                } else if (!columnsHeader.get(indexColumn).equals(getText())) {
+                    setText(columnsHeader.get(indexColumn));
+                }
+            }
+        });
+
+        // When changing rows, we re-calculate if this columns can be fixed.
+        spreadsheetView.getGrid().getRows().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable arg0) {
+                initCanFix();
+            }
+        });
+    }
+
+    /***************************************************************************
+     * * Public Methods * *
      **************************************************************************/
-	
-	/**
-	 * Return whether this column is fixed or not.
-	 * @return true if this column is fixed.
-	 */
-	public boolean isFixed() {
-		return spreadsheetView.getFixedColumns().contains(this);
-	}
-	
-	/**
-	 * Fix this column to the left if possible, although it is recommended that
-	 * you call {@link #isColumnFixable()} before trying to fix a column.
-         * @param fixed
-	 */
-	public void setFixed(boolean fixed) {
-	    if (fixed) {
-	        spreadsheetView.getFixedColumns().add(this);
-	    } else {
-	        spreadsheetView.getFixedColumns().removeAll(this);
-	    }
-	}
-	
-	/**
-	 * Set the width of this column.
-         * @param width
-	 */
-	public void setPrefWidth(double width){
-		column.setPrefWidth(width);
-	}
-	
-	/**
-	 * Return the actual width of the column.
-         * @return the actual width of the column
-	 */
-	public double getWidth(){
-		return column.getWidth();
-	}
-	
-	/**
-	 * If this column can be resized by the user
-         * @param b
-	 */
-	public void setResizable(boolean b){
-		column.setResizable(b);
-	}
-	
-	/**
-	 * If the column is resizable, it will compute the optimum 
-	 * width for all the visible cells to be visible.
-	 */
-	public void fitColumn(){
-		if(column.isResizable()){
-			spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, -1);
-		}
-	}
-	
-	/**
-	 * Indicate whether this column can be fixed or not.
-	 * Call that method before calling {@link #setFixed(boolean)} or
-	 * adding an item to {@link SpreadsheetView#getFixedColumns()}.
-	 * @return true if this column is fixable.
-	 */
-	public boolean isColumnFixable(){
-		return canFix;
-	}
-	
-	public void setText(String text){
-		column.setText(text);
-	}
-	
-	public String getText(){
-		return column.getText();
-	}
-	
-	
-	/***************************************************************************
-     *                                                                         *
-     * Private Methods                                               		   *
-     *                                                                         *
+
+    /**
+     * Return whether this column is fixed or not.
+     * 
+     * @return true if this column is fixed.
+     */
+    public boolean isFixed() {
+        return spreadsheetView.getFixedColumns().contains(this);
+    }
+
+    /**
+     * Fix this column to the left if possible, although it is recommended that
+     * you call {@link #isColumnFixable()} before trying to fix a column.
+     * 
+     * @param fixed
+     */
+    public void setFixed(boolean fixed) {
+        if (fixed) {
+            spreadsheetView.getFixedColumns().add(this);
+        } else {
+            spreadsheetView.getFixedColumns().removeAll(this);
+        }
+    }
+
+    /**
+     * Set the width of this column.
+     * 
+     * @param width
+     */
+    public void setPrefWidth(double width) {
+        column.setPrefWidth(width);
+    }
+
+    /**
+     * Return the actual width of the column.
+     * 
+     * @return the actual width of the column
+     */
+    public double getWidth() {
+        return column.getWidth();
+    }
+
+    /**
+     * If this column can be resized by the user
+     * 
+     * @param b
+     */
+    public void setResizable(boolean b) {
+        column.setResizable(b);
+    }
+
+    /**
+     * If the column is resizable, it will compute the optimum width for all the
+     * visible cells to be visible.
+     */
+    public void fitColumn() {
+        if (column.isResizable()) {
+            spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, -1);
+        }
+    }
+
+    /**
+     * Indicate whether this column can be fixed or not. Call that method before
+     * calling {@link #setFixed(boolean)} or adding an item to
+     * {@link SpreadsheetView#getFixedColumns()}.
+     * 
+     * @return true if this column is fixable.
+     */
+    public boolean isColumnFixable() {
+        return canFix;
+    }
+
+    /***************************************************************************
+     * * Private Methods * *
      **************************************************************************/
-	
-	/**
-     * Generate a context Menu in order to fix/unfix some column
-     * It is shown when right-clicking on the column header
+
+    private void setText(String text) {
+        if (!canFix) {
+            column.setText(text);
+        } else if (spreadsheetView.getFixedColumns().contains(this)) {
+            column.setText(text + ":");
+        } else {
+            column.setText(text + ".");
+        }
+
+    }
+
+    private String getText() {
+        return column.getText().replace(".", "").replace(":", "");
+    }
+
+    /**
+     * Generate a context Menu in order to fix/unfix some column It is shown
+     * when right-clicking on the column header
+     * 
      * @return a context menu.
      */
-    private ContextMenu getColumnContextMenu(){
-    	if(canFix){
-	    	final ContextMenu contextMenu = new ContextMenu();
-	
-	    	this.fixItem = new MenuItem("Fix");
-//	    	fixItem.setGraphic(new ImageView(new Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
-	    	fixItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent arg0) {
-					if(!isFixed()){
-						setFixed(true);
-					}else{
-						setFixed(false);
-					}
-				}
-			});
-	        contextMenu.getItems().addAll(fixItem);
-	        
-	        return contextMenu;
-    	}else{
-    		return new ContextMenu();
-    	}
+    private ContextMenu getColumnContextMenu() {
+        if (canFix) {
+            final ContextMenu contextMenu = new ContextMenu();
+
+            this.fixItem = new MenuItem("Fix");
+            // fixItem.setGraphic(new ImageView(new
+            // Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+            fixItem.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent arg0) {
+                    if (!isFixed()) {
+                        setFixed(true);
+                    } else {
+                        setFixed(false);
+                    }
+                }
+            });
+            contextMenu.getItems().addAll(fixItem);
+
+            return contextMenu;
+        } else {
+            return new ContextMenu();
+        }
     }
-    
+
     /**
-	 * Verify that you can fix this column.
-	 * Right now, only a column without any cell spanning 
-	 * can be fixed.
-	 * 
-	 * @return if it's fixable.
-	 */
-	private boolean initCanFix(){
-		for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
-			int columnSpan = row.get(indexColumn).getColumnSpan();
-			if(columnSpan >1 || row.get(indexColumn).getRowSpan()>1)
-				return false;
-//			}else if(columnSpan>1){
-//				columnSpanConstraint = columnSpanConstraint>columnSpan?columnSpanConstraint:columnSpan;
-//			}
-		}
-		return true;
-	}
-    
+     * Verify that you can fix this column. Right now, only a column without any
+     * cell spanning can be fixed.
+     * 
+     * @return if it's fixable.
+     */
+    private boolean initCanFix() {
+        for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
+            int columnSpan = row.get(indexColumn).getColumnSpan();
+            if (columnSpan > 1 || row.get(indexColumn).getRowSpan() > 1)
+                return false;
+            // }else if(columnSpan>1){
+            // columnSpanConstraint =
+            // columnSpanConstraint>columnSpan?columnSpanConstraint:columnSpan;
+            // }
+        }
+        return true;
+    }
+
 }

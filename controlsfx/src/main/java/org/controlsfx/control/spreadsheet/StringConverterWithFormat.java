@@ -35,12 +35,14 @@ import javafx.util.StringConverter;
  * Since the format is specified in the {@link SpreadsheetCell}, we need a
  * converter which provide a runtime method {@link #toStringFormat(Object, String)}.<br/>
  * 
- * This class provide two constructors:<br/>
- * -A default one where you implement the three abstract methods.<br/>
- * -Another one which takes another StringConverter. This is useful when you just want to implement 
- * the {@link #toStringFormat(Object, String)} and let the other converter handle the other methods.
+ * This class provide two constructors:
+ * <ul>
+ * <li>A default one where you implement the three abstract methods.</li>
+ * <li>Another one which takes another StringConverter. This is useful when you just want to implement 
+ * the {@link #toStringFormat(Object, String)} and let the other converter handle the other methods.</li>
+ * </ul>
  * 
- * 
+ * @see SpreadsheetCellType
  * 
  * @param <T>
  */
@@ -67,7 +69,7 @@ public abstract class StringConverterWithFormat<T> extends StringConverter<T> {
      * Converts the object provided into its string form with the specified format.
      * @param value
      * @param format
-     * @return
+     * @return a string containing the converted value with the specified format.
      */
     public String toStringFormat(T value, String format) {
         return toString(value);

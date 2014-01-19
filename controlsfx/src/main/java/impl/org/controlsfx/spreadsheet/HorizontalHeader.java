@@ -97,7 +97,7 @@ public class HorizontalHeader extends TableHeaderRow {
             @Override
             public void run() {
             	 //We are doing that because some columns may be already fixed.
-        		for(SpreadsheetColumn<?> column: view.getFixedColumns()){
+        		for(SpreadsheetColumn column: view.getFixedColumns()){
         			fixColumn(column);
         		}
             	requestLayout();
@@ -194,18 +194,18 @@ public class HorizontalHeader extends TableHeaderRow {
     /**
      * When we fix/unfix some columns, we change the style of the Label header text
      */
-    private final ListChangeListener<SpreadsheetColumn<?>> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn<?>>() {
+    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
 
 		@Override
 		public void onChanged(
-				javafx.collections.ListChangeListener.Change<? extends SpreadsheetColumn<?>> arg0) {
+				javafx.collections.ListChangeListener.Change<? extends SpreadsheetColumn> arg0) {
 			while(arg0.next()){
 				//If we unfix a column
-				for (SpreadsheetColumn<?> remitem : arg0.getRemoved()) {
+				for (SpreadsheetColumn remitem : arg0.getRemoved()) {
                   unfixColumn(remitem);
                 }
 				//If we fix one
-                for (SpreadsheetColumn<?> additem : arg0.getAddedSubList()) {
+                for (SpreadsheetColumn additem : arg0.getAddedSubList()) {
                 	fixColumn(additem);
                 }
 			}
@@ -217,18 +217,18 @@ public class HorizontalHeader extends TableHeaderRow {
 	 * Fix this column regarding the style
 	 * @param column
 	 */
-	private void fixColumn(SpreadsheetColumn<?> column){
+	private void fixColumn(SpreadsheetColumn column){
 		addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
-		column.setText(column.getText().replace(".", "")+":");
+//		column.setText(column.getText().replace(".", "")+":");
 	}
 	
 	/**
 	 * Unfix this column regarding the style
 	 * @param column
 	 */
-	private void unfixColumn(SpreadsheetColumn<?> column){
+	private void unfixColumn(SpreadsheetColumn column){
 		 removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
-		 column.setText(column.getText().replace(":", "."));
+//		 column.setText(column.getText().replace(":", "."));
 	}
 	/**
 	 * Add the fix style of the header Label of the specified column

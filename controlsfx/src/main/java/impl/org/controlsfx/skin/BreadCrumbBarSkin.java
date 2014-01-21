@@ -5,6 +5,8 @@ import java.util.Collections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.layout.HBox;
 
@@ -94,12 +96,24 @@ public class BreadCrumbBarSkin<T extends IBreadCrumbModel> extends BehaviorSkinB
 		
 	}
 
-	private BreadCrumbButton createCrumb(BreadCrumbNodeFactory<T> factory , T t, int i) {
+	private BreadCrumbButton createCrumb(final BreadCrumbNodeFactory<T> factory, final T t, final int i) {
 		BreadCrumbButton crumb = factory.createBreadCrumbButton(t, i);
 		
 		// We want all buttons to have the same height
 		// so we bind their preferred height to the enclosing container
 		crumb.prefHeightProperty().bind(layout.heightProperty());
+		
+		
+		// listen to the action event of each bread crumb
+		
+		crumb.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent ae) {
+				final BreadCrumbBar<T> buttonBar = getSkinnable();
+				t.activated();
+				buttonBar.fireBreadCrumbAction(t);
+			}
+		});
 					
 		return crumb;
 	}

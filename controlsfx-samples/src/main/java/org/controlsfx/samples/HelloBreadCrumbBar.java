@@ -27,6 +27,7 @@
 package org.controlsfx.samples;
 
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
@@ -35,7 +36,9 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.breadcrumbs.BreadCrumbBar;
+import org.controlsfx.control.breadcrumbs.BreadCrumbBar.BreadCrumbActionEvent;
 import org.controlsfx.control.breadcrumbs.SimpleBreadCrumbModel;
+import org.controlsfx.dialog.Dialogs;
 
 public class HelloBreadCrumbBar extends ControlsFXSample {
 
@@ -74,6 +77,19 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
 		root.setTop(sampleBreadCrumbBar);
 		BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
 
+
+
+		sampleBreadCrumbBar.setOnBreadCrumbAction(new EventHandler<BreadCrumbBar.BreadCrumbActionEvent>() {
+			@Override
+			public void handle(BreadCrumbActionEvent bae) {
+				Dialogs.create()
+				.title("BreadCrumbBar")
+				.masthead("Bread Crumb Action")
+				.message("You just clicked on '" + bae.getCrumbModel().getName() + "'!") 
+				.showInformation();
+			}
+		});
+
 		return root;
 	}
 
@@ -83,7 +99,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
 		grid.setHgap(10);
 		grid.setPadding(new Insets(30, 30, 0, 30));
 
-		// TODO Add customisation example controls
+		// TODO Add customization example controls
 
 		return grid;
 	}

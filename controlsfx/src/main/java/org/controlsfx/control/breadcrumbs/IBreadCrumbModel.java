@@ -14,7 +14,7 @@ public interface IBreadCrumbModel {
 	public String getName();
 
 	/**
-	 * Occurs when this breadcrumb is opened
+	 * Occurs when this bread crumb is activated
 	 */
-	public void open();
+	public void activated();
 }

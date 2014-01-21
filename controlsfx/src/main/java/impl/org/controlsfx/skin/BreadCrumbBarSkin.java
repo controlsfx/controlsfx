@@ -22,50 +22,50 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 public class BreadCrumbBarSkin<T extends IBreadCrumbModel> extends BehaviorSkinBase<BreadCrumbBar<T>, BehaviorBase<BreadCrumbBar<T>>>{
 
 	private final HBox layout;
-	
+
 	public BreadCrumbBarSkin(final BreadCrumbBar<T> control) {
-		 super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
-		 
-		 layout = new HBox();
-		 getChildren().add(layout);
-		 	
-		 registerChangeListener(control.crumbsProperty(), "CRUMBS");
-		 
-		 updateCrumbItems();
+		super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+
+		layout = new HBox();
+		getChildren().add(layout);
+
+		registerChangeListener(control.crumbsProperty(), "CRUMBS");
+
+		updateCrumbItems();
 	}
-	
-	 @Override 
-	 protected void handleControlPropertyChanged(String p) {
-		 super.handleControlPropertyChanged(p);
-	     if (p == "CRUMBS") {
-	    	 updateCrumbItems();
-	     }
-	 }
-	 
-	 
-	 private final ListChangeListener<T> crumbsListener = new ListChangeListener<T>() {
-	        @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
-	            
-	        	layoutBreadCrumbs();
-	            getSkinnable().requestLayout();
-	        }
-	 };   
 
-	 private final WeakListChangeListener<T> weakCrumbItemsListener = new WeakListChangeListener<T>(crumbsListener);
-	 
-	 private void updateCrumbItems() {
-	        if (getSkinnable().getCrumbs() != null) {
-	            getSkinnable().getCrumbs().removeListener(weakCrumbItemsListener);
-	        }
+	@Override 
+	protected void handleControlPropertyChanged(String p) {
+		super.handleControlPropertyChanged(p);
+		if (p == "CRUMBS") {
+			updateCrumbItems();
+		}
+	}
 
-	        if (getSkinnable().getCrumbs() != null) {
-	            getSkinnable().getCrumbs().addListener(weakCrumbItemsListener);
-	        }
 
-	        layoutBreadCrumbs();
-	        getSkinnable().requestLayout();
-	    }
-	
+	private final ListChangeListener<T> crumbsListener = new ListChangeListener<T>() {
+		@Override public void onChanged(ListChangeListener.Change<? extends T> change) {
+
+			layoutBreadCrumbs();
+			getSkinnable().requestLayout();
+		}
+	};   
+
+	private final WeakListChangeListener<T> weakCrumbItemsListener = new WeakListChangeListener<T>(crumbsListener);
+
+	private void updateCrumbItems() {
+		if (getSkinnable().getCrumbs() != null) {
+			getSkinnable().getCrumbs().removeListener(weakCrumbItemsListener);
+		}
+
+		if (getSkinnable().getCrumbs() != null) {
+			getSkinnable().getCrumbs().addListener(weakCrumbItemsListener);
+		}
+
+		layoutBreadCrumbs();
+		getSkinnable().requestLayout();
+	}
+
 	/**
 	 * Layout the bread crumbs
 	 */
@@ -73,9 +73,9 @@ public class BreadCrumbBarSkin<T extends IBreadCrumbModel> extends BehaviorSkinB
 		final BreadCrumbBar<T> buttonBar = getSkinnable();
 		final ObservableList<T> crumbs = buttonBar.getCrumbs();
 		final BreadCrumbNodeFactory<T> factory = buttonBar.getCrumbFactory();
-		
+
 		layout.getChildren().clear();
-		
+
 		if(crumbs != null){
 			for (int i=0; crumbs.size() > i; i++) {
 
@@ -93,19 +93,19 @@ public class BreadCrumbBarSkin<T extends IBreadCrumbModel> extends BehaviorSkinB
 				}
 			}
 		}
-		
+
 	}
 
 	private BreadCrumbButton createCrumb(final BreadCrumbNodeFactory<T> factory, final T t, final int i) {
 		BreadCrumbButton crumb = factory.createBreadCrumbButton(t, i);
-		
+
 		// We want all buttons to have the same height
 		// so we bind their preferred height to the enclosing container
 		crumb.prefHeightProperty().bind(layout.heightProperty());
-		
-		
+
+
 		// listen to the action event of each bread crumb
-		
+
 		crumb.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent ae) {
@@ -114,7 +114,7 @@ public class BreadCrumbBarSkin<T extends IBreadCrumbModel> extends BehaviorSkinB
 				buttonBar.fireBreadCrumbAction(t);
 			}
 		});
-					
+
 		return crumb;
 	}
 

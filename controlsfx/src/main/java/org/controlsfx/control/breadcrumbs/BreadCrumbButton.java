@@ -12,14 +12,15 @@ import javafx.scene.shape.Path;
 
 /**
  * Represents a BreadCrumb Button
+ * 
+ * <code>
  * ----------
- *	\         \
- *	/         /
+ * 	\         \
+ * 	/         /
  * ----------
+ * </code>
  * 
  * 
- * @author IsNull
- *
  */
 public class BreadCrumbButton extends Button {
 
@@ -103,8 +104,8 @@ public class BreadCrumbButton extends Button {
 			LineTo e6 = new LineTo(arrowWidth, arrowHeight / 2.0);
 			path.getElements().add(e6);
 		}else{
+			// draw an arc for the first bread crumb
 			ArcTo arcTo = new ArcTo();
-
 			arcTo.setSweepFlag(true);
 			arcTo.setX(0);
 			arcTo.setY(0);

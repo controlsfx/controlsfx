@@ -109,15 +109,24 @@ VerticalHeader > Label {
     -fx-font-style : normal;
 }  
 
-VerticalHeader > Label.selected,
-HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
-	-fx-background-color: -fx-box-border, -fx-inner-border,  #ffd700;
+VerticalHeader > Label.selected{
+-fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to right, derive(#FFDB6D,-10%) ,derive(#FFDB6D,10%));
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
     -fx-text-fill: -fx-selection-bar-text;
     -fx-alignment: center;
-    -fx-border-color : #ffd700;
+    -fx-border-color : #FFDB6D;
+}
+
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
+	-fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to bottom, derive(#FFDB6D,-10%) ,derive(#FFDB6D,10%));
+    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
+    -fx-font-weight: bold;
+    -fx-size: 2em;
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-alignment: center;
+    -fx-border-color : #FFDB6D;
 }  
 
 /* FIXED HEADERS  */

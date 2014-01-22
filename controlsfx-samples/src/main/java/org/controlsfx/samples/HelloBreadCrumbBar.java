@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,11 @@
  */
 package org.controlsfx.samples;
 
-import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -37,76 +38,75 @@ import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.breadcrumbs.BreadCrumbBar;
 import org.controlsfx.control.breadcrumbs.BreadCrumbBar.BreadCrumbActionEvent;
-import org.controlsfx.control.breadcrumbs.SimpleBreadCrumbModel;
 import org.controlsfx.dialog.Dialogs;
 
 public class HelloBreadCrumbBar extends ControlsFXSample {
 
-	BreadCrumbBar<SimpleBreadCrumbModel> sampleBreadCrumbBar;
+    BreadCrumbBar<String> sampleBreadCrumbBar;
 
-	@Override public String getSampleName() {
-		return "BreadCrumbBar";
-	}
+    @Override public String getSampleName() {
+        return "BreadCrumbBar";
+    }
 
-	@Override public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE + "org/controlsfx/control/BreadCrumbBar.html";
-	}
+    @Override public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/BreadCrumbBar.html";
+    }
 
-	@Override public String getSampleDescription() {
-		return "The BreadCrumbBar provides an easy way to navigate hirarchical structures " +
-				" such as file systems.";
-	}
+    @Override public String getSampleDescription() {
+        return "The BreadCrumbBar provides an easy way to navigate hirarchical structures " +
+                "such as file systems.";
+    }
 
-	@Override public Node getPanel(final Stage stage) {
+    @Override public Node getPanel(final Stage stage) {
 
-		BorderPane root = new BorderPane();
+        BorderPane root = new BorderPane();
 
+        sampleBreadCrumbBar = new BreadCrumbBar<>();
+        sampleBreadCrumbBar.getCrumbs().addAll("Hello", "World", "This", "Is", "cool");
 
-		sampleBreadCrumbBar = new BreadCrumbBar<>();
-
-		SimpleBreadCrumbModel[] crumbs = { 
-				new SimpleBreadCrumbModel("Hello"),
-				new SimpleBreadCrumbModel("World"),
-				new SimpleBreadCrumbModel("This"),
-				new SimpleBreadCrumbModel("Is"),
-				new SimpleBreadCrumbModel("cool"),
-		};
-
-		sampleBreadCrumbBar.setCrumbs(FXCollections.observableArrayList(crumbs));
-
-		root.setTop(sampleBreadCrumbBar);
-		BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
+        root.setTop(sampleBreadCrumbBar);
+        BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
 
 
 
-		sampleBreadCrumbBar.setOnBreadCrumbAction(new EventHandler<BreadCrumbBar.BreadCrumbActionEvent>() {
-			@Override
-			public void handle(BreadCrumbActionEvent bae) {
-				Dialogs.create()
-				.title("BreadCrumbBar")
-				.masthead("Bread Crumb Action")
-				.message("You just clicked on '" + bae.getCrumbModel().getName() + "'!") 
-				.showInformation();
-			}
-		});
+        sampleBreadCrumbBar.setOnBreadCrumbAction(new EventHandler<BreadCrumbBar.BreadCrumbActionEvent<String>>() {
+            @Override
+            public void handle(BreadCrumbActionEvent<String> bae) {
+                Dialogs.create()
+                .title("BreadCrumbBar")
+                .masthead("Bread Crumb Action")
+                .message("You just clicked on '" + bae.getCrumbModel() + "'!") 
+                .showInformation();
+            }
+        });
 
-		return root;
-	}
+        return root;
+    }
 
-	@Override public Node getControlPanel() {
-		GridPane grid = new GridPane();
-		grid.setVgap(10);
-		grid.setHgap(10);
-		grid.setPadding(new Insets(30, 30, 0, 30));
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
 
-		// TODO Add customization example controls
+        // TODO Add customization example controls
+        Button btn = new Button("Add Crumb");
+        grid.add(btn, 0, 0);
 
-		return grid;
-	}
+
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent ae) {
+                sampleBreadCrumbBar.getCrumbs().add("New!");
+            }
+        });
+
+        return grid;
+    }
 
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+    public static void main(String[] args) {
+        launch(args);
+    }
 
 }

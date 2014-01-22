@@ -227,8 +227,8 @@ public class SpreadsheetView extends Control {
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
-    private final BooleanProperty fixedRowsFrozenProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty fixedColumnsFrozenProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(false);
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -615,31 +615,31 @@ public class SpreadsheetView extends Control {
      * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row) {
-        return row < rowFix.size() && !isFixedRowsFrozen() ? rowFix.get(row) : false;
+        return row < rowFix.size() && !isFixingRowsAllowed() ? rowFix.get(row) : false;
     }
 
     /**
      * Return whether change to Fixed rows are allowed.
      * @return whether change to Fixed rows are allowed.
      */
-    public boolean isFixedRowsFrozen() {
-        return fixedRowsFrozenProperty.get();
+    public boolean isFixingRowsAllowed() {
+        return fixingRowsAllowedProperty.get();
     }
 
     /**
-     * If set to true, change to fixed rows will be permitted.
+     * If set to true, user will be allowed to fix and unfix the rows.
      * @param b
      */
-    public void setFixedRowsFrozen(boolean b) {
-        fixedRowsFrozenProperty.set(b);
+    public void setFixingRowsAllowed(boolean b) {
+        fixingRowsAllowedProperty.set(b);
     }
 
     /**
-     * Return the Boolean property associated with the frozen fixed rows.
-     * @return the Boolean property associated with the frozen fixed rows.
+     * Return the Boolean property associated with the allowance of fixing or unfixing some rows.
+     * @return the Boolean property associated with the allowance of fixing or unfixing some rows.
      */
-    public ReadOnlyBooleanProperty fixedRowsFrozenProperty() {
-        return fixedRowsFrozenProperty;
+    public ReadOnlyBooleanProperty fixingRowsAllowedProperty() {
+        return fixingRowsAllowedProperty;
     }
 
     /**
@@ -670,24 +670,24 @@ public class SpreadsheetView extends Control {
      * Return whether change to Fixed columns are allowed.
      * @return whether change to Fixed columns are allowed.
      */
-    public boolean isFixedColumnsFrozen() {
-        return fixedColumnsFrozenProperty.get();
+    public boolean isFixingColumnsAllowed() {
+        return fixingColumnsAllowedProperty.get();
     }
 
     /**
-     * If set to true, change to fixed columns will be permitted.
+     * If set to true, user will be allowed to fix and unfix the columns.
      * @param b
      */
-    public void setFixedColumnsFrozen(boolean b) {
-        fixedColumnsFrozenProperty.set(b);
+    public void setFixingColumnsAllowed(boolean b) {
+        fixingColumnsAllowedProperty.set(b);
     }
 
     /**
-     * Return the Boolean property associated with the frozen fixed columns.
-     * @return the Boolean property associated with the frozen fixed columns.
+     * Return the Boolean property associated with the allowance of fixing or unfixing some columns.
+     * @return the Boolean property associated with the allowance of fixing or unfixing some columns.
      */
-    public ReadOnlyBooleanProperty fixedColumnsFrozenProperty() {
-        return fixedColumnsFrozenProperty;
+    public ReadOnlyBooleanProperty fixingColumnsAllowedProperty() {
+        return fixingColumnsAllowedProperty;
     }
     
     /**

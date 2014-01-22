@@ -122,7 +122,7 @@ public class SpreadsheetColumn {
         spreadsheetView.getFixedColumns().addListener(updateTextListener);
 
         // When changing frozen fixed columns, we need to update the header.
-        spreadsheetView.fixedColumnsFrozenProperty().addListener(updateTextListener);
+        spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
 
         // When ColumnsHeaders are changing, we update the text
         ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
@@ -218,7 +218,7 @@ public class SpreadsheetColumn {
      * @return true if this column is fixable.
      */
     public boolean isColumnFixable() {
-        return canFix && !spreadsheetView.isFixedColumnsFrozen();
+        return canFix && !spreadsheetView.isFixingColumnsAllowed();
     }
 
     /***************************************************************************

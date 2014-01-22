@@ -302,7 +302,7 @@ public class SpreadsheetCell {
      * 
      * @return the item property which contains the value.
      */
-    public final ObjectProperty<?> itemProperty() {
+    public final ObjectProperty<Object> itemProperty() {
         return item;
     }
 

@@ -615,7 +615,7 @@ public class SpreadsheetView extends Control {
      * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row) {
-        return row < rowFix.size() && !isFixingRowsAllowed() ? rowFix.get(row) : false;
+        return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
     }
 
     /**

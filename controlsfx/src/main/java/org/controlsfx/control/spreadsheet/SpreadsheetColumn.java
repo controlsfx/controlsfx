@@ -218,7 +218,7 @@ public class SpreadsheetColumn {
      * @return true if this column is fixable.
      */
     public boolean isColumnFixable() {
-        return canFix && !spreadsheetView.isFixingColumnsAllowed();
+        return canFix && spreadsheetView.isFixingColumnsAllowed();
     }
 
     /***************************************************************************

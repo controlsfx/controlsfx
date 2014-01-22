@@ -41,6 +41,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -48,8 +49,12 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.util.Callback;
@@ -73,6 +78,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     /** Default height of a row. */
     public static final double DEFAULT_CELL_HEIGHT;
     
+    //FIXME This should seriously be investigated ..
     static final double DATE_CELL_MIN_WIDTH = 200-Screen.getPrimary().getDpi();
     static {
         double cell_size = 24.0;
@@ -174,9 +180,71 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         verticalHeader.init(this, (HorizontalHeader) getTableHeaderRow());
         
         getFlow().init(spreadsheetView);
+        
+       /**
+        * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME JDK8u20
+        */
+        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+               if(keyEvent.getCode() == KeyCode.LEFT){
+                   keyEvent.consume();
+                   selectLeft();
+                   scrollHorizontally();
+               }else if(keyEvent.getCode() == KeyCode.RIGHT){
+                   keyEvent.consume();
+                   selectRight();
+                   scrollHorizontally();
+               }
+            }
+        });
+    }   
+	
+	/**
+	 * Select the Right cell.
+	 */
+	private void selectRight(){
+        TableSelectionModel sm = getSelectionModel();
+        if (sm == null) return;
+
+        TableFocusModel fm = getFocusModel();
+        if (fm == null) return;
+
+        TablePosition focusedCell = getFocusedCell();
+        int currentRow = focusedCell.getRow();
+        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+        if (currentColumn == getVisibleLeafColumns().size() - 1) return;
+
+        TableColumnBase tc = focusedCell.getTableColumn();
+        tc = getVisibleLeafColumn(currentColumn +1);
+        
+        int row = focusedCell.getRow();
+        sm.clearAndSelect(row, tc);
     }
 	
-    @Override
+	/**
+	 * Select the left cell.
+	 */
+	private void selectLeft(){
+	    TableSelectionModel sm = getSelectionModel();
+        if (sm == null) return;
+
+        TableFocusModel fm = getFocusModel();
+        if (fm == null) return;
+
+        TablePosition focusedCell = getFocusedCell();
+        int currentRow = focusedCell.getRow();
+        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+        if (currentColumn == 0) return;
+
+        TableColumnBase tc = focusedCell.getTableColumn();
+        tc = getVisibleLeafColumn(currentColumn -1);
+        
+        int row = focusedCell.getRow();
+        sm.clearAndSelect(row, tc);
+	}
+
+	@Override
     protected void layoutChildren(double x, double y, double w, final double h) {
         if (spreadsheetView == null) { return; }
         if (spreadsheetView.showRowHeaderProperty().get()) {
@@ -269,6 +337,21 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * END OF MODIFIED BY NELLARMONIA
          *****************************************************************/
     }
+    
+    /**
+     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME JDK8u20
+     */
+    @Override
+    protected void onSelectRightCell() {
+    }
+    
+    /**
+     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME JDK8u20
+     */
+    @Override
+    protected void onSelectLeftCell() {
+    }
+    
     @Override
     protected void onSelectPreviousCell() {
         super.onSelectPreviousCell();

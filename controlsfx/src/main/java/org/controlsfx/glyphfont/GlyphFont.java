@@ -65,6 +65,9 @@ public abstract class GlyphFont {
 	private double size;
 	private Color color;
 	
+	private boolean  fontLoaded = false;
+	private Runnable fontLoader = null;
+	
 
 	/**
 	 * Loads glyph font from specified {@link InputStream}
@@ -72,11 +75,16 @@ public abstract class GlyphFont {
 	 * @param defaultSize default font size
 	 * @param in input stream to load the font from
 	 */
-	public GlyphFont( String fontName, int defaultSize, InputStream in   ) {
+	public GlyphFont( String fontName, int defaultSize, final InputStream in ) {
 		this.fontName = fontName;
 		this.defaultSize = defaultSize;
 		this.size = defaultSize;
-		Font.loadFont(in, -1);
+		fontLoader = new Runnable() {
+			public void run() {
+				Font.loadFont(in, -1);
+				fontLoaded = true;
+			}
+		};
 	}
 	
 	/**
@@ -85,11 +93,16 @@ public abstract class GlyphFont {
 	 * @param defaultSize default font size
 	 * @param urlStr {@link URL} to load the font from
 	 */
-	public GlyphFont( String fontName, int defaultSize, String urlStr ) {
+	public GlyphFont( String fontName, int defaultSize, final String urlStr ) {
 		this.fontName = fontName;
 		this.defaultSize = defaultSize;
 		this.size = defaultSize;
-		Font.loadFont(urlStr, -1);
+		fontLoader = new Runnable() {
+			public void run() {
+				Font.loadFont(urlStr, -1);
+				fontLoaded = true;
+			}
+		};
 	}
 	
 	/**
@@ -134,6 +147,7 @@ public abstract class GlyphFont {
 	 * @return instance of {@link Glyph}
 	 */
 	public Glyph create(char character) {
+		if ( !fontLoaded ) fontLoader.run();
 	    return new Glyph(fontName, character, size, color);
 	}
 	

@@ -115,16 +115,14 @@ public class SpreadsheetColumn {
         Platform.runLater(r);
 
         // Visual Confirmation
-        if (canFix)
+        if (isColumnFixable())
             column.setText(column.getText() + ".");
 
         // When changing FixedColumns, we set header in order to add "." or ":"
-        spreadsheetView.getFixedColumns().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable arg0) {
-                setText(getText());
-            }
-        });
+        spreadsheetView.getFixedColumns().addListener(updateTextListener);
+
+        // When changing frozen fixed columns, we need to update the header.
+        spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
 
         // When ColumnsHeaders are changing, we update the text
         ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
@@ -220,15 +218,14 @@ public class SpreadsheetColumn {
      * @return true if this column is fixable.
      */
     public boolean isColumnFixable() {
-        return canFix;
+        return canFix && spreadsheetView.isFixingColumnsAllowed();
     }
 
     /***************************************************************************
      * * Private Methods * *
      **************************************************************************/
-
     private void setText(String text) {
-        if (!canFix) {
+        if (!isColumnFixable()) {
             column.setText(text);
         } else if (spreadsheetView.getFixedColumns().contains(this)) {
             column.setText(text + ":");
@@ -249,7 +246,7 @@ public class SpreadsheetColumn {
      * @return a context menu.
      */
     private ContextMenu getColumnContextMenu() {
-        if (canFix) {
+        if (isColumnFixable()) {
             final ContextMenu contextMenu = new ContextMenu();
 
             this.fixItem = new MenuItem("Fix");
@@ -291,5 +288,16 @@ public class SpreadsheetColumn {
         }
         return true;
     }
+
+    /**
+     * Update the text in the header. So take the text and remove/add any "." or
+     * ":" if necessary.
+     */
+    private InvalidationListener updateTextListener = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable arg0) {
+            setText(getText());
+        }
+    };
 
 }

@@ -27,6 +27,7 @@
 package impl.org.controlsfx.spreadsheet;
 
 import javafx.application.Platform;
+import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -40,6 +41,7 @@ import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -228,6 +230,30 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else if (!isEditing() && item != null) {
             show(item);
             setGraphic(item.getGraphic());
+
+            /**
+             * If we only have a Image and no text, this means this cell is
+             * supposed to render that image. So I try to make things the good
+             * way by respecting ratio and reduce the image to the max size
+             * allowed by the Grid Design.
+             * 
+             * FIXME Handle when there is text with it.
+             */
+            if ((getText() == null || getText().equals("")) && getGraphic() != null
+                    && getGraphic() instanceof ImageView) {
+                ImageView image = (ImageView) getGraphic();
+                image.setCache(true);
+                image.setPreserveRatio(true);
+                image.setSmooth(true);
+
+                image.fitHeightProperty().bind(
+                        new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
+                                image.getImage().getHeight()).otherwise(heightProperty()));
+                image.fitWidthProperty().bind(
+                        new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
+                                image.getImage().getWidth()).otherwise(widthProperty()));
+            }
+            
             // Sometimes the hoverProperty is not called on exit. So the cell is
             // affected to a new Item but
             // the hover is still activated. So we fix it now.
@@ -254,7 +280,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // We want the text to wrap onto another line
         setWrapText(true);
         setEditable(item.isEditable());
-
     }
 
     public void show() {
@@ -358,8 +383,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     private ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
         @Override
-        public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node arg2) {
-            setGraphic(arg2);
+        public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node newGraphic) {
+            setGraphic(newGraphic);
         }
     };
 

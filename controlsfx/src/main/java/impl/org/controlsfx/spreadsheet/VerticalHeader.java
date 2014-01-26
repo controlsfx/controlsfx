@@ -147,10 +147,11 @@ public class VerticalHeader extends StackPane {
         // position of the verticalHeader
         spreadsheetView.showColumnHeaderProperty().addListener(layout);
         spreadsheetView.getFixedRows().addListener(layout);
-
+        spreadsheetView.fixingRowsAllowedProperty().addListener(layout);
+        
         // In case we resize the view in any manners
         spreadsheetView.heightProperty().addListener(layout);
-
+        
         // For layout properly the verticalHeader when there are some selected
         // items
         skin.getSelectedRows().addListener(layout);

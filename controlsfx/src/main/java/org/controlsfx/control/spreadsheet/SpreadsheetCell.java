@@ -46,13 +46,12 @@ import javafx.scene.Node;
  * 
  * <br/>
  * <h3>SpreadsheetCell Types</h3> Each SpreadsheetCell has its own
- * {@link SpreadsheetCellType} which has its own {@link SpreadsheetCellEditor} in
- * order to control very closely the possible modifications.
+ * {@link SpreadsheetCellType} which has its own {@link SpreadsheetCellEditor}
+ * in order to control very closely the possible modifications.
  * 
  * <p>
- * Different {@link SpreadsheetCellType
- * SpreadsheetCellTypes} are available depending on the data you want to
- * represent in your {@link SpreadsheetView}.
+ * Different {@link SpreadsheetCellType SpreadsheetCellTypes} are available
+ * depending on the data you want to represent in your {@link SpreadsheetView}.
  * You can use the different static method provided in
  * {@link SpreadsheetCellType} in order to create the specialized
  * SpreadsheetCell that suits your need.
@@ -90,7 +89,8 @@ import javafx.scene.Node;
  * 
  * <pre>
  * SpreadsheetCell cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan,
- *         LocalDate.now().plusDays((int) (Math.random() * 10))); //Random value given here
+ *         LocalDate.now().plusDays((int) (Math.random() * 10))); // Random value
+ * // given here
  * final double random = Math.random();
  * if (random &lt; 0.25) {
  *     cell.setFormat(&quot;EEEE d&quot;);
@@ -105,15 +105,18 @@ import javafx.scene.Node;
  * 
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
- * use the {@link #setGraphic(Node)} in order to specify the graphic you want,
- * for example :
+ * use the {@link #setGraphic(Node)} in order to specify the graphic you want.
+ * Be aware that no verification are made on the Image. So reduce wisely your
+ * image to fit the exact space available on your grid or the result will be
+ * incoherent.
+ * 
+ * For example :
  * 
  * <pre>
  * cell.setGraphic(new ImageView(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;))));
  * </pre>
  * 
- * <center><img src="graphicNodeToCell.png"></center>
- * <br>
+ * <center><img src="graphicNodeToCell.png"></center> <br>
  * In addition to that, you can also specify another graphic property to your
  * cell with {@link #commentedProperty()}. This allow you to specify whether
  * this cell has or not a unique property (here a comment). Therefore, you will
@@ -134,8 +137,8 @@ import javafx.scene.Node;
  * You can style your cell by specifying some styleClass with
  * {@link #getStyleClass()}. You just have to create and custom that class in
  * your CSS stylesheet associated with your {@link SpreadsheetView}. Also note
- * that all {@link SpreadsheetCell} have a "<b>spreadsheet-cell</b>" styleClass added
- * by default. Here is a example :<br>
+ * that all {@link SpreadsheetCell} have a "<b>spreadsheet-cell</b>" styleClass
+ * added by default. Here is a example :<br>
  * 
  * <pre>
  * cell.getStyleClass().add(&quot;row_header&quot;);
@@ -290,6 +293,7 @@ public class SpreadsheetCell {
 
     /**
      * Return the value contained in the cell.
+     * 
      * @return the value contained in the cell.
      */
     public final Object getItem() {
@@ -302,7 +306,7 @@ public class SpreadsheetCell {
      * 
      * @return the item property which contains the value.
      */
-    public final ObjectProperty<?> itemProperty() {
+    public final ObjectProperty<Object> itemProperty() {
         return item;
     }
 

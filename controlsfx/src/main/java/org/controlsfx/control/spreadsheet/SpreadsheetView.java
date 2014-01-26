@@ -49,6 +49,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -58,7 +59,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -227,6 +227,8 @@ public class SpreadsheetView extends Control {
     private DataFormat fmt;
     private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
     private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
+    private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -334,27 +336,35 @@ public class SpreadsheetView extends Control {
          */
         cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
-            public void handle(KeyEvent arg0) {
+            public void handle(KeyEvent keyEvent) {
                 // Copy
-                if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.C) == 0)
+                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
                     copyClipboard();
                 // Paste
-                else if (arg0.isShortcutDown() && arg0.getCode().compareTo(KeyCode.V) == 0)
+                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
                     pasteClipboard();
                 // Go to the next row
-                else if (arg0.getCode().compareTo(KeyCode.ENTER) == 0) {
+                else if (keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
                     if (position != null) {
                         cellsView.getSelectionModel().clearAndSelect(position.getRow() + 1, position.getTableColumn());
                     }
+                   /* // Go to next cell
+                } else if (keyEvent.getCode().compareTo(KeyCode.TAB) == 0) {
+                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
+                            .getFocusModel().getFocusedCell();
+                    if (position != null) {
+                        cellsView.getSelectionModel().clearSelection();
+                        cellsView.getSelectionModel().selectRightCell();
+                    }*/
                     // We want to erase values when delete key is pressed.
-                } else if (arg0.getCode().compareTo(KeyCode.DELETE) == 0)
+                } else if (keyEvent.getCode()==KeyCode.DELETE)
                     deleteSelectedCells();
                 // We want to edit if the user is on a cell and typing
-                else if ((arg0.getCode().isLetterKey() || arg0.getCode().isDigitKey() || arg0.getCode().isKeypadKey())
-                        && !arg0.isShortcutDown()) {
+                else if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() || keyEvent.getCode()
+                        .isKeypadKey()) && !keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
                     @SuppressWarnings("unchecked")
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
@@ -613,7 +623,36 @@ public class SpreadsheetView extends Control {
      * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row) {
-        return row < rowFix.size() ? rowFix.get(row) : false;
+        return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
+    }
+
+    /**
+     * Return whether change to Fixed rows are allowed.
+     * 
+     * @return whether change to Fixed rows are allowed.
+     */
+    public boolean isFixingRowsAllowed() {
+        return fixingRowsAllowedProperty.get();
+    }
+
+    /**
+     * If set to true, user will be allowed to fix and unfix the rows.
+     * 
+     * @param b
+     */
+    public void setFixingRowsAllowed(boolean b) {
+        fixingRowsAllowedProperty.set(b);
+    }
+
+    /**
+     * Return the Boolean property associated with the allowance of fixing or
+     * unfixing some rows.
+     * 
+     * @return the Boolean property associated with the allowance of fixing or
+     *         unfixing some rows.
+     */
+    public ReadOnlyBooleanProperty fixingRowsAllowedProperty() {
+        return fixingRowsAllowedProperty;
     }
 
     /**
@@ -638,6 +677,35 @@ public class SpreadsheetView extends Control {
      */
     public boolean isColumnFixable(int columnIndex) {
         return columnIndex < getColumns().size() ? getColumns().get(columnIndex).isColumnFixable() : null;
+    }
+
+    /**
+     * Return whether change to Fixed columns are allowed.
+     * 
+     * @return whether change to Fixed columns are allowed.
+     */
+    public boolean isFixingColumnsAllowed() {
+        return fixingColumnsAllowedProperty.get();
+    }
+
+    /**
+     * If set to true, user will be allowed to fix and unfix the columns.
+     * 
+     * @param b
+     */
+    public void setFixingColumnsAllowed(boolean b) {
+        fixingColumnsAllowedProperty.set(b);
+    }
+
+    /**
+     * Return the Boolean property associated with the allowance of fixing or
+     * unfixing some columns.
+     * 
+     * @return the Boolean property associated with the allowance of fixing or
+     *         unfixing some columns.
+     */
+    public ReadOnlyBooleanProperty fixingColumnsAllowedProperty() {
+        return fixingColumnsAllowedProperty;
     }
 
     /**
@@ -1180,7 +1248,7 @@ public class SpreadsheetView extends Control {
         public SpreadsheetViewSelectionModel(SpreadsheetView spreadsheetView) {
             super(spreadsheetView.cellsView);
             final SpreadsheetGridView cellsView = spreadsheetView.cellsView;
-            cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
                     key = true;
@@ -1795,12 +1863,7 @@ public class SpreadsheetView extends Control {
      * superior, concatenated letters are returned.
      * 
      * 
-     * For example: 
-     * 0    ->  A 
-     * 1    ->  B 
-     * 26   ->  AA 
-     * 32   ->  AG 
-     * 45   ->  AT
+     * For example: 0 -> A 1 -> B 26 -> AA 32 -> AG 45 -> AT
      * 
      * 
      * @param number

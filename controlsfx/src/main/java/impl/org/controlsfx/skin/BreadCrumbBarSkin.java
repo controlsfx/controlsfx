@@ -1,13 +1,19 @@
 package impl.org.controlsfx.skin;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.layout.HBox;
 
 import org.controlsfx.control.breadcrumbs.BreadCrumbBar;
@@ -29,52 +35,65 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         layout = new HBox();
         getChildren().add(layout);
 
-        updateCrumbItems();
+        control.pathTargetProperty().addListener(pathTargetChangeListener);
+
+        updatePathTarget(getSkinnable().pathTargetProperty().get(), null);
     }
 
-    @Override 
-    protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        if (p == "CRUMBS") {
-            updateCrumbItems();
+    /**
+     * Occurs when the pathTarget property has changed
+     */
+    private final ChangeListener<TreeItem<T>> pathTargetChangeListener =
+            new ChangeListener<TreeItem<T>>() {
+        @Override
+        public void changed(
+                ObservableValue<? extends TreeItem<T>> obs,
+                        TreeItem<T> oldItem,
+                        TreeItem<T> newItem) {
+
+            updatePathTarget(newItem, oldItem);
         }
-    }
+    };
 
+    private void updatePathTarget(TreeItem<T> newTarget, TreeItem<T> oldTarget) {
 
-    private final ListChangeListener<T> crumbsListener = new ListChangeListener<T>() {
-        @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
-
-            layoutBreadCrumbs();
-            getSkinnable().requestLayout();
-        }
-    };   
-
-    private final WeakListChangeListener<T> weakCrumbItemsListener = new WeakListChangeListener<T>(crumbsListener);
-
-    private void updateCrumbItems() {
-        if (getSkinnable().getCrumbs() != null) {
-            getSkinnable().getCrumbs().removeListener(weakCrumbItemsListener);
+        if(oldTarget != null){
+            // remove old listener
+            newTarget.removeEventHandler(TreeItem.childrenModificationEvent(), treeChildrenModifiedHandler);
         }
 
-        if (getSkinnable().getCrumbs() != null) {
-            getSkinnable().getCrumbs().addListener(weakCrumbItemsListener);
+        if(newTarget != null){
+            // add new listener
+            newTarget.addEventHandler(TreeItem.childrenModificationEvent(), treeChildrenModifiedHandler);
         }
 
         layoutBreadCrumbs();
-        getSkinnable().requestLayout();
+        //getSkinnable().requestLayout();
     }
+
+
+    private final EventHandler<TreeModificationEvent<Object>> treeChildrenModifiedHandler = new EventHandler<TreeModificationEvent<Object>>(){
+
+        @Override
+        public void handle(TreeModificationEvent<Object> args) {
+            layoutBreadCrumbs();
+        }
+    };
+
 
     /**
      * Layout the bread crumbs
      */
     private void layoutBreadCrumbs() {
         final BreadCrumbBar<T> buttonBar = getSkinnable();
-        final ObservableList<T> crumbs = buttonBar.getCrumbs();
+        final TreeItem<T> pathTarget = buttonBar.getPathTarget();
         final BreadCrumbNodeFactory<T> factory = buttonBar.getCrumbFactory();
 
         layout.getChildren().clear();
 
-        if(crumbs != null){
+        if(pathTarget != null){
+            List<TreeItem<T>> crumbs = constructFlatPath(pathTarget);
+
             for (int i=0; crumbs.size() > i; i++) {
 
                 BreadCrumbButton item = createCrumb(factory, crumbs.get(i), i);
@@ -94,7 +113,21 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
 
     }
 
-    private BreadCrumbButton createCrumb(final BreadCrumbNodeFactory<T> factory, final T t, final int i) {
+    private List<TreeItem<T>> constructFlatPath(TreeItem<T> bottomMost){
+        // construct a flat list for the crumbs
+        List<TreeItem<T>> path = new ArrayList<>();
+
+        TreeItem<T> current = bottomMost;
+        do {
+            path.add(current);
+            current = current.getParent();
+        } while (current != null);
+
+        Collections.reverse(path);
+        return path;
+    }
+
+    private BreadCrumbButton createCrumb(final BreadCrumbNodeFactory<T> factory, final TreeItem<T> t, final int i) {
         BreadCrumbButton crumb = factory.createBreadCrumbButton(t, i);
 
         // We want all buttons to have the same height

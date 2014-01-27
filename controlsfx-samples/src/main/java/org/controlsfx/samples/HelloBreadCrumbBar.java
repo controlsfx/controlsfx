@@ -62,7 +62,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         BorderPane root = new BorderPane();
 
         sampleBreadCrumbBar = new BreadCrumbBar<>();
-        sampleBreadCrumbBar.getCrumbs().addAll("Hello", "World", "This", "Is", "cool");
+        sampleBreadCrumbBar.appendCrumbs("Hello", "World", "This", "Is", "cool");
 
         root.setTop(sampleBreadCrumbBar);
         BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
@@ -97,7 +97,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent ae) {
-                sampleBreadCrumbBar.getCrumbs().add("New!");
+                sampleBreadCrumbBar.appendCrumbs("New!");
             }
         });
 

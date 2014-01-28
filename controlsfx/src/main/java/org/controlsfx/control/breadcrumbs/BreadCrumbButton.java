@@ -26,8 +26,13 @@
  */
 package org.controlsfx.control.breadcrumbs;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.TreeItem;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.ClosePath;
@@ -35,6 +40,7 @@ import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.Shape;
 
 /**
  * Represents a BreadCrumb Button
@@ -50,6 +56,8 @@ import javafx.scene.shape.Path;
  */
 public class BreadCrumbButton extends Button {
 
+    private final ObjectProperty<Boolean> first = new SimpleObjectProperty<Boolean>(this, "first");
+
     private final double arrowWidth = 5;
     private final double arrowHeight = 20;
 
@@ -59,8 +67,8 @@ public class BreadCrumbButton extends Button {
      * @param text Buttons text
      * @param first Is this the first / home button?
      */
-    public BreadCrumbButton(String text, boolean first){
-        this(text, null, first);
+    public BreadCrumbButton(String text){
+        this(text, null);
     }
 
     /**
@@ -69,14 +77,51 @@ public class BreadCrumbButton extends Button {
      * @param gfx Gfx of the Button
      * @param first Is this the first / home button?
      */
-    public BreadCrumbButton(String text, Node gfx, boolean first){
+    public BreadCrumbButton(String text, Node gfx){
         super(text, gfx);
-        // set path as button shape
-        this.setShape(createButtonShape(first));
+        first.set(false);
+
+        firstProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> obs, Boolean oldfirst, Boolean newfirst) {
+                updateShape();
+            }
+        });
+
+        updateShape();
     }
 
+    private void updateShape(){
+        this.setShape(createButtonShape(isFirst()));
+    }
+
+
+    /**
+     * Gets the crumb arrow with
+     * @return
+     */
     public double getArrowWidth(){
         return arrowWidth;
+    }
+
+    /**
+     * Has this button the first flag?
+     * @return
+     */
+    public boolean isFirst() {
+        return first.get();
+    }
+
+    /**
+     * Set this button as the first
+     * @param first
+     */
+    public void setFirst(boolean first) {
+        this.first.set(first);
+    }
+
+    public ObjectProperty<Boolean> firstProperty(){
+        return first;
     }
 
     /**
@@ -147,4 +192,6 @@ public class BreadCrumbButton extends Button {
         path.setFill(Color.BLACK);
         return path;
     }
+
+
 }

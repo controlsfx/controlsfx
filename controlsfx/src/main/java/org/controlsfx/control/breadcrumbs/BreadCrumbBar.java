@@ -37,6 +37,8 @@ import javafx.event.EventType;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
+import javafx.util.Callback;
+import jdk.nashorn.internal.codegen.CompilerConstants.Call;
 
 /**
  * Represents a bread crumb bar
@@ -45,7 +47,7 @@ import javafx.scene.control.TreeItem;
 public class BreadCrumbBar<T> extends Control {
 
     private final ObjectProperty<TreeItem<T>> pathTarget = new SimpleObjectProperty<TreeItem<T>>(this, "pathTarget");
-    private final ObjectProperty<BreadCrumbNodeFactory<T>> crumbFactory = new SimpleObjectProperty<BreadCrumbNodeFactory<T>>(this, "crumbFactory");
+    private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
 
 
     @SuppressWarnings("serial")
@@ -65,11 +67,10 @@ public class BreadCrumbBar<T> extends Control {
         }
     }
 
-
-    private final BreadCrumbNodeFactory<T> defaultCrumbNodeFactory = new BreadCrumbNodeFactory<T>(){
+    private final Callback<TreeItem<T>, BreadCrumbButton> defaultCrumbNodeFactory = new Callback<TreeItem<T>, BreadCrumbButton>(){
         @Override
-        public BreadCrumbButton createBreadCrumbButton(TreeItem<T> crumb, int index) {
-            return new BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "", index == 0);
+        public BreadCrumbButton call(TreeItem<T> crumb) {
+            return new BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
         }
     };
 
@@ -152,7 +153,7 @@ public class BreadCrumbBar<T> extends Control {
 
 
     // --- crumb factory
-    public final ObjectProperty<BreadCrumbNodeFactory<T>> crumbFactoryProperty() {
+    public final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactoryProperty() {
         return crumbFactory;
     }
 
@@ -161,7 +162,7 @@ public class BreadCrumbBar<T> extends Control {
      * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
      * <code>null</code> is not allowed and will result in a fall back to the default factory.
      */
-    public final void setCrumbFactory(BreadCrumbNodeFactory<T> value) {
+    public final void setCrumbFactory(Callback<TreeItem<T>, BreadCrumbButton> value) {
         if(value == null){
             value = defaultCrumbNodeFactory;
         }
@@ -172,7 +173,7 @@ public class BreadCrumbBar<T> extends Control {
      * Returns the cell factory that will be used to create {@link BreadCrumbButton} 
      * instances
      */
-    public final BreadCrumbNodeFactory<T> getCrumbFactory() {
+    public final Callback<TreeItem<T>, BreadCrumbButton> getCrumbFactory() {
         return crumbFactory.get();
     }
 

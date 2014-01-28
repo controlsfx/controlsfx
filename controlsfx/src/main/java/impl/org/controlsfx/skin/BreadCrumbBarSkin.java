@@ -32,18 +32,15 @@ import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 
 import org.controlsfx.control.breadcrumbs.BreadCrumbBar;
-import org.controlsfx.control.breadcrumbs.BreadCrumbNodeFactory;
 import org.controlsfx.control.breadcrumbs.BreadCrumbButton;
 import org.controlsfx.control.breadcrumbs.BreadCrumbBar.BreadCrumbActionEvent;
 
@@ -116,7 +113,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     private void layoutBreadCrumbs() {
         final BreadCrumbBar<T> buttonBar = getSkinnable();
         final TreeItem<T> pathTarget = buttonBar.getPathTarget();
-        final BreadCrumbNodeFactory<T> factory = buttonBar.getCrumbFactory();
+        final Callback<TreeItem<T>, BreadCrumbButton> factory = buttonBar.getCrumbFactory();
 
         layout.getChildren().clear();
 
@@ -125,17 +122,18 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
 
             for (int i=0; crumbs.size() > i; i++) {
 
-                BreadCrumbButton item = createCrumb(factory, crumbs.get(i), i);
+                BreadCrumbButton crumbView = createCrumb(factory, crumbs.get(i));
+                if(i == 0) crumbView.setFirst(true);
 
-                if(item != null){
+                if(crumbView != null){
                     // We have to position the bread crumbs slightly overlapping
                     // thus we have to create negative Insets
-                    double ins = item.getArrowWidth() / 2.0;
+                    double ins = crumbView.getArrowWidth() / 2.0;
                     double right = -ins - 0.1d;
                     double left = !(i==0) ? right : 0; // Omit the first button
 
-                    HBox.setMargin(item, new Insets(0, right, 0, left));
-                    layout.getChildren().add(item);
+                    HBox.setMargin(crumbView, new Insets(0, right, 0, left));
+                    layout.getChildren().add(crumbView);
                 }
             }
         }
@@ -160,11 +158,10 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     }
 
     private BreadCrumbButton createCrumb(
-            final BreadCrumbNodeFactory<T> factory,
-            final TreeItem<T> crumbModel,
-            final int i) {
+            final Callback<TreeItem<T>, BreadCrumbButton> factory,
+            final TreeItem<T> crumbModel) {
 
-        BreadCrumbButton crumb = factory.createBreadCrumbButton(crumbModel, i);
+        BreadCrumbButton crumb = factory.call(crumbModel);
 
         // We want all buttons to have the same height
         // so we bind their preferred height to the enclosing container

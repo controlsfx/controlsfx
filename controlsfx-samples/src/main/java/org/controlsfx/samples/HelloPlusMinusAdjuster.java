@@ -29,8 +29,10 @@ package org.controlsfx.samples;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -41,7 +43,7 @@ import org.controlsfx.control.PlusMinusEvent;
 
 public class HelloPlusMinusAdjuster extends ControlsFXSample {
 
-	private PlusMinusAdjuster plusMinusAdjuster;
+	private PlusMinusAdjuster plusMinusAdjuster = new PlusMinusAdjuster();
 
 	@Override
 	public Node getPanel(Stage stage) {
@@ -53,8 +55,6 @@ public class HelloPlusMinusAdjuster extends ControlsFXSample {
 		vBox.setStyle("-fx-padding: 40;");
 		
 		group.getChildren().add(vBox);
-
-		plusMinusAdjuster = new PlusMinusAdjuster();
 
 		vBox.getChildren().add(plusMinusAdjuster);
 
@@ -80,7 +80,11 @@ public class HelloPlusMinusAdjuster extends ControlsFXSample {
 
 	@Override
 	public Node getControlPanel() {
-		return null;
+		ComboBox<Orientation> box = new ComboBox<>();
+		box.getItems().addAll(Orientation.values());
+		box.setValue(plusMinusAdjuster.getOrientation());
+		plusMinusAdjuster.orientationProperty().bind(box.valueProperty());
+		return box;
 	}
 
 	public static void main(String[] args) {

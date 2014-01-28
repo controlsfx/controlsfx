@@ -98,11 +98,14 @@ public class PlusMinusAdjusterSkin extends SkinBase<PlusMinusAdjuster> {
 					public void changed(
 							ObservableValue<? extends Orientation> observable,
 							Orientation oldValue, Orientation newValue) {
+						updateLayout(newValue);
 					};
 				});
 	}
 
 	private void updateLayout(Orientation orientation) {
+		borderPane.getChildren().clear();
+		
 		switch (orientation) {
 		case HORIZONTAL:
 			borderPane.setLeft(minusRegion);

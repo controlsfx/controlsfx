@@ -26,8 +26,11 @@
  */
 package org.controlsfx.control.breadcrumbs;
 
+import com.sun.javafx.event.EventHandlerManager;
+
 import impl.org.controlsfx.skin.BreadCrumbBarSkin;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -87,11 +90,34 @@ public class BreadCrumbBar<T> extends Control {
     /**
      * Register an action event handler which is invoked when a bread crumb is activated
      * @param handler
-     */
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setOnBreadCrumbAction(EventHandler<BreadCrumbActionEvent<T>> handler){
         addEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)handler);
-    }
+    } */
+
+    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
+
+    public final ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbActionProperty() { return onCrumbAction; }
+    public final void setOnCrumbAction(EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> value) { onCrumbActionProperty().set(value); }
+    public final EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> getOnCrumbAction() { return onCrumbActionProperty().get(); }
+
+
+    private ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
+        @Override protected void invalidated() {
+            eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
+        }
+
+        @Override
+        public Object getBean() {
+            return BreadCrumbBar.this;
+        }
+
+        @Override
+        public String getName() {
+            return "onCrumbAction";
+        }
+    };
 
 
     /**

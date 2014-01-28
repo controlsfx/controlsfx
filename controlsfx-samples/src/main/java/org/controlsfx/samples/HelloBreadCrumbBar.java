@@ -68,8 +68,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
 
 
-
-        sampleBreadCrumbBar.setOnBreadCrumbAction(new EventHandler<BreadCrumbBar.BreadCrumbActionEvent<String>>() {
+        sampleBreadCrumbBar.setOnCrumbAction(new EventHandler<BreadCrumbBar.BreadCrumbActionEvent<String>>() {
             @Override
             public void handle(BreadCrumbActionEvent<String> bae) {
                 Dialogs.create()

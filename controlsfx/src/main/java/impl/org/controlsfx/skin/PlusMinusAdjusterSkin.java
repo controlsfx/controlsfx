@@ -1,0 +1,133 @@
+package impl.org.controlsfx.skin;
+
+import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+import static javafx.scene.input.MouseEvent.MOUSE_RELEASED;
+import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.Slider;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
+import javafx.util.Duration;
+
+import org.controlsfx.control.PlusMinusAdjuster;
+import org.controlsfx.control.PlusMinusEvent;
+
+public class PlusMinusAdjusterSkin extends SkinBase<PlusMinusAdjuster> {
+
+	private SliderReader reader;
+
+	private Slider slider;
+
+	private Region plusRegion;
+
+	private Region minusRegion;
+
+	private BorderPane borderPane;
+
+	public PlusMinusAdjusterSkin(PlusMinusAdjuster adjuster) {
+		super(adjuster);
+
+		/*
+		 * We are not supporting any key events, yet. Adding this filter makes
+		 * sure the user doesn't use the standard key bindings of the slider. In
+		 * that case the thumb would not move itself back automatically (e.g.
+		 * after pressing "arrow right").
+		 */
+		adjuster.addEventFilter(KeyEvent.ANY, new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				event.consume();
+			}
+		});
+
+		slider = new Slider(-1, 1, 0);
+
+		Bindings.bindBidirectional(adjuster.valueProperty(),
+				slider.valueProperty());
+
+		slider.orientationProperty().bind(adjuster.orientationProperty());
+
+		slider.addEventHandler(MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent evt) {
+				reader = new SliderReader();
+				reader.start();
+			}
+		});
+
+		slider.addEventHandler(MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent evt) {
+				if (reader != null) {
+					reader.stop();
+				}
+
+				KeyValue keyValue = new KeyValue(slider.valueProperty(), 0);
+				KeyFrame keyFrame = new KeyFrame(Duration.millis(100), keyValue);
+				Timeline timeline = new Timeline(keyFrame);
+				timeline.play();
+			}
+		});
+
+		plusRegion = new Region();
+		plusRegion.getStyleClass().add("adjust-plus");
+
+		minusRegion = new Region();
+		minusRegion.getStyleClass().add("adjust-minus");
+
+		borderPane = new BorderPane();
+
+		updateLayout(adjuster.getOrientation());
+
+		getChildren().add(borderPane);
+
+		adjuster.orientationProperty().addListener(
+				new ChangeListener<Orientation>() {
+					public void changed(
+							ObservableValue<? extends Orientation> observable,
+							Orientation oldValue, Orientation newValue) {
+					};
+				});
+	}
+
+	private void updateLayout(Orientation orientation) {
+		switch (orientation) {
+		case HORIZONTAL:
+			borderPane.setLeft(minusRegion);
+			borderPane.setCenter(slider);
+			borderPane.setRight(plusRegion);
+			break;
+		case VERTICAL:
+			borderPane.setTop(plusRegion);
+			borderPane.setCenter(slider);
+			borderPane.setBottom(minusRegion);
+			break;
+		}
+	}
+
+	class SliderReader extends AnimationTimer {
+		private long lastTime = System.currentTimeMillis();
+
+		@Override
+		public void handle(long now) {
+			// max speed: 100 hundred times per second
+			if (now - lastTime > 10000000) {
+				lastTime = now;
+				slider.fireEvent(new PlusMinusEvent(slider, slider,
+						PlusMinusEvent.VALUE_CHANGED, slider.getValue()));
+			}
+		}
+	}
+}

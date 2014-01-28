@@ -1,0 +1,245 @@
+package org.controlsfx.control;
+
+import impl.org.controlsfx.skin.PlusMinusAdjusterSkin;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
+
+import com.sun.javafx.css.converters.EnumConverter;
+
+/**
+ * A plus minus adjuster allows the user to continously fire an event carrying a
+ * value between -1 and +1 by moving a thumb from its center position to the
+ * left or right edge of the control. The thumb will automatically center itself
+ * again on the zero position when the user lets go of the mouse button.
+ * Scrolling through a large list of items at different speeds is one possible
+ * use case for a control like this.
+ * 
+ * <center> <img src="plus-minus-adjuster.png"/> </center>
+ */
+public class PlusMinusAdjuster extends Control {
+
+	private static final String DEFAULT_STYLE_CLASS = "plus-minus-adjuster";
+
+	private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass
+			.getPseudoClass("vertical");
+
+	private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE = PseudoClass
+			.getPseudoClass("horizontal");
+
+	/**
+	 * Constructs a new adjuster control with a default horizontal orientation.
+	 */
+	public PlusMinusAdjuster() {
+		getStyleClass().add(DEFAULT_STYLE_CLASS);
+
+		getStylesheets().add(
+				PlusMinusAdjuster.class.getResource("plusminusadjuster.css")
+						.toExternalForm());
+
+		setOrientation(Orientation.HORIZONTAL);
+	}
+
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new PlusMinusAdjusterSkin(this);
+	}
+
+	private DoubleProperty value = new SimpleDoubleProperty(this, "value", 0);
+
+	/**
+	 * Returns the value property of the adjuster. The value is always between
+	 * -1 and +1.
+	 * 
+	 * @return the value of the adjuster
+	 */
+	public final DoubleProperty valueProperty() {
+		return value;
+	}
+
+	/**
+	 * Returns the value of the value property.
+	 * 
+	 * @return the value of the adjuster [-1, +1]
+	 * 
+	 * @see #valueProperty()
+	 */
+	public final double getValue() {
+		return valueProperty().get();
+	}
+
+	// orientation
+
+	private ObjectProperty<Orientation> orientation;
+
+	/**
+	 * Sets the value of the orientation property.
+	 * 
+	 * @param value
+	 *            the new orientation (horizontal, vertical).
+	 * @see #orientationProperty()
+	 */
+	public final void setOrientation(Orientation value) {
+		orientationProperty().set(value);
+	}
+
+	/**
+	 * Returns the value of the orientation property.
+	 * 
+	 * @return the current orientation of the control
+	 * @see #orientationProperty()
+	 */
+	public final Orientation getOrientation() {
+		return orientation == null ? Orientation.HORIZONTAL : orientation.get();
+	}
+
+	/**
+	 * Returns the stylable object property used for storing the orientation of
+	 * the adjuster control. The CSS property "-fx-orientation" can be used to
+	 * initialize this value.
+	 * 
+	 * @return the orientation property
+	 */
+	public final ObjectProperty<Orientation> orientationProperty() {
+		if (orientation == null) {
+			orientation = new StyleableObjectProperty<Orientation>(null) {
+				@Override
+				protected void invalidated() {
+					final boolean vertical = (get() == Orientation.VERTICAL);
+					pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE,
+							vertical);
+					pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE,
+							!vertical);
+				}
+
+				@Override
+				public CssMetaData<PlusMinusAdjuster, Orientation> getCssMetaData() {
+					return StyleableProperties.ORIENTATION;
+				}
+
+				@Override
+				public Object getBean() {
+					return PlusMinusAdjuster.this;
+				}
+
+				@Override
+				public String getName() {
+					return "orientation";
+				}
+			};
+		}
+		return orientation;
+	}
+
+	// event support
+
+	/**
+	 * Stores the event handler that will be informed when the adjuster's value
+	 * changes.
+	 * 
+	 * @return the value change event handler property
+	 */
+	public final ObjectProperty<EventHandler<PlusMinusEvent>> onValueChangedProperty() {
+		return onValueChanged;
+	}
+
+	/**
+	 * Sets an event handler that will receive plus minus events when the user
+	 * moves the adjuster's thumb.
+	 * 
+	 * @param value
+	 *            the event handler
+	 * 
+	 * @see #onValueChangedProperty()
+	 */
+	public final void setOnValueChanged(EventHandler<PlusMinusEvent> value) {
+		onValueChangedProperty().set(value);
+	}
+
+	/**
+	 * Returns the event handler that will be notified when the adjuster's value
+	 * changes.
+	 * 
+	 * @return
+	 */
+	public final EventHandler<PlusMinusEvent> getOnValueChanged() {
+		return onValueChangedProperty().get();
+	}
+
+	private ObjectProperty<EventHandler<PlusMinusEvent>> onValueChanged = new ObjectPropertyBase<EventHandler<PlusMinusEvent>>() {
+
+		@Override
+		protected void invalidated() {
+			setEventHandler(PlusMinusEvent.VALUE_CHANGED, get());
+		}
+
+		@Override
+		public Object getBean() {
+			return PlusMinusAdjuster.this;
+		}
+
+		@Override
+		public String getName() {
+			return "onValueChanged";
+		}
+	};
+
+	private static class StyleableProperties {
+
+		private static final CssMetaData<PlusMinusAdjuster, Orientation> ORIENTATION = new CssMetaData<PlusMinusAdjuster, Orientation>(
+				"-fx-orientation", new EnumConverter<Orientation>(
+						Orientation.class), Orientation.VERTICAL) {
+
+			@Override
+			public Orientation getInitialValue(PlusMinusAdjuster node) {
+				// A vertical Slider should remain vertical
+				return node.getOrientation();
+			}
+
+			@Override
+			public boolean isSettable(PlusMinusAdjuster n) {
+				return n.orientation == null || !n.orientation.isBound();
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public StyleableProperty<Orientation> getStyleableProperty(
+					PlusMinusAdjuster n) {
+				return (StyleableProperty<Orientation>) n.orientationProperty();
+			}
+		};
+
+		private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+		static {
+			final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<CssMetaData<? extends Styleable, ?>>(
+					Control.getClassCssMetaData());
+			styleables.add(ORIENTATION);
+
+			STYLEABLES = Collections.unmodifiableList(styleables);
+		}
+	}
+
+	/**
+	 * @return The CssMetaData associated with this class, which may include the
+	 *         CssMetaData of its super classes.
+	 * @since JavaFX 8.0
+	 */
+	public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+		return StyleableProperties.STYLEABLES;
+	}
+}

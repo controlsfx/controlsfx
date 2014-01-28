@@ -35,9 +35,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
+import javafx.scene.layout.Region;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
@@ -73,7 +76,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * That is to say, when the VirtualFlow has not already placed one.
      */
     private ArrayList<T> myFixedCells = new ArrayList<>();
-
+    private List<Node> sheetChildren;
+    
     /***************************************************************************
      * * Constructor * *
      **************************************************************************/
@@ -91,8 +95,30 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
         // FIXME Until RT-31777 is resolved
         getHbar().setUnitIncrement(10);
+        
+        sheetChildren = findSheetChildren();
     }
 
+    /**
+     * WARNING : This is bad but no other options right now.
+     * This will find the sheetChildren of the VirtualFlow, 
+     * aka where the cells are kept and clipped. See layoutFixedRows() for use.
+     * 
+     * @return
+     */
+    private List<Node> findSheetChildren(){
+        if(!getChildren().isEmpty()){
+            if(getChildren().get(0) instanceof Region){
+                Region region = (Region) getChildren().get(0);
+                if(!region.getChildrenUnmodifiable().isEmpty()){
+                    if(region.getChildrenUnmodifiable().get(0) instanceof Group){
+                        return ((Group)region.getChildrenUnmodifiable().get(0)).getChildren();
+                    }
+                }
+            }
+        }
+        return new ArrayList<>();
+    }
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
@@ -273,14 +299,30 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 
                 cell = containsRows(fixedRowIndex);
                 if (cell == null) {
-                	cell = getAvailableCell(fixedRowIndex);
+                    /**
+                     * getAvailableCell is not added our cell to the ViewPort in some cases.
+                     * So we need to instantiate it ourselves.
+                     */
+                    cell = getCreateCell().call(this);
+                    cell.getProperties().put("newcell", null);
+//                	cell = getAvailableCell(fixedRowIndex);
+                	 
                     setCellIndex(cell, fixedRowIndex);
                     resizeCellSize(cell);
                     myFixedCells.add(cell);
                 }
                 
-                cell.setVisible(true);
+                /**
+                 * Sometime, when we set a new Grid on a SpreadsheetView without recreating it,
+                 * we can end up with some rows not being added to the ViewPort.
+                 * So we must be sure it's in and add it ourself otherwise.
+                 */
+                if(!sheetChildren.contains(cell)){
+                    sheetChildren.add(cell);
+                }
+               
                 cell.setManaged(true);
+                cell.setVisible(true);
                 cell.toFront();
                 cell.requestLayout();
             }

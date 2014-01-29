@@ -33,6 +33,7 @@ import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.TreeItem;
@@ -186,7 +187,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
      */
     protected void onBreadCrumbAction(final TreeItem<T> crumbModel){
         final BreadCrumbBar<T> buttonBar = getSkinnable();
-        buttonBar.fireEvent(new BreadCrumbActionEvent<T>(crumbModel));
+        Event.fireEvent(buttonBar, new BreadCrumbActionEvent<T>(crumbModel));
 
         // navigate to the clicked crumb
         buttonBar.setPathTarget(crumbModel);

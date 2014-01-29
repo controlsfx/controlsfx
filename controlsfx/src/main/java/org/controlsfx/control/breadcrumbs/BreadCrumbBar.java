@@ -52,6 +52,8 @@ public class BreadCrumbBar<T> extends Control {
     private final ObjectProperty<TreeItem<T>> pathTarget = new SimpleObjectProperty<TreeItem<T>>(this, "pathTarget");
     private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
 
+    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
+
 
     @SuppressWarnings("serial")
     public static class BreadCrumbActionEvent<TE> extends Event {
@@ -70,39 +72,10 @@ public class BreadCrumbBar<T> extends Control {
         }
     }
 
-    private final Callback<TreeItem<T>, BreadCrumbButton> defaultCrumbNodeFactory = new Callback<TreeItem<T>, BreadCrumbButton>(){
-        @Override
-        public BreadCrumbButton call(TreeItem<T> crumb) {
-            return new BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
-        }
-    };
-
-    public BreadCrumbBar(){
-        this(null);
-    }
-
-    public BreadCrumbBar(TreeItem<T> pathTarget) {
-        getStyleClass().add(DEFAULT_STYLE_CLASS);
-        setPathTarget(pathTarget);
-        setCrumbFactory(defaultCrumbNodeFactory);
-    }
-
-    /**
-     * Register an action event handler which is invoked when a bread crumb is activated
-     * @param handler
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void setOnBreadCrumbAction(EventHandler<BreadCrumbActionEvent<T>> handler){
-        addEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)handler);
-    } */
-
-    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     public final ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbActionProperty() { return onCrumbAction; }
     public final void setOnCrumbAction(EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> value) { onCrumbActionProperty().set(value); }
     public final EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> getOnCrumbAction() { return onCrumbActionProperty().get(); }
-
-
     private ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
         @Override protected void invalidated() {
             eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
@@ -119,6 +92,24 @@ public class BreadCrumbBar<T> extends Control {
         }
     };
 
+
+
+    private final Callback<TreeItem<T>, BreadCrumbButton> defaultCrumbNodeFactory = new Callback<TreeItem<T>, BreadCrumbButton>(){
+        @Override
+        public BreadCrumbButton call(TreeItem<T> crumb) {
+            return new BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
+        }
+    };
+
+    public BreadCrumbBar(){
+        this(null);
+    }
+
+    public BreadCrumbBar(TreeItem<T> pathTarget) {
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
+        setPathTarget(pathTarget);
+        setCrumbFactory(defaultCrumbNodeFactory);
+    }
 
     /**
      * {@inheritDoc}
@@ -160,11 +151,11 @@ public class BreadCrumbBar<T> extends Control {
     }
 
     /**
-     * Append the given crumbs to the path
+     * Create a tree model from the flat list
      * @param crumbs
      */
-    public final void appendCrumbs(T... crumbs){
-        TreeItem<T> subRoot = getPathTarget();
+    public static <T> TreeItem<T> buildTreeModel(T... crumbs){
+        TreeItem<T> subRoot = null;
         for (T crumb : crumbs) {
             TreeItem<T> currentNode = new TreeItem<T>(crumb);
             if(subRoot == null){
@@ -174,7 +165,7 @@ public class BreadCrumbBar<T> extends Control {
                 subRoot = currentNode;
             }
         }
-        setPathTarget(subRoot);
+        return subRoot;
     }
 
 

@@ -31,6 +31,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -62,7 +63,8 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         BorderPane root = new BorderPane();
 
         sampleBreadCrumbBar = new BreadCrumbBar<>();
-        sampleBreadCrumbBar.appendCrumbs("Hello", "World", "This", "Is", "cool");
+        TreeItem<String> model = BreadCrumbBar.buildTreeModel("Hello", "World", "This", "Is", "cool");
+        sampleBreadCrumbBar.setPathTarget(model);
 
         root.setTop(sampleBreadCrumbBar);
         BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
@@ -96,7 +98,9 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent ae) {
-                sampleBreadCrumbBar.appendCrumbs("New!");
+                TreeItem<String> leaf = new TreeItem<>("New!");
+                sampleBreadCrumbBar.getPathTarget().getChildren().add(leaf);
+                sampleBreadCrumbBar.setPathTarget(leaf);
             }
         });
 

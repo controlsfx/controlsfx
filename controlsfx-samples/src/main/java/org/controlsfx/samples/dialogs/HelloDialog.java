@@ -116,6 +116,7 @@ public class HelloDialog extends ControlsFXSample {
     
     
     @Override public Node getPanel(final Stage stage) {
+        this.stage = stage;
      // VBox vbox = new VBox(10);
         // vbox.setAlignment(Pos.CENTER);
 

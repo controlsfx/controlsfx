@@ -189,6 +189,11 @@ class LightweightDialog extends FXDialog {
         return modal;
     }
     
+    @Override 
+    public ObservableList<String> getStylesheets(){
+        return scene.getStylesheets();
+    }
+    
     public void setEffect(Effect e) {
         this.effect = e;
     }
@@ -359,14 +364,19 @@ class LightweightDialog extends FXDialog {
     }
     
     private void installCSSInScene() {
+        String dialogsCssUrl = DIALOGS_CSS_URL.toExternalForm();
         if (scene != null) {
             // install CSS
-            scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
+            if(!scene.getStylesheets().contains(dialogsCssUrl)){
+                scene.getStylesheets().addAll(dialogsCssUrl);
+            }
         } else if (owner != null) {
             Scene _scene = owner.getScene();
             if (_scene != null) {
                 // install CSS
-                _scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
+                if(!scene.getStylesheets().contains(dialogsCssUrl)){
+                    _scene.getStylesheets().addAll(dialogsCssUrl);
+                }
             }
         }
     }

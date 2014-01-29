@@ -47,6 +47,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
@@ -358,6 +359,14 @@ public class Dialog {
 
     }
     
+    /**
+     * Return the StyleSheets associated with the scene used in the Dialog (see {@link Scene#getStylesheets()}
+     * This allow you to specify custom CSS rules to be applied on your dialog's elements.
+     * @return and ObservableList of String. 
+     */
+    public ObservableList<String> getStylesheets(){
+        return dialog.getStylesheets();
+    }
     
     /**************************************************************************
      * 

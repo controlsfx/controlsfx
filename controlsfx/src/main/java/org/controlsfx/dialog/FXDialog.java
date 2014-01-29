@@ -34,6 +34,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -242,6 +243,8 @@ abstract class FXDialog {
     
     // --- root
     public abstract Node getRoot();
+    
+    public abstract ObservableList<String> getStylesheets();
     
     
     // --- width

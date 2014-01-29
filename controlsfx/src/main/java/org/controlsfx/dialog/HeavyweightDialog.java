@@ -35,6 +35,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -214,6 +215,11 @@ class HeavyweightDialog extends FXDialog {
         } else {
             stage.initModality(Modality.NONE);
         }
+    }
+    
+    @Override 
+    public ObservableList<String> getStylesheets(){
+        return stage.getScene().getStylesheets();
     }
     
     @Override public boolean isModal() {

@@ -53,7 +53,6 @@ public class BreadCrumbBar<T> extends Control {
 
     private final ObjectProperty<TreeItem<T>> selectedCrumb = new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
     private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
-
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
 
@@ -101,7 +100,9 @@ public class BreadCrumbBar<T> extends Control {
     };
 
 
-
+    /**
+     * Default crumb node factory. This factory is used when no custom factory is specified by the user.
+     */
     private final Callback<TreeItem<T>, BreadCrumbButton> defaultCrumbNodeFactory = new Callback<TreeItem<T>, BreadCrumbButton>(){
         @Override
         public BreadCrumbButton call(TreeItem<T> crumb) {
@@ -131,19 +132,6 @@ public class BreadCrumbBar<T> extends Control {
         return tail.prepend(eventHandlerManager);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected Skin<?> createDefaultSkin() {
-        return new BreadCrumbBarSkin<>(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected String getUserAgentStylesheet() {
-        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm();
-    }
 
     /**
      * Get the current target path
@@ -153,43 +141,26 @@ public class BreadCrumbBar<T> extends Control {
     }
 
     /**
-     * Set the bottom most path node.
+     * Set the bottom most path node (the node on the most-right side in terms of the bread crumb bar). 
+     * The full path is then being constructed using getParent() of the tree-items.
+     * 
      * <p>
      * Consider the following hierarchy:
      * [Root] > [Folder] > [SubFolder] > [myfile.txt]
      * 
-     * You have to set the [myfile.txt] tree node as path target.
+     * To show the above bread crumb bar, you have to set the [myfile.txt] tree-node as selected crumb.
      * 
-     * @param pathTarget
+     * @param selectedCrumb
      */
-    public final void setSelectedCrumb(TreeItem<T> pathTarget){
-        this.selectedCrumb.set(pathTarget);
+    public final void setSelectedCrumb(TreeItem<T> selectedCrumb){
+        this.selectedCrumb.set(selectedCrumb);
     }
 
     public final ObjectProperty<TreeItem<T>> selectedCrumbProperty() {
         return selectedCrumb;
     }
 
-    /**
-     * Create a tree model from the flat list
-     * @param crumbs
-     */
-    public static <T> TreeItem<T> buildTreeModel(T... crumbs){
-        TreeItem<T> subRoot = null;
-        for (T crumb : crumbs) {
-            TreeItem<T> currentNode = new TreeItem<T>(crumb);
-            if(subRoot == null){
-                subRoot = currentNode; 
-            }else{
-                subRoot.getChildren().add(currentNode);
-                subRoot = currentNode;
-            }
-        }
-        return subRoot;
-    }
 
-
-    // --- crumb factory
     public final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactoryProperty() {
         return crumbFactory;
     }
@@ -214,7 +185,47 @@ public class BreadCrumbBar<T> extends Control {
         return crumbFactory.get();
     }
 
+    //
     // Style sheet handling
+    //
 
     private static final String DEFAULT_STYLE_CLASS = "bread-crumb-bar";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override protected Skin<?> createDefaultSkin() {
+        return new BreadCrumbBarSkin<>(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override protected String getUserAgentStylesheet() {
+        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm();
+    }
+
+
+    //
+    // Static helper methods
+    //
+
+    /**
+     * Construct a tree model from the flat list which then can be set 
+     * as selectedCrumb node to be shown 
+     * @param crumbs
+     */
+    public static <T> TreeItem<T> buildTreeModel(T... crumbs){
+        TreeItem<T> subRoot = null;
+        for (T crumb : crumbs) {
+            TreeItem<T> currentNode = new TreeItem<T>(crumb);
+            if(subRoot == null){
+                subRoot = currentNode; 
+            }else{
+                subRoot.getChildren().add(currentNode);
+                subRoot = currentNode;
+            }
+        }
+        return subRoot;
+    }
 }

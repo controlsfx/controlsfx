@@ -31,6 +31,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -93,6 +94,10 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         // TODO Add customization example controls
         Button btn = new Button("Add Crumb");
         grid.add(btn, 0, 0);
+
+        CheckBox chkAutoNav = new CheckBox("Enable auto navigation");
+        grid.add(chkAutoNav, 0, 1);
+        chkAutoNav.selectedProperty().bindBidirectional(sampleBreadCrumbBar.autoNavigationProperty());
 
 
         btn.setOnAction(new EventHandler<ActionEvent>() {

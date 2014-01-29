@@ -52,6 +52,7 @@ import jdk.nashorn.internal.codegen.CompilerConstants.Call;
 public class BreadCrumbBar<T> extends Control {
 
     private final ObjectProperty<TreeItem<T>> selectedCrumb = new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
+    private final ObjectProperty<Boolean> autoNavigationEnabled = new SimpleObjectProperty<Boolean>(this, "autoNavigationEnabled");
     private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
@@ -122,6 +123,7 @@ public class BreadCrumbBar<T> extends Control {
      * @param pathTarget
      */
     public BreadCrumbBar(TreeItem<T> pathTarget) {
+        autoNavigationEnabled.set(true); // by default, auto navigation is enabled
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setSelectedCrumb(pathTarget);
         setCrumbFactory(defaultCrumbNodeFactory);
@@ -163,6 +165,28 @@ public class BreadCrumbBar<T> extends Control {
 
     public final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactoryProperty() {
         return crumbFactory;
+    }
+
+    /**
+     * Enable or disable auto navigation (default is enabled).
+     * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
+     * @param enabled
+     */
+    public void setAutoNavigationEnabled(boolean enabled) {
+        autoNavigationEnabled.set(enabled);
+    }
+
+    /**
+     * Checks if auto navigation is currently enabled.
+     * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
+     * @return
+     */
+    public boolean isAutoNavigationEnabled() {
+        return autoNavigationEnabled.get();
+    }
+
+    public  ObjectProperty<Boolean> autoNavigationProperty(){
+        return autoNavigationEnabled;
     }
 
 
@@ -228,4 +252,5 @@ public class BreadCrumbBar<T> extends Control {
         }
         return subRoot;
     }
+
 }

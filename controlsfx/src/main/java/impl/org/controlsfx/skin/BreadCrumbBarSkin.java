@@ -69,9 +69,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
     }
 
-    /**
-     * Occurs when the pathTarget property has changed
-     */
+
     private final ChangeListener<TreeItem<T>> selectedPathChangeListener =
             new ChangeListener<TreeItem<T>>() {
         @Override
@@ -186,11 +184,15 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
      * @param crumbModel The crumb which received the action event
      */
     protected void onBreadCrumbAction(final TreeItem<T> crumbModel){
-        final BreadCrumbBar<T> buttonBar = getSkinnable();
-        Event.fireEvent(buttonBar, new BreadCrumbActionEvent<T>(crumbModel));
+        final BreadCrumbBar<T> breadCrumbBar = getSkinnable();
+
+        // fire the composite event in the breadCrumbBar
+        Event.fireEvent(breadCrumbBar, new BreadCrumbActionEvent<T>(crumbModel));
 
         // navigate to the clicked crumb
-        buttonBar.setSelectedCrumb(crumbModel);
+        if(breadCrumbBar.isAutoNavigationEnabled()){
+            breadCrumbBar.setSelectedCrumb(crumbModel);
+        }
     }
 
 }

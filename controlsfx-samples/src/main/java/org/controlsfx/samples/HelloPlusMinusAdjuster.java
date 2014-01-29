@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@ package org.controlsfx.samples;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -39,76 +38,76 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PlusMinusAdjuster;
-import org.controlsfx.control.PlusMinusEvent;
+import org.controlsfx.control.PlusMinusAdjuster.PlusMinusEvent;
 
 public class HelloPlusMinusAdjuster extends ControlsFXSample {
 
-	private PlusMinusAdjuster plusMinusAdjuster = new PlusMinusAdjuster();
+    private PlusMinusAdjuster plusMinusAdjuster = new PlusMinusAdjuster();
 
-	@Override
-	public Node getPanel(Stage stage) {
-		Group group = new Group();
+    @Override
+    public Node getPanel(Stage stage) {
+        Group group = new Group();
 
-		VBox vBox = new VBox();
-		vBox.setMinWidth(500);
-		vBox.setSpacing(20);
-		vBox.setStyle("-fx-padding: 40;");
-		
-		group.getChildren().add(vBox);
+        VBox vBox = new VBox();
+        vBox.setMinWidth(500);
+        vBox.setSpacing(20);
+        vBox.setStyle("-fx-padding: 40;");
 
-		vBox.getChildren().add(plusMinusAdjuster);
+        group.getChildren().add(vBox);
 
-		final Label counterLabel = new Label();
-		vBox.getChildren().add(counterLabel);
+        vBox.getChildren().add(plusMinusAdjuster);
 
-		final Label valueLabel = new Label();
-		vBox.getChildren().add(valueLabel);
+        final Label counterLabel = new Label();
+        vBox.getChildren().add(counterLabel);
 
-		plusMinusAdjuster.setOnValueChanged(new EventHandler<PlusMinusEvent>() {
-			long counter = 1;
+        final Label valueLabel = new Label();
+        vBox.getChildren().add(valueLabel);
 
-			@Override
-			public void handle(PlusMinusEvent event) {
-				counterLabel.setText("Event #" + counter);
-				valueLabel.setText("Value = " + event.getValue());
-				counter++;
-			}
-		});
+        plusMinusAdjuster.setOnValueChanged(new EventHandler<PlusMinusEvent>() {
+            long counter = 1;
 
-		return group;
-	}
+            @Override
+            public void handle(PlusMinusEvent event) {
+                counterLabel.setText("Event #" + counter);
+                valueLabel.setText("Value = " + event.getValue());
+                counter++;
+            }
+        });
 
-	@Override
-	public Node getControlPanel() {
-		ComboBox<Orientation> box = new ComboBox<>();
-		box.getItems().addAll(Orientation.values());
-		box.setValue(plusMinusAdjuster.getOrientation());
-		plusMinusAdjuster.orientationProperty().bind(box.valueProperty());
-		return box;
-	}
+        return group;
+    }
 
-	public static void main(String[] args) {
-		Application.launch(args);
-	}
+    @Override
+    public Node getControlPanel() {
+        ComboBox<Orientation> box = new ComboBox<>();
+        box.getItems().addAll(Orientation.values());
+        box.setValue(plusMinusAdjuster.getOrientation());
+        plusMinusAdjuster.orientationProperty().bind(box.valueProperty());
+        return box;
+    }
 
-	@Override
-	public String getSampleName() {
-		return "PlusMinusAdjuster";
-	}
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
 
-	@Override
-	public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE
-		        + "org/controlsfx/control/PlusMinusAdjuster.html";
-	}
+    @Override
+    public String getSampleName() {
+        return "PlusMinusAdjuster";
+    }
 
-	@Override
-	public String getSampleDescription() {
-		return "A slider-like control used to fire value events "
-		        + "with values in the range of -1 and +1. "
-		        + "The slider thumb jumps back to the zero "
-		        + "position when the user lets go of the mouse. "
-		        + "Possible use case: scrolling through a lot of data "
-		        + "at different speeds.";
-	}
+    @Override
+    public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE
+                + "org/controlsfx/control/PlusMinusAdjuster.html";
+    }
+
+    @Override
+    public String getSampleDescription() {
+        return "A slider-like control used to fire value events "
+                + "with values in the range of -1 and +1. "
+                + "The slider thumb jumps back to the zero "
+                + "position when the user lets go of the mouse. "
+                + "Possible use case: scrolling through a lot of data "
+                + "at different speeds.";
+    }
 }

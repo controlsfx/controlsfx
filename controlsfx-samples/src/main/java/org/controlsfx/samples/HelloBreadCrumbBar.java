@@ -64,7 +64,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
 
         sampleBreadCrumbBar = new BreadCrumbBar<>();
         TreeItem<String> model = BreadCrumbBar.buildTreeModel("Hello", "World", "This", "Is", "cool");
-        sampleBreadCrumbBar.setPathTarget(model);
+        sampleBreadCrumbBar.setSelectedCrumb(model);
 
         root.setTop(sampleBreadCrumbBar);
         BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
@@ -99,8 +99,8 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
             @Override
             public void handle(ActionEvent ae) {
                 TreeItem<String> leaf = new TreeItem<>("New!");
-                sampleBreadCrumbBar.getPathTarget().getChildren().add(leaf);
-                sampleBreadCrumbBar.setPathTarget(leaf);
+                sampleBreadCrumbBar.getSelectedCrumb().getChildren().add(leaf);
+                sampleBreadCrumbBar.setSelectedCrumb(leaf);
             }
         });
 

@@ -35,6 +35,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.control.Control;
@@ -44,17 +45,23 @@ import javafx.util.Callback;
 import jdk.nashorn.internal.codegen.CompilerConstants.Call;
 
 /**
- * Represents a bread crumb bar
+ * Represents a bread crumb bar. 
+ * This control is useful to visualize and navigate a hierarchical path structure, such as file systems.
  * 
  */
 public class BreadCrumbBar<T> extends Control {
 
-    private final ObjectProperty<TreeItem<T>> pathTarget = new SimpleObjectProperty<TreeItem<T>>(this, "pathTarget");
+    private final ObjectProperty<TreeItem<T>> selectedCrumb = new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
     private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
 
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
 
+    /**
+     * Represents an Event which is fired when a bread crumb was activated.
+     *
+     * @param <TE>
+     */
     @SuppressWarnings("serial")
     public static class BreadCrumbActionEvent<TE> extends Event {
         @SuppressWarnings("rawtypes")
@@ -77,6 +84,7 @@ public class BreadCrumbBar<T> extends Control {
     public final void setOnCrumbAction(EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> value) { onCrumbActionProperty().set(value); }
     public final EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> getOnCrumbAction() { return onCrumbActionProperty().get(); }
     private ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
+        @SuppressWarnings("rawtypes")
         @Override protected void invalidated() {
             eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
         }
@@ -101,14 +109,26 @@ public class BreadCrumbBar<T> extends Control {
         }
     };
 
+    /**
+     * Creates an empty bread crumb bar
+     */
     public BreadCrumbBar(){
         this(null);
     }
 
+    /**
+     * Creates a bread crumb bar with the given initial model
+     * @param pathTarget
+     */
     public BreadCrumbBar(TreeItem<T> pathTarget) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
-        setPathTarget(pathTarget);
+        setSelectedCrumb(pathTarget);
         setCrumbFactory(defaultCrumbNodeFactory);
+    }
+
+    /** {@inheritDoc} */
+    @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
+        return tail.prepend(eventHandlerManager);
     }
 
     /**
@@ -128,8 +148,8 @@ public class BreadCrumbBar<T> extends Control {
     /**
      * Get the current target path
      */
-    public final TreeItem<T> getPathTarget() {
-        return pathTarget.get();
+    public final TreeItem<T> getSelectedCrumb() {
+        return selectedCrumb.get();
     }
 
     /**
@@ -142,12 +162,12 @@ public class BreadCrumbBar<T> extends Control {
      * 
      * @param pathTarget
      */
-    public final void setPathTarget(TreeItem<T> pathTarget){
-        this.pathTarget.set(pathTarget);
+    public final void setSelectedCrumb(TreeItem<T> pathTarget){
+        this.selectedCrumb.set(pathTarget);
     }
 
-    public final ObjectProperty<TreeItem<T>> pathTargetProperty() {
-        return pathTarget;
+    public final ObjectProperty<TreeItem<T>> selectedCrumbProperty() {
+        return selectedCrumb;
     }
 
     /**

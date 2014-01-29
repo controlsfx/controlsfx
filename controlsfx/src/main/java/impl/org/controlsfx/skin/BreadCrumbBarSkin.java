@@ -64,15 +64,15 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         layout = new HBox();
         getChildren().add(layout);
 
-        control.pathTargetProperty().addListener(pathTargetChangeListener);
+        control.selectedCrumbProperty().addListener(selectedPathChangeListener);
 
-        updatePathTarget(getSkinnable().pathTargetProperty().get(), null);
+        updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
     }
 
     /**
      * Occurs when the pathTarget property has changed
      */
-    private final ChangeListener<TreeItem<T>> pathTargetChangeListener =
+    private final ChangeListener<TreeItem<T>> selectedPathChangeListener =
             new ChangeListener<TreeItem<T>>() {
         @Override
         public void changed(
@@ -80,11 +80,11 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
                         TreeItem<T> oldItem,
                         TreeItem<T> newItem) {
 
-            updatePathTarget(newItem, oldItem);
+            updateSelectedPath(newItem, oldItem);
         }
     };
 
-    private void updatePathTarget(TreeItem<T> newTarget, TreeItem<T> oldTarget) {
+    private void updateSelectedPath(TreeItem<T> newTarget, TreeItem<T> oldTarget) {
 
         if(oldTarget != null){
             // remove old listener
@@ -113,7 +113,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
      */
     private void layoutBreadCrumbs() {
         final BreadCrumbBar<T> buttonBar = getSkinnable();
-        final TreeItem<T> pathTarget = buttonBar.getPathTarget();
+        final TreeItem<T> pathTarget = buttonBar.getSelectedCrumb();
         final Callback<TreeItem<T>, BreadCrumbButton> factory = buttonBar.getCrumbFactory();
 
         layout.getChildren().clear();
@@ -183,14 +183,14 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     /**
      * Occurs when a bread crumb gets the action event
      * 
-     * @param crumbModel The crumb which recived the action event
+     * @param crumbModel The crumb which received the action event
      */
     protected void onBreadCrumbAction(final TreeItem<T> crumbModel){
         final BreadCrumbBar<T> buttonBar = getSkinnable();
         Event.fireEvent(buttonBar, new BreadCrumbActionEvent<T>(crumbModel));
 
         // navigate to the clicked crumb
-        buttonBar.setPathTarget(crumbModel);
+        buttonBar.setSelectedCrumb(crumbModel);
     }
 
 }

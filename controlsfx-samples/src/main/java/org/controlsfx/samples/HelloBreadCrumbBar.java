@@ -77,7 +77,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
                 Dialogs.create()
                 .title("BreadCrumbBar")
                 .masthead("Bread Crumb Action")
-                .message("You just clicked on '" + bae.getCrumbModel() + "'!") 
+                .message("You just clicked on '" + bae.getSelectedCrumb() + "'!") 
                 .showInformation();
             }
         });
@@ -103,6 +103,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent ae) {
+                // Construct a new leaf node and append it to the previous leaf
                 TreeItem<String> leaf = new TreeItem<>("New!");
                 sampleBreadCrumbBar.getSelectedCrumb().getChildren().add(leaf);
                 sampleBreadCrumbBar.setSelectedCrumb(leaf);

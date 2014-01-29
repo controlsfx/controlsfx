@@ -67,15 +67,19 @@ public class BreadCrumbBar<T> extends Control {
         @SuppressWarnings("rawtypes")
         public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = new EventType<BreadCrumbActionEvent>("CRUMB_ACTION");
 
-        private final TreeItem<TE> crumbModel;
+        private final TreeItem<TE> selectedCrumb;
 
-        public BreadCrumbActionEvent(TreeItem<TE> crumbModel) {
+        public BreadCrumbActionEvent(TreeItem<TE> selectedCrumb) {
             super(CRUMB_ACTION);
-            this.crumbModel = crumbModel;
+            this.selectedCrumb = selectedCrumb;
         }
 
-        public TreeItem<TE> getCrumbModel() {
-            return crumbModel;
+        /**
+         * Returns the crumb which was the action target
+         * @return
+         */
+        public TreeItem<TE> getSelectedCrumb() {
+            return selectedCrumb;
         }
     }
 

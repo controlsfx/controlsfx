@@ -69,7 +69,6 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
     }
 
-
     private final ChangeListener<TreeItem<T>> selectedPathChangeListener =
             new ChangeListener<TreeItem<T>>() {
         @Override

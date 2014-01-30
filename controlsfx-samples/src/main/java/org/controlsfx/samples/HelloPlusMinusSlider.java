@@ -37,12 +37,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.PlusMinusAdjuster;
-import org.controlsfx.control.PlusMinusAdjuster.PlusMinusEvent;
+import org.controlsfx.control.PlusMinusSlider;
+import org.controlsfx.control.PlusMinusSlider.PlusMinusEvent;
 
-public class HelloPlusMinusAdjuster extends ControlsFXSample {
+public class HelloPlusMinusSlider extends ControlsFXSample {
 
-    private PlusMinusAdjuster plusMinusAdjuster = new PlusMinusAdjuster();
+    private PlusMinusSlider plusMinusSlider = new PlusMinusSlider();
 
     @Override
     public Node getPanel(Stage stage) {
@@ -55,7 +55,7 @@ public class HelloPlusMinusAdjuster extends ControlsFXSample {
 
         group.getChildren().add(vBox);
 
-        vBox.getChildren().add(plusMinusAdjuster);
+        vBox.getChildren().add(plusMinusSlider);
 
         final Label counterLabel = new Label();
         vBox.getChildren().add(counterLabel);
@@ -63,7 +63,7 @@ public class HelloPlusMinusAdjuster extends ControlsFXSample {
         final Label valueLabel = new Label();
         vBox.getChildren().add(valueLabel);
 
-        plusMinusAdjuster.setOnValueChanged(new EventHandler<PlusMinusEvent>() {
+        plusMinusSlider.setOnValueChanged(new EventHandler<PlusMinusEvent>() {
             long counter = 1;
 
             @Override
@@ -81,8 +81,8 @@ public class HelloPlusMinusAdjuster extends ControlsFXSample {
     public Node getControlPanel() {
         ComboBox<Orientation> box = new ComboBox<>();
         box.getItems().addAll(Orientation.values());
-        box.setValue(plusMinusAdjuster.getOrientation());
-        plusMinusAdjuster.orientationProperty().bind(box.valueProperty());
+        box.setValue(plusMinusSlider.getOrientation());
+        plusMinusSlider.orientationProperty().bind(box.valueProperty());
         return box;
     }
 
@@ -92,13 +92,13 @@ public class HelloPlusMinusAdjuster extends ControlsFXSample {
 
     @Override
     public String getSampleName() {
-        return "PlusMinusAdjuster";
+        return "PlusMinusSlider";
     }
 
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE
-                + "org/controlsfx/control/PlusMinusAdjuster.html";
+                + "org/controlsfx/control/PlusMinusSlider.html";
     }
 
     @Override

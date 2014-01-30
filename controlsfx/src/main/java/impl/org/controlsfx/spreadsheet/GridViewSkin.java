@@ -28,8 +28,10 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -45,6 +47,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
@@ -78,8 +81,16 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     /** Default height of a row. */
     public static final double DEFAULT_CELL_HEIGHT;
 
+    /**
+     * When resizing, we save the height here in order to override default row
+     * height.
+     * package protected
+     */
+    Map<Integer, Double> rowHeightMap = new HashMap<>();
+
     // FIXME This should seriously be investigated ..
     static final double DATE_CELL_MIN_WIDTH = 200 - Screen.getPrimary().getDpi();
+
     static {
         double cell_size = 24.0;
         try {
@@ -112,6 +123,10 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         return verticalHeaderWidth;
     }
 
+    public Double getRowHeight(int row){
+        Double rowHeight = handle.getCellsViewSkin().rowHeightMap.get(row);
+        return rowHeight == null? handle.getView().getGrid().getRowHeight(row): rowHeight;
+    }
     public void setVerticalHeaderWidth(double width) {
         verticalHeaderWidth.set(width);
     }
@@ -406,7 +421,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private void computeFixedRowHeight() {
         fixedRowHeight = 0;
         for (int i : getCurrentlyFixedRow()) {
-            fixedRowHeight += spreadsheetView.getGrid().getRowHeight(i);
+            fixedRowHeight += getRowHeight(i);//spreadsheetView.getGrid().getRowHeight(i);
         }
     }
 

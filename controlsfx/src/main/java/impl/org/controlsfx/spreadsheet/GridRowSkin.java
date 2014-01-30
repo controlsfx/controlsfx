@@ -109,7 +109,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         final double verticalPadding = snappedTopInset() + snappedBottomInset();
         final double horizontalPadding = snappedLeftInset()
                 + snappedRightInset();
-        final double controlHeight = control.getHeight();
+        final double controlHeight = getTableRowHeight(index);
 
         /**
          * FOR FIXED ROWS
@@ -152,7 +152,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 
             width = snapSize(tableCell.prefWidth(-1))
                     - snapSize(horizontalPadding);
-            height = Math.max(controlHeight, tableCell.prefHeight(-1));
+            height = controlHeight;//Math.max(controlHeight, tableCell.prefHeight(-1));
             height = snapSize(height) - snapSize(verticalPadding);
 
             /**
@@ -279,7 +279,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
      * @return
      */
     private double getTableRowHeight(int i) {
-    	return handle.getView().getGrid().getRowHeight(i);
+        return handle.getCellsViewSkin().getRowHeight(i);
+//    	return handle.getView().getGrid().getRowHeight(i);
 	}
 
 	/**

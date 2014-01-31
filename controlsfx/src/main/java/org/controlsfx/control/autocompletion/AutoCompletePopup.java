@@ -98,7 +98,11 @@ public class AutoCompletePopup<T> extends PopupControl{
      * Creates a new AutoCompletePopup
      */
     public AutoCompletePopup(){
+        this.setAutoFix(true);
+        this.setAutoHide(true);
+        this.setHideOnEscape(true);
 
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
     }
 
     /**
@@ -136,7 +140,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     // Style sheet handling
     //
 
-    private static final String DEFAULT_STYLE_CLASS = "auto-complete-popup";
+    public static final String DEFAULT_STYLE_CLASS = "auto-complete-popup";
 
     @Override
     protected Skin<?> createDefaultSkin() {

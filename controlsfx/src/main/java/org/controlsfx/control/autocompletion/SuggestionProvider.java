@@ -13,7 +13,7 @@ import org.controlsfx.control.autocompletion.AutoCompletionController.ISuggestio
 
 /**
  * This is a simple implementation of a generic suggestion provider callback.
- *
+ * The complexity of suggestion generation is O(n) where n is the number of possible suggestions.
  * @param <T>
  */
 public abstract class SuggestionProvider<T> implements Callback<ISuggestionRequest, Collection<T>>{
@@ -40,6 +40,9 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
         }
     }
 
+    /**
+     * Remove all current possible suggestions
+     */
     public void clearSuggestions(){
         synchronized (possibleSuggestionsLock) {
             possibleSuggestions.clear();
@@ -49,13 +52,16 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
     @Override
     public final Collection<T> call(final ISuggestionRequest request) {
         List<T> suggestions = new ArrayList<>();
-
-        for (T possibleSuggestion : possibleSuggestions) {
-            if(isMatch(possibleSuggestion, request)){
-                suggestions.add(possibleSuggestion);
+        if(!request.getUserText().isEmpty()){
+            synchronized (possibleSuggestionsLock) {
+                for (T possibleSuggestion : possibleSuggestions) {
+                    if(isMatch(possibleSuggestion, request)){
+                        suggestions.add(possibleSuggestion);
+                    }
+                }
             }
+            Collections.sort(suggestions, getComparator());
         }
-        Collections.sort(suggestions, getComparator());
         return suggestions;
     }
 
@@ -66,7 +72,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
     protected abstract Comparator<T> getComparator();
 
     /**
-     * Check the given suggestion is a match
+     * Check the given possible suggestion is a match (is a valid suggestion)
      * @param suggestion
      * @param request
      * @return

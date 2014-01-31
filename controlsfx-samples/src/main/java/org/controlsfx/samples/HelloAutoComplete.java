@@ -59,7 +59,7 @@ public class HelloAutoComplete extends ControlsFXSample {
 
     @Override public String getSampleDescription() {
         return "AutoComplete helps a user with suggestions to type faster, " +
-                "or it can also limit possibilities to enter.";
+                "but does not limit him to enter something else.\n";
     }
 
     @Override public Node getPanel(final Stage stage) {
@@ -75,26 +75,22 @@ public class HelloAutoComplete extends ControlsFXSample {
 
                 if(suggestionsPopup != null) suggestionsPopup.hide();
                 suggestionsPopup =  new AutoCompletePopup<String>();
-                suggestionsPopup.setAutoFix(true);
-                suggestionsPopup.setAutoHide(true);
-                suggestionsPopup.setHideOnEscape(true);
                 suggestionsPopup.getSuggestions().addAll("Fruit","Fruits","Frites", "Cheese!");
                 suggestionsPopup.showBelowNode(btnShowSuggestions);
             }
         });
         topBox.getChildren().add(btnShowSuggestions);
-        BorderPane.setMargin(btnShowSuggestions, new Insets(20));
+        VBox.setMargin(btnShowSuggestions, new Insets(20));
 
         // TextField with auto-complete functionality
-
-        TextField autoCompleteMe = new TextField();
+        TextField textField = new TextField();
 
         SuggestionProviderString suggestionProvider = new SuggestionProviderString();
         suggestionProvider.addPossibleSuggetions("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
-        AutoCompletionTextFieldBinding.createBinding(autoCompleteMe, suggestionProvider);
+        AutoCompletionTextFieldBinding.createBinding(textField, suggestionProvider);
 
-        topBox.getChildren().add(autoCompleteMe);
-        BorderPane.setMargin(autoCompleteMe, new Insets(20));
+        topBox.getChildren().add(textField);
+        VBox.setMargin(textField, new Insets(20));
 
         root.setTop(topBox);
         return root;

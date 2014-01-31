@@ -89,7 +89,11 @@ public class AutoCompletionController<T> {
         }
     }
 
-
+    /**
+     * This task is responsible to fetch suggestions asynchronous
+     * by using the current defined suggestionProvider
+     *
+     */
     private class FetchSuggestionsTask extends Task<Void> implements ISuggestionRequest {
         private final String userText;
 

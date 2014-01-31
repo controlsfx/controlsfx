@@ -24,6 +24,9 @@ public class SuggestionProviderString extends SuggestionProvider<String> {
 
     @Override
     protected boolean isMatch(String suggestion, ISuggestionRequest request) {
-        return suggestion.contains(request.getUserText());
+        String userTextLower = request.getUserText().toLowerCase();
+        suggestion = suggestion.toLowerCase();
+        return suggestion.contains(userTextLower) 
+                && !suggestion.equals(userTextLower);
     }
 }

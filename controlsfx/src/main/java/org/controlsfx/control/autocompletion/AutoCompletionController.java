@@ -107,6 +107,9 @@ public class AutoCompletionController<T> {
                         if(!fetchedSuggestions.isEmpty()){
                             autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
                             showPopupRequest.call(null);
+                        }else{
+                            // No suggestions found, so hide the popup
+                            autoCompletionPopup.hide();
                         }
                     }
                 });

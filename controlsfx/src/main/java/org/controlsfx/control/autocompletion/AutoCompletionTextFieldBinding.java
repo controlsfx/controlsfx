@@ -4,10 +4,12 @@ import java.util.Collection;
 
 import javax.xml.bind.Binder;
 
+import org.controlsfx.control.autocompletion.AutoCompletePopup.SuggestionChoosenEvent;
 import org.controlsfx.control.autocompletion.AutoCompletionController.ISuggestionRequest;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
 
@@ -76,6 +78,23 @@ public class AutoCompletionTextFieldBinding<T> {
      */
     public void bind(){
         textField.textProperty().addListener(textChangeListener);
+        popup.setOnSuggestionChoosen(new EventHandler<AutoCompletePopup.SuggestionChoosenEvent<T>>() {
+            @Override
+            public void handle(SuggestionChoosenEvent<T> sce) {
+                completeUserInput(sce.getSelectedSuggestion());
+            }
+        });
+    }
+
+    /**
+     * Complete the current user-input with the provided completion
+     * @param completion
+     */
+    protected void completeUserInput(T completion){
+        String newText = completion.toString(); // TODO Handle generic parameter better
+
+        textField.setText(newText);
+        textField.positionCaret(newText.length());
     }
 
     /**

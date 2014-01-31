@@ -41,6 +41,7 @@ import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -62,6 +63,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * * Static Fields * *
      **************************************************************************/
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
+    private static final int TOOLTIP_MAX_WIDTH = 400;
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
@@ -126,6 +128,13 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
                     setGraphic(newItem.getGraphic());
                     newItem.graphicProperty().addListener(graphicListener);
+
+                    if (newItem.getItem() != null) {
+                        Tooltip toolTip = new Tooltip(newItem.getItem().toString());
+                        toolTip.setWrapText(true);
+                        toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                        setTooltip(toolTip);
+                    }
                 }
             }
         });
@@ -253,7 +262,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                         new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
                                 image.getImage().getWidth()).otherwise(widthProperty()));
             }
-            
+
             // Sometimes the hoverProperty is not called on exit. So the cell is
             // affected to a new Item but
             // the hover is still activated. So we fix it now.

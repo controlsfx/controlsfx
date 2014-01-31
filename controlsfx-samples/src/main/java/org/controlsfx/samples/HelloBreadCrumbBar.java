@@ -38,8 +38,8 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.breadcrumbs.BreadCrumbBar;
-import org.controlsfx.control.breadcrumbs.BreadCrumbBar.BreadCrumbActionEvent;
+import org.controlsfx.control.BreadCrumbBar;
+import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
 import org.controlsfx.dialog.Dialogs;
 
 public class HelloBreadCrumbBar extends ControlsFXSample {

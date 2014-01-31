@@ -41,9 +41,9 @@ import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
-import org.controlsfx.control.breadcrumbs.BreadCrumbBar;
-import org.controlsfx.control.breadcrumbs.BreadCrumbButton;
-import org.controlsfx.control.breadcrumbs.BreadCrumbBar.BreadCrumbActionEvent;
+import org.controlsfx.control.BreadCrumbBar;
+import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
+import org.controlsfx.control.BreadCrumbBar.BreadCrumbButton;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;

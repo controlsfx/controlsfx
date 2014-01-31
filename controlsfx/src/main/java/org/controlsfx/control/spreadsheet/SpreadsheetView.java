@@ -1432,7 +1432,7 @@ public class SpreadsheetView extends Control {
                 int start = getCellsViewSkin().getRow(0).getIndex();
                 double posFinalOffset = 0;
                 for (int j = start; j < posFinal.getRow(); ++j) {
-                    posFinalOffset += getGrid().getRowHeight(j);
+                    posFinalOffset += getSpreadsheetViewSkin().getRowHeight(j);
                 }
 
                 if (getCellsViewSkin().getFixedRowHeight() > posFinalOffset) {

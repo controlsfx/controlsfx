@@ -189,7 +189,7 @@ public class GridCellEditor {
 
         // Then we call the user editor in order for it to be ready
         Object value = modelCell.getItem();
-        Double maxHeight = Math.max(handle.getView().getGrid().getRowHeight(viewCell.getIndex()), MAX_EDITOR_HEIGHT);
+        Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), MAX_EDITOR_HEIGHT);
         spreadsheetCellEditor.getEditor().setMaxHeight(maxHeight);
         spreadsheetCellEditor.getEditor().setPrefWidth(viewCell.getWidth());
         spreadsheetCellEditor.startEdit(value);

@@ -115,6 +115,7 @@ public interface Grid {
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
     
     /**
+     * FIXME DESCRIPTION WRONG
      * Return the height of a row. 
      * It will first look into the {@link Map} provided at the
      * initialization. If nothing's found, default height will be taken.

@@ -24,25 +24,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.breadcrumbs;
-
-import com.sun.javafx.event.EventHandlerManager;
+package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.BreadCrumbBarSkin;
+import impl.org.controlsfx.skin.BreadCrumbBarSkin.BreadCrumbButton;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
-import jdk.nashorn.internal.codegen.CompilerConstants.Call;
+
+import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * Represents a bread crumb bar. 
@@ -51,9 +50,6 @@ import jdk.nashorn.internal.codegen.CompilerConstants.Call;
  */
 public class BreadCrumbBar<T> extends Control {
 
-    private final ObjectProperty<TreeItem<T>> selectedCrumb = new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
-    private final ObjectProperty<Boolean> autoNavigationEnabled = new SimpleObjectProperty<Boolean>(this, "autoNavigationEnabled");
-    private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
 
@@ -82,38 +78,58 @@ public class BreadCrumbBar<T> extends Control {
             return selectedCrumb;
         }
     }
-
-
-    public final ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbActionProperty() { return onCrumbAction; }
-    public final void setOnCrumbAction(EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> value) { onCrumbActionProperty().set(value); }
-    public final EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>> getOnCrumbAction() { return onCrumbActionProperty().get(); }
-    private ObjectProperty<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
-        @SuppressWarnings("rawtypes")
-        @Override protected void invalidated() {
-            eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
+    
+    
+    
+    /**
+     * Construct a tree model from the flat list which then can be set 
+     * as selectedCrumb node to be shown 
+     * @param crumbs
+     */
+    public static <T> TreeItem<T> buildTreeModel(T... crumbs){
+        TreeItem<T> subRoot = null;
+        for (T crumb : crumbs) {
+            TreeItem<T> currentNode = new TreeItem<T>(crumb);
+            if(subRoot == null){
+                subRoot = currentNode; 
+            }else{
+                subRoot.getChildren().add(currentNode);
+                subRoot = currentNode;
+            }
         }
+        return subRoot;
+    }
 
-        @Override
-        public Object getBean() {
-            return BreadCrumbBar.this;
-        }
 
-        @Override
-        public String getName() {
-            return "onCrumbAction";
-        }
-    };
+    
+    
+    
+    
+    /***************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
 
 
     /**
      * Default crumb node factory. This factory is used when no custom factory is specified by the user.
      */
-    private final Callback<TreeItem<T>, BreadCrumbButton> defaultCrumbNodeFactory = new Callback<TreeItem<T>, BreadCrumbButton>(){
+    private final Callback<TreeItem<T>, Button> defaultCrumbNodeFactory = new Callback<TreeItem<T>, Button>(){
         @Override
-        public BreadCrumbButton call(TreeItem<T> crumb) {
-            return new BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
+        public Button call(TreeItem<T> crumb) {
+            return new BreadCrumbBarSkin.BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
         }
     };
+    
+    
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
 
     /**
      * Creates an empty bread crumb bar
@@ -123,22 +139,44 @@ public class BreadCrumbBar<T> extends Control {
     }
 
     /**
-     * Creates a bread crumb bar with the given initial model
-     * @param pathTarget
+     * Creates a bread crumb bar with the given TreeItem as the currently 
+     * selected crumb.
      */
-    public BreadCrumbBar(TreeItem<T> pathTarget) {
+    public BreadCrumbBar(TreeItem<T> selectedCrumb) {
         autoNavigationEnabled.set(true); // by default, auto navigation is enabled
         getStyleClass().add(DEFAULT_STYLE_CLASS);
-        setSelectedCrumb(pathTarget);
+        setSelectedCrumb(selectedCrumb);
         setCrumbFactory(defaultCrumbNodeFactory);
     }
+    
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
 
     /** {@inheritDoc} */
     @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
         return tail.prepend(eventHandlerManager);
     }
+    
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
 
-
+    // --- selectedCrumb
+    public final ObjectProperty<TreeItem<T>> selectedCrumbProperty() {
+        return selectedCrumb;
+    }
+    private final ObjectProperty<TreeItem<T>> selectedCrumb = 
+            new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
+    
     /**
      * Get the current target path
      */
@@ -162,21 +200,21 @@ public class BreadCrumbBar<T> extends Control {
         this.selectedCrumb.set(selectedCrumb);
     }
 
-    public final ObjectProperty<TreeItem<T>> selectedCrumbProperty() {
-        return selectedCrumb;
+    
+    // --- autoNavigation
+    public final  ObjectProperty<Boolean> autoNavigationProperty(){
+        return autoNavigationEnabled;
     }
-
-
-    public final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactoryProperty() {
-        return crumbFactory;
-    }
-
+    
+    private final ObjectProperty<Boolean> autoNavigationEnabled = 
+            new SimpleObjectProperty<Boolean>(this, "autoNavigationEnabled");
+    
     /**
      * Enable or disable auto navigation (default is enabled).
      * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
      * @param enabled
      */
-    public void setAutoNavigationEnabled(boolean enabled) {
+    public final void setAutoNavigationEnabled(boolean enabled) {
         autoNavigationEnabled.set(enabled);
     }
 
@@ -185,20 +223,24 @@ public class BreadCrumbBar<T> extends Control {
      * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
      * @return
      */
-    public boolean isAutoNavigationEnabled() {
+    public final boolean isAutoNavigationEnabled() {
         return autoNavigationEnabled.get();
     }
 
-    public  ObjectProperty<Boolean> autoNavigationProperty(){
-        return autoNavigationEnabled;
+    
+    // --- crumbFactory
+    public final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactoryProperty() {
+        return crumbFactory;
     }
-
+    
+    private final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactory = 
+            new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory");
 
     /**
      * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
      * <code>null</code> is not allowed and will result in a fall back to the default factory.
      */
-    public final void setCrumbFactory(Callback<TreeItem<T>, BreadCrumbButton> value) {
+    public final void setCrumbFactory(Callback<TreeItem<T>, Button> value) {
         if(value == null){
             value = defaultCrumbNodeFactory;
         }
@@ -209,26 +251,53 @@ public class BreadCrumbBar<T> extends Control {
      * Returns the cell factory that will be used to create {@link BreadCrumbButton} 
      * instances
      */
-    public final Callback<TreeItem<T>, BreadCrumbButton> getCrumbFactory() {
+    public final Callback<TreeItem<T>, Button> getCrumbFactory() {
         return crumbFactory.get();
     }
 
-    //
-    // Style sheet handling
-    //
+    
+    // --- onCrumbAction
+    public final ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbActionProperty() { 
+        return onCrumbAction; 
+    }
+    public final void setOnCrumbAction(EventHandler<BreadCrumbActionEvent<T>> value) {
+        onCrumbActionProperty().set(value); 
+    }
+    public final EventHandler<BreadCrumbActionEvent<T>> getOnCrumbAction() { 
+        return onCrumbActionProperty().get(); 
+    }
+    private ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
+        @SuppressWarnings("rawtypes")
+        @Override protected void invalidated() {
+            eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
+        }
+
+        @Override
+        public Object getBean() {
+            return BreadCrumbBar.this;
+        }
+
+        @Override
+        public String getName() {
+            return "onCrumbAction";
+        }
+    };
+    
+
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
 
     private static final String DEFAULT_STYLE_CLASS = "bread-crumb-bar";
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
         return new BreadCrumbBarSkin<>(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
         return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm();
     }
@@ -238,23 +307,10 @@ public class BreadCrumbBar<T> extends Control {
     // Static helper methods
     //
 
-    /**
-     * Construct a tree model from the flat list which then can be set 
-     * as selectedCrumb node to be shown 
-     * @param crumbs
-     */
-    public static <T> TreeItem<T> buildTreeModel(T... crumbs){
-        TreeItem<T> subRoot = null;
-        for (T crumb : crumbs) {
-            TreeItem<T> currentNode = new TreeItem<T>(crumb);
-            if(subRoot == null){
-                subRoot = currentNode; 
-            }else{
-                subRoot.getChildren().add(currentNode);
-                subRoot = currentNode;
-            }
-        }
-        return subRoot;
-    }
+    
 
+    
+    
+    
+    
 }

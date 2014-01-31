@@ -43,6 +43,8 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -51,6 +53,7 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
@@ -77,6 +80,14 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     }
 
     @Override
+    public String getSampleDescription() {
+        return "The SpreadsheetView is a control similar to the JavaFX TableView control "
+                + "but with different functionalities and use cases. The aim is to have a "
+                + "powerful grid where data can be written and retrieved.\n"
+                + "Don't forget to right-click on headers and cells to discover some features.";
+    }
+
+    @Override
     public Node getPanel(Stage stage) {
         centerPane = new StackPane();
 
@@ -91,7 +102,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.setShowRowHeader(rowHeader.isSelected());
         spreadSheetView.setShowColumnHeader(columnHeader.isSelected());
         spreadSheetView.setEditable(editable.isSelected());
-        
+
         centerPane.getChildren().setAll(spreadSheetView);
 
         return centerPane;
@@ -104,7 +115,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      */
     private Map<Integer, Double> generateRowHeight() {
         Map<Integer, Double> rowHeight = new HashMap<>();
-        rowHeight.put(0, 50.0);
+        rowHeight.put(1, 100.0);
         rowHeight.put(5, 50.0);
         rowHeight.put(8, 70.0);
         rowHeight.put(12, 40.0);
@@ -231,6 +242,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      */
     private void normalGrid(GridBase grid) {
         ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
+
         for (int row = 0; row < grid.getRowCount(); ++row) {
             final ObservableList<SpreadsheetCell> dataRow = FXCollections.observableArrayList(); // new
                                                                                                  // DataRow(row,
@@ -241,6 +253,24 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             rows.add(dataRow);
         }
         grid.setRows(rows);
+
+        // FIXME When setting at the very first row, the display is
+        // huumm..wrong.
+        final ObservableList<SpreadsheetCell> imageRow = FXCollections.observableArrayList();
+        for (int column = 0; column < grid.getColumnCount(); ++column) {
+            SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(1, column, 1, 1, null);
+            if (column % 3 == 0) {
+                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Koala.jpg"))));
+            } else if (column % 3 == 1) {
+                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Penguins.jpg"))));
+            } else {
+                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Jellyfish.jpg"))));
+            }
+
+            cell.setEditable(false);
+            imageRow.add(cell);
+        }
+        grid.getRows().set(1, imageRow);
     }
 
     /**

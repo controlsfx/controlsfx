@@ -26,11 +26,10 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import java.util.Map;
-
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.util.Callback;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
@@ -115,9 +114,8 @@ public interface Grid {
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
     
     /**
-     * FIXME DESCRIPTION WRONG
      * Return the height of a row. 
-     * It will first look into the {@link Map} provided at the
+     * It will first look into the {@link Callback}provided at the
      * initialization. If nothing's found, default height will be taken.
      * @param row
      * @return the height of a row.

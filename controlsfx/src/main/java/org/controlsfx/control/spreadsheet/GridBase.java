@@ -29,8 +29,6 @@ package org.controlsfx.control.spreadsheet;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
@@ -212,6 +210,12 @@ public class GridBase implements Grid, EventTarget {
      * 
      **************************************************************************/
 
+    /**
+     * Set a new {@link Callback} for this grid in order to specify height of
+     * each row.
+     * 
+     * @param rowHeight
+     */
     public void setRowHeightCallback(Callback<Integer, Double> rowHeight) {
         this.rowHeightFactory = rowHeight;
     }

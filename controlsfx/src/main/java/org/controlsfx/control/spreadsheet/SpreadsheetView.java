@@ -290,7 +290,7 @@ public class SpreadsheetView extends Control {
     public SpreadsheetView(final Grid grid) {
         super();
         // Reactivate that after
-        // verifyGrid(grid);
+        verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
@@ -900,7 +900,20 @@ public class SpreadsheetView extends Control {
                 pasteClipboard();
             }
         });
-        contextMenu.getItems().addAll(copyItem, pasteItem);
+        
+        final MenuItem commentedItem = new MenuItem("Comment cell");
+        commentedItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
+                .getResourceAsStream("comment.png"))));
+        commentedItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell =  getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+               cell.setCommented(!cell.isCommented());
+            }
+        });
+        
+        contextMenu.getItems().addAll(copyItem, pasteItem, commentedItem);
         return contextMenu;
     }
 
@@ -1686,7 +1699,7 @@ public class SpreadsheetView extends Control {
 
             // fire off a single add/remove/replace notification (rather than
             // individual remove and add notifications) - see RT-33324
-            if (old != null) {
+            if (old != null && old.getColumn() >= 0) {
                 TableColumn<ObservableList<SpreadsheetCell>, ?> columnFinal = getTableView().getColumns().get(
                         old.getColumn());
                 int changeIndex = selectedCellsSeq.indexOf(new TablePosition<>(getTableView(), old.getRow(),

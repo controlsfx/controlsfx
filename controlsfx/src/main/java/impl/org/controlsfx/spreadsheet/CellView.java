@@ -27,6 +27,8 @@
 package impl.org.controlsfx.spreadsheet;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -128,7 +130,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
                     setGraphic(newItem.getGraphic());
                     newItem.graphicProperty().addListener(graphicListener);
-
+                    
+                    //FIXME Toolip must listen to cell value change
                     if (newItem.getItem() != null) {
                         Tooltip toolTip = new Tooltip(newItem.getItem().toString());
                         toolTip.setWrapText(true);
@@ -254,7 +257,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
-
                 image.fitHeightProperty().bind(
                         new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
                                 image.getImage().getHeight()).otherwise(heightProperty()));

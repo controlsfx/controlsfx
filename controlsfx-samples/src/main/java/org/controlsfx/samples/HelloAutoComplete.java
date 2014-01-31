@@ -86,7 +86,7 @@ public class HelloAutoComplete extends ControlsFXSample {
         TextField textField = new TextField();
 
         SuggestionProviderString suggestionProvider = new SuggestionProviderString();
-        suggestionProvider.addPossibleSuggetions("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
+        suggestionProvider.addPossibleSuggestions("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
         AutoCompletionTextFieldBinding.createBinding(textField, suggestionProvider);
 
         topBox.getChildren().add(textField);

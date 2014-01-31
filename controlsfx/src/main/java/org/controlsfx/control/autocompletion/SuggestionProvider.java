@@ -26,15 +26,15 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      * Add the given new possible suggestions to this  SuggestionProvider
      * @param newPossible
      */
-    public void addPossibleSuggetions(T... newPossible){     
-        addPossibleSuggetions(Arrays.asList(newPossible));
+    public void addPossibleSuggestions(T... newPossible){     
+        addPossibleSuggestions(Arrays.asList(newPossible));
     }
 
     /**
      * Add the given new possible suggestions to this  SuggestionProvider
      * @param newPossible
      */
-    public void addPossibleSuggetions(Collection<T> newPossible){
+    public void addPossibleSuggestions(Collection<T> newPossible){
         synchronized (possibleSuggestionsLock) {
             possibleSuggestions.addAll(newPossible);
         }

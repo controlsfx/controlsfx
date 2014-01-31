@@ -61,7 +61,7 @@ public class BreadCrumbBar<T> extends Control {
 
     private final ObjectProperty<TreeItem<T>> selectedCrumb = new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
     private final ObjectProperty<Boolean> autoNavigationEnabled = new SimpleObjectProperty<Boolean>(this, "autoNavigationEnabled");
-    private final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>>(this, "crumbFactory");
+    private final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactory = new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory");
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
 
@@ -116,10 +116,10 @@ public class BreadCrumbBar<T> extends Control {
     /**
      * Default crumb node factory. This factory is used when no custom factory is specified by the user.
      */
-    private final Callback<TreeItem<T>, BreadCrumbButton> defaultCrumbNodeFactory = new Callback<TreeItem<T>, BreadCrumbButton>(){
+    private final Callback<TreeItem<T>, Button> defaultCrumbNodeFactory = new Callback<TreeItem<T>, Button>(){
         @Override
-        public BreadCrumbButton call(TreeItem<T> crumb) {
-            return new BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
+        public Button call(TreeItem<T> crumb) {
+            return new BreadCrumbBarSkin.BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
         }
     };
 
@@ -175,7 +175,7 @@ public class BreadCrumbBar<T> extends Control {
     }
 
 
-    public final ObjectProperty<Callback<TreeItem<T>, BreadCrumbButton>> crumbFactoryProperty() {
+    public final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactoryProperty() {
         return crumbFactory;
     }
 
@@ -206,7 +206,7 @@ public class BreadCrumbBar<T> extends Control {
      * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
      * <code>null</code> is not allowed and will result in a fall back to the default factory.
      */
-    public final void setCrumbFactory(Callback<TreeItem<T>, BreadCrumbButton> value) {
+    public final void setCrumbFactory(Callback<TreeItem<T>, Button> value) {
         if(value == null){
             value = defaultCrumbNodeFactory;
         }
@@ -217,7 +217,7 @@ public class BreadCrumbBar<T> extends Control {
      * Returns the cell factory that will be used to create {@link BreadCrumbButton} 
      * instances
      */
-    public final Callback<TreeItem<T>, BreadCrumbButton> getCrumbFactory() {
+    public final Callback<TreeItem<T>, Button> getCrumbFactory() {
         return crumbFactory.get();
     }
 
@@ -268,157 +268,5 @@ public class BreadCrumbBar<T> extends Control {
     
     
     
-    /**
-     * Represents a BreadCrumb Button
-     * 
-     * <pre>
-     * ----------
-     *  \         \
-     *  /         /
-     * ----------
-     * </pre>
-     * 
-     * 
-     */
-    public static class BreadCrumbButton extends Button {
-
-        private final ObjectProperty<Boolean> first = new SimpleObjectProperty<Boolean>(this, "first");
-
-        private final double arrowWidth = 5;
-        private final double arrowHeight = 20;
-
-        /**
-         * Create a BreadCrumbButton
-         * 
-         * @param text Buttons text
-         * @param first Is this the first / home button?
-         */
-        public BreadCrumbButton(String text){
-            this(text, null);
-        }
-
-        /**
-         * Create a BreadCrumbButton
-         * @param text Buttons text
-         * @param gfx Gfx of the Button
-         * @param first Is this the first / home button?
-         */
-        public BreadCrumbButton(String text, Node gfx){
-            super(text, gfx);
-            first.set(false);
-
-            firstProperty().addListener(new ChangeListener<Boolean>() {
-                @Override
-                public void changed(ObservableValue<? extends Boolean> obs, Boolean oldfirst, Boolean newfirst) {
-                    updateShape();
-                }
-            });
-
-            updateShape();
-        }
-
-        private void updateShape(){
-            this.setShape(createButtonShape(isFirst()));
-        }
-
-
-        /**
-         * Gets the crumb arrow with
-         * @return
-         */
-        public double getArrowWidth(){
-            return arrowWidth;
-        }
-
-        /**
-         * Has this button the first flag?
-         * @return
-         */
-        public boolean isFirst() {
-            return first.get();
-        }
-
-        /**
-         * Set this button as the first
-         * @param first
-         */
-        public void setFirst(boolean first) {
-            this.first.set(first);
-        }
-
-        public ObjectProperty<Boolean> firstProperty(){
-            return first;
-        }
-
-        /**
-         * Create an arrow path
-         * 
-         * Based upon Uwe / Andy Till code snippet found here:
-         * @see http://ustesis.wordpress.com/2013/11/04/implementing-breadcrumbs-in-javafx/
-         * @param first
-         * @return
-         */
-        private Path createButtonShape(boolean first){
-            // build the following shape (or home without left arrow)
-
-            //   --------
-            //  \         \
-            //  /         /
-            //   --------
-            Path path = new Path();
-
-            // begin in the upper left corner
-            MoveTo e1 = new MoveTo(0, 0);
-            path.getElements().add(e1);
-
-            // draw a horizontal line that defines the width of the shape
-            HLineTo e2 = new HLineTo();
-            // bind the width of the shape to the width of the button
-            e2.xProperty().bind(this.widthProperty().subtract(arrowWidth));
-            path.getElements().add(e2);
-
-            // draw upper part of right arrow
-            LineTo e3 = new LineTo();
-            // the x endpoint of this line depends on the x property of line e2
-            e3.xProperty().bind(e2.xProperty().add(arrowWidth));
-            e3.setY(arrowHeight / 2.0);
-            path.getElements().add(e3);
-
-            // draw lower part of right arrow
-            LineTo e4 = new LineTo();
-            // the x endpoint of this line depends on the x property of line e2
-            e4.xProperty().bind(e2.xProperty());
-            e4.setY(arrowHeight);
-            path.getElements().add(e4);
-
-            // draw lower horizontal line
-            HLineTo e5 = new HLineTo(0);
-            path.getElements().add(e5);
-
-            if(!first){
-                // draw lower part of left arrow
-                // we simply can omit it for the first Button
-                LineTo e6 = new LineTo(arrowWidth, arrowHeight / 2.0);
-                path.getElements().add(e6);
-            }else{
-                // draw an arc for the first bread crumb
-                ArcTo arcTo = new ArcTo();
-                arcTo.setSweepFlag(true);
-                arcTo.setX(0);
-                arcTo.setY(0);
-                arcTo.setRadiusX(15.0f);
-                arcTo.setRadiusY(15.0f);
-                path.getElements().add(arcTo);
-            }
-
-            // close path
-            ClosePath e7 = new ClosePath();
-            path.getElements().add(e7);
-            // this is a dummy color to fill the shape, it won't be visible
-            path.setFill(Color.BLACK);
-            return path;
-        }
-
-
-    }
+    
 }

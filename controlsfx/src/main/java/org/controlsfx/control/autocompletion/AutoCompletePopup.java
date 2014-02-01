@@ -1,10 +1,15 @@
 package org.controlsfx.control.autocompletion;
 
 
+import com.sun.javafx.event.EventHandlerManager;
+
 import impl.org.controlsfx.skin.AutoCompletePopupSkin;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
@@ -49,23 +54,7 @@ public class AutoCompletePopup<T> extends PopupControl{
         }
     }
 
-    /**
-     * Register a event handler for the SuggestionChoosen event.
-     * This event is fired whenever the user has chosen a suggestion to auto-complete
-     * @param value
-     */
-    public final void setOnSuggestionChoosen(EventHandler<SuggestionChoosenEvent<T>> value) {
-        addEventHandler(
-                SuggestionChoosenEvent.SUGGESTION_CHOOSEN,
-                (EventHandler<SuggestionChoosenEvent>)(Object)value); // Generic downcast
-    }
 
-
-    // The following event-handling code which re-dispatches the event chain
-    // will prevent the ListView from receiving any events. Therefore, the above 
-    // replacement is used until this is resolved.
-    //
-    /*
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     public final ObjectProperty<EventHandler<SuggestionChoosenEvent<T>>> onSuggestionChoosenProperty() { return onSuggestionChoosen; }
@@ -88,10 +77,10 @@ public class AutoCompletePopup<T> extends PopupControl{
         }
     };
 
-    {@inheritDoc}
+    /*{@inheritDoc}*/
     @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
-        return tail.prepend(eventHandlerManager);
-    } */
+        return super.buildEventDispatchChain(tail).append(eventHandlerManager);
+    } 
 
 
     /**
@@ -116,11 +105,12 @@ public class AutoCompletePopup<T> extends PopupControl{
 
     // HACK: Hard-coded title-bar height
     private final static int TITLE_HEIGHT = 28;
+
     /**
      * Show this popup right below the given Node
      * @param node
      */
-    public void showBelowNode(Node node){
+    public void show(Node node){
 
         if(node.getScene() == null || node.getScene().getWindow() == null)
             throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");

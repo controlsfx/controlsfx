@@ -54,7 +54,7 @@ public class AutoCompletionTextFieldBinding<T> {
         this(textField, new AutoCompletionController<>(autoCompletionPopup, suggestionProvider, new Callback<Void,Void>() {
             @Override
             public Void call(Void empty) {
-                autoCompletionPopup.showBelowNode(textField);
+                autoCompletionPopup.show(textField);
                 return null;
             }
         }));

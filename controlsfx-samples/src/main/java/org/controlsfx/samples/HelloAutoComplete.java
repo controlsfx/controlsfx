@@ -72,11 +72,10 @@ public class HelloAutoComplete extends ControlsFXSample {
         btnShowSuggestions.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent arg0) {
-
                 if(suggestionsPopup != null) suggestionsPopup.hide();
                 suggestionsPopup =  new AutoCompletePopup<String>();
                 suggestionsPopup.getSuggestions().addAll("Fruit","Fruits","Frites", "Cheese!");
-                suggestionsPopup.showBelowNode(btnShowSuggestions);
+                suggestionsPopup.show(btnShowSuggestions);
             }
         });
         topBox.getChildren().add(btnShowSuggestions);

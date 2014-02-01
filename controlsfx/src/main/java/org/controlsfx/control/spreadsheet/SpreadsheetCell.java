@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.Objects;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -575,12 +577,27 @@ public class SpreadsheetCell {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
+        if (this == obj)
+            return true;
         if (!(obj instanceof SpreadsheetCell))
             return false;
 
-        final SpreadsheetCell cell = (SpreadsheetCell) obj;
-        return cell != null && cell.getRow() == row && cell.getColumn() == column && cell.getText().equals(getText());
+        final SpreadsheetCell otherCell = (SpreadsheetCell) obj;        
+        return otherCell.getRow() == row 
+                && otherCell.getColumn() == column
+                && Objects.equals(otherCell.getText(), getText());
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + column;
+        result = prime * result + row;
+        result = prime * result + Objects.hashCode(getText());
+        return result;
     }
 
     /***************************************************************************

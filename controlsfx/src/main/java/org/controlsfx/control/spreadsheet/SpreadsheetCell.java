@@ -578,27 +578,27 @@ public class SpreadsheetCell {
     /** {@inheritDoc} */
     @Override
     public final boolean equals(Object obj) {
-		if (this == obj)
-			return true;
+        if (this == obj)
+            return true;
         if (!(obj instanceof SpreadsheetCell))
             return false;
 
         final SpreadsheetCell otherCell = (SpreadsheetCell) obj;        
         return otherCell.getRow() == row 
-        		&& otherCell.getColumn() == column
-        		&& Objects.equals(otherCell.getText(), getText());
+                && otherCell.getColumn() == column
+                && Objects.equals(otherCell.getText(), getText());
     }
     
     /** {@inheritDoc} */
     @Override
-	public final int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + column;
-		result = prime * result + row;
-		result = prime * result + Objects.hashCode(getText());
-		return result;
-	}
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + column;
+        result = prime * result + row;
+        result = prime * result + Objects.hashCode(getText());
+        return result;
+    }
 
     /***************************************************************************
      * 

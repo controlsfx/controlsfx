@@ -116,7 +116,7 @@ public class CheckComboBox<T> extends Control {
         
         this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
         this.items = items == null ? FXCollections.<T>observableArrayList() : items;
-        setCheckModel(new CheckComboBoxBitSetCheckModel<T>(items, itemBooleanMap));
+        setCheckModel(new CheckComboBoxBitSetCheckModel<T>(this.items, itemBooleanMap));
     }
     
     

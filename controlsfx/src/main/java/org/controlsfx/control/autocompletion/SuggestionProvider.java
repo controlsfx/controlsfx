@@ -9,7 +9,7 @@ import java.util.List;
 
 import javafx.util.Callback;
 
-import org.controlsfx.control.autocompletion.AutoCompletionController.ISuggestionRequest;
+import org.controlsfx.control.autocompletion.AutoCompletionBinding.ISuggestionRequest;
 
 /**
  * This is a simple implementation of a generic suggestion provider callback.

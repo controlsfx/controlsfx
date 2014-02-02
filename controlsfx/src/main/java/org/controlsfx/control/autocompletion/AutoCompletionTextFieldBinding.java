@@ -5,11 +5,12 @@ import java.util.Collection;
 import javax.xml.bind.Binder;
 
 import org.controlsfx.control.autocompletion.AutoCompletePopup.SuggestionChoosenEvent;
-import org.controlsfx.control.autocompletion.AutoCompletionController.ISuggestionRequest;
+import org.controlsfx.control.autocompletion.AutoCompletionBinding.ISuggestionRequest;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
 
@@ -18,11 +19,13 @@ import javafx.util.Callback;
  *
  * @param <T>
  */
-public class AutoCompletionTextFieldBinding<T> {
+public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>{
 
-    private final TextField textField;
-    private final AutoCompletionController<T> completionController;
-    private final AutoCompletePopup<T> popup;
+    /***************************************************************************
+     *                                                                         *
+     * Static methods                                                          *
+     *                                                                         *
+     **************************************************************************/
 
     /**
      * Create a new auto-completion binding between the given textField and the given suggestion provider
@@ -36,6 +39,12 @@ public class AutoCompletionTextFieldBinding<T> {
     }
 
 
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
     /**
      * Create a new auto-completion binding between the given textField and the given suggestion provider
      * 
@@ -47,67 +56,72 @@ public class AutoCompletionTextFieldBinding<T> {
     }
 
 
-    private AutoCompletionTextFieldBinding(
-            final TextField textField,
-            final AutoCompletePopup<T> autoCompletionPopup,
-            Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
-        this(textField, new AutoCompletionController<>(autoCompletionPopup, suggestionProvider, new Callback<Void,Void>() {
-            @Override
-            public Void call(Void empty) {
-                autoCompletionPopup.show(textField);
-                return null;
-            }
-        }));
-    }
-
     /**
      * Create a new auto-completion binding between the given textField and auto-completion controller
      * 
      * @param textField
      * @param completionController
      */
-    protected AutoCompletionTextFieldBinding(TextField textField, AutoCompletionController<T> completionController){
-        this.textField = textField;
-        this.completionController = completionController;
-        this.popup = completionController.getPopup();
+    public AutoCompletionTextFieldBinding(
+            final TextField textField,
+            final AutoCompletePopup<T> autoCompletionPopup,
+            Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+        super(textField, autoCompletionPopup, suggestionProvider);
+
         bind();
     }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    /** {@inheritDoc} */
+    @Override
+    public TextField getCompletionTarget(){
+        return (TextField)super.getCompletionTarget();
+    }
+
 
     /**
      * Bind the TextField
      */
     public void bind(){
-        textField.textProperty().addListener(textChangeListener);
-        popup.setOnSuggestionChoosen(new EventHandler<AutoCompletePopup.SuggestionChoosenEvent<T>>() {
-            @Override
-            public void handle(SuggestionChoosenEvent<T> sce) {
-                completeUserInput(sce.getSelectedSuggestion());
-            }
-        });
-    }
-
-    /**
-     * Complete the current user-input with the provided completion
-     * @param completion
-     */
-    protected void completeUserInput(T completion){
-        String newText = completion.toString(); // TODO Handle generic parameter better
-
-        textField.setText(newText);
-        textField.positionCaret(newText.length());
+        getCompletionTarget().textProperty().addListener(textChangeListener);
     }
 
     /**
      * Remove the binding
      */
     public void unbind(){
-        textField.textProperty().removeListener(textChangeListener);
+        getCompletionTarget().textProperty().removeListener(textChangeListener);
     }
+
+
+
+    /** {@inheritDoc} */
+    @Override
+    protected void completeUserInput(T completion){
+        String newText = completion.toString(); // TODO Handle generic parameter better
+
+        getCompletionTarget().setText(newText);
+        getCompletionTarget().positionCaret(newText.length());
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Event Listeners                                                         *
+     *                                                                         *
+     **************************************************************************/
+
 
     private final ChangeListener<String> textChangeListener = new ChangeListener<String>() {
         @Override
         public void changed(ObservableValue<? extends String> obs, String oldText, String newText) {
-            completionController.setUserInput(newText);
+            setUserInput(newText);
         }
     };
 }

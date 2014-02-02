@@ -2,7 +2,7 @@ package org.controlsfx.control.autocompletion;
 
 import java.util.Comparator;
 
-import org.controlsfx.control.autocompletion.AutoCompletionController.ISuggestionRequest;
+import org.controlsfx.control.autocompletion.AutoCompletionBinding.ISuggestionRequest;
 
 /**
  * This is a simple string based suggestion provider.

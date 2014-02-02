@@ -628,14 +628,14 @@ public class ActionUtils {
     private static class ButtonPropertiesMapChangeListener<T extends ButtonBase> implements MapChangeListener<Object, Object> {
 
         private final WeakReference<T> btnWeakReference;
-		private final Action action;
+        private final Action action;
 
-		private ButtonPropertiesMapChangeListener(T btn, Action action) {
-			btnWeakReference = new WeakReference<>(btn);
-			this.action = action;
-		}
+        private ButtonPropertiesMapChangeListener(T btn, Action action) {
+            btnWeakReference = new WeakReference<>(btn);
+            this.action = action;
+        }
 
-		public void onChanged(MapChangeListener.Change<?, ?> change) {
+        public void onChanged(MapChangeListener.Change<?, ?> change) {
             T btn = btnWeakReference.get();
             if (btn == null) {
                 action.getProperties().removeListener(this);
@@ -643,8 +643,8 @@ public class ActionUtils {
                 btn.getProperties().clear();
                 btn.getProperties().putAll(action.getProperties());
             }
-		}
-	}
+        }
+    }
 
     private static class MenuItemPropertiesMapChangeListener<T extends MenuItem> implements MapChangeListener<Object, Object> {
 

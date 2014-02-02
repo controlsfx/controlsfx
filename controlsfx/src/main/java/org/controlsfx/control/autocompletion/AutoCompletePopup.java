@@ -25,7 +25,21 @@ import javafx.stage.Window;
  */
 public class AutoCompletePopup<T> extends PopupControl{
 
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
+
+    private final static int TITLE_HEIGHT = 28; // HACK: Hard-coded title-bar height
     private final ObservableList<T> suggestions = FXCollections.observableArrayList();
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Inner classes                                                           *
+     *                                                                         *
+     **************************************************************************/
 
     /**
      * Represents an Event which is fired when the user has choosen a suggestion
@@ -55,6 +69,66 @@ public class AutoCompletePopup<T> extends PopupControl{
     }
 
 
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Creates a new AutoCompletePopup
+     */
+    public AutoCompletePopup(){
+        this.setAutoFix(true);
+        this.setAutoHide(true);
+        this.setHideOnEscape(true);
+
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+
+    /**
+     * Get the suggestions presented by this AutoCompletePopup
+     * @return
+     */
+    public ObservableList<T> getSuggestions() {
+        return suggestions;
+    }
+
+    /**
+     * Show this popup right below the given Node
+     * @param node
+     */
+    public void show(Node node){
+
+        if(node.getScene() == null || node.getScene().getWindow() == null)
+            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");
+
+        Window parent = node.getScene().getWindow();
+        this.show(
+                parent,
+                parent.getX() + node.localToScene(0, 0).getX() +
+                node.getScene().getX(),
+                parent.getY() + node.localToScene(0, 0).getY() +
+                node.getScene().getY() + TITLE_HEIGHT);
+
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     public final ObjectProperty<EventHandler<SuggestionChoosenEvent<T>>> onSuggestionChoosenProperty() { return onSuggestionChoosen; }
@@ -77,58 +151,17 @@ public class AutoCompletePopup<T> extends PopupControl{
         }
     };
 
-    /*{@inheritDoc}*/
+    /**{@inheritDoc}*/
     @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
         return super.buildEventDispatchChain(tail).append(eventHandlerManager);
     } 
 
 
-    /**
-     * Creates a new AutoCompletePopup
-     */
-    public AutoCompletePopup(){
-        this.setAutoFix(true);
-        this.setAutoHide(true);
-        this.setHideOnEscape(true);
-
-        getStyleClass().add(DEFAULT_STYLE_CLASS);
-    }
-
-    /**
-     * Get the suggestions presented by this AutoCompletePopup
-     * @return
-     */
-    public ObservableList<T> getSuggestions() {
-        return suggestions;
-    }
-
-
-    // HACK: Hard-coded title-bar height
-    private final static int TITLE_HEIGHT = 28;
-
-    /**
-     * Show this popup right below the given Node
-     * @param node
-     */
-    public void show(Node node){
-
-        if(node.getScene() == null || node.getScene().getWindow() == null)
-            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");
-
-        Window parent = node.getScene().getWindow();
-        this.show(
-                parent,
-                parent.getX() + node.localToScene(0, 0).getX() +
-                node.getScene().getX(),
-                parent.getY() + node.localToScene(0, 0).getY() +
-                node.getScene().getY() + TITLE_HEIGHT);
-
-    }
-
-
-    //
-    // Style sheet handling
-    //
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
 
     public static final String DEFAULT_STYLE_CLASS = "auto-complete-popup";
 

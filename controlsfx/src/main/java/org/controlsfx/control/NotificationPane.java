@@ -213,6 +213,8 @@ public class NotificationPane extends Control {
     public NotificationPane(Node content) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setContent(content);
+        
+        updateStyleClasses();
     }
     
     
@@ -334,8 +336,10 @@ public class NotificationPane extends Control {
     // --- show from top
     private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true) {
         protected void invalidated() {
-            pseudoClassStateChanged(SHOW_FROM_TOP_PSEUDOCLASS_STATE,      isShowFromTop());
-            pseudoClassStateChanged(SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE, ! isShowFromTop());
+//            pseudoClassStateChanged(SHOW_FROM_TOP_PSEUDOCLASS_STATE,      isShowFromTop());
+//            pseudoClassStateChanged(SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE, ! isShowFromTop());
+            
+            updateStyleClasses();
         }
     };
     
@@ -525,6 +529,11 @@ public class NotificationPane extends Control {
      *                                                                         *
      **************************************************************************/
     
+    private void updateStyleClasses() {
+        getStyleClass().removeAll("top", "bottom");
+        getStyleClass().add(isShowFromTop() ? "top" : "bottom");
+    }
+    
     private void hideAndThen(final Runnable r) {
         if (isShowing()) {
             final EventHandler<Event> eventHandler = new EventHandler<Event>() {
@@ -550,8 +559,8 @@ public class NotificationPane extends Control {
      
      private static final String DEFAULT_STYLE_CLASS = "notification-pane";
      
-     private static final PseudoClass SHOW_FROM_TOP_PSEUDOCLASS_STATE =
-             PseudoClass.getPseudoClass("top");
-     private static final PseudoClass SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE =
-             PseudoClass.getPseudoClass("bottom");
+//     private static final PseudoClass SHOW_FROM_TOP_PSEUDOCLASS_STATE =
+//             PseudoClass.getPseudoClass("top");
+//     private static final PseudoClass SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE =
+//             PseudoClass.getPseudoClass("bottom");
 }

@@ -78,4 +78,60 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      * @return
      */
     protected abstract boolean isMatch(T suggestion, ISuggestionRequest request);
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Static methods                                                          *
+     *                                                                         *
+     **************************************************************************/
+
+
+    /**
+     * Create a default suggestion provider for the given strings
+     * @param possibleSuggestions
+     * @return
+     */
+    public static SuggestionProvider<String> create(String... possibleSuggestions){
+        SuggestionProviderString suggestionProvider = new SuggestionProviderString();
+        suggestionProvider.addPossibleSuggestions(possibleSuggestions);
+        return suggestionProvider;
+    }
+
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Default implementations                                                 *
+     *                                                                         *
+     **************************************************************************/
+
+
+
+    /**
+     * This is a simple string based suggestion provider.
+     *
+     */
+    private static class SuggestionProviderString extends SuggestionProvider<String> {
+
+        private static final Comparator<String> stringComparator = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        };
+
+        @Override
+        protected Comparator<String> getComparator() {
+            return stringComparator;
+        }
+
+        @Override
+        protected boolean isMatch(String suggestion, ISuggestionRequest request) {
+            String userTextLower = request.getUserText().toLowerCase();
+            suggestion = suggestion.toLowerCase();
+            return suggestion.contains(userTextLower) 
+                    && !suggestion.equals(userTextLower);
+        }
+    }
 }

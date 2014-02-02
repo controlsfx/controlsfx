@@ -41,7 +41,7 @@ import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.autocompletion.AutoCompletePopup;
 import org.controlsfx.control.autocompletion.AutoCompletionTextFieldBinding;
-import org.controlsfx.control.autocompletion.SuggestionProviderString;
+import org.controlsfx.control.autocompletion.SuggestionProvider;
 
 public class HelloAutoComplete extends ControlsFXSample {
 
@@ -84,9 +84,9 @@ public class HelloAutoComplete extends ControlsFXSample {
         // TextField with auto-complete functionality
         TextField textField = new TextField();
 
-        SuggestionProviderString suggestionProvider = new SuggestionProviderString();
-        suggestionProvider.addPossibleSuggestions("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
-        AutoCompletionTextFieldBinding.createBinding(textField, suggestionProvider);
+        AutoCompletionTextFieldBinding.createBinding(
+                textField,
+                SuggestionProvider.create("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola"));
 
         topBox.getChildren().add(textField);
         VBox.setMargin(textField, new Insets(20));

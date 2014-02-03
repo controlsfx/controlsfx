@@ -27,8 +27,6 @@
 package impl.org.controlsfx.spreadsheet;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -130,14 +128,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
                     setGraphic(newItem.getGraphic());
                     newItem.graphicProperty().addListener(graphicListener);
-                    
-                    //FIXME Toolip must listen to cell value change
-                    if (newItem.getItem() != null) {
-                        Tooltip toolTip = new Tooltip(newItem.getItem().toString());
-                        toolTip.setWrapText(true);
-                        toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                        setTooltip(toolTip);
-                    }
                 }
             }
         });
@@ -287,6 +277,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     public void show(final SpreadsheetCell item) {
         // We reset the settings
         textProperty().bind(item.textProperty());
+
+        if (item.getItem() == null || item.getItem().equals("")
+                || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
+            setTooltip(null);
+        } else {
+            Tooltip toolTip = new Tooltip(item.getItem().toString());
+            toolTip.setWrapText(true);
+            toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+            setTooltip(toolTip);
+        }
 
         // We want the text to wrap onto another line
         setWrapText(true);

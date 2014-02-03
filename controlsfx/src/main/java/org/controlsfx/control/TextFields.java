@@ -1,6 +1,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+import impl.org.controlsfx.autocompletion.SuggestionProvider;
 
 import java.util.Collection;
 
@@ -94,5 +95,14 @@ public class TextFields {
      */
     public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
         return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider);
+    }
+
+    /**
+     * Creates a simple static suggestion provider for strings
+     * @param possibleSuggestions
+     * @return
+     */
+    public static Callback<ISuggestionRequest, Collection<String>> createSuggestionProvider(String... possibleSuggestions){
+        return SuggestionProvider.create(possibleSuggestions);
     }
 }

@@ -26,7 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -86,7 +85,7 @@ public class HelloAutoComplete extends ControlsFXSample {
 
         TextFields.autoComplete(
                 textField,
-                SuggestionProvider.create("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola"));
+                TextFields.createSuggestionProvider("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola"));
 
         topBox.getChildren().add(textField);
         VBox.setMargin(textField, new Insets(20));

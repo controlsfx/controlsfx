@@ -30,9 +30,10 @@ public abstract class AutoCompletionBinding<T> {
     private final Node completionTarget;
     private final AutoCompletePopup<T> autoCompletionPopup;
     private final Object suggestionsTaskLock = new Object();
-    private final Callback<ISuggestionRequest, Collection<T>> suggestionProvider;
 
     private FetchSuggestionsTask suggestionsTask = null;
+    private Callback<ISuggestionRequest, Collection<T>> suggestionProvider = null;
+
 
 
     /***************************************************************************
@@ -92,6 +93,14 @@ public abstract class AutoCompletionBinding<T> {
      */
     public Node getCompletionTarget(){
         return completionTarget;
+    }
+
+    /**
+     * Set the current suggestion provider
+     * @param suggestionProvider
+     */
+    public void setSuggestionProvider(Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+        this.suggestionProvider = suggestionProvider;
     }
 
     /***************************************************************************
@@ -183,20 +192,26 @@ public abstract class AutoCompletionBinding<T> {
 
         @Override
         protected Void call() throws Exception {
-            final Collection<T> fetchedSuggestions = suggestionProvider.call(this);
-            if(!isCancelled()){
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(!fetchedSuggestions.isEmpty()){
-                            autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
-                            showPopup();
-                        }else{
-                            // No suggestions found, so hide the popup
-                            hidePopup();
+            Callback<ISuggestionRequest, Collection<T>> provider = suggestionProvider;
+            if(provider != null){
+                final Collection<T> fetchedSuggestions = provider.call(this);
+                if(!isCancelled()){
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!fetchedSuggestions.isEmpty()){
+                                autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
+                                showPopup();
+                            }else{
+                                // No suggestions found, so hide the popup
+                                hidePopup();
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            }else {
+                // No suggestion provider
+                hidePopup();
             }
             return null;
         }

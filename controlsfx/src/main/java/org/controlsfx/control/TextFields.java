@@ -34,6 +34,12 @@ public class TextFields {
         // no-op
     }
 
+    /***************************************************************************
+     *                                                                         *
+     * Search fields                                                           *
+     *                                                                         *
+     **************************************************************************/
+
     /**
      * Creates a TextField that shows a clear button inside the TextField (on
      * the right hand side of it) when text is entered by the user.
@@ -86,11 +92,18 @@ public class TextFields {
     }
 
 
+    /***************************************************************************
+     *                                                                         *
+     * Auto-completion                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+
     /**
      * Create a new auto-completion binding between the given textField and the given suggestion provider
      * 
-     * @param textField
-     * @param suggestionProvider
+     * @param textField The textfield to which auto-completion shall be added
+     * @param suggestionProvider A suggestion provider to use
      * @return
      */
     public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
@@ -100,12 +113,21 @@ public class TextFields {
     /**
      * Create a new auto-completion binding between the given textField using the given auto-complete suggestions
      * 
-     * @param textField
-     * @param possibleSuggestions
+     * @param textField The textfield to which auto-completion shall be added
+     * @param possibleSuggestions Auto-complete suggestions
      * @return
      */
     public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, T... possibleSuggestions){
-        return new AutoCompletionTextFieldBinding<>(textField, SuggestionProvider.create(possibleSuggestions));
+        return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider(possibleSuggestions));
+    }
+
+    /**
+     * Creates a new suggestion provider
+     * @param possibleSuggestions
+     * @return
+     */
+    public static <T> Callback<ISuggestionRequest, Collection<T>> suggestionProvider(T... possibleSuggestions){
+        return SuggestionProvider.create(possibleSuggestions);
     }
 
 }

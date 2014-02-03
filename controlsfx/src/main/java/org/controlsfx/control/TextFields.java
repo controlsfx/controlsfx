@@ -98,11 +98,15 @@ public class TextFields {
     }
 
     /**
-     * Creates a simple static suggestion provider for strings
+     * Create a new auto-completion binding between the given textField using the given auto-complete suggestions
+     * 
+     * @param textField
      * @param possibleSuggestions
      * @return
      */
-    public static <T> Callback<ISuggestionRequest, Collection<T>> createSuggestionProvider(T... possibleSuggestions){
-        return SuggestionProvider.create(possibleSuggestions);
+    public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, T... possibleSuggestions){
+        return new AutoCompletionTextFieldBinding<>(textField, SuggestionProvider.create(possibleSuggestions));
     }
+
 }
+

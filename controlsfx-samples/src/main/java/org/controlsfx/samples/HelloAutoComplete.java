@@ -26,12 +26,17 @@
  */
 package org.controlsfx.samples;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -40,6 +45,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.AutoCompletePopup;
+import org.controlsfx.control.AutoCompletionBinding;
 import org.controlsfx.control.TextFields;
 
 public class HelloAutoComplete extends ControlsFXSample {
@@ -47,6 +53,11 @@ public class HelloAutoComplete extends ControlsFXSample {
     private AutoCompletePopup<String> suggestionsPopup;
 
     private Popup debugPopup;
+
+    // learning auto completion
+    private AutoCompletionBinding<String> autoCompletionBinding;
+    private String[] _possibleSuggestions = {"Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola"};
+    private Set<String> possibleSuggestions = new HashSet<>(Arrays.asList(_possibleSuggestions));
 
     @Override public String getSampleName() {
         return "AutoComplete";
@@ -66,7 +77,9 @@ public class HelloAutoComplete extends ControlsFXSample {
         BorderPane root = new BorderPane();
         VBox topBox = new VBox();
 
+        //
         // Simple suggestion popup
+        //
         final Button btnShowSuggestions = new Button(">Show sugestions<");
         btnShowSuggestions.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -80,7 +93,9 @@ public class HelloAutoComplete extends ControlsFXSample {
         topBox.getChildren().add(btnShowSuggestions);
         VBox.setMargin(btnShowSuggestions, new Insets(20));
 
-        // TextField with auto-complete functionality
+        //
+        // TextField with static auto-complete functionality
+        //
         TextField textField = new TextField();
 
         TextFields.autoComplete(
@@ -90,8 +105,43 @@ public class HelloAutoComplete extends ControlsFXSample {
         topBox.getChildren().add(textField);
         VBox.setMargin(textField, new Insets(20));
 
+
+        //
+        // TextField with learning auto-complete functionality
+        //
+
+        final TextField textFieldLearning = new TextField();
+
+        autoCompletionBinding = TextFields.autoComplete(
+                textFieldLearning,
+                possibleSuggestions.toArray(new String[0]));
+
+        textFieldLearning.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent ke) {
+                switch (ke.getCode()) {
+                case ENTER:
+                    autoCompletionLearnWord(textFieldLearning.getText().trim());
+                    break;
+
+                default:
+                    break;
+                }
+
+            }
+        });
+
+        topBox.getChildren().add(textFieldLearning);
+        VBox.setMargin(textFieldLearning, new Insets(20));
+
+
         root.setTop(topBox);
         return root;
+    }
+
+    private void autoCompletionLearnWord(String newWord){
+        possibleSuggestions.add(newWord);
+        autoCompletionBinding.setSuggestionProvider(TextFields.suggestionProvider(possibleSuggestions.toArray(new String[0])));
     }
 
     @Override public Node getControlPanel() {

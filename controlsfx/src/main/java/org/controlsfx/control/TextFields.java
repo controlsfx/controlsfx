@@ -102,7 +102,7 @@ public class TextFields {
      * @param possibleSuggestions
      * @return
      */
-    public static Callback<ISuggestionRequest, Collection<String>> createSuggestionProvider(String... possibleSuggestions){
+    public static <T> Callback<ISuggestionRequest, Collection<T>> createSuggestionProvider(T... possibleSuggestions){
         return SuggestionProvider.create(possibleSuggestions);
     }
 }

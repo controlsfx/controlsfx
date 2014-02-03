@@ -88,12 +88,12 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
 
 
     /**
-     * Create a default suggestion provider for the given strings
+     * Create a default suggestion provider based on the toString() method of the generic objects
      * @param possibleSuggestions
      * @return
      */
-    public static SuggestionProvider<String> create(String... possibleSuggestions){
-        SuggestionProviderString suggestionProvider = new SuggestionProviderString();
+    public static <T> SuggestionProvider<T> create(T... possibleSuggestions){
+        SuggestionProviderString<T> suggestionProvider = new SuggestionProviderString<>();
         suggestionProvider.addPossibleSuggestions(possibleSuggestions);
         return suggestionProvider;
     }
@@ -107,31 +107,30 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      **************************************************************************/
 
 
-
     /**
      * This is a simple string based suggestion provider.
      *
      */
-    private static class SuggestionProviderString extends SuggestionProvider<String> {
+    private static class SuggestionProviderString<T> extends SuggestionProvider<T> {
 
-        private static final Comparator<String> stringComparator = new Comparator<String>() {
+        private final Comparator<T> stringComparator = new Comparator<T>() {
             @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
+            public int compare(T o1, T o2) {
+                return o1.toString().compareTo(o2.toString());
             }
         };
 
         @Override
-        protected Comparator<String> getComparator() {
+        protected Comparator<T> getComparator() {
             return stringComparator;
         }
 
         @Override
-        protected boolean isMatch(String suggestion, ISuggestionRequest request) {
+        protected boolean isMatch(T suggestion, ISuggestionRequest request) {
             String userTextLower = request.getUserText().toLowerCase();
-            suggestion = suggestion.toLowerCase();
-            return suggestion.contains(userTextLower) 
-                    && !suggestion.equals(userTextLower);
+            String suggestionStr = suggestion.toString().toLowerCase();
+            return suggestionStr.contains(userTextLower) 
+                    && !suggestionStr.equals(userTextLower);
         }
     }
 }

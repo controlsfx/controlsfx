@@ -11,8 +11,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
+import org.controlsfx.control.AutoCompletePopup;
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.autocompletion.AutoCompletePopup;
 
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;

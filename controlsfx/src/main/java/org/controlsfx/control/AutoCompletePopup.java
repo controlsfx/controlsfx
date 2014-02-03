@@ -1,4 +1,4 @@
-package org.controlsfx.control.autocompletion;
+package org.controlsfx.control;
 
 
 import com.sun.javafx.event.EventHandlerManager;

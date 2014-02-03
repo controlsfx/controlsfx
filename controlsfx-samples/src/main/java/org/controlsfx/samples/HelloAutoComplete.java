@@ -26,6 +26,7 @@
  */
 package org.controlsfx.samples;
 
+import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -39,9 +40,8 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.autocompletion.AutoCompletePopup;
-import org.controlsfx.control.autocompletion.AutoCompletionTextFieldBinding;
-import org.controlsfx.control.autocompletion.SuggestionProvider;
+import org.controlsfx.control.AutoCompletePopup;
+import org.controlsfx.control.TextFields;
 
 public class HelloAutoComplete extends ControlsFXSample {
 
@@ -84,7 +84,7 @@ public class HelloAutoComplete extends ControlsFXSample {
         // TextField with auto-complete functionality
         TextField textField = new TextField();
 
-        AutoCompletionTextFieldBinding.createBinding(
+        TextFields.autoComplete(
                 textField,
                 SuggestionProvider.create("Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola"));
 
@@ -102,11 +102,6 @@ public class HelloAutoComplete extends ControlsFXSample {
         grid.setPadding(new Insets(30, 30, 0, 30));
 
         // TODO Add customization example controls
-        //Button btn = new Button("Add Crumb");
-        //grid.add(btn, 0, 0);
-
-        //CheckBox chkAutoNav = new CheckBox("Enable auto navigation");
-        //grid.add(chkAutoNav, 0, 1);
 
 
         return grid;

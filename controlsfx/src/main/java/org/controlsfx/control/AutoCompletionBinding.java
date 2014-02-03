@@ -1,8 +1,8 @@
-package org.controlsfx.control.autocompletion;
+package org.controlsfx.control;
 
 import java.util.Collection;
 
-import org.controlsfx.control.autocompletion.AutoCompletePopup.SuggestionChoosenEvent;
+import org.controlsfx.control.AutoCompletePopup.SuggestionChoosenEvent;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;

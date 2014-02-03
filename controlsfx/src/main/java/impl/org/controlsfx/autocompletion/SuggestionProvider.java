@@ -1,4 +1,4 @@
-package org.controlsfx.control.autocompletion;
+package impl.org.controlsfx.autocompletion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import javafx.util.Callback;
 
-import org.controlsfx.control.autocompletion.AutoCompletionBinding.ISuggestionRequest;
+import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
 
 /**
  * This is a simple implementation of a generic suggestion provider callback.

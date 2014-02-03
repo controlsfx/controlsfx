@@ -1,11 +1,13 @@
-package org.controlsfx.control.autocompletion;
+package impl.org.controlsfx.autocompletion;
 
 import java.util.Collection;
 
 import javax.xml.bind.Binder;
 
-import org.controlsfx.control.autocompletion.AutoCompletePopup.SuggestionChoosenEvent;
-import org.controlsfx.control.autocompletion.AutoCompletionBinding.ISuggestionRequest;
+import org.controlsfx.control.AutoCompletePopup;
+import org.controlsfx.control.AutoCompletionBinding;
+import org.controlsfx.control.AutoCompletePopup.SuggestionChoosenEvent;
+import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -20,23 +22,6 @@ import javafx.util.Callback;
  * @param <T>
  */
 public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>{
-
-    /***************************************************************************
-     *                                                                         *
-     * Static methods                                                          *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * Create a new auto-completion binding between the given textField and the given suggestion provider
-     * 
-     * @param textField
-     * @param suggestionProvider
-     * @return
-     */
-    public static <T> AutoCompletionTextFieldBinding<T> createBinding(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
-        return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider);
-    }
 
 
     /***************************************************************************

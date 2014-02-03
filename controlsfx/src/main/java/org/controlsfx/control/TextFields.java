@@ -1,5 +1,11 @@
 package org.controlsfx.control;
 
+import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+
+import java.util.Collection;
+
+import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
+
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -9,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.util.Callback;
 import javafx.util.Duration;
 
 /**
@@ -21,7 +28,7 @@ import javafx.util.Duration;
  */
 public class TextFields {
     private static final Duration FADE_DURATION = Duration.millis(350);
-    
+
     private TextFields() {
         // no-op
     }
@@ -33,46 +40,59 @@ public class TextFields {
     public static TextField createSearchField() {
         final CustomTextField searchField = new CustomTextField();
         searchField.getStyleClass().add("search-field");
-        
+
         Region clearButton = new Region();
         clearButton.getStyleClass().addAll("graphic");
         StackPane clearButtonPane = new StackPane(clearButton);
         clearButtonPane.getStyleClass().addAll("clear-button");
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
-        
+
         clearButtonPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
             public void handle(MouseEvent e) {
                 searchField.clear();
             }
         });
-        
+
         searchField.setRight(clearButtonPane);
-        
+
         final FadeTransition fader = new FadeTransition(FADE_DURATION, clearButtonPane);
         fader.setCycleCount(1);
-        
+
         searchField.textProperty().addListener(new InvalidationListener() {
-            
+
             @Override public void invalidated(Observable arg0) {
                 String text = searchField.getText();
                 boolean isTextEmpty = text == null || text.isEmpty();
                 boolean isButtonVisible = fader.getNode().getOpacity() > 0;
-                
+
                 if (isTextEmpty && isButtonVisible) {
                     setButtonVisible(false);
                 } else if (!isTextEmpty && !isButtonVisible) {
                     setButtonVisible(true);
                 }
             }
-            
+
             private void setButtonVisible( boolean visible ) {
                 fader.setFromValue(visible? 0.0: 1.0);
                 fader.setToValue(visible? 1.0: 0.0);
                 fader.play();
             }
         });
-        
+
         return searchField;
+    }
+
+
+    /**
+     * Create a new auto-completion binding between the given textField and the given suggestion provider
+     * 
+     * @param textField
+     * @param suggestionProvider
+     * @return
+     */
+    public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+        return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider);
     }
 }

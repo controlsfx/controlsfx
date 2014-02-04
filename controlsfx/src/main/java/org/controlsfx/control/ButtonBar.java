@@ -411,15 +411,14 @@ public final class ButtonBar extends Control {
         });
         
         TraversalEngine engine = new TraversalEngine(this, false) {
-            @Override public boolean trav(Node owner, Direction dir) {
+            @Override public void trav(Node owner, Direction dir) {
                 traversalDirection = dir;
-                return super.trav(owner, dir);
+                super.trav(owner, dir);
             }
         };
         engine.addTraverseListener(new TraverseListener() {
             @Override public void onTraverse(Node n, Bounds b) {
                 if (ButtonBar.this.equals(n)) {
-                    System.out.println("traversalDirection: " + traversalDirection);
                     if (traversalDirection == null || traversalDirection.equals(Direction.NEXT)) {
                         // Sends the focus to the first button in the button bar
                         getButtons().get(0).requestFocus();

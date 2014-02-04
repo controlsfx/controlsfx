@@ -251,6 +251,11 @@ public class CheckTreeView<T> extends TreeView<T> {
             return treeView.getRow(item);
         }
         
+        @Override BooleanProperty getItemBooleanProperty(TreeItem<T> item) {
+            if (item == null) return null;
+            return ((CheckBoxTreeItem<T>)item).selectedProperty();
+        }
+        
         
         
         /***********************************************************************

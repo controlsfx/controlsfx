@@ -28,11 +28,15 @@ package org.controlsfx.samples.checked;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -46,6 +50,8 @@ public class HelloCheckTreeView extends ControlsFXSample {
     
     private Label checkedItemsLabel;
     private Label selectedItemsLabel;
+    
+    private CheckTreeView<String> checkTreeView;
 
     @Override public String getSampleName() {
         return "CheckTreeView";
@@ -74,7 +80,7 @@ public class HelloCheckTreeView extends ControlsFXSample {
                 new CheckBoxTreeItem<String>("Samir"));
         
         // CheckListView
-        final CheckTreeView<String> checkTreeView = new CheckTreeView<>(root);
+        checkTreeView = new CheckTreeView<>(root);
         checkTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         checkTreeView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
             @Override public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
@@ -98,19 +104,37 @@ public class HelloCheckTreeView extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
         
+        int row = 0;
+        
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
-        grid.add(label1, 0, 0);
+        grid.add(label1, 0, row);
         checkedItemsLabel = new Label();
-        grid.add(checkedItemsLabel, 1, 0);
+        grid.add(checkedItemsLabel, 1, row++);
         updateText(checkedItemsLabel, null);
         
         Label label2 = new Label("Selected items: ");
         label2.getStyleClass().add("property");
-        grid.add(label2, 0, 1);
+        grid.add(label2, 0, row);
         selectedItemsLabel = new Label();
-        grid.add(selectedItemsLabel, 1, 1);
+        grid.add(selectedItemsLabel, 1, row++);
         updateText(selectedItemsLabel, null);
+        
+        Label checkItem2Label = new Label("Check 'Jonathan': ");
+        checkItem2Label.getStyleClass().add("property");
+        grid.add(checkItem2Label, 0, row);
+        final CheckBox checkItem2Btn = new CheckBox();
+        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                SelectionModel<TreeItem<String>> cm = checkTreeView.getCheckModel();
+                if (cm.isSelected(1)) {
+                    cm.clearSelection(1);
+                } else {
+                    cm.select(1);
+                }
+            }
+        });
+        grid.add(checkItem2Btn, 1, row++);
         
         return grid;
     }

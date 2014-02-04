@@ -35,7 +35,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ListChangeListener.Change;
 import javafx.scene.control.MultipleSelectionModel;
 
 import com.sun.javafx.collections.MappingChange;
@@ -125,6 +124,33 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
                 c.reset();
             }
         });
+        
+        // this code is to handle the situation where a developer is manually
+        // toggling the check model, and expecting the UI to update (without
+        // this it won't happen!).
+        getSelectedItems().addListener(new ListChangeListener<T>() {
+            @Override public void onChanged(ListChangeListener.Change<? extends T> c) {
+                while (c.next()) {
+                    if (c.wasAdded()) {
+                        for (T item : c.getAddedSubList()) {
+                            BooleanProperty p = getItemBooleanProperty(item);
+                            if (p != null) {
+                                p.set(true);
+                            }
+                        }
+                    } 
+                    
+                    if (c.wasRemoved()) {
+                        for (T item : c.getRemoved()) {
+                            BooleanProperty p = getItemBooleanProperty(item);
+                            if (p != null) {
+                                p.set(false);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
     
     
@@ -140,6 +166,10 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     public abstract int getItemCount();
     
     public abstract int getItemIndex(T item);
+    
+    BooleanProperty getItemBooleanProperty(T item) {
+        return itemBooleanMap.get(item);
+    }
     
     
     /***********************************************************************

@@ -29,10 +29,15 @@ package org.controlsfx.samples.checked;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -45,6 +50,8 @@ public class HelloCheckListView extends ControlsFXSample {
     
     private Label checkedItemsLabel;
     private Label selectedItemsLabel;
+    
+    private CheckListView<String> checkListView;
     
     @Override public String getSampleName() {
         return "CheckListView";
@@ -69,7 +76,7 @@ public class HelloCheckListView extends ControlsFXSample {
         }
         
         // CheckListView
-        final CheckListView<String> checkListView = new CheckListView<>(strings);
+        checkListView = new CheckListView<>(strings);
         checkListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         checkListView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<String>() {
             @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
@@ -93,19 +100,39 @@ public class HelloCheckListView extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
         
+        int row = 0;
+        
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
         grid.add(label1, 0, 0);
         checkedItemsLabel = new Label();
-        grid.add(checkedItemsLabel, 1, 0);
+        grid.add(checkedItemsLabel, 1, row++);
         updateText(checkedItemsLabel, null);
         
         Label label2 = new Label("Selected items: ");
         label2.getStyleClass().add("property");
         grid.add(label2, 0, 1);
         selectedItemsLabel = new Label();
-        grid.add(selectedItemsLabel, 1, 1);
+        grid.add(selectedItemsLabel, 1, row++);
         updateText(selectedItemsLabel, null);
+        
+        
+        Label checkItem2Label = new Label("Check 'Item 2': ");
+        checkItem2Label.getStyleClass().add("property");
+        grid.add(checkItem2Label, 0, row);
+        final CheckBox checkItem2Btn = new CheckBox();
+        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                SelectionModel<String> cm = checkListView.getCheckModel();
+                if (cm.isSelected(2)) {
+                    cm.clearSelection(2);
+                } else {
+                    cm.select(2);
+                }
+            }
+        });
+        grid.add(checkItem2Btn, 1, row++);
+        
         
         return grid;
     }

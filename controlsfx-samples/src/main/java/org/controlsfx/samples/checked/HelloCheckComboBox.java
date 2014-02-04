@@ -29,10 +29,14 @@ package org.controlsfx.samples.checked;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -43,6 +47,7 @@ import org.controlsfx.samples.Utils;
 public class HelloCheckComboBox extends ControlsFXSample {
     
     private Label checkedItemsLabel;
+    private CheckComboBox<String> checkComboBox;
     
     @Override public String getSampleName() {
         return "CheckComboBox";
@@ -78,7 +83,7 @@ public class HelloCheckComboBox extends ControlsFXSample {
         grid.add(new ComboBox<String>(strings), 1, row++);
         
         // CheckComboBox
-        final CheckComboBox<String> checkComboBox = new CheckComboBox<String>(strings);
+        checkComboBox = new CheckComboBox<String>(strings);
         checkComboBox.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
             @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
                 updateText(checkedItemsLabel, c.getList());
@@ -96,12 +101,30 @@ public class HelloCheckComboBox extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
         
+        int row = 0;
+        
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
         grid.add(label1, 0, 0);
         checkedItemsLabel = new Label();
-        grid.add(checkedItemsLabel, 1, 0);
+        grid.add(checkedItemsLabel, 1, row++);
         updateText(checkedItemsLabel, null);
+        
+        Label checkItem2Label = new Label("Check 'Item 2': ");
+        checkItem2Label.getStyleClass().add("property");
+        grid.add(checkItem2Label, 0, row);
+        final CheckBox checkItem2Btn = new CheckBox();
+        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                SelectionModel<String> cm = checkComboBox.getCheckModel();
+                if (cm.isSelected(2)) {
+                    cm.clearSelection(2);
+                } else {
+                    cm.select(2);
+                }
+            }
+        });
+        grid.add(checkItem2Btn, 1, row++);
         
         return grid;
     }

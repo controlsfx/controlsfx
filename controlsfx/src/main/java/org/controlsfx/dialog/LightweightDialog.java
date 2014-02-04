@@ -208,7 +208,7 @@ class LightweightDialog extends FXDialog {
     }
     
     @Override public void show() {
-        if (owner != null) {
+        if (owner != null && owner.getParent() != null) {
             showInParent();
         } else if (scene != null) {
             showInScene();

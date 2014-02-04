@@ -35,11 +35,12 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -75,7 +76,11 @@ public class HelloAutoComplete extends ControlsFXSample {
     @Override public Node getPanel(final Stage stage) {
 
         BorderPane root = new BorderPane();
-        VBox topBox = new VBox();
+
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
 
         //
         // Simple suggestion popup
@@ -90,8 +95,10 @@ public class HelloAutoComplete extends ControlsFXSample {
                 suggestionsPopup.show(btnShowSuggestions);
             }
         });
-        topBox.getChildren().add(btnShowSuggestions);
-        VBox.setMargin(btnShowSuggestions, new Insets(20));
+
+        grid.add(new Label("Popup Example"), 0, 1);
+        grid.add(btnShowSuggestions, 1, 1);
+        GridPane.setHgrow(btnShowSuggestions, Priority.ALWAYS);
 
         //
         // TextField with static auto-complete functionality
@@ -102,8 +109,9 @@ public class HelloAutoComplete extends ControlsFXSample {
                 textField,
                 "Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
 
-        topBox.getChildren().add(textField);
-        VBox.setMargin(textField, new Insets(20));
+        grid.add(new Label("Auto-complete Text"), 0, 2);
+        grid.add(textField, 1, 2);
+        GridPane.setHgrow(textField, Priority.ALWAYS);
 
 
         //
@@ -116,6 +124,9 @@ public class HelloAutoComplete extends ControlsFXSample {
                 textFieldLearning,
                 possibleSuggestions.toArray(new String[0]));
 
+
+        // Learn the word when user presses ENTER
+
         textFieldLearning.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent ke) {
@@ -123,19 +134,17 @@ public class HelloAutoComplete extends ControlsFXSample {
                 case ENTER:
                     autoCompletionLearnWord(textFieldLearning.getText().trim());
                     break;
-
                 default:
                     break;
                 }
-
             }
         });
 
-        topBox.getChildren().add(textFieldLearning);
-        VBox.setMargin(textFieldLearning, new Insets(20));
+        grid.add(new Label("Learning Example"), 0, 3);
+        grid.add(textFieldLearning, 1, 3);
+        GridPane.setHgrow(textFieldLearning, Priority.ALWAYS);
 
-
-        root.setTop(topBox);
+        root.setTop(grid);
         return root;
     }
 

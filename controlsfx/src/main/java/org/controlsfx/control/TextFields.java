@@ -20,7 +20,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 
 /**
- * A class containing useful customisations for the JavaFX {@link TextField}.
+ * A class containing useful customizations for the JavaFX {@link TextField}.
  * Note that this class is experimental and the API may change in future 
  * releases. Note also that this class makes use of the {@link CustomTextField}
  * class.
@@ -100,10 +100,12 @@ public class TextFields {
 
 
     /**
-     * Create a new auto-completion binding between the given textField and the given suggestion provider
+     * Create a new auto-completion binding between the given textField and the given suggestion provider.
      * 
-     * @param textField The textfield to which auto-completion shall be added
-     * @param suggestionProvider A suggestion provider to use
+     * The {@link TextFields} API has some suggestion-provider builder methods for simple use cases.
+     * 
+     * @param textField The {@link TextField} to which auto-completion shall be added
+     * @param suggestionProvider A suggestion-provider strategy to use
      * @return
      */
     public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
@@ -111,10 +113,10 @@ public class TextFields {
     }
 
     /**
-     * Create a new auto-completion binding between the given textField using the given auto-complete suggestions
+     * Create a new auto-completion binding between the given {@link TextField} using the given auto-complete suggestions
      * 
-     * @param textField The textfield to which auto-completion shall be added
-     * @param possibleSuggestions Auto-complete suggestions
+     * @param textField The {@link TextField} to which auto-completion shall be added
+     * @param possibleSuggestions Possible auto-complete suggestions
      * @return
      */
     public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, T... possibleSuggestions){
@@ -122,12 +124,30 @@ public class TextFields {
     }
 
     /**
-     * Creates a new suggestion provider
-     * @param possibleSuggestions
+     * Creates a new simple suggestion provider. 
+     * 
+     * For more advanced use cases, developers should consider to implement
+     * their own SuggestionProvider-Callback strategy.
+     * 
+     * @param possibleSuggestions Possible auto-complete suggestions
      * @return
      */
     public static <T> Callback<ISuggestionRequest, Collection<T>> suggestionProvider(T... possibleSuggestions){
         return SuggestionProvider.create(possibleSuggestions);
+    }
+
+    /**
+     * Creates a new simple suggestion-provider. 
+     * 
+     * For more advanced use cases, developers should consider to implement
+     * their own SuggestionProvider-Callback strategy.
+     * 
+     * @param stringConverter Strategy of how to convert T into a String. Default is the toString() method.
+     * @param possibleSuggestions Possible auto-complete suggestions
+     * @return
+     */
+    public static <T> Callback<ISuggestionRequest, Collection<T>> suggestionProvider( Callback<T, String> stringConverter, T... possibleSuggestions){
+        return SuggestionProvider.create(stringConverter, possibleSuggestions);
     }
 
 }

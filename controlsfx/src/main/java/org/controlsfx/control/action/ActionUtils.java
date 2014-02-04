@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.action;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -549,12 +550,7 @@ public class ActionUtils {
         // add all the properties of the action into the button, and set up
         // a listener so they are always copied across
         btn.getProperties().putAll(action.getProperties());
-        action.getProperties().addListener(new MapChangeListener<Object, Object>() {
-            public void onChanged(MapChangeListener.Change<? extends Object,? extends Object> change) {
-                btn.getProperties().clear();
-                btn.getProperties().putAll(action.getProperties());
-            }
-        });
+        action.getProperties().addListener(new ButtonPropertiesMapChangeListener<>(btn, action));
         
         // tooltip requires some special handling (i.e. don't have one when
         // the text property is null
@@ -611,12 +607,7 @@ public class ActionUtils {
         // add all the properties of the action into the button, and set up
         // a listener so they are always copied across
         btn.getProperties().putAll(action.getProperties());
-        action.getProperties().addListener(new MapChangeListener<Object, Object>() {
-            public void onChanged(MapChangeListener.Change<? extends Object,? extends Object> change) {
-                btn.getProperties().clear();
-                btn.getProperties().putAll(action.getProperties());
-            }
-        });
+        action.getProperties().addListener(new MenuItemPropertiesMapChangeListener<>(btn, action));
         
         // TODO handle the selected state of the menu item if it is a 
         // CheckMenuItem or RadioMenuItem
@@ -632,5 +623,47 @@ public class ActionUtils {
         });
         
         return btn;
+    }
+
+    private static class ButtonPropertiesMapChangeListener<T extends ButtonBase> implements MapChangeListener<Object, Object> {
+
+        private final WeakReference<T> btnWeakReference;
+        private final Action action;
+
+        private ButtonPropertiesMapChangeListener(T btn, Action action) {
+            btnWeakReference = new WeakReference<>(btn);
+            this.action = action;
+        }
+
+        public void onChanged(MapChangeListener.Change<?, ?> change) {
+            T btn = btnWeakReference.get();
+            if (btn == null) {
+                action.getProperties().removeListener(this);
+            } else {
+                btn.getProperties().clear();
+                btn.getProperties().putAll(action.getProperties());
+            }
+        }
+    }
+
+    private static class MenuItemPropertiesMapChangeListener<T extends MenuItem> implements MapChangeListener<Object, Object> {
+
+        private final WeakReference<T> btnWeakReference;
+        private final Action action;
+
+        private MenuItemPropertiesMapChangeListener(T btn, Action action) {
+            btnWeakReference = new WeakReference<>(btn);
+            this.action = action;
+        }
+
+        public void onChanged(MapChangeListener.Change<?, ?> change) {
+            T btn = btnWeakReference.get();
+            if (btn == null) {
+                action.getProperties().removeListener(this);
+            } else {
+                btn.getProperties().clear();
+                btn.getProperties().putAll(action.getProperties());
+            }
+        }
     }
 }

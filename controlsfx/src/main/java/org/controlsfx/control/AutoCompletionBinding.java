@@ -2,7 +2,7 @@ package org.controlsfx.control;
 
 import java.util.Collection;
 
-import org.controlsfx.control.AutoCompletePopup.SuggestionChoosenEvent;
+import org.controlsfx.control.AutoCompletePopup.SuggestionEvent;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -55,10 +55,10 @@ public abstract class AutoCompletionBinding<T> {
         this.suggestionProvider = suggestionProvider;
         this.autoCompletionPopup = autoCompletionPopup;
 
-        getPopup().setOnSuggestionChoosen(new EventHandler<AutoCompletePopup.SuggestionChoosenEvent<T>>() {
+        getPopup().setOnSuggestion(new EventHandler<AutoCompletePopup.SuggestionEvent<T>>() {
             @Override
-            public void handle(SuggestionChoosenEvent<T> sce) {
-                completeUserInput(sce.getSelectedSuggestion());
+            public void handle(SuggestionEvent<T> sce) {
+                completeUserInput(sce.getSuggestion());
             }
         });
     }

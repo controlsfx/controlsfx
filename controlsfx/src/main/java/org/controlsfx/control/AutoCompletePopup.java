@@ -42,29 +42,29 @@ public class AutoCompletePopup<T> extends PopupControl{
      **************************************************************************/
 
     /**
-     * Represents an Event which is fired when the user has choosen a suggestion
+     * Represents an Event which is fired when the user has selected a suggestion
      * for auto-complete
      *
      * @param <TE>
      */
     @SuppressWarnings("serial")
-    public static class SuggestionChoosenEvent<TE> extends Event {
+    public static class SuggestionEvent<TE> extends Event {
         @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionChoosenEvent> SUGGESTION_CHOOSEN = new EventType<SuggestionChoosenEvent>("SUGGESTION_CHOOSEN");
+        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<SuggestionEvent>("SUGGESTION");
 
-        private final TE selectedSuggestion;
+        private final TE suggestion;
 
-        public SuggestionChoosenEvent(TE selectedSuggestion) {
-            super(SUGGESTION_CHOOSEN);
-            this.selectedSuggestion = selectedSuggestion;
+        public SuggestionEvent(TE suggestion) {
+            super(SUGGESTION);
+            this.suggestion = suggestion;
         }
 
         /**
          * Returns the suggestion which was chosen by the user
          * @return
          */
-        public TE getSelectedSuggestion() {
-            return selectedSuggestion;
+        public TE getSuggestion() {
+            return suggestion;
         }
     }
 
@@ -131,13 +131,13 @@ public class AutoCompletePopup<T> extends PopupControl{
 
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
-    public final ObjectProperty<EventHandler<SuggestionChoosenEvent<T>>> onSuggestionChoosenProperty() { return onSuggestionChoosen; }
-    public final void setOnSuggestionChoosen(EventHandler<SuggestionChoosenEvent<T>> value) { onSuggestionChoosenProperty().set(value); }
-    public final EventHandler<SuggestionChoosenEvent<T>> getOnCrumbAction() { return onSuggestionChoosenProperty().get(); }
-    private ObjectProperty<EventHandler<SuggestionChoosenEvent<T>>> onSuggestionChoosen = new ObjectPropertyBase<EventHandler<SuggestionChoosenEvent<T>>>() {
+    public final ObjectProperty<EventHandler<SuggestionEvent<T>>> onSuggestionProperty() { return onSuggestion; }
+    public final void setOnSuggestion(EventHandler<SuggestionEvent<T>> value) { onSuggestionProperty().set(value); }
+    public final EventHandler<SuggestionEvent<T>> getOnSuggestion() { return onSuggestionProperty().get(); }
+    private ObjectProperty<EventHandler<SuggestionEvent<T>>> onSuggestion = new ObjectPropertyBase<EventHandler<SuggestionEvent<T>>>() {
         @SuppressWarnings("rawtypes")
         @Override protected void invalidated() {
-            eventHandlerManager.setEventHandler(SuggestionChoosenEvent.SUGGESTION_CHOOSEN, (EventHandler<SuggestionChoosenEvent>)(Object)get());
+            eventHandlerManager.setEventHandler(SuggestionEvent.SUGGESTION, (EventHandler<SuggestionEvent>)(Object)get());
         }
 
         @Override
@@ -147,7 +147,7 @@ public class AutoCompletePopup<T> extends PopupControl{
 
         @Override
         public String getName() {
-            return "onSuggestionChoosen";
+            return "onSuggestion";
         }
     };
 

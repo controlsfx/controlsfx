@@ -6,7 +6,7 @@ import javax.xml.bind.Binder;
 
 import org.controlsfx.control.AutoCompletePopup;
 import org.controlsfx.control.AutoCompletionBinding;
-import org.controlsfx.control.AutoCompletePopup.SuggestionChoosenEvent;
+import org.controlsfx.control.AutoCompletePopup.SuggestionEvent;
 import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
 
 import javafx.beans.value.ChangeListener;

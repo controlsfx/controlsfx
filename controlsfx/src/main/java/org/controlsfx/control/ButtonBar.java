@@ -27,6 +27,8 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.ButtonBarSkin;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -35,6 +37,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Control;
@@ -43,6 +47,10 @@ import javafx.scene.layout.HBox;
 
 import org.controlsfx.control.action.Action;
 import org.controlsfx.tools.Platform;
+
+import com.sun.javafx.scene.traversal.TraversalEngine;
+import com.sun.javafx.scene.traversal.Direction;
+import com.sun.javafx.scene.traversal.TraverseListener;
 
 /**
  * A ButtonBar is essentially an {@link HBox} for controls extending
@@ -330,6 +338,8 @@ public final class ButtonBar extends Control {
     
     private ObservableList<ButtonBase> buttons = FXCollections.<ButtonBase>observableArrayList();
     
+    private Direction traversalDirection;
+    
     
     
     /**************************************************************************
@@ -376,6 +386,52 @@ public final class ButtonBar extends Control {
             }
         }
 
+        // fix for issue where initial focus / tab navigation got lost on the ButtonBar -
+        // this code moves the focus onto the correct button inside the ButtonBar
+        focusedProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {
+                if (! isFocused()) return;
+                
+                boolean focusSet = false;
+                for (ButtonBase button : getButtons()) {
+                    if (button instanceof Button && ((Button)button).isDefaultButton()) {
+                        button.requestFocus();
+                        focusSet = true;
+                        break;
+                    }
+                }
+
+                // if we are here there is no default button, so for now we
+                // will simply give focus to the first button (this can 
+                // definitely be improved in the future!)
+                if (! focusSet && ! getButtons().isEmpty()) {
+                    getButtons().get(0).requestFocus();
+                }
+            }
+        });
+        
+        TraversalEngine engine = new TraversalEngine(this, false) {
+            @Override public boolean trav(Node owner, Direction dir) {
+                traversalDirection = dir;
+                return super.trav(owner, dir);
+            }
+        };
+        engine.addTraverseListener(new TraverseListener() {
+            @Override public void onTraverse(Node n, Bounds b) {
+                if (ButtonBar.this.equals(n)) {
+                    System.out.println("traversalDirection: " + traversalDirection);
+                    if (traversalDirection == null || traversalDirection.equals(Direction.NEXT)) {
+                        // Sends the focus to the first button in the button bar
+                        getButtons().get(0).requestFocus();
+                    } else if (traversalDirection.equals(Direction.PREVIOUS)) {
+                        // Sends the focus to the last button in the button bar
+                        getButtons().get(getButtons().size() - 1).requestFocus();
+                    }
+                }
+            }
+        });
+        setImpl_traversalEngine(engine);
+        // end of focus / traversal fix
     }
     
     

@@ -187,12 +187,14 @@ abstract class FXDialog {
 
         // add close min max
         closeButton = new WindowButton("close");
+        closeButton.setFocusTraversable(false);
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 FXDialog.this.hide();
             }
         });
         minButton = new WindowButton("minimize");
+        minButton.setFocusTraversable(false);
         minButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 setIconified(isIconified());
@@ -200,6 +202,7 @@ abstract class FXDialog {
         });
 
         maxButton = new WindowButton("maximize");
+        maxButton.setFocusTraversable(false);
 
         windowBtns = new HBox(3);
         windowBtns.getStyleClass().add("window-buttons");

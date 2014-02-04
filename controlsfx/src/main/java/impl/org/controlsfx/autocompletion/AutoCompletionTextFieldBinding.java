@@ -70,18 +70,18 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
     }
 
 
-    /**
-     * Bind the TextField
-     */
+    /** {@inheritDoc} */
+    @Override
     public void bind(){
         getCompletionTarget().textProperty().addListener(textChangeListener);
+        getCompletionTarget().focusedProperty().addListener(focusChangedListener);
     }
 
-    /**
-     * Remove the binding
-     */
+    /** {@inheritDoc} */
+    @Override
     public void unbind(){
         getCompletionTarget().textProperty().removeListener(textChangeListener);
+        getCompletionTarget().focusedProperty().removeListener(focusChangedListener);
     }
 
 
@@ -107,6 +107,15 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
         @Override
         public void changed(ObservableValue<? extends String> obs, String oldText, String newText) {
             setUserInput(newText);
+        }
+    };
+
+    private final ChangeListener<Boolean> focusChangedListener = new ChangeListener<Boolean>() {
+        @Override
+        public void changed(ObservableValue<? extends Boolean> obs, Boolean oldFocused, Boolean newFocused) {
+            System.out.println("focused: " + newFocused);
+            if(newFocused == false)
+                hidePopup();
         }
     };
 }

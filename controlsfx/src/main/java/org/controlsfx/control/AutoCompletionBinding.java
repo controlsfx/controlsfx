@@ -55,7 +55,6 @@ public abstract class AutoCompletionBinding<T> {
         this.suggestionProvider = suggestionProvider;
         this.autoCompletionPopup = autoCompletionPopup;
 
-
         getPopup().setOnSuggestionChoosen(new EventHandler<AutoCompletePopup.SuggestionChoosenEvent<T>>() {
             @Override
             public void handle(SuggestionChoosenEvent<T> sce) {
@@ -115,6 +114,16 @@ public abstract class AutoCompletionBinding<T> {
      * @param completion
      */
     protected abstract void completeUserInput(T completion);
+
+    /**
+     * Create the binding
+     */
+    public abstract void bind();
+
+    /**
+     * Remove the binding
+     */
+    public abstract void unbind();
 
 
     /**

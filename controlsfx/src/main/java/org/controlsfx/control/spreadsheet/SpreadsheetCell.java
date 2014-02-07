@@ -41,6 +41,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br/>
@@ -108,14 +109,13 @@ import javafx.scene.Node;
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
  * use the {@link #setGraphic(Node)} in order to specify the graphic you want.
- * Be aware that no verification are made on the Image. So reduce wisely your
- * image to fit the exact space available on your grid or the result will be
- * incoherent.
+ * If you specify an {@link Image}, the SpreadsheetView will try to resize it in
+ * order to fit the space available in the cell.
  * 
  * For example :
  * 
  * <pre>
- * cell.setGraphic(new ImageView(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;))));
+ * cell.setGraphic(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;)));
  * </pre>
  * 
  * <center><img src="graphicNodeToCell.png"></center> <br>
@@ -206,7 +206,7 @@ public class SpreadsheetCell {
     private int columnSpan;
     private final StringProperty format;
     private final StringProperty text;
-    private final ObjectProperty<Node> graphic;
+    private final ObjectProperty<Object> graphic;
 
     private ObservableSet<String> styleClass;
 
@@ -540,7 +540,7 @@ public class SpreadsheetCell {
         return properties != null && !properties.isEmpty();
     }
 
-    public ObjectProperty<Node> graphicProperty() {
+    public ObjectProperty<Object> graphicProperty() {
         return graphic;
     }
 
@@ -549,7 +549,7 @@ public class SpreadsheetCell {
      * 
      * @param graphic
      */
-    public void setGraphic(Node graphic) {
+    public void setGraphic(Object graphic) {
         this.graphic.set(graphic);
     }
 
@@ -559,7 +559,7 @@ public class SpreadsheetCell {
      * 
      * @return the graphic node associated with this cell.
      */
-    public Node getGraphic() {
+    public Object getGraphic() {
         return graphic.get();
     }
 
@@ -583,12 +583,11 @@ public class SpreadsheetCell {
         if (!(obj instanceof SpreadsheetCell))
             return false;
 
-        final SpreadsheetCell otherCell = (SpreadsheetCell) obj;        
-        return otherCell.getRow() == row 
-                && otherCell.getColumn() == column
+        final SpreadsheetCell otherCell = (SpreadsheetCell) obj;
+        return otherCell.getRow() == row && otherCell.getColumn() == column
                 && Objects.equals(otherCell.getText(), getText());
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public final int hashCode() {

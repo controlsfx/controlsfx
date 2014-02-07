@@ -42,6 +42,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -125,8 +126,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     getStyleClass().setAll(newItem.getStyleClass());
 
                     newItem.getStyleClass().addListener(styleClassListener);
-
-                    setGraphic(newItem.getGraphic());
+                    setCellGraphic(newItem);
                     newItem.graphicProperty().addListener(graphicListener);
                 }
             }
@@ -231,29 +231,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             setContentDisplay(null);
         } else if (!isEditing() && item != null) {
             show(item);
-            setGraphic(item.getGraphic());
-
-            /**
-             * If we only have a Image and no text, this means this cell is
-             * supposed to render that image. So I try to make things the good
-             * way by respecting ratio and reduce the image to the max size
-             * allowed by the Grid Design.
-             * 
-             * FIXME Handle when there is text with it.
-             */
-            if ((getText() == null || getText().equals("")) && getGraphic() != null
-                    && getGraphic() instanceof ImageView) {
-                ImageView image = (ImageView) getGraphic();
-                image.setCache(true);
-                image.setPreserveRatio(true);
-                image.setSmooth(true);
-                image.fitHeightProperty().bind(
-                        new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
-                                image.getImage().getHeight()).otherwise(heightProperty()));
-                image.fitWidthProperty().bind(
-                        new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
-                                image.getImage().getWidth()).otherwise(widthProperty()));
-            }
+             if(item.getGraphic() == null){
+                 setGraphic(null);
+             }
 
             // Sometimes the hoverProperty is not called on exit. So the cell is
             // affected to a new Item but
@@ -277,6 +257,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     public void show(final SpreadsheetCell item) {
         // We reset the settings
         textProperty().bind(item.textProperty());
+        setCellGraphic(item);
 
         if (item.getItem() == null || item.getItem().equals("")
                 || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
@@ -302,6 +283,27 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     /***************************************************************************
      * * Private Methods * *
      **************************************************************************/
+
+    private void setCellGraphic(SpreadsheetCell item) {
+
+        if (item.getGraphic() != null) {
+            if (item.getGraphic() instanceof Image) {
+                ImageView image = new ImageView((Image) item.getGraphic());
+                 image.setCache(true);
+                image.setPreserveRatio(true);
+                image.setSmooth(true);
+                image.fitHeightProperty().bind(
+                        new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
+                                image.getImage().getHeight()).otherwise(heightProperty()));
+                image.fitWidthProperty().bind(
+                        new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
+                                image.getImage().getWidth()).otherwise(widthProperty()));
+                setGraphic(image);
+            } else if (item.getGraphic() instanceof Node) {
+                setGraphic((Node) item.getGraphic());
+            }
+        }
+    }
 
     /**
      * Set this SpreadsheetCell hoverProperty
@@ -392,10 +394,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    private ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
+    private ChangeListener<Object> graphicListener = new ChangeListener<Object>() {
         @Override
-        public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node newGraphic) {
-            setGraphic(newGraphic);
+        public void changed(ObservableValue<? extends Object> arg0, Object arg1, Object newGraphic) {
+            setCellGraphic(getItem());
         }
     };
 

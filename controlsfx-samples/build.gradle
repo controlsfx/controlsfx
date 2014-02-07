@@ -45,6 +45,7 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'ControlsFX-Samples', 'Implementation-Version': project.version
     }
+    from sourceSets.main.allJava
 }
 
 task sourceJar(type: Jar) {

@@ -60,6 +60,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  */
 public class CellView extends TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
     private final SpreadsheetHandle handle;
+
     /***************************************************************************
      * * Static Fields * *
      **************************************************************************/
@@ -231,9 +232,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             setContentDisplay(null);
         } else if (!isEditing() && item != null) {
             show(item);
-             if(item.getGraphic() == null){
-                 setGraphic(null);
-             }
+            if (item.getGraphic() == null) {
+                setGraphic(null);
+            }
 
             // Sometimes the hoverProperty is not called on exit. So the cell is
             // affected to a new Item but
@@ -263,10 +264,20 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
             setTooltip(null);
         } else {
-            Tooltip toolTip = new Tooltip(item.getItem().toString());
-            toolTip.setWrapText(true);
-            toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-            setTooltip(toolTip);
+            /**
+             * Ensure that modification of ToolTip are set on the JFX thread
+             * because an exception can be thrown otherwise. This should use
+             * Lambda expression but I cannot use 1.8 compliance..
+             */
+            getValue(new FXThreadExecution() {
+                @Override
+                public void execute() {
+                    Tooltip toolTip = new Tooltip(item.getItem().toString());
+                    toolTip.setWrapText(true);
+                    toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                    setTooltip(toolTip);
+                }
+            });
         }
 
         // We want the text to wrap onto another line
@@ -289,7 +300,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (item.getGraphic() != null) {
             if (item.getGraphic() instanceof Image) {
                 ImageView image = new ImageView((Image) item.getGraphic());
-                 image.setCache(true);
+                image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
                 image.fitHeightProperty().bind(
@@ -486,6 +497,34 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                         tableView.getColumns().get(maxColumn));
         }
 
+    }
+
+    /**
+     * Interface for Lambda expression in order to execute some
+     * statements.
+     */
+    static interface FXThreadExecution {
+
+        public abstract void execute();
+    }
+
+    /**
+     * Will safely execute the request on the JFX thread by checking whether we
+     * are on the JFX thread or not.
+     * 
+     * @param request
+     */
+    static void getValue(final FXThreadExecution request) {
+        if (Platform.isFxApplicationThread()) {
+            request.execute();
+        } else {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    request.execute();
+                }
+            });
+        }
     }
 
     @Override

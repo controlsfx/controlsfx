@@ -26,8 +26,12 @@
  */
 package fxsampler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -285,16 +289,35 @@ public class FXSampler extends Application {
     }
     
     private String getSourceCode( Sample sample ) {
-    	String resourceName = "/" + sample.getClass().getName().replace('.','/') + ".java";
-    	System.out.println(resourceName);
-    	return getResource( resourceName, sample.getClass());
+        String sourceURL = sample.getSampleSourceURL();
+        
+        try {
+            // try loading via the web or local file system
+            URL url = new URL(sourceURL);
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                try(Scanner s = new Scanner(in).useDelimiter("/A")) {
+                    return s.hasNext() ? s.next() : "";
+                 } 
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        } catch (MalformedURLException e) {
+            // try class loading instead
+        	return getResource(sourceURL, sample.getClass());
+        }
     }
     
     private String formatSourceCode(Sample sample) {
+        String sourceURL = sample.getSampleSourceURL();
+        if (sourceURL == null) {
+            return "No sample source available";
+        }
+        
         String template = getResource("/fxsampler/util/SourceCodeTemplate.html", null);
         String src = "Sample Source not found";
         try {
-           src = getSourceCode( sample);
+           src = getSourceCode(sample);
         } catch(Throwable ex){
             ex.printStackTrace();
         }

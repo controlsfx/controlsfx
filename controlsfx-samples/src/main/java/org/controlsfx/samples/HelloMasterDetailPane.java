@@ -90,8 +90,8 @@ public class HelloMasterDetailPane extends ControlsFXSample {
         ComboBox<Side> positionBox = new ComboBox<>();
         positionBox.getItems().addAll(Side.values());
         vbox.getChildren().add(positionBox);
-        positionBox.setValue(masterDetailPane.getDetailPos());
-        masterDetailPane.detailPosProperty().bind(positionBox.valueProperty());
+        positionBox.setValue(masterDetailPane.getDetailSide());
+        masterDetailPane.detailSideProperty().bind(positionBox.valueProperty());
 
         final Label expandedLabel = new Label();
         if (masterDetailPane.isShowDetailNode()) {

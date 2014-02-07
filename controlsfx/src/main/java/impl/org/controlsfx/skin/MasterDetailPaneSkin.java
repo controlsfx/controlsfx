@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2014, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package impl.org.controlsfx.skin;
 
 import static java.lang.Double.MAX_VALUE;
@@ -42,7 +68,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
         SplitPane.setResizableWithParent(getSkinnable().getDetailNode(), false);
 
-        switch (getSkinnable().getDetailPos()) {
+        switch (getSkinnable().getDetailSide()) {
         case BOTTOM:
         case TOP:
             splitPane.setOrientation(VERTICAL);
@@ -70,7 +96,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                             int masterIndex = 0;
                             switch (splitPane.getOrientation()) {
                             case HORIZONTAL:
-                                switch (getSkinnable().getDetailPos()) {
+                                switch (getSkinnable().getDetailSide()) {
                                 case LEFT:
                                     masterIndex = 1;
                                     break;
@@ -81,14 +107,14 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     throw new IllegalArgumentException(
                                             "illegal details position "
                                                     + getSkinnable()
-                                                            .getDetailPos()
+                                                            .getDetailSide()
                                                     + " for orientation "
                                                     + splitPane
                                                             .getOrientation());
                                 }
                                 break;
                             case VERTICAL:
-                                switch (getSkinnable().getDetailPos()) {
+                                switch (getSkinnable().getDetailSide()) {
                                 case TOP:
                                     masterIndex = 1;
                                     break;
@@ -99,7 +125,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     throw new IllegalArgumentException(
                                             "illegal details position "
                                                     + getSkinnable()
-                                                            .getDetailPos()
+                                                            .getDetailSide()
                                                     + " for orientation "
                                                     + splitPane
                                                             .getOrientation());
@@ -135,7 +161,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                             int detailsIndex = 0;
                             switch (splitPane.getOrientation()) {
                             case HORIZONTAL:
-                                switch (getSkinnable().getDetailPos()) {
+                                switch (getSkinnable().getDetailSide()) {
                                 case LEFT:
                                     detailsIndex = 0;
                                     break;
@@ -146,14 +172,14 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     throw new IllegalArgumentException(
                                             "illegal details position "
                                                     + getSkinnable()
-                                                            .getDetailPos()
+                                                            .getDetailSide()
                                                     + " for orientation "
                                                     + splitPane
                                                             .getOrientation());
                                 }
                                 break;
                             case VERTICAL:
-                                switch (getSkinnable().getDetailPos()) {
+                                switch (getSkinnable().getDetailSide()) {
                                 case TOP:
                                     detailsIndex = 0;
                                     break;
@@ -164,7 +190,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     throw new IllegalArgumentException(
                                             "illegal details position "
                                                     + getSkinnable()
-                                                            .getDetailPos()
+                                                            .getDetailSide()
                                                     + " for orientation "
                                                     + splitPane
                                                             .getOrientation());
@@ -195,7 +221,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                     }
                 });
 
-        getSkinnable().detailPosProperty().addListener(
+        getSkinnable().detailSideProperty().addListener(
                 new ChangeListener<Side>() {
                     @Override
                     public void changed(ObservableValue<? extends Side> value,
@@ -263,7 +289,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         splitPane.getItems().add(getSkinnable().getMasterNode());
 
         if (getSkinnable().isShowDetailNode()) {
-            switch (getSkinnable().getDetailPos()) {
+            switch (getSkinnable().getDetailSide()) {
             case TOP:
             case LEFT:
                 splitPane.getItems().add(0, getSkinnable().getDetailNode());
@@ -313,7 +339,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     private void open() {
         Node node = getSkinnable().getDetailNode();
 
-        switch (getSkinnable().getDetailPos()) {
+        switch (getSkinnable().getDetailSide()) {
         case TOP:
         case LEFT:
             splitPane.getItems().add(0, node);
@@ -341,7 +367,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
              * top/bottom?
              */
             double targetLocation = 0;
-            switch (getSkinnable().getDetailPos()) {
+            switch (getSkinnable().getDetailSide()) {
             case BOTTOM:
             case RIGHT:
                 targetLocation = 1;

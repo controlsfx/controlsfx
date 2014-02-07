@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2014, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.MasterDetailPaneSkin;
@@ -22,9 +48,9 @@ import javafx.scene.control.Skin;
  * relationship to each other. Most of the time the user works with the
  * information displayed in the master node but every once in a while additional
  * information is required and can be made visible via the detail node. By
- * default the detail appear with a short slide in animation and disappear with
- * a slide out. This control allows the detail to be positioned in four
- * different locations (top, bottom, left, or right).
+ * default the detail appears with a short slide-in animation and disappears
+ * with a slide-out. This control allows the detail node to be positioned in
+ * four different locations (top, bottom, left, or right).
  */
 public class MasterDetailPane extends Control {
 
@@ -38,11 +64,11 @@ public class MasterDetailPane extends Control {
      *            the master node (always visible)
      * @param detailNode
      *            the detail node (slides in and out)
-     * @param expanded
-     *            the initial state (expanded / collapsed)
+     * @param showDetail
+     *            the initial state of the detail node (shown or hidden)
      */
     public MasterDetailPane(Side side, Node masterNode, Node detailNode,
-            boolean expanded) {
+            boolean showDetail) {
 
         super();
 
@@ -50,10 +76,10 @@ public class MasterDetailPane extends Control {
         Objects.requireNonNull(masterNode);
         Objects.requireNonNull(detailNode);
 
-        setDetailPos(side);
+        setDetailSide(side);
         setMasterNode(masterNode);
         setDetailNode(detailNode);
-        setShowDetailNode(expanded);
+        setShowDetailNode(showDetail);
 
         switch (side) {
         case BOTTOM:
@@ -76,16 +102,16 @@ public class MasterDetailPane extends Control {
      * @param pos
      *            the position where the details will be shown (top, bottom,
      *            left, right)
-     * @param expanded
-     *            the initial state (expanded / collapsed)
+     * @param showDetail
+     *            the initial state of the detail node (shown or hidden)
      */
-    public MasterDetailPane(Side pos, boolean expanded) {
-        this(pos, new Placeholder(true), new Placeholder(false), expanded);
+    public MasterDetailPane(Side pos, boolean showDetail) {
+        this(pos, new Placeholder(true), new Placeholder(false), showDetail);
     }
 
     /**
-     * Constructs a new pane with two placeholder nodes. The initial state is
-     * expanded.
+     * Constructs a new pane with two placeholder nodes. The detail node will be
+     * shown.
      * 
      * @param pos
      *            the position where the details will be shown (top, bottom,
@@ -96,8 +122,8 @@ public class MasterDetailPane extends Control {
     }
 
     /**
-     * Constructs a new pane with two placeholder nodes. The initial state is
-     * expanded and the details will be shown to the right of the master node.
+     * Constructs a new pane with two placeholder nodes. The detail node will be
+     * shown and to the right of the master node.
      * 
      * @param pos
      *            the position where the details will be shown (top, bottom,
@@ -114,39 +140,41 @@ public class MasterDetailPane extends Control {
 
     // Detail postion support
 
-    private final ObjectProperty<Side> detailPos = new SimpleObjectProperty<>(
-            this, "detailsPos", Side.RIGHT);
+    private final ObjectProperty<Side> detailSide = new SimpleObjectProperty<>(
+            this, "detailSide", Side.RIGHT);
 
     /**
-     * The property used to store the position of the detail node.
+     * The property used to store the side where the detail node will be shown.
      * 
-     * @return the details node property
+     * @return the details side property
      */
-    public final ObjectProperty<Side> detailPosProperty() {
-        return detailPos;
+    public final ObjectProperty<Side> detailSideProperty() {
+        return detailSide;
     }
 
     /**
-     * Returns the value of the detail node property.
+     * Returns the value of the detail side property.
      * 
-     * @return the position of the details node (left, right, top, bottom)
+     * @return the side where the detail node will be shown (left, right, top,
+     *         bottom)
      */
-    public final Side getDetailPos() {
-        return detailPosProperty().get();
+    public final Side getDetailSide() {
+        return detailSideProperty().get();
     }
 
     /**
-     * Sets the value of the detail node property.
+     * Sets the value of the detail side property.
      * 
      * @param side
-     *            the position of the detail node (left, right, top, bottom)
+     *            the side where the detail node will be shown (left, right,
+     *            top, bottom)
      */
-    public final void setDetailPos(Side side) {
+    public final void setDetailSide(Side side) {
         Objects.requireNonNull(side);
-        detailPosProperty().set(side);
+        detailSideProperty().set(side);
     }
 
-    // Expanded state support
+    // Show / hide detail node support.
 
     private final BooleanProperty showDetailNode = new SimpleBooleanProperty(
             this, "showDetailNode", true);

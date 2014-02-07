@@ -35,6 +35,10 @@ public class EmptySample implements Sample {
     @Override public String getJavaDocURL() {
         return null;
     }
+    
+    @Override public String getSampleSourceURL() {
+        return null;
+    }
 
     @Override public boolean isVisible() {
         return true;

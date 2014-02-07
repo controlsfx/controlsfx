@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.controlsfx.samples.Utils;
+
 import fxsampler.SampleBase;
 
 public abstract class ControlsFXSample extends SampleBase {
@@ -18,6 +20,10 @@ public abstract class ControlsFXSample extends SampleBase {
 	@Override
 	public String getProjectVersion() {
 		return projectInfo.getVersion();
+	}
+	
+	@Override public String getSampleSourceURL() {
+	    return Utils.JAVADOC_BASE + "samples-src/" + getClass().getName().replace('.','/') + ".java";
 	}
 	
 	private static class ProjectInfo {

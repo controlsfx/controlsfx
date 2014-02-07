@@ -1,0 +1,15 @@
+.info-overlay > .info-panel {
+    -fx-background-color: lightgray;
+    -fx-opacity: .75;
+    -fx-padding: 5 5 5 5;
+}
+
+.info-panel > .info-panel > .expand-button {
+    -fx-padding: 0 0 0 0 ;
+    /*-fx-graphic: url("/helloworld/david/collapse.png");*/
+}
+
+.info-panel > .info-panel > .collapse-button {
+    -fx-padding: 0 0 0 0 ;
+    /*-fx-graphic: url("expand.png");*/
+}

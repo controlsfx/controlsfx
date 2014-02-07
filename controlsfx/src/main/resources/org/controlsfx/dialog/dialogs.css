@@ -1,0 +1,330 @@
+
+/*******************************************************************************
+ *                                                                             *
+ * Lightweight dialog                                                          *
+ *                                                                             *
+ ******************************************************************************/
+ 
+/* used to 'fade out' the background content so the dialog becomes more prominent */
+.lightweight-dialog-background {
+     -fx-background-color: #00000044;
+ }
+
+/*******************************************************************************
+ *                                                                             *
+ * Window buttons: Close, Minimize, Maximize                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.dialog {
+    -fx-padding: -1;
+    -fx-border-insets: 0 10 10 0;
+}
+
+.dialog.custom-chrome {
+    -fx-border-width: 2;
+    -fx-border-radius: 5 5 0 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 11, 0.0, 3, 3);
+    -fx-border-color: #a3a3a3;
+}
+
+.dialog.heavyweight.custom-chrome {
+    /** 
+     * This allows for the drop shadow which otherwise won't appear. We don't
+     * want this in lightweight dialogs as it will overwrite the background.
+     */
+    -fx-background-color: inherit;
+}
+
+.dialog.custom-chrome:active {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 3, 3);
+    -fx-border-color: #3e3e3e;
+}
+
+.dialog > * > .window-header {
+    -fx-padding: 0 3 0 8;
+    -fx-background-color: linear-gradient(#cccccc, #bababa 37%, #a6a6a6);
+    -fx-background-radius: 5 5 0 0;
+}
+
+.dialog:active > * > .window-header {
+    -fx-background-color: linear-gradient(#595959, #474747 37%, #343434);
+}
+
+.dialog > * > .window-header > * > .window-title {
+    -fx-padding: 0 0 0 0;
+    -fx-alignment: center;
+    -fx-font-size: 1.166667em; /*15px;*/
+    -fx-text-fill: #808080;
+}
+
+.dialog:active > * > .window-header > * > .window-title {
+    -fx-text-fill: #ebebeb;
+}
+
+.dialog > .window-resize-corner {
+    -fx-fill: transparent;
+    -fx-cursor: se_resize;
+}
+
+.dialog > * > .window-header > * > .window-buttons > .window-button {
+    -fx-background-color: transparent transparent;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 2;
+    -fx-padding: 0 0 0 0;
+    -fx-alignment: center;
+}
+
+.dialog:active .window-button:hover {
+    -fx-background-color: linear-gradient(#505050,#2d2d2d),
+                          linear-gradient(#a3a3a3, #8b8b8b 34%, #777777 36%, #777777 63%, #8b8b8b 65%, #adadad);
+}
+
+.dialog .window-buttons {
+    -fx-padding: 6 0 0 0;
+}
+
+.dialog .window-button:pressed {
+    -fx-background-color: linear-gradient(#515151,#202020),
+                          linear-gradient(#a3a3a3, #8b8b8b 34%, #777777 36%, #777777 63%, #8b8b8b 65%, #adadad);
+}
+
+.dialog .window-button > .graphic {
+    -fx-background-color: #949494;
+    -fx-scale-shape: false;
+    -fx-padding: 4.5 4.5 4.5 4.5; /* Graphic is 9x9 px */
+}
+
+.dialog:active .window-button:hover > .graphic {
+    -fx-background-color: #fefeff;
+}
+
+.dialog .window-button:pressed > .graphic {
+    -fx-background-color: #cfcfcf;
+}
+
+.dialog .window-close-button > .graphic {
+    -fx-shape: "M395.992,296.758l1.794-1.794l7.292,7.292l-1.795,1.794 L395.992,296.758z M403.256,294.992l1.794,1.794l-7.292,7.292l-1.794-1.795 L403.256,294.992z";
+}
+
+.dialog .window-minimize-button > .graphic {
+    -fx-shape: "M420.012,299.248v2.537h-9.001v-2.537H420.012z";
+}
+
+.dialog .window-maximize-button > .graphic {
+    -fx-shape: "M406.283,294.985h2.537v9.031h-2.538L406.283,294.985z M412.012,298.248v2.537h-9.001v-2.537H412.012z";
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Masthead                                                                    *
+ *                                                                             *
+ ******************************************************************************/
+ 
+.dialog:masthead .masthead-panel {
+    -fx-padding: 10 14 10 14;
+    -fx-background-insets: 0 -1 0 -1, 0 -1 1 -1;
+    -fx-background-color: #b4b4b4, linear-gradient(#e2e2e2,#e2e2e2,#eeeeee);
+}
+
+.dialog:masthead .masthead-panel .label {
+    -fx-font-size: 1.249999em; 
+    -fx-wrap-text: true;
+}
+
+.dialog:masthead .masthead-panel .graphic-container {
+    -fx-padding: 0 0 0 10;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Content area of the Dialog                                                  *
+ *                                                                             *
+ ******************************************************************************/
+ 
+.dialog > * > .content-pane {
+    -fx-background-color: linear-gradient(#ffffff,#f3f3f4);
+    -fx-border-width: 1 1 1 1;
+    -fx-border-color: #b4b4b4 transparent #b4b4b4 transparent;
+    -fx-font-size: 1.083333em; /*13px;*/
+    -fx-text-fill: #292929;
+}
+
+.dialog > * > .content-pane > .button-bar {
+    -fx-font-size: 1em;
+}
+
+.dialog:no-masthead > * > .content-pane {
+    -fx-padding: 16 16 0 16;
+}
+
+.dialog:no-masthead > * > .content-pane .graphic {
+    -fx-padding: 0 10 0 0;
+}
+
+.dialog:no-masthead > * > .content-pane .expandable-content {
+    -fx-padding: 16 8 0 8;
+}
+
+.dialog:masthead > * > .content-pane > .button-bar {
+    -fx-padding: 0 14 0 14;
+}
+
+.dialog:masthead > * > .content-pane {
+    -fx-padding: 0 0 0 0;
+}
+
+.dialog:masthead > * > .content-pane .center {
+    -fx-padding: 16 16 0 16;
+}
+
+.dialog:masthead > * > .content-pane .expandable-content {
+    -fx-padding: 16 16 0 16;
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Expandable Dialog                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.dialog .more-info-dialog {
+    -fx-background-color: #eeeeee;
+    -fx-padding: 15 18 8 18;
+}
+
+.dialog .more-info-dialog .label {
+    -fx-font-size: 1.083333em;
+}
+
+.dialog .more-info-dialog > .button-bar {
+    -fx-padding: 12 0 6 12;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.dialog .details-button  {
+  -fx-alignment: baseline-left;
+  -fx-focus-traversable: false;
+  -fx-padding: 5 5 5 5;
+  -fx-font-size: 1em;
+}
+
+.dialog .details-button.more {
+    -fx-graphic: url("../../../impl/org/controlsfx/dialog/resources/more-details.png");
+}
+
+.dialog .details-button.less {
+    -fx-graphic: url("../../../impl/org/controlsfx/dialog/resources/fewer-details.png");
+}
+
+.dialog .details-button:hover {
+    -fx-underline: true;
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Command Link                                                                *
+ *                                                                             *
+ ******************************************************************************/
+ /* For the text displayed above command-link buttons (but below the masthead) */
+.dialog > * > .content-pane .command-link-message {
+    -fx-font-size: 1.25em; 
+}
+
+.dialog .command-link-button {
+    -fx-padding: 10 10 10 10;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+    -fx-border-radius: 3px;
+}
+
+.dialog .command-link-button:hover {
+    -fx-border-color: -fx-box-border;
+    -fx-background-color: linear-gradient(to bottom, 
+        white, 
+        derive(-fx-box-border, 60%)
+    );
+}
+
+.dialog .command-link-button:armed  {
+    -fx-background-color: linear-gradient(to bottom, 
+        white, 
+        derive(-fx-box-border, 40%)
+    );
+}
+
+.dialog .command-link-button:default {
+    -fx-border-color: -fx-default-button;
+    -fx-background-color: linear-gradient(to bottom, 
+        white, 
+        derive(-fx-default-button, 80%)
+    );
+}
+
+.dialog .command-link-button:default:hover {
+    -fx-border-color: -fx-default-button;
+    -fx-background-color: linear-gradient(to bottom, 
+        white, 
+        derive(-fx-default-button, 60%)
+    );
+}
+
+.dialog .command-link-button:default:armed {
+    -fx-border-color: -fx-default-button;
+    -fx-background-color: linear-gradient(to bottom, 
+        white, 
+        derive(-fx-default-button, 40%)
+    );
+}
+
+.dialog .command-link-button > .container > .line-1 {
+    -fx-font-size: 1.25em;
+    -fx-padding: -5 0 0 5;
+}
+
+.dialog .command-link-button > .container > .line-2 {
+    -fx-font-size: 1em; 
+    -fx-padding: 0 0 0 5;
+}
+
+.dialog .command-link-button > .container > .graphic-container {
+    -fx-padding: 10 10 0 0
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * OS-Specific modifications                                                   *
+ *                                                                             *
+ ******************************************************************************/
+.dialog.mac > * > .window-header > * > .window-title {
+    -fx-font-size: 1.083333em;
+}
+
+.dialog.mac:masthead .masthead-panel .label {
+    -fx-font-size: 1.167em;
+}
+
+.dialog.mac > * > .content-pane {
+    -fx-font-size: 1em;
+}
+
+.dialog.mac .more-info-dialog .label {
+    -fx-font-size: 1em;
+}
+
+.dialog.mac > * > .content-pane .command-link-message {
+    -fx-font-size: 1.167em;
+}
+
+.dialog.mac .command-link-button > .container > .line-1 {
+    -fx-font-size: 1.167em;
+}

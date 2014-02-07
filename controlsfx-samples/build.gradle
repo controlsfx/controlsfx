@@ -1,0 +1,115 @@
+import org.apache.tools.ant.filters.*
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'application'
+
+apply from: 'mavenPublish.gradle'
+apply from: 'javafx.plugin'
+
+
+Properties commons = new Properties()
+commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+
+group = commons.controlsfx_group
+version = commons.controlsfx_version
+
+applicationName = 'FXSampler'
+mainClassName = commons.fxsampler_mainClass
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+configurations {
+    jdk
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.jdk
+    }
+}
+
+dependencies {
+    compile group+":fxsampler:"+commons.fxsampler_version
+    compile group+":controlsfx:"+commons.controlsfx_version
+
+    try {
+        jdk files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        // javafx plugin will provide in this case
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'ControlsFX-Samples', 'Implementation-Version': project.version
+    }
+    from sourceSets.main.allJava
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourceJar
+    //archives javadocJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
+}
+
+// enumerate the samples at build time
+task enumerateSamples() {
+    doLast {
+        def samplesList = []
+        sourceSets.main.java.visit {
+            // could be improved:  we could load the class and check the hierarchy
+            if (!it.directory && it.file.text.contains(' extends SampleBase ') && it.path.contains("samples")) {
+                samplesList += it.path
+            }
+        }
+        println samplesList
+        File outputFile = new File(sourceSets.main.output.resourcesDir, 'fxsampler/samples/samples.txt')
+        outputFile.parentFile.mkdirs()
+        outputFile.text = samplesList.join('\n')
+    }
+}
+
+processResources.dependsOn(enumerateSamples)
+gradle.taskGraph.whenReady {
+    enumerateSamples.enabled = gradle.taskGraph.hasTask(":$project.name:jfxDeploy")
+}
+
+jfxJar {
+    classpath = files(
+            (project.sourceSets.main.compileClasspath .files
+                    - project.configurations['providedCompile'].files.findAll {it.file})
+                    + jar.archivePath
+    )
+}
+
+javafx {
+    try {
+        jfxrtJar = ext.jfxrtJar
+    } catch (MissingPropertyException pne) {
+        // ignore
+    }
+
+    appID 'HelloControlsFX'
+    appName 'Hello ControlsFX'
+    mainClass 'fxsampler.FXSampler'
+
+    javaRuntime = '<NO RUNTIME>' // for now don't bundle a VM
+
+    // deploy/info attributes
+    category = 'JavaFX Demos'
+    copyright = 'Copyright (c) 2013 Jonathan Giles and others'
+    description = 'This is a sample of all of the ControlsFX controls'
+    licenseType = '3 clause BSD'
+    vendor = 'FX Experience'
+}

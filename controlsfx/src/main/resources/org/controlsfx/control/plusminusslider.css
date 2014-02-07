@@ -1,0 +1,57 @@
+.plus-minus-slider {
+    -fx-background-radius: 2.0;
+    -fx-border-color: -fx-box-border;
+    -fx-border-radius: 2.0;
+}
+
+.plus-minus-slider:horizontal {
+    -fx-background-color: derive(-fx-box-border,30.0%), linear-gradient(to bottom, derive(-fx-base,-3.0%), derive(-fx-base,5.0%) 50.0%, derive(-fx-base,-3.0%));
+    -fx-background-insets: 0.0, 1.0 0.0 1.0 0.0;
+    -fx-pref-height: 16.0;
+    -fx-max-height: 16.0;
+}
+
+.plus-minus-slider:vertical {
+    -fx-background-color: derive(-fx-box-border,30.0%), linear-gradient(to right, derive(-fx-base,-3.0%), derive(-fx-base,5.0%) 50.0%, derive(-fx-base,-3.0%));
+    -fx-background-insets: 0.0, 0.0 1.0 0.0 1.0;
+    -fx-pref-width: 16.0;
+    -fx-max-width: 16.0;
+}
+
+.plus-minus-slider > * > .slider {
+    -fx-show-tick-marks: false;
+}
+
+.plus-minus-slider > * > .slider > .track {
+    -fx-background-color: transparent;
+}
+
+.plus-minus-slider > * > .slider > .thumb {
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color; 
+    -fx-background-insets: 2.0, 3.0, 4.0;
+    -fx-background-radius: 3.0, 2.0, 1.0;
+}
+
+.plus-minus-slider > * > .slider:focused > .thumb {
+    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
+    -fx-background-insets: 1.8, 3.0, 4.0, 0.6, 4.6;
+    -fx-background-radius: 3.0, 2.0, 1.0, 4.0, 1.0;
+}
+
+.plus-minus-slider > * > .adjust-plus {
+    -fx-pref-width: 16.0;
+    -fx-pref-height: 16.0;
+    -fx-shape: "M0,3 H3 V0 H5 V3 H8 V5 H5 V8 H3 V5 H0 V3 Z";
+    -fx-scale-shape: false;
+    -fx-effect: dropshadow(two-pass-box , -fx-shadow-highlight-color, 1.0, 0.0 , 0.0, 1.4);
+    -fx-background-color: -fx-mark-highlight-color,derive(-fx-base,-45.0%);
+}
+
+.plus-minus-slider > * > .adjust-minus {
+    -fx-pref-width: 16.0;
+    -fx-pref-height: 16.0;
+    -fx-shape: "M0,0H8V2H0Z";
+    -fx-scale-shape: false;
+    -fx-effect: dropshadow(two-pass-box , -fx-shadow-highlight-color, 1.0, 0.0 , 0.0, 1.4);
+    -fx-background-color: -fx-mark-highlight-color,derive(-fx-base,-45.0%);
+}

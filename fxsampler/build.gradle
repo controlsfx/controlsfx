@@ -1,0 +1,84 @@
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply from: 'mavenPublish.gradle'
+apply from: 'javafx.plugin'
+
+Properties commons = new Properties()
+commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+
+group = commons.controlsfx_group
+version = commons.fxsampler_version
+
+
+configurations {
+    //samples.extendsFrom mainRuntime
+    jdk
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.jdk
+    }
+}
+
+dependencies {
+    try {
+        jdk files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        jdk files("${System.properties['java.home']}/lib/jfxrt.jar")
+        jdk files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
+    }
+}
+
+javadoc {
+    exclude 'impl/*'
+    failOnError = false
+    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
+    
+    options.windowTitle("FXSampler Project ${version}")
+    options.links("http://download.oracle.com/javase/7/docs/api/");
+    options.links("http://docs.oracle.com/javafx/2/api/");
+    options.addBooleanOption("Xdoclint:none").setValue(true);
+    
+    // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
+    // over the doc-files if they are embedded with the sources. I find this arrangement
+    // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
+    doLast {
+        copy {
+            from "src/main/docs"
+            into "$buildDir/docs/javadoc"
+        }
+    }
+}
+
+jar {
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
+}
+
+artifacts {
+    archives sourceJar
+    archives javadocJar
+    //archives jarSamples
+}
+
+javafx {
+    mainClass commons.fxsampler_mainClass
+}

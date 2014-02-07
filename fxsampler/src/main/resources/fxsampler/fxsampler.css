@@ -1,0 +1,43 @@
+.root {
+    -fx-padding: 5 5 5 5;
+}
+
+.samples-tree {
+    -fx-background-color: -fx-outer-border, -fx-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 2, 0;
+}
+
+.right-panel {
+    -fx-padding: 5;
+}
+
+.right-panel > .sample-name {
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+}
+
+.right-panel > .separator {
+    -fx-padding: 5 0 5 0;
+}
+
+.right-panel > .description {
+    -fx-text-alignment: justify;
+}
+
+.right-panel > * > .project-name-title, 
+.right-panel > * > .property {
+    -fx-font-weight: bold;
+}
+
+.right-panel > * > .project-name {
+    -fx-text-alignment: justify;
+}
+
+/* 
+ * The area beneath the description specifically to allow people to interact with
+ * the sample.
+ */
+.right-panel > .control-panel {
+    -fx-padding: 5 0 0 0;
+}

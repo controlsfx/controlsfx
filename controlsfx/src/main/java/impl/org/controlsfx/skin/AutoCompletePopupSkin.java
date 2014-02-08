@@ -6,16 +6,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.AutoCompletePopup;
-import org.controlsfx.control.PopOver;
-
-import com.sun.javafx.scene.control.skin.VirtualContainerBase;
-import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;
 
 
 public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {

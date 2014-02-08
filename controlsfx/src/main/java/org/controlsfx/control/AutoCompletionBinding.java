@@ -102,6 +102,16 @@ public abstract class AutoCompletionBinding<T> {
         this.suggestionProvider = suggestionProvider;
     }
 
+    /**
+     * Create the binding
+     */
+    public abstract void bind();
+
+    /**
+     * Remove the binding
+     */
+    public abstract void unbind();
+
     /***************************************************************************
      *                                                                         *
      * Protected methods                                                       *
@@ -114,16 +124,6 @@ public abstract class AutoCompletionBinding<T> {
      * @param completion
      */
     protected abstract void completeUserInput(T completion);
-
-    /**
-     * Create the binding
-     */
-    public abstract void bind();
-
-    /**
-     * Remove the binding
-     */
-    public abstract void unbind();
 
 
     /**

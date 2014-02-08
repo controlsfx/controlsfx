@@ -108,7 +108,7 @@ public class TextFields {
      * @param suggestionProvider A suggestion-provider strategy to use
      * @return
      */
-    public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
         return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider);
     }
 
@@ -119,8 +119,8 @@ public class TextFields {
      * @param possibleSuggestions Possible auto-complete suggestions
      * @return
      */
-    public static <T> AutoCompletionBinding<T> autoComplete(TextField textField, T... possibleSuggestions){
-        return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider(possibleSuggestions));
+    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, T... possibleSuggestions){
+        return new AutoCompletionTextFieldBinding<>(textField, createSuggestionProvider(possibleSuggestions));
     }
 
     /**
@@ -132,7 +132,7 @@ public class TextFields {
      * @param possibleSuggestions Possible auto-complete suggestions
      * @return
      */
-    public static <T> Callback<ISuggestionRequest, Collection<T>> suggestionProvider(T... possibleSuggestions){
+    public static <T> Callback<ISuggestionRequest, Collection<T>> createSuggestionProvider(T... possibleSuggestions){
         return SuggestionProvider.create(possibleSuggestions);
     }
 
@@ -146,7 +146,7 @@ public class TextFields {
      * @param possibleSuggestions Possible auto-complete suggestions
      * @return
      */
-    public static <T> Callback<ISuggestionRequest, Collection<T>> suggestionProvider( Callback<T, String> stringConverter, T... possibleSuggestions){
+    public static <T> Callback<ISuggestionRequest, Collection<T>> createSuggestionProvider(Callback<T, String> stringConverter, T... possibleSuggestions){
         return SuggestionProvider.create(stringConverter, possibleSuggestions);
     }
 

@@ -105,7 +105,7 @@ public class HelloAutoComplete extends ControlsFXSample {
         //
         TextField textField = new TextField();
 
-        TextFields.autoComplete(
+        TextFields.bindAutoCompletion(
                 textField,
                 "Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
 
@@ -120,7 +120,7 @@ public class HelloAutoComplete extends ControlsFXSample {
 
         final TextField textFieldLearning = new TextField();
 
-        autoCompletionBinding = TextFields.autoComplete(
+        autoCompletionBinding = TextFields.bindAutoCompletion(
                 textFieldLearning,
                 possibleSuggestions.toArray(new String[0]));
 
@@ -150,7 +150,7 @@ public class HelloAutoComplete extends ControlsFXSample {
 
     private void autoCompletionLearnWord(String newWord){
         possibleSuggestions.add(newWord);
-        autoCompletionBinding.setSuggestionProvider(TextFields.suggestionProvider(possibleSuggestions.toArray(new String[0])));
+        autoCompletionBinding.setSuggestionProvider(TextFields.createSuggestionProvider(possibleSuggestions.toArray(new String[0])));
     }
 
     @Override public Node getControlPanel() {

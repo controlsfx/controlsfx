@@ -1,33 +1,277 @@
 package org.controlsfx.control.imageview;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
+/**
+ * View for the {@link SelectableImageView}. It displays the image and the selection and manages their positioning.
+ * MouseEvents are handed over to the {@link SelectableImageViewBehavior} which uses them to change thr selection.
+ */
 public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageView, SelectableImageViewBehavior> {
+
+    /*
+     * IMAGE:
+     * This skin uses an ImageView to display the Image.
+     * 
+     * SELECTION:
+     * Displaying the selection consists of three parts:
+     *  - selected area
+     *  - border
+     *  - unselected area
+     * This is done by using two rectangles with identical size and position. Both are bound to the control's
+     * selection-property, which represents the selection in term of the _Image's_ coordinates, in such a way that
+     * they represent the selection in term of the _ImageView's_ coordinates.
+     * One rectangle is used to display the selected area and its border. The other has its stroke set to such
+     * a width that it covers the rest of the ImageView. This means it effectively covers exactly the unselected
+     * area.
+     * The pane containing these rectangles clips anything it contains to its own bounds.
+     * 
+     * POSITION:
+     * The contract states that the image must always be centered within the control. Since a grid pane makes it
+     * very easy to define relative positions of its children, it is used to implement this.
+     * The grid pane is at the root of this control's scene graph and contains a single child. This child is a
+     * single pane which uses absolute positioning for its children. The image view always stays at (0, 0) as the
+     * pane is constantly resized to exactly fit the image view.
+     * The rectangles marking the selection are positioned by converting the original selection's coordinates,
+     * which are relative to the image, to coordinates relative to the image view. To prevent the unselected area's
+     * large bounds from messing up the layout, it is not managed by its parent.
+     */
+
+    /* ************************************************************************
+     *                                                                         *
+     * Attributes & Properties                                                 *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * The pane displaying the {@link #imageView} and the selection areas.
+     */
+    private final Pane pane;
 
     /**
      * The image view which displays the image.
      */
     private final ImageView imageView;
 
+    /**
+     * The rectangle which represents the selected area.
+     */
+    private final Rectangle selectedArea;
+
+    /**
+     * The rectangle whose stroke represents the unselected area. Note that the rectangle itself always has the same
+     * size and position as the {@link #selectedArea}.
+     */
+    private final Rectangle unselectedArea;
+
+    /* ************************************************************************
+     *                                                                         *
+     * Constructor & Initialization                                            *
+     *                                                                         *
+     **************************************************************************/
+
     public SelectableImageViewSkin(SelectableImageView selectableImageView) {
         super(selectableImageView, new SelectableImageViewBehavior(selectableImageView));
 
+        this.pane = createClippingPane();
         this.imageView = new ImageView();
-        bindPropertiesToImageView();
+        this.selectedArea = new Rectangle();
+        this.unselectedArea = new Rectangle();
 
-        getChildren().add(imageView);
+        buildSceneGraph();
+        bindImageViewProperties();
+        bindToSelectionProperties();
+        enableResizing();
+
+        styleAreas();
     }
 
     /**
-     * Binds some of the {@code SelectableImageView}'s properties to those of the {@link #imageView image view}.
+     * Creates a pane for the selection which clips its content to its own size.
+     * 
+     * @return
      */
-    private void bindPropertiesToImageView() {
+    private static Pane createClippingPane() {
+        Pane pane = new Pane();
+
+        // create the clipping rectangle which always resizes with the pane
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(pane.widthProperty());
+        clip.heightProperty().bind(pane.heightProperty());
+
+        pane.setClip(clip);
+        return pane;
+    }
+
+    /**
+     * Builds this skin's scene graph.
+     */
+    private void buildSceneGraph() {
+        // build the scene graph top to bottom
+
+        // create an outer pane which allows the ImageView to always be centered within this control
+        // TODO decide whether the alignment should be editable
+        GridPane outerPane = new GridPane();
+        getChildren().add(outerPane);
+        outerPane.setAlignment(Pos.CENTER);
+
+        // add the pane to the outer pane and the image view and the selection rectangles to first one
+        outerPane.add(pane, 0, 0);
+        pane.getChildren().addAll(imageView, unselectedArea, selectedArea);
+    }
+
+    /**
+     * Some of the {@link SelectableImageView}'s properties origin from {@link ImageView}. Those properties of the
+     * {@link #getSkinnable() skinnable} and the {@link #imageView} are bidirectionally bound together.
+     */
+    private void bindImageViewProperties() {
         SelectableImageView selectableImageView = getSkinnable();
-        imageView.fitHeightProperty().bindBidirectional(selectableImageView.fitHeightProperty());
-        imageView.fitWidthProperty().bindBidirectional(selectableImageView.fitWidthProperty());
-        imageView.imageProperty().bindBidirectional(selectableImageView.imageProperty());
+        Bindings.bindBidirectional(imageView.imageProperty(), selectableImageView.imageProperty());
+        Bindings.bindBidirectional(imageView.preserveRatioProperty(), selectableImageView.preserveRatioProperty());
+    }
+
+    /**
+     * Binds the controls which display the selection to the {@link SelectableImageView}'s
+     * {@link SelectableImageView#selectedAreaProperty() selectedArea} property and their visibility to the
+     * {@link SelectableImageView#selectionActiveProperty() selectionActive} property.
+     */
+    private void bindToSelectionProperties() {
+        SelectableImageView selectableImageView = getSkinnable();
+        Rectangle selection = selectableImageView.getSelection();
+
+        selectedArea.smoothProperty().bind(selection.smoothProperty());
+        selectedArea.arcHeightProperty().bind(selection.arcHeightProperty());
+        selectedArea.arcWidthProperty().bind(selection.arcWidthProperty());
+        selectedArea.visibleProperty().bind(selectableImageView.selectionActiveProperty());
+
+        unselectedArea.smoothProperty().bind(selection.smoothProperty());
+        unselectedArea.arcHeightProperty().bind(selection.arcHeightProperty());
+        unselectedArea.arcWidthProperty().bind(selection.arcWidthProperty());
+        unselectedArea.visibleProperty().bind(selectableImageView.selectionActiveProperty());
+
+        // whenever the selection's position or size changes, the selection rectangles must be updated
+        selection.xProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
+                updateSelection();
+            }
+        });
+        selection.yProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
+                updateSelection();
+            }
+        });
+        selection.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
+                updateSelection();
+            }
+        });
+        selection.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
+                updateSelection();
+            }
+        });
+    }
+
+    /**
+     * Binds the {@link #imageView}'s {@link ImageView#fitHeightProperty() fitHeight} and
+     * {@link ImageView#fitWidthtProperty() fitWidth} properties to he {@link #getSkinnable() skinnable}'s height and
+     * width property.
+     */
+    private void enableResizing() {
+        SelectableImageView selectableImageView = getSkinnable();
+
+        // resize all the internal controls when the selectable image view is resized
+        selectableImageView.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                resize();
+            }
+        });
+        selectableImageView.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                resize();
+            }
+        });
+    }
+
+    /**
+     * Styles the selected and unselected area.
+     */
+    private void styleAreas() {
+        // TODO: use CSS
+
+        selectedArea.setStroke(Color.WHITESMOKE);
+        selectedArea.setStrokeWidth(3d);
+        selectedArea.setStrokeType(StrokeType.OUTSIDE);
+
+        unselectedArea.setStroke(new Color(0, 0, 0, 0.5));
+        unselectedArea.strokeWidthProperty().bind(Bindings.max(pane.widthProperty(), pane.heightProperty()));
+        unselectedArea.setStrokeType(StrokeType.OUTSIDE);
+        // this call is crucial! it prevents the enormous unselected area from messing up the layout
+        unselectedArea.setManaged(false);
+    }
+
+    /* ************************************************************************
+     *                                                                         *
+     * Resizing                                                                *
+     *                                                                         *
+     **************************************************************************/
+
+    /*
+     * When the control is resized, the following steps are taking place:
+     *  - the ImageView's fitWidth and fitHeight properties are set to the new size
+     *  - this triggers a resize of the containing pane since it is the largest control in it
+     *  - by bindings the resizing pane resizes the clipping rectangle and the unselected area's stroke width
+     * This brings the control in a coherent visual state but the selection is displayed relative to the old size,
+     * so it must be updates as well.
+     */
+
+    /**
+     * Resizes the contained controls.
+     */
+    private void resize() {
+        imageView.setFitWidth(getSkinnable().getWidth());
+        imageView.setFitHeight(getSkinnable().getHeight());
+
+        updateSelection();
+        outputSizes();
+    }
+
+    private void outputSizes() {
+        System.out.println("Scene: " + getNode().getScene().getWidth() + " x " + getNode().getScene().getHeight());
+        System.out.println("Selectable Image View: " + getSkinnable().getWidth() + " x " + getSkinnable().getHeight());
+        System.out.println("Pane: " + pane.getWidth() + " x " + pane.getHeight());
+        System.out.println("Image View: " + imageView.getFitWidth() + " x " + imageView.getFitHeight());
+        System.out.println("Image View local bounds: " + imageView.getBoundsInLocal().getWidth() + " x "
+                + imageView.getBoundsInLocal().getHeight());
+        System.out.println("Selection: " + selectedArea.getWidth() + " x " + selectedArea.getHeight() + " at ("
+                + selectedArea.getLayoutX() + ", " + selectedArea.getLayoutY() + ")");
+        System.out.println();
+    }
+
+    /* ************************************************************************
+     *                                                                         *
+     * Selection                                                               *
+     *                                                                         *
+     **************************************************************************/
+
+    private void updateSelection() {
+        // TODO
     }
 
 }

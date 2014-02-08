@@ -1,63 +1,55 @@
 package org.controlsfx.control.imageview;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Rectangle;
 
-public class SelectableImageView extends Control {
+import org.controlsfx.tools.MathTools;
 
-    /**
-     * The rectangle which is used when nothing is selected.
-     */
-    private static final Rectangle NO_SELECTION = new Rectangle();
+public class SelectableImageView extends Control {
 
     /* ************************************************************************
      *                                                                         *
-     * Properties                                                              *
+     * Attributes & Properties                                                 *
      *                                                                         *
      **************************************************************************/
 
     // IMAGE VIEW
 
     /**
-     * The height of the bounding box within which the source image is resized as necessary to fit.
-     */
-    private final DoubleProperty fitHeight;
-
-    /**
-     * The width of the bounding box within which the source image is resized as necessary to fit.
-     */
-    private final DoubleProperty fitWidth;
-
-    /**
      * The {@link Image} to be painted by this {@code SelectableImageView}.
      */
     private final ObjectProperty<Image> image;
 
+    /**
+     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
+     * fitting bounding box.
+     */
+    private final BooleanProperty preserveRatio;
+
     // SELECTION
 
     /**
-     * Indicates whether an area is currently selected. If this is false, the {@link selectedArea} should not be
-     * evaluated as its state is undefined.
+     * The selected area as a rectangle. The coordinates are relative to the currently shown image. <br>
+     * The value is only well defined if {@link #selectionActive} is true.
+     */
+    private final Rectangle selection;
+
+    /**
+     * Indicates whether an area is currently selected. If this is false, the {@link #selection} should not be evaluated
+     * as its state is undefined.
      */
     private final BooleanProperty selectionActive;
 
     /**
-     * The selected area as a rectangle. The coordinates are relative to the currently shown image. This will never be
-     * null but the value is only well defined if {@link selectionActive} is true.
-     */
-    private final ObjectProperty<Rectangle> selectedArea;
-
-    /**
-     * Indicates whether the {@link #selectedAreaProperty() selectedArea} property is currently changing. This will be
-     * set to true when changing the selection begins and set to false when it ends.
+     * Indicates whether the {@link #selection} is currently changing. This will be set to true when changing the
+     * selection begins and set to false when it ends.
      */
     private final BooleanProperty selectionAreaChanging;
 
@@ -74,13 +66,12 @@ public class SelectableImageView extends Control {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // Image View
-        this.fitHeight = new SimpleDoubleProperty(this, "fitHeightProperty");
-        this.fitWidth = new SimpleDoubleProperty(this, "fitWidthProperty");
         this.image = new SimpleObjectProperty<Image>(this, "imageProperty");
+        this.preserveRatio = new SimpleBooleanProperty(this, "preserveRatioProperty", false);
 
         // Selection
+        this.selection = new Rectangle();
         this.selectionActive = new SimpleBooleanProperty(this, "selectionActiveProperty", false);
-        this.selectedArea = new SimpleObjectProperty<Rectangle>(this, "selectedAreaProperty", NO_SELECTION);
         this.selectionAreaChanging = new SimpleBooleanProperty(this, "selectionAreaChangingProperty", false);
     }
 
@@ -143,62 +134,6 @@ public class SelectableImageView extends Control {
     // IMAGE VIEW
 
     /**
-     * The height of the bounding box within which the source image is resized as necessary to fit.
-     * 
-     * @return the fitHeight as a property
-     */
-    public DoubleProperty fitHeightProperty() {
-        return fitHeight;
-    }
-
-    /**
-     * The height of the bounding box within which the source image is resized as necessary to fit.
-     * 
-     * @return the fitHeight
-     */
-    public double getFitHeight() {
-        return fitHeightProperty().get();
-    }
-
-    /**
-     * The height of the bounding box within which the source image is resized as necessary to fit.
-     * 
-     * @param fitHeight
-     *            the fitHeight to set
-     */
-    public void setFitHeight(double fitHeight) {
-        fitHeightProperty().set(fitHeight);
-    }
-
-    /**
-     * The width of the bounding box within which the source image is resized as necessary to fit.
-     * 
-     * @return the fitWidth as a property
-     */
-    public DoubleProperty fitWidthProperty() {
-        return fitWidth;
-    }
-
-    /**
-     * The width of the bounding box within which the source image is resized as necessary to fit.
-     * 
-     * @return the fitWidth
-     */
-    public double getFitWidth() {
-        return fitWidthProperty().get();
-    }
-
-    /**
-     * The width of the bounding box within which the source image is resized as necessary to fit.
-     * 
-     * @param fitWidth
-     *            the fitWidth to set
-     */
-    public void setFitWidth(double fitWidth) {
-        fitWidthProperty().set(fitWidth);
-    }
-
-    /**
      * The {@link Image} to be painted by this {@code SelectableImageView}.
      * 
      * @return the image as a property
@@ -226,11 +161,53 @@ public class SelectableImageView extends Control {
         imageProperty().set(image);
     }
 
+    /**
+     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
+     * fitting bounding box.
+     * 
+     * @return the preserveRatio as a property
+     */
+    public BooleanProperty preserveRatioProperty() {
+        return preserveRatio;
+    }
+
+    /**
+     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
+     * fitting bounding box.
+     * 
+     * @return the preserveRatio
+     */
+    public boolean isPreserveRatio() {
+        return preserveRatioProperty().get();
+    }
+
+    /**
+     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
+     * fitting bounding box.
+     * 
+     * @param preserveRatio
+     *            the preserveRatio to set
+     */
+    public void setPreserveRatio(boolean preserveRatio) {
+        preserveRatioProperty().set(preserveRatio);
+    }
+
     // SELECTION
 
     /**
-     * Indicates whether an area is currently selected. If this is false, the {@link #selectedAreaProperty()
-     * selectedArea} property should not be evaluated as its state is undefined.
+     * The selected area as a rectangle. The coordinates are relative to the currently shown image. <br>
+     * This method will always return the same instance so it is safe to bind to its properties without considering it
+     * changing. It will never be null but the value is only well defined if {@link selectionActive} is true.
+     * 
+     * @return the selection
+     */
+    public Rectangle getSelection() {
+        return selection;
+    }
+
+    /**
+     * Indicates whether an area is currently selected. If this is false, the {@link #selection} should not be evaluated
+     * as its state is undefined.
      * 
      * @return the selectionActive as a property
      */
@@ -239,60 +216,100 @@ public class SelectableImageView extends Control {
     }
 
     /**
-     * Indicates whether an area is currently selected. If this is false, the {@link #selectedAreaProperty()
-     * selectedArea} should not be evaluated as its state is undefined.
+     * Indicates whether an area is currently selected. If this is false, the {@link #selection} should not be evaluated
+     * as its state is undefined.
      * 
-     * @return the selectionActive
+     * @return whether the selection is active
      */
     public boolean isSelectionActive() {
         return selectionActiveProperty().get();
     }
 
     /**
-     * Indicates whether an area is currently selected. If this is false, the {@link #selectedAreaProperty()
-     * selectedArea} should not be evaluated as its state is undefined.
+     * Indicates whether an area is currently selected. If this is false, the {@link #selection} should not be evaluated
+     * as its state is undefined.
      * 
      * @param selectionActive
-     *            the selectionActive to set
+     *            the new selection active status
      */
     public void setSelectionActive(boolean selectionActive) {
         selectionActiveProperty().set(selectionActive);
     }
 
     /**
-     * The selected area as a rectangle. The coordinates are relative to the currently shown image. This will never be
-     * null but the value is only used when {@link #selectionActiveProperty() selectionActive} property is true.
+     * Sets the selection. The coordinates will be interpreted relative to the currently shown image but might be
+     * modified to fit the currently shown image's size. <br>
+     * If there is no current image (i.e. the {@link #imageProperty()} holds {@code null}), an
+     * {@link IllegalStateException} will be thrown.
      * 
-     * @return the selectedArea as a property
+     * @param upperLeftX
+     *            the new x coordinate of the selection's upper left corner
+     * @param upperLeftY
+     *            the new y coordinate of the selection's upper left corner
+     * @param width
+     *            the selection's new width
+     * @param height
+     *            the selection's new height
+     * @throws IllegalStateException
+     *             if there is no current image, i.e. the {@link #imageProperty()} holds {@code null}
      */
-    public ObjectProperty<Rectangle> selectedAreaProperty() {
-        return selectedArea;
+    public void setSelection(double upperLeftX, double upperLeftY, double width, double height)
+            throws IllegalStateException {
+
+        if (getImage() == null)
+            throw new IllegalStateException("If the imageProperty holds null, the selection can not be set.");
+
+        double imageWidth = getImage().getWidth();
+        double imageHeight = getImage().getHeight();
+
+        double correctedUpperLeftX = MathTools.inInterval(0, upperLeftX, imageWidth);
+        getSelection().setX(correctedUpperLeftX);
+        double correctedUpperLeftY = MathTools.inInterval(0, upperLeftY, imageHeight);
+        getSelection().setY(correctedUpperLeftY);
+
+        double correctedWidth = MathTools.inInterval(0, width - correctedUpperLeftX, imageWidth);
+        getSelection().setWidth(correctedWidth);
+        double correctedHeight = MathTools.inInterval(0, width - correctedUpperLeftX, imageWidth);
+        getSelection().setHeight(correctedHeight);
     }
 
     /**
-     * The selected area as a rectangle. The coordinates are relative to the currently shown image. This will never be
-     * null but the value is only used when {@link #selectionActiveProperty() selectionActive} property is true.
+     * Uses the specified rectangle as a template to set the selection. This means that the specified instance itself
+     * will *not* be the new selection. Instead its coordinates will be used. They will be interpreted relative to the
+     * currently shown image but might be modified to fit the currently shown image's size. <br>
+     * If there is no current image (i.e. the {@link #imageProperty()} holds {@code null}), an
+     * {@link IllegalStateException} will be thrown.
      * 
-     * @return the selectedArea
+     * @param selectionTemplate
+     *            the template for the new selection
+     * @throws IllegalStateException
+     *             if there is no current image, i.e. the {@link #imageProperty()} holds {@code null}
      */
-    public Rectangle getSelectedArea() {
-        return selectedAreaProperty().get();
+    public void setSelectionFromTemplate(Rectangle selectionTemplate) throws IllegalStateException {
+        setSelection(selectionTemplate.getX(), selectionTemplate.getY(), selectionTemplate.getWidth(),
+                selectionTemplate.getHeight());
     }
 
     /**
-     * The selected area as a rectangle. The coordinates are relative to the currently shown image. This will never be
-     * null but the value is only used when {@link #selectionActiveProperty() selectionActive} property is true.
+     * Uses the specified rectangle as a template to set the selection. This means that the specified instance itself
+     * will *not* be the new selection. Instead its coordinates will be used. They will be interpreted relative to the
+     * currently shown image but might be modified to fit the currently shown image's size. <br>
+     * If there is no current image (i.e. the {@link #imageProperty()} holds {@code null}), an
+     * {@link IllegalStateException} will be thrown.
      * 
-     * @param selectedArea
-     *            the selectedArea to set
+     * @param selectionTemplate
+     *            the template for the new selection
+     * @throws IllegalStateException
+     *             if there is no current image, i.e. the {@link #imageProperty()} holds {@code null}
      */
-    public void setSelectedArea(Rectangle selectedArea) {
-        selectedAreaProperty().set(selectedArea);
+    public void setSelectionFromTemplate(Rectangle2D selectionTemplate) throws IllegalStateException {
+        setSelection(selectionTemplate.getMinX(), selectionTemplate.getMinY(), selectionTemplate.getWidth(),
+                selectionTemplate.getHeight());
     }
 
     /**
-     * Indicates whether the {@link #selectedAreaProperty() selectedArea} property is currently changing. This will be
-     * set to true when changing the selection begins and set to false when it ends.
+     * Indicates whether the {@link #selection} is currently changing. This will be set to true when changing the
+     * selection begins and set to false when it ends.
      * 
      * @return the selectionAreaChanging as a property
      */
@@ -301,24 +318,13 @@ public class SelectableImageView extends Control {
     }
 
     /**
-     * Indicates whether the {@link #selectedAreaProperty() selectedArea} property is currently changing. This will be
-     * set to true when changing the selection begins and set to false when it ends.
+     * Indicates whether the {@link #selection} is currently changing. This will be set to true when changing the
+     * selection begins and set to false when it ends.
      * 
      * @return the selectionAreaChanging
      */
     public boolean isSelectionAreaChanging() {
         return selectionAreaChangingProperty().get();
-    }
-
-    /**
-     * Indicates whether the {@link #selectedAreaProperty() selectedArea} property is currently changing. This will be
-     * set to true when changing the selection begins and set to false when it ends.
-     * 
-     * @param selectionAreaChanging
-     *            the selectionAreaChanging to set
-     */
-    public void setSelectionAreaChanging(boolean selectionAreaChanging) {
-        selectionAreaChangingProperty().set(selectionAreaChanging);
     }
 
     /* ************************************************************************

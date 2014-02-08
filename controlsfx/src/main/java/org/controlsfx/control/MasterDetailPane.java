@@ -51,14 +51,14 @@ import javafx.scene.control.Skin;
  * default the detail appears with a short slide-in animation and disappears
  * with a slide-out. This control allows the detail node to be positioned in
  * four different locations (top, bottom, left, or right). 
- * <h2>Screenshot</h2>
+ * <h3>Screenshot</h3>
  * To better describe what a master / detail pane is, please refer to the picture
  * below:
  * <center><img src="masterDetailPane.png" /></center>
- * <h2>Code Sample</h2>
+ * <h3>Code Sample</h3>
  * <pre>
  * {@code
- * final MasterDetailPane pane = new MasterDetailPane();
+ * MasterDetailPane pane = new MasterDetailPane();
  * pane.setMasterNode(new TableView());
  * pane.setDetailNode(new PropertySheet());
  * pane.setDetailSide(Side.RIGHT);

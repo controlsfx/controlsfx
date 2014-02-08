@@ -27,18 +27,13 @@
 package org.controlsfx.samples;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
@@ -58,70 +53,48 @@ public class HelloMasterDetailPane extends ControlsFXSample {
     public Node getPanel(Stage stage) {
         masterDetailPane = new MasterDetailPane(Side.BOTTOM);
         masterDetailPane.setShowDetailNode(true);
+        
         return masterDetailPane;
     }
 
     @Override
     public Node getControlPanel() {
-        VBox vbox = new VBox();
-        vbox.setSpacing(10);
-        vbox.setPadding(new Insets(5, 5, 5, 5));
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
 
-        Button hide = new Button("Hide");
-        vbox.getChildren().add(hide);
+        int row = 0;
 
-        Button show = new Button("Show");
-        vbox.getChildren().add(show);
+        // show details
+        Label lblShowDetail = new Label("Show details: ");
+        lblShowDetail.getStyleClass().add("property");
+        grid.add(lblShowDetail, 0, row);
+        CheckBox chkShowDetails = new CheckBox();
+        grid.add(chkShowDetails, 1, row++);
+        chkShowDetails.selectedProperty().bindBidirectional(masterDetailPane.showDetailNodeProperty());
+        
+     
+        // animated
+        Label lblAnimated = new Label("Animated: ");
+        lblAnimated.getStyleClass().add("property");
+        grid.add(lblAnimated, 0, row);
+        CheckBox chkAnimated = new CheckBox();
+        grid.add(chkAnimated, 1, row++);
+        chkAnimated.selectedProperty().bindBidirectional(masterDetailPane.animatedProperty());
 
-        hide.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent evt) {
-                masterDetailPane.setShowDetailNode(false);
-            }
-        });
 
-        show.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent evt) {
-                masterDetailPane.setShowDetailNode(true);
-            }
-        });
-
+        // side
+        Label lblSide = new Label("Side: ");
+        lblSide.getStyleClass().add("property");
+        grid.add(lblSide, 0, row);
         ComboBox<Side> positionBox = new ComboBox<>();
         positionBox.getItems().addAll(Side.values());
-        vbox.getChildren().add(positionBox);
+        grid.add(positionBox, 1, row++);
         positionBox.setValue(masterDetailPane.getDetailSide());
         masterDetailPane.detailSideProperty().bind(positionBox.valueProperty());
 
-        final Label expandedLabel = new Label();
-        if (masterDetailPane.isShowDetailNode()) {
-            expandedLabel.setText("Drawer is initially open");
-        } else {
-            expandedLabel.setText("Drawer is initially closed");
-        }
-        vbox.getChildren().add(expandedLabel);
-
-        masterDetailPane.showDetailNodeProperty().addListener(
-                new ChangeListener<Boolean>() {
-                    @Override
-                    public void changed(
-                            ObservableValue<? extends Boolean> value,
-                            Boolean oldValue, Boolean newValue) {
-                        if (newValue) {
-                            expandedLabel.setText("Drawer is open");
-                        } else {
-                            expandedLabel.setText("Drawer is closed");
-                        }
-                    }
-                });
-
-        CheckBox animatedBox = new CheckBox("Animated");
-        animatedBox.setSelected(true);
-        masterDetailPane.animatedProperty()
-                .bind(animatedBox.selectedProperty());
-        vbox.getChildren().add(animatedBox);
-
-        return vbox;
+        return grid;
     }
 
     @Override

@@ -75,6 +75,8 @@ public class MasterDetailPane extends Control {
         Objects.requireNonNull(side);
         Objects.requireNonNull(masterNode);
         Objects.requireNonNull(detailNode);
+        
+        getStyleClass().add("master-detail-pane");
 
         setDetailSide(side);
         setMasterNode(masterNode);
@@ -133,9 +135,14 @@ public class MasterDetailPane extends Control {
         this(Side.RIGHT, new Placeholder(true), new Placeholder(false), true);
     }
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
         return new MasterDetailPaneSkin(this);
+    }
+    
+    /** {@inheritDoc} */
+    @Override protected String getUserAgentStylesheet() {
+        return getClass().getResource("masterdetailpane.css").toExternalForm();
     }
 
     // Detail postion support
@@ -354,9 +361,9 @@ public class MasterDetailPane extends Control {
             setAlignment(Pos.CENTER);
 
             if (master) {
-                setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                setStyle("-fx-background-color: -fx-background;");
             } else {
-                setStyle("-fx-background-color: red; ; -fx-text-fill: white;");
+                setStyle("-fx-background-color: derive(-fx-background, -10%);");
             }
         }
     }

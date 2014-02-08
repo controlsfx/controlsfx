@@ -48,6 +48,13 @@ import com.sun.javafx.event.EventHandlerManager;
 /**
  * Represents a bread crumb bar. This control is useful to visualize and navigate 
  * a hierarchical path structure, such as file systems.
+ * 
+ * <p>Shown below is a screenshot of the BreadCrumbBar control:
+ * 
+ * <br/>
+ * <center>
+ * <img src="breadCrumbBar.png"/>
+ * </center>
  */
 public class BreadCrumbBar<T> extends Control {
 
@@ -56,24 +63,31 @@ public class BreadCrumbBar<T> extends Control {
 
     /**
      * Represents an Event which is fired when a bread crumb was activated.
-     *
-     * @param <TE>
      */
     @SuppressWarnings("serial")
     public static class BreadCrumbActionEvent<TE> extends Event {
+        
+        /**
+         * The event type that should be listened to by people interested in 
+         * knowing when the {@link BreadCrumbBar#selectedCrumbProperty() selected crumb}
+         * has changed.
+         */
         @SuppressWarnings("rawtypes")
-        public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = new EventType<BreadCrumbActionEvent>("CRUMB_ACTION");
+        public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = 
+                new EventType<BreadCrumbActionEvent>("CRUMB_ACTION");
 
         private final TreeItem<TE> selectedCrumb;
 
+        /**
+         * Creates a new event that can subsequently be fired.
+         */
         public BreadCrumbActionEvent(TreeItem<TE> selectedCrumb) {
             super(CRUMB_ACTION);
             this.selectedCrumb = selectedCrumb;
         }
 
         /**
-         * Returns the crumb which was the action target
-         * @return
+         * Returns the crumb which was the action target.
          */
         public TreeItem<TE> getSelectedCrumb() {
             return selectedCrumb;

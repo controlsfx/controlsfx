@@ -301,10 +301,10 @@ public class FXSampler extends Application {
         String sourceURL = sample.getSampleSourceURL();
         
         try {
-                // try loading via the web or local file system
-                URL url = new URL(sourceURL);
-                InputStream is = url.openStream();
-                return getResource(is);
+            // try loading via the web or local file system
+            URL url = new URL(sourceURL);
+            InputStream is = url.openStream();
+            return getResource(is);
         } catch (IOException e) {
             // no-op - the URL may not be valid, no biggy
         }

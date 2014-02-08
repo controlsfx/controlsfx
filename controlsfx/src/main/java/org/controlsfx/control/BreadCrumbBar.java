@@ -28,8 +28,10 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.BreadCrumbBarSkin;
 import impl.org.controlsfx.skin.BreadCrumbBarSkin.BreadCrumbButton;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
 import javafx.event.EventDispatchChain;
@@ -44,9 +46,8 @@ import javafx.util.Callback;
 import com.sun.javafx.event.EventHandlerManager;
 
 /**
- * Represents a bread crumb bar. 
- * This control is useful to visualize and navigate a hierarchical path structure, such as file systems.
- * 
+ * Represents a bread crumb bar. This control is useful to visualize and navigate 
+ * a hierarchical path structure, such as file systems.
  */
 public class BreadCrumbBar<T> extends Control {
 
@@ -143,7 +144,6 @@ public class BreadCrumbBar<T> extends Control {
      * selected crumb.
      */
     public BreadCrumbBar(TreeItem<T> selectedCrumb) {
-        autoNavigationEnabled.set(true); // by default, auto navigation is enabled
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setSelectedCrumb(selectedCrumb);
         setCrumbFactory(defaultCrumbNodeFactory);
@@ -171,6 +171,17 @@ public class BreadCrumbBar<T> extends Control {
      **************************************************************************/
 
     // --- selectedCrumb
+    /**
+     * Represents the bottom-most path node (the node on the most-right side in 
+     * terms of the bread crumb bar). The full path is then being constructed 
+     * using getParent() of the tree-items.
+     * 
+     * <p>
+     * Consider the following hierarchy:
+     * [Root] > [Folder] > [SubFolder] > [myfile.txt]
+     * 
+     * To show the above bread crumb bar, you have to set the [myfile.txt] tree-node as selected crumb.
+     */
     public final ObjectProperty<TreeItem<T>> selectedCrumbProperty() {
         return selectedCrumb;
     }
@@ -184,51 +195,37 @@ public class BreadCrumbBar<T> extends Control {
         return selectedCrumb.get();
     }
 
-    /**
-     * Set the bottom most path node (the node on the most-right side in terms of the bread crumb bar). 
-     * The full path is then being constructed using getParent() of the tree-items.
-     * 
-     * <p>
-     * Consider the following hierarchy:
-     * [Root] > [Folder] > [SubFolder] > [myfile.txt]
-     * 
-     * To show the above bread crumb bar, you have to set the [myfile.txt] tree-node as selected crumb.
-     * 
-     * @param selectedCrumb
-     */
     public final void setSelectedCrumb(TreeItem<T> selectedCrumb){
         this.selectedCrumb.set(selectedCrumb);
     }
 
     
     // --- autoNavigation
-    public final  ObjectProperty<Boolean> autoNavigationProperty(){
-        return autoNavigationEnabled;
-    }
-    
-    private final ObjectProperty<Boolean> autoNavigationEnabled = 
-            new SimpleObjectProperty<Boolean>(this, "autoNavigationEnabled");
-    
     /**
      * Enable or disable auto navigation (default is enabled).
      * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
-     * @param enabled
      */
+    public final BooleanProperty autoNavigationEnabledProperty() {
+        return autoNavigation;
+    }
+    private final BooleanProperty autoNavigation = 
+            new SimpleBooleanProperty(this, "autoNavigationEnabled", true);
+    
+    public final boolean isAutoNavigationEnabled() {
+        return autoNavigation.get();
+    }
+    
     public final void setAutoNavigationEnabled(boolean enabled) {
-        autoNavigationEnabled.set(enabled);
+        autoNavigation.set(enabled);
     }
 
-    /**
-     * Checks if auto navigation is currently enabled.
-     * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
-     * @return
-     */
-    public final boolean isAutoNavigationEnabled() {
-        return autoNavigationEnabled.get();
-    }
 
     
     // --- crumbFactory
+    /**
+     * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
+     * <code>null</code> is not allowed and will result in a fall back to the default factory.
+     */
     public final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactoryProperty() {
         return crumbFactory;
     }
@@ -236,10 +233,6 @@ public class BreadCrumbBar<T> extends Control {
     private final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactory = 
             new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory");
 
-    /**
-     * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
-     * <code>null</code> is not allowed and will result in a fall back to the default factory.
-     */
     public final void setCrumbFactory(Callback<TreeItem<T>, Button> value) {
         if(value == null){
             value = defaultCrumbNodeFactory;
@@ -257,6 +250,9 @@ public class BreadCrumbBar<T> extends Control {
 
     
     // --- onCrumbAction
+    /**
+     * Callback property for when a user selects a crumb.
+     */
     public final ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbActionProperty() { 
         return onCrumbAction; 
     }
@@ -301,16 +297,4 @@ public class BreadCrumbBar<T> extends Control {
     @Override protected String getUserAgentStylesheet() {
         return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm();
     }
-
-
-    //
-    // Static helper methods
-    //
-
-    
-
-    
-    
-    
-    
 }

@@ -69,7 +69,7 @@ class DialogFactory {
                     }
                 }
             } else if (owner instanceof Node) {
-            	((Node)owner).getScene().getWindow();
+            	window = ((Node)owner).getScene().getWindow();
             } else {
                 throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
             }

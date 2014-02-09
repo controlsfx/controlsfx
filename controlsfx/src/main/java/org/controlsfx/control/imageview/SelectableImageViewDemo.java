@@ -12,11 +12,11 @@ public class SelectableImageViewDemo extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        SelectableImageView customControl = new SelectableImageView(image);
-        customControl.setPreserveRatio(true);
-        customControl.setSelectionActive(true);
+        SelectableImageView selectableImageView = new SelectableImageView(image);
+        selectableImageView.setPreserveRatio(true);
+        selectableImageView.setSelection(100, 100, 200, 200);
 
-        stage.setScene(new Scene(customControl));
+        stage.setScene(new Scene(selectableImageView));
         stage.setTitle("Custom Control");
         stage.setWidth(800);
         stage.setHeight(600);

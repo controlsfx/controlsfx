@@ -11,6 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 
+import org.controlsfx.tools.MathTools;
+
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
@@ -69,8 +71,8 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     private final Rectangle selectedArea;
 
     /**
-     * The rectangle whose stroke represents the unselected area. Note that the rectangle itself always has the same
-     * size and position as the {@link #selectedArea}.
+     * The rectangle whose stroke represents the unselected area. Note that binding is used to ensure that the rectangle
+     * itself always has the same size and position as the {@link #selectedArea}.
      */
     private final Rectangle unselectedArea;
 
@@ -80,6 +82,12 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      *                                                                         *
      **************************************************************************/
 
+    /**
+     * Creates a new skin for the specified {@link SelectableImageView}.
+     * 
+     * @param selectableImageView
+     *            the control which this skin will display
+     */
     public SelectableImageViewSkin(SelectableImageView selectableImageView) {
         super(selectableImageView, new SelectableImageViewBehavior(selectableImageView));
 
@@ -90,16 +98,14 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
 
         buildSceneGraph();
         bindImageViewProperties();
-        bindToSelectionProperties();
         enableResizing();
-
-        styleAreas();
+        initializeAreas();
     }
 
     /**
      * Creates a pane for the selection which clips its content to its own size.
      * 
-     * @return
+     * @return a {@link Pane} with a clip whose width and height is bound to the pane's width and height
      */
     private static Pane createClippingPane() {
         Pane pane = new Pane();
@@ -141,8 +147,70 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     }
 
     /**
+     * Binds the {@link #imageView}'s {@link ImageView#fitHeightProperty() fitHeight} and
+     * {@link ImageView#fitWidthProperty() fitWidth} properties to he {@link #getSkinnable() skinnable}'s height and
+     * width property.
+     */
+    private void enableResizing() {
+        SelectableImageView selectableImageView = getSkinnable();
+
+        // resize all the internal controls when the selectable image view is resized
+        selectableImageView.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                resize();
+            }
+        });
+        selectableImageView.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                resize();
+            }
+        });
+    }
+
+    /**
+     * Initializes the {@link #selectedArea} and the {@link #unselectedArea}. This includes their style and their
+     * bindings to the {@link SelectableImageView#getSelection() selection}.
+     */
+    private void initializeAreas() {
+        styleAreas();
+        bindCoordinates();
+        bindToSelectionProperties();
+    }
+
+    /**
+     * Styles the selected and unselected area.
+     */
+    private void styleAreas() {
+        // TODO: use CSS
+
+        selectedArea.setFill(Color.TRANSPARENT);
+        selectedArea.setStroke(Color.WHITESMOKE);
+        selectedArea.setStrokeWidth(2d);
+        selectedArea.setStrokeType(StrokeType.OUTSIDE);
+
+        unselectedArea.setFill(Color.TRANSPARENT);
+        unselectedArea.setStroke(new Color(0, 0, 0, 0.5));
+        unselectedArea.strokeWidthProperty().bind(Bindings.max(pane.widthProperty(), pane.heightProperty()));
+        unselectedArea.setStrokeType(StrokeType.OUTSIDE);
+        // this call is crucial! it prevents the enormous unselected area from messing up the layout
+        unselectedArea.setManaged(false);
+    }
+
+    /**
+     * Binds the position and size of {@link #unselectedArea} to {@link #selectedArea}.
+     */
+    private void bindCoordinates() {
+        unselectedArea.xProperty().bind(selectedArea.xProperty());
+        unselectedArea.yProperty().bind(selectedArea.yProperty());
+        unselectedArea.widthProperty().bind(selectedArea.widthProperty());
+        unselectedArea.heightProperty().bind(selectedArea.heightProperty());
+    }
+
+    /**
      * Binds the controls which display the selection to the {@link SelectableImageView}'s
-     * {@link SelectableImageView#selectedAreaProperty() selectedArea} property and their visibility to the
+     * {@link SelectableImageView#getSelection() selection} property and their visibility to the
      * {@link SelectableImageView#selectionActiveProperty() selectionActive} property.
      */
     private void bindToSelectionProperties() {
@@ -186,46 +254,6 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         });
     }
 
-    /**
-     * Binds the {@link #imageView}'s {@link ImageView#fitHeightProperty() fitHeight} and
-     * {@link ImageView#fitWidthtProperty() fitWidth} properties to he {@link #getSkinnable() skinnable}'s height and
-     * width property.
-     */
-    private void enableResizing() {
-        SelectableImageView selectableImageView = getSkinnable();
-
-        // resize all the internal controls when the selectable image view is resized
-        selectableImageView.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                resize();
-            }
-        });
-        selectableImageView.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                resize();
-            }
-        });
-    }
-
-    /**
-     * Styles the selected and unselected area.
-     */
-    private void styleAreas() {
-        // TODO: use CSS
-
-        selectedArea.setStroke(Color.WHITESMOKE);
-        selectedArea.setStrokeWidth(3d);
-        selectedArea.setStrokeType(StrokeType.OUTSIDE);
-
-        unselectedArea.setStroke(new Color(0, 0, 0, 0.5));
-        unselectedArea.strokeWidthProperty().bind(Bindings.max(pane.widthProperty(), pane.heightProperty()));
-        unselectedArea.setStrokeType(StrokeType.OUTSIDE);
-        // this call is crucial! it prevents the enormous unselected area from messing up the layout
-        unselectedArea.setManaged(false);
-    }
-
     /* ************************************************************************
      *                                                                         *
      * Resizing                                                                *
@@ -234,35 +262,37 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
 
     /*
      * When the control is resized, the following steps are taking place:
-     *  - the ImageView's fitWidth and fitHeight properties are set to the new size
-     *  - this triggers a resize of the containing pane since it is the largest control in it
+     *  - the ImageView's fitWidth and fitHeight properties are explicitly set to the new size
+     *  - this triggers a resize of the containing pane since the view is the largest control in it
      *  - by bindings the resizing pane resizes the clipping rectangle and the unselected area's stroke width
-     * This brings the control in a coherent visual state but the selection is displayed relative to the old size,
+     * This brings the control to a coherent visual state but the selection is displayed relative to the old size,
      * so it must be updates as well.
      */
 
     /**
-     * Resizes the contained controls.
+     * Resizes the contained controls when the control itself is resized.
      */
     private void resize() {
         imageView.setFitWidth(getSkinnable().getWidth());
         imageView.setFitHeight(getSkinnable().getHeight());
 
         updateSelection();
-        outputSizes();
     }
 
-    private void outputSizes() {
-        System.out.println("Scene: " + getNode().getScene().getWidth() + " x " + getNode().getScene().getHeight());
-        System.out.println("Selectable Image View: " + getSkinnable().getWidth() + " x " + getSkinnable().getHeight());
-        System.out.println("Pane: " + pane.getWidth() + " x " + pane.getHeight());
-        System.out.println("Image View: " + imageView.getFitWidth() + " x " + imageView.getFitHeight());
-        System.out.println("Image View local bounds: " + imageView.getBoundsInLocal().getWidth() + " x "
-                + imageView.getBoundsInLocal().getHeight());
-        System.out.println("Selection: " + selectedArea.getWidth() + " x " + selectedArea.getHeight() + " at ("
-                + selectedArea.getLayoutX() + ", " + selectedArea.getLayoutY() + ")");
-        System.out.println();
-    }
+//    /**
+//     * Prints the sizes of the most relevant controls to {@link System#out}. Can be used to debug the control.
+//     */
+//    private void outputSizes() {
+//        System.out.println("Scene: " + getNode().getScene().getWidth() + " x " + getNode().getScene().getHeight());
+//        System.out.println("Selectable Image View: " + getSkinnable().getWidth() + " x " + getSkinnable().getHeight());
+//        System.out.println("Pane: " + pane.getWidth() + " x " + pane.getHeight());
+//        System.out.println("Image View: " + imageView.getFitWidth() + " x " + imageView.getFitHeight());
+//        System.out.println("Image View local bounds: " + imageView.getBoundsInLocal().getWidth() + " x "
+//                + imageView.getBoundsInLocal().getHeight());
+//        System.out.println("Selection: " + selectedArea.getWidth() + " x " + selectedArea.getHeight() + " at ("
+//                + selectedArea.getX() + ", " + selectedArea.getY() + ")");
+//        System.out.println();
+//    }
 
     /* ************************************************************************
      *                                                                         *
@@ -270,8 +300,65 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      *                                                                         *
      **************************************************************************/
 
+    /**
+     * Updates the position and size of {@link #selectedArea} (and by binding that of {@link #unselectedArea}). This
+     * needs to be done whenever the selection changes or when the control resizes.
+     */
     private void updateSelection() {
-        // TODO
+        if (imageView.getImage() == null)
+            setSelectionDirectly(0, 0, 0, 0);
+        else
+            setTransformedSelection();
+    }
+
+    /**
+     * Transforms the {@link SelectableImageView#getSelection() selection} from Image coordinates to ImageView
+     * coordinates and sets the position and size of {@link #selectedArea} (and by binding that of
+     * {@link #unselectedArea}). <br>
+     * This call will fail if the {@link #imageView} has a {@code null} image.
+     */
+    private void setTransformedSelection() {
+        // get the image view's width and height and compute the ratio between the image size and the view's size
+        double imageViewWidth = imageView.getBoundsInLocal().getWidth();
+        double imageViewHeight = imageView.getBoundsInLocal().getHeight();
+        double widthRatio = imageViewWidth / imageView.getImage().getWidth();
+        double heightRatio = imageViewHeight / imageView.getImage().getHeight();
+
+        // compute the new position and size such that it is always within the image view's area
+        Rectangle selection = getSkinnable().getSelection();
+        double newX = MathTools.inInterval(0, widthRatio * selection.getX(), imageViewWidth);
+        double newY = MathTools.inInterval(0, heightRatio * selection.getY(), imageViewHeight);
+        double newWidth = widthRatio * selection.getWidth();
+        boolean tooWide = newX + newWidth > imageViewWidth;
+        if (tooWide)
+            newWidth = imageViewWidth - newX;
+        double newHeight = heightRatio * selection.getHeight();
+        boolean tooHigh = newY - newHeight > imageViewHeight;
+        if (tooHigh)
+            newHeight = imageViewHeight - newY;
+
+        // set the new values
+        setSelectionDirectly(newX, newY, newWidth, newHeight);
+    }
+
+    /**
+     * Updates the position and size of {@link #selectedArea} (and by binding that of {@link #unselectedArea}) to the
+     * specified arguments.
+     * 
+     * @param newX
+     *            the new x coordinate of the upper left corner
+     * @param newY
+     *            the new y coordinate of the upper left corner
+     * @param newWidth
+     *            the new width
+     * @param newHeight
+     *            the new height
+     */
+    private void setSelectionDirectly(double newX, double newY, double newWidth, double newHeight) {
+        selectedArea.setX(newX);
+        selectedArea.setY(newY);
+        selectedArea.setWidth(newWidth);
+        selectedArea.setHeight(newHeight);
     }
 
 }

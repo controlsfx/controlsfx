@@ -208,7 +208,7 @@ public abstract class AutoCompletionBinding<T> {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            if(!fetchedSuggestions.isEmpty()){
+                            if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
                                 autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
                                 showPopup();
                             }else{

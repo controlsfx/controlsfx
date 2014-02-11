@@ -46,6 +46,8 @@ public class HelloNotificationPopup extends ControlsFXSample {
     
     private NotificationPopup notifier;
     
+    private int count = 0;
+    
     public static void main(String[] args) {
         launch(args);
     }
@@ -109,7 +111,7 @@ public class HelloNotificationPopup extends ControlsFXSample {
     }
     
     private void notification(Pos pos) {
-        Notification n = Notifications.create().text("Hello World!").position(pos).build();
+        Notification n = Notifications.create().text("Hello World " + (count++) + "!").position(pos).build();
         notifier.show(stage, n);
     }
 }

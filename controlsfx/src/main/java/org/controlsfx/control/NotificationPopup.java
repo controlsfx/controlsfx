@@ -28,12 +28,17 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.NotificationBar;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
+import javafx.animation.Transition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -50,9 +55,10 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.action.Action;
 
+
 public class NotificationPopup {
     
-    private static final List<NotificationPopup> popupsList = new ArrayList<>();
+    private static final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
     private static final double padding = 15;
     private static final Duration FADE_OUT_DURATION = Duration.seconds(5);
     
@@ -101,15 +107,7 @@ public class NotificationPopup {
             }
 
             @Override public boolean isShowFromTop() {
-                Pos p = notification.getPosition();
-                switch (p) {
-                    case TOP_LEFT:
-                    case TOP_CENTER:
-                    case TOP_RIGHT: 
-                        return true;
-                    default: 
-                        return false;
-                }
+                return NotificationPopup.this.isShowFromTop(notification.getPosition());
             }
             
             @Override public void hide() {
@@ -152,8 +150,7 @@ public class NotificationPopup {
         isShowing = true;
         notificationBar.doShow();
         
-        popupsList.add(this);
-        
+        addPopupToMap(p, popup);
         
         // begin a timeline to get rid of the popup
         KeyValue fadeOutBegin = new KeyValue(notificationBar.opacityProperty(), 1.0);
@@ -167,11 +164,68 @@ public class NotificationPopup {
         timeline.setOnFinished(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 popup.hide();
-                popupsList.remove(NotificationPopup.this);
+                removePopupFromMap(p, NotificationPopup.this);
             }
         });
         timeline.play();
     }
+    
+    private void addPopupToMap(Pos p, Popup popup) {
+        List<Popup> popups;
+        if (! popupsMap.containsKey(p)) {
+            popups = new LinkedList<>();
+            popupsMap.put(p, popups);
+        } else {
+            popups = popupsMap.get(p);
+        }
+        
+        final double newPopupHeight = popup.getHeight();
+        
+        // animate all other popups in the list upwards so that the new one
+        // is in the 'new' area
+        ParallelTransition parallelTransition = new ParallelTransition();
+        for (Popup oldPopup : popups) {
+            final double oldAnchorY = oldPopup.getAnchorY();
+            Transition t = new Transition() {
+                {
+                    setCycleDuration(Duration.millis(200));
+                }
+                
+                @Override protected void interpolate(double frac) {
+                    double newAnchorY = oldAnchorY + (isShowFromTop(p) ? newPopupHeight : -newPopupHeight) * frac;
+                    oldPopup.setAnchorY(newAnchorY);
+                }
+            };
+            t.setCycleCount(1);
+            parallelTransition.getChildren().add(t);
+        }
+        parallelTransition.play();
+        
+        // add the popup to the list so it is kept in memory and can be
+        // accessed later on
+        popups.add(popup);
+    }
+    
+    private void removePopupFromMap(Pos p, NotificationPopup popup) {
+        if (popupsMap.containsKey(p)) {
+            List<Popup> popups = popupsMap.get(p);
+            popups.remove(popup);
+        }
+    }
+    
+    private boolean isShowFromTop(Pos p) {
+        switch (p) {
+            case TOP_LEFT:
+            case TOP_CENTER:
+            case TOP_RIGHT: 
+                return true;
+            default: 
+                return false;
+        }
+    }
+    
+    
+    
     
     public static class Notification {
         private final String text;

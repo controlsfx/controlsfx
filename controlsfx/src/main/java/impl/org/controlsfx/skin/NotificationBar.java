@@ -17,7 +17,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -47,7 +46,10 @@ public abstract class NotificationBar extends Region {
     };
     
     
-    public abstract void requestContainerLayout();
+    public void requestContainerLayout() {
+        layoutChildren();
+    }
+    
     public abstract String getText();
     public abstract Node getGraphic();
     public abstract ObservableList<Action> getActions();
@@ -63,7 +65,7 @@ public abstract class NotificationBar extends Region {
         pane.setAlignment(Pos.BASELINE_LEFT);
         pane.setVisible(isShowing());
         getChildren().setAll(pane);
-
+        
         // initialise label area
         label = new Label();
         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -122,10 +124,12 @@ public abstract class NotificationBar extends Region {
     }
 
     @Override protected double computePrefHeight(double width) {
+        final double minHeight = Math.max(minHeight(width), MIN_HEIGHT);
+        
         if (isShowFromTop()) {
-            return MIN_HEIGHT; 
+            return minHeight; 
         } else {
-            return Math.max(pane.prefHeight(width), MIN_HEIGHT) * transition.get();
+            return Math.max(pane.prefHeight(width), minHeight) * transition.get();
         }
     }
 

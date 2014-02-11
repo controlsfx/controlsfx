@@ -26,46 +26,90 @@
  */
 package org.controlsfx.samples;
 
-import java.util.Random;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.NotificationPopup;
 import org.controlsfx.control.NotificationPopup.Notification;
 import org.controlsfx.control.NotificationPopup.Notifications;
 
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-
-public class HelloNotificationPopup extends Application {
+public class HelloNotificationPopup extends ControlsFXSample {
     
-    private Notification[] notifications = new Notification[] {
-        Notifications.create().text("Hello World!").build(),
-        Notifications.create().text("Top-right notification").position(Pos.TOP_RIGHT).build()
-    };
-
+    private Stage stage;
+    
+    private NotificationPopup notifier;
+    
     public static void main(String[] args) {
         launch(args);
     }
     
-    public void start(final Stage stage) {
-        Button showBtn = new Button("Show Notification");
-        showBtn.setOnAction(new EventHandler<ActionEvent>() {
+    @Override public String getSampleName() {
+        return "NotificationPopup";
+    }
+    
+    @Override public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationPopup.html";
+    }
+    
+    @Override public Node getPanel(Stage stage) {
+        this.stage = stage;
+        this.notifier = new NotificationPopup();
+        
+        Button topLeftBtn = new Button("Top-left\nnotification");
+        topLeftBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Random r = new Random();
-                new NotificationPopup().show(stage, notifications[r.nextInt(notifications.length)]);
+                notification(Pos.TOP_LEFT);
             }
         });
+        AnchorPane.setTopAnchor(topLeftBtn, 0.0);
+        AnchorPane.setLeftAnchor(topLeftBtn, 0.0);
         
-        VBox vbox = new VBox(10, showBtn);
+        Button topRightBtn = new Button("Top-right\nnotification");
+        topRightBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.TOP_RIGHT);
+            }
+        });
+        AnchorPane.setTopAnchor(topRightBtn, 0.0);
+        AnchorPane.setRightAnchor(topRightBtn, 0.0);
         
-        Scene scene = new Scene(vbox, 200, 200);
-        stage.setScene(scene);
-        stage.show();
+        Button bottomLeftBtn = new Button("Bottom-left\nNotification");
+        bottomLeftBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.BOTTOM_LEFT);
+            }
+        });
+        AnchorPane.setBottomAnchor(bottomLeftBtn, 0.0);
+        AnchorPane.setLeftAnchor(bottomLeftBtn, 0.0);
+        
+        Button bottomRightBtn = new Button("Bottom-right\nNotification");
+        bottomRightBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.BOTTOM_RIGHT);
+            }
+        });
+        AnchorPane.setBottomAnchor(bottomRightBtn, 0.0);
+        AnchorPane.setRightAnchor(bottomRightBtn, 0.0);
+        
+        AnchorPane pane = new AnchorPane(topLeftBtn, topRightBtn, bottomLeftBtn, bottomRightBtn);
+        
+        return pane;
+    }
+    
+    @Override public String getSampleDescription() {
+        return "Unlike the NotificationPane, the NotificationPopup is designed to"
+                + "show popup warnings outside your application.";
+    }
+    
+    private void notification(Pos pos) {
+        Notification n = Notifications.create().text("Hello World!").position(pos).build();
+        notifier.show(stage, n);
     }
 }

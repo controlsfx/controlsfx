@@ -222,7 +222,7 @@ public class NotificationPopup {
             return this;
         }
         
-        public Notifications text(Node graphic) {
+        public Notifications graphic(Node graphic) {
             this.graphic = graphic;
             return this;
         }

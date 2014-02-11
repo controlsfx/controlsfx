@@ -65,7 +65,7 @@ public abstract class NotificationBar extends Region {
 
     private final GridPane pane;
     
-    DoubleProperty transition = new SimpleDoubleProperty() {
+    public DoubleProperty transition = new SimpleDoubleProperty() {
         @Override protected void invalidated() {
             requestContainerLayout();
         }
@@ -82,6 +82,17 @@ public abstract class NotificationBar extends Region {
     public abstract void hide();
     public abstract boolean isShowing();
     public abstract boolean isShowFromTop();
+    public abstract double getContainerHeight();
+    
+//    /**
+//     * May be false if relocation is handled by the consumer of this API,
+//     * but by default this is true.
+//     */
+//    public boolean isRelocateEnabled() {
+//        return true;
+//    }
+    
+    public abstract void relocateInParent(double x, double y);
     
     
 
@@ -142,21 +153,41 @@ public abstract class NotificationBar extends Region {
     @Override protected void layoutChildren() {
         final double w = getWidth();
         final double h = computePrefHeight(-1);
-        pane.resize(w, h);
+        
+        final double notificationBarHeight = prefHeight(w);
+        final double notificationMinHeight = minHeight(w);
+        
+        if (isShowFromTop()) {
+            // place at top of area
+            pane.resize(w, h);
+            
+//            if (isRelocateEnabled()) {
+//                pane.relocate(0, 0 - (1 - transition.get()) * notificationMinHeight);
+//            }
+            relocateInParent(0, 0 - (1 - transition.get()) * notificationMinHeight);
+        } else {
+            // place at bottom of area
+            pane.resize(w, notificationBarHeight);
+            
+//            if (isRelocateEnabled()) {
+//                pane.relocate(0, getContainerHeight() - notificationBarHeight);
+//            }
+            relocateInParent(0, getContainerHeight() - notificationBarHeight);
+        }
     }
 
     @Override protected double computeMinHeight(double width) {
-        return super.computePrefHeight(width);
+        return Math.max(super.computePrefHeight(width), MIN_HEIGHT);
     }
 
     @Override protected double computePrefHeight(double width) {
-        final double minHeight = Math.max(minHeight(width), MIN_HEIGHT);
+        final double minHeight = minHeight(width);
         
-        if (isShowFromTop()) {
-            return minHeight; 
-        } else {
+//        if (isShowFromTop()) {
+//            return minHeight; 
+//        } else {
             return Math.max(pane.prefHeight(width), minHeight) * transition.get();
-        }
+//        }
     }
 
     public void doShow() {

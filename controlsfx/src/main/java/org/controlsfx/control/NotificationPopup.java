@@ -39,6 +39,8 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -47,10 +49,12 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.PopupWindow.AnchorLocation;
 import javafx.util.Duration;
 
 import org.controlsfx.control.action.Action;
@@ -61,6 +65,10 @@ public class NotificationPopup {
     private static final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
     private static final double padding = 15;
     private static final Duration FADE_OUT_DURATION = Duration.seconds(5);
+    
+    private static final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+    private static final double screenWidth = screenBounds.getWidth();
+    private static final double screenHeight = screenBounds.getHeight();
     
     private Scene ownerScene;
     
@@ -80,6 +88,10 @@ public class NotificationPopup {
         
         
         final Popup popup = new Popup();
+//        popup.getScene().getRoot().setStyle("-fx-background-color: yellow");
+        
+//        final Pane pane = new Pane();
+//        pane.setStyle("-fx-background-color: yellow");
         
         final NotificationBar notificationBar = new NotificationBar() {
             @Override public String getText() {
@@ -114,13 +126,36 @@ public class NotificationPopup {
                 isShowing = false;
                 doHide();
             }
+            
+            @Override
+            public double getContainerHeight() {
+                return screenHeight;
+            }
+            
+            @Override
+            public void relocateInParent(double x, double y) {
+//                popup.setAnchorX(x);
+//                popup.setAnchorY(y);
+                
+                final double t = transition.get();
+                
+                final double height = getBoundsInParent().getHeight();
+                
+//                popup.setHeight(height * t);
+//                popup.setAnchorY(screenHeight - height - padding);
+                
+//                if (! isShowFromTop()) {
+//                    setTranslateY(height - height * t);
+//                }
+//                
+//                if (t == 1.0) {
+//                    setTranslateY(0);
+//                }
+            }
         };
         
         // determine location for the popup
         double anchorX = 0, anchorY = 0;
-        final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        final double screenWidth = screenBounds.getWidth();
-        final double screenHeight = screenBounds.getHeight();
         final double barWidth = notificationBar.getWidth();
         final double barHeight = notificationBar.getHeight();
         
@@ -144,6 +179,18 @@ public class NotificationPopup {
                 anchorY = screenHeight - barHeight - padding;
                 break;
         }
+        
+//        notificationBar.transition.addListener(new InvalidationListener() {
+//            @Override public void invalidated(Observable o) {
+//                double t = notificationBar.transition.get();
+//                
+//                if (! isShowFromTop(p)) {
+//                    System.out.println(screenHeight - notificationBar.getHeight() * t);
+////                    popup.setY(screenHeight - notificationBar.minHeight(-1) * t);
+//                    notificationBar.relocate(0, screenHeight - notificationBar.getHeight() * t);
+//                }
+//            }
+//        });
         
         popup.getContent().add(notificationBar);
         popup.show(owner, anchorX, anchorY);
@@ -179,7 +226,7 @@ public class NotificationPopup {
             popups = popupsMap.get(p);
         }
         
-        final double newPopupHeight = popup.getHeight();
+        final double newPopupHeight = popup.getContent().get(0).getBoundsInParent().getHeight();
         
         // animate all other popups in the list upwards so that the new one
         // is in the 'new' area
@@ -188,11 +235,13 @@ public class NotificationPopup {
             final double oldAnchorY = oldPopup.getAnchorY();
             Transition t = new Transition() {
                 {
-                    setCycleDuration(Duration.millis(200));
+                    setCycleDuration(Duration.millis(350));
                 }
                 
                 @Override protected void interpolate(double frac) {
-                    double newAnchorY = oldAnchorY + (isShowFromTop(p) ? newPopupHeight : -newPopupHeight) * frac;
+                    final boolean isShowFromTop = isShowFromTop(p);
+                    
+                    double newAnchorY = oldAnchorY + (isShowFromTop ? 1 : -1) * (newPopupHeight + padding) * frac;
                     oldPopup.setAnchorY(newAnchorY);
                 }
             };

@@ -74,6 +74,14 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             @Override public void hide() {
                 control.hide();
             }
+            
+            @Override public double getContainerHeight() {
+                return control.getHeight();
+            }
+            
+            @Override public void relocateInParent(double x, double y) {
+                notificationBar.relocate(x, y);
+            }
         };
         
         updateContent();
@@ -123,14 +131,21 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         final double notificationBarHeight = notificationBar.prefHeight(w);
+        final double notificationMinHeight = notificationBar.minHeight(w);
         
-        if (getSkinnable().isShowFromTop()) {
-            // place at top of area
-            notificationBar.resizeRelocate(x, y - (1 - notificationBar.transition.get()) * notificationBarHeight, w, notificationBarHeight);
-        } else {
-            // place at bottom of area
-            notificationBar.resizeRelocate(x, h - notificationBarHeight, w, notificationBarHeight);
-        }
+        notificationBar.resize(w, notificationBarHeight);
+        
+//        if (getSkinnable().isShowFromTop()) {
+//            // place at top of area
+////            notificationBar.resizeRelocate(x, y - (1 - notificationBar.transition.get()) * notificationMinHeight, w, notificationBarHeight);
+//            notificationBar.relocate(x, y - (1 - notificationBar.transition.get()) * notificationMinHeight);
+//        } else {
+//            // place at bottom of area
+////            notificationBar.resizeRelocate(x, h - notificationBarHeight, w, notificationBarHeight);
+//            notificationBar.relocate(x, h - notificationBarHeight);
+//        }
+        
+//        notificationBar.layoutChildren();
         
         // layout the content
         if (content != null) {

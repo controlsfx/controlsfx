@@ -64,7 +64,6 @@ public class NotificationPopup {
     
     private static final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
     private static final double padding = 15;
-    private static final Duration FADE_OUT_DURATION = Duration.seconds(5);
     
     private static final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
     private static final double screenWidth = screenBounds.getWidth();
@@ -95,6 +94,10 @@ public class NotificationPopup {
 //        pane.setStyle("-fx-background-color: yellow");
         
         final NotificationBar notificationBar = new NotificationBar() {
+            @Override public String getTitle() {
+                return notification.getTitle();
+            }
+            
             @Override public String getText() {
                 return notification.getText();
             }
@@ -126,6 +129,10 @@ public class NotificationPopup {
             @Override public void hide() {
                 isShowing = false;
                 doHide();
+            }
+            
+            @Override public boolean isHideCloseButton() {
+                return notification.isHideCloseButton();
             }
             
             @Override public double getContainerHeight() {
@@ -185,7 +192,7 @@ public class NotificationPopup {
         KeyFrame kfEnd = new KeyFrame(Duration.millis(500), fadeOutEnd);
 
         Timeline timeline = new Timeline(kfBegin, kfEnd);
-        timeline.setDelay(FADE_OUT_DURATION);
+        timeline.setDelay(notification.getFadeOutDuration());
         timeline.setOnFinished(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 popup.hide();
@@ -255,16 +262,27 @@ public class NotificationPopup {
     
     
     public static class Notification {
+        private final String title;
         private final String text;
         private final Node graphic;
         private final ObservableList<Action> actions;
         private final Pos position;
+        private final Duration fadeOutDuration;
+        private final boolean hideCloseButton;
         
-        private Notification(String text, Node graphic, Pos position, ObservableList<Action> actions) {
+        private Notification(String title, String text, Node graphic, Pos position,
+                Duration fadeOutDuration, boolean hideCloseButton, ObservableList<Action> actions) {
+            this.title = title;
             this.text = text;
             this.graphic = graphic;
             this.position = position == null ? Pos.BOTTOM_RIGHT : position;
+            this.fadeOutDuration = fadeOutDuration == null ? Duration.seconds(5) : fadeOutDuration;
+            this.hideCloseButton = hideCloseButton;
             this.actions = actions == null ? FXCollections.observableArrayList() : actions;
+        }
+        
+        public String getTitle() {
+            return title;
         }
         
         public String getText() {
@@ -282,13 +300,24 @@ public class NotificationPopup {
         public Pos getPosition() {
             return position;
         }
+        
+        public Duration getFadeOutDuration() {
+            return fadeOutDuration;
+        }
+        
+        public boolean isHideCloseButton() {
+            return hideCloseButton;
+        }
     }
     
     public static class Notifications {
+        private String title;
         private String text;
         private Node graphic;
         private ObservableList<Action> actions;
         private Pos position;
+        private Duration fadeOutDuration;
+        private boolean hideCloseButton;
         
         private Notifications() {
             // no-op
@@ -303,6 +332,11 @@ public class NotificationPopup {
             return this;
         }
         
+        public Notifications title(String title) {
+            this.title = title;
+            return this;
+        }
+        
         public Notifications graphic(Node graphic) {
             this.graphic = graphic;
             return this;
@@ -313,6 +347,16 @@ public class NotificationPopup {
             return this;
         }
         
+        public Notifications fadeAfter(Duration duration) {
+            this.fadeOutDuration = duration;
+            return this;
+        }
+        
+        public Notifications hideCloseButton() {
+            this.hideCloseButton = true;
+            return this;
+        }
+        
         public Notifications action(Action... actions) {
             this.actions = actions == null ? FXCollections.<Action>observableArrayList() :
                                              FXCollections.observableArrayList(actions);
@@ -320,7 +364,7 @@ public class NotificationPopup {
         }
         
         public Notification build() {
-            return new Notification(text, graphic, position, actions);
+            return new Notification(title, text, graphic, position, fadeOutDuration, hideCloseButton, actions);
         }
     }
 }

@@ -41,6 +41,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -60,8 +61,9 @@ public abstract class NotificationBar extends Region {
     private static final double MIN_HEIGHT = 40;
 
     final Label label;
+    Label title;
     ButtonBar actionsBar;
-    final Button closeBtn;
+    Button closeBtn;
 
     private final GridPane pane;
     
@@ -76,12 +78,21 @@ public abstract class NotificationBar extends Region {
         layoutChildren();
     }
     
+    public String getTitle() {
+        return "";
+    }
+    
+    public boolean isHideCloseButton() {
+        return false;
+    }
+    
     public abstract String getText();
     public abstract Node getGraphic();
     public abstract ObservableList<Action> getActions();
     public abstract void hide();
     public abstract boolean isShowing();
     public abstract boolean isShowFromTop();
+    
     public abstract double getContainerHeight();
     public abstract void relocateInParent(double x, double y);
     
@@ -93,6 +104,18 @@ public abstract class NotificationBar extends Region {
         pane.setAlignment(Pos.BASELINE_LEFT);
         pane.setVisible(isShowing());
         getChildren().setAll(pane);
+        
+        // initialise title area, if one is set
+        String titleStr = getTitle();
+        if (titleStr != null && ! titleStr.isEmpty()) {
+            title = new Label();
+            title.getStyleClass().add("title");
+            title.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            GridPane.setHgrow(title, Priority.ALWAYS);
+
+            title.setText(titleStr);
+            title.opacityProperty().bind(transition);
+        }
         
         // initialise label area
         label = new Label();
@@ -112,20 +135,23 @@ public abstract class NotificationBar extends Region {
         });
 
         // initialise close button area
-        closeBtn = new Button();
-        closeBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent arg0) {
-                hide();
-            }
-        });
-        closeBtn.getStyleClass().setAll("close-button");
-        StackPane graphic = new StackPane();
-        graphic.getStyleClass().setAll("graphic");
-        closeBtn.setGraphic(graphic);
-        closeBtn.setMinSize(17, 17);
-        closeBtn.setPrefSize(17, 17);
-        closeBtn.opacityProperty().bind(transition);
-        GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
+        if (! isHideCloseButton()) {
+            closeBtn = new Button();
+            closeBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent arg0) {
+                    hide();
+                }
+            });
+            closeBtn.getStyleClass().setAll("close-button");
+            StackPane graphic = new StackPane();
+            graphic.getStyleClass().setAll("graphic");
+            closeBtn.setGraphic(graphic);
+            closeBtn.setMinSize(17, 17);
+            closeBtn.setPrefSize(17, 17);
+            closeBtn.opacityProperty().bind(transition);
+            GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
+            GridPane.setValignment(closeBtn, VPos.TOP);
+        }
 
         // put it all together
         updatePane();
@@ -136,9 +162,19 @@ public abstract class NotificationBar extends Region {
         actionsBar.opacityProperty().bind(transition);
         GridPane.setHgrow(actionsBar, Priority.SOMETIMES);
         pane.getChildren().clear();
-        pane.add(label, 0, 0);
-        pane.add(actionsBar, 1, 0);
-        pane.add(closeBtn, 2, 0);
+        
+        int row = 0;
+        
+        if (title != null) {
+            pane.add(title, 0, row++);
+        }
+        
+        pane.add(label, 0, row);
+        pane.add(actionsBar, 1, row);
+        
+        if (closeBtn != null) {
+            pane.add(closeBtn, 2, 0, 1, row+1);
+        }
     }
 
     @Override protected void layoutChildren() {

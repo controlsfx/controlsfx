@@ -1,6 +1,6 @@
 .notification-bar {
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
-    -fx-padding: 0 7 0 7;
+    -fx-padding: 7 7 7 7;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 0, 3);
 }
 
@@ -8,9 +8,16 @@
     -fx-background-insets: 0, 1, 2;
 }
 
+.notification-bar .title {
+    -fx-font-size: 1.166667em; /*15px;*/
+    -fx-text-fill: #292929;
+    -fx-font-weight: bold;
+}
+
 .notification-bar .label {
     -fx-font-size: 1.166667em; /*15px;*/
     -fx-text-fill: #292929;
+    -fx-alignment: top-left;
 }
 
 

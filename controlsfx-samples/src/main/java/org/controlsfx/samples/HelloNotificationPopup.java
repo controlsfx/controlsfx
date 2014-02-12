@@ -26,27 +26,56 @@
  */
 package org.controlsfx.samples;
 
+import java.util.Random;
+
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionModel;
+import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.Duration;
 
 import org.controlsfx.ControlsFXSample;
+import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 import org.controlsfx.control.NotificationPopup;
 import org.controlsfx.control.NotificationPopup.Notification;
 import org.controlsfx.control.NotificationPopup.Notifications;
+import org.controlsfx.control.cell.ColorGridCell;
 
 
 public class HelloNotificationPopup extends ControlsFXSample {
     
-    private Stage stage;
+    private static final Image SMALL_GRAPHIC = 
+            new Image(HelloNotificationPane.class.getResource("notification-pane-warning.png").toExternalForm());
     
+    private Stage stage;
     private NotificationPopup notifier;
     
     private int count = 0;
+    
+    private CheckBox showTitleChkBox;
+    private CheckBox showCloseButtonChkBox;
+    private Slider fadeDelaySlider;
+    protected String graphicMode = "";
     
     public static void main(String[] args) {
         launch(args);
@@ -110,8 +139,107 @@ public class HelloNotificationPopup extends ControlsFXSample {
                 + "show popup warnings outside your application.";
     }
     
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        int row = 0;
+        
+        // --- show title
+        Label showTitleLabel = new Label("Show Title: ");
+        showTitleLabel.getStyleClass().add("property");
+        grid.add(showTitleLabel, 0, row);
+        showTitleChkBox = new CheckBox();
+        showTitleChkBox.setSelected(true);
+        grid.add(showTitleChkBox, 1, row++);
+        
+        // --- show close button
+        Label showCloseButtonLabel = new Label("Show Close Button: ");
+        showCloseButtonLabel.getStyleClass().add("property");
+        grid.add(showCloseButtonLabel, 0, row);
+        showCloseButtonChkBox = new CheckBox();
+        showCloseButtonChkBox.setSelected(true);
+        grid.add(showCloseButtonChkBox, 1, row++);
+        
+        // --- graphic
+        Label graphicLabel = new Label("Graphic Options: ");
+        graphicLabel.getStyleClass().add("property");
+        grid.add(graphicLabel, 0, row);
+        final ChoiceBox<String> graphicOptions = new ChoiceBox<>(
+                FXCollections.observableArrayList("No graphic", "Small graphic", "Total-replacement graphic"));
+        graphicOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(graphicOptions, Priority.ALWAYS);
+        final SelectionModel<String> sm = graphicOptions.getSelectionModel();
+        sm.selectedItemProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {
+                graphicMode = sm.getSelectedItem();
+            }
+        });
+        sm.select(1);
+        grid.add(graphicOptions, 1, row++);
+        
+        // --- fade duration
+        Label fadeDurationLabel = new Label("Fade delay (seconds): ");
+        fadeDurationLabel.getStyleClass().add("property");
+        grid.add(fadeDurationLabel, 0, row);
+        fadeDelaySlider = new Slider(1, 20, 5);
+        fadeDelaySlider.setShowTickMarks(true);
+        fadeDelaySlider.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(fadeDelaySlider, Priority.ALWAYS);
+        grid.add(fadeDelaySlider, 1, row++);
+        
+        
+        return grid;
+    }
+    
     private void notification(Pos pos) {
-        Notification n = Notifications.create().text("Hello World " + (count++) + "!").position(pos).build();
-        notifier.show(stage, n);
+        String text = "Hello World " + (count++) + "!";
+        
+        Node graphic = null;
+        switch (graphicMode) {
+            default:
+            case "No graphic": 
+                break;
+            case "Small graphic":
+                graphic = new ImageView(SMALL_GRAPHIC);
+                break;
+            case "Total-replacement graphic": 
+                text = null;
+                graphic = buildTotalReplacementGraphic();
+                break;
+        }
+        
+        Notifications notificationBuilder = Notifications.create()
+                .title(showTitleChkBox.isSelected() ? "Title Text" : "")
+                .text(text)
+                .graphic(graphic)
+                .fadeAfter(Duration.seconds(fadeDelaySlider.getValue()))
+                .position(pos);
+        
+        if (! showCloseButtonChkBox.isSelected()) {
+            notificationBuilder.hideCloseButton();
+        }
+        
+        Notification actualNotification = notificationBuilder.build();
+        notifier.show(stage, actualNotification);
+    }
+    
+    private Node buildTotalReplacementGraphic() {
+        final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
+
+        GridView<Color> colorGrid = new GridView<>(list);
+
+        colorGrid.setCellFactory(new Callback<GridView<Color>, GridCell<Color>>() {
+            @Override public GridCell<Color> call(GridView<Color> arg0) {
+                return new ColorGridCell();
+            }
+        });
+        Random r = new Random(System.currentTimeMillis());
+        for(int i = 0; i < 500; i++) {
+            list.add(new Color(r.nextDouble(), r.nextDouble(), r.nextDouble(), 1.0));
+        }
+        return colorGrid;
     }
 }

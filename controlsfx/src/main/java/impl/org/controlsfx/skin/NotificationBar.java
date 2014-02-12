@@ -83,15 +83,6 @@ public abstract class NotificationBar extends Region {
     public abstract boolean isShowing();
     public abstract boolean isShowFromTop();
     public abstract double getContainerHeight();
-    
-//    /**
-//     * May be false if relocation is handled by the consumer of this API,
-//     * but by default this is true.
-//     */
-//    public boolean isRelocateEnabled() {
-//        return true;
-//    }
-    
     public abstract void relocateInParent(double x, double y);
     
     
@@ -160,18 +151,10 @@ public abstract class NotificationBar extends Region {
         if (isShowFromTop()) {
             // place at top of area
             pane.resize(w, h);
-            
-//            if (isRelocateEnabled()) {
-//                pane.relocate(0, 0 - (1 - transition.get()) * notificationMinHeight);
-//            }
             relocateInParent(0, 0 - (1 - transition.get()) * notificationMinHeight);
         } else {
             // place at bottom of area
             pane.resize(w, notificationBarHeight);
-            
-//            if (isRelocateEnabled()) {
-//                pane.relocate(0, getContainerHeight() - notificationBarHeight);
-//            }
             relocateInParent(0, getContainerHeight() - notificationBarHeight);
         }
     }
@@ -181,13 +164,7 @@ public abstract class NotificationBar extends Region {
     }
 
     @Override protected double computePrefHeight(double width) {
-        final double minHeight = minHeight(width);
-        
-//        if (isShowFromTop()) {
-//            return minHeight; 
-//        } else {
-            return Math.max(pane.prefHeight(width), minHeight) * transition.get();
-//        }
+        return Math.max(pane.prefHeight(width), minHeight(width)) * transition.get();
     }
 
     public void doShow() {

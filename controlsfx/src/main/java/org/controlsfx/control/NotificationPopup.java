@@ -88,6 +88,7 @@ public class NotificationPopup {
         
         
         final Popup popup = new Popup();
+        popup.setAutoFix(false);
 //        popup.getScene().getRoot().setStyle("-fx-background-color: yellow");
         
 //        final Pane pane = new Pane();
@@ -127,37 +128,25 @@ public class NotificationPopup {
                 doHide();
             }
             
-            @Override
-            public double getContainerHeight() {
+            @Override public double getContainerHeight() {
                 return screenHeight;
             }
             
-            @Override
-            public void relocateInParent(double x, double y) {
-//                popup.setAnchorX(x);
-//                popup.setAnchorY(y);
-                
-                final double t = transition.get();
-                
-                final double height = getBoundsInParent().getHeight();
-                
-//                popup.setHeight(height * t);
-//                popup.setAnchorY(screenHeight - height - padding);
-                
-//                if (! isShowFromTop()) {
-//                    setTranslateY(height - height * t);
-//                }
-//                
-//                if (t == 1.0) {
-//                    setTranslateY(0);
-//                }
+            @Override public void relocateInParent(double x, double y) {
+                // this allows for us to slide the notification upwards
+                if (! isShowFromTop()) {
+                    popup.setAnchorY(y - padding);
+                }
             }
         };
+        
+        popup.getContent().add(notificationBar);
+        popup.show(owner, 0, 0);
         
         // determine location for the popup
         double anchorX = 0, anchorY = 0;
         final double barWidth = notificationBar.getWidth();
-        final double barHeight = notificationBar.getHeight();
+        final double barHeight = notificationBar.prefHeight(-1);
         
         Pos p = notification.getPosition();
         switch (p) {
@@ -180,20 +169,9 @@ public class NotificationPopup {
                 break;
         }
         
-//        notificationBar.transition.addListener(new InvalidationListener() {
-//            @Override public void invalidated(Observable o) {
-//                double t = notificationBar.transition.get();
-//                
-//                if (! isShowFromTop(p)) {
-//                    System.out.println(screenHeight - notificationBar.getHeight() * t);
-////                    popup.setY(screenHeight - notificationBar.minHeight(-1) * t);
-//                    notificationBar.relocate(0, screenHeight - notificationBar.getHeight() * t);
-//                }
-//            }
-//        });
+        popup.setAnchorX(anchorX);
+        popup.setAnchorY(anchorY);
         
-        popup.getContent().add(notificationBar);
-        popup.show(owner, anchorX, anchorY);
         isShowing = true;
         notificationBar.doShow();
         
@@ -241,7 +219,7 @@ public class NotificationPopup {
                 @Override protected void interpolate(double frac) {
                     final boolean isShowFromTop = isShowFromTop(p);
                     
-                    double newAnchorY = oldAnchorY + (isShowFromTop ? 1 : -1) * (newPopupHeight + padding) * frac;
+                    double newAnchorY = oldAnchorY + (isShowFromTop ? 1 : -1) * newPopupHeight * frac;
                     oldPopup.setAnchorY(newAnchorY);
                 }
             };

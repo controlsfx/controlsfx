@@ -131,21 +131,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         final double notificationBarHeight = notificationBar.prefHeight(w);
-        final double notificationMinHeight = notificationBar.minHeight(w);
         
         notificationBar.resize(w, notificationBarHeight);
-        
-//        if (getSkinnable().isShowFromTop()) {
-//            // place at top of area
-////            notificationBar.resizeRelocate(x, y - (1 - notificationBar.transition.get()) * notificationMinHeight, w, notificationBarHeight);
-//            notificationBar.relocate(x, y - (1 - notificationBar.transition.get()) * notificationMinHeight);
-//        } else {
-//            // place at bottom of area
-////            notificationBar.resizeRelocate(x, h - notificationBarHeight, w, notificationBarHeight);
-//            notificationBar.relocate(x, h - notificationBarHeight);
-//        }
-        
-//        notificationBar.layoutChildren();
         
         // layout the content
         if (content != null) {

@@ -40,13 +40,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -58,20 +56,16 @@ import javafx.util.Duration;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
-import org.controlsfx.control.NotificationPopup;
-import org.controlsfx.control.NotificationPopup.Notification;
-import org.controlsfx.control.NotificationPopup.Notifications;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.cell.ColorGridCell;
 
-
-public class HelloNotificationPopup extends ControlsFXSample {
+public class HelloNotifications extends ControlsFXSample {
     
     private static final Image SMALL_GRAPHIC = 
             new Image(HelloNotificationPane.class.getResource("notification-pane-warning.png").toExternalForm());
     
     private Stage stage;
     private Pane pane;
-    private NotificationPopup notifier;
     
     private int count = 0;
     
@@ -90,12 +84,11 @@ public class HelloNotificationPopup extends ControlsFXSample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationPopup.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/Notifications.html";
     }
     
     @Override public Node getPanel(Stage stage) {
         this.stage = stage;
-        this.notifier = new NotificationPopup();
         
         pane = new Pane() {
             protected void layoutChildren() {
@@ -213,7 +206,7 @@ public class HelloNotificationPopup extends ControlsFXSample {
     }
 
     @Override public String getSampleDescription() {
-        return "Unlike the NotificationPane, the NotificationPopup is designed to"
+        return "Unlike the NotificationPane, the Notifications class is designed to"
                 + "show popup warnings outside your application.";
     }
     
@@ -316,8 +309,7 @@ public class HelloNotificationPopup extends ControlsFXSample {
             notificationBuilder.darkStyle();
         }
         
-        Notification actualNotification = notificationBuilder.build();
-        notifier.show(actualNotification);
+        notificationBuilder.show();
     }
     
     private Node buildTotalReplacementGraphic() {

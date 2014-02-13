@@ -28,7 +28,6 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.NotificationBar;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,7 +39,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -55,17 +53,26 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import org.controlsfx.control.Notifications.Notification;
 import org.controlsfx.control.action.Action;
 
 
-public class NotificationPopup {
+final class NotificationPopupHandler {
     
-    private static final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
-    private static final double padding = 15;
+    private static final NotificationPopupHandler INSTANCE = new NotificationPopupHandler();
     
     private static final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
     private static final double screenWidth = screenBounds.getWidth();
     private static final double screenHeight = screenBounds.getHeight();
+    
+    static final NotificationPopupHandler getInstance() {
+        return INSTANCE;
+    }
+    
+    private final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
+    private final double padding = 15;
+    
+    
     
     private Scene ownerScene;
     
@@ -129,7 +136,7 @@ public class NotificationPopup {
             }
 
             @Override public boolean isShowFromTop() {
-                return NotificationPopup.this.isShowFromTop(notification.getPosition());
+                return NotificationPopupHandler.this.isShowFromTop(notification.getPosition());
             }
             
             @Override public void hide() {
@@ -243,7 +250,7 @@ public class NotificationPopup {
     
     private void hide(Popup popup, Pos p) {
         popup.hide();
-        removePopupFromMap(p, NotificationPopup.this);
+        removePopupFromMap(p, NotificationPopupHandler.this);
     }
     
     private Timeline createHideTimeline(Popup popup, NotificationBar bar, Pos p, Duration startDelay) {
@@ -302,7 +309,7 @@ public class NotificationPopup {
         popups.add(popup);
     }
     
-    private void removePopupFromMap(Pos p, NotificationPopup popup) {
+    private void removePopupFromMap(Pos p, NotificationPopupHandler popup) {
         if (popupsMap.containsKey(p)) {
             List<Popup> popups = popupsMap.get(p);
             popups.remove(popup);
@@ -317,147 +324,6 @@ public class NotificationPopup {
                 return true;
             default: 
                 return false;
-        }
-    }
-    
-    
-    
-    
-    public static final class Notification {
-        private final String title;
-        private final String text;
-        private final Node graphic;
-        private final ObservableList<Action> actions;
-        private final Pos position;
-        private final Duration hideAfterDuration;
-        private final boolean hideCloseButton;
-        private final List<String> styleClass;
-        private final EventHandler<ActionEvent> onAction;
-        
-        private Notification(String title, String text, Node graphic, Pos position,
-                Duration hideAfterDuration, boolean hideCloseButton, EventHandler<ActionEvent> onAction,
-                ObservableList<Action> actions, List<String> styleClass) {
-            this.title = title;
-            this.text = text;
-            this.graphic = graphic;
-            this.position = position == null ? Pos.BOTTOM_RIGHT : position;
-            this.hideAfterDuration = hideAfterDuration == null ? Duration.seconds(5) : hideAfterDuration;
-            this.hideCloseButton = hideCloseButton;
-            this.onAction = onAction;
-            this.actions = actions == null ? FXCollections.observableArrayList() : actions;
-            this.styleClass = styleClass;
-        }
-        
-        public final String getTitle() {
-            return title;
-        }
-        
-        public final String getText() {
-            return text;
-        }
-        
-        public final Node getGraphic() {
-            return graphic;
-        }
-        
-        public final ObservableList<Action> getActions() {
-            return actions;
-        }
-        
-        public final Pos getPosition() {
-            return position;
-        }
-        
-        public final Duration getHideAfterDuration() {
-            return hideAfterDuration;
-        }
-        
-        public final boolean isHideCloseButton() {
-            return hideCloseButton;
-        }
-        
-        public final List<String> getStyleClass() {
-            return styleClass;
-        }
-        
-        public final EventHandler<ActionEvent> getOnAction() {
-            return onAction;
-        }
-    }
-    
-    public static class Notifications {
-        
-        private static final String STYLE_CLASS_DARK = "dark";
-        
-        private String title;
-        private String text;
-        private Node graphic;
-        private ObservableList<Action> actions;
-        private Pos position;
-        private Duration hideAfterDuration;
-        private boolean hideCloseButton;
-        private EventHandler<ActionEvent> onAction;
-        
-        private List<String> styleClass = new ArrayList<>();
-        
-        private Notifications() {
-            // no-op
-        }
-        
-        public static Notifications create() {
-            return new Notifications();
-        }
-        
-        public Notifications text(String text) {
-            this.text = text;
-            return this;
-        }
-        
-        public Notifications title(String title) {
-            this.title = title;
-            return this;
-        }
-        
-        public Notifications graphic(Node graphic) {
-            this.graphic = graphic;
-            return this;
-        }
-        
-        public Notifications position(Pos position) {
-            this.position = position;
-            return this;
-        }
-        
-        public Notifications hideAfter(Duration duration) {
-            this.hideAfterDuration = duration;
-            return this;
-        }
-        
-        public Notifications onAction(EventHandler<ActionEvent> onAction) {
-            this.onAction = onAction;
-            return this;
-        }
-        
-        public Notifications darkStyle() {
-            styleClass.add(STYLE_CLASS_DARK);
-            return this;
-        }
-        
-        public Notifications hideCloseButton() {
-            this.hideCloseButton = true;
-            return this;
-        }
-        
-        public Notifications action(Action... actions) {
-            this.actions = actions == null ? FXCollections.<Action>observableArrayList() :
-                                             FXCollections.observableArrayList(actions);
-            return this;
-        }
-        
-        public Notification build() {
-            return new Notification(title, text, graphic, position, 
-                                    hideAfterDuration, hideCloseButton, onAction, 
-                                    actions, styleClass);
         }
     }
 }

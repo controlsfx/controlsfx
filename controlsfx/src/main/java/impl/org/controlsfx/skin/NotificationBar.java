@@ -99,8 +99,10 @@ public abstract class NotificationBar extends Region {
     
 
     public NotificationBar() {
+        getStyleClass().add("notification-bar");
+        
         pane = new GridPane();
-        pane.getStyleClass().add("notification-bar");
+        pane.getStyleClass().add("pane");
         pane.setAlignment(Pos.BASELINE_LEFT);
         pane.setVisible(isShowing());
         getChildren().setAll(pane);

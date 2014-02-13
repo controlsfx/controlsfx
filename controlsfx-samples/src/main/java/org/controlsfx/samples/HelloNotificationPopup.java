@@ -40,6 +40,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Slider;
@@ -47,6 +48,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -68,12 +70,14 @@ public class HelloNotificationPopup extends ControlsFXSample {
             new Image(HelloNotificationPane.class.getResource("notification-pane-warning.png").toExternalForm());
     
     private Stage stage;
+    private Pane pane;
     private NotificationPopup notifier;
     
     private int count = 0;
     
     private CheckBox showTitleChkBox;
     private CheckBox showCloseButtonChkBox;
+    private CheckBox darkStyleChkBox;
     private Slider fadeDelaySlider;
     protected String graphicMode = "";
     
@@ -93,14 +97,33 @@ public class HelloNotificationPopup extends ControlsFXSample {
         this.stage = stage;
         this.notifier = new NotificationPopup();
         
+        pane = new Pane() {
+            protected void layoutChildren() {
+                super.layoutChildren();
+                updatePane();
+            }
+        };
+        createPaneChildren();
+        updatePane();
+        pane.setPadding(new Insets(10));
+        
+        return pane;
+    }
+    
+    private void createPaneChildren() {
         Button topLeftBtn = new Button("Top-left\nnotification");
         topLeftBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 notification(Pos.TOP_LEFT);
             }
         });
-        AnchorPane.setTopAnchor(topLeftBtn, 0.0);
-        AnchorPane.setLeftAnchor(topLeftBtn, 0.0);
+        
+        Button topCenterBtn = new Button("Top-center\nnotification");
+        topCenterBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.TOP_CENTER);
+            }
+        });
         
         Button topRightBtn = new Button("Top-right\nnotification");
         topRightBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -108,8 +131,27 @@ public class HelloNotificationPopup extends ControlsFXSample {
                 notification(Pos.TOP_RIGHT);
             }
         });
-        AnchorPane.setTopAnchor(topRightBtn, 0.0);
-        AnchorPane.setRightAnchor(topRightBtn, 0.0);
+        
+        Button centerLeftBtn = new Button("Center-left\nNotification");
+        centerLeftBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.CENTER_LEFT);
+            }
+        });
+        
+        Button centerBtn = new Button("Center\nnotification");
+        centerBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.CENTER);
+            }
+        });
+        
+        Button centerRightBtn = new Button("Center-right\nNotification");
+        centerRightBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.CENTER_RIGHT);
+            }
+        });
         
         Button bottomLeftBtn = new Button("Bottom-left\nNotification");
         bottomLeftBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -117,8 +159,13 @@ public class HelloNotificationPopup extends ControlsFXSample {
                 notification(Pos.BOTTOM_LEFT);
             }
         });
-        AnchorPane.setBottomAnchor(bottomLeftBtn, 0.0);
-        AnchorPane.setLeftAnchor(bottomLeftBtn, 0.0);
+        
+        Button bottomCenterBtn = new Button("Bottom-center\nnotification");
+        bottomCenterBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                notification(Pos.BOTTOM_CENTER);
+            }
+        });
         
         Button bottomRightBtn = new Button("Bottom-right\nNotification");
         bottomRightBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -126,14 +173,45 @@ public class HelloNotificationPopup extends ControlsFXSample {
                 notification(Pos.BOTTOM_RIGHT);
             }
         });
-        AnchorPane.setBottomAnchor(bottomRightBtn, 0.0);
-        AnchorPane.setRightAnchor(bottomRightBtn, 0.0);
         
-        AnchorPane pane = new AnchorPane(topLeftBtn, topRightBtn, bottomLeftBtn, bottomRightBtn);
-        
-        return pane;
+        pane.getChildren().addAll(topLeftBtn,    topCenterBtn,    topRightBtn,
+                                  centerLeftBtn, centerBtn,       centerRightBtn,
+                                  bottomLeftBtn, bottomCenterBtn, bottomRightBtn);
     }
     
+    private void updatePane() {
+        final double paneWidth = pane.getWidth();
+        final double paneHeight = pane.getHeight();
+        
+        final double halfWidth = paneWidth / 2.0;
+        final double halfHeight = paneHeight / 2.0;
+        
+        int row = 0;
+        int col = 0;
+        
+        for (Node node : pane.getChildren()) {
+            final double nodeWidth = node.prefWidth(-1);
+            final double nodeHeight = node.prefHeight(-1);
+            
+            double layoutX = col == 0 ? 0 : 
+                             col == 1 ? halfWidth - nodeWidth / 2.0 :
+                           /*col == 2*/ paneWidth - nodeWidth;
+            
+            double layoutY = row == 0 ? 0 : 
+                             row == 1 ? halfHeight - nodeHeight / 2.0 :
+                           /*row == 2*/ paneHeight - nodeHeight;
+            
+            node.setLayoutX(layoutX);
+            node.setLayoutY(layoutY);
+            
+            col++;
+            if (col == 3) {
+                row++;
+                col = 0;
+            }
+        }
+    }
+
     @Override public String getSampleDescription() {
         return "Unlike the NotificationPane, the NotificationPopup is designed to"
                 + "show popup warnings outside your application.";
@@ -162,6 +240,13 @@ public class HelloNotificationPopup extends ControlsFXSample {
         showCloseButtonChkBox = new CheckBox();
         showCloseButtonChkBox.setSelected(true);
         grid.add(showCloseButtonChkBox, 1, row++);
+        
+        // --- dark style
+        Label darkStyleLabel = new Label("Use Dark Style: ");
+        darkStyleLabel.getStyleClass().add("property");
+        grid.add(darkStyleLabel, 0, row);
+        darkStyleChkBox = new CheckBox();
+        grid.add(darkStyleChkBox, 1, row++);
         
         // --- graphic
         Label graphicLabel = new Label("Graphic Options: ");
@@ -215,11 +300,15 @@ public class HelloNotificationPopup extends ControlsFXSample {
                 .title(showTitleChkBox.isSelected() ? "Title Text" : "")
                 .text(text)
                 .graphic(graphic)
-                .fadeAfter(Duration.seconds(fadeDelaySlider.getValue()))
+                .hideAfter(Duration.seconds(fadeDelaySlider.getValue()))
                 .position(pos);
         
         if (! showCloseButtonChkBox.isSelected()) {
             notificationBuilder.hideCloseButton();
+        }
+        
+        if (darkStyleChkBox.isSelected()) {
+            notificationBuilder.darkStyle();
         }
         
         Notification actualNotification = notificationBuilder.build();
@@ -230,6 +319,8 @@ public class HelloNotificationPopup extends ControlsFXSample {
         final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
 
         GridView<Color> colorGrid = new GridView<>(list);
+        colorGrid.setPrefSize(300, 300);
+        colorGrid.setMaxSize(300, 300);
 
         colorGrid.setCellFactory(new Callback<GridView<Color>, GridCell<Color>>() {
             @Override public GridCell<Color> call(GridView<Color> arg0) {

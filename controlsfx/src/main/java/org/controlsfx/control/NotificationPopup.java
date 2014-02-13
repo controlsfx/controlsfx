@@ -28,6 +28,7 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.NotificationBar;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +39,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
-import javafx.animation.TranslateTransition;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -49,12 +47,10 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.PopupWindow.AnchorLocation;
 import javafx.util.Duration;
 
 import org.controlsfx.control.action.Action;
@@ -141,11 +137,20 @@ public class NotificationPopup {
             
             @Override public void relocateInParent(double x, double y) {
                 // this allows for us to slide the notification upwards
-                if (! isShowFromTop()) {
-                    popup.setAnchorY(y - padding);
+                switch (notification.getPosition()) {
+                    case BOTTOM_LEFT:
+                    case BOTTOM_CENTER:
+                    case BOTTOM_RIGHT:
+                        popup.setAnchorY(y - padding);
+                        break;
+                    default: 
+                            //no-op
+                            break;
                 }
             }
         };
+        
+        notificationBar.getStyleClass().addAll(notification.getStyleClass());
         
         popup.getContent().add(notificationBar);
         popup.show(owner, 0, 0);
@@ -153,25 +158,50 @@ public class NotificationPopup {
         // determine location for the popup
         double anchorX = 0, anchorY = 0;
         final double barWidth = notificationBar.getWidth();
-        final double barHeight = notificationBar.prefHeight(-1);
+        final double barHeight = notificationBar.getHeight();
         
         Pos p = notification.getPosition();
+        
+        // get anchorX
         switch (p) {
-            default:
-            case BOTTOM_RIGHT:
-                anchorX = screenWidth - barWidth - padding;
-                anchorY = screenHeight - barHeight - padding;
-                break;
-            case TOP_RIGHT:
-                anchorX = screenWidth - barWidth - padding;
-                anchorY = padding;
-                break;
             case TOP_LEFT:
-                anchorX = padding;
-                anchorY = padding;
-                break;
+            case CENTER_LEFT:
             case BOTTOM_LEFT:
                 anchorX = padding;
+                break;
+                
+            case TOP_CENTER:
+            case CENTER:
+            case BOTTOM_CENTER:
+                anchorX = screenWidth / 2.0 - barWidth / 2.0 - padding / 2.0;
+                break;
+                
+            default:
+            case TOP_RIGHT:
+            case CENTER_RIGHT:
+            case BOTTOM_RIGHT:
+                anchorX = screenWidth - barWidth - padding;
+                break;
+        }
+        
+        // get anchorY
+        switch (p) {
+            case TOP_LEFT:
+            case TOP_CENTER:
+            case TOP_RIGHT:
+                anchorY = padding;
+                break;
+                
+            case CENTER_LEFT:
+            case CENTER:
+            case CENTER_RIGHT:
+                anchorY = screenHeight / 2.0 - barHeight / 2.0 - padding / 2.0;
+                break;
+
+            default:
+            case BOTTOM_LEFT:
+            case BOTTOM_CENTER:
+            case BOTTOM_RIGHT:
                 anchorY = screenHeight - barHeight - padding;
                 break;
         }
@@ -192,7 +222,7 @@ public class NotificationPopup {
         KeyFrame kfEnd = new KeyFrame(Duration.millis(500), fadeOutEnd);
 
         Timeline timeline = new Timeline(kfBegin, kfEnd);
-        timeline.setDelay(notification.getFadeOutDuration());
+        timeline.setDelay(notification.getHideAfterDuration());
         timeline.setOnFinished(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 popup.hide();
@@ -261,63 +291,75 @@ public class NotificationPopup {
     
     
     
-    public static class Notification {
+    public static final class Notification {
         private final String title;
         private final String text;
         private final Node graphic;
         private final ObservableList<Action> actions;
         private final Pos position;
-        private final Duration fadeOutDuration;
+        private final Duration hideAfterDuration;
         private final boolean hideCloseButton;
+        private final List<String> styleClass;
         
         private Notification(String title, String text, Node graphic, Pos position,
-                Duration fadeOutDuration, boolean hideCloseButton, ObservableList<Action> actions) {
+                Duration hideAfterDuration, boolean hideCloseButton, 
+                ObservableList<Action> actions, List<String> styleClass) {
             this.title = title;
             this.text = text;
             this.graphic = graphic;
             this.position = position == null ? Pos.BOTTOM_RIGHT : position;
-            this.fadeOutDuration = fadeOutDuration == null ? Duration.seconds(5) : fadeOutDuration;
+            this.hideAfterDuration = hideAfterDuration == null ? Duration.seconds(5) : hideAfterDuration;
             this.hideCloseButton = hideCloseButton;
             this.actions = actions == null ? FXCollections.observableArrayList() : actions;
+            this.styleClass = styleClass;
         }
         
-        public String getTitle() {
+        public final String getTitle() {
             return title;
         }
         
-        public String getText() {
+        public final String getText() {
             return text;
         }
         
-        public Node getGraphic() {
+        public final Node getGraphic() {
             return graphic;
         }
         
-        public ObservableList<Action> getActions() {
+        public final ObservableList<Action> getActions() {
             return actions;
         }
         
-        public Pos getPosition() {
+        public final Pos getPosition() {
             return position;
         }
         
-        public Duration getFadeOutDuration() {
-            return fadeOutDuration;
+        public final Duration getHideAfterDuration() {
+            return hideAfterDuration;
         }
         
-        public boolean isHideCloseButton() {
+        public final boolean isHideCloseButton() {
             return hideCloseButton;
+        }
+        
+        public final List<String> getStyleClass() {
+            return styleClass;
         }
     }
     
     public static class Notifications {
+        
+        private static final String STYLE_CLASS_DARK = "dark";
+        
         private String title;
         private String text;
         private Node graphic;
         private ObservableList<Action> actions;
         private Pos position;
-        private Duration fadeOutDuration;
+        private Duration hideAfterDuration;
         private boolean hideCloseButton;
+        
+        private List<String> styleClass = new ArrayList<>();
         
         private Notifications() {
             // no-op
@@ -347,8 +389,13 @@ public class NotificationPopup {
             return this;
         }
         
-        public Notifications fadeAfter(Duration duration) {
-            this.fadeOutDuration = duration;
+        public Notifications hideAfter(Duration duration) {
+            this.hideAfterDuration = duration;
+            return this;
+        }
+        
+        public Notifications darkStyle() {
+            styleClass.add(STYLE_CLASS_DARK);
             return this;
         }
         
@@ -364,7 +411,7 @@ public class NotificationPopup {
         }
         
         public Notification build() {
-            return new Notification(title, text, graphic, position, fadeOutDuration, hideCloseButton, actions);
+            return new Notification(title, text, graphic, position, hideAfterDuration, hideCloseButton, actions, styleClass);
         }
     }
 }

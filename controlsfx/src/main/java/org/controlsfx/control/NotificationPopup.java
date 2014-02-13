@@ -30,6 +30,7 @@ import impl.org.controlsfx.skin.NotificationBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -68,26 +70,34 @@ public class NotificationPopup {
     private Scene ownerScene;
     
     private boolean isShowing = false;
+    
+    public void show(Notification notification) {
+        Iterator<Window> windows = Window.impl_getWindows();
+        Window window = null;
+        while (windows.hasNext()) {
+            window = windows.next();
+            
+            if (window instanceof Popup) {
+                continue;
+            }
+            
+            if (window.isFocused()) {
+                break;
+            }
+        }
+        show(window, notification);
+    }
 
-    public void show(Window owner, Notification notification) {
+    private void show(Window owner, Notification notification) {
         // need to install our CSS
         if (owner instanceof Stage) {
             ownerScene = ((Stage)owner).getScene();
-//        } else if (owner instanceof Scene) {
-//            ownerScene = (Scene) owner;
-//        } else if (owner instanceof Node) {
-//            ownerScene = ((Node)owner).getScene();
         }
         
         ownerScene.getStylesheets().add(getClass().getResource("notificationpopup.css").toExternalForm());
         
-        
         final Popup popup = new Popup();
         popup.setAutoFix(false);
-//        popup.getScene().getRoot().setStyle("-fx-background-color: yellow");
-        
-//        final Pane pane = new Pane();
-//        pane.setStyle("-fx-background-color: yellow");
         
         final NotificationBar notificationBar = new NotificationBar() {
             @Override public String getTitle() {
@@ -144,13 +154,27 @@ public class NotificationPopup {
                         popup.setAnchorY(y - padding);
                         break;
                     default: 
-                            //no-op
-                            break;
+                        //no-op
+                        break;
                 }
             }
         };
         
+        final Pos p = notification.getPosition();
+        
         notificationBar.getStyleClass().addAll(notification.getStyleClass());
+        
+        notificationBar.setOnMouseClicked(new EventHandler<Event>() {
+            public void handle(Event e) {
+                if (notification.getOnAction() != null) {
+                    ActionEvent actionEvent = new ActionEvent(notificationBar, notificationBar);
+                    notification.getOnAction().handle(actionEvent);
+                    
+                    // animate out the popup
+                    createHideTimeline(popup, notificationBar, p, Duration.ZERO).play();
+                }
+            }
+        });
         
         popup.getContent().add(notificationBar);
         popup.show(owner, 0, 0);
@@ -159,8 +183,6 @@ public class NotificationPopup {
         double anchorX = 0, anchorY = 0;
         final double barWidth = notificationBar.getWidth();
         final double barHeight = notificationBar.getHeight();
-        
-        Pos p = notification.getPosition();
         
         // get anchorX
         switch (p) {
@@ -215,21 +237,31 @@ public class NotificationPopup {
         addPopupToMap(p, popup);
         
         // begin a timeline to get rid of the popup
-        KeyValue fadeOutBegin = new KeyValue(notificationBar.opacityProperty(), 1.0);
-        KeyValue fadeOutEnd = new KeyValue(notificationBar.opacityProperty(), 0.0);
+        Timeline timeline = createHideTimeline(popup, notificationBar, p, notification.getHideAfterDuration());
+        timeline.play();
+    }
+    
+    private void hide(Popup popup, Pos p) {
+        popup.hide();
+        removePopupFromMap(p, NotificationPopup.this);
+    }
+    
+    private Timeline createHideTimeline(Popup popup, NotificationBar bar, Pos p, Duration startDelay) {
+        KeyValue fadeOutBegin = new KeyValue(bar.opacityProperty(), 1.0);
+        KeyValue fadeOutEnd = new KeyValue(bar.opacityProperty(), 0.0);
 
         KeyFrame kfBegin = new KeyFrame(Duration.ZERO, fadeOutBegin);
         KeyFrame kfEnd = new KeyFrame(Duration.millis(500), fadeOutEnd);
 
         Timeline timeline = new Timeline(kfBegin, kfEnd);
-        timeline.setDelay(notification.getHideAfterDuration());
+        timeline.setDelay(startDelay);
         timeline.setOnFinished(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                popup.hide();
-                removePopupFromMap(p, NotificationPopup.this);
+                hide(popup, p);
             }
         });
-        timeline.play();
+        
+        return timeline;
     }
     
     private void addPopupToMap(Pos p, Popup popup) {
@@ -300,9 +332,10 @@ public class NotificationPopup {
         private final Duration hideAfterDuration;
         private final boolean hideCloseButton;
         private final List<String> styleClass;
+        private final EventHandler<ActionEvent> onAction;
         
         private Notification(String title, String text, Node graphic, Pos position,
-                Duration hideAfterDuration, boolean hideCloseButton, 
+                Duration hideAfterDuration, boolean hideCloseButton, EventHandler<ActionEvent> onAction,
                 ObservableList<Action> actions, List<String> styleClass) {
             this.title = title;
             this.text = text;
@@ -310,6 +343,7 @@ public class NotificationPopup {
             this.position = position == null ? Pos.BOTTOM_RIGHT : position;
             this.hideAfterDuration = hideAfterDuration == null ? Duration.seconds(5) : hideAfterDuration;
             this.hideCloseButton = hideCloseButton;
+            this.onAction = onAction;
             this.actions = actions == null ? FXCollections.observableArrayList() : actions;
             this.styleClass = styleClass;
         }
@@ -345,6 +379,10 @@ public class NotificationPopup {
         public final List<String> getStyleClass() {
             return styleClass;
         }
+        
+        public final EventHandler<ActionEvent> getOnAction() {
+            return onAction;
+        }
     }
     
     public static class Notifications {
@@ -358,6 +396,7 @@ public class NotificationPopup {
         private Pos position;
         private Duration hideAfterDuration;
         private boolean hideCloseButton;
+        private EventHandler<ActionEvent> onAction;
         
         private List<String> styleClass = new ArrayList<>();
         
@@ -394,6 +433,11 @@ public class NotificationPopup {
             return this;
         }
         
+        public Notifications onAction(EventHandler<ActionEvent> onAction) {
+            this.onAction = onAction;
+            return this;
+        }
+        
         public Notifications darkStyle() {
             styleClass.add(STYLE_CLASS_DARK);
             return this;
@@ -411,7 +455,9 @@ public class NotificationPopup {
         }
         
         public Notification build() {
-            return new Notification(title, text, graphic, position, hideAfterDuration, hideCloseButton, actions, styleClass);
+            return new Notification(title, text, graphic, position, 
+                                    hideAfterDuration, hideCloseButton, onAction, 
+                                    actions, styleClass);
         }
     }
 }

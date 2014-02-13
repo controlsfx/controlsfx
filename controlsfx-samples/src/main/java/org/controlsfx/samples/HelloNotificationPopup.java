@@ -301,7 +301,12 @@ public class HelloNotificationPopup extends ControlsFXSample {
                 .text(text)
                 .graphic(graphic)
                 .hideAfter(Duration.seconds(fadeDelaySlider.getValue()))
-                .position(pos);
+                .position(pos)
+                .onAction(new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent arg0) {
+                        System.out.println("Notification clicked on!");
+                    }
+                });
         
         if (! showCloseButtonChkBox.isSelected()) {
             notificationBuilder.hideCloseButton();
@@ -312,7 +317,7 @@ public class HelloNotificationPopup extends ControlsFXSample {
         }
         
         Notification actualNotification = notificationBuilder.build();
-        notifier.show(stage, actualNotification);
+        notifier.show(actualNotification);
     }
     
     private Node buildTotalReplacementGraphic() {

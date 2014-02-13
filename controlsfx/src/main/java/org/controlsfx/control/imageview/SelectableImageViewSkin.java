@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -17,7 +18,7 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
  * View for the {@link SelectableImageView}. It displays the image and the selection and manages their positioning.
- * MouseEvents are handed over to the {@link SelectableImageViewBehavior} which uses them to change thr selection.
+ * MouseEvents are handed over to the {@link SelectableImageViewBehavior} which uses them to change the selection.
  */
 public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageView, SelectableImageViewBehavior> {
 
@@ -171,12 +172,12 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
 
     /**
      * Initializes the {@link #selectedArea} and the {@link #unselectedArea}. This includes their style and their
-     * bindings to the {@link SelectableImageView#getSelection() selection}.
+     * bindings to the {@link SelectableImageView#selectionProperty() selection} property.
      */
     private void initializeAreas() {
         styleAreas();
-        bindCoordinates();
-        bindToSelectionProperties();
+        bindAreaCoordinatesTogether();
+        bindAreaCoordinatesToSelection();
     }
 
     /**
@@ -201,7 +202,7 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     /**
      * Binds the position and size of {@link #unselectedArea} to {@link #selectedArea}.
      */
-    private void bindCoordinates() {
+    private void bindAreaCoordinatesTogether() {
         unselectedArea.xProperty().bind(selectedArea.xProperty());
         unselectedArea.yProperty().bind(selectedArea.yProperty());
         unselectedArea.widthProperty().bind(selectedArea.widthProperty());
@@ -209,46 +210,14 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     }
 
     /**
-     * Binds the controls which display the selection to the {@link SelectableImageView}'s
-     * {@link SelectableImageView#getSelection() selection} property and their visibility to the
-     * {@link SelectableImageView#selectionActiveProperty() selectionActive} property.
+     * Binds the position and size of {@link #selectedArea} to the {@link SelectableImageView}'s
+     * {@link SelectableImageView#selectionProperty() selection} property.
      */
-    private void bindToSelectionProperties() {
-        SelectableImageView selectableImageView = getSkinnable();
-        Rectangle selection = selectableImageView.getSelection();
-
-        selectedArea.smoothProperty().bind(selection.smoothProperty());
-        selectedArea.arcHeightProperty().bind(selection.arcHeightProperty());
-        selectedArea.arcWidthProperty().bind(selection.arcWidthProperty());
-        selectedArea.visibleProperty().bind(selectableImageView.selectionActiveProperty());
-
-        unselectedArea.smoothProperty().bind(selection.smoothProperty());
-        unselectedArea.arcHeightProperty().bind(selection.arcHeightProperty());
-        unselectedArea.arcWidthProperty().bind(selection.arcWidthProperty());
-        unselectedArea.visibleProperty().bind(selectableImageView.selectionActiveProperty());
-
-        // whenever the selection's position or size changes, the selection rectangles must be updated
-        selection.xProperty().addListener(new ChangeListener<Number>() {
+    private void bindAreaCoordinatesToSelection() {
+        getSkinnable().selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
             @Override
-            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
-                updateSelection();
-            }
-        });
-        selection.yProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
-                updateSelection();
-            }
-        });
-        selection.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
-                updateSelection();
-            }
-        });
-        selection.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observabe, Number oldValue, Number newValue) {
+            public void changed(ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue,
+                    Rectangle2D newValue) {
                 updateSelection();
             }
         });
@@ -301,21 +270,34 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      **************************************************************************/
 
     /**
+     * Returns the value contained in the {@link SelectableImageView}'s {@link SelectableImageView#selectionProperty()
+     * selection} property.
+     * 
+     * @return the image's selection
+     */
+    private Rectangle2D getImageSelection() {
+        return getSkinnable().getSelection();
+    }
+
+    /**
      * Updates the position and size of {@link #selectedArea} (and by binding that of {@link #unselectedArea}). This
-     * needs to be done whenever the selection changes or when the control resizes.
+     * needs to be done whenever either the image, selection or control size changes.
      */
     private void updateSelection() {
         if (imageView.getImage() == null)
             setSelectionDirectly(0, 0, 0, 0);
+        else if (getImageSelection() == null)
+            setSelectionDirectly(0, 0, 0, 0);
         else
+            // in this case, the image and the selection are not-null, so the selection can be properly displayed
             setTransformedSelection();
     }
 
     /**
-     * Transforms the {@link SelectableImageView#getSelection() selection} from Image coordinates to ImageView
+     * Transforms the {@link #getImageSelection() image selection} from Image coordinates to ImageView
      * coordinates and sets the position and size of {@link #selectedArea} (and by binding that of
      * {@link #unselectedArea}). <br>
-     * This call will fail if the {@link #imageView} has a {@code null} image.
+     * This call will fail if the {@link #imageView imageView.get()} or {@link #getImageSelection()} returns {@code null}.
      */
     private void setTransformedSelection() {
         // get the image view's width and height and compute the ratio between the image size and the view's size
@@ -325,9 +307,9 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         double heightRatio = imageViewHeight / imageView.getImage().getHeight();
 
         // compute the new position and size such that it is always within the image view's area
-        Rectangle selection = getSkinnable().getSelection();
-        double newX = MathTools.inInterval(0, widthRatio * selection.getX(), imageViewWidth);
-        double newY = MathTools.inInterval(0, heightRatio * selection.getY(), imageViewHeight);
+        Rectangle2D selection = getImageSelection();
+        double newX = MathTools.inInterval(0, widthRatio * selection.getMinX(), imageViewWidth);
+        double newY = MathTools.inInterval(0, heightRatio * selection.getMinY(), imageViewHeight);
         double newWidth = widthRatio * selection.getWidth();
         boolean tooWide = newX + newWidth > imageViewWidth;
         if (tooWide)

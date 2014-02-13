@@ -14,7 +14,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
      * Creates a new behavior for the specified {@link SelectableImageView}.
      * 
      * @param selectableImageView
-     *            the control which this beavior will control
+     *            the control which this behavior will control
      */
     public SelectableImageViewBehavior(SelectableImageView selectableImageView) {
         super(selectableImageView, new ArrayList<KeyBinding>());

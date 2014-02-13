@@ -8,29 +8,26 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
-import javafx.scene.shape.Rectangle;
-
-import org.controlsfx.tools.MathTools;
-import org.controlsfx.tools.Shapes;
 
 /**
  * <b>SELECTION</b> <br>
  * <br>
  * 
  * <b>Model</b> <br>
- * The model for the selection can be accessed with {@link SelectableImageView#getSelection()}. This method always
- * returns the same {@link Rectangle} instance so it is safe to bind to its values.<br>
+ * The model for the selection is the {@link SelectableImageView#selectionProperty() selection} property. It contains a
+ * {@link Rectangle2D}, which might be null if the selection is deactivated (see below). The returned rectangle is
+ * immutable and the selection can only be changed by setting a new one. <br>
  * <br>
  * 
  * <b>Active</b> <br>
  * The {@link SelectableImageView#selectionActiveProperty() selectionActive} property indicates whether the selection is
- * currently active. It is only displayed by the control if and only if it is active.<br>
+ * currently active. It is displayed by the control if and only if it is active.<br>
  * The selection is automatically deactivated when a new image is set (more precisely: <i>before</i> the
  * {@link SelectableImageView#imageProperty() image} property changes) and automatically activated when a selection is
- * explicitly set via the {@code setSelection}-methods (more precisely: <i>after</i> the
- * {@link SelectableImageView#getSelection() selection} was updated to the new values). <br>
- * If it is deactivated, the {@link SelectableImageView#getSelection() selection} is in an undefined state and should
- * not be accessed.
+ * explicitly set (via {@link SelectableImageView#setSelection(Rectangle2D) setSelection} or the
+ * {@link SelectableImageView#selectionProperty() selection} property; more precisely: <i>after</i> the property was
+ * updated to its new value). <br>
+ * If it is deactivated, the selection is in an undefined state and the property should not be accessed.
  */
 public class SelectableImageView extends Control {
 
@@ -56,10 +53,10 @@ public class SelectableImageView extends Control {
     // SELECTION
 
     /**
-     * The selected area as a rectangle. The coordinates are relative to the currently shown image. <br>
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image. <br>
      * The value is only well defined if {@link #selectionActive} is true.
      */
-    private final Rectangle selection;
+    private final ObjectProperty<Rectangle2D> selection;
 
     /**
      * Indicates whether an area is currently selected. If this is false, the {@link #selection} should not be accessed
@@ -92,13 +89,21 @@ public class SelectableImageView extends Control {
                 // deactivate the selection when a new image is set
                 setSelectionActive(false);
                 super.set(newValue);
-                setSelectionDirectly(0, 0, 0, 0);
+                // set the selection to be null
+                setSelection(null);
             }
         };
         this.preserveRatio = new SimpleBooleanProperty(this, "preserveRatioProperty", false);
 
         // Selection
-        this.selection = new Rectangle();
+        this.selection = new SimpleObjectProperty<Rectangle2D>(this, "selectionProperty") {
+            @Override
+            public void set(Rectangle2D newValue) {
+                super.set(newValue);
+                // activate the selection when a new value is set
+                setSelectionActive(true);
+            }
+        };
         this.selectionActive = new SimpleBooleanProperty(this, "selectionActiveProperty", false);
         this.selectionChanging = new SimpleBooleanProperty(this, "selectionChangingProperty", false);
     }
@@ -224,25 +229,34 @@ public class SelectableImageView extends Control {
     // SELECTION
 
     /**
-     * The selected area as a rectangle. The coordinates are relative to the currently shown image. <br>
-     * This method will always return the same instance so it is safe to bind to its properties without considering it
-     * changing. It will never be null but the value is only well defined if {@link #selectionActive} is true.
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image. <br>
+     * The value is only well defined if {@link #selectionActive} is true.
      * 
-     * @return the selection
+     * @return the selection as a property
      */
-    public Rectangle getSelection() {
+    public ObjectProperty<Rectangle2D> selectionProperty() {
         return selection;
     }
 
     /**
-     * A copy of the selected area as a rectangle. The coordinates are relative to the currently shown image. <br>
-     * This method will always return a different instance which will not be changed by this class. It will never be
-     * null but the value is only well defined if {@link #selectionActive} is true.
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image. <br>
+     * The value is only well defined if {@link #selectionActive} is true.
      * 
-     * @return a copy of the selection
+     * @return the selection
      */
-    public Rectangle getSelectionCopy() {
-        return Shapes.copy(selection);
+    public Rectangle2D getSelection() {
+        return selectionProperty().get();
+    }
+
+    /**
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image. <br>
+     * The value is only well defined if {@link #selectionActive} is true.
+     * 
+     * @param selection
+     *            the selection to set
+     */
+    public void setSelection(Rectangle2D selection) {
+        selectionProperty().set(selection);
     }
 
     /**
@@ -277,99 +291,6 @@ public class SelectableImageView extends Control {
     public void setSelectionActive(boolean selectionActive) {
         if (getImage() != null)
             selectionActiveProperty().set(selectionActive);
-    }
-
-    /**
-     * Sets the selection. The coordinates will be interpreted relative to the currently shown image but might be
-     * modified to fit the currently shown image's size. This also activates the selection. <br>
-     * If there is no current image (i.e. the {@link #imageProperty()} holds {@code null}), this call does nothing.
-     * 
-     * @param upperLeftX
-     *            the new x coordinate of the selection's upper left corner
-     * @param upperLeftY
-     *            the new y coordinate of the selection's upper left corner
-     * @param width
-     *            the selection's new width
-     * @param height
-     *            the selection's new height
-     */
-    public void setSelection(double upperLeftX, double upperLeftY, double width, double height) {
-        if (getImage() == null)
-            return;
-
-        setCorrectedSelection(upperLeftX, upperLeftY, width, height);
-        setSelectionActive(true);
-    }
-
-    /**
-     * Sets the selection after correcting the specified arguments.
-     * 
-     * @param upperLeftX
-     *            the new x coordinate of the selection's upper left corner
-     * @param upperLeftY
-     *            the new y coordinate of the selection's upper left corner
-     * @param width
-     *            the selection's new width
-     * @param height
-     *            the selection's new height
-     */
-    private void setCorrectedSelection(double upperLeftX, double upperLeftY, double width, double height) {
-        // compute corrected position and size and set them
-        double imageWidth = getImage().getWidth();
-        double imageHeight = getImage().getHeight();
-        double correctedUpperLeftX = MathTools.inInterval(0, upperLeftX, imageWidth);
-        double correctedUpperLeftY = MathTools.inInterval(0, upperLeftY, imageHeight);
-        double correctedWidth = MathTools.inInterval(0, width - correctedUpperLeftX, imageWidth);
-        double correctedHeight = MathTools.inInterval(0, height - correctedUpperLeftX, imageWidth);
-
-        setSelectionDirectly(correctedUpperLeftX, correctedUpperLeftY, correctedWidth, correctedHeight);
-    }
-
-    /**
-     * Sets the selection without any further checks.
-     * 
-     * @param upperLeftX
-     *            the new x coordinate of the selection's upper left corner
-     * @param upperLeftY
-     *            the new y coordinate of the selection's upper left corner
-     * @param width
-     *            the selection's new width
-     * @param height
-     *            the selection's new height
-     */
-    private void setSelectionDirectly(double upperLeftX, double upperLeftY, double width, double height) {
-        getSelection().setX(upperLeftX);
-        getSelection().setY(upperLeftY);
-        getSelection().setWidth(width);
-        getSelection().setHeight(height);
-    }
-
-    /**
-     * Uses the specified rectangle as a template to set the selection. This means that the specified instance itself
-     * will *not* be the new selection. Instead its coordinates will be used. They will be interpreted relative to the
-     * currently shown image but might be modified to fit the currently shown image's size. <br>
-     * If there is no current image (i.e. the {@link #imageProperty()} holds {@code null}), this call does nothing.
-     * 
-     * @param selectionTemplate
-     *            the template for the new selection
-     */
-    public void setSelectionFromTemplate(Rectangle selectionTemplate) {
-        setSelection(selectionTemplate.getX(), selectionTemplate.getY(), selectionTemplate.getWidth(),
-                selectionTemplate.getHeight());
-    }
-
-    /**
-     * Uses the specified rectangle as a template to set the selection. This means that the specified instance itself
-     * will *not* be the new selection. Instead its coordinates will be used. They will be interpreted relative to the
-     * currently shown image but might be modified to fit the currently shown image's size. <br>
-     * If there is no current image (i.e. the {@link #imageProperty()} holds {@code null}), this call does nothing.
-     * 
-     * @param selectionTemplate
-     *            the template for the new selection
-     */
-    public void setSelectionFromTemplate(Rectangle2D selectionTemplate) {
-        setSelection(selectionTemplate.getMinX(), selectionTemplate.getMinY(), selectionTemplate.getWidth(),
-                selectionTemplate.getHeight());
     }
 
     /**

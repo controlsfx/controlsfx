@@ -1,6 +1,7 @@
 package org.controlsfx.control.imageview;
 
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -14,7 +15,7 @@ public class SelectableImageViewDemo extends Application {
     public void start(Stage stage) throws Exception {
         SelectableImageView selectableImageView = new SelectableImageView(image);
         selectableImageView.setPreserveRatio(true);
-        selectableImageView.setSelection(100, 100, 200, 200);
+        selectableImageView.setSelection(new Rectangle2D(100, 100, 200, 200));
 
         stage.setScene(new Scene(selectableImageView));
         stage.setTitle("Custom Control");

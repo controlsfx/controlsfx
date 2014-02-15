@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+// TODO turn this into a 'HelloSelectableImageView' example.
+
 public class SelectableImageViewDemo extends Application {
 
     private static final Image image = new Image(
@@ -14,14 +16,16 @@ public class SelectableImageViewDemo extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         SelectableImageView selectableImageView = new SelectableImageView(image);
-        selectableImageView.setPreserveRatio(true);
-        selectableImageView.setSelection(new Rectangle2D(100, 100, 200, 200));
+        selectableImageView.setPreserveImageRatio(true);
 
         stage.setScene(new Scene(selectableImageView));
         stage.setTitle("Custom Control");
         stage.setWidth(800);
         stage.setHeight(600);
         stage.show();
+
+        selectableImageView.setSelection(new Rectangle2D(100, 100, 200, 200));
+        selectableImageView.setSelectionActive(false);
     }
 
     public static void main(String[] args) {

@@ -62,7 +62,7 @@ abstract class AbstractBeginEndCheckingChangeStrategy implements ChangeStrategy 
     @Override
     public final Rectangle2D endChange(Point2D point) {
         Objects.requireNonNull(point, "The specified point must not be null.");
-        if (!beforeBegin)
+        if (beforeBegin)
             throw new IllegalStateException("The change did not begin. Call 'beginChange' before 'endChange'.");
 
         Rectangle2D finalRectangle = doEnd(point);

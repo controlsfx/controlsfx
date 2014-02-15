@@ -22,10 +22,10 @@ public class CoordinatePositions {
      *            the tolerance in pixels used to determine whether the coordinates are on some edge
      * @return a set of those positions the coordinates have regarding the specified rectangle
      */
-    public static EnumSet<CoordinatePosition> getFor(Rectangle2D rectangle, Point2D point, double edgeTolerance) {
+    public static EnumSet<CoordinatePosition> onRectangleAndEdges(Rectangle2D rectangle, Point2D point, double edgeTolerance) {
         EnumSet<CoordinatePosition> positions = EnumSet.noneOf(CoordinatePosition.class);
-        positions.addAll(coordinatePositionInRectangle(rectangle, point));
-        positions.addAll(coordinatePositionOnEdges(rectangle, point, edgeTolerance));
+        positions.add(inRectangle(rectangle, point));
+        positions.add(onEdges(rectangle, point, edgeTolerance));
         return positions;
     }
 
@@ -34,7 +34,7 @@ public class CoordinatePositions {
      */
 
     /**
-     * Returns all positions the specified coordinates have regarding the specified rectangle. Edges are not checked.
+     * Returns the position the specified coordinates have regarding the specified rectangle. Edges are not checked.
      * 
      * @param rectangle
      *            the rectangle relative to which the point will be checked
@@ -42,38 +42,11 @@ public class CoordinatePositions {
      *            the checked point
      * @return a set of those positions the coordinates have regarding the specified rectangle
      */
-    private static EnumSet<CoordinatePosition> coordinatePositionInRectangle(Rectangle2D rectangle, Point2D point) {
-        EnumSet<CoordinatePosition> positions = EnumSet.noneOf(CoordinatePosition.class);
-
-        if (coordinatesInRectangle(rectangle, point))
-            positions.add(CoordinatePosition.IN_RECTANGLE);
+    public static CoordinatePosition inRectangle(Rectangle2D rectangle, Point2D point) {
+        if (rectangle.contains(point))
+            return CoordinatePosition.IN_RECTANGLE;
         else
-            positions.add(CoordinatePosition.OUT_OF_RECTANGLE);
-
-        return positions;
-    }
-
-    /**
-     * Indicates whether the specified coordinates are inside the specified rectangle.
-     * 
-     * @param rectangle
-     *            the rectangle relative to which the point will be checked
-     * @param point
-     *            the checked point
-     * @return true if the coordinates are in the rectangle, false otherwise
-     */
-    private static boolean coordinatesInRectangle(Rectangle2D rectangle, Point2D point) {
-        // check x coordinate
-        boolean xInRectangle = rectangle.getMinX() < point.getX() && point.getX() < rectangle.getMaxX();
-        if (!xInRectangle)
-            return false;
-
-        // check y coordinate
-        boolean yInRectangle = rectangle.getMinY() < point.getY() && point.getY() < rectangle.getMaxY();
-        if (!yInRectangle)
-            return false;
-
-        return true;
+            return CoordinatePosition.OUT_OF_RECTANGLE;
     }
 
     /*
@@ -90,18 +63,15 @@ public class CoordinatePositions {
      *            the checked point
      * @param edgeTolerance
      *            the tolerance in pixels used to determine whether the coordinates are on some edge
-     * @return that edge position the coordinates have regarding the specified rectangle; the set might be empty
+     * @return that edge position the coordinates have regarding the specified rectangle; the value might be null
      */
-    private static EnumSet<CoordinatePosition> coordinatePositionOnEdges(Rectangle2D rectangle, Point2D point,
+    public static CoordinatePosition onEdges(Rectangle2D rectangle, Point2D point,
             double edgeTolerance) {
 
         CoordinatePosition vertical = closeToVertical(rectangle, point, edgeTolerance);
         CoordinatePosition horizontal = closeToHorizontal(rectangle, point, edgeTolerance);
-        CoordinatePosition joined = extractSingleCardinalDirection(vertical, horizontal);
 
-        if (joined == null)
-            return EnumSet.noneOf(CoordinatePosition.class);
-        return EnumSet.of(joined);
+        return extractSingleCardinalDirection(vertical, horizontal);
     }
 
     /**

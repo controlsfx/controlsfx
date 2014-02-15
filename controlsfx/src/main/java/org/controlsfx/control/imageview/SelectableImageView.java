@@ -1,8 +1,10 @@
 package org.controlsfx.control.imageview;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Control;
@@ -11,6 +13,10 @@ import javafx.scene.image.Image;
 
 /**
  * <b>SELECTION</b> <br>
+ * <br>
+ * 
+ * <b>Position</b> <br>
+ * TODO Define contract about position<br>
  * <br>
  * 
  * <b>Model</b> <br>
@@ -48,13 +54,13 @@ public class SelectableImageView extends Control {
      * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
      * fitting bounding box.
      */
-    private final BooleanProperty preserveRatio;
+    private final BooleanProperty preserveImageRatio;
 
     // SELECTION
 
     /**
      * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image. <br>
-     * The value is only well defined if {@link #selectionActive} is true.
+     * The value is only well defined if {@link #selectionActiveProperty()} holds {@code true}.
      */
     private final ObjectProperty<Rectangle2D> selection;
 
@@ -69,6 +75,20 @@ public class SelectableImageView extends Control {
      * selection begins and set to false when it ends.
      */
     private final BooleanProperty selectionChanging;
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() selectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     */
+    private final BooleanProperty selectionRatioFixed;
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     */
+    private final DoubleProperty fixedSelectionRatio;
 
     /* ************************************************************************
      *                                                                         *
@@ -93,7 +113,7 @@ public class SelectableImageView extends Control {
                 setSelection(null);
             }
         };
-        this.preserveRatio = new SimpleBooleanProperty(this, "preserveRatioProperty", false);
+        this.preserveImageRatio = new SimpleBooleanProperty(this, "preserveImageRatioProperty", false);
 
         // Selection
         this.selection = new SimpleObjectProperty<Rectangle2D>(this, "selectionProperty") {
@@ -101,11 +121,21 @@ public class SelectableImageView extends Control {
             public void set(Rectangle2D newValue) {
                 super.set(newValue);
                 // activate the selection when a new value is set
-                setSelectionActive(true);
+                boolean activateSelection = newValue != null;
+                setSelectionActive(activateSelection);
             }
         };
         this.selectionActive = new SimpleBooleanProperty(this, "selectionActiveProperty", false);
         this.selectionChanging = new SimpleBooleanProperty(this, "selectionChangingProperty", false);
+        this.selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixedProperty", false);
+        this.fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatioProperty", 1) {
+            @Override
+            public void set(double newValue) {
+                if (newValue <= 0)
+                    throw new IllegalArgumentException("The fixed selection ratio must be positive.");
+                super.set(newValue);
+            }
+        };
     }
 
     /**
@@ -199,31 +229,31 @@ public class SelectableImageView extends Control {
      * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
      * fitting bounding box.
      * 
-     * @return the preserveRatio as a property
+     * @return the preserveImageRatio as a property
      */
-    public BooleanProperty preserveRatioProperty() {
-        return preserveRatio;
+    public BooleanProperty preserveImageRatioProperty() {
+        return preserveImageRatio;
     }
 
     /**
      * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
      * fitting bounding box.
      * 
-     * @return the preserveRatio
+     * @return the preserveImageRatio
      */
-    public boolean isPreserveRatio() {
-        return preserveRatioProperty().get();
+    public boolean isPreserveImageRatio() {
+        return preserveImageRatioProperty().get();
     }
 
     /**
      * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
      * fitting bounding box.
      * 
-     * @param preserveRatio
-     *            the preserveRatio to set
+     * @param preserveImageRatio
+     *            the preserveImageRatio to set
      */
-    public void setPreserveRatio(boolean preserveRatio) {
-        preserveRatioProperty().set(preserveRatio);
+    public void setPreserveImageRatio(boolean preserveImageRatio) {
+        preserveImageRatioProperty().set(preserveImageRatio);
     }
 
     // SELECTION
@@ -300,6 +330,10 @@ public class SelectableImageView extends Control {
      * @return the selectionChanging as a property
      */
     public BooleanProperty selectionChangingProperty() {
+
+        // TODO It would be very nice if this could be a read only property
+        // but it is unclear how it could then be edited by 'SelectableImageViewBehavior'.
+
         return selectionChanging;
     }
 
@@ -311,6 +345,76 @@ public class SelectableImageView extends Control {
      */
     public boolean isSelectionChanging() {
         return selectionChangingProperty().get();
+    }
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     * 
+     * @return the selectionRatioFixed as a property
+     */
+    public BooleanProperty selectionRatioFixedProperty() {
+        return selectionRatioFixed;
+    }
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     * 
+     * @return the selectionRatioFixed
+     */
+    public boolean isSelectionRatioFixed() {
+        return selectionRatioFixedProperty().get();
+    }
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     * 
+     * @param selectionRatioFixed
+     *            the selectionRatioFixed to set
+     */
+    public void setSelectionRatioFixed(boolean selectionRatioFixed) {
+        selectionRatioFixedProperty().set(selectionRatioFixed);
+    }
+
+    /**
+     * The fixed ratio of the {@link #selectionProperty() selection}. Is only enforced if and only if the
+     * {@link #selectionRatioFixedProperty() selectionRatioFixed} property holds {@code true}. <br>
+     * Settings non-positive values throws an {@link IllegalArgumentException}.
+     * 
+     * @return the fixedSelectionRatio as a property
+     */
+    public DoubleProperty fixedSelectionRatioProperty() {
+        return fixedSelectionRatio;
+    }
+
+    /**
+     * The fixed ratio of the {@link #selectionProperty() selection}. Is only enforced if and only if the
+     * {@link #selectionRatioFixedProperty() selectionRatioFixed} property holds {@code true}. <br>
+     * Settings non-positive values throws an {@link IllegalArgumentException}.
+     * 
+     * @return the fixedSelectionRatio
+     */
+    public double getFixedSelectionRatio() {
+        return fixedSelectionRatioProperty().get();
+    }
+
+    /**
+     * The fixed ratio of the {@link #selectionProperty() selection}. Is only enforced if and only if the
+     * {@link #selectionRatioFixedProperty() selectionRatioFixed} property holds {@code true}. <br>
+     * Settings non-positive values throws an {@link IllegalArgumentException}.
+     * 
+     * @param fixedSelectionRatio
+     *            the fixedSelectionRatio to set
+     * @throws IllegalArgumentException
+     *             if {@code fixedSelectionRatio} is non-positive
+     */
+    public void setFixedSelectionRatio(double fixedSelectionRatio) {
+        fixedSelectionRatioProperty().set(fixedSelectionRatio);
     }
 
     /* ************************************************************************

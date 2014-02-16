@@ -280,7 +280,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             setPadding(new Insets(5, 15, 5, 15 + nestingLevel*10 ));
             getStyleClass().add("property-pane");
             setItems(properties);
-            this.managedProperty().bind(this.visibleProperty());
 //            setGridLinesVisible(true);
         }
         

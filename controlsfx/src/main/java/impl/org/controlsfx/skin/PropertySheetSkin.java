@@ -37,6 +37,7 @@ import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -208,9 +209,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 // create category-based accordion
                 Accordion accordeon = new Accordion();
                 for( String category: categoryMap.keySet() ) {
-                    TitledPane pane = new TitledPane( category, new PropertyPane( categoryMap.get(category)));
-                    pane.setExpanded(true);
-                    accordeon.getPanes().add(pane);
+                	PropertyPane props = new PropertyPane( categoryMap.get(category));
+                	// Only show non-empty categories 
+                	if ( props.getChildrenUnmodifiable().size() > 0 ) {
+                       TitledPane pane = new TitledPane( category, props );
+                       pane.setExpanded(true);
+                       accordeon.getPanes().add(pane);
+                    }
                 }
                 if ( accordeon.getPanes().size() > 0 ) {
                     accordeon.setExpandedPane( accordeon.getPanes().get(0));
@@ -275,6 +280,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             setPadding(new Insets(5, 15, 5, 15 + nestingLevel*10 ));
             getStyleClass().add("property-pane");
             setItems(properties);
+            this.managedProperty().bind(this.visibleProperty());
 //            setGridLinesVisible(true);
         }
         
@@ -320,6 +326,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 
                 row++;
             }
+            
         }
         
         @SuppressWarnings("unchecked")

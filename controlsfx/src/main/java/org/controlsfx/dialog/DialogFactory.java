@@ -68,6 +68,8 @@ class DialogFactory {
                         break;
                     }
                 }
+            } else if (owner instanceof Window) {
+                window = (Window) owner;
             } else if (owner instanceof Node) {
             	window = ((Node)owner).getScene().getWindow();
             } else {

@@ -206,7 +206,7 @@ public class SpreadsheetCell {
     private int columnSpan;
     private final StringProperty format;
     private final StringProperty text;
-    private final ObjectProperty<Object> graphic;
+    private final ObjectProperty<Node> graphic;
 
     private ObservableSet<String> styleClass;
 
@@ -540,7 +540,7 @@ public class SpreadsheetCell {
         return properties != null && !properties.isEmpty();
     }
 
-    public ObjectProperty<Object> graphicProperty() {
+    public ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
 
@@ -549,7 +549,7 @@ public class SpreadsheetCell {
      * 
      * @param graphic
      */
-    public void setGraphic(Object graphic) {
+    public void setGraphic(Node graphic) {
         this.graphic.set(graphic);
     }
 
@@ -559,7 +559,7 @@ public class SpreadsheetCell {
      * 
      * @return the graphic node associated with this cell.
      */
-    public Object getGraphic() {
+    public Node getGraphic() {
         return graphic.get();
     }
 

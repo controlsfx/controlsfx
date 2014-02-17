@@ -269,9 +269,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * because an exception can be thrown otherwise. This should use
              * Lambda expression but I cannot use 1.8 compliance..
              */
-            getValue(new FXThreadExecution() {
+            getValue(new Runnable() {
                 @Override
-                public void execute() {
+                public void run() {
                     Tooltip toolTip = new Tooltip(item.getItem().toString());
                     toolTip.setWrapText(true);
                     toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
@@ -297,9 +297,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     private void setCellGraphic(SpreadsheetCell item) {
 
+        if(isEditing()){
+            return;
+        }
         if (item.getGraphic() != null) {
-            if (item.getGraphic() instanceof Image) {
-                ImageView image = new ImageView((Image) item.getGraphic());
+            if (item.getGraphic() instanceof ImageView) {
+                ImageView image = new ImageView(((ImageView) item.getGraphic()).getImage());
                 image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
@@ -313,6 +316,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             } else if (item.getGraphic() instanceof Node) {
                 setGraphic((Node) item.getGraphic());
             }
+        }else{
+            setGraphic(null);
         }
     }
 
@@ -405,9 +410,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    private ChangeListener<Object> graphicListener = new ChangeListener<Object>() {
+    private ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
         @Override
-        public void changed(ObservableValue<? extends Object> arg0, Object arg1, Object newGraphic) {
+        public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node newGraphic) {
             setCellGraphic(getItem());
         }
     };
@@ -499,31 +504,18 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     }
 
-    /**
-     * Interface for Lambda expression in order to execute some
-     * statements.
-     */
-    static interface FXThreadExecution {
-
-        public abstract void execute();
-    }
 
     /**
      * Will safely execute the request on the JFX thread by checking whether we
      * are on the JFX thread or not.
      * 
-     * @param request
+     * @param runnable
      */
-    static void getValue(final FXThreadExecution request) {
+    static void getValue(final Runnable runnable) {
         if (Platform.isFxApplicationThread()) {
-            request.execute();
+            runnable.run();
         } else {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    request.execute();
-                }
-            });
+            Platform.runLater(runnable);
         }
     }
 

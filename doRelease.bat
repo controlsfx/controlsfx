@@ -28,7 +28,14 @@ echo Success - all projects built!
 pause
 
 echo.
-echo Step 3: Copy new javadocs from controlsfx/build/docs/javadoc to ../controlsfx-javadoc directory
+echo Step 3.1: Copy new javadocs from controlsfx/build/docs/javadoc to ../controlsfx-javadoc directory
+echo.
+pause
+
+echo.
+echo Step 3.2: Copying samples source code from controlsfx-samples/src/main/java to ../controlsfx-javadoc/samples-src directory
+rmdir /S /Q ..\controlsfx-javadoc\samples-src
+xcopy controlsfx-samples\src\main\java ..\controlsfx-javadoc\samples-src /E /I
 echo.
 pause
 
@@ -38,7 +45,7 @@ echo.
 pause
 
 echo.
-echo Step 5: Test that ControlsFX-samples can load the javadoc tab for all samples. If not, update the URLs in the samples and rebuild the jar files. 
+echo Step 5: Test that ControlsFX-samples can load the javadoc and source tab for all samples. If not, update the URLs in the samples and rebuild the jar files. 
 echo.
 pause
 

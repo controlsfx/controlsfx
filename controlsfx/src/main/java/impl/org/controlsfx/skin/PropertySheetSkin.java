@@ -208,9 +208,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 // create category-based accordion
                 Accordion accordeon = new Accordion();
                 for( String category: categoryMap.keySet() ) {
-                    TitledPane pane = new TitledPane( category, new PropertyPane( categoryMap.get(category)));
-                    pane.setExpanded(true);
-                    accordeon.getPanes().add(pane);
+                	PropertyPane props = new PropertyPane( categoryMap.get(category));
+                	// Only show non-empty categories 
+                	if ( props.getChildrenUnmodifiable().size() > 0 ) {
+                       TitledPane pane = new TitledPane( category, props );
+                       pane.setExpanded(true);
+                       accordeon.getPanes().add(pane);
+                    }
                 }
                 if ( accordeon.getPanes().size() > 0 ) {
                     accordeon.setExpandedPane( accordeon.getPanes().get(0));
@@ -320,6 +324,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 
                 row++;
             }
+            
         }
         
         @SuppressWarnings("unchecked")

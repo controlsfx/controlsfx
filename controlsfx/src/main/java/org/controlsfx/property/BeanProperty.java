@@ -27,11 +27,13 @@
 package org.controlsfx.property;
 
 import java.beans.PropertyDescriptor;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
+import org.controlsfx.dialog.Dialogs;
 
 /**
  * A convenience class for creating a {@link Item} for use in the 
@@ -88,6 +90,15 @@ public class BeanProperty implements PropertySheet.Item {
                 writeMethod.invoke(bean, value);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 e.printStackTrace();
+            } catch (Throwable e) {
+				if (e instanceof PropertyVetoException) {
+					Dialogs.create().title("Property Change Error")
+							.message(e.getLocalizedMessage())
+							.masthead("Change is not allowed")
+							.showError();
+				} else {
+					throw e;
+				}
             }
         }
     }

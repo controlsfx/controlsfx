@@ -26,8 +26,13 @@
  */
 package fxsampler;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -271,13 +276,21 @@ public class FXSampler extends Application {
         javaDocWebView.getEngine().load(newSample.getJavaDocURL());
         sourceWebView.getEngine().loadContent( formatSourceCode(newSample));
     }
+    
+    private String getResource(String resourceName, Class<?> baseClass) {
+        Class<?> clz = baseClass == null? getClass(): baseClass;
+        return getResource(clz.getResourceAsStream(resourceName));
+    }
 
-    private String getResource( String resourceName, Class<?> baseClass ) {
-    	Class<?> clz = baseClass == null? getClass(): baseClass;
-        try (InputStream is = clz.getResourceAsStream(resourceName)) {
-        	try(Scanner s = new Scanner(is).useDelimiter("/A")) {
-      		   return s.hasNext() ? s.next() : "";
-   		    } 
+    private String getResource(InputStream is) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+        	String line;
+            StringBuilder sb = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            } 
+            return sb.toString();
         } catch (IOException e) {
 			e.printStackTrace();
 			return "";
@@ -285,16 +298,30 @@ public class FXSampler extends Application {
     }
     
     private String getSourceCode( Sample sample ) {
-    	String resourceName = "/" + sample.getClass().getName().replace('.','/') + ".java";
-    	System.out.println(resourceName);
-    	return getResource( resourceName, sample.getClass());
+        String sourceURL = sample.getSampleSourceURL();
+        
+        try {
+            // try loading via the web or local file system
+            URL url = new URL(sourceURL);
+            InputStream is = url.openStream();
+            return getResource(is);
+        } catch (IOException e) {
+            // no-op - the URL may not be valid, no biggy
+        }
+        
+        return getResource(sourceURL, sample.getClass());
     }
     
     private String formatSourceCode(Sample sample) {
+        String sourceURL = sample.getSampleSourceURL();
+        if (sourceURL == null) {
+            return "No sample source available";
+        }
+        
         String template = getResource("/fxsampler/util/SourceCodeTemplate.html", null);
         String src = "Sample Source not found";
         try {
-           src = getSourceCode( sample);
+           src = getSourceCode(sample);
         } catch(Throwable ex){
             ex.printStackTrace();
         }

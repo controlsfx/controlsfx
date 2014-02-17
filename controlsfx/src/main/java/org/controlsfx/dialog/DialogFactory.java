@@ -26,6 +26,13 @@
  */
 package org.controlsfx.dialog;
 
+import java.util.Iterator;
+
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 class DialogFactory {
@@ -46,7 +53,29 @@ class DialogFactory {
         if (useLightweight) {
             return new LightweightDialog(title, owner);
         } else {
-            return new HeavyweightDialog(title, (Window) owner, modal, nativeChrome);
+        	
+        	Window window = null;
+            
+            // we need to determine the type of the owner, so that we can appropriately
+            // show the dialog
+            if (owner == null) {
+                // lets just get the focused stage and show the dialog in there
+                @SuppressWarnings("deprecation")
+				Iterator<Window> windows = Window.impl_getWindows();
+                while (windows.hasNext()) {
+                    window = windows.next();
+                    if (window.isFocused()) {
+                        break;
+                    }
+                }
+            } else if (owner instanceof Node) {
+            	window = ((Node)owner).getScene().getWindow();
+            } else {
+                throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
+            }
+        	
+            return new HeavyweightDialog(title, window, modal, nativeChrome);
         }
     }
+    
 }

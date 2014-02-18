@@ -72,7 +72,8 @@ final class NotificationPopupHandler {
     private final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
     private final double padding = 15;
     
-    
+    // for animating in the notifications
+    private ParallelTransition parallelTransition = new ParallelTransition();
     
     private Scene ownerScene;
     
@@ -218,7 +219,7 @@ final class NotificationPopupHandler {
             case TOP_LEFT:
             case TOP_CENTER:
             case TOP_RIGHT:
-                anchorY = padding;
+                anchorY = 0;
                 break;
                 
             case CENTER_LEFT:
@@ -250,7 +251,7 @@ final class NotificationPopupHandler {
     
     private void hide(Popup popup, Pos p) {
         popup.hide();
-        removePopupFromMap(p, NotificationPopupHandler.this);
+        removePopupFromMap(p, popup);
     }
     
     private Timeline createHideTimeline(Popup popup, NotificationBar bar, Pos p, Duration startDelay) {
@@ -280,40 +281,82 @@ final class NotificationPopupHandler {
             popups = popupsMap.get(p);
         }
         
-        final double newPopupHeight = popup.getContent().get(0).getBoundsInParent().getHeight();
-        
-        // animate all other popups in the list upwards so that the new one
-        // is in the 'new' area
-        ParallelTransition parallelTransition = new ParallelTransition();
-        for (Popup oldPopup : popups) {
-            final double oldAnchorY = oldPopup.getAnchorY();
-            Transition t = new Transition() {
-                {
-                    setCycleDuration(Duration.millis(350));
-                }
-                
-                @Override protected void interpolate(double frac) {
-                    final boolean isShowFromTop = isShowFromTop(p);
-                    
-                    double newAnchorY = oldAnchorY + (isShowFromTop ? 1 : -1) * newPopupHeight * frac;
-                    oldPopup.setAnchorY(newAnchorY);
-                }
-            };
-            t.setCycleCount(1);
-            parallelTransition.getChildren().add(t);
-        }
-        parallelTransition.play();
+        doAnimation(p, popup);
         
         // add the popup to the list so it is kept in memory and can be
         // accessed later on
         popups.add(popup);
     }
     
-    private void removePopupFromMap(Pos p, NotificationPopupHandler popup) {
+    private void removePopupFromMap(Pos p, Popup popup) {
         if (popupsMap.containsKey(p)) {
             List<Popup> popups = popupsMap.get(p);
             popups.remove(popup);
         }
+    }
+    
+    private void doAnimation(Pos p, Popup changedPopup) {
+        List<Popup> popups = popupsMap.get(p);
+        if (popups == null) {
+            return;
+        }
+        
+        final double newPopupHeight = changedPopup.getContent().get(0).getBoundsInParent().getHeight();
+        
+        parallelTransition.stop();
+        parallelTransition.getChildren().clear();
+        
+        final boolean isShowFromTop = isShowFromTop(p);
+        
+        // animate all other popups in the list upwards so that the new one
+        // is in the 'new' area.
+        // firstly, we need to determine the target positions for all popups
+        double sum = 0;
+        double targetAnchors[] = new double[popups.size()];
+        for (int i = popups.size() - 1; i >= 0; i--) {
+            Popup _popup = popups.get(i);
+            
+            final double popupHeight = _popup.getContent().get(0).getBoundsInParent().getHeight(); 
+            
+            if (isShowFromTop) {
+                if (i == popups.size() - 1) {
+                    sum = newPopupHeight + padding;
+                } else {
+                    sum += popupHeight;
+                }
+                targetAnchors[i] = sum;
+            } else {
+                if (i == popups.size() - 1) {
+                    sum = changedPopup.getAnchorY() - popupHeight;
+                } else {
+                    sum -= popupHeight;
+                }
+                
+                targetAnchors[i] = sum;
+            }
+        }
+        
+        // then we set up animations for each popup to animate towards the target
+        for (int i = popups.size() - 1; i >= 0; i--) {
+            Popup _popup = popups.get(i);
+            final double anchorYTarget = targetAnchors[i];
+            final double oldAnchorY = _popup.getAnchorY();
+            final double distance = anchorYTarget - oldAnchorY; 
+            
+            Transition t = new Transition() {
+                {
+                    setCycleDuration(Duration.millis(350));
+                }
+                
+                @Override protected void interpolate(double frac) {
+                    double newAnchorY = oldAnchorY + distance * frac;
+                    _popup.setAnchorY(newAnchorY);
+                }
+            };
+            t.setCycleCount(1);
+            parallelTransition.getChildren().add(t);
+        }
+        parallelTransition.play();
     }
     
     private boolean isShowFromTop(Pos p) {

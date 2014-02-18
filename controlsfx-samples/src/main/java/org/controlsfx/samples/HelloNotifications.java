@@ -62,7 +62,7 @@ import org.controlsfx.control.cell.ColorGridCell;
 public class HelloNotifications extends ControlsFXSample {
     
     private static final Image SMALL_GRAPHIC = 
-            new Image(HelloNotificationPane.class.getResource("notification-pane-warning.png").toExternalForm());
+            new Image(HelloNotificationPane.class.getResource("controlsfx-logo.png").toExternalForm());
     
     private Stage stage;
     private Pane pane;
@@ -80,7 +80,7 @@ public class HelloNotifications extends ControlsFXSample {
     }
     
     @Override public String getSampleName() {
-        return "NotificationPopup";
+        return "Notifications";
     }
     
     @Override public String getJavaDocURL() {
@@ -246,7 +246,14 @@ public class HelloNotifications extends ControlsFXSample {
         graphicLabel.getStyleClass().add("property");
         grid.add(graphicLabel, 0, row);
         final ChoiceBox<String> graphicOptions = new ChoiceBox<>(
-                FXCollections.observableArrayList("No graphic", "Small graphic", "Total-replacement graphic"));
+                FXCollections.observableArrayList(
+                        "No graphic", 
+                        "Warning graphic",
+                        "Information graphic",
+                        "Confirm graphic",
+                        "Error graphic",
+                        "Custom graphic",
+                        "Total-replacement graphic"));
         graphicOptions.setMaxWidth(Double.MAX_VALUE);
         GridPane.setHgrow(graphicOptions, Priority.ALWAYS);
         final SelectionModel<String> sm = graphicOptions.getSelectionModel();
@@ -279,8 +286,12 @@ public class HelloNotifications extends ControlsFXSample {
         switch (graphicMode) {
             default:
             case "No graphic": 
+            case "Warning graphic":
+            case "Information graphic":
+            case "Confirm graphic":
+            case "Error graphic":
                 break;
-            case "Small graphic":
+            case "Custom graphic":
                 graphic = new ImageView(SMALL_GRAPHIC);
                 break;
             case "Total-replacement graphic": 
@@ -309,7 +320,13 @@ public class HelloNotifications extends ControlsFXSample {
             notificationBuilder.darkStyle();
         }
         
-        notificationBuilder.show();
+        switch (graphicMode) {
+            case "Warning graphic":     notificationBuilder.showWarning(); break;
+            case "Information graphic": notificationBuilder.showInformation(); break;
+            case "Confirm graphic":     notificationBuilder.showConfirm(); break;
+            case "Error graphic":       notificationBuilder.showError(); break;
+            default: notificationBuilder.show(); 
+        }
     }
     
     private Node buildTotalReplacementGraphic() {

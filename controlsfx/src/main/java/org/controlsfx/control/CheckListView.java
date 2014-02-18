@@ -33,6 +33,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
@@ -112,10 +113,15 @@ public class CheckListView<T> extends ListView<T> {
      * 
      * @param items The items to display within the CheckListView.
      */
-    public CheckListView(final ObservableList<T> items) {
+    public CheckListView(ObservableList<T> items) {
         super(items);
         
-        final int initialSize = items == null ? 32 : items.size();
+        if (items == null) {
+            items = FXCollections.observableArrayList();
+            setItems(items);
+        }
+        
+        final int initialSize = items.size();
         this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
         
         setCheckModel(new CheckListViewBitSetCheckModel<T>(items, itemBooleanMap));

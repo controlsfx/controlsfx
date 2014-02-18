@@ -103,7 +103,7 @@ public class HelloActionProxy extends ControlsFXSample {
     
     @ActionProxy(text="Action 2.2.1", graphic=imagePath)
     private void action221() {
-    	 System.out.println( "Action 2.2,1 is executed");
+    	 System.out.println( "Action 2.2.1 is executed");
     }
     
     @ActionProxy(text="Action 2.2.2", graphic=imagePath)

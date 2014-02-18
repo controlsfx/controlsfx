@@ -115,7 +115,7 @@ import javafx.scene.image.Image;
  * For example :
  * 
  * <pre>
- * cell.setGraphic(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;)));
+ * cell.setGraphic(new ImageView(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;))));
  * </pre>
  * 
  * <center><img src="graphicNodeToCell.png"></center> <br>

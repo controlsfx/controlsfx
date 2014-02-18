@@ -35,6 +35,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 import org.controlsfx.control.action.Action;
@@ -112,6 +114,26 @@ public class Notifications {
         return new Notification(title, text, graphic, position, 
                 hideAfterDuration, hideCloseButton, onAction, 
                 actions, styleClass);
+    }
+    
+    public void showWarning() {
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-warning.png")));
+        show();
+    }
+    
+    public void showInformation() {
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-information.png")));
+        show();
+    }
+    
+    public void showError() {
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-error.png")));
+        show();
+    }
+    
+    public void showConfirm() {
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/system-help.png")));
+        show();
     }
     
     public void show() {

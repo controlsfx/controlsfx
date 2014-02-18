@@ -56,7 +56,7 @@ import javafx.util.Duration;
 import org.controlsfx.control.Notifications.Notification;
 import org.controlsfx.control.action.Action;
 
-
+// not public so no need for JavaDoc
 final class NotificationPopupHandler {
     
     private static final NotificationPopupHandler INSTANCE = new NotificationPopupHandler();
@@ -107,6 +107,8 @@ final class NotificationPopupHandler {
         final Popup popup = new Popup();
         popup.setAutoFix(false);
         
+        final Pos p = notification.getPosition();
+        
         final NotificationBar notificationBar = new NotificationBar() {
             @Override public String getTitle() {
                 return notification.getTitle();
@@ -142,7 +144,13 @@ final class NotificationPopupHandler {
             
             @Override public void hide() {
                 isShowing = false;
-                doHide();
+                
+                // this would slide the notification bar out of view,
+                // but I prefer the fade out below
+//                doHide();
+                
+                // animate out the popup by fading it
+                createHideTimeline(popup, this, p, Duration.ZERO).play();
             }
             
             @Override public boolean isHideCloseButton() {
@@ -155,7 +163,7 @@ final class NotificationPopupHandler {
             
             @Override public void relocateInParent(double x, double y) {
                 // this allows for us to slide the notification upwards
-                switch (notification.getPosition()) {
+                switch (p) {
                     case BOTTOM_LEFT:
                     case BOTTOM_CENTER:
                     case BOTTOM_RIGHT:
@@ -167,8 +175,6 @@ final class NotificationPopupHandler {
                 }
             }
         };
-        
-        final Pos p = notification.getPosition();
         
         notificationBar.getStyleClass().addAll(notification.getStyleClass());
         

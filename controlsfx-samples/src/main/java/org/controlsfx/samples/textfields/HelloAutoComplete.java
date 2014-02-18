@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.textfields;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -48,6 +48,7 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.AutoCompletePopup;
 import org.controlsfx.control.AutoCompletionBinding;
 import org.controlsfx.control.TextFields;
+import org.controlsfx.samples.Utils;
 
 public class HelloAutoComplete extends ControlsFXSample {
 

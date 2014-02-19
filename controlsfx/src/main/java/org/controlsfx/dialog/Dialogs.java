@@ -30,7 +30,9 @@ import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.OK;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
-import static org.controlsfx.dialog.DialogResources.getString;
+//import static org.controlsfx.dialog.DialogResources.getString;
+
+import impl.org.controlsfx.i18n.Localization;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -875,7 +877,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label(getString("exception.dialog.label"));
+        Label label = new Label( Localization.getString("exception.dialog.label"));
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

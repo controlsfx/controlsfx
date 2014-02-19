@@ -63,11 +63,44 @@ import org.controlsfx.control.action.Action;
  * An API to show popup notification messages to the user in the corner of their
  * screen, unlike the {@link NotificationPane} which shows notification messages
  * within your application itself.
+ * 
+ * <h3>Screenshot</h3>
+ * <p>The following screenshot shows a sample Notification rising from the
+ * bottom-right corner of my screen:
+ * 
+ * <br/><br/>
+ * <img src="notifications.png"/>
+ * 
+ * <h3>Code Example:</h3>
+ * <p>To create the notification shown in the screenshot, simply do the 
+ * following:
+ * 
+ * <pre>
+ * {@code
+ * Notifications.create()
+ *              .title("Title Text")
+ *              .text("Hello World 0!")
+ *              .showWarning();
+ * }</pre>
  */
 public class Notifications {
 
+    /***************************************************************************
+     *                                                                         *
+     * Static fields                                                           *
+     *                                                                         *
+     **************************************************************************/
+    
     private static final String STYLE_CLASS_DARK = "dark";
 
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
+    
     private String title;
     private String text;
     private Node graphic;
@@ -79,87 +112,164 @@ public class Notifications {
     
     private List<String> styleClass = new ArrayList<>();
 
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+    
     // we do not allow instantiation of the Notifications class directly - users
     // must go via the builder API (that is, calling create())
     private Notifications() {
         // no-op
     }
+    
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
 
+    /**
+     * Call this to begin the process of building a notification to show.
+     */
     public static Notifications create() {
         return new Notifications();
     }
 
+    /**
+     * Specify the text to show in the notification.
+     */
     public Notifications text(String text) {
         this.text = text;
         return this;
     }
 
+    /**
+     * Specify the title to show in the notification.
+     */
     public Notifications title(String title) {
         this.title = title;
         return this;
     }
 
+    /**
+     * Specify the graphic to show in the notification.
+     */
     public Notifications graphic(Node graphic) {
         this.graphic = graphic;
         return this;
     }
 
+    /**
+     * Specify the position of the notification on screen, by default it is
+     * {@link Pos#BOTTOM_RIGHT bottom-right}.
+     */
     public Notifications position(Pos position) {
         this.position = position;
         return this;
     }
-
+    
+    /**
+     * Specify the duration that the notification should show, after which it 
+     * will be hidden.
+     */
     public Notifications hideAfter(Duration duration) {
         this.hideAfterDuration = duration;
         return this;
     }
 
+    /**
+     * Specify what to do when the user clicks on the notification (in addition
+     * to the notification hiding, which happens whenever the notification is
+     * clicked on).
+     */
     public Notifications onAction(EventHandler<ActionEvent> onAction) {
         this.onAction = onAction;
         return this;
     }
 
+    /**
+     * Specify that the notification should use the built-in dark styling, rather
+     * than the default 'modena' notification style (which is a light-gray).
+     */
     public Notifications darkStyle() {
         styleClass.add(STYLE_CLASS_DARK);
         return this;
     }
 
+    /**
+     * Specify that the close button in the top-right corner of the notification
+     * should not be shown.
+     */
     public Notifications hideCloseButton() {
         this.hideCloseButton = true;
         return this;
     }
 
+    /**
+     * Specify the actions that should be shown in the notification as buttons.
+     */
     public Notifications action(Action... actions) {
         this.actions = actions == null ? FXCollections.<Action>observableArrayList() :
             FXCollections.observableArrayList(actions);
         return this;
     }
     
+    /**
+     * Instructs the notification to be shown, and that it should use
+     * the built-in 'warning' graphic.
+     */
     public void showWarning() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-warning.png")));
         show();
     }
     
+    /**
+     * Instructs the notification to be shown, and that it should use
+     * the built-in 'information' graphic.
+     */
     public void showInformation() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-information.png")));
         show();
     }
     
+    /**
+     * Instructs the notification to be shown, and that it should use
+     * the built-in 'error' graphic.
+     */
     public void showError() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-error.png")));
         show();
     }
     
+    /**
+     * Instructs the notification to be shown, and that it should use
+     * the built-in 'confirm' graphic.
+     */
     public void showConfirm() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/system-help.png")));
         show();
     }
     
+    /**
+     * Instructs the notification to be shown.
+     */
     public void show() {
         NotificationPopupHandler.getInstance().show(this);
     }
     
     
+    
+    /***************************************************************************
+     *                                                                         *
+     * Private support classes                                                 *
+     *                                                                         *
+     **************************************************************************/
     
     // not public so no need for JavaDoc
     private static final class NotificationPopupHandler {

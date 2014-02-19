@@ -28,9 +28,11 @@ package org.controlsfx.samples.dialogs;
 
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
+import impl.org.controlsfx.i18n.Localization;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -44,6 +46,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -503,8 +506,21 @@ public class HelloDialog extends ControlsFXSample {
         
         int row = 0;
 
+        grid.add(createLabel("Locale: ", "property"), 0, row);
+        final ComboBox<Locale> localeCombobox = new ComboBox<Locale>();
+        localeCombobox.getItems().addAll(Locale.ENGLISH, new Locale( "ru", "RU"));
+        localeCombobox.valueProperty().addListener(new ChangeListener<Locale>() {
+            @Override 
+            public void changed(ObservableValue<? extends Locale> ov, Locale oldValue, Locale newValue) {                
+                Localization.setLocale(newValue);             
+            }    
+        });
+        localeCombobox.setValue(localeCombobox.getItems().get(0));
+        grid.add(localeCombobox, 1, row);
+        row++;
+        
         // operating system button order
-        grid.add(createLabel("Operating system button order: ", "property"), 0, 0);
+        grid.add(createLabel("Operating system button order: ", "property"), 0, row);
         final ToggleButton windowsBtn = createToggle(WINDOWS);
         final ToggleButton macBtn = createToggle(MAC_OS);
         final ToggleButton linuxBtn = createToggle(LINUX);

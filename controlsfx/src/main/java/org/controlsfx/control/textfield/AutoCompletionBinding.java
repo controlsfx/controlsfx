@@ -1,8 +1,9 @@
-package org.controlsfx.control;
+package org.controlsfx.control.textfield;
+
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopup.SuggestionEvent;
 
 import java.util.Collection;
-
-import org.controlsfx.control.AutoCompletePopup.SuggestionEvent;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -47,17 +48,15 @@ public abstract class AutoCompletionBinding<T> {
      * Creates a new AutoCompletionBinding
      * 
      * @param completionTarget The target node to which auto-completion shall be added
-     * @param autoCompletionPopup The auto-completion popup
      * @param suggestionProvider The strategy to retrieve suggestions 
      */
-    protected AutoCompletionBinding(Node completionTarget, AutoCompletePopup<T> autoCompletionPopup, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+    protected AutoCompletionBinding(Node completionTarget, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
         this.completionTarget = completionTarget;
         this.suggestionProvider = suggestionProvider;
-        this.autoCompletionPopup = autoCompletionPopup;
+        this.autoCompletionPopup = new AutoCompletePopup<T>();
 
-        getPopup().setOnSuggestion(new EventHandler<AutoCompletePopup.SuggestionEvent<T>>() {
-            @Override
-            public void handle(SuggestionEvent<T> sce) {
+        autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup.SuggestionEvent<T>>() {
+            @Override public void handle(SuggestionEvent<T> sce) {
                 completeUserInput(sce.getSuggestion());
             }
         });
@@ -79,14 +78,6 @@ public abstract class AutoCompletionBinding<T> {
     }
 
     /**
-     * Get the auto-completion popup
-     * @return
-     */
-    public final AutoCompletePopup<T> getPopup(){
-        return autoCompletionPopup;
-    }
-
-    /**
      * Gets the target node for auto completion
      * @return
      */
@@ -95,23 +86,12 @@ public abstract class AutoCompletionBinding<T> {
     }
 
     /**
-     * Set the current suggestion provider
-     * @param suggestionProvider
+     * Disposes the binding.
      */
-    public void setSuggestionProvider(Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
-        this.suggestionProvider = suggestionProvider;
-    }
+    public abstract void dispose();
 
-    /**
-     * Create the binding
-     */
-    public abstract void bind();
-
-    /**
-     * Remove the binding
-     */
-    public abstract void unbind();
-
+    
+    
     /***************************************************************************
      *                                                                         *
      * Protected methods                                                       *
@@ -140,12 +120,19 @@ public abstract class AutoCompletionBinding<T> {
         autoCompletionPopup.hide();
     }
 
+    
+    
+    /***************************************************************************
+     *                                                                         *
+     * Private methods                                                         *
+     *                                                                         *
+     **************************************************************************/
 
     /**
      * Occurs when the user text has changed and the suggestions require an update
      * @param userText
      */
-    protected final void onUserInputChanged(final String userText){
+    private final void onUserInputChanged(final String userText){
         autoCompletionPopup.getSuggestions().clear();
 
         synchronized (suggestionsTaskLock) {
@@ -158,9 +145,6 @@ public abstract class AutoCompletionBinding<T> {
             new Thread(suggestionsTask).start();
         }
     }
-
-
-
     /***************************************************************************
      *                                                                         *
      * Inner classes and interfaces                                            *

@@ -1,9 +1,8 @@
-package org.controlsfx.control;
+package impl.org.controlsfx.skin;
 
 
 import com.sun.javafx.event.EventHandlerManager;
 
-import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.collections.FXCollections;
@@ -20,8 +19,6 @@ import javafx.stage.Window;
 /**
  * The auto-complete-popup provides an list of available suggestions in order
  * to complete current user input.
- * 
- *
  */
 public class AutoCompletePopup<T> extends PopupControl{
 

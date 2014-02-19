@@ -1,11 +1,12 @@
-package org.controlsfx.control;
+package org.controlsfx.control.textfield;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import impl.org.controlsfx.autocompletion.SuggestionProvider;
 
+import java.util.Arrays;
 import java.util.Collection;
 
-import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
+import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
 
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
@@ -120,35 +121,11 @@ public class TextFields {
      * @return
      */
     public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, T... possibleSuggestions){
-        return new AutoCompletionTextFieldBinding<>(textField, createSuggestionProvider(possibleSuggestions));
+        return bindAutoCompletion(textField, Arrays.asList(possibleSuggestions));
     }
-
-    /**
-     * Creates a new simple suggestion provider. 
-     * 
-     * For more advanced use cases, developers should consider to implement
-     * their own SuggestionProvider-Callback strategy.
-     * 
-     * @param possibleSuggestions Possible auto-complete suggestions
-     * @return
-     */
-    public static <T> Callback<ISuggestionRequest, Collection<T>> createSuggestionProvider(T... possibleSuggestions){
-        return SuggestionProvider.create(possibleSuggestions);
+    
+    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, Collection<T> possibleSuggestions){
+        return new AutoCompletionTextFieldBinding<>(textField, SuggestionProvider.create(possibleSuggestions));
     }
-
-    /**
-     * Creates a new simple suggestion-provider. 
-     * 
-     * For more advanced use cases, developers should consider to implement
-     * their own SuggestionProvider-Callback strategy.
-     * 
-     * @param stringConverter Strategy of how to convert T into a String. Default is the toString() method.
-     * @param possibleSuggestions Possible auto-complete suggestions
-     * @return
-     */
-    public static <T> Callback<ISuggestionRequest, Collection<T>> createSuggestionProvider(Callback<T, String> stringConverter, T... possibleSuggestions){
-        return SuggestionProvider.create(stringConverter, possibleSuggestions);
-    }
-
 }
 

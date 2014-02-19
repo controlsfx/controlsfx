@@ -1,5 +1,7 @@
 package impl.org.controlsfx.skin;
 
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+
 import javafx.beans.binding.Bindings;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -9,8 +11,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-
-import org.controlsfx.control.AutoCompletePopup;
 
 
 public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
@@ -25,11 +25,10 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         suggestionList.getStyleClass().add(AutoCompletePopup.DEFAULT_STYLE_CLASS);
 
-        suggestionList.getStylesheets().add(AutoCompletePopup.class.getResource("autocompletion.css").toExternalForm());
+        suggestionList.getStylesheets().add(AutoCompletionBinding.class.getResource("autocompletion.css").toExternalForm());
         suggestionList.prefHeightProperty().bind(
                 Bindings.size(suggestionList.getItems()).multiply(LIST_CELL_HEIGHT)
-                .add(5) // HACK: avoid that the vertical scrollbar is shown
-                );
+                .add(15));
         suggestionList.maxHeightProperty().bind(control.maxHeightProperty());
         registerEventListener();
     }
@@ -38,10 +37,8 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         suggestionList.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
-                if(me.getButton().equals(MouseButton.PRIMARY)){
-                    if(me.getClickCount() == 2){
-                        onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
-                    }
+                if (me.getButton() == MouseButton.PRIMARY){
+                    onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
                 }
             }
         });
@@ -63,8 +60,9 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
     }
 
     private void onSuggestionChoosen(T suggestion){
-        if(suggestion != null)
+        if(suggestion != null) {
             Event.fireEvent(control, new AutoCompletePopup.SuggestionEvent<T>(suggestion));
+        }
     }
 
 

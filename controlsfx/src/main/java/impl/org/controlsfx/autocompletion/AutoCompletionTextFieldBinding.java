@@ -1,20 +1,15 @@
 package impl.org.controlsfx.autocompletion;
 
+import impl.org.controlsfx.skin.AutoCompletePopup;
+
 import java.util.Collection;
-
-import javax.xml.bind.Binder;
-
-import org.controlsfx.control.AutoCompletePopup;
-import org.controlsfx.control.AutoCompletionBinding;
-import org.controlsfx.control.AutoCompletePopup.SuggestionEvent;
-import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
  * Represents a binding between a text field and a auto-completion popup
@@ -36,24 +31,13 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
      * @param textField
      * @param suggestionProvider
      */
-    public AutoCompletionTextFieldBinding(final TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
-        this(textField, new AutoCompletePopup<T>(), suggestionProvider);
-    }
-
-
-    /**
-     * Create a new auto-completion binding between the given textField and auto-completion controller
-     * 
-     * @param textField
-     * @param completionController
-     */
     public AutoCompletionTextFieldBinding(
             final TextField textField,
-            final AutoCompletePopup<T> autoCompletionPopup,
             Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
-        super(textField, autoCompletionPopup, suggestionProvider);
+        super(textField, suggestionProvider);
 
-        bind();
+        getCompletionTarget().textProperty().addListener(textChangeListener);
+        getCompletionTarget().focusedProperty().addListener(focusChangedListener);
     }
 
 
@@ -64,31 +48,18 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
      **************************************************************************/
 
     /** {@inheritDoc} */
-    @Override
-    public TextField getCompletionTarget(){
+    @Override public TextField getCompletionTarget(){
         return (TextField)super.getCompletionTarget();
     }
 
-
     /** {@inheritDoc} */
-    @Override
-    public void bind(){
-        getCompletionTarget().textProperty().addListener(textChangeListener);
-        getCompletionTarget().focusedProperty().addListener(focusChangedListener);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void unbind(){
+    @Override public void dispose(){
         getCompletionTarget().textProperty().removeListener(textChangeListener);
         getCompletionTarget().focusedProperty().removeListener(focusChangedListener);
     }
 
-
-
     /** {@inheritDoc} */
-    @Override
-    protected void completeUserInput(T completion){
+    @Override protected void completeUserInput(T completion){
         String newText = completion.toString(); // TODO Handle generic parameter better
 
         getCompletionTarget().setText(newText);
@@ -104,16 +75,13 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
 
 
     private final ChangeListener<String> textChangeListener = new ChangeListener<String>() {
-        @Override
-        public void changed(ObservableValue<? extends String> obs, String oldText, String newText) {
+        @Override public void changed(ObservableValue<? extends String> obs, String oldText, String newText) {
             setUserInput(newText);
         }
     };
 
     private final ChangeListener<Boolean> focusChangedListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> obs, Boolean oldFocused, Boolean newFocused) {
-            System.out.println("focused: " + newFocused);
+        @Override public void changed(ObservableValue<? extends Boolean> obs, Boolean oldFocused, Boolean newFocused) {
             if(newFocused == false)
                 hidePopup();
         }

@@ -35,6 +35,7 @@ public class Localization {
 	private Localization() {}
 	
 	private static final String LOCALE_BUNDLE_NAME = "controlsfx";
+	public static final String KEY_PREFIX = "@@";
 	private static Locale locale = null;
 	
 	
@@ -51,14 +52,14 @@ public class Localization {
 	 * Sets locale which will be used as ControlsFX locale
 	 * @param newLocale null is allowed and will be interpreted as default locale
 	 */
-	public static void setLocale( final Locale newLocale ) {
+	public static final void setLocale( final Locale newLocale ) {
 		locale = newLocale;
 	}
 	
 	private static Locale resourceBundleLocale = null; // has to be null
 	private static ResourceBundle resourceBundle = null;
 
-	public static synchronized final ResourceBundle getLocaleBundle() {
+	private static synchronized final ResourceBundle getLocaleBundle() {
 
 		Locale currentLocale = getLocale();
 		if ( !currentLocale.equals(resourceBundleLocale)) {
@@ -74,15 +75,43 @@ public class Localization {
 	
 	/**
 	 * Returns a string localized using currently set locale
-	 * @param key
-	 * @return
+	 * @param key resource bundle key
+	 * @return localized text or key if not found
 	 */
-	public static String getString( String key ) {
+	public static final String getString( final String key ) {
 		try {
 			return getLocaleBundle().getString(key);
 		} catch ( MissingResourceException ex ) {
 			return String.format("<%s>", key);
 		}
+	}
+	
+	/**
+	 * Converts text to localization key by prepending it with the KEY_PREFIX 
+	 * @param text
+	 * @return localization key
+	 */
+	public static final String asKey( String text ) {
+		return KEY_PREFIX + text;
+	}
+	
+	/**
+	 * Checks if the text is a localization key
+	 * @param text
+	 * @return true if text is a localization key
+	 */
+	public static final boolean isKey( String text ) {
+		return text != null && text.startsWith(KEY_PREFIX);
+	}
+	
+	/**
+	 * Tries to localize the text. If the text starts with KEY_PREFIX, it is considered to represent a key in the i18n 
+	 * resource bundle and will be used for localization, otherwise the text is returned as is
+	 * @param text 
+	 * @return
+	 */
+	public static String localize( String text ) {
+		return isKey(text)? getString( text.substring(KEY_PREFIX.length()).trim()): text;
 	}
 
 }

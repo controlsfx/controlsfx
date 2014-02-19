@@ -65,7 +65,7 @@ import org.controlsfx.control.action.Action;
  * within your application itself.
  * 
  * <h3>Screenshot</h3>
- * <p>The following screenshot shows a sample Notification rising from the
+ * <p>The following screenshot shows a sample notification rising from the
  * bottom-right corner of my screen:
  * 
  * <br/><br/>

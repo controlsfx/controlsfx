@@ -9,7 +9,7 @@ import java.util.List;
 
 import javafx.util.Callback;
 
-import org.controlsfx.control.AutoCompletionBinding.ISuggestionRequest;
+import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
 
 /**
  * This is a simple implementation of a generic suggestion provider callback.
@@ -93,7 +93,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      * @param possibleSuggestions All possible suggestions
      * @return
      */
-    public static <T> SuggestionProvider<T> create(T... possibleSuggestions){
+    public static <T> SuggestionProvider<T> create(Collection<T> possibleSuggestions){
         return create(null, possibleSuggestions);
     }
 
@@ -105,7 +105,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      * @param possibleSuggestions All possible suggestions
      * @return
      */
-    public static <T> SuggestionProvider<T> create(Callback<T, String> stringConverter, T... possibleSuggestions){
+    public static <T> SuggestionProvider<T> create(Callback<T, String> stringConverter, Collection<T> possibleSuggestions){
         SuggestionProviderString<T> suggestionProvider = new SuggestionProviderString<>(stringConverter);
         suggestionProvider.addPossibleSuggestions(possibleSuggestions);
         return suggestionProvider;

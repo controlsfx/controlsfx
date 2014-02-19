@@ -152,7 +152,10 @@ public abstract class NotificationBar extends Region {
             closeBtn.setPrefSize(17, 17);
             closeBtn.opacityProperty().bind(transition);
             GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
-            GridPane.setValignment(closeBtn, VPos.TOP);
+            
+            // position the close button in the best place, depending on the height
+            double minHeight = minHeight(-1);
+            GridPane.setValignment(closeBtn, minHeight == MIN_HEIGHT ? VPos.CENTER : VPos.TOP);
         }
 
         // put it all together

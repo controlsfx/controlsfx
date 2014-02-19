@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.button;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -42,6 +42,7 @@ import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
+import org.controlsfx.samples.Utils;
 
 public class HelloBreadCrumbBar extends ControlsFXSample {
 
@@ -66,6 +67,7 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
     @Override public Node getPanel(final Stage stage) {
 
         VBox root = new VBox(10);
+        root.setPadding(new Insets(10));
 
         sampleBreadCrumbBar = new BreadCrumbBar<>();
         resetModel();

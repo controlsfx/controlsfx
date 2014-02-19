@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.button;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -37,6 +37,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.samples.Utils;
 
 public class HelloSegmentedButton extends ControlsFXSample {
     

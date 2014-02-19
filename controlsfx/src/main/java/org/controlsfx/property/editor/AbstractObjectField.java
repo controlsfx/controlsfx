@@ -15,7 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 
-import org.controlsfx.control.CustomTextField;
+import org.controlsfx.control.textfield.CustomTextField;
 
 // package-private for now...
 abstract class AbstractObjectField<T> extends HBox {

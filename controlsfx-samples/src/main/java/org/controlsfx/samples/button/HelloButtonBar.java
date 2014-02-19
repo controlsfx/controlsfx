@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.button;
 
 import static org.controlsfx.control.ButtonBar.ButtonType.APPLY;
 import static org.controlsfx.control.ButtonBar.ButtonType.BACK_PREVIOUS;
@@ -62,6 +62,7 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.samples.Utils;
 
 public class HelloButtonBar extends ControlsFXSample {
     

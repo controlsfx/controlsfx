@@ -1,7 +1,5 @@
 package impl.org.controlsfx.autocompletion;
 
-import impl.org.controlsfx.skin.AutoCompletePopup;
-
 import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;

@@ -360,7 +360,7 @@ public class FXSampler extends Application {
 
         VBox initialVBox = new VBox(5, welcomeLabel1, welcomeLabel2);
 
-        welcomeTab = new Tab("Welcome to ControlsFX!");
+        welcomeTab = new Tab("Welcome!");
         welcomeTab.setContent(initialVBox);
 
         tabPane.getTabs().setAll(welcomeTab);

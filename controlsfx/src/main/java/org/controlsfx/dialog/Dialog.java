@@ -746,27 +746,27 @@ public class Dialog {
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( Localization.getString("dialog.cancel.button"), ButtonType.CANCEL_CLOSE ),
+        CANCEL( Localization.asKey("dialog.cancel.button"), ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( Localization.getString("dialog.close.button"),  ButtonType.CANCEL_CLOSE ),
+        CLOSE ( Localization.asKey("dialog.close.button"),  ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( Localization.getString("dialog.no.button"),     ButtonType.NO ),
+        NO    ( Localization.asKey("dialog.no.button"),     ButtonType.NO ),
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( Localization.getString("dialog.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
+        OK    ( Localization.asKey("dialog.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( Localization.getString("dialog.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
+        YES   ( Localization.asKey("dialog.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
 
         private final AbstractAction action;
         private final EnumSet<ActionTrait> traits;

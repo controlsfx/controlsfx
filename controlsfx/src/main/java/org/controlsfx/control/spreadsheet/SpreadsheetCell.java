@@ -42,6 +42,7 @@ import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br/>
@@ -109,7 +110,7 @@ import javafx.scene.image.Image;
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
  * use the {@link #setGraphic(Node)} in order to specify the graphic you want.
- * If you specify an {@link Image}, the SpreadsheetView will try to resize it in
+ * If you specify an {@link ImageView}, the SpreadsheetView will try to resize it in
  * order to fit the space available in the cell.
  * 
  * For example :
@@ -167,7 +168,7 @@ import javafx.scene.image.Image;
  *     final double random = Math.random();
  *     if (random &lt; 0.10) {
  *         List&lt;String?&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
- *         cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, null);
+ *         cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int) (Math.random() * 6)));
  *     } else if (random ?&gt;= 0.10 && random &lt; 0.25) {
  *         cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
  *     } else if (random ?&gt;= 0.25 && random &lt; 0.75) {
@@ -178,13 +179,6 @@ import javafx.scene.image.Image;
  *     return cell;
  * }
  * </pre>
- * 
- * <p>
- * When you are using {@link SpreadsheetCellType.DoubleType}, you will then be
- * sure that your cells contain only {@link Double} value. If the user wants to
- * enter a {@link String}, the value will be ignored. Moreover, the
- * {@link SpreadsheetCellEditor} background color will turn red when the value
- * is incorrect to notify the user that his value will not be be saved.
  * 
  * @see SpreadsheetView
  * @see SpreadsheetCellEditor

@@ -223,7 +223,6 @@ public class GridBase implements Grid, EventTarget {
     /**
      * Returns an ObservableList of string to display in the row headers.
      * 
-     * @param rowIndex
      * @return an ObservableList of string to display in the row headers.
      */
     public ObservableList<String> getRowHeaders() {
@@ -233,7 +232,6 @@ public class GridBase implements Grid, EventTarget {
     /**
      * Returns an ObservableList of string to display in the column headers.
      * 
-     * @param columnIndex
      * @return an ObservableList of string to display in the column headers.
      */
     public ObservableList<String> getColumnHeaders() {

@@ -746,27 +746,27 @@ public class Dialog {
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( Localization.asKey("dialog.cancel.button"), ButtonType.CANCEL_CLOSE ),
+        CANCEL( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( Localization.asKey("dialog.close.button"),  ButtonType.CANCEL_CLOSE ),
+        CLOSE ( Localization.asKey("dlg.close.button"),  ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( Localization.asKey("dialog.no.button"),     ButtonType.NO ),
+        NO    ( Localization.asKey("dlg.no.button"),     ButtonType.NO ),
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( Localization.asKey("dialog.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
+        OK    ( Localization.asKey("dlg.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( Localization.asKey("dialog.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
+        YES   ( Localization.asKey("dlg.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
 
         private final AbstractAction action;
         private final EnumSet<ActionTrait> traits;
@@ -1009,8 +1009,8 @@ public class Dialog {
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
         detailsButton.getStyleClass().setAll("details-button", "more");
-        final String moreText = Localization.getString("dialog.detail.button.more");
-        final String lessText = Localization.getString("dialog.detail.button.less");
+        final String moreText = Localization.getString("dlg.detail.button.more");
+        final String lessText = Localization.getString("dlg.detail.button.less");
         
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,18 +27,15 @@
 package fxsampler;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -73,7 +70,10 @@ public class FXSampler extends Application {
     
     private Map<String, Project> projectsMap;
 
+    private Stage stage;
     private GridPane grid;
+    
+    private Sample selectedSample;
     
     private TreeView<Sample> samplesTreeView;
     private TreeItem<Sample> root;
@@ -89,12 +89,11 @@ public class FXSampler extends Application {
 
 
     public static void main(String[] args) {
-//    	System.out.println(System.getProperty("user.dir"));
-//    	System.out.println(System.getProperty("java.class.path"));
         launch(args);
     }
 
     @Override public void start(final Stage primaryStage) throws Exception {
+        this.stage = primaryStage;
 //        primaryStage.getIcons().add(new Image("/org/controlsfx/samples/controlsfx-logo.png"));
 
         projectsMap = new SampleScanner().discoverSamples();
@@ -150,7 +149,8 @@ public class FXSampler extends Application {
                 } else if (newSample.getValue() instanceof EmptySample) {
                     return;
                 }
-                changeSample(newSample.getValue(), primaryStage);
+                selectedSample = newSample.getValue();
+                changeSample();
             }
         });
         GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
@@ -161,6 +161,11 @@ public class FXSampler extends Application {
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
+        tabPane.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable arg0) {
+                updateTab();
+            }
+        });
         GridPane.setHgrow(tabPane, Priority.ALWAYS);
         GridPane.setVgrow(tabPane, Priority.ALWAYS);
         grid.add(tabPane, 1, 0, 1, 2);
@@ -260,21 +265,30 @@ public class FXSampler extends Application {
         }
     }
 
-    private void changeSample(Sample newSample, final Stage stage) {
-        if (newSample == null) {
+    private void changeSample() {
+        if (selectedSample == null) {
             return;
         }
 
         if (tabPane.getTabs().contains(welcomeTab)) {
             tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab);
         }
-
-        // update the sample tab
-        sampleTab.setContent(buildSampleTabContent(newSample, stage));
-
-        // update the javadoc tab
-        javaDocWebView.getEngine().load(newSample.getJavaDocURL());
-        sourceWebView.getEngine().loadContent( formatSourceCode(newSample));
+        
+        updateTab();
+    }
+    
+    private void updateTab() {
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        
+        // we only update the selected tab - leaving the other tabs in their
+        // previous state until they are selected
+        if (selectedTab == sampleTab) {
+            sampleTab.setContent(buildSampleTabContent(selectedSample));
+        } else if (selectedTab == javaDocTab) {
+            javaDocWebView.getEngine().load(selectedSample.getJavaDocURL());
+        } else if (selectedTab == sourceTab) {
+            sourceWebView.getEngine().loadContent(formatSourceCode(selectedSample));
+        }  
     }
     
     private String getResource(String resourceName, Class<?> baseClass) {
@@ -329,7 +343,7 @@ public class FXSampler extends Application {
     }
 
 
-    private Node buildSampleTabContent(Sample sample, Stage stage) {
+    private Node buildSampleTabContent(Sample sample) {
         return SampleBase.buildSample(sample, stage);
     }
 

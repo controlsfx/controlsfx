@@ -114,6 +114,7 @@ class LightweightDialog extends FXDialog {
             @Override public void handle(MouseEvent event) {
                 mouseDragDeltaX = lightweightDialog.getLayoutX() - event.getSceneX();
                 mouseDragDeltaY = lightweightDialog.getLayoutY() - event.getSceneY();
+                lightweightDialog.setCache(true);
             }
         });
         toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -139,6 +140,11 @@ class LightweightDialog extends FXDialog {
                 
                 lightweightDialog.setLayoutX(newX);
                 lightweightDialog.setLayoutY(newY);
+            }
+        });
+        toolBar.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {
+                lightweightDialog.setCache(false);
             }
         });
 

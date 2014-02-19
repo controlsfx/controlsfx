@@ -1,7 +1,3 @@
-.root {
-    -fx-padding: 5 5 5 5;
-}
-
 .samples-tree {
     -fx-background-color: -fx-outer-border, -fx-background;
     -fx-background-insets: 0, 1;

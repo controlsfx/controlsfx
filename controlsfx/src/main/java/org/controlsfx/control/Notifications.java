@@ -49,6 +49,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Popup;
@@ -300,7 +301,7 @@ public class Notifications {
             while (windows.hasNext()) {
                 window = windows.next();
                 
-                if (window instanceof Popup) {
+                if (window instanceof Popup || window instanceof ContextMenu) {
                     continue;
                 }
                 
@@ -311,7 +312,7 @@ public class Notifications {
             show(window, notification);
         }
 
-        private void show(Window owner, Notifications notification) {
+        private void show(Window owner, final Notifications notification) {
             // need to install our CSS
             if (owner instanceof Stage) {
                 ownerScene = ((Stage)owner).getScene();
@@ -485,7 +486,7 @@ public class Notifications {
             removePopupFromMap(p, popup);
         }
         
-        private Timeline createHideTimeline(Popup popup, NotificationBar bar, Pos p, Duration startDelay) {
+        private Timeline createHideTimeline(final Popup popup, NotificationBar bar, final Pos p, Duration startDelay) {
             KeyValue fadeOutBegin = new KeyValue(bar.opacityProperty(), 1.0);
             KeyValue fadeOutEnd = new KeyValue(bar.opacityProperty(), 0.0);
 
@@ -569,7 +570,7 @@ public class Notifications {
             
             // then we set up animations for each popup to animate towards the target
             for (int i = popups.size() - 1; i >= 0; i--) {
-                Popup _popup = popups.get(i);
+                final Popup _popup = popups.get(i);
                 final double anchorYTarget = targetAnchors[i];
                 final double oldAnchorY = _popup.getAnchorY();
                 final double distance = anchorYTarget - oldAnchorY; 

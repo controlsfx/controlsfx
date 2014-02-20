@@ -1017,8 +1017,8 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     private void checkFormat() {
-        if ((fmt = DataFormat.lookupMimeType("shuttle")) == null) {
-            fmt = new DataFormat("shuttle");
+        if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
+            fmt = new DataFormat("SpreadsheetView");
         }
     }
 

@@ -34,8 +34,11 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -77,12 +80,20 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         }
     };
 
-    public InfoOverlaySkin(InfoOverlay control) {
+    public InfoOverlaySkin(final InfoOverlay control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
 
         // content
         content = control.getContent();
-        registerChangeListener(control.contentProperty(), "CONTENT");
+        control.hoverProperty().addListener(new ChangeListener<Boolean>() {
+            @Override public void changed(ObservableValue<? extends Boolean> o, Boolean wasHover, Boolean isHover) {
+                if (control.isShowOnHover()) {
+                    if ((isHover && ! isExpanded()) || (!isHover && isExpanded())) {
+                        doToggle();
+                    }
+                }
+            }
+        });
 
         // text
         infoLabel = new Label();
@@ -94,6 +105,8 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         // button to expand / collapse the info overlay
         expandCollapseButton = new ToggleButton();
         expandCollapseButton.setMouseTransparent(true);
+        expandCollapseButton.visibleProperty().bind(Bindings.not(control.showOnHoverProperty()));
+        expandCollapseButton.managedProperty().bind(Bindings.not(control.showOnHoverProperty()));
         updateToggleButton();
 
         // container for the info overlay and the button
@@ -103,14 +116,17 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         infoPanel.getStyleClass().add("info-panel");
         infoPanel.setCursor(Cursor.HAND);
         infoPanel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent e) {
-                doToggle();
+            @Override public void handle(MouseEvent e) {
+                if (! control.isShowOnHover()) {
+                    doToggle();
+                }
             }
         });
 
         // adding everything to the scenegraph
         getChildren().addAll(content, infoPanel);
+        
+        registerChangeListener(control.contentProperty(), "CONTENT");
     }
     
     @Override protected void handleControlPropertyChanged(String p) {

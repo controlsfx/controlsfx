@@ -155,7 +155,7 @@ public class MasterDetailPane extends Control {
     
     /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("masterdetailpane.css").toExternalForm();
+        return MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm();
     }
 
     // Detail postion support

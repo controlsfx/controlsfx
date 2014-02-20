@@ -105,7 +105,7 @@ public class SampleScanner {
                     
                     Project project;
                     if (! projectsMap.containsKey(prettyProjectName)) {
-                        project = new Project(prettyProjectName);
+                        project = new Project(prettyProjectName, key);
                         projectsMap.put(prettyProjectName, project);
                     } else {
                         project = projectsMap.get(prettyProjectName);

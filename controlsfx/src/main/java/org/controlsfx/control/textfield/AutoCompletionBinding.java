@@ -86,12 +86,20 @@ public abstract class AutoCompletionBinding<T> {
     }
 
     /**
+     * Gets the auto-completion Popup-node
+     * @return
+     */
+    public AutoCompletePopup<T> getPopup(){
+        return autoCompletionPopup;
+    }
+
+    /**
      * Disposes the binding.
      */
     public abstract void dispose();
 
-    
-    
+
+
     /***************************************************************************
      *                                                                         *
      * Protected methods                                                       *
@@ -120,8 +128,8 @@ public abstract class AutoCompletionBinding<T> {
         autoCompletionPopup.hide();
     }
 
-    
-    
+
+
     /***************************************************************************
      *                                                                         *
      * Private methods                                                         *

@@ -42,6 +42,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
+import javafx.scene.effect.Effect;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -284,7 +285,7 @@ abstract class FXDialog {
     
     abstract boolean isModal();
     
-    
+    abstract void setEffect(Effect e);
     
     /***************************************************************************
      *                                                                         
@@ -312,5 +313,6 @@ abstract class FXDialog {
      *                                                                         
      **************************************************************************/
     protected static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active");
+
 
 }

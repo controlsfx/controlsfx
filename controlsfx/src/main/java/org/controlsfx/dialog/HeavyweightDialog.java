@@ -43,6 +43,7 @@ import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.effect.Effect;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -289,6 +290,11 @@ class HeavyweightDialog extends FXDialog {
     
     @Override boolean isIconified() {
         return stage.isIconified();
+    }
+    
+    @Override
+    void setEffect(Effect e) {
+        // not implemented for heavyweight dialogs
     }
 
     

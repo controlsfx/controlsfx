@@ -52,6 +52,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Effect;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -723,6 +724,37 @@ public class Dialog {
     public void setTitle(String title){
         this.dialog.titleProperty().set(title);
     }
+    
+    
+    // --- background effect
+    private final ObjectProperty<Effect> backgroundEffectProperty = new SimpleObjectProperty<Effect>() {
+        protected void invalidated() {
+            dialog.setEffect(getValue());
+        }
+    };
+
+    /**
+     * Background effect property of the dialog
+     */
+    public ObjectProperty<Effect> backgroundEffectProperty() {
+        return backgroundEffectProperty;
+    }
+    
+    /**
+     * Gets background effect of the dialog
+     */
+    public final Effect getBackgroundEffect() {
+        return backgroundEffectProperty.get();
+    }
+
+    /**
+     * Sets background effect of the dialog
+     */
+    public final void setBackgroundEffect(Effect effect) {
+        this.backgroundEffectProperty.set(effect);
+    }
+
+
     
     /**************************************************************************
      * 

@@ -31,87 +31,95 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Localization {
-	
-	private Localization() {}
-	
+
+	private Localization() {
+	}
+
 	private static final String LOCALE_BUNDLE_NAME = "controlsfx";
 	public static final String KEY_PREFIX = "@@";
 	private static Locale locale = null;
-	
-	
+
 	/**
 	 * Returns the Locale object that is associated with ControlsFX.
+	 * 
 	 * @return the global ControlsFX locale
 	 */
 	public static final Locale getLocale() {
 		// following allows us to have a "dynamic" locale based on OS/JDK
-		return locale == null? Locale.getDefault(): locale;
+		return locale == null ? Locale.getDefault() : locale;
 	}
 
 	/**
 	 * Sets locale which will be used as ControlsFX locale
-	 * @param newLocale null is allowed and will be interpreted as default locale
+	 * 
+	 * @param newLocale
+	 *            null is allowed and will be interpreted as default locale
 	 */
-	public static final void setLocale( final Locale newLocale ) {
+	public static final void setLocale(final Locale newLocale) {
 		locale = newLocale;
 	}
-	
+
 	private static Locale resourceBundleLocale = null; // has to be null
 	private static ResourceBundle resourceBundle = null;
 
 	private static synchronized final ResourceBundle getLocaleBundle() {
 
 		Locale currentLocale = getLocale();
-		if ( !currentLocale.equals(resourceBundleLocale)) {
+		if (!currentLocale.equals(resourceBundleLocale)) {
 			resourceBundleLocale = currentLocale;
-			resourceBundle = ResourceBundle.getBundle(
-				LOCALE_BUNDLE_NAME,
-				resourceBundleLocale,
-				Localization.class.getClassLoader() );
+			resourceBundle = ResourceBundle.getBundle(LOCALE_BUNDLE_NAME,
+					resourceBundleLocale, Localization.class.getClassLoader());
 		}
 		return resourceBundle;
 
 	}
-	
+
 	/**
 	 * Returns a string localized using currently set locale
-	 * @param key resource bundle key
+	 * 
+	 * @param key
+	 *            resource bundle key
 	 * @return localized text or key if not found
 	 */
-	public static final String getString( final String key ) {
+	public static final String getString(final String key) {
 		try {
 			return getLocaleBundle().getString(key);
-		} catch ( MissingResourceException ex ) {
+		} catch (MissingResourceException ex) {
 			return String.format("<%s>", key);
 		}
 	}
-	
+
 	/**
-	 * Converts text to localization key by prepending it with the KEY_PREFIX 
+	 * Converts text to localization key by prepending it with the KEY_PREFIX
+	 * 
 	 * @param text
 	 * @return localization key
 	 */
-	public static final String asKey( String text ) {
+	public static final String asKey(String text) {
 		return KEY_PREFIX + text;
 	}
-	
+
 	/**
 	 * Checks if the text is a localization key
+	 * 
 	 * @param text
 	 * @return true if text is a localization key
 	 */
-	public static final boolean isKey( String text ) {
+	public static final boolean isKey(String text) {
 		return text != null && text.startsWith(KEY_PREFIX);
 	}
-	
+
 	/**
-	 * Tries to localize the text. If the text starts with KEY_PREFIX, it is considered to represent a key in the i18n 
-	 * resource bundle and will be used for localization, otherwise the text is returned as is
-	 * @param text 
+	 * Tries to localize the text. If the text starts with KEY_PREFIX, it is
+	 * considered to represent a key in the i18n resource bundle and will be
+	 * used for localization, otherwise the text is returned as is
+	 * 
+	 * @param text
 	 * @return
 	 */
-	public static String localize( String text ) {
-		return isKey(text)? getString( text.substring(KEY_PREFIX.length()).trim()): text;
+	public static String localize(String text) {
+		return isKey(text) ? getString(text.substring(KEY_PREFIX.length())
+				.trim()) : text;
 	}
 
 }

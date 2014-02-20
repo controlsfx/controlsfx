@@ -41,10 +41,11 @@ public class SimpleLocalizedStringProperty extends SimpleStringProperty {
 		super(bean, name);
 	}
 
-	public SimpleLocalizedStringProperty(Object bean, String name, String initialValue) {
+	public SimpleLocalizedStringProperty(Object bean, String name,
+			String initialValue) {
 		super(bean, name, initialValue);
 	}
-	
+
 	public String getValue() {
 		return Localization.localize(super.getValue());
 	}

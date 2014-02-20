@@ -28,6 +28,7 @@ package org.controlsfx.samples;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
@@ -39,7 +40,8 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.InfoOverlay;
 
 public class HelloInfoOverlay extends ControlsFXSample {
-    
+
+    private InfoOverlay infoOverlay;
     private Slider fitHeightSlider = new Slider(250, 800, 400);
     
     public static void main(String[] args) {
@@ -72,7 +74,7 @@ public class HelloInfoOverlay extends ControlsFXSample {
                 "Nam tortor felis, pulvinar in scelerisque cursus, pulvinar at ante. " +
                 "Nulla consequat congue lectus in sodales.";
 
-        InfoOverlay infoOverlay = new InfoOverlay(image, info);
+        infoOverlay = new InfoOverlay(image, info);
         
         StackPane stackPane = new StackPane(infoOverlay);
         
@@ -92,6 +94,15 @@ public class HelloInfoOverlay extends ControlsFXSample {
         imageHeightLabel.getStyleClass().add("property");
         grid.add(imageHeightLabel, 0, row);
         grid.add(fitHeightSlider, 1, row++);
+        
+        // show on hover
+        Label showOnHoverLabel = new Label("Show overlay on hover: ");
+        showOnHoverLabel.getStyleClass().add("property");
+        grid.add(showOnHoverLabel, 0, row);
+        CheckBox showOnHoverChk = new CheckBox();
+        showOnHoverChk.setSelected(true);
+        infoOverlay.showOnHoverProperty().bind(showOnHoverChk.selectedProperty());
+        grid.add(showOnHoverChk, 1, row++);
         
         return grid;
     }

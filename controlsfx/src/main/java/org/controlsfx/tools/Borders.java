@@ -29,8 +29,6 @@ package org.controlsfx.tools;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.geometry.Bounds;
@@ -38,7 +36,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotResult;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -49,6 +46,8 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
+
+import javax.swing.BorderFactory;
 
 /**
  * A utility class that allows you to wrap JavaFX {@link Node Nodes} with a border,

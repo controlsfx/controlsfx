@@ -3,7 +3,9 @@ package org.controlsfx.control.textfield;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import impl.org.controlsfx.skin.AutoCompletePopup.SuggestionEvent;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -35,7 +37,7 @@ public abstract class AutoCompletionBinding<T> {
     private FetchSuggestionsTask suggestionsTask = null;
     private Callback<ISuggestionRequest, Collection<T>> suggestionProvider = null;
 
-
+    private List<IAutoCompletionListener<T>> autoCompletionListeners = new ArrayList<>();
 
     /***************************************************************************
      *                                                                         *
@@ -58,6 +60,7 @@ public abstract class AutoCompletionBinding<T> {
         autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup.SuggestionEvent<T>>() {
             @Override public void handle(SuggestionEvent<T> sce) {
                 completeUserInput(sce.getSuggestion());
+                fireAutoCompletion(sce.getSuggestion());
             }
         });
     }
@@ -86,11 +89,19 @@ public abstract class AutoCompletionBinding<T> {
     }
 
     /**
-     * Gets the auto-completion Popup-node
-     * @return
+     * Add an autoCompletionListener which is fired after user input has been completed.
+     * @param autoCompletionListener
      */
-    public AutoCompletePopup<T> getPopup(){
-        return autoCompletionPopup;
+    public void addListener(IAutoCompletionListener<T> autoCompletionListener){
+        autoCompletionListeners.add(autoCompletionListener);
+    }
+
+    /**
+     * Remove the autoCompletionListener
+     * @param autoCompletionListener
+     */
+    public void removeListener(IAutoCompletionListener<T> autoCompletionListener){
+        autoCompletionListeners.remove(autoCompletionListener);
     }
 
     /**
@@ -128,7 +139,11 @@ public abstract class AutoCompletionBinding<T> {
         autoCompletionPopup.hide();
     }
 
-
+    protected void fireAutoCompletion(T completion){
+        for (IAutoCompletionListener<T> listener : autoCompletionListeners) {
+            listener.afterAutocompletion(completion);
+        }
+    }
 
     /***************************************************************************
      *                                                                         *
@@ -158,6 +173,20 @@ public abstract class AutoCompletionBinding<T> {
      * Inner classes and interfaces                                            *
      *                                                                         *
      **************************************************************************/
+
+    /**
+     * Listener which listens to auto-completion events
+     * @param <T>
+     */
+    public static interface IAutoCompletionListener<T> {
+        /**
+         * Invoked after user input has been auto-completed.
+         * @param completion The chosen suggestion which has been used for auto-complete
+         */
+        void afterAutocompletion(T completion);
+    }
+
+
 
     /**
      * Represents a suggestion fetch request

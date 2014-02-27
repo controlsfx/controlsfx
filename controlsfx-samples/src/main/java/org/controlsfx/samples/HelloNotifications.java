@@ -72,6 +72,7 @@ public class HelloNotifications extends ControlsFXSample {
     private CheckBox showTitleChkBox;
     private CheckBox showCloseButtonChkBox;
     private CheckBox darkStyleChkBox;
+    private CheckBox ownerChkBox;
     private Slider fadeDelaySlider;
     protected String graphicMode = "";
     
@@ -241,6 +242,13 @@ public class HelloNotifications extends ControlsFXSample {
         darkStyleChkBox = new CheckBox();
         grid.add(darkStyleChkBox, 1, row++);
         
+        // --- owner
+        Label owner = new Label("Set Owner: ");
+        owner.getStyleClass().add("property");
+        grid.add(owner, 0, row);
+        ownerChkBox = new CheckBox();
+        grid.add(ownerChkBox, 1, row++);
+        
         // --- graphic
         Label graphicLabel = new Label("Graphic Options: ");
         graphicLabel.getStyleClass().add("property");
@@ -311,6 +319,10 @@ public class HelloNotifications extends ControlsFXSample {
                         System.out.println("Notification clicked on!");
                     }
                 });
+        
+        if(ownerChkBox.isSelected()){
+            notificationBuilder.owner(stage);
+        }
         
         if (! showCloseButtonChkBox.isSelected()) {
             notificationBuilder.hideCloseButton();

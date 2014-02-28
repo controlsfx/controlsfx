@@ -30,7 +30,6 @@ import impl.org.controlsfx.skin.NotificationBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Popup;
@@ -59,6 +57,7 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 import org.controlsfx.control.action.Action;
+import org.controlsfx.tools.Utils;
 
 /**
  * An API to show popup notification messages to the user in the corner of their
@@ -66,15 +65,17 @@ import org.controlsfx.control.action.Action;
  * within your application itself.
  * 
  * <h3>Screenshot</h3>
- * <p>The following screenshot shows a sample notification rising from the
+ * <p>
+ * The following screenshot shows a sample notification rising from the
  * bottom-right corner of my screen:
  * 
- * <br/><br/>
+ * <br/>
+ * <br/>
  * <img src="notifications.png"/>
  * 
  * <h3>Code Example:</h3>
- * <p>To create the notification shown in the screenshot, simply do the 
- * following:
+ * <p>
+ * To create the notification shown in the screenshot, simply do the following:
  * 
  * <pre>
  * {@code
@@ -82,24 +83,19 @@ import org.controlsfx.control.action.Action;
  *              .title("Title Text")
  *              .text("Hello World 0!")
  *              .showWarning();
- * }</pre>
+ * }
+ * </pre>
  */
 public class Notifications {
 
     /***************************************************************************
-     *                                                                         *
-     * Static fields                                                           *
-     *                                                                         *
+     * * Static fields * *
      **************************************************************************/
 
     private static final String STYLE_CLASS_DARK = "dark";
 
-    
-    
     /***************************************************************************
-     *                                                                         *
-     * Private fields                                                          *
-     *                                                                         *
+     * * Private fields * *
      **************************************************************************/
 
     private String title;
@@ -124,12 +120,8 @@ public class Notifications {
         // no-op
     }
 
-    
-    
     /***************************************************************************
-     *                                                                         *
-     * Public API                                                              *
-     *                                                                         *
+     * * Public API * *
      **************************************************************************/
 
     /**
@@ -173,19 +165,15 @@ public class Notifications {
     }
 
     /**
-     * The dialog window owner - if specified the notifications will be
-     *      inside the owner, otherwise the notifications will be shown within the 
-     *      whole screen.
+     * The dialog window owner - if specified the notifications will be inside
+     * the owner, otherwise the notifications will be shown within the whole
+     * screen.
+     * 
      * @param owner
      * @return
      */
     public Notifications owner(Object owner) {
-        if (owner instanceof Window) {
-            this.owner = (Window) owner;
-        } else if (owner instanceof Node) {
-            this.owner = ((Node) owner).getScene().getWindow();
-        }
-
+        this.owner = Utils.getWindow(owner);
         return this;
     }
 
@@ -209,8 +197,9 @@ public class Notifications {
     }
 
     /**
-     * Specify that the notification should use the built-in dark styling, rather
-     * than the default 'modena' notification style (which is a light-gray).
+     * Specify that the notification should use the built-in dark styling,
+     * rather than the default 'modena' notification style (which is a
+     * light-gray).
      */
     public Notifications darkStyle() {
         styleClass.add(STYLE_CLASS_DARK);
@@ -230,14 +219,14 @@ public class Notifications {
      * Specify the actions that should be shown in the notification as buttons.
      */
     public Notifications action(Action... actions) {
-        this.actions = actions == null ? FXCollections.<Action>observableArrayList() :
-            FXCollections.observableArrayList(actions);
+        this.actions = actions == null ? FXCollections.<Action> observableArrayList() : FXCollections
+                .observableArrayList(actions);
         return this;
     }
 
     /**
-     * Instructs the notification to be shown, and that it should use
-     * the built-in 'warning' graphic.
+     * Instructs the notification to be shown, and that it should use the
+     * built-in 'warning' graphic.
      */
     public void showWarning() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-warning.png")));
@@ -245,8 +234,8 @@ public class Notifications {
     }
 
     /**
-     * Instructs the notification to be shown, and that it should use
-     * the built-in 'information' graphic.
+     * Instructs the notification to be shown, and that it should use the
+     * built-in 'information' graphic.
      */
     public void showInformation() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-information.png")));
@@ -254,8 +243,8 @@ public class Notifications {
     }
 
     /**
-     * Instructs the notification to be shown, and that it should use
-     * the built-in 'error' graphic.
+     * Instructs the notification to be shown, and that it should use the
+     * built-in 'error' graphic.
      */
     public void showError() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-error.png")));
@@ -263,8 +252,8 @@ public class Notifications {
     }
 
     /**
-     * Instructs the notification to be shown, and that it should use
-     * the built-in 'confirm' graphic.
+     * Instructs the notification to be shown, and that it should use the
+     * built-in 'confirm' graphic.
      */
     public void showConfirm() {
         graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/system-help.png")));
@@ -278,12 +267,8 @@ public class Notifications {
         NotificationPopupHandler.getInstance().show(this);
     }
 
-    
-    
     /***************************************************************************
-     *                                                                         *
-     * Private support classes                                                 *
-     *                                                                         *
+     * * Private support classes * *
      **************************************************************************/
 
     // not public so no need for JavaDoc
@@ -292,9 +277,9 @@ public class Notifications {
         private static final NotificationPopupHandler INSTANCE = new NotificationPopupHandler();
 
         private static final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        
+
         private double startX;
-        private double startY; 
+        private double startY;
         private double screenWidth;
         private double screenHeight;
 
@@ -321,28 +306,17 @@ public class Notifications {
                 screenWidth = screenBounds.getWidth();
                 screenHeight = screenBounds.getHeight();
 
-                Iterator<Window> windows = Window.impl_getWindows();
-
-                while (windows.hasNext()) {
-                    window = windows.next();
-
-                    if (window instanceof Popup || window instanceof ContextMenu) {
-                        continue;
-                    }
-
-                    if (window.isFocused()) {
-                        break;
-                    }
-                }
-            }else{
+                window = Utils.getWindow(null);
+            } else {
                 /*
-                 * If the owner is set, we will make the notifications popup inside its window.
+                 * If the owner is set, we will make the notifications popup
+                 * inside its window.
                  */
                 startX = notification.owner.getX();
                 startY = notification.owner.getY();
                 screenWidth = notification.owner.getWidth();
                 screenHeight = notification.owner.getHeight();
-                window = notification.owner; 
+                window = notification.owner;
             }
             show(window, notification);
         }
@@ -360,27 +334,33 @@ public class Notifications {
             final Pos p = notification.position;
 
             final NotificationBar notificationBar = new NotificationBar() {
-                @Override public String getTitle() {
+                @Override
+                public String getTitle() {
                     return notification.title;
                 }
 
-                @Override public String getText() {
+                @Override
+                public String getText() {
                     return notification.text;
                 }
 
-                @Override public Node getGraphic() {
+                @Override
+                public Node getGraphic() {
                     return notification.graphic;
                 }
 
-                @Override public ObservableList<Action> getActions() {
+                @Override
+                public ObservableList<Action> getActions() {
                     return notification.actions;
                 }
 
-                @Override public boolean isShowing() {
+                @Override
+                public boolean isShowing() {
                     return isShowing;
                 }
 
-                @Override protected double computeMinWidth(double height) {
+                @Override
+                protected double computeMinWidth(double height) {
                     String text = getText();
                     Node graphic = getGraphic();
                     if ((text == null || text.isEmpty()) && (graphic != null)) {
@@ -399,11 +379,13 @@ public class Notifications {
                     return 100;
                 }
 
-                @Override public boolean isShowFromTop() {
+                @Override
+                public boolean isShowFromTop() {
                     return NotificationPopupHandler.this.isShowFromTop(notification.position);
                 }
 
-                @Override public void hide() {
+                @Override
+                public void hide() {
                     isShowing = false;
 
                     // this would slide the notification bar out of view,
@@ -414,15 +396,18 @@ public class Notifications {
                     createHideTimeline(popup, this, p, Duration.ZERO).play();
                 }
 
-                @Override public boolean isHideCloseButton() {
+                @Override
+                public boolean isHideCloseButton() {
                     return notification.hideCloseButton;
                 }
 
-                @Override public double getContainerHeight() {
+                @Override
+                public double getContainerHeight() {
                     return startY + screenHeight;
                 }
 
-                @Override public void relocateInParent(double x, double y) {
+                @Override
+                public void relocateInParent(double x, double y) {
                     // this allows for us to slide the notification upwards
                     switch (p) {
                     case BOTTOM_LEFT:
@@ -477,7 +462,7 @@ public class Notifications {
             case TOP_RIGHT:
             case CENTER_RIGHT:
             case BOTTOM_RIGHT:
-                anchorX =  startX + screenWidth - barWidth - padding;
+                anchorX = startX + screenWidth - barWidth - padding;
                 break;
             }
 
@@ -531,7 +516,8 @@ public class Notifications {
             Timeline timeline = new Timeline(kfBegin, kfEnd);
             timeline.setDelay(startDelay);
             timeline.setOnFinished(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent e) {
+                @Override
+                public void handle(ActionEvent e) {
                     hide(popup, p);
                 }
             });
@@ -603,7 +589,8 @@ public class Notifications {
                 }
             }
 
-            // then we set up animations for each popup to animate towards the target
+            // then we set up animations for each popup to animate towards the
+            // target
             for (int i = popups.size() - 1; i >= 0; i--) {
                 final Popup _popup = popups.get(i);
                 final double anchorYTarget = targetAnchors[i];
@@ -615,7 +602,8 @@ public class Notifications {
                         setCycleDuration(Duration.millis(350));
                     }
 
-                    @Override protected void interpolate(double frac) {
+                    @Override
+                    protected void interpolate(double frac) {
                         double newAnchorY = oldAnchorY + distance * frac;
                         _popup.setAnchorY(newAnchorY);
                     }

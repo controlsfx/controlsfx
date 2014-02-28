@@ -71,16 +71,7 @@ class LightweightDialog extends FXDialog {
         // we need to determine the type of the owner, so that we can appropriately
         // show the dialog
         if (_owner == null) {
-            // lets just get the focused stage and show the dialog in there
-            Iterator<Window> windows = Window.impl_getWindows();
-            Window window = null;
-            while (windows.hasNext()) {
-                window = windows.next();
-                if (window.isFocused()) {
-                    break;
-                }
-            }
-            _owner = window;
+            _owner = org.controlsfx.tools.Utils.getWindow(_owner);
         } 
         
         if (_owner instanceof Scene) {

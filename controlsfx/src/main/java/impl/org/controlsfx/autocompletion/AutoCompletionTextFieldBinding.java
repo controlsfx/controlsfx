@@ -6,6 +6,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
@@ -16,7 +17,36 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
  */
 public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>{
 
+    /***************************************************************************
+     *                                                                         *
+     * Static properties and methods                                           *
+     *                                                                         *
+     **************************************************************************/
+    
+    private static <T> StringConverter<T> defaultStringConverter() {
+        return new StringConverter<T>() {
+            @Override public String toString(T t) {
+                return t == null ? null : t.toString();
+            }
+            @SuppressWarnings("unchecked")
+			@Override public T fromString(String string) {
+                return (T) string;
+            }
+        };
+    }
 
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
+	
+    /**
+     * String converter to be used to convert suggestions to strings.
+     */
+	private StringConverter<T> converter;
+
+	
     /***************************************************************************
      *                                                                         *
      * Constructors                                                            *
@@ -24,15 +54,32 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
      **************************************************************************/
 
     /**
-     * Create a new auto-completion binding between the given textField and the given suggestion provider
+     * Creates a new auto-completion binding between the given textField 
+     * and the given suggestion provider.
      * 
      * @param textField
      * @param suggestionProvider
      */
-    public AutoCompletionTextFieldBinding(
-            final TextField textField,
-            Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
-        super(textField, suggestionProvider);
+    public AutoCompletionTextFieldBinding(final TextField textField,
+            Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
+    	
+        this(textField, suggestionProvider, AutoCompletionTextFieldBinding
+    			.<T>defaultStringConverter());
+    }
+
+    /**
+     * Creates a new auto-completion binding between the given textField 
+     * and the given suggestion provider.
+     * 
+     * @param textField
+     * @param suggestionProvider
+     */
+    public AutoCompletionTextFieldBinding(final TextField textField,
+            Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
+            final StringConverter<T> converter) {
+    	
+        super(textField, suggestionProvider, converter);
+        this.converter = converter; 
 
         getCompletionTarget().textProperty().addListener(textChangeListener);
         getCompletionTarget().focusedProperty().addListener(focusChangedListener);
@@ -58,8 +105,7 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
 
     /** {@inheritDoc} */
     @Override protected void completeUserInput(T completion){
-        String newText = completion.toString(); // TODO Handle generic parameter better
-
+    	String newText = converter.toString(completion);     	
         getCompletionTarget().setText(newText);
         getCompletionTarget().positionCaret(newText.length());
     }

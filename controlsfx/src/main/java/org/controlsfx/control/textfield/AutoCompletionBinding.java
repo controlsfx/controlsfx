@@ -10,6 +10,7 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 
 /**
  * The AutoCompletionBinding is the abstract base class of all auto-completion bindings
@@ -49,13 +50,19 @@ public abstract class AutoCompletionBinding<T> {
      * 
      * @param completionTarget The target node to which auto-completion shall be added
      * @param suggestionProvider The strategy to retrieve suggestions 
+     * @param converter The converter to be used to convert suggestions to strings 
      */
-    protected AutoCompletionBinding(Node completionTarget, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+    protected AutoCompletionBinding(Node completionTarget, 
+    		Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
+    		StringConverter<T> converter){
+    	
         this.completionTarget = completionTarget;
         this.suggestionProvider = suggestionProvider;
         this.autoCompletionPopup = new AutoCompletePopup<T>();
+        this.autoCompletionPopup.setConverter(converter);
 
-        autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup.SuggestionEvent<T>>() {
+        autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup
+        		.SuggestionEvent<T>>() {
             @Override public void handle(SuggestionEvent<T> sce) {
                 completeUserInput(sce.getSuggestion());
             }

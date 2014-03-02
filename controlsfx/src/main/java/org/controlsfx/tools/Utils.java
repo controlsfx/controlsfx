@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,35 +24,43 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.dialog;
+package org.controlsfx.tools;
 
-import org.controlsfx.tools.Utils;
+import java.util.Iterator;
 
+import javafx.scene.Node;
+import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 
-class DialogFactory {
+public class Utils {
 
-    static FXDialog createDialog(String title) {
-        return createDialog(false, title);
-    }
-
-    static FXDialog createDialog(boolean useLightweight, String title) {
-        return createDialog(false, title, null, false);
-    }
-
-    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
-        return createDialog(useLightweight, title, owner, modal, false);
-    }
-
-    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, boolean nativeChrome) {
-        if (useLightweight) {
-            return new LightweightDialog(title, owner);
+    /**
+     * Will return a {@link Window} from an object if any can be found. null
+     * value can be given, the program will then try to find the focused window
+     * among those available.
+     * 
+     * @param owner
+     * @return
+     */
+    public static Window getWindow(Object owner) throws IllegalArgumentException {
+        if (owner == null) {
+            Window window = null;
+            // lets just get the focused stage and show the dialog in there
+            @SuppressWarnings("deprecation")
+            Iterator<Window> windows = Window.impl_getWindows();
+            while (windows.hasNext()) {
+                window = windows.next();
+                if (window.isFocused() && !(window instanceof PopupWindow)) {
+                    break;
+                }
+            }
+            return window;
+        } else if (owner instanceof Window) {
+            return (Window) owner;
+        } else if (owner instanceof Node) {
+            return ((Node) owner).getScene().getWindow();
         } else {
-
-            Window window = Utils.getWindow(owner);
-
-            return new HeavyweightDialog(title, window, modal, nativeChrome);
+            throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
         }
     }
-
 }

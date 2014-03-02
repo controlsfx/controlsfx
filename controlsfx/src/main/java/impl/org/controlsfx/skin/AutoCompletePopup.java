@@ -1,8 +1,6 @@
 package impl.org.controlsfx.skin;
 
 
-import com.sun.javafx.event.EventHandlerManager;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.collections.FXCollections;
@@ -15,6 +13,9 @@ import javafx.scene.Node;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.stage.Window;
+import javafx.util.StringConverter;
+
+import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * The auto-complete-popup provides an list of available suggestions in order
@@ -30,6 +31,7 @@ public class AutoCompletePopup<T> extends PopupControl{
 
     private final static int TITLE_HEIGHT = 28; // HACK: Hard-coded title-bar height
     private final ObservableList<T> suggestions = FXCollections.observableArrayList();
+    private StringConverter<T> converter;
 
 
     /***************************************************************************
@@ -47,7 +49,8 @@ public class AutoCompletePopup<T> extends PopupControl{
     @SuppressWarnings("serial")
     public static class SuggestionEvent<TE> extends Event {
         @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<SuggestionEvent>("SUGGESTION");
+        public static final EventType<SuggestionEvent> SUGGESTION 
+        	= new EventType<SuggestionEvent>("SUGGESTION");
 
         private final TE suggestion;
 
@@ -118,6 +121,18 @@ public class AutoCompletePopup<T> extends PopupControl{
 
     }
 
+    /**
+     */
+    public void setConverter(StringConverter<T> converter) {
+		this.converter = converter;
+	}
+    
+    /**
+     */
+	public StringConverter<T> getConverter() {
+		return converter;
+	}
+    
 
     /***************************************************************************
      *                                                                         *

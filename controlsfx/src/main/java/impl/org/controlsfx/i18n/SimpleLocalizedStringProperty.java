@@ -28,6 +28,12 @@ package impl.org.controlsfx.i18n;
 
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * A special implementation of string property which assumes that its content may be a key and 
+ * attempts to get localized text resource base on it. 
+ * 
+ * It is intended for internal use only and will not work for bidirectional binding. 
+ */
 public class SimpleLocalizedStringProperty extends SimpleStringProperty {
 
 	public SimpleLocalizedStringProperty() {

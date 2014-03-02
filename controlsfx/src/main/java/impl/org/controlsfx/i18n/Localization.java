@@ -35,8 +35,9 @@ public class Localization {
 	private Localization() {
 	}
 
-	private static final String LOCALE_BUNDLE_NAME = "controlsfx";
 	public static final String KEY_PREFIX = "@@";
+
+	private static final String LOCALE_BUNDLE_NAME = "controlsfx";
 	private static Locale locale = null;
 
 	/**
@@ -59,7 +60,7 @@ public class Localization {
 		locale = newLocale;
 	}
 
-	private static Locale resourceBundleLocale = null; // has to be null
+	private static Locale resourceBundleLocale = null; // has to be null initially
 	private static ResourceBundle resourceBundle = null;
 
 	private static synchronized final ResourceBundle getLocaleBundle() {
@@ -77,9 +78,8 @@ public class Localization {
 	/**
 	 * Returns a string localized using currently set locale
 	 * 
-	 * @param key
-	 *            resource bundle key
-	 * @return localized text or key if not found
+	 * @param key resource bundle key
+	 * @return localized text or formatted key if not found
 	 */
 	public static final String getString(final String key) {
 		try {
@@ -90,7 +90,8 @@ public class Localization {
 	}
 
 	/**
-	 * Converts text to localization key by prepending it with the KEY_PREFIX
+	 * Converts text to localization key,
+	 * currently by prepending it with the KEY_PREFIX
 	 * 
 	 * @param text
 	 * @return localization key
@@ -110,9 +111,8 @@ public class Localization {
 	}
 
 	/**
-	 * Tries to localize the text. If the text starts with KEY_PREFIX, it is
-	 * considered to represent a key in the i18n resource bundle and will be
-	 * used for localization, otherwise the text is returned as is
+	 * Tries to localize the text. If the text is a localization key - and attempt will be made to 
+	 * use it for localization, otherwise the text is returned as is
 	 * 
 	 * @param text
 	 * @return

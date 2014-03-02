@@ -3,13 +3,19 @@ package org.controlsfx.control.textfield;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import impl.org.controlsfx.skin.AutoCompletePopup.SuggestionEvent;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import com.sun.javafx.event.EventHandlerManager;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -22,7 +28,7 @@ import javafx.util.StringConverter;
  *
  * @param <T> Model-Type of the suggestions
  */
-public abstract class AutoCompletionBinding<T> {
+public abstract class AutoCompletionBinding<T> implements EventTarget {
 
 
     /***************************************************************************
@@ -37,8 +43,6 @@ public abstract class AutoCompletionBinding<T> {
 
     private FetchSuggestionsTask suggestionsTask = null;
     private Callback<ISuggestionRequest, Collection<T>> suggestionProvider = null;
-
-    private List<IAutoCompletionListener<T>> autoCompletionListeners = new ArrayList<>();
 
     /***************************************************************************
      *                                                                         *
@@ -55,16 +59,16 @@ public abstract class AutoCompletionBinding<T> {
      * @param converter The converter to be used to convert suggestions to strings 
      */
     protected AutoCompletionBinding(Node completionTarget, 
-    		Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
-    		StringConverter<T> converter){
-    	
+            Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
+            StringConverter<T> converter){
+
         this.completionTarget = completionTarget;
         this.suggestionProvider = suggestionProvider;
         this.autoCompletionPopup = new AutoCompletePopup<T>();
         this.autoCompletionPopup.setConverter(converter);
 
         autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup
-        		.SuggestionEvent<T>>() {
+                .SuggestionEvent<T>>() {
             @Override public void handle(SuggestionEvent<T> sce) {
                 completeUserInput(sce.getSuggestion());
                 fireAutoCompletion(sce.getSuggestion());
@@ -93,22 +97,6 @@ public abstract class AutoCompletionBinding<T> {
      */
     public Node getCompletionTarget(){
         return completionTarget;
-    }
-
-    /**
-     * Add an autoCompletionListener which is fired after user input has been completed.
-     * @param autoCompletionListener
-     */
-    public void addListener(IAutoCompletionListener<T> autoCompletionListener){
-        autoCompletionListeners.add(autoCompletionListener);
-    }
-
-    /**
-     * Remove the autoCompletionListener
-     * @param autoCompletionListener
-     */
-    public void removeListener(IAutoCompletionListener<T> autoCompletionListener){
-        autoCompletionListeners.remove(autoCompletionListener);
     }
 
     /**
@@ -147,9 +135,7 @@ public abstract class AutoCompletionBinding<T> {
     }
 
     protected void fireAutoCompletion(T completion){
-        for (IAutoCompletionListener<T> listener : autoCompletionListeners) {
-            listener.afterAutocompletion(completion);
-        }
+        Event.fireEvent(this, new ActionEvent());
     }
 
     /***************************************************************************
@@ -180,19 +166,6 @@ public abstract class AutoCompletionBinding<T> {
      * Inner classes and interfaces                                            *
      *                                                                         *
      **************************************************************************/
-
-    /**
-     * Listener which listens to auto-completion events
-     * @param <T>
-     */
-    public static interface IAutoCompletionListener<T> {
-        /**
-         * Invoked after user input has been auto-completed.
-         * @param completion The chosen suggestion which has been used for auto-complete
-         */
-        void afterAutocompletion(T completion);
-    }
-
 
 
     /**
@@ -257,6 +230,129 @@ public abstract class AutoCompletionBinding<T> {
         public String getUserText() {
             return userText;
         }
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Events                                                                  *
+     *                                                                         *
+     **************************************************************************/
+
+
+    // --- AutoCompletionEvent
+
+    /**
+     * Represents an Event which is fired after an auto completion.
+     */
+    @SuppressWarnings("serial")
+    public static class AutoCompletionEvent<TE> extends Event {
+
+        /**
+         * The event type that should be listened to by people interested in 
+         * knowing when an auto completion has been performed.
+         */
+        @SuppressWarnings("rawtypes")
+        public static final EventType<AutoCompletionEvent> AUTO_COMPLETED = 
+        new EventType<AutoCompletionEvent>("AUTO_COMPLETED");
+
+        private final TE completion;
+
+        /**
+         * Creates a new event that can subsequently be fired.
+         */
+        public AutoCompletionEvent(TE completion) {
+            super(AUTO_COMPLETED);
+            this.completion = completion;
+        }
+
+        /**
+         * Returns the chosen completion.
+         */
+        public TE getCompletion() {
+            return completion;
+        }
+    }
+
+
+    private ObjectProperty<EventHandler<AutoCompletionEvent<T>>> onAutoCompleted;
+
+    /**
+     * Set a event handler which is invoked after an auto completion.
+     * @param value
+     */
+    public final void setOnAutoCompleted(EventHandler<AutoCompletionEvent<T>> value) {
+        onAutoCompletedProperty().set( value);
+    }
+
+    public final EventHandler<AutoCompletionEvent<T>> getOnAutoCompleted() {
+        return onAutoCompleted == null ? null : onAutoCompleted.get();
+    }
+
+    public final ObjectProperty<EventHandler<AutoCompletionEvent<T>>> onAutoCompletedProperty() {
+        if (onAutoCompleted == null) {
+            onAutoCompleted = new ObjectPropertyBase<EventHandler<AutoCompletionEvent<T>>>() {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                @Override protected void invalidated() {
+                    eventHandlerManager.setEventHandler(
+                            AutoCompletionEvent.AUTO_COMPLETED,
+                            (EventHandler<AutoCompletionEvent>)(Object)get());
+                }
+
+                @Override
+                public Object getBean() {
+                    return AutoCompletionBinding.this;
+                }
+
+                @Override
+                public String getName() {
+                    return "onAutoCompleted";
+                }
+            };
+        }
+        return onAutoCompleted;
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * EventTarget Implementation                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
+
+    /**
+     * Registers an event handler to this MenuItem. The handler is called when the
+     * menu item receives an {@code Event} of the specified type during the bubbling
+     * phase of event delivery.
+     *
+     * @param <E> the specific event class of the handler
+     * @param eventType the type of the events to receive by the handler
+     * @param eventHandler the handler to register
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {
+        eventHandlerManager.addEventHandler(eventType, eventHandler);
+    }
+
+    /**
+     * Unregisters a previously registered event handler from this MenuItem. One
+     * handler might have been registered for different event types, so the
+     * caller needs to specify the particular event type from which to
+     * unregister the handler.
+     *
+     * @param <E> the specific event class of the handler
+     * @param eventType the event type from which to unregister
+     * @param eventHandler the handler to unregister
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {
+        eventHandlerManager.removeEventHandler(eventType, eventHandler);
+    }
+
+    /** {@inheritDoc} */
+    @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
+        return tail.prepend(eventHandlerManager);
     }
 
 

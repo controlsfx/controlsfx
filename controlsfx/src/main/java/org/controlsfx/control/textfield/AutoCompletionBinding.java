@@ -322,7 +322,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     /**
-     * Registers an event handler to this MenuItem. The handler is called when the
+     * Registers an event handler to this EventTarget. The handler is called when the
      * menu item receives an {@code Event} of the specified type during the bubbling
      * phase of event delivery.
      *
@@ -336,7 +336,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     }
 
     /**
-     * Unregisters a previously registered event handler from this MenuItem. One
+     * Unregisters a previously registered event handler from this EventTarget. One
      * handler might have been registered for different event types, so the
      * caller needs to specify the particular event type from which to
      * unregister the handler.

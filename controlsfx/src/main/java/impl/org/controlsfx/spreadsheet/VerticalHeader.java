@@ -159,7 +159,7 @@ public class VerticalHeader extends StackPane {
                     savedWidth = verticalHeaderWidth.get();
                     verticalHeaderWidth.set(0);
                 } else {
-                    verticalHeaderWidth.set(savedWidth == null ? skin.DEFAULT_VERTICALHEADER_WIDTH : savedWidth);
+                    verticalHeaderWidth.set(savedWidth == null ? skin.DEFAULT_VERTICAL_HEADER_WIDTH : savedWidth);
                 }
                 requestLayout();
             }

@@ -186,6 +186,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setContentDisplay(ContentDisplay.LEFT);
         updateItem(newValue, false);
 
+        if (getTableView() != null) {
+            getTableView().requestFocus();
+        }
     }
 
     @Override
@@ -199,13 +202,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setContentDisplay(ContentDisplay.LEFT);
         updateItem(getItem(), false);
 
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                getTableView().requestFocus();
-            }
-        };
-        Platform.runLater(r);
+        if (getTableView() != null) {
+            getTableView().requestFocus();
+        }
     }
 
     @Override
@@ -297,7 +296,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     private void setCellGraphic(SpreadsheetCell item) {
 
-        if(isEditing()){
+        if (isEditing()) {
             return;
         }
         if (item.getGraphic() != null) {
@@ -316,7 +315,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             } else if (item.getGraphic() instanceof Node) {
                 setGraphic((Node) item.getGraphic());
             }
-        }else{
+        } else {
             setGraphic(null);
         }
     }
@@ -503,7 +502,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
 
     }
-
 
     /**
      * Will safely execute the request on the JFX thread by checking whether we

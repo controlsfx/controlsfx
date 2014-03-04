@@ -6,8 +6,6 @@ import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
-
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -19,6 +17,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
 
 /**
  * A class containing useful customizations for the JavaFX {@link TextField}.
@@ -99,33 +100,57 @@ public class TextFields {
      *                                                                         *
      **************************************************************************/
 
-
     /**
-     * Create a new auto-completion binding between the given textField and the given suggestion provider.
+     * Create a new auto-completion binding between the given textField and the 
+     * given suggestion provider.
      * 
-     * The {@link TextFields} API has some suggestion-provider builder methods for simple use cases.
+     * The {@link TextFields} API has some suggestion-provider builder methods 
+     * for simple use cases.
+     * 
+     * @param textField The {@link TextField} to which auto-completion shall be added
+     * @param suggestionProvider A suggestion-provider strategy to use
+     * @param converter The converter to be used to convert suggestions to strings
+     */
+	public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField,
+			Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
+			StringConverter<T> converter) {
+		return new AutoCompletionTextFieldBinding<>(textField,
+				suggestionProvider, converter);
+	}    
+    
+    /**
+     * Create a new auto-completion binding between the given textField and the 
+     * given suggestion provider.
+     * 
+     * The {@link TextFields} API has some suggestion-provider builder methods 
+     * for simple use cases.
      * 
      * @param textField The {@link TextField} to which auto-completion shall be added
      * @param suggestionProvider A suggestion-provider strategy to use
      * @return
      */
-    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
+    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, 
+    		Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
         return new AutoCompletionTextFieldBinding<>(textField, suggestionProvider);
     }
 
     /**
-     * Create a new auto-completion binding between the given {@link TextField} using the given auto-complete suggestions
+     * Create a new auto-completion binding between the given {@link TextField} 
+     * using the given auto-complete suggestions
      * 
      * @param textField The {@link TextField} to which auto-completion shall be added
      * @param possibleSuggestions Possible auto-complete suggestions
      * @return
      */
-    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, T... possibleSuggestions){
-        return bindAutoCompletion(textField, Arrays.asList(possibleSuggestions));
-    }
+	public static <T> AutoCompletionBinding<T> bindAutoCompletion(
+			TextField textField, T... possibleSuggestions) {
+		return bindAutoCompletion(textField, Arrays.asList(possibleSuggestions));
+	}
     
-    public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, Collection<T> possibleSuggestions){
-        return new AutoCompletionTextFieldBinding<>(textField, SuggestionProvider.create(possibleSuggestions));
-    }
+	public static <T> AutoCompletionBinding<T> bindAutoCompletion(
+			TextField textField, Collection<T> possibleSuggestions) {
+		return new AutoCompletionTextFieldBinding<>(textField,
+				SuggestionProvider.create(possibleSuggestions));
+	}
 }
 

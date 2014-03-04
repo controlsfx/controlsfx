@@ -26,21 +26,16 @@
  */
 package org.controlsfx.dialog;
 
-import java.util.Iterator;
+import org.controlsfx.tools.Utils;
 
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 class DialogFactory {
-    
+
     static FXDialog createDialog(String title) {
         return createDialog(false, title);
     }
-    
+
     static FXDialog createDialog(boolean useLightweight, String title) {
         return createDialog(false, title, null, false);
     }
@@ -48,36 +43,16 @@ class DialogFactory {
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
         return createDialog(useLightweight, title, owner, modal, false);
     }
-    
+
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, boolean nativeChrome) {
         if (useLightweight) {
             return new LightweightDialog(title, owner);
         } else {
-        	
-        	Window window = null;
-            
-            // we need to determine the type of the owner, so that we can appropriately
-            // show the dialog
-            if (owner == null) {
-                // lets just get the focused stage and show the dialog in there
-                @SuppressWarnings("deprecation")
-				Iterator<Window> windows = Window.impl_getWindows();
-                while (windows.hasNext()) {
-                    window = windows.next();
-                    if (window.isFocused()) {
-                        break;
-                    }
-                }
-            } else if (owner instanceof Window) {
-                window = (Window) owner;
-            } else if (owner instanceof Node) {
-            	window = ((Node)owner).getScene().getWindow();
-            } else {
-                throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
-            }
-        	
+
+            Window window = Utils.getWindow(owner);
+
             return new HeavyweightDialog(title, window, modal, nativeChrome);
         }
     }
-    
+
 }

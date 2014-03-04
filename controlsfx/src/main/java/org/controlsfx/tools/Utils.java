@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,47 +26,41 @@
  */
 package org.controlsfx.tools;
 
-import com.sun.javafx.Utils;
-/**
- * Represents operating system with appropriate properties 
- *
- */
-public enum Platform {
-    
-    WINDOWS("windows"),
-    OSX("mac"),
-    UNIX("unix"),
-    UNKNOWN("");
-    
-    private static Platform current = getCurrentPlatform();
-    
-    private String platformId;
-    
-    Platform( String platformId ) {
-        this.platformId = platformId;
-    }
-    
+import java.util.Iterator;
+
+import javafx.scene.Node;
+import javafx.stage.PopupWindow;
+import javafx.stage.Window;
+
+public class Utils {
+
     /**
-     * Returns platform id. Usually used to specify platform dependent styles
-     * @return platform id
-     */
-    public String getPlatformId() {
-        return platformId;
-    }
-    
-    /**
-     * Returns current OS 
+     * Will return a {@link Window} from an object if any can be found. null
+     * value can be given, the program will then try to find the focused window
+     * among those available.
+     * 
+     * @param owner
      * @return
      */
-    public static Platform getCurrent() {
-        return current;
+    public static Window getWindow(Object owner) throws IllegalArgumentException {
+        if (owner == null) {
+            Window window = null;
+            // lets just get the focused stage and show the dialog in there
+            @SuppressWarnings("deprecation")
+            Iterator<Window> windows = Window.impl_getWindows();
+            while (windows.hasNext()) {
+                window = windows.next();
+                if (window.isFocused() && !(window instanceof PopupWindow)) {
+                    break;
+                }
+            }
+            return window;
+        } else if (owner instanceof Window) {
+            return (Window) owner;
+        } else if (owner instanceof Node) {
+            return ((Node) owner).getScene().getWindow();
+        } else {
+            throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
+        }
     }
-    
-    private static Platform getCurrentPlatform() {
-        if ( Utils.isWindows() ) return WINDOWS;
-        if ( Utils.isMac() )     return OSX;
-        if ( Utils.isUnix() )    return UNIX;
-        return UNKNOWN;
-    }
-    
 }

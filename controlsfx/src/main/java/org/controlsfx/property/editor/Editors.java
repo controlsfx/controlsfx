@@ -44,11 +44,12 @@ public class Editors {
         };
     }
     
+    @SuppressWarnings("unchecked")
     public static final PropertyEditor<?> createNumericEditor( Item property ) {
-        
-        return new AbstractPropertyEditor<Number, NumericField>(property, new NumericField()) {
 
-            private Class<? extends Number> sourceClass = Double.class;
+    	return new AbstractPropertyEditor<Number, NumericField>(property, new NumericField( (Class<? extends Number>) property.getType())) {
+
+			private Class<? extends Number> sourceClass = (Class<? extends Number>) property.getType(); //Double.class;
             
             { enableAutoSelectAll(getEditor()); }
 

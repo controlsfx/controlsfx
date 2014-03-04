@@ -47,7 +47,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
@@ -78,18 +77,18 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
  * 
  */
 public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>> {
+    /***************************************************************************
+     * * STATIC FIELDS * *
+     **************************************************************************/
+
     /** Default height of a row. */
     public static final double DEFAULT_CELL_HEIGHT;
 
-    /**
-     * When resizing, we save the height here in order to override default row
-     * height.
-     * package protected
-     */
-    Map<Integer, Double> rowHeightMap = new HashMap<>();
+    /** Default width of the VerticalHeader. */
+    protected static final double DEFAULT_VERTICAL_HEADER_WIDTH = 40.0;
 
     // FIXME This should seriously be investigated ..
-    static final double DATE_CELL_MIN_WIDTH = 200 - Screen.getPrimary().getDpi();
+    private static final double DATE_CELL_MIN_WIDTH = 200 - Screen.getPrimary().getDpi();
 
     static {
         double cell_size = 24.0;
@@ -114,26 +113,16 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         DEFAULT_CELL_HEIGHT = cell_size;
     }
 
-    /** Default with of the VerticalHeader. */
-    protected final double DEFAULT_VERTICALHEADER_WIDTH = 40.0;
-
-    private DoubleProperty verticalHeaderWidth = new SimpleDoubleProperty(DEFAULT_VERTICALHEADER_WIDTH);
-
-    public DoubleProperty verticalHeaderWidthProperty() {
-        return verticalHeaderWidth;
-    }
-
-    public Double getRowHeight(int row){
-        Double rowHeight = handle.getCellsViewSkin().rowHeightMap.get(row);
-        return rowHeight == null? handle.getView().getGrid().getRowHeight(row): rowHeight;
-    }
-    public void setVerticalHeaderWidth(double width) {
-        verticalHeaderWidth.set(width);
-    }
-
-    public double getVerticalHeaderWidth() {
-        return verticalHeaderWidth.get();
-    }
+    /***************************************************************************
+     * * PRIVATE FIELDS * *
+     **************************************************************************/
+    /**
+     * When resizing, we save the height here in order to override default row
+     * height. package protected.
+     */
+    Map<Integer, Double> rowHeightMap = new HashMap<>();
+    /** The width of the vertical header */
+    private DoubleProperty verticalHeaderWidth = new SimpleDoubleProperty(DEFAULT_VERTICAL_HEADER_WIDTH);
 
     /** The editor. */
     private GridCellEditor gridCellEditor;
@@ -141,25 +130,34 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader verticalHeader;
-
     /**
-     * The height of the currently fixedRows
-     */
-    private double fixedRowHeight = 0;
-
-    public double getFixedRowHeight() {
-        return fixedRowHeight;
-    }
-
-    /**
-     * The currently fixedRow
+     * The currently fixedRow. This handles an Integer's set of rows being
+     * fixed. NOT Fixable but truly fixed.
      */
     private ObservableSet<Integer> currentlyFixedRow = FXCollections.observableSet(new HashSet<Integer>());
 
-    protected ObservableSet<Integer> getCurrentlyFixedRow() {
-        return currentlyFixedRow;
-    }
+    /**
+     * A list of Integer with the current selected Rows. This is useful for
+     * HorizontalHeader and VerticalHeader because they need to highlight when a
+     * selection is made.
+     */
+    private final ObservableList<Integer> selectedRows = FXCollections.observableArrayList();
 
+    /**
+     * A list of Integer with the current selected Columns. This is useful for
+     * HorizontalHeader and VerticalHeader because they need to highlight when a
+     * selection is made.
+     */
+    private final ObservableList<Integer> selectedColumns = FXCollections.observableArrayList();
+
+    /**
+     * The total height of the currently fixedRows.
+     */
+    private double fixedRowHeight = 0;
+
+    /***************************************************************************
+     * * CONSTRUCTOR * *
+     **************************************************************************/
     public GridViewSkin(final SpreadsheetHandle handle) {
         super(handle.getGridView());
         this.handle = handle;
@@ -187,354 +185,43 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         computeFixedRowHeight();
     }
 
-    protected void init() {
-        getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
-        verticalHeader = new VerticalHeader(handle, verticalHeaderWidth);
-        getChildren().addAll(verticalHeader);
+    public DoubleProperty verticalHeaderWidthProperty() {
+        return verticalHeaderWidth;
+    }
 
-        ((HorizontalHeader) getTableHeaderRow()).init();
-        verticalHeader.init(this, (HorizontalHeader) getTableHeaderRow());
+    public void setVerticalHeaderWidth(double width) {
+        verticalHeaderWidth.set(width);
+    }
 
-        getFlow().init(spreadsheetView);
-
-        /**
-         * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-         * JDK8u20
-         */
-        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.LEFT) {
-                    keyEvent.consume();
-                    selectLeft();
-                    scrollHorizontally();
-                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
-                    keyEvent.consume();
-                    selectRight();
-                    scrollHorizontally();
-                }
-            }
-        });
+    public double getVerticalHeaderWidth() {
+        return verticalHeaderWidth.get();
     }
 
     /**
-     * Select the Right cell.
-     */
-    private void selectRight() {
-        TableSelectionModel sm = getSelectionModel();
-        if (sm == null)
-            return;
-
-        TableFocusModel fm = getFocusModel();
-        if (fm == null)
-            return;
-
-        TablePosition focusedCell = getFocusedCell();
-        int currentRow = focusedCell.getRow();
-        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-        if (currentColumn == getVisibleLeafColumns().size() - 1)
-            return;
-
-        TableColumnBase tc = focusedCell.getTableColumn();
-        tc = getVisibleLeafColumn(currentColumn + 1);
-
-        int row = focusedCell.getRow();
-        sm.clearAndSelect(row, tc);
-    }
-
-    /**
-     * Select the left cell.
-     */
-    private void selectLeft() {
-        TableSelectionModel sm = getSelectionModel();
-        if (sm == null)
-            return;
-
-        TableFocusModel fm = getFocusModel();
-        if (fm == null)
-            return;
-
-        TablePosition focusedCell = getFocusedCell();
-        int currentRow = focusedCell.getRow();
-        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-        if (currentColumn == 0)
-            return;
-
-        TableColumnBase tc = focusedCell.getTableColumn();
-        tc = getVisibleLeafColumn(currentColumn - 1);
-
-        int row = focusedCell.getRow();
-        sm.clearAndSelect(row, tc);
-    }
-
-    @Override
-    protected void layoutChildren(double x, double y, double w, final double h) {
-        if (spreadsheetView == null) {
-            return;
-        }
-        if (spreadsheetView.showRowHeaderProperty().get()) {
-            x += getVerticalHeaderWidth();
-            w -= getVerticalHeaderWidth();
-        }
-
-        super.layoutChildren(x, y, w, h);
-
-        final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
-        double tableHeaderRowHeight = 0;
-
-        if (spreadsheetView.showColumnHeaderProperty().get()) {
-            // position the table header
-            tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
-            layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight, baselineOffset, HPos.CENTER, VPos.CENTER);
-
-            y += tableHeaderRowHeight;
-        } else {
-            // This is temporary handled in the HorizontalHeader with Css
-            // FIXME tweak open in RT-32673
-        }
-
-        if (spreadsheetView.showRowHeaderProperty().get()) {
-            layoutInArea(verticalHeader, x - getVerticalHeaderWidth(), y - tableHeaderRowHeight, w, h, baselineOffset,
-                    HPos.CENTER, VPos.CENTER);
-        }
-    }
-
-    /**
-     * When the vertical moves, we update the verticalHeader
-     */
-    final InvalidationListener vbarValueListener = new InvalidationListener() {
-        @Override
-        public void invalidated(Observable valueModel) {
-            verticalScroll();
-        }
-    };
-
-    protected void verticalScroll() {
-        verticalHeader.updateScrollY();
-    }
-
-    @Override
-    protected void onFocusPreviousCell() {
-        final TableFocusModel<?, ?> fm = getFocusModel();
-        if (fm == null) {
-            return;
-        }
-        /*****************************************************************
-         * MODIFIED BY NELLARMONIA
-         *****************************************************************/
-        final int row = fm.getFocusedIndex();
-        // We try to make visible the rows that may be hiden by Fixed rows
-        if (!getFlow().getCells().isEmpty()
-                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
-                && !spreadsheetView.getFixedRows().contains(row)) {
-            flow.scrollTo(row);
-        } else {
-            flow.show(row);
-        }
-        scrollHorizontally();
-        /*****************************************************************
-         * END OF MODIFIED BY NELLARMONIA
-         *****************************************************************/
-    }
-
-    @Override
-    protected void onFocusNextCell() {
-        final TableFocusModel<?, ?> fm = getFocusModel();
-        if (fm == null) {
-            return;
-        }
-        /*****************************************************************
-         * MODIFIED BY NELLARMONIA
-         *****************************************************************/
-        final int row = fm.getFocusedIndex();
-        // FIXME This is not true anymore I think
-        // We try to make visible the rows that may be hidden by Fixed rows
-        if (!getFlow().getCells().isEmpty()
-                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
-                && !spreadsheetView.getFixedRows().contains(row)) {
-            flow.scrollTo(row);
-        } else {
-            flow.show(row);
-        }
-        scrollHorizontally();
-        /*****************************************************************
-         * END OF MODIFIED BY NELLARMONIA
-         *****************************************************************/
-    }
-
-    /**
-     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-     * JDK8u20
-     */
-    @Override
-    protected void onSelectRightCell() {
-    }
-
-    /**
-     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-     * JDK8u20
-     */
-    @Override
-    protected void onSelectLeftCell() {
-    }
-
-    @Override
-    protected void onSelectPreviousCell() {
-        super.onSelectPreviousCell();
-        scrollHorizontally();
-    }
-
-    @Override
-    protected void onSelectNextCell() {
-        super.onSelectNextCell();
-        scrollHorizontally();
-    }
-
-    /**
-     * We listen on the FixedRows in order to do the modification in the
-     * VirtualFlow
-     */
-    private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
-        @Override
-        public void onChanged(Change<? extends Integer> c) {
-            // requestLayout() not responding immediately..
-            getFlow().layoutTotal();
-        }
-
-    };
-
-    /**
-     * We listen on the currentlyFixedRow in order to do the modification in the
-     * FixedRowHeight
-     */
-    private final SetChangeListener<? super Integer> currentlyFixedRowListener = new SetChangeListener<Integer>() {
-        @Override
-        public void onChanged(javafx.collections.SetChangeListener.Change<? extends Integer> arg0) {
-            computeFixedRowHeight();
-        }
-    };
-
-    /**
-     * We compute the total height of the fixedRows so that the selection can
-     * use it without performance regression.
-     */
-    private void computeFixedRowHeight() {
-        fixedRowHeight = 0;
-        for (int i : getCurrentlyFixedRow()) {
-            fixedRowHeight += getRowHeight(i);//spreadsheetView.getGrid().getRowHeight(i);
-        }
-    }
-
-    /**
-     * We listen on the FixedColumns in order to do the modification in the
-     * VirtualFlow
-     */
-    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
-        @Override
-        public void onChanged(Change<? extends SpreadsheetColumn> c) {
-            if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
-                for (int i = 0; i < getFlow().getCells().size(); ++i) {
-                    ((GridRow) getFlow().getCells().get(i)).putFixedColumnToBack();
-                }
-            }
-            // requestLayout() not responding immediately..
-            getFlow().layoutTotal();
-        }
-    };
-
-    @Override
-    protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
-        return new GridVirtualFlow<TableRow<ObservableList<SpreadsheetCell>>>(this);
-    }
-
-    protected TableHeaderRow createTableHeaderRow() {
-        return new HorizontalHeader(this);
-    }
-
-    BooleanProperty getTableMenuButtonVisibleProperty() {
-        return tableMenuButtonVisibleProperty();
-    }
-
-    @Override
-    protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
-
-        if (col == null || !col.isVisible()) {
-            return;
-        }
-
-        // work out where this column header is, and it's width (start -> end)
-        double start = 0;// scrollX;
-        for (TableColumnBase<?, ?> c : getVisibleLeafColumns()) {
-            if (c.equals(col))
-                break;
-            start += c.getWidth();
-        }
-
-        /*****************************************************************
-         * MODIFIED BY NELLARMONIA We modified this function so that we ensure
-         * that any selected cells will not be below a fixed column. Because
-         * when there's some fixed columns, the "left border" is not the table
-         * anymore, but the right side of the last fixed columns.
-         *****************************************************************/
-        // We add the fixed columns width
-        final double fixedColumnWidth = getFixedColumnWidth();
-
-        /*****************************************************************
-         * END OF MODIFIED BY NELLARMONIA
-         *****************************************************************/
-        final double end = start + col.getWidth();
-
-        // determine the visible width of the table
-        final double headerWidth = getSkinnable().getWidth() - snappedLeftInset() - snappedRightInset();
-
-        // determine by how much we need to translate the table to ensure that
-        // the start position of this column lines up with the left edge of the
-        // tableview, and also that the columns don't become detached from the
-        // right edge of the table
-        final double pos = getFlow().getHorizontalBar().getValue();
-        final double max = getFlow().getHorizontalBar().getMax();
-        double newPos;
-
-        /*****************************************************************
-         * MODIFIED BY NELLARMONIA
-         *****************************************************************/
-        if (start < pos + fixedColumnWidth && start >= 0 && start >= fixedColumnWidth) {
-            newPos = start - fixedColumnWidth < 0 ? start : start - fixedColumnWidth;
-        } else {
-            final double delta = start < 0 || end > headerWidth ? start - pos - fixedColumnWidth : 0;
-            newPos = pos + delta > max ? max : pos + delta;
-        }
-
-        /*****************************************************************
-         * END OF MODIFIED BY NELLARMONIA
-         *****************************************************************/
-
-        // FIXME we should add API in VirtualFlow so we don't end up going
-        // direct to the hbar.
-        // actually shift the flow - this will result in the header moving
-        // as well
-        getFlow().getHorizontalBar().setValue(newPos);
-    }
-
-    /**
-     * Compute the width of the fixed columns in order not to select cells that
-     * are hidden by the fixed columns
+     * Compute the height of a particular row.
      * 
+     * @param row
      * @return
      */
-    private double getFixedColumnWidth() {
-        double fixedColumnWidth = 0;
-        if (!spreadsheetView.getFixedColumns().isEmpty()) {
-            for (int i = 0, max = spreadsheetView.getFixedColumns().size(); i < max; ++i) {
-                final TableColumnBase<ObservableList<SpreadsheetCell>, ?> c = getVisibleLeafColumn(i);
-                fixedColumnWidth += c.getWidth();
-            }
-        }
-        return fixedColumnWidth;
+    public Double getRowHeight(int row) {
+        Double rowHeight = handle.getCellsViewSkin().rowHeightMap.get(row);
+        return rowHeight == null ? handle.getView().getGrid().getRowHeight(row) : rowHeight;
     }
 
-    public GridVirtualFlow<?> getFlow() {
-        return (GridVirtualFlow<?>) flow;
+    public double getFixedRowHeight() {
+        return fixedRowHeight;
+    }
+
+    public ObservableList<Integer> getSelectedRows() {
+        return selectedRows;
+    }
+
+    public ObservableList<Integer> getSelectedColumns() {
+        return selectedColumns;
+    }
+
+    public GridCellEditor getSpreadsheetCellEditorImpl() {
+        return gridCellEditor;
     }
 
     public GridRow getRow(int index) {
@@ -566,42 +253,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     public VirtualScrollBar getVBar() {
         return getFlow().getVerticalBar();
-    }
-
-    /**
-     * A list of Integer with the current selected Rows. This is useful for
-     * HorizontalHeader and VerticalHeader because they need to highlight when a
-     * selection is made.
-     */
-    private final ObservableList<Integer> selectedRows = FXCollections.observableArrayList();
-
-    public ObservableList<Integer> getSelectedRows() {
-        return selectedRows;
-    }
-
-    /**
-     * A list of Integer with the current selected Columns. This is useful for
-     * HorizontalHeader and VerticalHeader because they need to highlight when a
-     * selection is made.
-     */
-    private final ObservableList<Integer> selectedColumns = FXCollections.observableArrayList();
-
-    public ObservableList<Integer> getSelectedColumns() {
-        return selectedColumns;
-    }
-
-    public GridCellEditor getSpreadsheetCellEditorImpl() {
-        return gridCellEditor;
-    }
-
-    /**
-     * Used in the HorizontalColumnHeader when we need to resize in double
-     * click. Keep in mind that resize is broken RT-31653
-     * 
-     * @param tc
-     */
-    void resize(TableColumnBase<?, ?> tc) {
-        resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
     }
 
     /**
@@ -671,5 +322,370 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         }
         col.impl_setWidth(widthMax);
         col.setPrefWidth(widthMax);
+    }
+
+    /***************************************************************************
+     * * PRIVATE/PROTECTED METHOD * *
+     **************************************************************************/
+    protected void init() {
+        getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
+        verticalHeader = new VerticalHeader(handle, verticalHeaderWidth);
+        getChildren().addAll(verticalHeader);
+
+        ((HorizontalHeader) getTableHeaderRow()).init();
+        verticalHeader.init(this, (HorizontalHeader) getTableHeaderRow());
+
+        getFlow().init(spreadsheetView);
+
+        /**
+         * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
+         * JDK8u20
+         */
+        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode() == KeyCode.LEFT) {
+                    if (keyEvent.isShortcutDown()) {
+                        getFocusModel().focusLeftCell();
+                    } else {
+                        selectLeft();
+                    }
+                    keyEvent.consume();
+                    scrollHorizontally();
+                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
+                    if (keyEvent.isShortcutDown()) {
+                        getFocusModel().focusRightCell();
+                    } else {
+                        selectRight();
+                    }
+                    keyEvent.consume();
+                    scrollHorizontally();
+                }
+            }
+        });
+    }
+
+    protected ObservableSet<Integer> getCurrentlyFixedRow() {
+        return currentlyFixedRow;
+    }
+
+    /**
+     * Used in the HorizontalColumnHeader when we need to resize in double
+     * click. Keep in mind that resize is broken RT-31653
+     * 
+     * @param tc
+     */
+    void resize(TableColumnBase<?, ?> tc) {
+        resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
+    }
+
+    @Override
+    protected void layoutChildren(double x, double y, double w, final double h) {
+        if (spreadsheetView == null) {
+            return;
+        }
+        if (spreadsheetView.showRowHeaderProperty().get()) {
+            x += getVerticalHeaderWidth();
+            w -= getVerticalHeaderWidth();
+        }
+
+        super.layoutChildren(x, y, w, h);
+
+        final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
+        double tableHeaderRowHeight = 0;
+
+        if (spreadsheetView.showColumnHeaderProperty().get()) {
+            // position the table header
+            tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
+            layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight, baselineOffset, HPos.CENTER, VPos.CENTER);
+
+            y += tableHeaderRowHeight;
+        } else {
+            // This is temporary handled in the HorizontalHeader with Css
+            // FIXME tweak open in RT-32673
+        }
+
+        if (spreadsheetView.showRowHeaderProperty().get()) {
+            layoutInArea(verticalHeader, x - getVerticalHeaderWidth(), y - tableHeaderRowHeight, w, h, baselineOffset,
+                    HPos.CENTER, VPos.CENTER);
+        }
+    }
+
+    @Override
+    protected void onFocusPreviousCell() {
+        final TableFocusModel<?, ?> fm = getFocusModel();
+        if (fm == null) {
+            return;
+        }
+        /*****************************************************************
+         * MODIFIED
+         *****************************************************************/
+        final int row = fm.getFocusedIndex();
+        // We try to make visible the rows that may be hiden by Fixed rows
+        if (!getFlow().getCells().isEmpty()
+                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
+                && !spreadsheetView.getFixedRows().contains(row)) {
+            flow.scrollTo(row);
+        } else {
+            flow.show(row);
+        }
+        scrollHorizontally();
+        /*****************************************************************
+         * END OF MODIFIED
+         *****************************************************************/
+    }
+
+    @Override
+    protected void onFocusNextCell() {
+        final TableFocusModel<?, ?> fm = getFocusModel();
+        if (fm == null) {
+            return;
+        }
+        /*****************************************************************
+         * MODIFIED
+         *****************************************************************/
+        final int row = fm.getFocusedIndex();
+        // FIXME This is not true anymore I think
+        // We try to make visible the rows that may be hidden by Fixed rows
+        if (!getFlow().getCells().isEmpty()
+                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
+                && !spreadsheetView.getFixedRows().contains(row)) {
+            flow.scrollTo(row);
+        } else {
+            flow.show(row);
+        }
+        scrollHorizontally();
+        /*****************************************************************
+         * END OF MODIFIED
+         *****************************************************************/
+    }
+
+    /**
+     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
+     * JDK8u20
+     */
+    @Override
+    protected void onSelectRightCell() {
+    }
+
+    /**
+     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
+     * JDK8u20
+     */
+    @Override
+    protected void onSelectLeftCell() {
+    }
+
+    @Override
+    protected void onSelectPreviousCell() {
+        super.onSelectPreviousCell();
+        scrollHorizontally();
+    }
+
+    @Override
+    protected void onSelectNextCell() {
+        super.onSelectNextCell();
+        scrollHorizontally();
+    }
+
+    @Override
+    protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
+        return new GridVirtualFlow<TableRow<ObservableList<SpreadsheetCell>>>(this);
+    }
+
+    protected TableHeaderRow createTableHeaderRow() {
+        return new HorizontalHeader(this);
+    }
+
+    BooleanProperty getTableMenuButtonVisibleProperty() {
+        return tableMenuButtonVisibleProperty();
+    }
+
+    @Override
+    protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
+
+        if (col == null || !col.isVisible()) {
+            return;
+        }
+
+        // work out where this column header is, and it's width (start -> end)
+        double start = 0;// scrollX;
+        for (TableColumnBase<?, ?> c : getVisibleLeafColumns()) {
+            if (c.equals(col))
+                break;
+            start += c.getWidth();
+        }
+
+        /*****************************************************************
+         * MODIFIED : We modified this function so that we ensure that any
+         * selected cells will not be below a fixed column. Because when there's
+         * some fixed columns, the "left border" is not the table anymore, but
+         * the right side of the last fixed columns.
+         *****************************************************************/
+        // We add the fixed columns width
+        final double fixedColumnWidth = getFixedColumnWidth();
+
+        final double end = start + col.getWidth();
+
+        // determine the visible width of the table
+        final double headerWidth = getSkinnable().getWidth() - snappedLeftInset() - snappedRightInset();
+
+        // determine by how much we need to translate the table to ensure that
+        // the start position of this column lines up with the left edge of the
+        // tableview, and also that the columns don't become detached from the
+        // right edge of the table
+        final double pos = getFlow().getHorizontalBar().getValue();
+        final double max = getFlow().getHorizontalBar().getMax();
+        double newPos;
+
+        if (start < pos + fixedColumnWidth && start >= 0 && start >= fixedColumnWidth) {
+            newPos = start - fixedColumnWidth < 0 ? start : start - fixedColumnWidth;
+        } else {
+            final double delta = start < 0 || end > headerWidth ? start - pos - fixedColumnWidth : 0;
+            newPos = pos + delta > max ? max : pos + delta;
+        }
+
+        // FIXME we should add API in VirtualFlow so we don't end up going
+        // direct to the hbar.
+        // actually shift the flow - this will result in the header moving
+        // as well
+        getFlow().getHorizontalBar().setValue(newPos);
+    }
+
+    private void verticalScroll() {
+        verticalHeader.updateScrollY();
+    }
+
+    private GridVirtualFlow<?> getFlow() {
+        return (GridVirtualFlow<?>) flow;
+    }
+
+    /**
+     * Select the Right cell.
+     */
+    private void selectRight() {
+        TableSelectionModel sm = getSelectionModel();
+        if (sm == null)
+            return;
+
+        TableFocusModel fm = getFocusModel();
+        if (fm == null)
+            return;
+
+        TablePosition focusedCell = getFocusedCell();
+        int currentRow = focusedCell.getRow();
+        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+        if (currentColumn == getVisibleLeafColumns().size() - 1)
+            return;
+
+        TableColumnBase tc = focusedCell.getTableColumn();
+        tc = getVisibleLeafColumn(currentColumn + 1);
+
+        int row = focusedCell.getRow();
+        sm.clearAndSelect(row, tc);
+    }
+
+    /**
+     * Select the left cell.
+     */
+    private void selectLeft() {
+        TableSelectionModel sm = getSelectionModel();
+        if (sm == null)
+            return;
+
+        TableFocusModel fm = getFocusModel();
+        if (fm == null)
+            return;
+
+        TablePosition focusedCell = getFocusedCell();
+        int currentRow = focusedCell.getRow();
+        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+        if (currentColumn == 0)
+            return;
+
+        TableColumnBase tc = focusedCell.getTableColumn();
+        tc = getVisibleLeafColumn(currentColumn - 1);
+
+        int row = focusedCell.getRow();
+        sm.clearAndSelect(row, tc);
+    }
+
+    /**
+     * When the vertical moves, we update the verticalHeader
+     */
+    private final InvalidationListener vbarValueListener = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable valueModel) {
+            verticalScroll();
+        }
+    };
+
+    /**
+     * We listen on the FixedRows in order to do the modification in the
+     * VirtualFlow
+     */
+    private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
+        @Override
+        public void onChanged(Change<? extends Integer> c) {
+            // requestLayout() not responding immediately..
+            getFlow().layoutTotal();
+        }
+
+    };
+
+    /**
+     * We listen on the currentlyFixedRow in order to do the modification in the
+     * FixedRowHeight
+     */
+    private final SetChangeListener<? super Integer> currentlyFixedRowListener = new SetChangeListener<Integer>() {
+        @Override
+        public void onChanged(javafx.collections.SetChangeListener.Change<? extends Integer> arg0) {
+            computeFixedRowHeight();
+        }
+    };
+
+    /**
+     * We compute the total height of the fixedRows so that the selection can
+     * use it without performance regression.
+     */
+    private void computeFixedRowHeight() {
+        fixedRowHeight = 0;
+        for (int i : getCurrentlyFixedRow()) {
+            fixedRowHeight += getRowHeight(i);// spreadsheetView.getGrid().getRowHeight(i);
+        }
+    }
+
+    /**
+     * We listen on the FixedColumns in order to do the modification in the
+     * VirtualFlow
+     */
+    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
+        @Override
+        public void onChanged(Change<? extends SpreadsheetColumn> c) {
+            if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
+                for (int i = 0; i < getFlow().getCells().size(); ++i) {
+                    ((GridRow) getFlow().getCells().get(i)).putFixedColumnToBack();
+                }
+            }
+            // requestLayout() not responding immediately..
+            getFlow().layoutTotal();
+        }
+    };
+
+    /**
+     * Compute the width of the fixed columns in order not to select cells that
+     * are hidden by the fixed columns
+     * 
+     * @return
+     */
+    private double getFixedColumnWidth() {
+        double fixedColumnWidth = 0;
+        if (!spreadsheetView.getFixedColumns().isEmpty()) {
+            for (int i = 0, max = spreadsheetView.getFixedColumns().size(); i < max; ++i) {
+                final TableColumnBase<ObservableList<SpreadsheetCell>, ?> c = getVisibleLeafColumn(i);
+                fixedColumnWidth += c.getWidth();
+            }
+        }
+        return fixedColumnWidth;
     }
 }

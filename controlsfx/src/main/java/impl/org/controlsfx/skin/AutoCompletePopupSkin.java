@@ -1,16 +1,17 @@
 package impl.org.controlsfx.skin;
 
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-
 import javafx.beans.binding.Bindings;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 
 public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
@@ -25,11 +26,13 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         suggestionList.getStyleClass().add(AutoCompletePopup.DEFAULT_STYLE_CLASS);
 
-        suggestionList.getStylesheets().add(AutoCompletionBinding.class.getResource("autocompletion.css").toExternalForm());
+        suggestionList.getStylesheets().add(AutoCompletionBinding.class
+        		.getResource("autocompletion.css").toExternalForm());
         suggestionList.prefHeightProperty().bind(
                 Bindings.size(suggestionList.getItems()).multiply(LIST_CELL_HEIGHT)
                 .add(15));
         suggestionList.maxHeightProperty().bind(control.maxHeightProperty());
+        suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));               
         registerEventListener();
     }
 

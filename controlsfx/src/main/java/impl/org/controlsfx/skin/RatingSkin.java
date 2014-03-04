@@ -251,11 +251,11 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         }
     }
     
-    private double getSpacing() {
-        return (backgroundContainer instanceof HBox) ?
-                ((HBox)backgroundContainer).getSpacing() :
-                ((VBox)backgroundContainer).getSpacing();
-    }
+//    private double getSpacing() {
+//        return (backgroundContainer instanceof HBox) ?
+//                ((HBox)backgroundContainer).getSpacing() :
+//                ((VBox)backgroundContainer).getSpacing();
+//    }
     
     private Node createButton() {
         Region btn = new Region();

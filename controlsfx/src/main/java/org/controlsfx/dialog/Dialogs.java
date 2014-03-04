@@ -30,7 +30,7 @@ import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.OK;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
-import static org.controlsfx.dialog.DialogResources.getString;
+import static impl.org.controlsfx.i18n.Localization.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -347,9 +347,9 @@ public final class Dialogs {
     public static final String USE_DEFAULT = "$$$";
 
     private Object owner;
-    private String title;
+    private String title = USE_DEFAULT;
     private String message;
-    private String masthead;
+    private String masthead = USE_DEFAULT;
     private boolean lightweight;
     private boolean nativeTitleBar;
     private Set<Action> actions = new LinkedHashSet<>();
@@ -838,7 +838,7 @@ public final class Dialogs {
      **************************************************************************/
 
     private Dialog buildDialog(final Type dlgType) {
-        String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
+        String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
         dlg.setResizable(false);
@@ -892,7 +892,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label(getString("exception.dialog.label"));
+        Label label = new Label( localize(asKey("exception.dlg.label")));
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -976,13 +976,13 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image", "Error", "Error", OK),
-        INFORMATION("info.image", "Message", "Message", OK),
-        WARNING("warning.image", "Warning", "Warning", OK),
-        CONFIRMATION("confirm.image", "Select an option", "Select an option", YES, NO, CANCEL),
-        INPUT("confirm.image", "Select an option", "Select an option", OK, CANCEL),
-        FONT( null, "Select Font", "Select Font", OK, CANCEL),
-        PROGRESS("info.image", "Progress", "Progress");
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("error.dlg.masthead"), OK),
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), OK),
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), OK, CANCEL),
+        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead"));
 
         private final String defaultTitle;
         private final String defaultMasthead;
@@ -1005,11 +1005,11 @@ public final class Dialogs {
         }
 
         public String getDefaultMasthead() {
-            return defaultMasthead;
+            return localize(defaultMasthead);
         }
 
         public String getDefaultTitle() {
-            return defaultTitle;
+            return localize(defaultTitle);
         }
 
         public Collection<Action> getActions() {

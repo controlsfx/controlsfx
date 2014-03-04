@@ -29,15 +29,15 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         Class<?> type = item.getType();
         
         //TODO: add support for char and collection editors
-        if (type != null && type == String.class) {
+        if (/*type != null &&*/ type == String.class) {
             return Editors.createTextEditor(item);  
         }
 
-        if (type != null && isNumber(type)) {
+        if (/*type != null &&*/ isNumber(type)) {
             return Editors.createNumericEditor(item);
         }
         
-        if (type != null && (type == boolean.class || type == Boolean.class)) {
+        if (/*type != null &&*/(type == boolean.class || type == Boolean.class)) {
             return Editors.createCheckEditor(item);
         }
 

@@ -1,9 +1,13 @@
 package org.controlsfx.property.editor;
 
+import java.math.BigInteger;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
+import javafx.beans.binding.NumberExpression;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 
@@ -13,42 +17,108 @@ import javafx.scene.control.TextField;
  */
 class NumericField extends TextField {
 
-    private static String regex = "[-+]?[0-9]*\\.?[0-9]+";
-    
-//    private final DoubleStringConverter converter = new DoubleStringConverter();
-    private final DoubleProperty value = new SimpleDoubleProperty(this, "value", 0.0) {
-        protected void invalidated() {
-            setText(Double.toString(get()));
-        };
-    };
-    
-    public NumericField() {
+    private final NumericValidator<? extends Number> value ;
+    		
+    public NumericField( Class<? extends Number> cls ) {
+    	
+    	if ( cls == byte.class || cls == Byte.class || cls == short.class || cls == Short.class ||
+    		 cls ==	int.class  || cls == Integer.class || cls == long.class || cls == Long.class ||
+    	     cls == BigInteger.class) {
+    		value = new LongValidator(this);
+    	} else {
+    		value = new DoubleValidator(this);
+    	}
+    	
         textProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
-                // TODO handle when the text changes...?
-//                value.set(converter.fromString(getText()));
+                value.setValue(value.toNumber(getText()));
             }
         });
+        
     }
     
-    public final DoubleProperty valueProperty() {
+    public final ObservableValue<Number> valueProperty() {
         return value;
     }
 
     @Override public void replaceText(int start, int end, String text) {
-        if (replaceMatches(start, end, text)) {
+        if (replaceValid(start, end, text)) {
             super.replaceText(start, end, text);
         }
     }
 
     @Override public void replaceSelection(String text) {
         IndexRange range = getSelection();
-        if (replaceMatches(range.getStart(), range.getEnd(), text)) {
+        if (replaceValid(range.getStart(), range.getEnd(), text)) {
             super.replaceSelection(text);
         }
     }
 
-    private Boolean replaceMatches(int start, int end, String fragment) {
-        return (getText().substring(0, start) + fragment + getText().substring(end)).matches(regex);
+    private Boolean replaceValid(int start, int end, String fragment) {
+        try {
+        	String newText = getText().substring(0, start) + fragment + getText().substring(end);
+        	if (newText.isEmpty()) return true; 
+			value.toNumber(newText);
+        	return true;
+        } catch( Throwable ex ) {
+        	return false;
+        }
     }
+    
+    
+    private static abstract interface NumericValidator<T extends Number> extends NumberExpression {
+    	void setValue(Number num);
+    	T toNumber(String s);
+    	
+    }
+    
+    static class DoubleValidator extends SimpleDoubleProperty implements NumericValidator<Double>{
+    	
+    	private NumericField field;
+    	
+    	public DoubleValidator(NumericField field) {
+    		super(field, "value", 0.0);
+    		this.field = field;
+		}
+    	
+    	protected void invalidated() {
+            field.setText(Double.toString(get()));
+        }
+
+		@Override
+		public Double toNumber(String s) {
+			if ( s == null || s.trim().isEmpty() ) return 0d;
+	    	String d = s.trim();
+	    	if ( d.endsWith("f") || d.endsWith("d") || d.endsWith("F") || d.endsWith("D") ) {
+	    		throw new NumberFormatException("There should be no alpha symbols");
+	    	}
+	    	return new Double(d);
+		};
+		
+    }
+ 
+    
+    static class LongValidator extends SimpleLongProperty implements NumericValidator<Long>{
+    	
+    	private NumericField field;
+    	
+    	public LongValidator(NumericField field) {
+    		super(field, "value", 0l);
+    		this.field = field;
+		}
+    	
+    	protected void invalidated() {
+            field.setText(Long.toString(get()));
+        }
+
+		@Override
+		public Long toNumber(String s) {
+			if ( s == null || s.trim().isEmpty() ) return 0l;
+	    	String d = s.trim();
+	    	return new Long(d);
+		};
+		
+    }    
+    
+    
 }

@@ -573,7 +573,7 @@ public class Notifications {
 
                 if (isShowFromTop) {
                     if (i == popups.size() - 1) {
-                        sum = newPopupHeight + padding;
+                        sum = startY + newPopupHeight + padding;
                     } else {
                         sum += popupHeight;
                     }

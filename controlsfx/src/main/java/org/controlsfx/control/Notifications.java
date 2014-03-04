@@ -168,9 +168,6 @@ public class Notifications {
      * The dialog window owner - if specified the notifications will be inside
      * the owner, otherwise the notifications will be shown within the whole
      * screen.
-     * 
-     * @param owner
-     * @return
      */
     public Notifications owner(Object owner) {
         this.owner = Utils.getWindow(owner);

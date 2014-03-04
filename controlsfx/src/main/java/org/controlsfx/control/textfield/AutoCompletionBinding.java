@@ -21,12 +21,13 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 /**
- * The AutoCompletionBinding is the abstract base class of all auto-completion bindings
- * 
+ * The AutoCompletionBinding is the abstract base class of all auto-completion bindings.
  * This class is the core logic for the auto-completion feature but highly customizable.
- *
+ * 
+ * <p>To use the autocompletion functionality, refer to the {@link TextFields} class.
  *
  * @param <T> Model-Type of the suggestions
+ * @see TextFields
  */
 public abstract class AutoCompletionBinding<T> implements EventTarget {
 

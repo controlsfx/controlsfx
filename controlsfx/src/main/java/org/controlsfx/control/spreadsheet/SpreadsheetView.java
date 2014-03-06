@@ -144,18 +144,21 @@ import javafx.util.Duration;
  * 
  * <pre>
  * int rowCount = 15;
- * int columnCount = 10;
- * Grid grid = new Grid(rowCount, columnCount);
- * 
- * ArrayList&lt;ObservableList&lt;DataCell&gt;&gt; rows = new ArrayList&lt;ObservableList&lt;DataCell&gt;&gt;(grid.getRowCount());
- * for (int row = 0; row < grid.getRowCount(); ++row) {
- *     final ObservableList&lt;DataCell&gt; ObservableList&lt;DataCell&gt; = new ObservableList&lt;DataCell&gt;(row, grid.getColumnCount());
- *     for (int column = 0; column < grid.getColumnCount(); ++column) {
- *         ObservableList&lt;DataCell&gt;.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,""));
+ *     int columnCount = 10;
+ *     GridBase grid = new GridBase(rowCount, columnCount);
+ *     
+ *     ObservableList&lt;ObservableList&lt;SpreadsheetCell&lt;&lt; rows = FXCollections.observableArrayList();
+ *     for (int row = 0; row &lt; grid.getRowCount(); ++row) {
+ *         final ObservableList&lt;SpreadsheetCell&lt; list = FXCollections.observableArrayList();
+ *         for (int column = 0; column &lt; grid.getColumnCount(); ++column) {
+ *             list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,"value"));
+ *         }
+ *         rows.add(list);
  *     }
- *     rows.add(ObservableList&lt;DataCell&gt;);
- * }
- * grid.setRows(rows);
+ *     grid.setRows(rows);
+ *
+ *     SpreadsheetView spv = new SpreadsheetView(grid);
+ *     
  * </pre>
  * 
  * At that moment you can span some of the cells with the convenient method

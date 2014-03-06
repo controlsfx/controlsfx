@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
@@ -125,6 +126,7 @@ public class GridBase implements Grid, EventTarget {
         rowsHeader = FXCollections.observableArrayList();
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
+        rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<Integer,Double>());
     }
 
     /***************************************************************************

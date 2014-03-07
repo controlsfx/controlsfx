@@ -33,6 +33,7 @@ import impl.org.controlsfx.i18n.Localization;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -450,7 +451,7 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				UserInfo response = configureSampleDialog(Dialogs.create())
+				Optional<UserInfo> response = configureSampleDialog(Dialogs.create())
 						.showLogin(new UserInfo("user", "password".toCharArray()), info -> {
 							if ( !"controlsfx".equalsIgnoreCase(info.getUserName())) {
 								throw new RuntimeException("Service is not available... try again later!"); 
@@ -541,12 +542,7 @@ public class HelloDialog extends ControlsFXSample {
 				dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
 				validate();
 
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						txUserName.requestFocus();
-					}
-				});
+				Platform.runLater( () -> txUserName.requestFocus() );
 
 				Action response = dlg.show();
 				System.out.println("response: " + response);

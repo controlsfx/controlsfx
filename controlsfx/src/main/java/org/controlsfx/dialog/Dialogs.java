@@ -26,11 +26,13 @@
  */
 package org.controlsfx.dialog;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.getString;
+import static impl.org.controlsfx.i18n.Localization.localize;
 import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.OK;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
-import static impl.org.controlsfx.i18n.Localization.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,6 +43,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -92,7 +95,6 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog.ActionTrait;
@@ -878,23 +880,26 @@ public final class Dialogs {
     }
     
     
-    public UserInfo showLogin( final UserInfo userInfo, final Function <UserInfo, Void> authenticator ) {
+    public Optional<UserInfo> showLogin( final UserInfo userInfo, final Function <UserInfo, Void> authenticator ) {
     	
     	TextField txUserName     = new TextField();
 		PasswordField txPassword = new PasswordField();
+		Label lbMessage          = new Label(""); 
+		lbMessage.setStyle("-fx-text-fill: red;");
 		
+		lbMessage.setVisible(false);
 		final GridPane content = new GridPane();
 		content.setHgap(10);
 		content.setVgap(10);
-		content.add(new Label( getString("login.dlg.user.caption")), 0, 0);
-		content.add(txUserName, 1, 0);
+		content.add(lbMessage, 0, 0, 2, 1);
+		GridPane.setHgrow(lbMessage, Priority.ALWAYS);
+		content.addRow(1, new Label( getString("login.dlg.user.caption")),txUserName);
 		GridPane.setHgrow(txUserName, Priority.ALWAYS);
-		content.add(new Label(getString("login.dlg.pswd.caption")), 0, 1);
-		content.add(txPassword, 1, 1);
+		content.addRow(2,new Label(getString("login.dlg.pswd.caption")), txPassword);
 		GridPane.setHgrow(txPassword, Priority.ALWAYS);
 		
-		NotificationPane notificationPane = new NotificationPane(content);
-		notificationPane.setShowFromTop(true);
+//		NotificationPane notificationPane = new NotificationPane(content);
+//		notificationPane.setShowFromTop(true);
 		
 		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
 
@@ -908,10 +913,13 @@ public final class Dialogs {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					authenticator.apply( new UserInfo(txUserName.getText(), txPassword.getText().toCharArray() ) );
+					lbMessage.setVisible(false);
 					dlg.hide();
 					dlg.setResult(this);
 				} catch( Throwable ex ) {
-					notificationPane.show(ex.getMessage());
+					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
+					lbMessage.setVisible(true);
+					lbMessage.setText(ex.getMessage());
 					ex.printStackTrace();
 				}
 				
@@ -948,14 +956,12 @@ public final class Dialogs {
 		txUserName.setText( userInfo.getUserName());
 		txPassword.setText(new String(userInfo.getPassword()));
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				txUserName.requestFocus();
-			}
-		});
+		Platform.runLater( () -> txUserName.requestFocus() );
 
-    	return  dlg.show() == actionLogin? new UserInfo(txUserName.getText(), txPassword.getText().toCharArray()): null;
+    	return Optional.ofNullable( 
+    			dlg.show() == actionLogin? 
+    					new UserInfo(txUserName.getText(), txPassword.getText().toCharArray()): 
+    					null);
     }
     
     

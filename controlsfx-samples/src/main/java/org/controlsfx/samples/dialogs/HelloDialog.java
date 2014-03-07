@@ -452,7 +452,7 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent e) {
 				Optional<UserInfo> response = configureSampleDialog(Dialogs.create())
-						.showLogin(new UserInfo("user", "password".toCharArray()), info -> {
+						.showLogin(new UserInfo("user", "password"), info -> {
 							if ( !"controlsfx".equalsIgnoreCase(info.getUserName())) {
 								throw new RuntimeException("Service is not available... try again later!"); 
 							};

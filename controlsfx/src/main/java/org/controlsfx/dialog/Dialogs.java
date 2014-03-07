@@ -823,11 +823,11 @@ public final class Dialogs {
     public static class UserInfo {
     	
     	private String userName;
-    	private char[] password;
+    	private String password;
     	
-		public UserInfo(String userName, char[] password) {
+		public UserInfo(String userName, String password) {
 			this.userName = userName == null? "": userName;
-			this.password = password == null? new char[0]: password;
+			this.password = password == null? "": password;
 		}
 		
 		public String getUserName() {
@@ -836,10 +836,10 @@ public final class Dialogs {
 		public void setUserName(String userName) {
 			this.userName = userName;
 		}
-		public char[] getPassword() {
+		public String getPassword() {
 			return password;
 		}
-		public void setPassword(char[] password) {
+		public void setPassword(String password) {
 			this.password = password;
 		}
 
@@ -852,7 +852,8 @@ public final class Dialogs {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + Arrays.hashCode(password);
+			result = prime * result
+					+ ((password == null) ? 0 : password.hashCode());
 			result = prime * result
 					+ ((userName == null) ? 0 : userName.hashCode());
 			return result;
@@ -867,7 +868,10 @@ public final class Dialogs {
 			if (getClass() != obj.getClass())
 				return false;
 			UserInfo other = (UserInfo) obj;
-			if (!Arrays.equals(password, other.password))
+			if (password == null) {
+				if (other.password != null)
+					return false;
+			} else if (!password.equals(other.password))
 				return false;
 			if (userName == null) {
 				if (other.userName != null)
@@ -876,11 +880,13 @@ public final class Dialogs {
 				return false;
 			return true;
 		}
+
+		
 		
     }
     
     
-    public Optional<UserInfo> showLogin( final UserInfo userInfo, final Function <UserInfo, Void> authenticator ) {
+    public Optional<UserInfo> showLogin( final UserInfo userInfo, final Callback<UserInfo, Void> authenticator ) {
     	
     	TextField txUserName     = new TextField();
 		PasswordField txPassword = new PasswordField();
@@ -912,7 +918,7 @@ public final class Dialogs {
 			public void execute(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
-					authenticator.apply( new UserInfo(txUserName.getText(), txPassword.getText().toCharArray() ) );
+					authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
 					lbMessage.setVisible(false);
 					dlg.hide();
 					dlg.setResult(this);
@@ -960,7 +966,7 @@ public final class Dialogs {
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
-    					new UserInfo(txUserName.getText(), txPassword.getText().toCharArray()): 
+    					new UserInfo(txUserName.getText(), txPassword.getText()): 
     					null);
     }
     

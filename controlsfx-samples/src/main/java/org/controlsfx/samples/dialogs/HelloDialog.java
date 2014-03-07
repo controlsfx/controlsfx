@@ -68,6 +68,7 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
+import org.controlsfx.dialog.Dialogs.UserInfo;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
@@ -444,8 +445,25 @@ public class HelloDialog extends ControlsFXSample {
 				th.start();
 			}
 		});
+		
+		final Button Hyperlink12c = new Button("Login");
+		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				UserInfo response = configureSampleDialog(Dialogs.create())
+						.showLogin(new UserInfo("user", "password".toCharArray()), info -> {
+							if ( !"controlsfx".equalsIgnoreCase(info.getUserName())) {
+								throw new RuntimeException("Service is not available... try again later!"); 
+							};
+							return null;
+							}
+						 );
 
-		grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b), 1, row);
+				System.out.println("User info: " + response);
+			}
+		});
+
+		grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c), 1, row);
 		row++;
 
 		// *******************************************************************

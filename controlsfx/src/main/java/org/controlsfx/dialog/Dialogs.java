@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javafx.application.Platform;
@@ -65,6 +66,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -90,8 +92,10 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
+import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialog.Actions;
 
 
@@ -814,6 +818,146 @@ public final class Dialogs {
         content.setWorker(worker);
     }
     
+    public static class UserInfo {
+    	
+    	private String userName;
+    	private char[] password;
+    	
+		public UserInfo(String userName, char[] password) {
+			this.userName = userName == null? "": userName;
+			this.password = password == null? new char[0]: password;
+		}
+		
+		public String getUserName() {
+			return userName;
+		}
+		public void setUserName(String userName) {
+			this.userName = userName;
+		}
+		public char[] getPassword() {
+			return password;
+		}
+		public void setPassword(char[] password) {
+			this.password = password;
+		}
+
+		@Override
+		public String toString() {
+			return "UserInfo [userName=" + userName + "]";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + Arrays.hashCode(password);
+			result = prime * result
+					+ ((userName == null) ? 0 : userName.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			UserInfo other = (UserInfo) obj;
+			if (!Arrays.equals(password, other.password))
+				return false;
+			if (userName == null) {
+				if (other.userName != null)
+					return false;
+			} else if (!userName.equals(other.userName))
+				return false;
+			return true;
+		}
+		
+    }
+    
+    
+    public UserInfo showLogin( final UserInfo userInfo, final Function <UserInfo, Void> authenticator ) {
+    	
+    	TextField txUserName     = new TextField();
+		PasswordField txPassword = new PasswordField();
+		
+		final GridPane content = new GridPane();
+		content.setHgap(10);
+		content.setVgap(10);
+		content.add(new Label( getString("login.dlg.user.caption")), 0, 0);
+		content.add(txUserName, 1, 0);
+		GridPane.setHgrow(txUserName, Priority.ALWAYS);
+		content.add(new Label(getString("login.dlg.pswd.caption")), 0, 1);
+		content.add(txPassword, 1, 1);
+		GridPane.setHgrow(txPassword, Priority.ALWAYS);
+		
+		NotificationPane notificationPane = new NotificationPane(content);
+		notificationPane.setShowFromTop(true);
+		
+		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+
+			{
+				ButtonBar.setType(this, ButtonType.OK_DONE);
+			}
+			
+			
+			@Override
+			public void execute(ActionEvent ae) {
+				Dialog dlg = (Dialog) ae.getSource();
+				try {
+					authenticator.apply( new UserInfo(txUserName.getText(), txPassword.getText().toCharArray() ) );
+					dlg.hide();
+					dlg.setResult(this);
+				} catch( Throwable ex ) {
+					notificationPane.show(ex.getMessage());
+					ex.printStackTrace();
+				}
+				
+			}
+
+			public String toString() {
+				return "LOGIN";
+			};
+		};
+
+		ChangeListener<String> fieldChangeListener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				actionLogin.disabledProperty().set(
+						txUserName.getText().trim().isEmpty()
+					 || txPassword.getText().trim().isEmpty());
+			}
+		};
+
+		txUserName.textProperty().addListener(fieldChangeListener);
+		txPassword.textProperty().addListener(fieldChangeListener);		
+		
+		final Dialog dlg = buildDialog(Type.LOGIN);
+        dlg.setContent(content);
+        
+        dlg.setResizable(false);
+		dlg.setIconifiable(false);
+		if ( dlg.getGraphic() == null ) { 
+			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
+		}
+		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
+		txUserName.setText( userInfo.getUserName());
+		txPassword.setText(new String(userInfo.getPassword()));
+
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				txUserName.requestFocus();
+			}
+		});
+
+    	return  dlg.show() == actionLogin? new UserInfo(txUserName.getText(), txPassword.getText().toCharArray()): null;
+    }
+    
     
     
     /***************************************************************************
@@ -965,7 +1109,8 @@ public final class Dialogs {
         CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
         INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),
         FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), OK, CANCEL),
-        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead"));
+        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
+        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), OK, CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;

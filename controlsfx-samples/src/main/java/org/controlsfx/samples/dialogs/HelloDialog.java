@@ -33,6 +33,7 @@ import impl.org.controlsfx.i18n.Localization;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -68,6 +69,7 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
+import org.controlsfx.dialog.Dialogs.UserInfo;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
@@ -444,8 +446,25 @@ public class HelloDialog extends ControlsFXSample {
 				th.start();
 			}
 		});
+		
+		final Button Hyperlink12c = new Button("Login");
+		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Optional<UserInfo> response = configureSampleDialog(Dialogs.create())
+						.showLogin(new UserInfo("user", "password"), info -> {
+							if ( !"controlsfx".equalsIgnoreCase(info.getUserName())) {
+								throw new RuntimeException("Service is not available... try again later!"); 
+							};
+							return null;
+							}
+						 );
 
-		grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b), 1, row);
+				System.out.println("User info: " + response);
+			}
+		});
+
+		grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c), 1, row);
 		row++;
 
 		// *******************************************************************
@@ -523,12 +542,7 @@ public class HelloDialog extends ControlsFXSample {
 				dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
 				validate();
 
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						txUserName.requestFocus();
-					}
-				});
+				Platform.runLater( () -> txUserName.requestFocus() );
 
 				Action response = dlg.show();
 				System.out.println("response: " + response);

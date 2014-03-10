@@ -659,6 +659,33 @@ public class SpreadsheetView extends Control {
     }
 
     /**
+     * This method will compute the best height for each line. That is to say
+     * a height where each content of each cell could be fully visible.\n
+     * Use this method wisely because it can degrade performance on great grid.
+     */
+    public void resizeRowsToFitContent(){
+        getCellsViewSkin().resizeRowsToFitContent();
+    }
+    
+    /**
+     * This method will first apply {@link #resizeRowsToFitContent() } and then
+     * take the highest height and apply it to every row.\n
+     * Just as {@link #resizeRowsToFitContent() }, this method can be degrading
+     * your performance on great grid.
+     */
+    public void resizeRowsToMaximum(){
+        getCellsViewSkin().resizeRowsToMaximum();
+    }
+    
+    /**
+     * This method will wipe all changes made to the row's height and set all row's
+     * height back to their default height defined in the model Grid.
+     */
+    public void resizeRowsToDefault(){
+        getCellsViewSkin().resizeRowsToDefault();
+    }
+    
+    /**
      * You can fix or unfix a column by modifying this list. Call
      * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
      * an item.

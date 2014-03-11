@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,8 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -69,6 +67,7 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
+import javafx.collections.ObservableMap;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -120,7 +119,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * When resizing, we save the height here in order to override default row
      * height. package protected.
      */
-    Map<Integer, Double> rowHeightMap = new HashMap<>();
+    ObservableMap<Integer, Double> rowHeightMap = FXCollections.observableHashMap();
     /** The width of the vertical header */
     private DoubleProperty verticalHeaderWidth = new SimpleDoubleProperty(DEFAULT_VERTICAL_HEADER_WIDTH);
 
@@ -255,6 +254,86 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         return getFlow().getVerticalBar();
     }
 
+    /**
+     * Will compute for each row the necessary height and fit the line.
+     * This can degrade performance a lot so need to use it wisely. 
+     * But I don't see other solutions right now.
+     */
+    public void resizeRowsToFitContent() {
+        if(getSkinnable().getColumns().isEmpty()){
+            return;
+        }
+        
+        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = getSkinnable().getColumns().get(0);
+        List<?> items = itemsProperty().get();
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+        Callback/* <TableColumn<T, ?>, TableCell<T,?>> */ cellFactory = col.getCellFactory();
+        if (cellFactory == null) {
+            return;
+        }
+
+        CellView cell = (CellView) cellFactory.call(col);
+        if (cell == null) {
+            return;
+        }
+
+        // set this property to tell the TableCell we want to know its actual
+        // preferred width, not the width of the associated TableColumnBase
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE);
+        
+        // determine cell padding
+        double padding = 10;
+        Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
+        if (n instanceof Region) {
+            Region r = (Region) n;
+            padding = r.snappedTopInset() + r.snappedBottomInset();
+        }
+
+        double maxHeight;
+        int maxRows = handle.getView().getGrid().getRowCount();
+        for (int row = 0; row < maxRows; row++) {
+            maxHeight = 0;
+            for (TableColumn column : getSkinnable().getColumns()) {
+
+                cell.updateTableColumn(column);
+                cell.updateTableView(handle.getGridView());
+                cell.updateIndex(row);
+
+                if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
+                    getChildren().add(cell);
+                    cell.setWrapText(true);
+
+                    cell.impl_processCSS(false);
+                    maxHeight = Math.max(maxHeight, cell.prefHeight(col.getWidth()));
+                    getChildren().remove(cell);
+                }
+            }
+            rowHeightMap.put(row, maxHeight + padding);
+        }
+    }
+    
+    public void resizeRowsToMaximum() {
+        //First we resize to fit.
+        resizeRowsToFitContent();
+        
+        //Then we take the maximum and apply it everywhere.
+        double maxHeight = 0;
+        for(int key:rowHeightMap.keySet()){
+            maxHeight = Math.max(maxHeight, rowHeightMap.get(key));
+        }
+        
+        rowHeightMap.clear();
+        int maxRows = handle.getView().getGrid().getRowCount();
+        for (int row = 0; row < maxRows; row++) {
+            rowHeightMap.put(row, maxHeight);
+        }
+    }
+    
+    public void resizeRowsToDefault() {
+        rowHeightMap.clear();
+    }
     /**
      * We want to have extra space when displaying LocalDate because they will
      * use an editor that display a little icon on the right. Thus, that icon is

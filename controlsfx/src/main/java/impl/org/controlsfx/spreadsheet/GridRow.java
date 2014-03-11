@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
@@ -69,6 +70,23 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
                 setPrefHeight(computePrefHeight(-1));
             }
         });
+        
+        /**
+         * When the height is changing elsewhere, we need to update ourself if necessary.
+         */
+        handle.getCellsViewSkin().rowHeightMap.addListener(new MapChangeListener<Integer, Double>() {
+
+            @Override
+            public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
+                if(change.wasAdded() && change.getKey() == getIndex()){
+                    setPrefHeight(change.getValueAdded());
+                    requestLayout();
+                }else if(change.wasRemoved() && change.getKey() == getIndex()){
+                    setPrefHeight(computePrefHeight(-1));
+                    requestLayout();
+                }
+            }
+        });
     }
 
     /***************************************************************************
@@ -79,7 +97,6 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * When unfixing some Columns, we need to put the previously FixedColumns
      * back if we want the hover to be dealt correctly
      * 
-     * @param size
      */
     public void putFixedColumnToBack() {
         final List<Node> tset = new ArrayList<>(getChildren());

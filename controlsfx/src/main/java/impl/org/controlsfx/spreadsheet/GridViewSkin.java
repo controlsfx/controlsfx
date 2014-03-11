@@ -306,7 +306,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                     cell.setWrapText(true);
 
                     cell.impl_processCSS(false);
-                    maxHeight = Math.max(maxHeight, cell.prefHeight(-1));
+                    maxHeight = Math.max(maxHeight, cell.prefHeight(col.getWidth()));
                     getChildren().remove(cell);
                 }
             }

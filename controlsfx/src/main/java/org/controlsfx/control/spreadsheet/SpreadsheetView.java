@@ -686,6 +686,15 @@ public class SpreadsheetView extends Control {
     }
     
     /**
+     * Return the height of a particular row of the SpreadsheetView. \n
+     * @param row
+     * @return 
+     */
+    public double getRowHeight(int row) {
+         return getCellsViewSkin().getRowHeight(row);
+    }
+    
+    /**
      * You can fix or unfix a column by modifying this list. Call
      * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
      * an item.

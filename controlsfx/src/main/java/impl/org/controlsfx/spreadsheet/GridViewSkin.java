@@ -202,7 +202,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * @param row
      * @return
      */
-    public Double getRowHeight(int row) {
+    public double getRowHeight(int row) {
         Double rowHeight = handle.getCellsViewSkin().rowHeightMap.get(row);
         return rowHeight == null ? handle.getView().getGrid().getRowHeight(row) : rowHeight;
     }

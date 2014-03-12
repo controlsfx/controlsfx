@@ -98,7 +98,7 @@
 
 /* HORIZONTAL AND VERTICAL HEADER SELECTION */
 VerticalHeader > Label {
-   	-fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+   	-fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to left, derive(-fx-color,-10%) ,derive(-fx-color,10%));
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;

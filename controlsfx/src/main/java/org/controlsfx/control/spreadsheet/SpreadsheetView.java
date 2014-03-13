@@ -462,6 +462,14 @@ public class SpreadsheetView extends Control {
         }
         getFixedColumns().clear();
 
+        /**
+         * We try to save the width of the column as we save the height of our rows so that we preserve the state.
+         */
+        List<Double> widthColumns = new ArrayList<>();
+        for(SpreadsheetColumn column:columns){
+            widthColumns.add(column.getWidth());
+        }
+        
         // TODO move into a property
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
@@ -505,6 +513,9 @@ public class SpreadsheetView extends Control {
                 });
                 cellsView.getColumns().add(column);
                 final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
+                if(widthColumns.size() > i){
+                    spreadsheetColumn.setPrefWidth(widthColumns.get(i));
+                }
                 columns.add(spreadsheetColumn);
                 // We verify if this column was fixed before and try to re-fix
                 // it.

@@ -62,8 +62,7 @@ public class ValidationSupport {
 		validationResults.addListener( new MapChangeListener<Control, ValidationResult>() {
 			@Override
 			public void onChanged(MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) {
-				// TODO: fire global "validation" event with global validationResults asParameter
-				// lazy binding??
+				// TODO: lazy binding??
 				validationResultProperty.set(new ValidationResult().addValidationResults(validationResults.values()));
 			}
 		});
@@ -92,7 +91,7 @@ public class ValidationSupport {
 	// TODO: Need weak listeners to avoid memory leaks
     // TODO: Should both old and new value be passed into a validator? 
     // TODO: Add 'required' flag
-	public <T> void registerValidator( final Control c, final Callback<T, ValidationResult> validator  ) {
+	public <T> void registerValidator( final Control c, final Validator<T> validator  ) {
 		
 		getExtractor(c).ifPresent(e->{
 			
@@ -100,10 +99,10 @@ public class ValidationSupport {
 		
 			ov.addListener(new ChangeListener<T>(){
 				public void changed(ObservableValue<? extends T> o, T oldValue, T newValue) {
-					validationResults.put(c, validator.call(newValue));
+					validationResults.put(c, validator.validate(c, newValue));
 				};
 		    });
-			validationResults.put(c, validator.call(ov.getValue()));
+			validationResults.put(c, validator.validate(c, ov.getValue()));
 			
 		});
 		

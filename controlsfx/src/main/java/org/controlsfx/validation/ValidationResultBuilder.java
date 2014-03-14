@@ -1,8 +1,5 @@
 package org.controlsfx.validation;
 
-import static org.controlsfx.validation.SimpleValidationMessage.error;
-import static org.controlsfx.validation.SimpleValidationMessage.warning;
-
 import java.util.function.Supplier;
 
 import javafx.scene.control.Control;
@@ -20,28 +17,33 @@ public class ValidationResultBuilder {
 		return validationResult;
 	}
 	
-	public ValidationResultBuilder addError( String text ) {
-		validationResult.add ( error( target, text ));
+	public ValidationResultBuilder addMessage( String text, Severity severity ) {
+		validationResult.add( new SimpleValidationMessage(target, text, severity));
 		return this;
 	}
 	
-	public ValidationResultBuilder addErrorIf( String text,  Supplier<Boolean> condition ) {
+	public ValidationResultBuilder addMessageIf( String text, Severity severity, Supplier<Boolean> condition ) {
 		if ( condition.get()) {
-			validationResult.add ( error( target, text ));
+			validationResult.add( new SimpleValidationMessage(target, text, severity));
 		}
 		return this;
+	}
+	
+	
+	public ValidationResultBuilder addError( String text ) {
+		return addMessage( text, Severity.ERROR );
+	}
+	
+	public ValidationResultBuilder addErrorIf( String text, Supplier<Boolean> condition ) {
+		return addMessageIf( text, Severity.ERROR, condition );
 	}
 	
 	public ValidationResultBuilder addWarning( String text ) {
-		validationResult.add ( warning( target, text ));
-		return this;
+		return addMessage( text, Severity.WARNING );
 	}
 	
 	public ValidationResultBuilder addWarningIf( String text,  Supplier<Boolean> condition ) {
-		if ( condition.get()) {
-			validationResult.add ( warning( target, text ));
-		}
-		return this;
+		return addMessageIf( text, Severity.WARNING, condition );
 	}
 	
 	

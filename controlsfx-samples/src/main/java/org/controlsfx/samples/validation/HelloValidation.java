@@ -31,6 +31,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -46,6 +47,7 @@ import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationResultBuilder;
 import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validators;
 
 public class HelloValidation extends ControlsFXSample {
 
@@ -86,16 +88,7 @@ public class HelloValidation extends ControlsFXSample {
         // TextField with static auto-complete functionality
         //
         TextField textField = new TextField();
-        validationSupport.registerValidator(textField, value -> {
-        	
-        	String v = value == null? "": value.toString().trim();
-        	
-        	return new ValidationResultBuilder(textField)
-        		.addErrorIf( "Text is required", () -> v.isEmpty())
-        	    .addWarningIf( "Text has incorrect length (7)", () -> v.length() != 7 )
-        	    .build();
-        	
-        });
+        validationSupport.registerValidator(textField, Validators.getEmptyValidator("Text is required"));
 
         TextFields.bindAutoCompletion(
                 textField,
@@ -107,11 +100,13 @@ public class HelloValidation extends ControlsFXSample {
         
         ComboBox<String> combobox = new ComboBox<String>();
         combobox.getItems().addAll("Item A", "Item B", "Item C");
-        validationSupport.registerValidator(combobox, value -> {
+        validationSupport.registerValidator(combobox, (Control c, String newValue) -> {
+
         	return new ValidationResultBuilder(combobox)
-    			.addErrorIf( "Selection required", () -> value == null)
+    			.addErrorIf( "Selection required", () -> newValue == null)
     			.build();
-        });
+			}
+        );
         
         grid.add(new Label("Combobox"), 0, 1);
         grid.add(combobox, 1, 1);

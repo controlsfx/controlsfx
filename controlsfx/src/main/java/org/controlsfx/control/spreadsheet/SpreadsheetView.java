@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -109,11 +109,9 @@ import javafx.util.Duration;
  * <br/>
  * 
  * <h3>Fixing Rows and Columns</h3> You can fix some rows and some columns by
- * right-clicking on their header (if it has a dot, then it means it can be
- * fixed). A context menu will appear if it's possible to fix them. The label
- * will then be in italic and the dot will be replaced by a colon to confirm
- * that the fixing has been done properly. Keep in mind that only columns
- * without any spanning cells can be fixed.
+ * right-clicking on their header. A context menu will appear if it's possible to fix them. 
+ * The label will then be in italic and the background will turn to dark grey. 
+ * Keep in mind that only columns without any spanning cells can be fixed.
  * 
  * And that and only rows without row-spanning cells can be fixed. <br/>
  * You have also the possibility to fix them manually by adding and removing

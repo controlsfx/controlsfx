@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,7 +73,7 @@ public class VerticalHeader extends StackPane {
     private final SpreadsheetHandle handle;
     private final SpreadsheetView spreadsheetView;
     private double horizontalHeaderHeight;
-    private DoubleProperty verticalHeaderWidth;
+    private final DoubleProperty verticalHeaderWidth;
     private Double savedWidth;
     private boolean working = true; // Whether or not we are showing the
                                     // verticalHeader
@@ -85,9 +85,9 @@ public class VerticalHeader extends StackPane {
     private static double dragAnchorY = 0.0;
 
     // drag rectangle overlays
-    private List<Rectangle> dragRects = new ArrayList<Rectangle>();
+    private final List<Rectangle> dragRects = new ArrayList<>();
 
-    private List<Label> labelList = new ArrayList<Label>();
+    private final List<Label> labelList = new ArrayList<>();
     GridViewSkin skin;
     private boolean resizing = false;
 
@@ -221,13 +221,14 @@ public class VerticalHeader extends StackPane {
                 // label.minHeightProperty().bind(row.minHeightProperty());
                 getChildren().add(label);
                 // label.textProperty().bind(row.indexProperty().asString());
-                if (spreadsheetView.getFixedRows().contains(rowIndex)) {
-                    label.setText(getRowHeader(rowIndex) + ":");
-                } else if (spreadsheetView.isRowFixable(row.getIndex())) {
-                    label.setText(getRowHeader(rowIndex) + ".");
-                } else {
-                    label.setText(getRowHeader(rowIndex) + " ");
-                }
+                label.setText(getRowHeader(rowIndex));
+//                if (spreadsheetView.getFixedRows().contains(rowIndex)) {
+//                    label.setText(getRowHeader(rowIndex) + ":");
+//                } else if (spreadsheetView.isRowFixable(row.getIndex())) {
+//                    label.setText(getRowHeader(rowIndex) + ".");
+//                } else {
+//                    label.setText(getRowHeader(rowIndex) + " ");
+//                }
                 // label.setPrefWidth(verticalHeaderWidth.get());
                 label.resize(verticalHeaderWidth.get(), row.getHeight());
                 label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
@@ -271,7 +272,7 @@ public class VerticalHeader extends StackPane {
                         break;
                     label = getLabel(rowCount++);
 
-                    label.setText(getRowHeader(rowIndex) + ":");
+                    label.setText(getRowHeader(rowIndex));
                     label.resize(verticalHeaderWidth.get(), skin.getRowHeight(rowIndex));
                     label.setContextMenu(getRowContextMenu(rowIndex));
                     label.layoutYProperty().unbind();
@@ -367,7 +368,6 @@ public class VerticalHeader extends StackPane {
     private void columnResizing(GridRow gridRow, Label label, MouseEvent me) {
         double draggedY = me.getSceneY() - dragAnchorY;
         if (gridRow.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
-            System.out.println("ici");
             draggedY = -draggedY;
         }
         

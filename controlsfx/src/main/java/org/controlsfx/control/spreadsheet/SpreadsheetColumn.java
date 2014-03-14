@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,9 +60,8 @@ import javafx.scene.control.TableColumn;
  * description to understand the fixing constraints.
  * 
  * <p>
- * If the column can be fixed, a dot is displayed in the header and a
- * {@link ContextMenu} will appear if the user right-clicks on it. If not,
- * nothing will appear and the user will not have the possibility to fix it.
+ * If the column can be fixed, a{@link ContextMenu} will appear if the user right-clicks on it. 
+ * If not, nothing will appear and the user will not have the possibility to fix it.
  * 
  * <h3>Screenshot</h3>
  * The column <b>A</b> is fixed and is covering column <b>B</b> and partially
@@ -75,7 +74,7 @@ import javafx.scene.control.TableColumn;
  * 
  * @see SpreadsheetView
  */
-public class SpreadsheetColumn {
+public final class SpreadsheetColumn {
 
     /***************************************************************************
      * * Private Fields * *
@@ -113,9 +112,9 @@ public class SpreadsheetColumn {
         };
         Platform.runLater(r);
 
-        // Visual Confirmation
-        if (isColumnFixable())
-            column.setText(column.getText() + ".");
+//        // Visual Confirmation
+//        if (isColumnFixable())
+//            column.setText(column.getText() + ".");
 
         // When changing FixedColumns, we set header in order to add "." or ":"
         spreadsheetView.getFixedColumns().addListener(updateTextListener);
@@ -224,18 +223,18 @@ public class SpreadsheetColumn {
      * * Private Methods * *
      **************************************************************************/
     private void setText(String text) {
-        if (!isColumnFixable()) {
+//        if (!isColumnFixable()) {
             column.setText(text);
-        } else if (spreadsheetView.getFixedColumns().contains(this)) {
-            column.setText(text + ":");
-        } else {
-            column.setText(text + ".");
-        }
+//        } else if (spreadsheetView.getFixedColumns().contains(this)) {
+//            column.setText(text + ":");
+//        } else {
+//            column.setText(text + ".");
+//        }
 
     }
 
     private String getText() {
-        return column.getText().replace(".", "").replace(":", "");
+        return column.getText();//.replace(".", "").replace(":", "");
     }
 
     /**
@@ -292,7 +291,7 @@ public class SpreadsheetColumn {
      * Update the text in the header. So take the text and remove/add any "." or
      * ":" if necessary.
      */
-    private InvalidationListener updateTextListener = new InvalidationListener() {
+    private final InvalidationListener updateTextListener = new InvalidationListener() {
         @Override
         public void invalidated(Observable arg0) {
             setText(getText());

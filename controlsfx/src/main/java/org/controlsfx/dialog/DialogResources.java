@@ -29,7 +29,6 @@ package org.controlsfx.dialog;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -53,21 +52,21 @@ class DialogResources {
     /**
      * Method to get an internationalized string from the deployment resource.
      */
-    static String getMessage(String key) {
-        try {
-            return rbFX.getString(key);
-        } catch (MissingResourceException ex) {
-            // Do not trace this exception, because the key could be
-            // an already translated string.
-            System.out.println("Failed to get string for key '" + key + "'");
-            return key;
-        }
-    }
+//    static String getMessage(String key) {
+//        try {
+//            return rbFX.getString(key);
+//        } catch (MissingResourceException ex) {
+//            // Do not trace this exception, because the key could be
+//            // an already translated string.
+//            System.out.println("Failed to get string for key '" + key + "'");
+//            return key;
+//        }
+//    }
 
     /**
      * Returns a string from the resources
      */
-    static String getString(String key) {
+    private static String getString(String key) {
         try {
             return rbFX.getString(key);
         } catch (MissingResourceException mre) {
@@ -81,9 +80,9 @@ class DialogResources {
     /**
      * Returns a string from a resource, substituting argument 1
      */
-    static String getString(String key, Object... args) {
-        return MessageFormat.format(getString(key), args);
-    }
+//    static String getString(String key, Object... args) {
+//        return MessageFormat.format(getString(key), args);
+//    }
 
 
     /**

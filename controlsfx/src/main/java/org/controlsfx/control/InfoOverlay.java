@@ -28,7 +28,9 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.InfoOverlaySkin;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -149,6 +151,26 @@ public class InfoOverlay extends Control {
 
     public final void setText(String text) {
         textProperty().set(text);
+    }
+    
+    
+    // --- showOnHover
+    /**
+     * Specifies whether to show the overlay on hover of the content node (and 
+     * to hide it again when the content is no longer being hovered). By default 
+     * this is true. 
+     */
+    public final BooleanProperty showOnHoverProperty() {
+        return showOnHover;
+    }
+    private BooleanProperty showOnHover = new SimpleBooleanProperty(this, "showOnHover", true);
+
+    public final boolean isShowOnHover() {
+        return showOnHoverProperty().get();
+    }
+
+    public final void setShowOnHover(boolean value) {
+        showOnHoverProperty().set(value);
     }
 
     

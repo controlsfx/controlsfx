@@ -70,6 +70,8 @@ public interface Sample {
      */
     public String getJavaDocURL();
     
+    public String getSampleSourceURL();
+    
     /**
      * If true this sample is shown to users, if false it is not.
      */

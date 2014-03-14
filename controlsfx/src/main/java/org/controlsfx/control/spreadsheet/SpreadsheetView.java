@@ -144,18 +144,21 @@ import javafx.util.Duration;
  * 
  * <pre>
  * int rowCount = 15;
- * int columnCount = 10;
- * Grid grid = new Grid(rowCount, columnCount);
- * 
- * ArrayList&lt;ObservableList&lt;DataCell&gt;&gt; rows = new ArrayList&lt;ObservableList&lt;DataCell&gt;&gt;(grid.getRowCount());
- * for (int row = 0; row < grid.getRowCount(); ++row) {
- *     final ObservableList&lt;DataCell&gt; ObservableList&lt;DataCell&gt; = new ObservableList&lt;DataCell&gt;(row, grid.getColumnCount());
- *     for (int column = 0; column < grid.getColumnCount(); ++column) {
- *         ObservableList&lt;DataCell&gt;.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,""));
+ *     int columnCount = 10;
+ *     GridBase grid = new GridBase(rowCount, columnCount);
+ *     
+ *     ObservableList&lt;ObservableList&lt;SpreadsheetCell&lt;&lt; rows = FXCollections.observableArrayList();
+ *     for (int row = 0; row &lt; grid.getRowCount(); ++row) {
+ *         final ObservableList&lt;SpreadsheetCell&lt; list = FXCollections.observableArrayList();
+ *         for (int column = 0; column &lt; grid.getColumnCount(); ++column) {
+ *             list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,"value"));
+ *         }
+ *         rows.add(list);
  *     }
- *     rows.add(ObservableList&lt;DataCell&gt;);
- * }
- * grid.setRows(rows);
+ *     grid.setRows(rows);
+ *
+ *     SpreadsheetView spv = new SpreadsheetView(grid);
+ *     
  * </pre>
  * 
  * At that moment you can span some of the cells with the convenient method
@@ -459,6 +462,14 @@ public class SpreadsheetView extends Control {
         }
         getFixedColumns().clear();
 
+        /**
+         * We try to save the width of the column as we save the height of our rows so that we preserve the state.
+         */
+        List<Double> widthColumns = new ArrayList<>();
+        for(SpreadsheetColumn column:columns){
+            widthColumns.add(column.getWidth());
+        }
+        
         // TODO move into a property
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
@@ -502,6 +513,9 @@ public class SpreadsheetView extends Control {
                 });
                 cellsView.getColumns().add(column);
                 final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
+                if(widthColumns.size() > i){
+                    spreadsheetColumn.setPrefWidth(widthColumns.get(i));
+                }
                 columns.add(spreadsheetColumn);
                 // We verify if this column was fixed before and try to re-fix
                 // it.
@@ -655,6 +669,42 @@ public class SpreadsheetView extends Control {
         return fixingRowsAllowedProperty;
     }
 
+    /**
+     * This method will compute the best height for each line. That is to say
+     * a height where each content of each cell could be fully visible.\n
+     * Use this method wisely because it can degrade performance on great grid.
+     */
+    public void resizeRowsToFitContent(){
+        getCellsViewSkin().resizeRowsToFitContent();
+    }
+    
+    /**
+     * This method will first apply {@link #resizeRowsToFitContent() } and then
+     * take the highest height and apply it to every row.\n
+     * Just as {@link #resizeRowsToFitContent() }, this method can be degrading
+     * your performance on great grid.
+     */
+    public void resizeRowsToMaximum(){
+        getCellsViewSkin().resizeRowsToMaximum();
+    }
+    
+    /**
+     * This method will wipe all changes made to the row's height and set all row's
+     * height back to their default height defined in the model Grid.
+     */
+    public void resizeRowsToDefault(){
+        getCellsViewSkin().resizeRowsToDefault();
+    }
+    
+    /**
+     * Return the height of a particular row of the SpreadsheetView. \n
+     * @param row
+     * @return 
+     */
+    public double getRowHeight(int row) {
+         return getCellsViewSkin().getRowHeight(row);
+    }
+    
     /**
      * You can fix or unfix a column by modifying this list. Call
      * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
@@ -1017,8 +1067,8 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     private void checkFormat() {
-        if ((fmt = DataFormat.lookupMimeType("shuttle")) == null) {
-            fmt = new DataFormat("shuttle");
+        if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
+            fmt = new DataFormat("SpreadsheetView");
         }
     }
 

@@ -8,7 +8,7 @@ apply plugin: 'maven'
 apply from: 'mavenPublish.gradle'
 
 Properties commons = new Properties()
-commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
 
 group = commons.controlsfx_group
 version = commons.controlsfx_version

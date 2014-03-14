@@ -28,32 +28,11 @@ package impl.org.controlsfx.skin;
 
 import java.util.Collections;
 
-import javafx.animation.Animation.Status;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.util.Duration;
 
-import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.control.action.Action;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
@@ -67,7 +46,43 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     public NotificationPaneSkin(final NotificationPane control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
-        notificationBar = new NotificationBar(control);
+        notificationBar = new NotificationBar() {
+            @Override public void requestContainerLayout() {
+                control.requestLayout();
+            }
+
+            @Override public String getText() {
+                return control.getText();
+            }
+
+            @Override public Node getGraphic() {
+                return control.getGraphic();
+            }
+
+            @Override public ObservableList<Action> getActions() {
+                return control.getActions();
+            }
+
+            @Override public boolean isShowing() {
+                return control.isShowing();
+            }
+
+            @Override public boolean isShowFromTop() {
+                return control.isShowFromTop();
+            }
+            
+            @Override public void hide() {
+                control.hide();
+            }
+            
+            @Override public double getContainerHeight() {
+                return control.getHeight();
+            }
+            
+            @Override public void relocateInParent(double x, double y) {
+                notificationBar.relocate(x, y);
+            }
+        };
         
         updateContent();
         
@@ -89,9 +104,9 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             notificationBar.label.setGraphic(getSkinnable().getGraphic());
         } else if ("SHOWING".equals(p)) {
             if (getSkinnable().isShowing()) {
-                notificationBar.show();
+                notificationBar.doShow();
             } else {
-                notificationBar.hide();
+                notificationBar.doHide();
             }
         } else if ("SHOW_FROM_TOP".equals(p)) {
             if (getSkinnable().isShowing()) {
@@ -117,13 +132,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         final double notificationBarHeight = notificationBar.prefHeight(w);
         
-        if (getSkinnable().isShowFromTop()) {
-            // place at top of area
-            notificationBar.resizeRelocate(x, y - (1 - notificationBar.transition.get()) * notificationBarHeight, w, notificationBarHeight);
-        } else {
-            // place at bottom of area
-            notificationBar.resizeRelocate(x, h - notificationBarHeight, w, notificationBarHeight);
-        }
+        notificationBar.resize(w, notificationBarHeight);
         
         // layout the content
         if (content != null) {
@@ -154,199 +163,4 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.maxHeight(width);
     };
-    
-    
-    
-    
-    static class NotificationBar extends Region {
-        
-        private static final double MIN_HEIGHT = 40;
-        
-        private final NotificationPane notificationPane;
-        
-        private final Label label;
-        private ButtonBar actionsBar;
-        private final Button closeBtn;
-        
-        private final GridPane pane;
-
-        public NotificationBar(final NotificationPane notificationPane) {
-            this.notificationPane = notificationPane;
-            
-            pane = new GridPane();
-            pane.getStyleClass().add("notification-bar");
-            pane.setAlignment(Pos.BASELINE_LEFT);
-            pane.setVisible(notificationPane.isShowing());
-            getChildren().setAll(pane);
-            
-            // initialise label area
-            label = new Label();
-            label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            GridPane.setVgrow(label, Priority.ALWAYS);
-            GridPane.setHgrow(label, Priority.ALWAYS);
-            
-            label.setText(notificationPane.getText());
-            label.setGraphic(notificationPane.getGraphic());
-            label.opacityProperty().bind(transition);
-            
-            // initialise actions area
-            notificationPane.getActions().addListener(new InvalidationListener() {
-                @Override public void invalidated(Observable arg0) {
-                    updatePane();
-                }
-            });
-            
-            // initialise close button area
-            closeBtn = new Button();
-            closeBtn.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent arg0) {
-                    notificationPane.hide();
-                }
-            });
-            closeBtn.getStyleClass().setAll("close-button");
-            StackPane graphic = new StackPane();
-            graphic.getStyleClass().setAll("graphic");
-            closeBtn.setGraphic(graphic);
-            closeBtn.setMinSize(17, 17);
-            closeBtn.setPrefSize(17, 17);
-            closeBtn.opacityProperty().bind(transition);
-            GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
-            
-            // put it all together
-            updatePane();
-        }
-        
-        private void updatePane() {
-            actionsBar = ActionUtils.createButtonBar(notificationPane.getActions());
-            actionsBar.opacityProperty().bind(transition);
-            GridPane.setHgrow(actionsBar, Priority.SOMETIMES);
-            pane.getChildren().clear();
-            pane.add(label, 0, 0);
-            pane.add(actionsBar, 1, 0);
-            pane.add(closeBtn, 2, 0);
-        }
-        
-        @Override protected void layoutChildren() {
-            final double w = getWidth();
-            final double h = computePrefHeight(-1);
-            pane.resize(w, h);
-        }
-        
-        @Override protected double computeMinHeight(double width) {
-            return super.computePrefHeight(width);
-        }
-        
-        @Override protected double computePrefHeight(double width) {
-            if (notificationPane.isShowFromTop()) {
-                return MIN_HEIGHT; 
-            } else {
-                return Math.max(pane.prefHeight(width), MIN_HEIGHT) * transition.get();
-            }
-        }
-        
-        private void show() {
-            transitionStartValue = 0;
-            doAnimationTransition();
-        }
-        
-        private void hide() {
-            transitionStartValue = 1;
-            doAnimationTransition();
-        }
-        
-        
-        
-        // --- animation timeline code
-        private final Duration TRANSITION_DURATION = new Duration(350.0);
-        private Timeline timeline;
-        private double transitionStartValue;
-        private void doAnimationTransition() {
-            Duration duration;
-
-            if (timeline != null && (timeline.getStatus() != Status.STOPPED)) {
-                duration = timeline.getCurrentTime();
-                
-                // fix for #70 - the notification pane freezes up as it has zero
-                // duration to expand / contract
-                duration = duration == Duration.ZERO ? TRANSITION_DURATION : duration;
-                transitionStartValue = transition.get();
-                // --- end of fix
-                
-                timeline.stop();
-            } else {
-                duration = TRANSITION_DURATION;
-            }
-
-            timeline = new Timeline();
-            timeline.setCycleCount(1);
-
-            KeyFrame k1, k2;
-
-            if (notificationPane.isShowing()) {
-                k1 = new KeyFrame(
-                    Duration.ZERO,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // start expand
-                            pane.setCache(true);
-                            pane.setVisible(true);
-                            
-                            pane.fireEvent(new Event(NotificationPane.ON_SHOWING));
-                        }
-                    },
-                    new KeyValue(transition, transitionStartValue)
-                );
-
-                k2 = new KeyFrame(
-                    duration,
-                        new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // end expand
-                            pane.setCache(false);
-                            
-                            pane.fireEvent(new Event(NotificationPane.ON_SHOWN));
-                        }
-                    },
-                    new KeyValue(transition, 1, Interpolator.EASE_OUT)
-
-                );
-            } else {
-                k1 = new KeyFrame(
-                    Duration.ZERO,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // Start collapse
-                            pane.setCache(true);
-                            
-                            pane.fireEvent(new Event(NotificationPane.ON_HIDING));
-                        }
-                    },
-                    new KeyValue(transition, transitionStartValue)
-                );
-
-                k2 = new KeyFrame(
-                    duration,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // end collapse
-                            pane.setCache(false);
-                            pane.setVisible(false);
-                            
-                            pane.fireEvent(new Event(NotificationPane.ON_HIDDEN));
-                        }
-                    },
-                    new KeyValue(transition, 0, Interpolator.EASE_IN)
-                );
-            }
-
-            timeline.getKeyFrames().setAll(k1, k2);
-            timeline.play();
-        }
-        
-        private DoubleProperty transition = new SimpleDoubleProperty() {
-            @Override protected void invalidated() {
-                notificationPane.requestLayout();
-            }
-        };
-    }
 }

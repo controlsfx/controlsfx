@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -37,12 +39,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.ClosePath;
@@ -68,13 +68,13 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     
     private static final String STYLE_CLASS_FIRST = "first";
 
-    private final HBox layout;
+//    private final HBox layout;
 
     public BreadCrumbBarSkin(final BreadCrumbBar<T> control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
 
-        layout = new HBox();
-        getChildren().add(layout);
+//        layout = new HBox();
+//        getChildren().add(layout);
 
         control.selectedCrumbProperty().addListener(selectedPathChangeListener);
 
@@ -104,59 +104,60 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
             // add new listener
             newTarget.addEventHandler(TreeItem.childrenModificationEvent(), treeChildrenModifiedHandler);
         }
-        layoutBreadCrumbs();
+        updateBreadCrumbs();
     }
 
 
     private final EventHandler<TreeModificationEvent<Object>> treeChildrenModifiedHandler =
             new EventHandler<TreeModificationEvent<Object>>(){
-        @Override
-        public void handle(TreeModificationEvent<Object> args) {
-            layoutBreadCrumbs();
+        @Override public void handle(TreeModificationEvent<Object> args) {
+            updateBreadCrumbs();
         }
     };
 
 
-    /**
-     * Layout the bread crumbs
-     */
-    private void layoutBreadCrumbs() {
+    private void updateBreadCrumbs() {
         final BreadCrumbBar<T> buttonBar = getSkinnable();
         final TreeItem<T> pathTarget = buttonBar.getSelectedCrumb();
         final Callback<TreeItem<T>, Button> factory = buttonBar.getCrumbFactory();
 
-        layout.getChildren().clear();
+        getChildren().clear();
 
         if(pathTarget != null){
             List<TreeItem<T>> crumbs = constructFlatPath(pathTarget);
 
-            for (int i=0; crumbs.size() > i; i++) {
-                Button crumbView = createCrumb(factory, crumbs.get(i));
+            for (int i=0; i < crumbs.size(); i++) {
+                Button crumb = createCrumb(factory, crumbs.get(i));
                 
                 if (i == 0) {
-                    if (crumbView instanceof BreadCrumbButton) {
-                        ((BreadCrumbButton)crumbView).setFirst(true);
-                    } else {
-                        if (! crumbView.getStyleClass().contains(STYLE_CLASS_FIRST)) {
-                            crumbView.getStyleClass().add(STYLE_CLASS_FIRST);
-                        }
+                    if (! crumb.getStyleClass().contains(STYLE_CLASS_FIRST)) {
+                        crumb.getStyleClass().add(STYLE_CLASS_FIRST);
                     }
                 } else {
-                    crumbView.getStyleClass().remove(STYLE_CLASS_FIRST);
+                    crumb.getStyleClass().remove(STYLE_CLASS_FIRST);
                 }
 
-                if(crumbView != null){
-                    // We have to position the bread crumbs slightly overlapping
-                    // thus we have to create negative Insets
-                    double ins = crumbView instanceof BreadCrumbButton ? 
-                            ((BreadCrumbButton)crumbView).getArrowWidth() / 2.0 : 0;
-                    double right = -ins - 0.1d;
-                    double left = !(i==0) ? right : 0; // Omit the first button
-
-                    HBox.setMargin(crumbView, new Insets(0, right, 0, left));
-                    layout.getChildren().add(crumbView);
-                }
+                getChildren().add(crumb);
             }
+        }
+    }
+    
+    @Override protected void layoutChildren(double x, double y, double w, double h) {
+        for (int i = 0; i < getChildren().size(); i++) {
+            Node n = getChildren().get(i);
+            
+            double nw = snapSize(n.prefWidth(h));
+            double nh = snapSize(n.prefHeight(-1));
+            
+            if (i > 0) {
+                // We have to position the bread crumbs slightly overlapping
+                double ins = n instanceof BreadCrumbButton ?  ((BreadCrumbButton)n).getArrowWidth() : 0;
+                x = snapPosition(x - ins);
+            }
+
+            n.resize(nw, nh);
+            n.relocate(x, y);
+            x += nw;
         }
     }
 
@@ -183,10 +184,12 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
             final TreeItem<T> selectedCrumb) {
 
         Button crumb = factory.call(selectedCrumb);
+        
+        crumb.getStyleClass().add("crumb");
 
         // We want all buttons to have the same height
         // so we bind their preferred height to the enclosing container
-        crumb.prefHeightProperty().bind(layout.heightProperty());
+//        crumb.prefHeightProperty().bind(getSkinnable().heightProperty());
 
         // listen to the action event of each bread crumb
         crumb.setOnAction(new EventHandler<ActionEvent>() {
@@ -258,9 +261,8 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
             super(text, gfx);
             first.set(false);
 
-            firstProperty().addListener(new ChangeListener<Boolean>() {
-                @Override
-                public void changed(ObservableValue<? extends Boolean> obs, Boolean oldfirst, Boolean newfirst) {
+            getStyleClass().addListener(new InvalidationListener() {
+                @Override public void invalidated(Observable arg0) {
                     updateShape();
                 }
             });
@@ -269,7 +271,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         }
 
         private void updateShape(){
-            this.setShape(createButtonShape(isFirst()));
+            this.setShape(createButtonShape());
         }
 
 
@@ -282,26 +284,6 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         }
 
         /**
-         * Has this button the first flag?
-         * @return
-         */
-        public boolean isFirst() {
-            return first.get();
-        }
-
-        /**
-         * Set this button as the first
-         * @param first
-         */
-        public void setFirst(boolean first) {
-            this.first.set(first);
-        }
-
-        public ObjectProperty<Boolean> firstProperty(){
-            return first;
-        }
-
-        /**
          * Create an arrow path
          * 
          * Based upon Uwe / Andy Till code snippet found here:
@@ -309,7 +291,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
          * @param first
          * @return
          */
-        private Path createButtonShape(boolean first){
+        private Path createButtonShape(){
             // build the following shape (or home without left arrow)
 
             //   --------
@@ -346,7 +328,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
             HLineTo e5 = new HLineTo(0);
             path.getElements().add(e5);
 
-            if(!first){
+            if(! getStyleClass().contains(STYLE_CLASS_FIRST)){
                 // draw lower part of left arrow
                 // we simply can omit it for the first Button
                 LineTo e6 = new LineTo(arrowWidth, arrowHeight / 2.0);
@@ -367,6 +349,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
             path.getElements().add(e7);
             // this is a dummy color to fill the shape, it won't be visible
             path.setFill(Color.BLACK);
+            
             return path;
         }
     }

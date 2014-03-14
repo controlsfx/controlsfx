@@ -26,11 +26,13 @@
  */
 package org.controlsfx.dialog;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.getString;
+import static impl.org.controlsfx.i18n.Localization.localize;
 import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.OK;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
-import static org.controlsfx.dialog.DialogResources.getString;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,6 +43,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -65,6 +68,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -92,6 +96,7 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialog.Actions;
 
 
@@ -346,9 +351,9 @@ public final class Dialogs {
     public static final String USE_DEFAULT = "$$$";
 
     private Object owner;
-    private String title;
+    private String title = USE_DEFAULT;
     private String message;
-    private String masthead;
+    private String masthead = USE_DEFAULT;
     private boolean lightweight;
     private boolean nativeTitleBar;
     private Set<Action> actions = new LinkedHashSet<>();
@@ -814,6 +819,156 @@ public final class Dialogs {
         content.setWorker(worker);
     }
     
+    public static class UserInfo {
+    	
+    	private String userName;
+    	private String password;
+    	
+		public UserInfo(String userName, String password) {
+			this.userName = userName == null? "": userName;
+			this.password = password == null? "": password;
+		}
+		
+		public String getUserName() {
+			return userName;
+		}
+		public void setUserName(String userName) {
+			this.userName = userName;
+		}
+		public String getPassword() {
+			return password;
+		}
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		@Override
+		public String toString() {
+			return "UserInfo [userName=" + userName + "]";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((password == null) ? 0 : password.hashCode());
+			result = prime * result
+					+ ((userName == null) ? 0 : userName.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			UserInfo other = (UserInfo) obj;
+			if (password == null) {
+				if (other.password != null)
+					return false;
+			} else if (!password.equals(other.password))
+				return false;
+			if (userName == null) {
+				if (other.userName != null)
+					return false;
+			} else if (!userName.equals(other.userName))
+				return false;
+			return true;
+		}
+
+		
+		
+    }
+    
+    
+    public Optional<UserInfo> showLogin( final UserInfo userInfo, final Callback<UserInfo, Void> authenticator ) {
+    	
+    	TextField txUserName     = new TextField();
+		PasswordField txPassword = new PasswordField();
+		Label lbMessage          = new Label(""); 
+		lbMessage.setStyle("-fx-text-fill: red;");
+		
+		lbMessage.setVisible(false);
+		final GridPane content = new GridPane();
+		content.setHgap(10);
+		content.setVgap(10);
+		content.add(lbMessage, 0, 0, 2, 1);
+		GridPane.setHgrow(lbMessage, Priority.ALWAYS);
+		content.addRow(1, new Label( getString("login.dlg.user.caption")),txUserName);
+		GridPane.setHgrow(txUserName, Priority.ALWAYS);
+		content.addRow(2,new Label(getString("login.dlg.pswd.caption")), txPassword);
+		GridPane.setHgrow(txPassword, Priority.ALWAYS);
+		
+//		NotificationPane notificationPane = new NotificationPane(content);
+//		notificationPane.setShowFromTop(true);
+		
+		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+
+			{
+				ButtonBar.setType(this, ButtonType.OK_DONE);
+			}
+			
+			
+			@Override
+			public void execute(ActionEvent ae) {
+				Dialog dlg = (Dialog) ae.getSource();
+				try {
+					authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
+					lbMessage.setVisible(false);
+					dlg.hide();
+					dlg.setResult(this);
+				} catch( Throwable ex ) {
+					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
+					lbMessage.setVisible(true);
+					lbMessage.setText(ex.getMessage());
+					ex.printStackTrace();
+				}
+				
+			}
+
+			public String toString() {
+				return "LOGIN";
+			};
+		};
+
+		ChangeListener<String> fieldChangeListener = new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				actionLogin.disabledProperty().set(
+						txUserName.getText().trim().isEmpty()
+					 || txPassword.getText().trim().isEmpty());
+			}
+		};
+
+		txUserName.textProperty().addListener(fieldChangeListener);
+		txPassword.textProperty().addListener(fieldChangeListener);		
+		
+		final Dialog dlg = buildDialog(Type.LOGIN);
+        dlg.setContent(content);
+        
+        dlg.setResizable(false);
+		dlg.setIconifiable(false);
+		if ( dlg.getGraphic() == null ) { 
+			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
+		}
+		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
+		txUserName.setText( userInfo.getUserName());
+		txPassword.setText(new String(userInfo.getPassword()));
+
+		Platform.runLater( () -> txUserName.requestFocus() );
+
+    	return Optional.ofNullable( 
+    			dlg.show() == actionLogin? 
+    					new UserInfo(txUserName.getText(), txPassword.getText()): 
+    					null);
+    }
+    
     
     
     /***************************************************************************
@@ -823,7 +978,7 @@ public final class Dialogs {
      **************************************************************************/
 
     private Dialog buildDialog(final Type dlgType) {
-        String actualTitle = title == null ? null : (USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title);
+        String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
         dlg.setResizable(false);
@@ -875,7 +1030,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label(getString("exception.dialog.label"));
+        Label label = new Label( localize(asKey("exception.dlg.label")));
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -959,13 +1114,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image", "Error", "Error", OK),
-        INFORMATION("info.image", "Message", "Message", OK),
-        WARNING("warning.image", "Warning", "Warning", OK),
-        CONFIRMATION("confirm.image", "Select an option", "Select an option", YES, NO, CANCEL),
-        INPUT("confirm.image", "Select an option", "Select an option", OK, CANCEL),
-        FONT( null, "Select Font", "Select Font", OK, CANCEL),
-        PROGRESS("info.image", "Progress", "Progress");
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("error.dlg.masthead"), OK),
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), OK),
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), OK, CANCEL),
+        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
+        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), OK, CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;
@@ -988,11 +1144,11 @@ public final class Dialogs {
         }
 
         public String getDefaultMasthead() {
-            return defaultMasthead;
+            return localize(defaultMasthead);
         }
 
         public String getDefaultTitle() {
-            return defaultTitle;
+            return localize(defaultTitle);
         }
 
         public Collection<Action> getActions() {

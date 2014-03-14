@@ -26,14 +26,16 @@
  */
 package org.controlsfx.dialog;
 
+import org.controlsfx.tools.Utils;
+
 import javafx.stage.Window;
 
 class DialogFactory {
-    
+
     static FXDialog createDialog(String title) {
         return createDialog(false, title);
     }
-    
+
     static FXDialog createDialog(boolean useLightweight, String title) {
         return createDialog(false, title, null, false);
     }
@@ -41,12 +43,16 @@ class DialogFactory {
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
         return createDialog(useLightweight, title, owner, modal, false);
     }
-    
+
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, boolean nativeChrome) {
         if (useLightweight) {
             return new LightweightDialog(title, owner);
         } else {
-            return new HeavyweightDialog(title, (Window) owner, modal, nativeChrome);
+
+            Window window = Utils.getWindow(owner);
+
+            return new HeavyweightDialog(title, window, modal, nativeChrome);
         }
     }
+
 }

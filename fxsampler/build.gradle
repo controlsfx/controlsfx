@@ -7,7 +7,7 @@ apply from: 'mavenPublish.gradle'
 apply from: 'javafx.plugin'
 
 Properties commons = new Properties()
-commons.load(new FileInputStream("$rootDir/../controlsfx.properties"))
+commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
 
 group = commons.controlsfx_group
 version = commons.fxsampler_version

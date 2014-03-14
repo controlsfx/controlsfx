@@ -26,11 +26,12 @@
  */
 package org.controlsfx.control.action;
 
+import impl.org.controlsfx.i18n.Localization;
+import impl.org.controlsfx.i18n.SimpleLocalizedStringProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -88,7 +89,7 @@ public abstract class AbstractAction implements Action {
      **************************************************************************/
     
     // --- text
-    private final StringProperty textProperty = new SimpleStringProperty(this, "text");
+    private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text");
     
     /** {@inheritDoc} */
     @Override public StringProperty textProperty() {
@@ -126,7 +127,7 @@ public abstract class AbstractAction implements Action {
 
     
     // --- longText
-    private final StringProperty longTextProperty = new SimpleStringProperty(this, "longText");
+    private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText");
     
     /** {@inheritDoc} */
     @Override public StringProperty longTextProperty() {
@@ -135,7 +136,7 @@ public abstract class AbstractAction implements Action {
     
     //  javadoc auto-generated from property
     public final String getLongText() {
-        return longTextProperty.get();
+        return Localization.localize(longTextProperty.get());
     }
     
     //  javadoc auto-generated from property

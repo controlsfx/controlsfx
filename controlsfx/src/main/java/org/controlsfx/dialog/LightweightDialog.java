@@ -4,8 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -73,16 +71,7 @@ class LightweightDialog extends FXDialog {
         // we need to determine the type of the owner, so that we can appropriately
         // show the dialog
         if (_owner == null) {
-            // lets just get the focused stage and show the dialog in there
-            Iterator<Window> windows = Window.impl_getWindows();
-            Window window = null;
-            while (windows.hasNext()) {
-                window = windows.next();
-                if (window.isFocused()) {
-                    break;
-                }
-            }
-            _owner = window;
+            _owner = org.controlsfx.tools.Utils.getWindow(_owner);
         } 
         
         if (_owner instanceof Scene) {
@@ -114,6 +103,7 @@ class LightweightDialog extends FXDialog {
             @Override public void handle(MouseEvent event) {
                 mouseDragDeltaX = lightweightDialog.getLayoutX() - event.getSceneX();
                 mouseDragDeltaY = lightweightDialog.getLayoutY() - event.getSceneY();
+                lightweightDialog.setCache(true);
             }
         });
         toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -139,6 +129,11 @@ class LightweightDialog extends FXDialog {
                 
                 lightweightDialog.setLayoutX(newX);
                 lightweightDialog.setLayoutY(newY);
+            }
+        });
+        toolBar.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {
+                lightweightDialog.setCache(false);
             }
         });
 

@@ -1,0 +1,14 @@
+.tab-pane > * > .master-detail-pane > .split-pane,
+.split-pane > * > .master-detail-pane > .split-pane {
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+ }
+.tab-pane.floating > * > .master-detail-pane > .split-pane {
+    -fx-background-insets: 0, 0;
+    -fx-padding: -1;
+}
+.titled-pane > * > * > .master-detail-pane > .split-pane {
+    -fx-background-color: null;
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+}

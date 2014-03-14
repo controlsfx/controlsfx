@@ -53,7 +53,6 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
-import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
@@ -212,7 +211,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
                     (double) Math.round((Math.random() * 100) * 100) / 100);
             final double randomFormat = Math.random();
             if (randomFormat < 0.25) {
-                cell.setFormat("#,##0.00€");
+                cell.setFormat("#,##0.00"+"\u20AC");
             } else if (randomFormat < 0.5) {
                 cell.setFormat("0.###E0 km/h");
             } else {

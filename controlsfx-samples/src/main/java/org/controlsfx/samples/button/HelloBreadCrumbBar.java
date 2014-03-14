@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.button;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,19 +32,24 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
-import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.samples.Utils;
 
 public class HelloBreadCrumbBar extends ControlsFXSample {
 
-    BreadCrumbBar<String> sampleBreadCrumbBar;
+    private BreadCrumbBar<String> sampleBreadCrumbBar;
+    private final Label selectedCrumbLbl = new Label();
+    
+    private int newCrumbCount = 0;
 
     @Override public String getSampleName() {
         return "BreadCrumbBar";
@@ -61,26 +66,22 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
 
     @Override public Node getPanel(final Stage stage) {
 
-        BorderPane root = new BorderPane();
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(10));
 
         sampleBreadCrumbBar = new BreadCrumbBar<>();
-        TreeItem<String> model = BreadCrumbBar.buildTreeModel("Hello", "World", "This", "Is", "cool");
-        sampleBreadCrumbBar.setSelectedCrumb(model);
+        resetModel();
 
-        root.setTop(sampleBreadCrumbBar);
+        root.getChildren().add(sampleBreadCrumbBar);
         BorderPane.setMargin(sampleBreadCrumbBar, new Insets(20));
 
-
         sampleBreadCrumbBar.setOnCrumbAction(new EventHandler<BreadCrumbBar.BreadCrumbActionEvent<String>>() {
-            @Override
-            public void handle(BreadCrumbActionEvent<String> bae) {
-                Dialogs.create()
-                .title("BreadCrumbBar")
-                .masthead("Bread Crumb Action")
-                .message("You just clicked on '" + bae.getSelectedCrumb() + "'!") 
-                .showInformation();
+            @Override public void handle(BreadCrumbActionEvent<String> bae) {
+                selectedCrumbLbl.setText("You just clicked on '" + bae.getSelectedCrumb() + "'!");
             }
         });
+        
+        root.getChildren().add(selectedCrumbLbl);
 
         return root;
     }
@@ -91,26 +92,50 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
 
-        // TODO Add customization example controls
-        Button btn = new Button("Add Crumb");
-        grid.add(btn, 0, 0);
+        int row = 0;
 
-        CheckBox chkAutoNav = new CheckBox("Enable auto navigation");
-        grid.add(chkAutoNav, 0, 1);
-        chkAutoNav.selectedProperty().bindBidirectional(sampleBreadCrumbBar.autoNavigationProperty());
-
-
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent ae) {
+        // add crumb
+        Label lblAddCrumb = new Label("Add crumb: ");
+        lblAddCrumb.getStyleClass().add("property");
+        grid.add(lblAddCrumb, 0, row);
+        Button btnAddCrumb = new Button("Press");
+        btnAddCrumb.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent ae) {
                 // Construct a new leaf node and append it to the previous leaf
-                TreeItem<String> leaf = new TreeItem<>("New!");
+                TreeItem<String> leaf = new TreeItem<>("New Crumb #" + newCrumbCount++);
                 sampleBreadCrumbBar.getSelectedCrumb().getChildren().add(leaf);
                 sampleBreadCrumbBar.setSelectedCrumb(leaf);
             }
         });
+        grid.add(btnAddCrumb, 1, row++);
+        
+        // reset
+        Label lblReset = new Label("Reset model: ");
+        lblReset.getStyleClass().add("property");
+        grid.add(lblReset, 0, row);
+        Button btnReset = new Button("Press");
+        btnReset.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent ae) {
+                resetModel();
+            }
+        });
+        grid.add(btnReset, 1, row++);
+        
+        // auto navigation
+        Label lblAutoNavigation = new Label("Enable auto navigation: ");
+        lblAutoNavigation.getStyleClass().add("property");
+        grid.add(lblAutoNavigation, 0, row);
+        CheckBox chkAutoNav = new CheckBox();
+        chkAutoNav.selectedProperty().bindBidirectional(sampleBreadCrumbBar.autoNavigationEnabledProperty());
+        grid.add(chkAutoNav, 1, row++);
+        
 
         return grid;
+    }
+    
+    private void resetModel() {
+        TreeItem<String> model = BreadCrumbBar.buildTreeModel("Hello", "World", "This", "is", "cool");
+        sampleBreadCrumbBar.setSelectedCrumb(model);
     }
 
 

@@ -26,6 +26,8 @@
  */
 package org.controlsfx.dialog;
 
+import impl.org.controlsfx.i18n.Localization;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -744,27 +746,27 @@ public class Dialog {
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( DialogResources.getString("common.cancel.button"), ButtonType.CANCEL_CLOSE ),
+        CANCEL( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( DialogResources.getString("common.close.button"),  ButtonType.CANCEL_CLOSE ),
+        CLOSE ( Localization.asKey("dlg.close.button"),  ButtonType.CANCEL_CLOSE ),
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( DialogResources.getString("common.no.button"),     ButtonType.NO ),
+        NO    ( Localization.asKey("dlg.no.button"),     ButtonType.NO ),
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( DialogResources.getString("common.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
+        OK    ( Localization.asKey("dlg.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( DialogResources.getString("common.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
+        YES   ( Localization.asKey("dlg.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
 
         private final AbstractAction action;
         private final EnumSet<ActionTrait> traits;
@@ -1007,8 +1009,8 @@ public class Dialog {
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
         detailsButton.getStyleClass().setAll("details-button", "more");
-        final String moreText = DialogResources.getString("common.detail.button.more");
-        final String lessText = DialogResources.getString("common.detail.button.less");
+        final String moreText = Localization.getString("dlg.detail.button.more");
+        final String lessText = Localization.getString("dlg.detail.button.less");
         
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {

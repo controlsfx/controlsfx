@@ -14,16 +14,10 @@ public class Project {
     // A Project has a Tree of samples
     private final SampleTree sampleTree;
     
-    public Project(String name) {
+    public Project(String name, String basePackage) {
         this.name = name;
+        this.basePackage = basePackage;
         this.sampleTree = new SampleTree(new EmptySample(name));
-        
-        // FIXME we shouldn't be hard coding like this, but it'll do for now
-        switch (name) {
-            case "ControlsFX": basePackage = "org.controlsfx.samples"; break;
-            case "JFXtras":    basePackage = "jfxtras.labs.samples"; break;
-            default:           basePackage = ""; break;
-        }
     }
 
     public void addSample(String packagePath, Sample sample) {

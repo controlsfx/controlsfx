@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
+package org.controlsfx.samples.textfields;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -36,8 +36,9 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.CustomTextField;
-import org.controlsfx.control.TextFields;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
+import org.controlsfx.samples.Utils;
 
 public class HelloTextFields extends ControlsFXSample {
     
@@ -48,7 +49,7 @@ public class HelloTextFields extends ControlsFXSample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/TextFields.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/textfield/TextFields.html";
     }
     
     @Override public Node getPanel(Stage stage) {

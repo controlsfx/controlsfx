@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control;
+package org.controlsfx.control.textfield;
 
 import impl.org.controlsfx.skin.CustomTextFieldSkin;
 import javafx.beans.property.ObjectProperty;

@@ -31,7 +31,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 
-import org.controlsfx.control.CustomTextField;
+import org.controlsfx.control.textfield.CustomTextField;
 
 import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
 import com.sun.javafx.scene.control.skin.TextFieldSkin;

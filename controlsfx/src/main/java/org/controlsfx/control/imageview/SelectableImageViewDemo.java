@@ -26,6 +26,8 @@ public class SelectableImageViewDemo extends Application {
 
         selectableImageView.setSelection(new Rectangle2D(100, 100, 200, 200));
         selectableImageView.setSelectionActive(false);
+        selectableImageView.setFixedSelectionRatio(16/(9d));
+        selectableImageView.setSelectionRatioFixed(true);
     }
 
     public static void main(String[] args) {

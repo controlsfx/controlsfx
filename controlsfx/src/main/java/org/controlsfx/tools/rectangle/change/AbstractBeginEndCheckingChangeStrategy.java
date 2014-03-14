@@ -1,4 +1,4 @@
-package org.controlsfx.tools.rectangle;
+package org.controlsfx.tools.rectangle.change;
 
 import java.util.Objects;
 
@@ -6,10 +6,10 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
 /**
- * Abstract superclass to implementations of {@link ChangeStrategy}. Checks whether the specified points are not-null
+ * Abstract superclass to implementations of {@link Rectangle2DChangeStrategy}. Checks whether the specified points are not-null
  * and the "begin-continue-end"-contract.
  */
-abstract class AbstractBeginEndCheckingChangeStrategy implements ChangeStrategy {
+abstract class AbstractBeginEndCheckingChangeStrategy implements Rectangle2DChangeStrategy {
 
     // ATTRIBUTES
 

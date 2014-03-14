@@ -1,4 +1,4 @@
-package org.controlsfx.tools.rectangle;
+package org.controlsfx.tools.rectangle.change;
 
 import java.util.Objects;
 
@@ -104,7 +104,7 @@ public class MoveChangeStrategy extends AbstractPreviousRectangleChangeStrategy 
         double correctedUpperLeftX = MathTools.inInterval(bounds.getMinX(), upperLeftX, maxX);
         double correctedUpperLeftY = MathTools.inInterval(bounds.getMinY(), upperLeftY, maxY);
 
-        // rectangle from corected upper left corner with the previous rectangle's width and height
+        // rectangle from corrected upper left corner with the previous rectangle's width and height
         return new Rectangle2D(
                 correctedUpperLeftX, correctedUpperLeftY,
                 getPrevious().getWidth(), getPrevious().getHeight());

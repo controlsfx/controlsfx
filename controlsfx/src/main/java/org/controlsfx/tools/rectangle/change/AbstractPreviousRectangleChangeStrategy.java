@@ -1,11 +1,11 @@
-package org.controlsfx.tools.rectangle;
+package org.controlsfx.tools.rectangle.change;
 
 import java.util.Objects;
 
 import javafx.geometry.Rectangle2D;
 
 /**
- * Abstract superclass to most implementations of {@link ChangeStrategy}. Stores a ratio and is based on a previous
+ * Abstract superclass to most implementations of {@link Rectangle2DChangeStrategy}. Stores a ratio and is based on a previous
  * rectangle. Both behaviors are determined during construction.
  */
 abstract class AbstractPreviousRectangleChangeStrategy extends AbstractRatioRespectingChangeStrategy {

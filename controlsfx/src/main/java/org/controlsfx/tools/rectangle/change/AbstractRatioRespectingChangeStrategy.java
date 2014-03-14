@@ -1,7 +1,7 @@
-package org.controlsfx.tools.rectangle;
+package org.controlsfx.tools.rectangle.change;
 
 /**
- * Abstract superclass to implementations of {@link ChangeStrategy}, which might be parameterized such that only
+ * Abstract superclass to implementations of {@link Rectangle2DChangeStrategy}, which might be parameterized such that only
  * rectangles of a defined ratio are created. This parameterization happens during construction. Subclasses must
  * implement the ratio handling themselves! This class only holds the parameters.
  */

@@ -41,7 +41,7 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * pane is constantly resized to exactly fit the image view.
      * The rectangles marking the selection are positioned by converting the original selection's coordinates,
      * which are relative to the image, to coordinates relative to the image view. To prevent the unselected area's
-     * large bounds from messing up the layout, it is not managed by its parent.
+     * large bounds (see below) from messing up the layout, it is not managed by its parent.
      * 
      * MOUSE:
      * To capture mouse events an additional node is added on top of the image view and the selection areas (see

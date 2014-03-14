@@ -9,15 +9,19 @@ import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-import org.controlsfx.tools.rectangle.ChangeStrategy;
 import org.controlsfx.tools.rectangle.CoordinatePosition;
 import org.controlsfx.tools.rectangle.CoordinatePositions;
-import org.controlsfx.tools.rectangle.MoveChangeStrategy;
-import org.controlsfx.tools.rectangle.NewChangeStrategy;
-import org.controlsfx.tools.rectangle.ToNortheastChangeStrategy;
-import org.controlsfx.tools.rectangle.ToNorthwestChangeStrategy;
-import org.controlsfx.tools.rectangle.ToSoutheastChangeStrategy;
-import org.controlsfx.tools.rectangle.ToSouthwestChangeStrategy;
+import org.controlsfx.tools.rectangle.change.Rectangle2DChangeStrategy;
+import org.controlsfx.tools.rectangle.change.MoveChangeStrategy;
+import org.controlsfx.tools.rectangle.change.NewChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToEastChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToNorthChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToNortheastChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToNorthwestChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToSouthChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToSoutheastChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToSouthwestChangeStrategy;
+import org.controlsfx.tools.rectangle.change.ToWestChangeStrategy;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
@@ -161,7 +165,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     private Cursor handleMousePressedEvent(SelectionEvent selectionEvent) {
         // get all necessary information to create a selection change
         Cursor cursor = getCursor(selectionEvent);
-        ChangeStrategy selectionChangeStrategy = getChangeStrategy(selectionEvent);
+        Rectangle2DChangeStrategy selectionChangeStrategy = getChangeStrategy(selectionEvent);
         boolean deactivateSelectionIfClick = willDeactivateSelectionIfClick(selectionEvent);
 
         // create and begin the selection change
@@ -241,19 +245,19 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
         case OUT_OF_RECTANGLE:
             return Cursor.DEFAULT;
         case NORTH_EDGE:
-            return Cursor.MOVE;
+            return Cursor.N_RESIZE;
         case NORTHEAST_EDGE:
             return Cursor.NE_RESIZE;
         case EAST_EDGE:
-            return Cursor.MOVE;
+            return Cursor.E_RESIZE;
         case SOUTHEAST_EDGE:
             return Cursor.SE_RESIZE;
         case SOUTH_EDGE:
-            return Cursor.MOVE;
+            return Cursor.S_RESIZE;
         case SOUTHWEST_EDGE:
             return Cursor.SW_RESIZE;
         case WEST_EDGE:
-            return Cursor.MOVE;
+            return Cursor.W_RESIZE;
         case NORTHWEST_EDGE:
             return Cursor.NW_RESIZE;
         default:
@@ -267,11 +271,11 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
      * 
      * @param selectionEvent
      *            the {@link SelectionEvent} which will be checked
-     * @return the {@link ChangeStrategy} which will be executed based on the selection event
+     * @return the {@link Rectangle2DChangeStrategy} which will be executed based on the selection event
      * @throws IllegalArgumentException
      *             if {@link SelectionEvent#getMouseEvent()} is not of type {@link MouseEvent#MOUSE_PRESSED}.
      */
-    private ChangeStrategy getChangeStrategy(SelectionEvent selectionEvent) {
+    private Rectangle2DChangeStrategy getChangeStrategy(SelectionEvent selectionEvent) {
         boolean mousePressed = selectionEvent.getMouseEvent().getEventType() == MouseEvent.MOUSE_PRESSED;
         if (!mousePressed)
             throw new IllegalArgumentException();
@@ -283,23 +287,23 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
         case OUT_OF_RECTANGLE:
             return new NewChangeStrategy(isSelectionRatioFixed(), getSelectionRatio());
         case NORTH_EDGE:
-            // TODO create a ratio respecting 'ToNorthChangeStrategy'
-            return new MoveChangeStrategy(getSelection(), getImageWidth(), getImageHeight());
+            return new ToNorthChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
         case NORTHEAST_EDGE:
             return new ToNortheastChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
         case EAST_EDGE:
-            // TODO create a ratio respecting 'ToEastChangeStrategy'
-            return new MoveChangeStrategy(getSelection(), getImageWidth(), getImageHeight());
+            return new ToEastChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
         case SOUTHEAST_EDGE:
             return new ToSoutheastChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
         case SOUTH_EDGE:
-            // TODO create a ratio respecting 'ToSouthChangeStrategy'
-            return new MoveChangeStrategy(getSelection(), getImageWidth(), getImageHeight());
+            return new ToSouthChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
         case SOUTHWEST_EDGE:
             return new ToSouthwestChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
         case WEST_EDGE:
-            // TODO create a ratio respecting 'ToWestChangeStrategy'
-            return new MoveChangeStrategy(getSelection(), getImageWidth(), getImageHeight());
+            return new ToWestChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
         case NORTHWEST_EDGE:
             return new ToNorthwestChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
         default:
@@ -327,7 +331,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
      **************************************************************************/
 
     /**
-     * An event for which this class provides a cursor and possibly executes a {@link ChangeStrategy selection change
+     * An event for which this class provides a cursor and possibly executes a {@link Rectangle2DChangeStrategy selection change
      * strategy}.
      */
     public interface SelectionEvent {
@@ -348,7 +352,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     }
 
     /**
-     * Executes the changes from a {@link ChangeStrategy} on a {@link SelectableImageView}'s
+     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link SelectableImageView}'s
      * {@link SelectableImageView#selectionProperty() selection} property. This includes to check whether the mouse
      * moved from the change's start to end and to possibly deactivate the selection if not.
      */
@@ -364,7 +368,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
         /**
          * The executed change strategy.
          */
-        private final ChangeStrategy selectionChangeStrategy;
+        private final Rectangle2DChangeStrategy selectionChangeStrategy;
 
         /**
          * The cursor during the selection change.
@@ -391,18 +395,18 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
 
         /**
          * Creates a new selection change for the specified {@link SelectableImageView} using the specified
-         * {@link ChangeStrategy}.
+         * {@link Rectangle2DChangeStrategy}.
          * 
          * @param selectableImageView
          *            the {@link SelectableImageView} whose selection will be changed
          * @param selectionChangeStrategy
-         *            the {@link ChangeStrategy} used to change the selection
+         *            the {@link Rectangle2DChangeStrategy} used to change the selection
          * @param cursor
          *            the {@link Cursor} used during the selection change
          * @param deactivateSelectionIfClick
          *            indicates whether the selection will be deactivated if the change is only a click
          */
-        public SelectionChange(SelectableImageView selectableImageView, ChangeStrategy selectionChangeStrategy,
+        public SelectionChange(SelectableImageView selectableImageView, Rectangle2DChangeStrategy selectionChangeStrategy,
                 Cursor cursor, boolean deactivateSelectionIfClick) {
             super();
             this.selectableImageView = selectableImageView;

@@ -1,14 +1,25 @@
-package org.controlsfx.tools.rectangle;
+package org.controlsfx.tools.rectangle.change;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
+import org.controlsfx.tools.rectangle.Rectangles2D;
+
 /**
- * Abstract superclass to those implementations of {@link ChangeStrategy} which computed their rectangle by spanning it
- * from a fixed point to the point given to {@link ChangeStrategy#continueChange(Point2D) continueChange}. <br>
- * Implemented such that a ratio is respected if specified.
+ * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy} which computed their rectangle by spanning it
+ * from a fixed point to the point given to {@link Rectangle2DChangeStrategy#continueChange(Point2D) continueChange}. <br>
+ * The point is fixed during the change but can be changed in between changes. Implemented such that a ratio is respected
+ * if specified.
  */
 abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingChangeStrategy {
+
+    // ATTRIBUTES
+
+    /**
+     * The point which is fixed during the change. In {@link #doBegin(Point2D)} it is set to {@link #getFixedCorner()}; in
+     * {@link #doEnd(Point2D)} it is set to {@code null}.
+     */
+    private Point2D fixedCorner;
 
     // CONSTRUCTOR
 
@@ -28,7 +39,7 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
     // ABSTRACT METHODS
 
     /**
-     * Returns the corner which is fixed during the change.
+     * Returns the corner which is fixed during the change. Called once when the change begins.
      * 
      * @return the corner which is fixed during the change
      */
@@ -45,9 +56,9 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
      */
     private final Rectangle2D createFromCorners(Point2D point) {
         if (isRatioFixed())
-            return Rectangles2D.forDiagonalCornersAndRatio(getFixedCorner(), point, getRatio());
+            return Rectangles2D.forDiagonalCornersAndRatio(fixedCorner, point, getRatio());
         else
-            return Rectangles2D.forDiagonalCorners(getFixedCorner(), point);
+            return Rectangles2D.forDiagonalCorners(fixedCorner, point);
     }
 
     /**
@@ -55,6 +66,7 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
      */
     @Override
     protected final Rectangle2D doBegin(Point2D point) {
+        fixedCorner = getFixedCorner();
         return createFromCorners(point);
     }
 
@@ -71,7 +83,9 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
      */
     @Override
     protected final Rectangle2D doEnd(Point2D point) {
-        return createFromCorners(point);
+        Rectangle2D newRectangle = createFromCorners(point);
+        fixedCorner = null;
+        return newRectangle;
     }
 
 }

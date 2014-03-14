@@ -369,6 +369,7 @@ public class SpreadsheetView extends Control {
                     @SuppressWarnings("unchecked")
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
+                    cellsView.setEditWithKey(true);
                     cellsView.edit(position.getRow(), position.getTableColumn());
                 }
             }

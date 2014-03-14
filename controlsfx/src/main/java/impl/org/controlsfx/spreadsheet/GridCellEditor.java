@@ -192,7 +192,12 @@ public class GridCellEditor {
         Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), MAX_EDITOR_HEIGHT);
         spreadsheetCellEditor.getEditor().setMaxHeight(maxHeight);
         spreadsheetCellEditor.getEditor().setPrefWidth(viewCell.getWidth());
+        if(handle.getGridView().getEditWithKey()){
+            handle.getGridView().setEditWithKey(false);
+            spreadsheetCellEditor.startEdit("");
+        }else{
         spreadsheetCellEditor.startEdit(value);
+        }
     }
 
     private void end() {

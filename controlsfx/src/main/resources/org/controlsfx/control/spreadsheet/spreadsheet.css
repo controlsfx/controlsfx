@@ -6,7 +6,19 @@
     -fx-background-color: green;
 }
 
-/* CELLULE ROW HEADER */
+.tooltip {
+    -fx-background-radius: 0px;
+    -fx-background-color:
+        linear-gradient(#cec340, #a59c31),
+        linear-gradient(#fefefc, #e6dd71),
+        linear-gradient(#fef592, #e5d848);
+    -fx-background-insets: 0,1,2;
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em; /* 4 8 4 8 */
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
+    -fx-text-fill:black;
+}
+
+/* ROW HEADER CELL */
 .spreadsheet-cell.row_header:filled:selected ,
 .spreadsheet-cell.row_header:filled:focused:selected,
 .spreadsheet-cell.row_header:filled:focused:selected:hover {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -63,7 +64,7 @@ public class ValidationSupport {
 			public void onChanged(MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) {
 				// TODO: fire global "validation" event with global validationResults asParameter
 				// lazy binding??
-				setValidationResult(new ValidationResult().addValidationResults(validationResults.values()));
+				validationResultProperty.set(new ValidationResult().addValidationResults(validationResults.values()));
 			}
 		});
 	}
@@ -71,17 +72,13 @@ public class ValidationSupport {
 	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
 			new ReadOnlyObjectWrapper<ValidationResult>();
 	
-	private void setValidationResult(ValidationResult vr ) {
-		validationResultProperty.set(vr);
-	}
 	
 	public ValidationResult getValidationResult() {
 		return validationResultProperty.get();
-		//return new ValidationResult().addValidationResults(validationResults.values());
 	}
 	
-	public ReadOnlyObjectWrapper<ValidationResult> validationResultProperty() {
-		return validationResultProperty;
+	public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
+		return validationResultProperty.getReadOnlyProperty();
 	}
 	
 	private Optional<ObservableValueExtractor> getExtractor(final Control c) {

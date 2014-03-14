@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javafx.scene.control.Control;
-
 public class ValidationResult {
 
 	private List<ValidationMessage> errors   = new ArrayList<>();
@@ -55,19 +53,6 @@ public class ValidationResult {
 		messages.addAll(errors);
 		messages.addAll(warnings);
 		return Collections.unmodifiableList(messages);
-	}
-	
-	
-	// --- Utility methods -----
-	
-	
-	
-	public void checkEmpty( Object value, Control target ) {
-		
-		if ( (value instanceof String && value.toString().trim().isEmpty()) || value == null ) {
-			
-		}
-		
 	}
 	
 }

@@ -1,5 +1,7 @@
-package org.controlsfx.control.imageview;
+package impl.org.controlsfx.skin;
 
+import impl.org.controlsfx.behavior.SelectableImageViewBehavior;
+import impl.org.controlsfx.behavior.SelectableImageViewBehavior.SelectionEvent;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -21,7 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 
-import org.controlsfx.control.imageview.SelectableImageViewBehavior.SelectionEvent;
+import org.controlsfx.control.SelectableImageView;
 import org.controlsfx.tools.MathTools;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;

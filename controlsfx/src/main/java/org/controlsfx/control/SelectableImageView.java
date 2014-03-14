@@ -1,6 +1,7 @@
-package org.controlsfx.control.imageview;
+package org.controlsfx.control;
 
 import static org.controlsfx.tools.MathTools.isInInterval;
+import impl.org.controlsfx.skin.SelectableImageViewSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -27,7 +28,8 @@ import org.controlsfx.tools.rectangle.Rectangles2D;
  * case the user's resizing will be limited such that the ratio is always upheld.
  * 
  * <h3>Screenshots</h3>
- * TODO
+ * TODO Does this src-path work? It doesn't in my Eclipse instance.
+ * <center><img src="selectable-image-view-screenshot.png"></center>
  * 
  * <h3>Code Samples</h3>
  * 

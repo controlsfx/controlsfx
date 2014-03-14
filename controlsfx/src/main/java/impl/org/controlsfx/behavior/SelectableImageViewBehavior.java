@@ -1,4 +1,4 @@
-package org.controlsfx.control.imageview;
+package impl.org.controlsfx.behavior;
 
 import java.util.ArrayList;
 
@@ -9,6 +9,7 @@ import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import org.controlsfx.control.SelectableImageView;
 import org.controlsfx.tools.rectangle.CoordinatePosition;
 import org.controlsfx.tools.rectangle.CoordinatePositions;
 import org.controlsfx.tools.rectangle.change.MoveChangeStrategy;

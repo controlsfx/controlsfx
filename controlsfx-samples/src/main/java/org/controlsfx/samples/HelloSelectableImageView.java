@@ -24,7 +24,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.imageview.SelectableImageView;
+import org.controlsfx.control.SelectableImageView;
 
 /**
  * Demonstrates the {@link SelectableImageView}.

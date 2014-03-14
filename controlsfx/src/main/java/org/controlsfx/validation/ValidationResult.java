@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.scene.control.Control;
+
 public class ValidationResult {
 
 	private List<ValidationMessage> errors   = new ArrayList<>();
@@ -40,19 +42,32 @@ public class ValidationResult {
 	}
 	
 	
-	public List<ValidationMessage> getErrors() {
+	public List<? extends ValidationMessage> getErrors() {
 		return Collections.unmodifiableList(errors);
 	}
 	
-	public List<ValidationMessage> getWarnings() {
+	public List<? extends ValidationMessage> getWarnings() {
 		return Collections.unmodifiableList(warnings);
 	}
 	
-	public List<ValidationMessage> getMessages() {
+	public List<? extends ValidationMessage> getMessages() {
 		List<ValidationMessage> messages = new ArrayList<>();
 		messages.addAll(errors);
 		messages.addAll(warnings);
 		return Collections.unmodifiableList(messages);
+	}
+	
+	
+	// --- Utility methods -----
+	
+	
+	
+	public void checkEmpty( Object value, Control target ) {
+		
+		if ( (value instanceof String && value.toString().trim().isEmpty()) || value == null ) {
+			
+		}
+		
 	}
 	
 }

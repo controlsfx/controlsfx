@@ -26,13 +26,13 @@
  */
 package org.controlsfx.samples.validation;
 
-import org.controlsfx.validation.ValidationSupport;
-import org.controlsfx.validation.ValidationResult; 
-
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -42,6 +42,10 @@ import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.samples.Utils;
+import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationResultBuilder;
+import org.controlsfx.validation.ValidationSupport;
 
 public class HelloValidation extends ControlsFXSample {
 
@@ -68,13 +72,29 @@ public class HelloValidation extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
 
+        
+        final ListView<ValidationMessage> messageList = new ListView<>();
+        validationSupport.validationResultProperty().addListener( new ChangeListener<ValidationResult>(){
+			public void changed(ObservableValue<? extends ValidationResult> o, ValidationResult oldValue, ValidationResult newValue) {
+				messageList.getItems().clear();
+				newValue.getMessages().stream().forEach(msg -> messageList.getItems().addAll(msg) );
+			};
+        });
+        
+        
         //
         // TextField with static auto-complete functionality
         //
         TextField textField = new TextField();
         validationSupport.registerValidator(textField, value -> {
-        	System.out.println("validating text field: " + value );
-        	return new ValidationResult();
+        	
+        	String v = value == null? "": value.toString().trim();
+        	
+        	return new ValidationResultBuilder(textField)
+        		.addErrorIf( "Text is required", () -> v.isEmpty())
+        	    .addWarningIf( "Text has incorrect length (7)", () -> v.length() != 7 )
+        	    .build();
+        	
         });
 
         TextFields.bindAutoCompletion(
@@ -88,13 +108,16 @@ public class HelloValidation extends ControlsFXSample {
         ComboBox<String> combobox = new ComboBox<String>();
         combobox.getItems().addAll("Item A", "Item B", "Item C");
         validationSupport.registerValidator(combobox, value -> {
-        	System.out.println("validating combobox: " + value );
-        	return new ValidationResult();
+        	return new ValidationResultBuilder(combobox)
+    			.addErrorIf( "Selection required", () -> value == null)
+    			.build();
         });
         
         grid.add(new Label("Combobox"), 0, 1);
         grid.add(combobox, 1, 1);
         GridPane.setHgrow(textField, Priority.ALWAYS);
+        
+        grid.add(messageList, 0, 2, 2, 1);
        
         root.setTop(grid);
         return root;

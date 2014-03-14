@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -19,6 +20,8 @@ public class ValidationSupport {
 	
 	private ObservableMap<Control,ValidationResult> validationResults = 
 			FXCollections.observableMap(new WeakHashMap<>());
+	
+	
 	
 	// this can probably be done better
 	private static class ObservableValueExtractor {
@@ -55,20 +58,33 @@ public class ValidationSupport {
 	
 	public ValidationSupport() {
 		
-		
 		validationResults.addListener( new MapChangeListener<Control, ValidationResult>() {
 			@Override
 			public void onChanged(MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) {
 				// TODO: fire global "validation" event with global validationResults asParameter
+				// lazy binding??
+				setValidationResult(new ValidationResult().addValidationResults(validationResults.values()));
 			}
 		});
 	}
 	
-	public ValidationResult getValidationResult() {
-		return new ValidationResult().addValidationResults(validationResults.values());
+	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
+			new ReadOnlyObjectWrapper<ValidationResult>();
+	
+	private void setValidationResult(ValidationResult vr ) {
+		validationResultProperty.set(vr);
 	}
 	
-	private Optional<ObservableValueExtractor> getExtractor(Control c) {
+	public ValidationResult getValidationResult() {
+		return validationResultProperty.get();
+		//return new ValidationResult().addValidationResults(validationResults.values());
+	}
+	
+	public ReadOnlyObjectWrapper<ValidationResult> validationResultProperty() {
+		return validationResultProperty;
+	}
+	
+	private Optional<ObservableValueExtractor> getExtractor(final Control c) {
 		for( ObservableValueExtractor e: extractors ) {
 			if ( e.isAppicable(c)) return Optional.of(e);
 		}
@@ -79,7 +95,7 @@ public class ValidationSupport {
 	// TODO: Need weak listeners to avoid memory leaks
     // TODO: Should both old and new value be passed into a validator? 
     // TODO: Add 'required' flag
-	public <T> void registerValidator( Control c, Callback<T, ValidationResult> validator  ) {
+	public <T> void registerValidator( final Control c, final Callback<T, ValidationResult> validator  ) {
 		
 		getExtractor(c).ifPresent(e->{
 			

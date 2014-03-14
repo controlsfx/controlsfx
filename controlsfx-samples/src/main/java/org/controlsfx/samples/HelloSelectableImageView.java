@@ -193,6 +193,10 @@ public class HelloSelectableImageView extends ControlsFXSample {
         selectionCoordiantes.addRow(2,
                 new Label("Size (Ratio):"), width, new Label("x"), height, new Label(" ("), ratio, new Label(")"));
 
+        CheckBox selectionChanging = new CheckBox("Selection Changing");
+        selectionChanging.setDisable(true);
+        selectionChanging.selectedProperty().bindBidirectional(imageView.selectionChangingProperty());
+
         CheckBox selectionValid = new CheckBox("Selection Valid");
         selectionValid.selectedProperty().bind(imageView.selectionValidProperty());
         selectionValid.setDisable(true);
@@ -203,10 +207,8 @@ public class HelloSelectableImageView extends ControlsFXSample {
         CheckBox selectionManaged = new CheckBox("Selection Activity Explicitly Managed");
         selectionManaged.selectedProperty().bindBidirectional(imageView.selectionActivityExplicitlyManagedProperty());
 
-        CheckBox selectionChanging = new CheckBox("Selection Changing");
-        selectionChanging.selectedProperty().bindBidirectional(imageView.selectionChangingProperty());
-
-        GridPane selectionPane = createPaneWithGapAndColumn(GAP, selectionCoordiantes, selectionValid, selectionActive, selectionManaged);
+        GridPane selectionPane = createPaneWithGapAndColumn(GAP, selectionCoordiantes,
+                selectionChanging, selectionValid, selectionActive, selectionManaged);
         return new TitledPane("Selection", selectionPane);
     }
 
@@ -248,7 +250,8 @@ public class HelloSelectableImageView extends ControlsFXSample {
      */
     private Node createRatioControl() {
         TextField ratioTextField = new TextField();
-        ratioTextField.textProperty().bindBidirectional(imageView.fixedSelectionRatioProperty(), new StringConverter<Number>(){
+        ratioTextField.textProperty().bindBidirectional(imageView.fixedSelectionRatioProperty(),
+                new StringConverter<Number>() {
             @Override
             public Number fromString(String value) {
                 try {
@@ -257,13 +260,15 @@ public class HelloSelectableImageView extends ControlsFXSample {
                     return 1;
                 }
             }
+
             @Override
             public String toString(Number value) {
                 return format.format(value);
-            }});
+            }
+        });
         GridPane ratio = createPaneWithGapAndRow(GAP, new Label("Fixed Ratio:"), ratioTextField);
 
-        CheckBox ratioFixed = new CheckBox ("Ratio Fixed");
+        CheckBox ratioFixed = new CheckBox("Ratio Fixed");
         ratioFixed.selectedProperty().bindBidirectional(imageView.selectionRatioFixedProperty());
 
         GridPane ratioPane = createPaneWithGapAndColumn(GAP, ratio, ratioFixed);
@@ -277,7 +282,8 @@ public class HelloSelectableImageView extends ControlsFXSample {
      **************************************************************************/
 
     /**
-     * @param gap the gap to set
+     * @param gap
+     *            the gap to set
      * @return a {@link GridPane} with the specified horizontal and vertical gap
      */
     private static GridPane createPaneWithGap(double gap) {

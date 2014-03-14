@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,40 +24,31 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.decoration;
+package org.controlsfx.control.decoration;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 
-public class DecorationUtils {
+public class DefaultDecoration implements Decoration {
 
-    public final static String DECORATIONS_PROPERTY_KEY = "$org.controlsfx.decorations$";
+    private final Node node;
+    private final Pos pos;
 
-    private DecorationUtils() {
-        // no op
+    public DefaultDecoration(Node decoration, Pos position) {
+        this.node = decoration;
+        this.pos = position;
     }
 
-    public static final void registerDecoration(Node target, Decoration decoration) {
-        getDecorations(target, true).add(decoration);
+    public DefaultDecoration(Node decoration) {
+        this(decoration, Pos.TOP_LEFT);
     }
 
-    public static final void unregisterDecoration(Node target, Decoration decoration) {
-        getDecorations(target, true).remove(decoration);
+    @Override public Node getNode() {
+        return node;
     }
 
-    public static final ObservableSet<Decoration> getDecorations(Node target, boolean createIfAbsent) {
-        @SuppressWarnings("unchecked")
-        ObservableSet<Decoration> decorations = (ObservableSet<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
-        if (decorations == null && createIfAbsent) {
-            decorations = FXCollections.observableSet();
-            target.getProperties().put(DECORATIONS_PROPERTY_KEY, decorations);
-        }
-        return decorations;
-    }
-
-    public static final ObservableSet<Decoration> getDecorations(Node target) {
-        return getDecorations(target, false);
+    @Override public Pos getPosition() {
+        return pos;
     }
 
 }

@@ -1,5 +1,7 @@
 package impl.org.controlsfx.skin;
 
+import java.util.Collections;
+
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -9,10 +11,11 @@ import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
 import org.controlsfx.control.DecorationPane;
-import org.controlsfx.decoration.Decoration;
-import org.controlsfx.decoration.DecorationUtils;
+import org.controlsfx.control.decoration.Decoration;
+import org.controlsfx.control.decoration.DecorationUtils;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class DecorationPaneSkin extends BehaviorSkinBase<DecorationPane, BehaviorBase<DecorationPane>> {
@@ -21,7 +24,7 @@ public class DecorationPaneSkin extends BehaviorSkinBase<DecorationPane, Behavio
     private final Node base;
 
     public DecorationPaneSkin(DecorationPane control, Node base) {
-        super(control, new BehaviorBase<>(control));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         this.base = base;
         getChildren().add(stackPane);
 

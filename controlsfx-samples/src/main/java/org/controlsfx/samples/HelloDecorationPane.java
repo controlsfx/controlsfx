@@ -26,7 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -38,12 +37,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
-import org.controlsfx.Sample;
+import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.DecorationPane;
-import org.controlsfx.decoration.DefaultDecoration;
-import static org.controlsfx.decoration.DecorationUtils.*;
+import org.controlsfx.control.decoration.DefaultDecoration;
 
-public class HelloDecorationPane extends Application implements Sample {
+import static org.controlsfx.control.decoration.DecorationUtils.*;
+
+public class HelloDecorationPane extends ControlsFXSample {
     
     @Override public String getSampleName() {
         return "Decorations";
@@ -51,10 +51,6 @@ public class HelloDecorationPane extends Application implements Sample {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/DecorationPane.html";
-    }
-    
-    @Override public boolean includeInSamples() {
-        return true;
     }
     
     @Override public Node getPanel(final Stage stage) {

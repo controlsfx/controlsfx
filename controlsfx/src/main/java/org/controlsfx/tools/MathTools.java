@@ -8,6 +8,22 @@ import java.util.Objects;
 public class MathTools {
 
     /**
+     * Checks whether the specified value lies in the closed interval defined by the specified bounds.
+     * 
+     * @param lowerBound
+     *            the interval's lower bound; included in the interval
+     * @param value
+     *            the value which will be checked
+     * @param upperBound
+     *            the interval's upper bound; included in the interval
+     * @return {@code true} if {@code lowerBound} <= {@code value} <= {@code upperBound} <br>
+     *         {@code false} otherwise
+     */
+    public static boolean isInInterval(double lowerBound, double value, double upperBound) {
+        return lowerBound <= value && value <= upperBound;
+    }
+
+    /**
      * Checks whether the specified value lies in the closed interval defined by the specified bounds. If it does, it is
      * returned; otherwise the bound closer to the value will be returned.
      * 
@@ -32,10 +48,13 @@ public class MathTools {
     /**
      * Returns the smallest value in the specified array according to {@link Math#min(double, double)}.
      * 
-     * @param values a non-null, non-empty array of double values
+     * @param values
+     *            a non-null, non-empty array of double values
      * @return a value from the array which is smaller then or equal to any other value from the array
-     * @throws NullPointerException if the values array is {@code null}
-     * @throws IllegalArgumentException if the values array is empty (i.e. has {@code length} 0)
+     * @throws NullPointerException
+     *             if the values array is {@code null}
+     * @throws IllegalArgumentException
+     *             if the values array is empty (i.e. has {@code length} 0)
      */
     public static double min(double... values) {
         Objects.requireNonNull(values, "The specified value array must not be null.");

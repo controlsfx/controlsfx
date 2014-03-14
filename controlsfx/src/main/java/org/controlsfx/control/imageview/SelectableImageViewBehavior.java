@@ -11,9 +11,9 @@ import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.tools.rectangle.CoordinatePosition;
 import org.controlsfx.tools.rectangle.CoordinatePositions;
-import org.controlsfx.tools.rectangle.change.Rectangle2DChangeStrategy;
 import org.controlsfx.tools.rectangle.change.MoveChangeStrategy;
 import org.controlsfx.tools.rectangle.change.NewChangeStrategy;
+import org.controlsfx.tools.rectangle.change.Rectangle2DChangeStrategy;
 import org.controlsfx.tools.rectangle.change.ToEastChangeStrategy;
 import org.controlsfx.tools.rectangle.change.ToNorthChangeStrategy;
 import org.controlsfx.tools.rectangle.change.ToNortheastChangeStrategy;
@@ -218,7 +218,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
      *         the selection is inactive this always returns {@link CoordinatePosition#OUT_OF_RECTANGLE}.
      */
     private CoordinatePosition getPosition(SelectionEvent selectionEvent) {
-        boolean noSelection = !getControl().isSelectionActive();
+        boolean noSelection = !getControl().isSelectionValid() || !getControl().isSelectionActive();
         if (noSelection)
             return CoordinatePosition.OUT_OF_RECTANGLE;
 
@@ -458,7 +458,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
 
             boolean deactivateSelection = deactivateSelectionIfClick && !mouseMoved;
             if (deactivateSelection)
-                selectableImageView.setSelectionActive(false);
+                selectableImageView.setSelection(null);
             selectableImageView.selectionChangingProperty().set(false);
         }
 

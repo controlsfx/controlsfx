@@ -1,6 +1,8 @@
 package org.controlsfx.control.imageview;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -39,9 +41,9 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * The grid pane is at the root of this control's scene graph and contains a single child. This child is a
      * single pane which uses absolute positioning for its children. The image view always stays at (0, 0) as the
      * pane is constantly resized to exactly fit the image view.
-     * The rectangles marking the selection are positioned by converting the original selection's coordinates,
-     * which are relative to the image, to coordinates relative to the image view. To prevent the unselected area's
-     * large bounds (see below) from messing up the layout, it is not managed by its parent.
+     * The rectangles marking the selection (see below) are positioned by converting the original selection's
+     * coordinates, which are relative to the image, to coordinates relative to the image view. To prevent the
+     * unselected area's large bounds from messing up the layout, it is not managed by its parent.
      * 
      * MOUSE:
      * To capture mouse events an additional node is added on top of the image view and the selection areas (see
@@ -61,6 +63,14 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * area.
      * The pane containing these rectangles clips anything it contains to its own bounds.
      * 
+     * VALID & ACTIVE
+     * The selection areas visibility is bound to the Boolean term (selectionValid && selectionActive). Their position
+     * and size is updated whenever the image or the selection changes unless their combination is invalid.
+     * So a valid selection is always properly represented but only visible if the selection is active. An invalid
+     * selection can not be properly represented and is hence set to an arbitrary value like (0, 0, 0, 0). If a
+     * becomes valid, the visibility changes but size and position are not explicitly updated. This is not necessary
+     * because a selection's validity can only change if either the image or the selection does and this case is
+     * already covered.
      */
 
     /* ************************************************************************
@@ -169,7 +179,6 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         // build the scene graph top to bottom
 
         // create an outer pane which allows the ImageView to always be centered within this control
-        // TODO decide whether the alignment should be editable
         GridPane outerPane = new GridPane();
         getChildren().add(outerPane);
         outerPane.setAlignment(Pos.CENTER);
@@ -219,7 +228,8 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     private void initializeAreas() {
         styleAreas();
         bindAreaCoordinatesTogether();
-        bindAreaCoordinatesToSelection();
+        bindAreaVisibilityToSelection();
+        bindAreaToSelection();
     }
 
     /**
@@ -255,14 +265,24 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     }
 
     /**
-     * Binds the visibility, position and size of {@link #selectedArea} to the {@link SelectableImageView}'s
-     * {@link SelectableImageView#selectionActiveProperty() selectionActive} and
-     * {@link SelectableImageView#selectionProperty() selection} propertyies.
+     * Binds the visibility of {@link #selectedArea} and {@link #unselectedArea unselected} to the
+     * {@link SelectableImageView}'s {@link SelectableImageView#selectionActiveProperty() selectionActive} and
+     * {@link SelectableImageView#selectionValidProperty() selectionValid} properties.
      */
-    private void bindAreaCoordinatesToSelection() {
-        selectedArea.visibleProperty().bind(getSkinnable().selectionActiveProperty());
-        unselectedArea.visibleProperty().bind(getSkinnable().selectionActiveProperty());
+    private void bindAreaVisibilityToSelection() {
+        ReadOnlyBooleanProperty selectionValid = getSkinnable().selectionValidProperty();
+        ReadOnlyBooleanProperty selectionActive = getSkinnable().selectionActiveProperty();
+        BooleanBinding validAndVisible = Bindings.and(selectionValid, selectionActive);
 
+        selectedArea.visibleProperty().bind(validAndVisible);
+        unselectedArea.visibleProperty().bind(validAndVisible);
+    }
+
+    /**
+     * Binds the position and size of {@link #selectedArea} to the {@link SelectableImageView}'s
+     * {@link SelectableImageView#selectionProperty() selection} property.
+     */
+    private void bindAreaToSelection() {
         getSkinnable().selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
             @Override
             public void changed(ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue,
@@ -331,8 +351,8 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      **************************************************************************/
 
     /**
-     * Returns the value contained in the {@link SelectableImageView}'s {@link SelectableImageView#selectionProperty()
-     * selection} property.
+     * Usability method. Returns the value contained in the {@link SelectableImageView}'s
+     * {@link SelectableImageView#selectionProperty() selection} property.
      * 
      * @return the image's selection
      */
@@ -345,13 +365,17 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * needs to be done whenever either the image, selection or control size changes.
      */
     private void updateSelection() {
-        if (imageView.getImage() == null)
-            setSelectionDirectly(0, 0, 0, 0);
-        else if (getImageSelection() == null)
-            setSelectionDirectly(0, 0, 0, 0);
-        else
-            // in this case, the image and the selection are not-null, so the selection can be properly displayed
+        boolean showSelection =
+                getSkinnable().getImage() != null && getSkinnable().isSelectionValid();
+
+        if (showSelection)
+            // the selection can be properly displayed
             setTransformedSelection();
+        else
+            // in this case the selection areas are invisible,
+            // so the only thing left to do is to make sure their coordinates are not all over the place
+            // (this is not strictly necessary but makes the skin's state cleaner)
+            setSelectionDirectly(0, 0, 0, 0);
     }
 
     /**
@@ -388,20 +412,20 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * Updates the position and size of {@link #selectedArea} (and by binding that of {@link #unselectedArea}) to the
      * specified arguments.
      * 
-     * @param newX
+     * @param x
      *            the new x coordinate of the upper left corner
-     * @param newY
+     * @param y
      *            the new y coordinate of the upper left corner
-     * @param newWidth
+     * @param width
      *            the new width
-     * @param newHeight
+     * @param height
      *            the new height
      */
-    private void setSelectionDirectly(double newX, double newY, double newWidth, double newHeight) {
-        selectedArea.setX(newX);
-        selectedArea.setY(newY);
-        selectedArea.setWidth(newWidth);
-        selectedArea.setHeight(newHeight);
+    private void setSelectionDirectly(double x, double y, double width, double height) {
+        selectedArea.setX(x);
+        selectedArea.setY(y);
+        selectedArea.setWidth(width);
+        selectedArea.setHeight(height);
     }
 
     /* ************************************************************************

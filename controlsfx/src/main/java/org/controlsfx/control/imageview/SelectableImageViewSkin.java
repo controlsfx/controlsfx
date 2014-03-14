@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -36,19 +37,23 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * This skin uses an ImageView to display the Image.
      * 
      * POSITION:
-     * The contract states that the image must always be centered within the control. Since a grid pane makes it
-     * very easy to define relative positions of its children, it is used to implement this.
-     * The grid pane is at the root of this control's scene graph and contains a single child. This child is a
-     * single pane which uses absolute positioning for its children. The image view always stays at (0, 0) as the
-     * pane is constantly resized to exactly fit the image view.
+     * The contract states that the image must always be centered within the control. Since a grid pane makes it very
+     * easy to define relative positions of its children, it is used to implement this.
+     * The grid pane is at the root of this control's scene graph and contains a single child. This child is a simple
+     * 'Pane' which uses absolute positioning for its children. The image view always stays at (0, 0) as the pane is
+     * constantly resized to exactly fit the image view.
      * The rectangles marking the selection (see below) are positioned by converting the original selection's
      * coordinates, which are relative to the image, to coordinates relative to the image view. To prevent the
      * unselected area's large bounds from messing up the layout, it is not managed by its parent.
      * 
+     * FIXME There seems to be a problem when the control could grow. At the moment it does not behave well when it
+     * shares a 'VBox' with another control. In that case it shrinks if images change but never grows. Didn't have time
+     * to test this more thoroughly.
+     * 
      * MOUSE:
      * To capture mouse events an additional node is added on top of the image view and the selection areas (see
-     * below). These events are handed over to the 'SelectableImageViewBehavior' which uses them to determine a
-     * cursor and change the selection.
+     * below). These events are handed over to the 'SelectableImageViewBehavior' which uses them to determine a cursor
+     * and change the selection.
      * 
      * SELECTION:
      * Displaying the selection consists of three parts:
@@ -56,11 +61,10 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      *  - border
      *  - unselected area
      * This is done by using two rectangles with identical size and position. Both are bound to the control's
-     * selection-property, which represents the selection in term of the _Image's_ coordinates, in such a way that
+     * 'selectionProperty', which represents the selection in term of the _Image's_ coordinates, in such a way that
      * they represent the selection in term of the _ImageView's_ coordinates.
-     * One rectangle is used to display the selected area and its border. The other has its stroke set to such
-     * a width that it covers the rest of the ImageView. This means it effectively covers exactly the unselected
-     * area.
+     * One rectangle is used to display the selected area and its border. The other has its stroke set to such a width
+     * that it covers the rest of the ImageView. This means it effectively covers exactly the unselected area.
      * The pane containing these rectangles clips anything it contains to its own bounds.
      * 
      * VALID & ACTIVE
@@ -229,7 +233,7 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         styleAreas();
         bindAreaCoordinatesTogether();
         bindAreaVisibilityToSelection();
-        bindAreaToSelection();
+        bindAreaToImageAndSelection();
     }
 
     /**
@@ -282,8 +286,27 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * Binds the position and size of {@link #selectedArea} to the {@link SelectableImageView}'s
      * {@link SelectableImageView#selectionProperty() selection} property.
      */
-    private void bindAreaToSelection() {
-        getSkinnable().selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
+    private void bindAreaToImageAndSelection() {
+        SelectableImageView selectableImageView = getSkinnable();
+
+        // image
+        selectableImageView.imageProperty().addListener(new ChangeListener<Image>() {
+            @Override
+            public void changed(ObservableValue<? extends Image> observable, Image oldValue, Image newValue) {
+                updateSelection();
+            }
+        });
+
+        // image ratio
+        selectableImageView.preserveImageRatioProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                updateSelection();
+            }
+        });
+
+        // selection
+        selectableImageView.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
             @Override
             public void changed(ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue,
                     Rectangle2D newValue) {

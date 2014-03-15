@@ -104,15 +104,27 @@ public class ValidationSupport {
 		return Optional.empty();
 	}
 	
+	private static String CTRL_REQUIRED_FLAG = "controlsfx.required.control";
+	
+	private void setRequired( Control c, boolean required ) {
+		c.getProperties().put(CTRL_REQUIRED_FLAG, required );
+	}
+	
+	public boolean getRequired( Control c ) {
+		Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
+		return value instanceof Boolean? (Boolean)value: false;
+	}
+	
 	
 	// TODO: Need weak listeners to avoid memory leaks
     // TODO: Should both old and new value be passed into a validator? 
     // TODO: Add 'required' flag
-	public <T> void registerValidator( final Control c, final Validator<T> validator  ) {
+	public <T> void registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
 		
 		getExtractor(c).ifPresent(e->{
 			
 			ObservableValue<T> ov = (ObservableValue<T>) e.extract(c);
+			setRequired( c, required );
 		
 			ov.addListener(new ChangeListener<T>(){
 				public void changed(ObservableValue<? extends T> o, T oldValue, T newValue) {
@@ -123,7 +135,10 @@ public class ValidationSupport {
 			
 		});
 		
-		
+	}
+	
+	public <T> void registerValidator( final Control c, final Validator<T> validator  ) {
+		registerValidator(c, true, validator);
 	}
 
 }

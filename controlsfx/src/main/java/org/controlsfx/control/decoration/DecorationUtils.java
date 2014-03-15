@@ -26,9 +26,16 @@
  */
 package org.controlsfx.control.decoration;
 
+import impl.org.controlsfx.skin.DecorationPaneSkin;
+
+import java.util.List;
+
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+
+import org.controlsfx.control.DecorationPane;
 
 public class DecorationUtils {
 
@@ -39,25 +46,59 @@ public class DecorationUtils {
     }
 
     public static final void registerDecoration(Node target, Decoration decoration) {
-        getDecorations(target, true).add(decoration);
+        getAllDecorations(target, true).add(decoration);
+        updateDecorationsOnNode(target, FXCollections.observableArrayList(decoration), null);
     }
 
     public static final void unregisterDecoration(Node target, Decoration decoration) {
-        getDecorations(target, true).remove(decoration);
+        getAllDecorations(target, true).remove(decoration);
+        updateDecorationsOnNode(target, null, FXCollections.observableArrayList(decoration));
+    }
+    
+    public static final void unregisterAllDecorations(Node target) {
+        List<Decoration> decorations = getAllDecorations(target, true);
+        List<Decoration> removed = FXCollections.observableArrayList(decorations);
+        
+        target.getProperties().remove(DECORATIONS_PROPERTY_KEY);
+        
+        updateDecorationsOnNode(target, null, removed);
+    }
+    
+    public static final ObservableList<Decoration> getAllDecorations(Node target) {
+        return getAllDecorations(target, false);
     }
 
-    public static final ObservableSet<Decoration> getDecorations(Node target, boolean createIfAbsent) {
+    private static final ObservableList<Decoration> getAllDecorations(Node target, boolean createIfAbsent) {
         @SuppressWarnings("unchecked")
-        ObservableSet<Decoration> decorations = (ObservableSet<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
+        ObservableList<Decoration> decorations = (ObservableList<Decoration>) target.getProperties().get(DECORATIONS_PROPERTY_KEY);
         if (decorations == null && createIfAbsent) {
-            decorations = FXCollections.observableSet();
+            decorations = FXCollections.observableArrayList();
             target.getProperties().put(DECORATIONS_PROPERTY_KEY, decorations);
         }
         return decorations;
     }
-
-    public static final ObservableSet<Decoration> getDecorations(Node target) {
-        return getDecorations(target, false);
+    
+    private static void updateDecorationsOnNode(Node target, List<Decoration> added, List<Decoration> removed) {
+        // find a DecorationPane parent and notify it that a node has updated
+        // decorations
+        DecorationPane p = getDecorationPane(target);
+        if (p == null) return;
+        
+        DecorationPaneSkin skin = (DecorationPaneSkin) p.getSkin();
+        skin.updateDecorationsOnNode(target, added, removed);
     }
-
+    
+    private static DecorationPane getDecorationPane(Node target) {
+        // find a DecorationPane parent and notify it that a node has updated
+        // decorations
+        Parent p = target.getParent();
+        while (p != null) {
+            if (p instanceof DecorationPane) {
+                break;
+            }
+            p = p.getParent();
+        }
+        
+        return (DecorationPane)p;
+    }
 }

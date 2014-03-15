@@ -26,29 +26,35 @@
  */
 package org.controlsfx.control.decoration;
 
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 
-public class DefaultDecoration implements Decoration {
+public class StyleClassDecoration implements Decoration {
 
-    private final Node node;
-    private final Pos pos;
+    private final String styleClass;
 
-    public DefaultDecoration(Node decoration, Pos position) {
-        this.node = decoration;
-        this.pos = position;
+    public StyleClassDecoration(String styleClass) {
+        this.styleClass = styleClass;
     }
 
-    public DefaultDecoration(Node decoration) {
-        this(decoration, Pos.TOP_LEFT);
+    public final Node getDecorationNode() {
+        return null;
     }
-
-    @Override public Node getNode() {
-        return node;
+    
+    public final String getStyleClass() {
+        return styleClass;
     }
-
-    @Override public Pos getPosition() {
-        return pos;
+    
+    @Override public Node decorate(Node targetNode) {
+       if (targetNode.getStyleClass().contains(styleClass)) return null;
+       
+       targetNode.getStyleClass().add(styleClass);
+       
+       // no decoration node, so return null
+       return null;
     }
-
+    
+    @Override
+    public void undecorate(Node targetNode) {
+        targetNode.getStyleClass().remove(styleClass);
+    }
 }

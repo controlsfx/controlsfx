@@ -26,11 +26,24 @@
  */
 package org.controlsfx.control.decoration;
 
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 
 public interface Decoration {
-    Node getNode();
 
-    Pos getPosition();
+    /**
+     * Decorates the given target node with the relevant decorations, returning
+     * any 'decoration node' that needs to be added to the scenegraph (although
+     * normally this can be null).
+     * 
+     * @param targetNode The node to decorate.
+     * @return The decoration, but null is a valid return value.
+     */
+    public Node decorate(Node targetNode);
+    
+    /**
+     * Removes the decoration from the given node.
+     * 
+     * @param targetNode The node to remove the decoration from.
+     */
+    public void undecorate(Node targetNode);
 }

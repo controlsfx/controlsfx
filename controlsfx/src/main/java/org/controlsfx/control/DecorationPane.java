@@ -29,6 +29,7 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.DecorationPaneSkin;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 
 public class DecorationPane extends Control {
 
@@ -38,7 +39,7 @@ public class DecorationPane extends Control {
         this.base = base;
     }
 
-    @Override protected DecorationPaneSkin createDefaultSkin() {
+    @Override protected Skin<DecorationPane> createDefaultSkin() {
         return new DecorationPaneSkin(this, base);
     }
 

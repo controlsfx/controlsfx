@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,21 @@
  */
 package org.controlsfx.samples;
 
+import static org.controlsfx.control.decoration.DecorationUtils.registerDecoration;
+import static org.controlsfx.control.decoration.DecorationUtils.unregisterAllDecorations;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -39,11 +48,12 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.DecorationPane;
-import org.controlsfx.control.decoration.DefaultDecoration;
-
-import static org.controlsfx.control.decoration.DecorationUtils.*;
+import org.controlsfx.control.decoration.GraphicDecoration;
+import org.controlsfx.control.decoration.StyleClassDecoration;
 
 public class HelloDecorationPane extends ControlsFXSample {
+    
+    private final TextField field = new TextField();
     
     @Override public String getSampleName() {
         return "Decorations";
@@ -58,29 +68,77 @@ public class HelloDecorationPane extends ControlsFXSample {
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
         
-        final TextField field = new TextField();
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_LEFT));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_CENTER));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.RED),Pos.TOP_RIGHT));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_LEFT));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_LEFT));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_CENTER));
-		registerDecoration( field, 
-				new DefaultDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_RIGHT));
-        
         root.getChildren().add(field);
         
-        return new DecorationPane(root);
+        DecorationPane pane = new DecorationPane(root);
+        
+        // for the sake of this sample we have to install a custom css file to
+        // style the sample - but we can't do this until the scene is set on the
+        // pane
+        pane.sceneProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {
+                pane.getScene().getStylesheets().add(HelloDecorationPane.class.getResource("decorations.css").toExternalForm());
+            }
+        });
+        
+        return pane;
+    }
+    
+    @Override
+    public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        int row = 0;
+        
+        // --- show decorations
+        Label showDecorationsLabel = new Label("Show decorations: ");
+        showDecorationsLabel.getStyleClass().add("property");
+        grid.add(showDecorationsLabel, 0, row);
+        ChoiceBox<String> decorationTypeBox = new ChoiceBox<>(FXCollections.observableArrayList("None", "Node", "CSS", "Node + CSS"));
+        decorationTypeBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override public void changed(ObservableValue<? extends String> o, String old, String newItem) {
+                unregisterAllDecorations(field);
+                switch (newItem) {
+                    case "None": break;
+                    case "Node": {
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_LEFT));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_CENTER));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_RIGHT));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_LEFT));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_LEFT));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_CENTER));
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_RIGHT));
+                        break;
+                    }
+                    case "CSS": {
+                        registerDecoration(field, new StyleClassDecoration("warning"));
+                        break;
+                    }
+                    case "Node + CSS": {
+                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
+                        registerDecoration(field, new StyleClassDecoration("success"));
+                        break;
+                    }
+                }
+            }
+        });
+        grid.add(decorationTypeBox, 1, row++);
+        
+        // --- Toggle text field visibility
+        Label showTextFieldLabel = new Label("TextField visible: ");
+        showTextFieldLabel.getStyleClass().add("property");
+        grid.add(showTextFieldLabel, 0, row);
+        ToggleButton fieldVisibleBtn = new ToggleButton("Press");
+        fieldVisibleBtn.setSelected(true);
+        field.visibleProperty().bindBidirectional(fieldVisibleBtn.selectedProperty());
+        grid.add(fieldVisibleBtn, 1, row++);
+        
+        return grid;
     }
     
     private Node createDecoratorNode(Color color) {
@@ -89,16 +147,6 @@ public class HelloDecorationPane extends ControlsFXSample {
         return d;
     }
     
-    @Override public void start(Stage stage) throws Exception {
-        stage.setTitle("DecorationPane Demo");
-        
-        Scene scene = new Scene((Parent)getPanel(stage), 1300, 300);
-        scene.setFill(Color.WHITE);
-        
-        stage.setScene(scene);
-        stage.show();
-    }
-     
     public static void main(String[] args) {
         launch(args);
     }

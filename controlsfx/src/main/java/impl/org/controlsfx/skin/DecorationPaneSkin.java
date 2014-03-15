@@ -1,10 +1,13 @@
 package impl.org.controlsfx.skin;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
-import javafx.collections.ObservableSet;
-import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -22,12 +25,23 @@ public class DecorationPaneSkin extends BehaviorSkinBase<DecorationPane, Behavio
 
     private final StackPane stackPane = new StackPane();
     private final Node base;
+    
+    private final Map<Node, Node> nodeDecorationMap = new WeakHashMap<>();
+    
+    ChangeListener<Boolean> visibilityListener = new ChangeListener<Boolean>() {
+        @Override public void changed(ObservableValue<? extends Boolean> o, Boolean wasVisible, Boolean isVisible) {
+            BooleanProperty p = (BooleanProperty)o;
+            Node n = (Node) p.getBean();
+            
+            removeAllDecorationsOnNode(n, DecorationUtils.getAllDecorations(n));
+            DecorationUtils.unregisterAllDecorations(n);
+        }
+    };
 
     public DecorationPaneSkin(DecorationPane control, Node base) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         this.base = base;
         getChildren().add(stackPane);
-
     }
 
     @Override protected void handleControlPropertyChanged(String p) {
@@ -42,18 +56,10 @@ public class DecorationPaneSkin extends BehaviorSkinBase<DecorationPane, Behavio
     }
 
     private void showDecorations(Node target) {
-
         // TODO Respond for component bound changes
-        // TODO Respond for component visibility changes
-        // TODO Respond to component decoration changes.
 
         // show target decorations if found
-        ObservableSet<Decoration> decorations = DecorationUtils.getDecorations(target);
-        if (decorations != null) {
-            for (Decoration decoration : decorations) {
-                showDecoration(target, decoration);
-            }
-        }
+        addAllDecorationsOnNode(target, DecorationUtils.getAllDecorations(target));
 
         // recursively show decorations for target's children
         if (target instanceof Parent) {
@@ -62,64 +68,42 @@ public class DecorationPaneSkin extends BehaviorSkinBase<DecorationPane, Behavio
             }
         }
     }
-
-    private void showDecoration(Node target, Decoration decoration) {
-        Node dnode = decoration.getNode();
-        if (!stackPane.getChildren().contains(dnode)) {
-            stackPane.getChildren().add(dnode);
-            StackPane.setAlignment(dnode, Pos.TOP_LEFT); // TODO support for all positions.
-        }
-        Bounds targetBounds = getDecorationBounds(target);
-        Bounds dbounds = dnode.getBoundsInLocal();
-        Insets margin = new Insets(targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds, decoration), 0, 0, targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(
-                targetBounds, decoration));
-        StackPane.setMargin(dnode, margin);
-
+    
+    public void updateDecorationsOnNode(Node targetNode, List<Decoration> added, List<Decoration> removed) {
+        removeAllDecorationsOnNode(targetNode, removed);
+        addAllDecorationsOnNode(targetNode, added);
     }
 
-    private double getHInset(Bounds targetBounds, Decoration decoration) {
-        switch (decoration.getPosition().getHpos()) {
-            case CENTER:
-                return targetBounds.getWidth() / 2;
-            case RIGHT:
-                return targetBounds.getWidth();
-            default:
-                return 0;
+    private void showDecoration(Node targetNode, Decoration decoration) {
+        Node decorationNode = decoration.decorate(targetNode);
+        if (decorationNode != null) {
+            nodeDecorationMap.put(targetNode, decorationNode);
         }
+        
+        if (decorationNode != null && !stackPane.getChildren().contains(decorationNode)) {
+            stackPane.getChildren().add(decorationNode);
+            StackPane.setAlignment(decorationNode, Pos.TOP_LEFT); // TODO support for all positions.
+        }
+        
+        targetNode.visibleProperty().addListener(visibilityListener);
     }
 
-    private double getVInset(Bounds targetBounds, Decoration decoration) {
-        switch (decoration.getPosition().getVpos()) {
-            case CENTER:
-                return targetBounds.getHeight() / 2;
-            case BOTTOM:
-                return targetBounds.getHeight();
-            default:
-                return 0;
+    private void removeAllDecorationsOnNode(Node targetNode, List<Decoration> decorations) {
+        if (decorations == null) return;
+        for (Decoration decoration : decorations) {
+            Node decorationNode = nodeDecorationMap.get(targetNode);
+            
+            if (targetNode != null) {
+                stackPane.getChildren().remove(decorationNode);
+                decoration.undecorate(targetNode);
+            }
         }
     }
-
-    /**
-     * Computes bounds on decoration pane for any node as long as the node is a child of decoration
-     * pane.
-     * 
-     * @param node
-     *            node to compute bounds for
-     * @return bounds for give node on decoration pane or null node is not a child of decoration
-     *         pane
-     */
-    private Bounds getDecorationBounds(Node node) {
-
-        if (node == null)
-            return null;
-        Node parent = node.getParent();
-        Bounds bounds = null;
-        while (parent != null && parent != stackPane) {
-            bounds = bounds == null ? node.getBoundsInParent() : parent.localToParent(bounds);
-            parent = parent.getParent();
+    
+    private void addAllDecorationsOnNode(Node targetNode, List<Decoration> decorations) {
+        if (decorations == null) return;
+        for (Decoration decoration : decorations) {
+            showDecoration(targetNode, decoration);
         }
-        return parent == null ? null : parent.localToParent(bounds);
-
     }
-
 }

@@ -30,14 +30,19 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
@@ -53,7 +58,7 @@ public class HelloValidation extends ControlsFXSample {
 
 
     @Override public String getSampleName() {
-        return "Panel Validation";
+        return "Component Validation";
     }
 
     @Override public String getJavaDocURL() {
@@ -61,7 +66,7 @@ public class HelloValidation extends ControlsFXSample {
     }
 
     @Override public String getSampleDescription() {
-        return "Panel Validation";
+        return "Component Validation";
     }
 
     @Override public Node getPanel(final Stage stage) {
@@ -83,6 +88,7 @@ public class HelloValidation extends ControlsFXSample {
 			};
         });
         
+        int row = 0;
         
         //
         // TextField with static auto-complete functionality
@@ -90,29 +96,89 @@ public class HelloValidation extends ControlsFXSample {
         TextField textField = new TextField();
         validationSupport.registerValidator(textField, Validators.getEmptyValidator("Text is required"));
 
+        
         TextFields.bindAutoCompletion(
                 textField,
                 "Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
 
-        grid.add(new Label("Auto-complete Text"), 0, 0);
-        grid.add(textField, 1, 0);
+        grid.add(new Label("Auto-complete Text"), 0, row);
+        grid.add(textField, 1, row);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         
+        row++;
         ComboBox<String> combobox = new ComboBox<String>();
         combobox.getItems().addAll("Item A", "Item B", "Item C");
         validationSupport.registerValidator(combobox, (Control c, String newValue) -> {
 
         	return new ValidationResultBuilder(combobox)
-    			.addErrorIf( "Selection required", () -> newValue == null)
+    			.addErrorIf( "ComboBox Selection required", () -> newValue == null)
     			.build();
 			}
         );
         
-        grid.add(new Label("Combobox"), 0, 1);
-        grid.add(combobox, 1, 1);
-        GridPane.setHgrow(textField, Priority.ALWAYS);
+        grid.add(new Label("Combobox"), 0, row);
+        grid.add(combobox, 1, row);
+        GridPane.setHgrow(combobox, Priority.ALWAYS);
+
+        row++;
+        ChoiceBox<String> choiceBox = new ChoiceBox<String>();
+        choiceBox.getItems().addAll("Item A", "Item B", "Item C");
+        validationSupport.registerValidator(choiceBox, (Control c, String newValue) -> {
+
+        	return new ValidationResultBuilder(choiceBox)
+    			.addErrorIf( "ChoiceBox Selection required", () -> newValue == null)
+    			.build();
+			}
+        );
         
-        grid.add(messageList, 0, 2, 2, 1);
+        grid.add(new Label("ChoiceBox"), 0, row);
+        grid.add(choiceBox, 1, row);
+        GridPane.setHgrow(combobox, Priority.ALWAYS);
+        
+        row++;
+        CheckBox checkBox =  new CheckBox("CheckBox");
+        validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> {
+
+        	return new ValidationResultBuilder(checkBox)
+    			.addErrorIf( "Checkbox should be checked", () -> !newValue)
+    			.build();
+			}
+        );
+        grid.add(checkBox, 1, row);
+        GridPane.setHgrow(checkBox, Priority.ALWAYS);
+        
+        row++;
+        Slider slider =  new Slider(-50d, 50d, -10d);
+        slider.setShowTickLabels(true);
+        validationSupport.registerValidator(slider, (Control c, Double newValue) -> {
+
+        	return new ValidationResultBuilder(slider)
+    			.addErrorIf( "Slider value should be > 0", () -> newValue <= 0 )
+    			.build();
+			}
+        );
+       
+        grid.add(new Label("Slider"), 0, row);
+        grid.add(slider, 1, row);
+        GridPane.setHgrow(checkBox, Priority.ALWAYS);
+        
+        row++;
+        ColorPicker colorPicker =  new ColorPicker(Color.RED);
+        validationSupport.registerValidator(colorPicker, (Control c, Color newValue) -> {
+
+        	return new ValidationResultBuilder(c)
+    			.addErrorIf( "Color should be WHITE", () -> !Color.WHITE.equals(newValue))
+    			.build();
+			}
+        );
+       
+        grid.add(new Label("Color Picker"), 0, row);
+        grid.add(colorPicker, 1, row);
+        GridPane.setHgrow(checkBox, Priority.ALWAYS);
+        
+        row++;
+        grid.add(messageList, 0, row, 2, 1);
+        GridPane.setHgrow(messageList, Priority.ALWAYS);
        
         root.setTop(grid);
         return root;

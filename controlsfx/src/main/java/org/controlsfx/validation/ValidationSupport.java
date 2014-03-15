@@ -12,9 +12,15 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.TextField;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
 public class ValidationSupport {
@@ -53,8 +59,19 @@ public class ValidationSupport {
 	}
 	
 	{
-		addObservableValueExtractor( c -> c instanceof TextField, c -> ((TextField)c).textProperty());
-		addObservableValueExtractor( c -> c instanceof ComboBox,  c -> ((ComboBox<?>)c).valueProperty());
+		addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
+		addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
+		addObservableValueExtractor( c -> c instanceof ChoiceBox,        c -> ((ChoiceBox<?>)c).valueProperty());
+		addObservableValueExtractor( c -> c instanceof CheckBox,         c -> ((CheckBox)c).selectedProperty());
+		addObservableValueExtractor( c -> c instanceof Slider,           c -> ((Slider)c).valueProperty());
+		addObservableValueExtractor( c -> c instanceof ColorPicker,      c -> ((ColorPicker)c).valueProperty());
+		
+		addObservableValueExtractor( c -> c instanceof ListView,         c -> ((ListView<?>)c).itemsProperty());
+		addObservableValueExtractor( c -> c instanceof TableView,        c -> ((TableView<?>)c).itemsProperty());
+		
+		
+		// FIXME: How to listen for TreeView changes???
+		//addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
 	}
 	
 	public ValidationSupport() {

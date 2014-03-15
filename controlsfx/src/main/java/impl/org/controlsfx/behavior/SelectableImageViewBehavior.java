@@ -1,5 +1,19 @@
 package impl.org.controlsfx.behavior;
 
+import impl.org.controlsfx.tools.rectangle.CoordinatePosition;
+import impl.org.controlsfx.tools.rectangle.CoordinatePositions;
+import impl.org.controlsfx.tools.rectangle.change.MoveChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.NewChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.Rectangle2DChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToEastChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToNorthChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToNortheastChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToNorthwestChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToSouthChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToSoutheastChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToSouthwestChangeStrategy;
+import impl.org.controlsfx.tools.rectangle.change.ToWestChangeStrategy;
+
 import java.util.ArrayList;
 
 import javafx.event.EventType;
@@ -10,19 +24,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.SelectableImageView;
-import org.controlsfx.tools.rectangle.CoordinatePosition;
-import org.controlsfx.tools.rectangle.CoordinatePositions;
-import org.controlsfx.tools.rectangle.change.MoveChangeStrategy;
-import org.controlsfx.tools.rectangle.change.NewChangeStrategy;
-import org.controlsfx.tools.rectangle.change.Rectangle2DChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToEastChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToNorthChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToNortheastChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToNorthwestChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToSouthChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToSoutheastChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToSouthwestChangeStrategy;
-import org.controlsfx.tools.rectangle.change.ToWestChangeStrategy;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;

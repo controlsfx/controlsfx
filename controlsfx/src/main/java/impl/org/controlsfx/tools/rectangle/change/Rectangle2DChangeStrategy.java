@@ -1,4 +1,4 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;

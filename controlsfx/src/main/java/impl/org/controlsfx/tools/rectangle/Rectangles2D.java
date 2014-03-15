@@ -1,12 +1,12 @@
-package org.controlsfx.tools.rectangle;
+package impl.org.controlsfx.tools.rectangle;
+
+import impl.org.controlsfx.tools.MathTools;
 
 import java.util.Objects;
 
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
-
-import org.controlsfx.tools.MathTools;
 
 /**
  * Usability methods for rectangles.

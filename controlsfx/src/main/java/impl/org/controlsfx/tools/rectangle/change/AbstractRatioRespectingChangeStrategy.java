@@ -1,4 +1,4 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
 
 /**
  * Abstract superclass to implementations of {@link Rectangle2DChangeStrategy}, which might be parameterized such that only

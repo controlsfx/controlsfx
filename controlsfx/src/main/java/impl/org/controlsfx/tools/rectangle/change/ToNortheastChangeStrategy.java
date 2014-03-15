@@ -1,15 +1,15 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
 /**
- * A strategy which enlarges an existing rectangle to the southeast.
+ * A strategy which enlarges an existing rectangle to the northeast.
  */
-public class ToSoutheastChangeStrategy extends AbstractFixedPointChangeStrategy {
+public class ToNortheastChangeStrategy extends AbstractFixedPointChangeStrategy {
 
     /*
-     * The new rectangle will have the existing rectangle's northwestern corner as a fixed corner. The other corner will
+     * The new rectangle will have the existing rectangle's southwestern corner as a fixed corner. The other corner will
      * always be the current point (modulo the ratio which will be respected if enforced), which is handled by the
      * superclass.
      */
@@ -17,23 +17,23 @@ public class ToSoutheastChangeStrategy extends AbstractFixedPointChangeStrategy 
     // ATTRIBUTES
 
     /**
-     * The new rectangle's northwestern corner.
+     * The new rectangle's southwestern corner.
      */
-    private final Point2D northwesternCorner;
+    private final Point2D southwesternCorner;
 
     // CONSTRUCTOR
 
     /**
-     * Creates a new change strategy which enlarges the specified {@code original} rectangle to the southeast. The given
+     * Creates a new change strategy which enlarges the specified {@code original} rectangle to the northeast. The given
      * {@code ratio} is enforced when indicated by {@code ratioFixed}.
      * 
      * @param original the original rectangle
      * @param ratioFixed indicates whether the rectangle's ratio will be fixed to the {@code ratio}
      * @param ratio the possibly fixed ratio of the rectangle created by this strategy
      */
-    public ToSoutheastChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio) {
+    public ToNortheastChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio) {
         super(ratioFixed, ratio);
-        northwesternCorner = new Point2D(original.getMinX(), original.getMinY());
+        southwesternCorner = new Point2D(original.getMinX(), original.getMaxY());
     }
 
     // IMPLEMENTATION OF 'AbstractFixedPointChangeStrategy'
@@ -43,7 +43,7 @@ public class ToSoutheastChangeStrategy extends AbstractFixedPointChangeStrategy 
      */
     @Override
     protected Point2D getFixedCorner() {
-        return northwesternCorner;
+        return southwesternCorner;
     }
 
 }

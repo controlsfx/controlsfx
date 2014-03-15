@@ -1,11 +1,11 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
+
+import impl.org.controlsfx.tools.MathTools;
 
 import java.util.Objects;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
-
-import org.controlsfx.tools.MathTools;
 
 /**
  * Moves the rectangle around.

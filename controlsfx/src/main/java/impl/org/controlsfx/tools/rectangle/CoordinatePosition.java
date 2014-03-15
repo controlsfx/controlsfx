@@ -1,4 +1,4 @@
-package org.controlsfx.tools.rectangle;
+package impl.org.controlsfx.tools.rectangle;
 
 /**
  * Enumerates all possible positions coordinates can have relative to a rectangle.

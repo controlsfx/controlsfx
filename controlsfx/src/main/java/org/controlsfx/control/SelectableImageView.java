@@ -1,7 +1,8 @@
 package org.controlsfx.control;
 
-import static org.controlsfx.tools.MathTools.isInInterval;
+import static impl.org.controlsfx.tools.MathTools.isInInterval;
 import impl.org.controlsfx.skin.SelectableImageViewSkin;
+import impl.org.controlsfx.tools.rectangle.Rectangles2D;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -15,8 +16,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
-
-import org.controlsfx.tools.rectangle.Rectangles2D;
 
 /**
  * A {@code SelectableImageView} is (in the colloquial not the inheritance sense) an

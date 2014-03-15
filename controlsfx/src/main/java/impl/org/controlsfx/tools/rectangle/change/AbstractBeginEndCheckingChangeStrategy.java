@@ -1,4 +1,4 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
 
 import java.util.Objects;
 

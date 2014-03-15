@@ -1,18 +1,17 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
 
+import impl.org.controlsfx.tools.rectangle.Edge2D;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
-import org.controlsfx.tools.rectangle.Edge2D;
-
 /**
- * A strategy which enlarges an existing rectangle to the west.
+ * A strategy which enlarges an existing rectangle to the east.
  */
-public class ToWestChangeStrategy extends AbstractFixedEdgeChangeStrategy {
+public class ToEastChangeStrategy extends AbstractFixedEdgeChangeStrategy {
 
     /*
-     * The new rectangle will have the existing rectangle's eastern edge as a fixed edge. The parallel edge will
+     * The new rectangle will have the existing rectangle's western edge as a fixed edge. The parallel edge will
      * be defined by the current point (modulo the ratio which will be respected if enforced), which is handled by the
      * superclass.
      */
@@ -20,14 +19,14 @@ public class ToWestChangeStrategy extends AbstractFixedEdgeChangeStrategy {
     // ATTRIBUTES
 
     /**
-     * The new rectangle's eastern edge.
+     * The new rectangle's western edge.
      */
-    private final Edge2D easternEdge;
+    private final Edge2D westernEdge;
 
     // CONSTRUCTOR
 
     /**
-     * Creates a new change strategy which enlarges the specified {@code original} rectangle to the west. The given
+     * Creates a new change strategy which enlarges the specified {@code original} rectangle to the east. The given
      * {@code ratio} is enforced when indicated by {@code ratioFixed}.
      * 
      * @param original
@@ -39,10 +38,10 @@ public class ToWestChangeStrategy extends AbstractFixedEdgeChangeStrategy {
      * @param bounds
      *            the bounds within which the rectangle can be resized
      */
-    public ToWestChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio, Rectangle2D bounds) {
+    public ToEastChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio, Rectangle2D bounds) {
         super(ratioFixed, ratio, bounds);
-        Point2D edgeCenterPoint = new Point2D(original.getMaxX(), (original.getMinY() + original.getMaxY()) / 2);
-        easternEdge = new Edge2D(edgeCenterPoint, Orientation.VERTICAL, original.getMaxY() - original.getMinY());
+        Point2D edgeCenterPoint = new Point2D(original.getMinX(), (original.getMinY() + original.getMaxY()) / 2);
+        westernEdge = new Edge2D(edgeCenterPoint, Orientation.VERTICAL, original.getMaxY() - original.getMinY());
     }
 
     /**
@@ -62,7 +61,7 @@ public class ToWestChangeStrategy extends AbstractFixedEdgeChangeStrategy {
      *            the maximal y-coordinate of the lower edge of the created rectangles; must be greater than or equal to
      *            the previous rectangle's height
      */
-    public ToWestChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio, double maxX, double maxY) {
+    public ToEastChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio, double maxX, double maxY) {
         this(original, ratioFixed, ratio, new Rectangle2D(0, 0, maxX, maxY));
     }
 
@@ -73,7 +72,7 @@ public class ToWestChangeStrategy extends AbstractFixedEdgeChangeStrategy {
      */
     @Override
     protected Edge2D getFixedEdge() {
-        return easternEdge;
+        return westernEdge;
     }
 
 }

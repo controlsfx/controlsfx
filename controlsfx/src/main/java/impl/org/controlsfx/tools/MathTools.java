@@ -1,4 +1,4 @@
-package org.controlsfx.tools;
+package impl.org.controlsfx.tools;
 
 import java.util.Objects;
 

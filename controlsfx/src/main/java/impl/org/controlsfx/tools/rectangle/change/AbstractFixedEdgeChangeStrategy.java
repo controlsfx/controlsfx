@@ -1,10 +1,9 @@
-package org.controlsfx.tools.rectangle.change;
+package impl.org.controlsfx.tools.rectangle.change;
 
+import impl.org.controlsfx.tools.rectangle.Edge2D;
+import impl.org.controlsfx.tools.rectangle.Rectangles2D;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
-
-import org.controlsfx.tools.rectangle.Edge2D;
-import org.controlsfx.tools.rectangle.Rectangles2D;
 
 /**
  * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy} which computed their rectangle by spanning it

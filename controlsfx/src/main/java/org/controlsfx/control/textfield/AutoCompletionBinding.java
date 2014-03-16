@@ -44,6 +44,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
     private FetchSuggestionsTask suggestionsTask = null;
     private Callback<ISuggestionRequest, Collection<T>> suggestionProvider = null;
+    private boolean ignoreInputChanges = false;
 
     /***************************************************************************
      *                                                                         *
@@ -71,8 +72,15 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup
                 .SuggestionEvent<T>>() {
             @Override public void handle(SuggestionEvent<T> sce) {
-                completeUserInput(sce.getSuggestion());
-                fireAutoCompletion(sce.getSuggestion());
+                try{
+                    setIgnoreInputChanges(true);
+                    completeUserInput(sce.getSuggestion());
+                    fireAutoCompletion(sce.getSuggestion());
+                    hidePopup();
+                }finally{
+                    // Ensure that ignore is always set back to false
+                    setIgnoreInputChanges(false);
+                }
             }
         });
     }
@@ -89,7 +97,9 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * @param userText
      */
     public final void setUserInput(String userText){
-        onUserInputChanged(userText);
+        if(!isIgnoreInputChanges()){
+            onUserInputChanged(userText);
+        }
     }
 
     /**
@@ -137,6 +147,24 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
     protected void fireAutoCompletion(T completion){
         Event.fireEvent(this, new ActionEvent());
+    }
+
+    /**
+     * Shall changes to the user input be ignored?
+     * @return
+     */
+    protected boolean isIgnoreInputChanges(){
+        return ignoreInputChanges;
+    }
+
+    /**
+     * If IgnoreInputChanges is set to true, all changes to the user input are
+     * ignored. This is primary used to avoid self triggering while
+     * auto completing.
+     * @param state
+     */
+    protected void setIgnoreInputChanges(boolean state){
+        ignoreInputChanges = state;
     }
 
     /***************************************************************************

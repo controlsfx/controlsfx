@@ -146,7 +146,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     }
 
     protected void fireAutoCompletion(T completion){
-        Event.fireEvent(this, new ActionEvent());
+        Event.fireEvent(this, new AutoCompletionEvent<T>(completion));
     }
 
     /**

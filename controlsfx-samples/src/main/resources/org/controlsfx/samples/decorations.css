@@ -1,0 +1,7 @@
+.warning {
+    -fx-background-color: #FF000055;
+}
+
+.success {
+    -fx-background-color: #00FF0055;
+}

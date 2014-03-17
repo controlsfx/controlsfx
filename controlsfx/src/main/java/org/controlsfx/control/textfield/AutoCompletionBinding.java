@@ -149,23 +149,6 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         Event.fireEvent(this, new AutoCompletionEvent<T>(completion));
     }
 
-    /**
-     * Shall changes to the user input be ignored?
-     * @return
-     */
-    protected boolean isIgnoreInputChanges(){
-        return ignoreInputChanges;
-    }
-
-    /**
-     * If IgnoreInputChanges is set to true, all changes to the user input are
-     * ignored. This is primary used to avoid self triggering while
-     * auto completing.
-     * @param state
-     */
-    protected void setIgnoreInputChanges(boolean state){
-        ignoreInputChanges = state;
-    }
 
     /***************************************************************************
      *                                                                         *
@@ -190,6 +173,25 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
             new Thread(suggestionsTask).start();
         }
     }
+
+    /**
+     * Shall changes to the user input be ignored?
+     * @return
+     */
+    private boolean isIgnoreInputChanges(){
+        return ignoreInputChanges;
+    }
+
+    /**
+     * If IgnoreInputChanges is set to true, all changes to the user input are
+     * ignored. This is primary used to avoid self triggering while
+     * auto completing.
+     * @param state
+     */
+    private void setIgnoreInputChanges(boolean state){
+        ignoreInputChanges = state;
+    }
+
     /***************************************************************************
      *                                                                         *
      * Inner classes and interfaces                                            *

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -192,7 +192,12 @@ public class GridCellEditor {
         Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), MAX_EDITOR_HEIGHT);
         spreadsheetCellEditor.getEditor().setMaxHeight(maxHeight);
         spreadsheetCellEditor.getEditor().setPrefWidth(viewCell.getWidth());
+        if(handle.getGridView().getEditWithKey()){
+            handle.getGridView().setEditWithKey(false);
+            spreadsheetCellEditor.startEdit("");
+        }else{
         spreadsheetCellEditor.startEdit(value);
+        }
     }
 
     private void end() {

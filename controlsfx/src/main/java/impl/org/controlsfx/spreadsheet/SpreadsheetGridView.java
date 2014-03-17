@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,12 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 	 * SEE RT-34753
 	 */
 	private boolean editWithEnter = false;
+        /**
+         * We don't want to show the current value in the TextField when we are
+         * editing by typing a key. We want directly to take those typed letters
+         * and put them into the textfield.
+         */
+        private boolean editWithKey = false;
 	
 	public SpreadsheetGridView(SpreadsheetHandle handle) {
 		this.handle = handle;
@@ -68,5 +74,13 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 	
 	public void setEditWithEnter(boolean b){
 	    editWithEnter = b;
+	}
+        
+        public void setEditWithKey(boolean b){
+	    editWithKey = b;
+	}
+        
+        public boolean getEditWithKey(){
+	    return editWithKey;
 	}
 };

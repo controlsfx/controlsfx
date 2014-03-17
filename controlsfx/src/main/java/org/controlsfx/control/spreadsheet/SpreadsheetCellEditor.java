@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -133,6 +134,7 @@ import javafx.util.StringConverter;
  * @see SpreadsheetCellType
  */
 public abstract class SpreadsheetCellEditor {
+    public static final DecimalFormat decimalFormat=new DecimalFormat("#.##########");
     SpreadsheetView view;
 
     /***************************************************************************
@@ -365,7 +367,7 @@ public abstract class SpreadsheetCellEditor {
         @Override
         public void startEdit(Object value) {
             if (value instanceof Double) {
-                tf.setText(((Double) value).isNaN() ? "" : value.toString());
+                tf.setText(((Double) value).isNaN() ? "" : decimalFormat.format(value));
             } else {
                 tf.setText(null);
             }

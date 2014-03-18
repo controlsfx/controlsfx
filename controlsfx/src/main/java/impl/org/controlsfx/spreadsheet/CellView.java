@@ -65,6 +65,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor"; //$NON-NLS-1$
     private static final int TOOLTIP_MAX_WIDTH = 400;
+    private static final int WRAP_HEIGHT = 35;
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
@@ -131,7 +132,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 }
             }
         });
-
+        heightProperty().addListener(wrapHeightChangeListener);
     }
 
     /***************************************************************************
@@ -277,9 +278,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 }
             });
         }
-
         // We want the text to wrap onto another line
-        setWrapText(true);
+//        setWrapText(true);
         setEditable(item.isEditable());
     }
 
@@ -293,6 +293,26 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * * Private Methods * *
      **************************************************************************/
 
+    /**
+     * FIXME
+     * We got a problem right now with wrapping values because if the height of the row is
+     * too small for the text, it is not rendered. And this bug is not happening when we set
+     * the wrap property to false.
+     * 
+     * So this is a work-around in order to set the wrap property only if this has a bit of sense,
+     * aka, the height could allow a second line.
+     */
+     private ChangeListener<Number> wrapHeightChangeListener = new ChangeListener<Number>() {
+
+        @Override
+        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+            if (t1.doubleValue() > WRAP_HEIGHT) {
+                setWrapText(true);
+            } else {
+                setWrapText(false);
+            }
+        }
+    };
     private void setCellGraphic(SpreadsheetCell item) {
 
         if (isEditing()) {

@@ -359,6 +359,14 @@ public class MasterDetailPane extends Control {
      *            the new divider position.
      */
     public final void setDividerPosition(double position) {
+        /**
+         * See https://bitbucket.org/controlsfx/controlsfx/issue/145/divider-position-in-masterdetailpane-is
+         * 
+         * Thie work-around is not the best ever found but at least it works.
+         */
+        if(getDividerPosition() == position){
+            dividerPosition.set(-1);
+        }
         dividerPosition.set(position);
     }
 

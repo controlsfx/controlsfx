@@ -4,6 +4,7 @@
 
 .spreadsheet-cell {
     -fx-background-color: green;
+     -fx-padding: 0 0 0 0.2em;
 }
 
 .tooltip {

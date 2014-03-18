@@ -43,8 +43,6 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -259,11 +257,11 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         for (int column = 0; column < grid.getColumnCount(); ++column) {
             SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(1, column, 1, 1, null);
             if (column % 3 == 0) {
-                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Koala.jpg"))));
+//                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Koala.jpg"))));
             } else if (column % 3 == 1) {
-                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Penguins.jpg"))));
+//                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Penguins.jpg"))));
             } else {
-                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Jellyfish.jpg"))));
+//                cell.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("Jellyfish.jpg"))));
             }
 
             cell.setEditable(false);

@@ -35,10 +35,10 @@ import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.binding.Bindings;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
@@ -304,22 +304,19 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         }
     }
 
-    private void bindDividerPosition() {
-        final ObservableList<Divider> dividers = splitPane.getDividers();
-        if (dividers.size() > 0) {
-            Bindings.bindBidirectional(
-                    getSkinnable().dividerPositionProperty(), dividers.get(0)
-                            .positionProperty());
+    private InvalidationListener listenersDivider = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable arg0) {
+            splitPane.setDividerPosition(0, getSkinnable().getDividerPosition());
+            
         }
+    };
+    private void bindDividerPosition() {
+        getSkinnable().dividerPositionProperty().addListener(listenersDivider);
     }
 
     private void unbindDividerPosition() {
-        ObservableList<Divider> dividers = splitPane.getDividers();
-        if (dividers.size() > 0) {
-            Bindings.unbindBidirectional(getSkinnable()
-                    .dividerPositionProperty(), dividers.get(0)
-                    .positionProperty());
-        }
+        getSkinnable().dividerPositionProperty().removeListener(listenersDivider);
     }
 
     private void updateMinAndMaxSizes() {

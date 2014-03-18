@@ -55,7 +55,7 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 
 	@Override
 	protected String getUserAgentStylesheet() {
-		return SpreadsheetView.class.getResource("spreadsheet.css")
+		return SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
 				.toExternalForm();
 	}
 

@@ -103,7 +103,7 @@ public class ActionMap {
 				ActionProxy annotation = (ActionProxy) annotations[0];
 				String id = annotation.id().isEmpty()? method.getName(): annotation.id();
 				if ( actions.containsKey(id)) {
-					throw new IllegalArgumentException( String.format("Action proxy with key = '%s' already exists", id));
+					throw new IllegalArgumentException( String.format("Action proxy with key = '%s' already exists", id)); //$NON-NLS-1$
 				}
 				actions.put(id, new AnnotatedAction( annotation, method, target));
 			}
@@ -144,7 +144,7 @@ public class ActionMap {
 	public static Collection<Action> actions(String... ids) {
 		List<Action> result = new ArrayList<>();
 		for( String id: ids ) {
-			if ( id.startsWith("---")) result.add(ActionUtils.ACTION_SEPARATOR);
+			if ( id.startsWith("---")) result.add(ActionUtils.ACTION_SEPARATOR); //$NON-NLS-1$
 			Action action = action(id);
 			if ( action != null ) result.add(action);
 		}
@@ -189,12 +189,12 @@ class AnnotatedAction extends AbstractAction {
 		String graphicDef = annotation.graphic().trim();
 		if ( !graphicDef.isEmpty()) {
 			
-			String[] def = graphicDef.split("\\>");  // cannot use ':' because it used in urls
+			String[] def = graphicDef.split("\\>");  // cannot use ':' because it used in urls //$NON-NLS-1$
 			if ( def.length == 1 ) return new ImageView(new Image(def[0]));
 			switch (def[0]) {
-			   case "font"    : return GlyphFontRegistry.glyph(def[1]);  
-			   case "image"   : return new ImageView(new Image(def[1]));
-			   default: throw new IllegalArgumentException( String.format("Unknown ActionProxy graphic protocol: %s", def[0]));
+			   case "font"    : return GlyphFontRegistry.glyph(def[1]);   //$NON-NLS-1$
+			   case "image"   : return new ImageView(new Image(def[1])); //$NON-NLS-1$
+			   default: throw new IllegalArgumentException( String.format("Unknown ActionProxy graphic protocol: %s", def[0])); //$NON-NLS-1$
 			}
 		}
 		return null;

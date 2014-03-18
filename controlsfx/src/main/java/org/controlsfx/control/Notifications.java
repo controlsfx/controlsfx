@@ -92,7 +92,7 @@ public class Notifications {
      * * Static fields * *
      **************************************************************************/
 
-    private static final String STYLE_CLASS_DARK = "dark";
+    private static final String STYLE_CLASS_DARK = "dark"; //$NON-NLS-1$
 
     /***************************************************************************
      * * Private fields * *
@@ -226,7 +226,7 @@ public class Notifications {
      * built-in 'warning' graphic.
      */
     public void showWarning() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-warning.png")));
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-warning.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -235,7 +235,7 @@ public class Notifications {
      * built-in 'information' graphic.
      */
     public void showInformation() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-information.png")));
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-information.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -244,7 +244,7 @@ public class Notifications {
      * built-in 'error' graphic.
      */
     public void showError() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-error.png")));
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-error.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -253,7 +253,7 @@ public class Notifications {
      * built-in 'confirm' graphic.
      */
     public void showConfirm() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/system-help.png")));
+        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/system-help.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -322,7 +322,7 @@ public class Notifications {
             // need to install our CSS
             if (owner instanceof Stage) {
                 Scene ownerScene = ((Stage) owner).getScene();
-                ownerScene.getStylesheets().add(getClass().getResource("notificationpopup.css").toExternalForm());
+                ownerScene.getStylesheets().add(getClass().getResource("notificationpopup.css").toExternalForm()); //$NON-NLS-1$
             }
 
             final Popup popup = new Popup();

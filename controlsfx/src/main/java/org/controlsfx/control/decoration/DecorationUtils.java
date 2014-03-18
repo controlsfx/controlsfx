@@ -39,7 +39,7 @@ import org.controlsfx.control.DecorationPane;
 
 public class DecorationUtils {
 
-    public final static String DECORATIONS_PROPERTY_KEY = "$org.controlsfx.decorations$";
+    public final static String DECORATIONS_PROPERTY_KEY = "$org.controlsfx.decorations$"; //$NON-NLS-1$
 
     private DecorationUtils() {
         // no op

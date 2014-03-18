@@ -143,7 +143,7 @@ public class Editors {
                     }
                     
                     @Override protected String objectToString(Font font) {
-                        return font == null? "": String.format("%s, %.1f", font.getName(), font.getSize());
+                        return font == null? "": String.format("%s, %.1f", font.getName(), font.getSize()); //$NON-NLS-1$ //$NON-NLS-2$
                     }
         
                     @Override protected Font edit(Font font) {

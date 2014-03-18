@@ -46,19 +46,19 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
         getChildren().clear();
         updateCells();
         
-        registerChangeListener(getSkinnable().indexProperty(), "INDEX");
-        registerChangeListener(getSkinnable().widthProperty(), "WIDTH");
-        registerChangeListener(getSkinnable().heightProperty(), "HEIGHT");
+        registerChangeListener(getSkinnable().indexProperty(), "INDEX"); //$NON-NLS-1$
+        registerChangeListener(getSkinnable().widthProperty(), "WIDTH"); //$NON-NLS-1$
+        registerChangeListener(getSkinnable().heightProperty(), "HEIGHT"); //$NON-NLS-1$
     }
     
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if ("INDEX".equals(p)) {
+        if ("INDEX".equals(p)) { //$NON-NLS-1$
             updateCells();
-        } else if ("WIDTH".equals(p)) {
+        } else if ("WIDTH".equals(p)) { //$NON-NLS-1$
             updateCells();
-        } else if ("HEIGHT".equals(p)) {
+        } else if ("HEIGHT".equals(p)) { //$NON-NLS-1$
             updateCells();
         }
     }
@@ -126,7 +126,7 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<Gr
             @Override protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
                 if(empty) {
-                    setText("");
+                    setText(""); //$NON-NLS-1$
                 } else {
                     setText(item.toString());
                 }

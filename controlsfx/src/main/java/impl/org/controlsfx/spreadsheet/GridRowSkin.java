@@ -55,10 +55,10 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
      * fixedRows and also our rows CSS.. (kind of flicker)
      */
     @Override protected void handleControlPropertyChanged(String p) {
-        if ("ITEM".equals(p)) {
+        if ("ITEM".equals(p)) { //$NON-NLS-1$
             updateCells = true;
             getSkinnable().requestLayout();
-        } else if ("INDEX".equals(p)){
+        } else if ("INDEX".equals(p)){ //$NON-NLS-1$
            /* // update the index of all children cells (RT-29849)
             final int newIndex = getSkinnable().getIndex();
             for (int i = 0, max = cells.size(); i < max; i++) {

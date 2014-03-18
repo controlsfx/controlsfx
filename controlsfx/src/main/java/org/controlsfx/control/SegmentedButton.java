@@ -104,7 +104,7 @@ public class SegmentedButton extends Control {
      * segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
      * }</pre>
      */
-    public static final String STYLE_CLASS_DARK = "dark";
+    public static final String STYLE_CLASS_DARK = "dark"; //$NON-NLS-1$
     
     
     
@@ -149,7 +149,7 @@ public class SegmentedButton extends Control {
      * @param buttons A list of buttons to add into the SegmentedButton instance.
      */
     public SegmentedButton(ObservableList<ToggleButton> buttons) {
-        getStyleClass().add("segmented-button");
+        getStyleClass().add("segmented-button"); //$NON-NLS-1$
         this.buttons = buttons == null ? FXCollections.<ToggleButton>observableArrayList() : buttons;
         
         // Fix for Issue #87:
@@ -192,6 +192,6 @@ public class SegmentedButton extends Control {
      * {@inheritDoc}
      */
     @Override protected String getUserAgentStylesheet() {
-        return SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm();
+        return SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm(); //$NON-NLS-1$
     }
 }

@@ -42,7 +42,7 @@ public class GridChange extends Event implements Serializable {
     /**
      * This is the event used by {@link GridChange}.
      */
-    public static final EventType<GridChange> GRID_CHANGE_EVENT = new EventType<>(Event.ANY, "GridChange");
+    public static final EventType<GridChange> GRID_CHANGE_EVENT = new EventType<>(Event.ANY, "GridChange"); //$NON-NLS-1$
 
     /**
      * *************************************************************************

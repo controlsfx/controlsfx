@@ -143,7 +143,7 @@ public class Rating extends Control {
      * @param max The maximum allowed rating value.
      */
     public Rating(int max, int rating) {
-        getStyleClass().setAll("rating");
+        getStyleClass().setAll("rating"); //$NON-NLS-1$
         
         setMax(max);
         setRating(rating == -1 ? (int) Math.floor(max / 2.0) : rating);
@@ -164,7 +164,7 @@ public class Rating extends Control {
 
     /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("rating.css").toExternalForm();
+        return getClass().getResource("rating.css").toExternalForm(); //$NON-NLS-1$
     }
     
     
@@ -182,7 +182,7 @@ public class Rating extends Control {
     public final DoubleProperty ratingProperty() {
         return rating;
     }
-    private DoubleProperty rating = new SimpleDoubleProperty(this, "rating", 3);
+    private DoubleProperty rating = new SimpleDoubleProperty(this, "rating", 3); //$NON-NLS-1$
     
     /**
      * Sets the current rating value.
@@ -206,7 +206,7 @@ public class Rating extends Control {
     public final IntegerProperty maxProperty() {
         return max;
     }
-    private IntegerProperty max = new SimpleIntegerProperty(this, "max", 5);
+    private IntegerProperty max = new SimpleIntegerProperty(this, "max", 5); //$NON-NLS-1$
     
     /**
      * Sets the maximum-allowed rating value.
@@ -230,7 +230,7 @@ public class Rating extends Control {
      */
     public final ObjectProperty<Orientation> orientationProperty() {
         if (orientation == null) {
-            orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL);
+            orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$
         }
         return orientation;
     }
@@ -264,7 +264,7 @@ public class Rating extends Control {
     public final BooleanProperty partialRatingProperty() {
         return partialRating;
     }
-    private BooleanProperty partialRating = new SimpleBooleanProperty(this, "partialRating", false);
+    private BooleanProperty partialRating = new SimpleBooleanProperty(this, "partialRating", false); //$NON-NLS-1$
     
     /**
      * Sets whether {@link #partialRatingProperty() partial rating} support is
@@ -293,7 +293,7 @@ public class Rating extends Control {
     public final BooleanProperty updateOnHoverProperty() {
         return updateOnHover;
     }
-    private BooleanProperty updateOnHover = new SimpleBooleanProperty(this, "updateOnHover", false);
+    private BooleanProperty updateOnHover = new SimpleBooleanProperty(this, "updateOnHover", false); //$NON-NLS-1$
     
     /**
      * Sets whether {@link #updateOnHoverProperty() update on hover} support is

@@ -99,7 +99,7 @@ public class HiddenSidesPane extends Control {
     }
 
     private DoubleProperty triggerDistance = new SimpleDoubleProperty(this,
-            "triggerDistance", 16);
+            "triggerDistance", 16); //$NON-NLS-1$
 
     /**
      * The property that stores the distance to the pane's edges that will
@@ -132,7 +132,7 @@ public class HiddenSidesPane extends Control {
     public final void setTriggerDistance(double distance) {
         if (distance <= 0) {
             throw new IllegalArgumentException(
-                    "trigger distance must be larger than 0 but was "
+                    "trigger distance must be larger than 0 but was " //$NON-NLS-1$
                             + distance);
         }
         triggerDistance.set(distance);
@@ -141,7 +141,7 @@ public class HiddenSidesPane extends Control {
     // Content node support.
 
     private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this,
-            "content");
+            "content"); //$NON-NLS-1$
 
     /**
      * The property that is used to store a reference to the content node. The
@@ -175,7 +175,7 @@ public class HiddenSidesPane extends Control {
     // Top node support.
 
     private ObjectProperty<Node> top = new SimpleObjectProperty<Node>(this,
-            "top");
+            "top"); //$NON-NLS-1$
 
     /**
      * The property used to store a reference to the node shown at the top side
@@ -215,7 +215,7 @@ public class HiddenSidesPane extends Control {
      * @return the hidden node at the right side of the pane
      */
     private ObjectProperty<Node> right = new SimpleObjectProperty<Node>(this,
-            "right");
+            "right"); //$NON-NLS-1$
 
     /**
      * Returns the value of the right node property.
@@ -254,7 +254,7 @@ public class HiddenSidesPane extends Control {
      * @return the hidden node at the bottom side of the pane
      */
     private ObjectProperty<Node> bottom = new SimpleObjectProperty<Node>(this,
-            "bottom");
+            "bottom"); //$NON-NLS-1$
 
     /**
      * Returns the value of the bottom node property.
@@ -293,7 +293,7 @@ public class HiddenSidesPane extends Control {
      * @return the hidden node at the left side of the pane
      */
     private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this,
-            "left");
+            "left"); //$NON-NLS-1$
 
     /**
      * Returns the value of the left node property.
@@ -326,7 +326,7 @@ public class HiddenSidesPane extends Control {
     // Pinned side support.
 
     private ObjectProperty<Side> pinnedSide = new SimpleObjectProperty<Side>(
-            this, "pinnedSide");
+            this, "pinnedSide"); //$NON-NLS-1$
 
     /**
      * Returns the pinned side property. The value of this property determines

@@ -43,10 +43,10 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>> {
     
-    private static final String ONLY_BUTTON = "only-button";
-    private static final String LEFT_PILL   = "left-pill";
-    private static final String CENTER_PILL = "center-pill";
-    private static final String RIGHT_PILL  = "right-pill";
+    private static final String ONLY_BUTTON = "only-button"; //$NON-NLS-1$
+    private static final String LEFT_PILL   = "left-pill"; //$NON-NLS-1$
+    private static final String CENTER_PILL = "center-pill"; //$NON-NLS-1$
+    private static final String RIGHT_PILL  = "right-pill"; //$NON-NLS-1$
 
     private final ToggleGroup group;
     

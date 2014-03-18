@@ -167,7 +167,7 @@ public class CheckComboBox<T> extends Control {
 
     // --- Check Model
     private ObjectProperty<MultipleSelectionModel<T>> checkModel = 
-            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel");
+            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel"); //$NON-NLS-1$
     
     /**
      * Sets the 'check model' to be used in the CheckComboBox - this is the

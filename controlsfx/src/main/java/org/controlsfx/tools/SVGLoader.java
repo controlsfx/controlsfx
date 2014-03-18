@@ -93,7 +93,7 @@ class SVGLoader {
     public static void loadSVGImage(final URL svgImage, 
                                     final WritableImage outputImage) {
         if (outputImage == null) {
-            throw new NullPointerException("outputImage can not be null");
+            throw new NullPointerException("outputImage can not be null"); //$NON-NLS-1$
         }
         final double w = outputImage.getWidth();
         final double h = outputImage.getHeight();
@@ -126,14 +126,14 @@ class SVGLoader {
 //        String svgString = readFile(svgImage);
 
         String content =
-        "<html>" +
-            "<body style=\"margin-top: 0px; margin-bottom: 30px; margin-left: 0px; margin-right: 0px; padding: 0;\">" +
+        "<html>" + //$NON-NLS-1$
+            "<body style=\"margin-top: 0px; margin-bottom: 30px; margin-left: 0px; margin-right: 0px; padding: 0;\">" + //$NON-NLS-1$
 //                "<div style=\"width: " + prefWidth + "; height: " + prefHeight + ";\">" +
-                    "<img id=\"svgImage\" style=\"display: block;float: top;\" width=\"" + prefWidth + "\" height=\"" + prefHeight + "\" src=\"" + svgImage.toExternalForm() + "\" />" +
+                    "<img id=\"svgImage\" style=\"display: block;float: top;\" width=\"" + prefWidth + "\" height=\"" + prefHeight + "\" src=\"" + svgImage.toExternalForm() + "\" />" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //                    svgString +
 //                "</div>" +
-            "</body>" +
-        "</head>";
+            "</body>" + //$NON-NLS-1$
+        "</head>"; //$NON-NLS-1$
                 
         
         System.out.println(content);
@@ -190,7 +190,7 @@ class SVGLoader {
 //    }
     
     private static double getSvgWidth(WebEngine webEngine) {
-        Object result = getSvgDomProperty(webEngine, "offsetWidth");
+        Object result = getSvgDomProperty(webEngine, "offsetWidth"); //$NON-NLS-1$
         if (result instanceof Integer) {
             return (Integer) result;
         }
@@ -198,7 +198,7 @@ class SVGLoader {
     }
     
     private static double getSvgHeight(WebEngine webEngine) {
-        Object result = getSvgDomProperty(webEngine, "offsetHeight");
+        Object result = getSvgDomProperty(webEngine, "offsetHeight"); //$NON-NLS-1$
         if (result instanceof Integer) {
             return (Integer) result;
         }
@@ -206,7 +206,7 @@ class SVGLoader {
     }
     
     private static Object getSvgDomProperty(final WebEngine webEngine, final String property) {
-        return webEngine.executeScript("document.getElementById('svgImage')." + property);
+        return webEngine.executeScript("document.getElementById('svgImage')." + property); //$NON-NLS-1$
     }
 
 //    private static HTMLImageElement getSvgDom(WebEngine webEngine) {

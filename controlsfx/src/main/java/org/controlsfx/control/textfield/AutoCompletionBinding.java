@@ -284,7 +284,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
          */
         @SuppressWarnings("rawtypes")
         public static final EventType<AutoCompletionEvent> AUTO_COMPLETED = 
-        new EventType<AutoCompletionEvent>("AUTO_COMPLETED");
+        new EventType<AutoCompletionEvent>("AUTO_COMPLETED"); //$NON-NLS-1$
 
         private final TE completion;
 
@@ -336,7 +336,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
                 @Override
                 public String getName() {
-                    return "onAutoCompleted";
+                    return "onAutoCompleted"; //$NON-NLS-1$
                 }
             };
         }

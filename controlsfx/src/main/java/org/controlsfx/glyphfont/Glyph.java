@@ -59,7 +59,7 @@ public class Glyph extends Label implements Duplicatable<Glyph>{
         this.size = size;
         this.color = color;
 
-        getStyleClass().add("glyph-font");
+        getStyleClass().add("glyph-font"); //$NON-NLS-1$
         updateStyle();
     }
     
@@ -83,17 +83,17 @@ public class Glyph extends Label implements Duplicatable<Glyph>{
     
     //TODO: Need to be able to use external styles
     private void updateStyle() {
-        StringBuilder css = new StringBuilder( String.format("-fx-font-family: %s; -fx-font-size: %fpx;", fontFamily, size));
+        StringBuilder css = new StringBuilder( String.format("-fx-font-family: %s; -fx-font-size: %fpx;", fontFamily, size)); //$NON-NLS-1$
         if (color == null) {
-            css.append("-glyphs-color: -fx-text-background-color;");
+            css.append("-glyphs-color: -fx-text-background-color;"); //$NON-NLS-1$
         } else {
-            css.append("-glyphs-color: rgb(");
+            css.append("-glyphs-color: rgb("); //$NON-NLS-1$
             css.append((int)(color.getRed()*255));
-            css.append(",");
+            css.append(","); //$NON-NLS-1$
             css.append((int)(color.getGreen()*255));
-            css.append(",");
+            css.append(","); //$NON-NLS-1$
             css.append((int)(color.getBlue())*255);
-            css.append(");");
+            css.append(");"); //$NON-NLS-1$
         }
         setStyle(css.toString());
     }

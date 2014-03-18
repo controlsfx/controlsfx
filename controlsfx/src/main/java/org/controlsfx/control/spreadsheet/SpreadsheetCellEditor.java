@@ -367,12 +367,12 @@ public abstract class SpreadsheetCellEditor {
         @Override
         public void startEdit(Object value) {
             if (value instanceof Double) {
-                tf.setText(((Double) value).isNaN() ? "" : decimalFormat.format(value));
+                tf.setText(((Double) value).isNaN() ? "" : decimalFormat.format(value)); //$NON-NLS-1$
             } else {
                 tf.setText(null);
             }
 
-            tf.getStyleClass().removeAll("error");
+            tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
             attachEnterEscapeEventHandler();
 
             tf.requestFocus();
@@ -404,7 +404,7 @@ public abstract class SpreadsheetCellEditor {
                 public void handle(KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
                         try {
-                            if (tf.getText().equals("")) {
+                            if (tf.getText().equals("")) { //$NON-NLS-1$
                                 endEdit(true);
                             } else {
                                 Double.parseDouble(tf.getText());
@@ -422,14 +422,14 @@ public abstract class SpreadsheetCellEditor {
                 @Override
                 public void handle(KeyEvent t) {
                     try {
-                        if (tf.getText().equals("")) {
-                            tf.getStyleClass().removeAll("error");
+                        if (tf.getText().equals("")) { //$NON-NLS-1$
+                            tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
                         } else {
                             Double.parseDouble(tf.getText());
-                            tf.getStyleClass().removeAll("error");
+                            tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
                         }
                     } catch (Exception e) {
-                        tf.getStyleClass().add("error");
+                        tf.getStyleClass().add("error"); //$NON-NLS-1$
                     }
                 }
             });
@@ -471,7 +471,7 @@ public abstract class SpreadsheetCellEditor {
                 tf.setText(null);
             }
 
-            tf.getStyleClass().removeAll("error");
+            tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
             attachEnterEscapeEventHandler();
 
             tf.requestFocus();
@@ -503,7 +503,7 @@ public abstract class SpreadsheetCellEditor {
                 public void handle(KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
                         try {
-                            if (tf.getText().equals("")) {
+                            if (tf.getText().equals("")) { //$NON-NLS-1$
                                 endEdit(true);
                             } else {
                                 Integer.parseInt(tf.getText());
@@ -521,14 +521,14 @@ public abstract class SpreadsheetCellEditor {
                 @Override
                 public void handle(KeyEvent t) {
                     try {
-                        if (tf.getText().equals("")) {
-                            tf.getStyleClass().removeAll("error");
+                        if (tf.getText().equals("")) { //$NON-NLS-1$
+                            tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
                         } else {
                             Integer.parseInt(tf.getText());
-                            tf.getStyleClass().removeAll("error");
+                            tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
                         }
                     } catch (Exception e) {
-                        tf.getStyleClass().add("error");
+                        tf.getStyleClass().add("error"); //$NON-NLS-1$
                     }
                 }
             });

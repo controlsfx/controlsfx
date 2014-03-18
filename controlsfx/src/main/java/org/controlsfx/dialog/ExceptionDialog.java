@@ -46,7 +46,7 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 class ExceptionDialog extends HeavyweightDialog {
 
     public ExceptionDialog(Window owner, String moreDetails, boolean nativeChrome) {
-        super(localize(asKey("exception.dlg.title")), owner, false, nativeChrome);
+        super(localize(asKey("exception.dlg.title")), owner, false, nativeChrome); //$NON-NLS-1$
         initComponents(moreDetails);
     }
 
@@ -55,14 +55,14 @@ class ExceptionDialog extends HeavyweightDialog {
      */
     private void initComponents(String moreDetails) {
         VBox contentPanel = new VBox();
-        contentPanel.getStyleClass().add("more-info-dialog");
+        contentPanel.getStyleClass().add("more-info-dialog"); //$NON-NLS-1$
 
         contentPanel.setPrefSize(800, 600);
 
         if (moreDetails != null) {
             BorderPane labelPanel = new BorderPane();
 
-            Label label = new Label(localize(asKey("exception.dlg.label")));
+            Label label = new Label(localize(asKey("exception.dlg.label"))); //$NON-NLS-1$
             labelPanel.setLeft(label);
 
             contentPanel.getChildren().add(labelPanel);
@@ -86,7 +86,7 @@ class ExceptionDialog extends HeavyweightDialog {
      * dismiss the dialog and dispose of it.
      */
     private Node getBtnPanel() {
-        Button dismissBtn = new Button(localize(asKey("dlg.close.button")));
+        Button dismissBtn = new Button(localize(asKey("dlg.close.button"))); //$NON-NLS-1$
         dismissBtn.setPrefWidth(80);
         dismissBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {

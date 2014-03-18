@@ -66,7 +66,7 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  */
 public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, BehaviorBase<BreadCrumbBar<T>>> {
     
-    private static final String STYLE_CLASS_FIRST = "first";
+    private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 
 //    private final HBox layout;
 
@@ -185,7 +185,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
 
         Button crumb = factory.call(selectedCrumb);
         
-        crumb.getStyleClass().add("crumb");
+        crumb.getStyleClass().add("crumb"); //$NON-NLS-1$
 
         // We want all buttons to have the same height
         // so we bind their preferred height to the enclosing container
@@ -236,7 +236,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
      */
     public static class BreadCrumbButton extends Button {
 
-        private final ObjectProperty<Boolean> first = new SimpleObjectProperty<Boolean>(this, "first");
+        private final ObjectProperty<Boolean> first = new SimpleObjectProperty<Boolean>(this, "first"); //$NON-NLS-1$
 
         private final double arrowWidth = 5;
         private final double arrowHeight = 20;

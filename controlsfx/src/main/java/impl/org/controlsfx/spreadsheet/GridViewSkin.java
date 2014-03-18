@@ -93,7 +93,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         double cell_size = 24.0;
         try {
             Class<?> clazz = com.sun.javafx.scene.control.skin.CellSkinBase.class;
-            Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE");
+            Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE"); //$NON-NLS-1$
             f.setAccessible(true);
             cell_size = f.getDouble(null);
         } catch (NoSuchFieldException e) {
@@ -173,7 +173,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                     }
                 });
 
-        tableView.getStyleClass().add("cell-spreadsheet");
+        tableView.getStyleClass().add("cell-spreadsheet"); //$NON-NLS-1$
 
         getCurrentlyFixedRow().addListener(currentlyFixedRowListener);
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
@@ -281,7 +281,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
-        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE);
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
         
         // determine cell padding
         double padding = 10;
@@ -357,7 +357,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
-        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE);
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
 
         // determine cell padding
         double padding = 10;

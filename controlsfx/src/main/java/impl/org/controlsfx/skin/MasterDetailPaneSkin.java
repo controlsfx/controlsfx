@@ -105,10 +105,10 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     break;
                                 default:
                                     throw new IllegalArgumentException(
-                                            "illegal details position "
+                                            "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
                                                             .getDetailSide()
-                                                    + " for orientation "
+                                                    + " for orientation " //$NON-NLS-1$
                                                     + splitPane
                                                             .getOrientation());
                                 }
@@ -123,10 +123,10 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     break;
                                 default:
                                     throw new IllegalArgumentException(
-                                            "illegal details position "
+                                            "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
                                                             .getDetailSide()
-                                                    + " for orientation "
+                                                    + " for orientation " //$NON-NLS-1$
                                                     + splitPane
                                                             .getOrientation());
                                 }
@@ -170,10 +170,10 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     break;
                                 default:
                                     throw new IllegalArgumentException(
-                                            "illegal details position "
+                                            "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
                                                             .getDetailSide()
-                                                    + " for orientation "
+                                                    + " for orientation " //$NON-NLS-1$
                                                     + splitPane
                                                             .getOrientation());
                                 }
@@ -188,10 +188,10 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     break;
                                 default:
                                     throw new IllegalArgumentException(
-                                            "illegal details position "
+                                            "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
                                                             .getDetailSide()
-                                                    + " for orientation "
+                                                    + " for orientation " //$NON-NLS-1$
                                                     + splitPane
                                                             .getOrientation());
                                 }

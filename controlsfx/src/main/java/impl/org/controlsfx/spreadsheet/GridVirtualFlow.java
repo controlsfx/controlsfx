@@ -304,7 +304,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                      * So we need to instantiate it ourselves.
                      */
                     cell = getCreateCell().call(this);
-                    cell.getProperties().put("newcell", null);
+                    cell.getProperties().put("newcell", null); //$NON-NLS-1$
 //                	cell = getAvailableCell(fixedRowIndex);
                 	 
                     setCellIndex(cell, fixedRowIndex);

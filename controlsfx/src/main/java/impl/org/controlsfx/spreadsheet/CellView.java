@@ -63,7 +63,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     /***************************************************************************
      * * Static Fields * *
      **************************************************************************/
-    private static final String ANCHOR_PROPERTY_KEY = "table.anchor";
+    private static final String ANCHOR_PROPERTY_KEY = "table.anchor"; //$NON-NLS-1$
     private static final int TOOLTIP_MAX_WIDTH = 400;
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
@@ -245,7 +245,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     @Override
     public String toString() {
-        return getItem().getRow() + "/" + getItem().getColumn();
+        return getItem().getRow() + "/" + getItem().getColumn(); //$NON-NLS-1$
 
     }
 
@@ -258,7 +258,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         textProperty().bind(item.textProperty());
         setCellGraphic(item);
 
-        if (item.getItem() == null || item.getItem().equals("")
+        if (item.getItem() == null || item.getItem().equals("") //$NON-NLS-1$
                 || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
             setTooltip(null);
         } else {

@@ -48,12 +48,12 @@ public class TextFields {
      */
     public static TextField createSearchField() {
         final CustomTextField searchField = new CustomTextField();
-        searchField.getStyleClass().add("search-field");
+        searchField.getStyleClass().add("search-field"); //$NON-NLS-1$
 
         Region clearButton = new Region();
-        clearButton.getStyleClass().addAll("graphic");
+        clearButton.getStyleClass().addAll("graphic"); //$NON-NLS-1$
         StackPane clearButtonPane = new StackPane(clearButton);
-        clearButtonPane.getStyleClass().addAll("clear-button");
+        clearButtonPane.getStyleClass().addAll("clear-button"); //$NON-NLS-1$
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
 

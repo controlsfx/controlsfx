@@ -56,7 +56,7 @@ public abstract class GlyphFont {
     
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
-                GlyphFont.class.getResource("glyphfont.css").toExternalForm());
+                GlyphFont.class.getResource("glyphfont.css").toExternalForm()); //$NON-NLS-1$
     }
 
 	private final String fontName;

@@ -113,7 +113,7 @@ public final class GlyphFontRegistry {
 	 */
 	public static Node glyph( String fontAndGlyph ) {
 	    init();
-		String[] args = fontAndGlyph.split("\\|");
+		String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
 		return glyph( args[0], args[1]);
 	}
 }

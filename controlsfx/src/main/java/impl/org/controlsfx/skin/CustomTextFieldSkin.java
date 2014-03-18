@@ -38,9 +38,9 @@ import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
 public class CustomTextFieldSkin extends TextFieldSkin {
     
-    private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes");
-    private static final PseudoClass HAS_LEFT_NODE = PseudoClass.getPseudoClass("left-node-visible");
-    private static final PseudoClass HAS_RIGHT_NODE = PseudoClass.getPseudoClass("right-node-visible");
+    private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes"); //$NON-NLS-1$
+    private static final PseudoClass HAS_LEFT_NODE = PseudoClass.getPseudoClass("left-node-visible"); //$NON-NLS-1$
+    private static final PseudoClass HAS_RIGHT_NODE = PseudoClass.getPseudoClass("right-node-visible"); //$NON-NLS-1$
     
     private Node left;
     private StackPane leftPane;
@@ -55,15 +55,15 @@ public class CustomTextFieldSkin extends TextFieldSkin {
         this.control = control;
         updateChildren();
         
-        registerChangeListener(control.leftProperty(), "LEFT_NODE");
-        registerChangeListener(control.rightProperty(), "RIGHT_NODE");
-        registerChangeListener(control.focusedProperty(), "FOCUSED");
+        registerChangeListener(control.leftProperty(), "LEFT_NODE"); //$NON-NLS-1$
+        registerChangeListener(control.rightProperty(), "RIGHT_NODE"); //$NON-NLS-1$
+        registerChangeListener(control.focusedProperty(), "FOCUSED"); //$NON-NLS-1$
     }
     
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if (p == "LEFT_NODE" || p == "RIGHT_NODE") {
+        if (p == "LEFT_NODE" || p == "RIGHT_NODE") { //$NON-NLS-1$ //$NON-NLS-2$
             updateChildren();
         }
     }
@@ -73,7 +73,7 @@ public class CustomTextFieldSkin extends TextFieldSkin {
         if (newLeft != null) {
             leftPane = new StackPane(newLeft);
             leftPane.setAlignment(Pos.CENTER_LEFT);
-            leftPane.getStyleClass().add("left-pane");
+            leftPane.getStyleClass().add("left-pane"); //$NON-NLS-1$
             getChildren().remove(left);
             getChildren().add(leftPane);
             left = newLeft;
@@ -83,7 +83,7 @@ public class CustomTextFieldSkin extends TextFieldSkin {
         if (newRight != null) {
             rightPane = new StackPane(newRight);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
-            rightPane.getStyleClass().add("right-pane");
+            rightPane.getStyleClass().add("right-pane"); //$NON-NLS-1$
             getChildren().remove(right);
             getChildren().add(rightPane);
             right = newRight;

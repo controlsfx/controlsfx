@@ -104,16 +104,7 @@ public class ValidationSupport {
 		return Optional.empty();
 	}
 	
-	private static String CTRL_REQUIRED_FLAG = "controlsfx.required.control";
 	
-	private void setRequired( Control c, boolean required ) {
-		c.getProperties().put(CTRL_REQUIRED_FLAG, required );
-	}
-	
-	public boolean getRequired( Control c ) {
-		Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
-		return value instanceof Boolean? (Boolean)value: false;
-	}
 	
 	
 	// TODO: Need weak listeners to avoid memory leaks
@@ -124,7 +115,7 @@ public class ValidationSupport {
 		getExtractor(c).ifPresent(e->{
 			
 			ObservableValue<T> ov = (ObservableValue<T>) e.extract(c);
-			setRequired( c, required );
+			ValidationControlUtils.setRequired( c, required );
 		
 			ov.addListener(new ChangeListener<T>(){
 				public void changed(ObservableValue<? extends T> o, T oldValue, T newValue) {

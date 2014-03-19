@@ -53,7 +53,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         
         updateGridViewItems();
 
-        flow.setId("virtual-flow");
+        flow.setId("virtual-flow"); //$NON-NLS-1$
         flow.setPannable(false);
         flow.setVertical(true);
         flow.setFocusTraversable(getSkinnable().isFocusTraversable());
@@ -67,38 +67,38 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         updateRowCount();
 
         // Register listeners
-        registerChangeListener(control.itemsProperty(), "ITEMS");
-        registerChangeListener(control.cellFactoryProperty(), "CELL_FACTORY");
-        registerChangeListener(control.parentProperty(), "PARENT");
-        registerChangeListener(control.cellHeightProperty(), "CELL_HEIGHT");
-        registerChangeListener(control.cellWidthProperty(), "CELL_WIDTH");
-        registerChangeListener(control.horizontalCellSpacingProperty(), "HORIZONZAL_CELL_SPACING");
-        registerChangeListener(control.verticalCellSpacingProperty(), "VERTICAL_CELL_SPACING");
-        registerChangeListener(control.widthProperty(), "WIDTH_PROPERTY");
-        registerChangeListener(control.heightProperty(), "HEIGHT_PROPERTY");
+        registerChangeListener(control.itemsProperty(), "ITEMS"); //$NON-NLS-1$
+        registerChangeListener(control.cellFactoryProperty(), "CELL_FACTORY"); //$NON-NLS-1$
+        registerChangeListener(control.parentProperty(), "PARENT"); //$NON-NLS-1$
+        registerChangeListener(control.cellHeightProperty(), "CELL_HEIGHT"); //$NON-NLS-1$
+        registerChangeListener(control.cellWidthProperty(), "CELL_WIDTH"); //$NON-NLS-1$
+        registerChangeListener(control.horizontalCellSpacingProperty(), "HORIZONZAL_CELL_SPACING"); //$NON-NLS-1$
+        registerChangeListener(control.verticalCellSpacingProperty(), "VERTICAL_CELL_SPACING"); //$NON-NLS-1$
+        registerChangeListener(control.widthProperty(), "WIDTH_PROPERTY"); //$NON-NLS-1$
+        registerChangeListener(control.heightProperty(), "HEIGHT_PROPERTY"); //$NON-NLS-1$
     }
 
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
-        if (p == "ITEMS") {
+        if (p == "ITEMS") { //$NON-NLS-1$
             updateGridViewItems();
-        } else if (p == "CELL_FACTORY") {
+        } else if (p == "CELL_FACTORY") { //$NON-NLS-1$
             flow.recreateCells();
-        } else if (p == "CELL_HEIGHT") {
+        } else if (p == "CELL_HEIGHT") { //$NON-NLS-1$
             flow.recreateCells();
-        } else if (p == "CELL_WIDTH") {
+        } else if (p == "CELL_WIDTH") { //$NON-NLS-1$
             updateRowCount();
             flow.recreateCells();
-        } else if (p == "HORIZONZAL_CELL_SPACING") {
+        } else if (p == "HORIZONZAL_CELL_SPACING") { //$NON-NLS-1$
             updateRowCount();
             flow.recreateCells();
-        } else if (p == "VERTICAL_CELL_SPACING") {
+        } else if (p == "VERTICAL_CELL_SPACING") { //$NON-NLS-1$
             flow.recreateCells();
-        } else if (p == "PARENT") {
+        } else if (p == "PARENT") { //$NON-NLS-1$
             if (getSkinnable().getParent() != null && getSkinnable().isVisible()) {
                 getSkinnable().requestLayout();
             }
-        } else if (p == "WIDTH_PROPERTY" || p == "HEIGHT_PROPERTY") {
+        } else if (p == "WIDTH_PROPERTY" || p == "HEIGHT_PROPERTY") { //$NON-NLS-1$ //$NON-NLS-2$
             updateRowCount();
         }
     }

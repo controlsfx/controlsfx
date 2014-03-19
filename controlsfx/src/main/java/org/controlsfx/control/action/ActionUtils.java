@@ -371,7 +371,7 @@ public class ActionUtils {
         }
         
         public String toString() { 
-            return "Separator"; 
+            return "Separator";  //$NON-NLS-1$
         };
         
     };    
@@ -527,7 +527,7 @@ public class ActionUtils {
     private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBahavior ) {
         
         if (action == null) {
-            throw new NullPointerException("Action can not be null");
+            throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
         }
         
         // button bind to action properties
@@ -587,7 +587,7 @@ public class ActionUtils {
     private static <T extends MenuItem> T configure(final T btn, final Action action) {
         
         if (action == null) {
-            throw new NullPointerException("Action can not be null");
+            throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
         }
         
         // button bind to action properties

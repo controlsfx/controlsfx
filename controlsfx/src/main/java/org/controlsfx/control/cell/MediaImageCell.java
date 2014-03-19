@@ -48,7 +48,7 @@ public class MediaImageCell extends GridCell<Media> {
 	 * Creates a default MediaGridCell instance.
 	 */
 	public MediaImageCell() {
-		getStyleClass().add("media-grid-cell");
+		getStyleClass().add("media-grid-cell"); //$NON-NLS-1$
 		
 		mediaView = new MediaView();
 		mediaView.setMediaPlayer(mediaPlayer);

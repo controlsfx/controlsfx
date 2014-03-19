@@ -118,7 +118,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 for (int i = 0, max = selectedItems.size(); i < max; i++) {
                     sb.append(selectedItems.get(i));
                     if (i < max - 1) {
-                        sb.append(", ");
+                        sb.append(", "); //$NON-NLS-1$
                     }
                 }
                 setText(sb.toString());

@@ -68,28 +68,28 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
      *************************************************************************/
     private static final List<KeyBinding> RANGESLIDER_BINDINGS = new ArrayList<KeyBinding>();
     static {
-        RANGESLIDER_BINDINGS.add(new KeyBinding(F4, "TraverseDebug").alt().ctrl().shift());
+        RANGESLIDER_BINDINGS.add(new KeyBinding(F4, "TraverseDebug").alt().ctrl().shift()); //$NON-NLS-1$
 
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(LEFT, "DecrementValue"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_LEFT, "DecrementValue"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(UP, "IncrementValue").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_UP, "IncrementValue").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(RIGHT, "IncrementValue"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_RIGHT, "IncrementValue"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(DOWN, "DecrementValue").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_DOWN, "DecrementValue").vertical());
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(LEFT, "DecrementValue")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_LEFT, "DecrementValue")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(UP, "IncrementValue").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_UP, "IncrementValue").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(RIGHT, "IncrementValue")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_RIGHT, "IncrementValue")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(DOWN, "DecrementValue").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_DOWN, "DecrementValue").vertical()); //$NON-NLS-1$
 
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(LEFT, "TraverseLeft").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_LEFT, "TraverseLeft").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(UP, "TraverseUp"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_UP, "TraverseUp"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(RIGHT, "TraverseRight").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_RIGHT, "TraverseRight").vertical());
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(DOWN, "TraverseDown"));
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_DOWN, "TraverseDown"));
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(LEFT, "TraverseLeft").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_LEFT, "TraverseLeft").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(UP, "TraverseUp")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_UP, "TraverseUp")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(RIGHT, "TraverseRight").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_RIGHT, "TraverseRight").vertical()); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(DOWN, "TraverseDown")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_DOWN, "TraverseDown")); //$NON-NLS-1$
 
-        RANGESLIDER_BINDINGS.add(new KeyBinding(HOME, KEY_RELEASED, "Home"));
-        RANGESLIDER_BINDINGS.add(new KeyBinding(END, KEY_RELEASED, "End"));
+        RANGESLIDER_BINDINGS.add(new KeyBinding(HOME, KEY_RELEASED, "Home")); //$NON-NLS-1$
+        RANGESLIDER_BINDINGS.add(new KeyBinding(END, KEY_RELEASED, "End")); //$NON-NLS-1$
     }
     
     public RangeSliderBehavior(RangeSlider slider) {
@@ -97,10 +97,10 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     }
 
     @Override protected void callAction(String s) {
-        if ("Home".equals(s) || "Home2".equals(s)) home();
-        else if ("End".equals(s) || "End2".equals(s)) end();
-        else if ("IncrementValue".equals(s) || "IncrementValue2".equals(s)) incrementValue();
-        else if ("DecrementValue".equals(s) || "DecrementValue2".equals(s)) decrementValue();
+        if ("Home".equals(s) || "Home2".equals(s)) home(); //$NON-NLS-1$ //$NON-NLS-2$
+        else if ("End".equals(s) || "End2".equals(s)) end(); //$NON-NLS-1$ //$NON-NLS-2$
+        else if ("IncrementValue".equals(s) || "IncrementValue2".equals(s)) incrementValue(); //$NON-NLS-1$ //$NON-NLS-2$
+        else if ("DecrementValue".equals(s) || "DecrementValue2".equals(s)) decrementValue(); //$NON-NLS-1$ //$NON-NLS-2$
         else super.callAction(s);
     }
      

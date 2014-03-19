@@ -62,8 +62,8 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<InfoOverlay>> {
 
-    private final ImageView EXPAND_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("expand.png").toExternalForm()));
-    private final ImageView COLLAPSE_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("collapse.png").toExternalForm()));
+    private final ImageView EXPAND_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("expand.png").toExternalForm())); //$NON-NLS-1$
+    private final ImageView COLLAPSE_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("collapse.png").toExternalForm())); //$NON-NLS-1$
     
     private static final Duration TRANSITION_DURATION = new Duration(350.0);
 
@@ -74,7 +74,7 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
 
     // animation support
     private Timeline timeline;
-    private DoubleProperty transition = new SimpleDoubleProperty(this, "transition", 0.0) {
+    private DoubleProperty transition = new SimpleDoubleProperty(this, "transition", 0.0) { //$NON-NLS-1$
         @Override protected void invalidated() {
             getSkinnable().requestLayout();
         }
@@ -99,7 +99,7 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         infoLabel = new Label();
         infoLabel.setWrapText(true);
         infoLabel.setAlignment(Pos.TOP_LEFT);
-        infoLabel.getStyleClass().add("info");
+        infoLabel.getStyleClass().add("info"); //$NON-NLS-1$
         infoLabel.textProperty().bind(control.textProperty());
 
         // button to expand / collapse the info overlay
@@ -113,7 +113,7 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         infoPanel = new HBox(infoLabel, expandCollapseButton);
         infoPanel.setAlignment(Pos.TOP_LEFT);
         infoPanel.setFillHeight(true);
-        infoPanel.getStyleClass().add("info-panel");
+        infoPanel.getStyleClass().add("info-panel"); //$NON-NLS-1$
         infoPanel.setCursor(Cursor.HAND);
         infoPanel.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent e) {
@@ -126,13 +126,13 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         // adding everything to the scenegraph
         getChildren().addAll(content, infoPanel);
         
-        registerChangeListener(control.contentProperty(), "CONTENT");
+        registerChangeListener(control.contentProperty(), "CONTENT"); //$NON-NLS-1$
     }
     
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if ("CONTENT".equals(p)) {
+        if ("CONTENT".equals(p)) { //$NON-NLS-1$
             getChildren().remove(0);
             getChildren().add(0, getSkinnable().getContent());
             getSkinnable().requestLayout();
@@ -185,10 +185,10 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
 
     private void updateToggleButton() {
         if (expandCollapseButton.isSelected()) {
-            expandCollapseButton.getStyleClass().setAll("collapse-button");
+            expandCollapseButton.getStyleClass().setAll("collapse-button"); //$NON-NLS-1$
             expandCollapseButton.setGraphic(COLLAPSE_IMAGE);
         } else {
-            expandCollapseButton.getStyleClass().setAll("expand-button");
+            expandCollapseButton.getStyleClass().setAll("expand-button"); //$NON-NLS-1$
             expandCollapseButton.setGraphic(EXPAND_IMAGE);
         }
     }

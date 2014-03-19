@@ -171,7 +171,7 @@ public class CheckListView<T> extends ListView<T> {
 
     // --- Check Model
     private ObjectProperty<MultipleSelectionModel<T>> checkModel = 
-            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel");
+            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel"); //$NON-NLS-1$
     
     /**
      * Sets the 'check model' to be used in the CheckListView - this is the

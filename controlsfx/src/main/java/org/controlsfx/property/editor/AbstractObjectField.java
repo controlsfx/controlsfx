@@ -21,7 +21,7 @@ import org.controlsfx.control.textfield.CustomTextField;
 abstract class AbstractObjectField<T> extends HBox {
 
     //TODO: Replace with CSS
-    private static final Image image = new Image("/org/controlsfx/control/open-editor.png");
+    private static final Image image = new Image("/org/controlsfx/control/open-editor.png"); //$NON-NLS-1$
 
     private final CustomTextField textField = new CustomTextField();
 
@@ -66,7 +66,7 @@ abstract class AbstractObjectField<T> extends HBox {
     }
 
     protected String objectToString(T object) {
-        return object == null ? "" : object.toString();
+        return object == null ? "" : object.toString(); //$NON-NLS-1$
     }
 
     protected abstract Class<T> getType();

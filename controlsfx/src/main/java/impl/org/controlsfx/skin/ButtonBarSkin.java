@@ -59,13 +59,13 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     //TODO: Make it platform dependent
     private static final double GAP_SIZE = 10; 
     
-    private static final String CATEGORIZED_TYPES = "LRHEYNXBIACO";
+    private static final String CATEGORIZED_TYPES = "LRHEYNXBIACO"; //$NON-NLS-1$
     
     // represented as a ButtonType
-    public static final String BUTTON_TYPE_PROPERTY  = "controlfx.button.type";
+    public static final String BUTTON_TYPE_PROPERTY  = "controlfx.button.type"; //$NON-NLS-1$
     
     // allows to exclude button from uniform resizing
-    public static final String BUTTON_SIZE_INDEPENDENCE = "controlfx.button.size.indepenence";
+    public static final String BUTTON_SIZE_INDEPENDENCE = "controlfx.button.size.indepenence"; //$NON-NLS-1$
     
     
     /**************************************************************************
@@ -106,9 +106,9 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
             }
         });
         
-        registerChangeListener(control.buttonOrderProperty(), "BUTTON_ORDER");
-        registerChangeListener(control.buttonMinWidthProperty(), "BUTTON_MIN_WIDTH");
-        registerChangeListener(control.buttonUniformSizeProperty(), "BUTTON_UNIFORM_SIZE");
+        registerChangeListener(control.buttonOrderProperty(), "BUTTON_ORDER"); //$NON-NLS-1$
+        registerChangeListener(control.buttonMinWidthProperty(), "BUTTON_MIN_WIDTH"); //$NON-NLS-1$
+        registerChangeListener(control.buttonUniformSizeProperty(), "BUTTON_UNIFORM_SIZE"); //$NON-NLS-1$
     }
     
     
@@ -121,12 +121,12 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if ("BUTTON_ORDER".equals(p)) {
+        if ("BUTTON_ORDER".equals(p)) { //$NON-NLS-1$
             layoutButtons();
-        } else if ("BUTTON_MIN_WIDTH".equals(p)) {
+        } else if ("BUTTON_MIN_WIDTH".equals(p)) { //$NON-NLS-1$
 //            layoutButtons();
             resizeButtons();
-        } else if ("BUTTON_UNIFORM_SIZE".equals(p)) {
+        } else if ("BUTTON_UNIFORM_SIZE".equals(p)) { //$NON-NLS-1$
 //            layoutButtons();
             resizeButtons();
         }
@@ -149,7 +149,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         String buttonOrderStr = getSkinnable().getButtonOrder();
         
         if (buttonOrderStr == null || buttonOrderStr.isEmpty()) {
-            throw new IllegalStateException("ButtonBar buttonOrder string can not be null or empty");
+            throw new IllegalStateException("ButtonBar buttonOrder string can not be null or empty"); //$NON-NLS-1$
         }
          
         char[] buttonOrder = buttonOrderStr.toCharArray();
@@ -237,7 +237,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         }
         
         String typeCode = buttonType.getTypeCode();
-        typeCode = typeCode.length() > 0? typeCode.substring(0,1): "";
+        typeCode = typeCode.length() > 0? typeCode.substring(0,1): ""; //$NON-NLS-1$
         return CATEGORIZED_TYPES.contains(typeCode.toUpperCase())? typeCode : ButtonType.OTHER.getTypeCode(); 
     }
     

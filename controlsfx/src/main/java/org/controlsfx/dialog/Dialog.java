@@ -297,7 +297,7 @@ public class Dialog {
         this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, nativeTitleBar);
         
         this.contentPane = new GridPane();
-        this.contentPane.getStyleClass().add("content-pane");
+        this.contentPane.getStyleClass().add("content-pane"); //$NON-NLS-1$
         this.contentPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         
         this.dialog.setContentPane(contentPane);
@@ -491,7 +491,7 @@ public class Dialog {
         }
         
         BorderPane mastheadPanel = new BorderPane();
-        mastheadPanel.getStyleClass().add("masthead-panel");
+        mastheadPanel.getStyleClass().add("masthead-panel"); //$NON-NLS-1$
 
         // on left of masthead is the text
         Label mastheadLabel = new Label(mastheadText);
@@ -524,7 +524,7 @@ public class Dialog {
                     mastheadBorderPane.setRight(null);
                 } else {
                     StackPane pane = new StackPane(graphic);
-                    pane.getStyleClass().add("graphic-container");
+                    pane.getStyleClass().add("graphic-container"); //$NON-NLS-1$
                     mastheadBorderPane.setRight(pane);
                 }
             }
@@ -544,7 +544,7 @@ public class Dialog {
         @Override protected void invalidated() {
             Node contentNode = getContent();
             if (contentNode != null) {
-                contentNode.getStyleClass().addAll("content");
+                contentNode.getStyleClass().addAll("content"); //$NON-NLS-1$
             }
         };
     };
@@ -778,27 +778,27 @@ public class Dialog {
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ),
+        CANCEL( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ), //$NON-NLS-1$
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( Localization.asKey("dlg.close.button"),  ButtonType.CANCEL_CLOSE ),
+        CLOSE ( Localization.asKey("dlg.close.button"),  ButtonType.CANCEL_CLOSE ), //$NON-NLS-1$
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( Localization.asKey("dlg.no.button"),     ButtonType.NO ),
+        NO    ( Localization.asKey("dlg.no.button"),     ButtonType.NO ), //$NON-NLS-1$
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( Localization.asKey("dlg.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING),
+        OK    ( Localization.asKey("dlg.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING), //$NON-NLS-1$
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( Localization.asKey("dlg.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING );
+        YES   ( Localization.asKey("dlg.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ); //$NON-NLS-1$
 
         private final AbstractAction action;
         private final EnumSet<ActionTrait> traits;
@@ -955,7 +955,7 @@ public class Dialog {
         
         final Node content = getContent();
         if (content != null) {
-            content.getStyleClass().add("center");
+            content.getStyleClass().add("center"); //$NON-NLS-1$
             
             contentPane.add(content, hasMasthead ? 0 : 1, startRow);
             GridPane.setVgrow(content, Priority.SOMETIMES);
@@ -983,7 +983,7 @@ public class Dialog {
             final double w = graphic.getLayoutBounds().getWidth();
             final double h = graphic.getLayoutBounds().getHeight();
             graphicPane.setMinSize(w, h);
-            graphicPane.getStyleClass().add("graphic");
+            graphicPane.getStyleClass().add("graphic"); //$NON-NLS-1$
             contentPane.add(graphicPane, 0, startRow);
             GridPane.setValignment(graphicPane, VPos.TOP);
             GridPane.setMargin(graphicPane, new Insets(0,8,0,0));
@@ -991,7 +991,7 @@ public class Dialog {
         
         if (hasExpandableContent()) {
             Node ec = getExpandableContent();
-            ec.getStyleClass().add("expandable-content");
+            ec.getStyleClass().add("expandable-content"); //$NON-NLS-1$
             
             contentPane.add(ec, 0, startRow + 1, 2, 1);
             ec.setVisible(false);
@@ -1040,9 +1040,9 @@ public class Dialog {
     
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
-        detailsButton.getStyleClass().setAll("details-button", "more");
-        final String moreText = Localization.getString("dlg.detail.button.more");
-        final String lessText = Localization.getString("dlg.detail.button.less");
+        detailsButton.getStyleClass().setAll("details-button", "more"); //$NON-NLS-1$ //$NON-NLS-2$
+        final String moreText = Localization.getString("dlg.detail.button.more"); //$NON-NLS-1$
+        final String lessText = Localization.getString("dlg.detail.button.less"); //$NON-NLS-1$
         
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -1051,7 +1051,7 @@ public class Dialog {
                 setResizable(!content.isVisible());
                 content.setVisible(!content.isVisible());
                 detailsButton.setText(content.isVisible() ? lessText : moreText);
-                detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more"));
+                detailsButton.getStyleClass().setAll("details-button", (content.isVisible() ? "less" : "more")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 dialog.sizeToScene();
             }
         });
@@ -1082,7 +1082,7 @@ public class Dialog {
      *                                                                         
      **************************************************************************/
     private static final PseudoClass MASTHEAD_PSEUDO_CLASS = 
-            PseudoClass.getPseudoClass("masthead");
+            PseudoClass.getPseudoClass("masthead"); //$NON-NLS-1$
     private static final PseudoClass NO_MASTHEAD_PSEUDO_CLASS = 
-            PseudoClass.getPseudoClass("no-masthead");
+            PseudoClass.getPseudoClass("no-masthead"); //$NON-NLS-1$
 }

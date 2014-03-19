@@ -183,7 +183,7 @@ public class RangeSlider extends Control {
      * {@inheritDoc}
      */
     @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("rangeslider.css").toExternalForm();
+        return getClass().getResource("rangeslider.css").toExternalForm(); //$NON-NLS-1$
     }
     
     /**
@@ -211,7 +211,7 @@ public class RangeSlider extends Control {
     public final DoubleProperty lowValueProperty() {
         return lowValue;
     }
-    private DoubleProperty lowValue = new SimpleDoubleProperty(this, "lowValue", 0.0D) {
+    private DoubleProperty lowValue = new SimpleDoubleProperty(this, "lowValue", 0.0D) { //$NON-NLS-1$
         @Override protected void invalidated() {
             adjustLowValues();
         }
@@ -243,7 +243,7 @@ public class RangeSlider extends Control {
      */
     public final BooleanProperty lowValueChangingProperty() {
         if (lowValueChanging == null) {
-            lowValueChanging = new SimpleBooleanProperty(this, "lowValueChanging", false);
+            lowValueChanging = new SimpleBooleanProperty(this, "lowValueChanging", false); //$NON-NLS-1$
         }
         return lowValueChanging;
     }
@@ -277,7 +277,7 @@ public class RangeSlider extends Control {
     public final DoubleProperty highValueProperty() {
         return highValue;
     }
-    private DoubleProperty highValue = new SimpleDoubleProperty(this, "highValue", 100D) {
+    private DoubleProperty highValue = new SimpleDoubleProperty(this, "highValue", 100D) { //$NON-NLS-1$
         @Override protected void invalidated() {
             adjustHighValues();
         }
@@ -287,7 +287,7 @@ public class RangeSlider extends Control {
         }
 
         @Override public String getName() {
-            return "highValue";
+            return "highValue"; //$NON-NLS-1$
         }
     };
     
@@ -317,7 +317,7 @@ public class RangeSlider extends Control {
      */
     public final BooleanProperty highValueChangingProperty() {
         if (highValueChanging == null) {
-            highValueChanging = new SimpleBooleanProperty(this, "highValueChanging", false);
+            highValueChanging = new SimpleBooleanProperty(this, "highValueChanging", false); //$NON-NLS-1$
         }
         return highValueChanging;
     }
@@ -460,7 +460,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "max";
+                    return "max"; //$NON-NLS-1$
                 }
             };
         }
@@ -494,7 +494,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "min";
+                    return "min"; //$NON-NLS-1$
                 }
             };
         }
@@ -527,7 +527,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "snapToTicks";
+                    return "snapToTicks"; //$NON-NLS-1$
                 }
             };
         }
@@ -547,7 +547,7 @@ public class RangeSlider extends Control {
     private DoubleProperty majorTickUnit;
     public final void setMajorTickUnit(double value) {
         if (value <= 0) {
-            throw new IllegalArgumentException("MajorTickUnit cannot be less than or equal to 0.");
+            throw new IllegalArgumentException("MajorTickUnit cannot be less than or equal to 0."); //$NON-NLS-1$
         }
         majorTickUnitProperty().set(value);
     }
@@ -561,7 +561,7 @@ public class RangeSlider extends Control {
             majorTickUnit = new StyleableDoubleProperty(25) {
                 @Override public void invalidated() {
                     if (get() <= 0) {
-                        throw new IllegalArgumentException("MajorTickUnit cannot be less than or equal to 0.");
+                        throw new IllegalArgumentException("MajorTickUnit cannot be less than or equal to 0."); //$NON-NLS-1$
                     }
                 }
                 
@@ -574,7 +574,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "majorTickUnit";
+                    return "majorTickUnit"; //$NON-NLS-1$
                 }
             };
         }
@@ -606,7 +606,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "minorTickCount";
+                    return "minorTickCount"; //$NON-NLS-1$
                 }
             };
         }
@@ -639,7 +639,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "blockIncrement";
+                    return "blockIncrement"; //$NON-NLS-1$
                 }
             };
         }
@@ -677,7 +677,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "orientation";
+                    return "orientation"; //$NON-NLS-1$
                 }
             };
         }
@@ -710,7 +710,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "showTickLabels";
+                    return "showTickLabels"; //$NON-NLS-1$
                 }
             };
         }
@@ -740,7 +740,7 @@ public class RangeSlider extends Control {
                 }
 
                 @Override public String getName() {
-                    return "showTickMarks";
+                    return "showTickMarks"; //$NON-NLS-1$
                 }
             };
         }
@@ -803,11 +803,11 @@ public class RangeSlider extends Control {
     *                                                                         *
     **************************************************************************/
     
-    private static final String DEFAULT_STYLE_CLASS = "range-slider";
+    private static final String DEFAULT_STYLE_CLASS = "range-slider"; //$NON-NLS-1$
     
     private static class StyleableProperties {
         private static final CssMetaData<RangeSlider,Number> BLOCK_INCREMENT =
-            new CssMetaData<RangeSlider,Number>("-fx-block-increment",
+            new CssMetaData<RangeSlider,Number>("-fx-block-increment", //$NON-NLS-1$
                 SizeConverter.getInstance(), 10.0) {
 
             @Override public boolean isSettable(RangeSlider n) {
@@ -821,7 +821,7 @@ public class RangeSlider extends Control {
         };
         
         private static final CssMetaData<RangeSlider,Boolean> SHOW_TICK_LABELS =
-            new CssMetaData<RangeSlider,Boolean>("-fx-show-tick-labels",
+            new CssMetaData<RangeSlider,Boolean>("-fx-show-tick-labels", //$NON-NLS-1$
                 BooleanConverter.getInstance(), Boolean.FALSE) {
 
             @Override public boolean isSettable(RangeSlider n) {
@@ -835,7 +835,7 @@ public class RangeSlider extends Control {
         };
                     
         private static final CssMetaData<RangeSlider,Boolean> SHOW_TICK_MARKS =
-            new CssMetaData<RangeSlider,Boolean>("-fx-show-tick-marks",
+            new CssMetaData<RangeSlider,Boolean>("-fx-show-tick-marks", //$NON-NLS-1$
                 BooleanConverter.getInstance(), Boolean.FALSE) {
 
             @Override public boolean isSettable(RangeSlider n) {
@@ -849,7 +849,7 @@ public class RangeSlider extends Control {
         };
             
         private static final CssMetaData<RangeSlider,Boolean> SNAP_TO_TICKS =
-            new CssMetaData<RangeSlider,Boolean>("-fx-snap-to-ticks",
+            new CssMetaData<RangeSlider,Boolean>("-fx-snap-to-ticks", //$NON-NLS-1$
                 BooleanConverter.getInstance(), Boolean.FALSE) {
 
             @Override public boolean isSettable(RangeSlider n) {
@@ -863,7 +863,7 @@ public class RangeSlider extends Control {
         };
         
         private static final CssMetaData<RangeSlider,Number> MAJOR_TICK_UNIT =
-            new CssMetaData<RangeSlider,Number>("-fx-major-tick-unit",
+            new CssMetaData<RangeSlider,Number>("-fx-major-tick-unit", //$NON-NLS-1$
                 SizeConverter.getInstance(), 25.0) {
 
             @Override public boolean isSettable(RangeSlider n) {
@@ -877,7 +877,7 @@ public class RangeSlider extends Control {
         };
         
         private static final CssMetaData<RangeSlider,Number> MINOR_TICK_COUNT =
-            new CssMetaData<RangeSlider,Number>("-fx-minor-tick-count",
+            new CssMetaData<RangeSlider,Number>("-fx-minor-tick-count", //$NON-NLS-1$
                 SizeConverter.getInstance(), 3.0) {
 
             @SuppressWarnings("deprecation")
@@ -896,7 +896,7 @@ public class RangeSlider extends Control {
         };
         
         private static final CssMetaData<RangeSlider,Orientation> ORIENTATION =
-            new CssMetaData<RangeSlider,Orientation>("-fx-orientation",
+            new CssMetaData<RangeSlider,Orientation>("-fx-orientation", //$NON-NLS-1$
                 new EnumConverter<Orientation>(Orientation.class), 
                 Orientation.HORIZONTAL) {
 
@@ -950,7 +950,7 @@ public class RangeSlider extends Control {
     }
 
     private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE =
-            PseudoClass.getPseudoClass("vertical");
+            PseudoClass.getPseudoClass("vertical"); //$NON-NLS-1$
     private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE =
-            PseudoClass.getPseudoClass("horizontal");
+            PseudoClass.getPseudoClass("horizontal"); //$NON-NLS-1$
 }

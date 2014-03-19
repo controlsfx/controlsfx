@@ -79,7 +79,7 @@ public abstract class NotificationBar extends Region {
     }
     
     public String getTitle() {
-        return "";
+        return ""; //$NON-NLS-1$
     }
     
     public boolean isHideCloseButton() {
@@ -99,10 +99,10 @@ public abstract class NotificationBar extends Region {
     
 
     public NotificationBar() {
-        getStyleClass().add("notification-bar");
+        getStyleClass().add("notification-bar"); //$NON-NLS-1$
         
         pane = new GridPane();
-        pane.getStyleClass().add("pane");
+        pane.getStyleClass().add("pane"); //$NON-NLS-1$
         pane.setAlignment(Pos.BASELINE_LEFT);
         pane.setVisible(isShowing());
         getChildren().setAll(pane);
@@ -111,7 +111,7 @@ public abstract class NotificationBar extends Region {
         String titleStr = getTitle();
         if (titleStr != null && ! titleStr.isEmpty()) {
             title = new Label();
-            title.getStyleClass().add("title");
+            title.getStyleClass().add("title"); //$NON-NLS-1$
             title.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             GridPane.setHgrow(title, Priority.ALWAYS);
 
@@ -144,9 +144,9 @@ public abstract class NotificationBar extends Region {
                     hide();
                 }
             });
-            closeBtn.getStyleClass().setAll("close-button");
+            closeBtn.getStyleClass().setAll("close-button"); //$NON-NLS-1$
             StackPane graphic = new StackPane();
-            graphic.getStyleClass().setAll("graphic");
+            graphic.getStyleClass().setAll("graphic"); //$NON-NLS-1$
             closeBtn.setGraphic(graphic);
             closeBtn.setMinSize(17, 17);
             closeBtn.setPrefSize(17, 17);

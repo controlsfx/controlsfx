@@ -44,6 +44,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
     private FetchSuggestionsTask suggestionsTask = null;
     private Callback<ISuggestionRequest, Collection<T>> suggestionProvider = null;
+    private boolean ignoreInputChanges = false;
 
     /***************************************************************************
      *                                                                         *
@@ -71,8 +72,15 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup
                 .SuggestionEvent<T>>() {
             @Override public void handle(SuggestionEvent<T> sce) {
-                completeUserInput(sce.getSuggestion());
-                fireAutoCompletion(sce.getSuggestion());
+                try{
+                    setIgnoreInputChanges(true);
+                    completeUserInput(sce.getSuggestion());
+                    fireAutoCompletion(sce.getSuggestion());
+                    hidePopup();
+                }finally{
+                    // Ensure that ignore is always set back to false
+                    setIgnoreInputChanges(false);
+                }
             }
         });
     }
@@ -89,7 +97,9 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * @param userText
      */
     public final void setUserInput(String userText){
-        onUserInputChanged(userText);
+        if(!isIgnoreInputChanges()){
+            onUserInputChanged(userText);
+        }
     }
 
     /**
@@ -136,8 +146,9 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     }
 
     protected void fireAutoCompletion(T completion){
-        Event.fireEvent(this, new ActionEvent());
+        Event.fireEvent(this, new AutoCompletionEvent<T>(completion));
     }
+
 
     /***************************************************************************
      *                                                                         *
@@ -162,6 +173,25 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
             new Thread(suggestionsTask).start();
         }
     }
+
+    /**
+     * Shall changes to the user input be ignored?
+     * @return
+     */
+    private boolean isIgnoreInputChanges(){
+        return ignoreInputChanges;
+    }
+
+    /**
+     * If IgnoreInputChanges is set to true, all changes to the user input are
+     * ignored. This is primary used to avoid self triggering while
+     * auto completing.
+     * @param state
+     */
+    private void setIgnoreInputChanges(boolean state){
+        ignoreInputChanges = state;
+    }
+
     /***************************************************************************
      *                                                                         *
      * Inner classes and interfaces                                            *
@@ -254,7 +284,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
          */
         @SuppressWarnings("rawtypes")
         public static final EventType<AutoCompletionEvent> AUTO_COMPLETED = 
-        new EventType<AutoCompletionEvent>("AUTO_COMPLETED");
+        new EventType<AutoCompletionEvent>("AUTO_COMPLETED"); //$NON-NLS-1$
 
         private final TE completion;
 
@@ -306,7 +336,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
                 @Override
                 public String getName() {
-                    return "onAutoCompleted";
+                    return "onAutoCompleted"; //$NON-NLS-1$
                 }
             };
         }

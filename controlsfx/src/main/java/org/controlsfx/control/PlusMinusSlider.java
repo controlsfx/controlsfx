@@ -64,13 +64,13 @@ import com.sun.javafx.css.converters.EnumConverter;
  */
 public class PlusMinusSlider extends Control {
 
-	private static final String DEFAULT_STYLE_CLASS = "plus-minus-slider";
+	private static final String DEFAULT_STYLE_CLASS = "plus-minus-slider"; //$NON-NLS-1$
 
 	private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass
-			.getPseudoClass("vertical");
+			.getPseudoClass("vertical"); //$NON-NLS-1$
 
 	private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE = PseudoClass
-			.getPseudoClass("horizontal");
+			.getPseudoClass("horizontal"); //$NON-NLS-1$
 
 	/**
 	 * Constructs a new adjuster control with a default horizontal orientation.
@@ -88,11 +88,11 @@ public class PlusMinusSlider extends Control {
 		getProperties().addListener(new MapChangeListener<Object, Object>() {
 			public void onChanged(
 					MapChangeListener.Change<? extends Object, ? extends Object> change) {
-				if (change.getKey().equals("plusminusslidervalue")) {
+				if (change.getKey().equals("plusminusslidervalue")) { //$NON-NLS-1$
 					if (change.getValueAdded() != null) {
 						Double valueAdded = (Double) change.getValueAdded();
 						value.set(valueAdded);
-						change.getMap().remove("plusminusslidervalue");
+						change.getMap().remove("plusminusslidervalue"); //$NON-NLS-1$
 					}
 				}
 			};
@@ -101,7 +101,7 @@ public class PlusMinusSlider extends Control {
 
 	@Override
 	protected String getUserAgentStylesheet() {
-		return PlusMinusSlider.class.getResource("plusminusslider.css")
+		return PlusMinusSlider.class.getResource("plusminusslider.css") //$NON-NLS-1$
 				.toExternalForm();
 	}
 
@@ -111,7 +111,7 @@ public class PlusMinusSlider extends Control {
 	}
 
 	private ReadOnlyDoubleWrapper value = new ReadOnlyDoubleWrapper(this,
-			"value", 0);
+			"value", 0); //$NON-NLS-1$
 
 	/**
 	 * Returns the value property of the adjuster. The value is always between
@@ -190,7 +190,7 @@ public class PlusMinusSlider extends Control {
 
 				@Override
 				public String getName() {
-					return "orientation";
+					return "orientation"; //$NON-NLS-1$
 				}
 			};
 		}
@@ -246,14 +246,14 @@ public class PlusMinusSlider extends Control {
 
 		@Override
 		public String getName() {
-			return "onValueChanged";
+			return "onValueChanged"; //$NON-NLS-1$
 		}
 	};
 
 	private static class StyleableProperties {
 
 		private static final CssMetaData<PlusMinusSlider, Orientation> ORIENTATION = new CssMetaData<PlusMinusSlider, Orientation>(
-				"-fx-orientation", new EnumConverter<Orientation>(
+				"-fx-orientation", new EnumConverter<Orientation>( //$NON-NLS-1$
 						Orientation.class), Orientation.VERTICAL) {
 
 			@Override
@@ -303,14 +303,14 @@ public class PlusMinusSlider extends Control {
 		private static final long serialVersionUID = 2881004583512990781L;
 
 		public static final EventType<PlusMinusEvent> ANY = new EventType<>(
-				InputEvent.ANY, "ANY");
+				InputEvent.ANY, "ANY"); //$NON-NLS-1$
 
 		/**
 		 * An event type used when the value property (
 		 * {@link PlusMinusSlider#valueProperty()}) changes.
 		 */
 		public static final EventType<PlusMinusEvent> VALUE_CHANGED = new EventType<>(
-				PlusMinusEvent.ANY, "VALUE_CHANGED");
+				PlusMinusEvent.ANY, "VALUE_CHANGED"); //$NON-NLS-1$
 
 		private double value;
 

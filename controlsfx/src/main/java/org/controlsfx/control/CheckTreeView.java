@@ -145,7 +145,7 @@ public class CheckTreeView<T> extends TreeView<T> {
 
     // --- Check Model
     private ObjectProperty<MultipleSelectionModel<TreeItem<T>>> checkModel = 
-            new SimpleObjectProperty<>(this, "checkModel");
+            new SimpleObjectProperty<>(this, "checkModel"); //$NON-NLS-1$
     
     /**
      * Sets the 'check model' to be used in the CheckTreeView - this is the

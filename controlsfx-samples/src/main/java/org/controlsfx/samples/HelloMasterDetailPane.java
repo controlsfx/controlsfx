@@ -44,7 +44,7 @@ public class HelloMasterDetailPane extends ControlsFXSample {
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE
-                + "org/controlsfx/control/MasterDetailsPane.html";
+                + "org/controlsfx/control/MasterDetailPane.html";
     }
 
     private MasterDetailPane masterDetailPane;

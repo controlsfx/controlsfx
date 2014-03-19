@@ -300,7 +300,7 @@ public abstract class SpreadsheetCellType<T> {
 
                 @Override
                 public String toString(Object arg0) {
-                    return arg0 == null ? "" : arg0.toString();
+                    return arg0 == null ? "" : arg0.toString(); //$NON-NLS-1$
                 }
             });
         }
@@ -311,7 +311,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString() {
-            return "object";
+            return "object"; //$NON-NLS-1$
         }
 
         @Override
@@ -364,7 +364,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString() {
-            return "string";
+            return "string"; //$NON-NLS-1$
         }
 
         @Override
@@ -388,7 +388,7 @@ public abstract class SpreadsheetCellType<T> {
         @Override
         public String convertValue(Object value) {
             String convertedValue = converter.fromString(value == null ? null : value.toString());
-            if (convertedValue == null || convertedValue.equals("")) {
+            if (convertedValue == null || convertedValue.equals("")) { //$NON-NLS-1$
                 return null;
             }
             return convertedValue;
@@ -416,12 +416,12 @@ public abstract class SpreadsheetCellType<T> {
             this(new StringConverterWithFormat<Double>(new DoubleStringConverter()) {
                 @Override
                 public String toString(Double item) {
-                    return toStringFormat(item, "");
+                    return toStringFormat(item, ""); //$NON-NLS-1$
                 }
 
                 @Override
                 public Double fromString(String str) {
-                    if (str == null || str.isEmpty() || "NaN".equals(str)) {
+                    if (str == null || str.isEmpty() || "NaN".equals(str)) { //$NON-NLS-1$
                         return Double.NaN;
                     } else {
                         return myConverter.fromString(str);
@@ -432,7 +432,7 @@ public abstract class SpreadsheetCellType<T> {
                 public String toStringFormat(Double item, String format) {
                     try {
                         if (item == null || Double.isNaN(item)) {
-                            return "";
+                            return ""; //$NON-NLS-1$
                         } else {
                             return new DecimalFormat(format).format(item);
                         }
@@ -449,7 +449,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString() {
-            return "double";
+            return "double"; //$NON-NLS-1$
         }
 
         @Override
@@ -518,7 +518,7 @@ public abstract class SpreadsheetCellType<T> {
                 @Override
                 public String toString(Integer item) {
                     if (item == null || Double.isNaN(item)) {
-                        return "";
+                        return ""; //$NON-NLS-1$
                     } else {
                         return super.toString(item);
                     }
@@ -526,7 +526,7 @@ public abstract class SpreadsheetCellType<T> {
 
                 @Override
                 public Integer fromString(String str) {
-                    if (str == null || str.isEmpty() || "NaN".equals(str)) {
+                    if (str == null || str.isEmpty() || "NaN".equals(str)) { //$NON-NLS-1$
                         return null;
                     } else {
                         // We try to integrate Double if possible by truncating
@@ -548,7 +548,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString() {
-            return "Integer";
+            return "Integer"; //$NON-NLS-1$
         }
 
         @Override
@@ -631,7 +631,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString() {
-            return "list";
+            return "list"; //$NON-NLS-1$
         }
 
         @Override
@@ -689,7 +689,7 @@ public abstract class SpreadsheetCellType<T> {
             this(new StringConverterWithFormat<LocalDate>() {
                 @Override
                 public String toString(LocalDate item) {
-                    return toStringFormat(item, "");
+                    return toStringFormat(item, ""); //$NON-NLS-1$
                 }
 
                 @Override
@@ -703,12 +703,12 @@ public abstract class SpreadsheetCellType<T> {
 
                 @Override
                 public String toStringFormat(LocalDate item, String format) {
-                    if (("").equals(format)) {
+                    if (("").equals(format)) { //$NON-NLS-1$
                         return item.toString();
                     } else if (item != null) {
                         return item.format(DateTimeFormatter.ofPattern(format));
                     } else {
-                        return "";
+                        return ""; //$NON-NLS-1$
                     }
                 }
             });
@@ -720,7 +720,7 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public String toString() {
-            return "date";
+            return "date"; //$NON-NLS-1$
         }
 
         @Override

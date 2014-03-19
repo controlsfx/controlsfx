@@ -226,7 +226,7 @@ public class PropertySheet extends Control {
      * {@inheritDoc}
      */
     @Override protected String getUserAgentStylesheet() {
-        return PropertySheet.class.getResource("propertysheet.css").toExternalForm();
+        return PropertySheet.class.getResource("propertysheet.css").toExternalForm(); //$NON-NLS-1$
     }
     
     
@@ -239,7 +239,7 @@ public class PropertySheet extends Control {
     
     // --- modeProperty 
     private final SimpleObjectProperty<Mode> modeProperty = 
-            new SimpleObjectProperty<>(this, "mode", Mode.NAME);
+            new SimpleObjectProperty<>(this, "mode", Mode.NAME); //$NON-NLS-1$
     
     /**
      * A property used to represent how the properties should be laid out in
@@ -263,7 +263,7 @@ public class PropertySheet extends Control {
 
     // --- propertyEditorFactory
     private final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory = 
-            new SimpleObjectProperty<Callback<Item, PropertyEditor<?>>>(this, "propertyEditor", new DefaultPropertyEditorFactory());
+            new SimpleObjectProperty<Callback<Item, PropertyEditor<?>>>(this, "propertyEditor", new DefaultPropertyEditorFactory()); //$NON-NLS-1$
     
     /**
      * The property editor factory is used by the PropertySheet to determine which
@@ -289,7 +289,7 @@ public class PropertySheet extends Control {
     
     // --- modeSwitcherVisible
     private final SimpleBooleanProperty modeSwitcherVisible = 
-            new SimpleBooleanProperty(this, "modeSwitcherVisible", true);
+            new SimpleBooleanProperty(this, "modeSwitcherVisible", true); //$NON-NLS-1$
     
     /**
      * This property represents whether a visual option should be presented to
@@ -313,7 +313,7 @@ public class PropertySheet extends Control {
     
     // --- toolbarSearchVisibleProperty
     private final SimpleBooleanProperty searchBoxVisible = 
-            new SimpleBooleanProperty(this, "searchBoxVisible", true);
+            new SimpleBooleanProperty(this, "searchBoxVisible", true); //$NON-NLS-1$
     
     /**
      * This property represents whether a text field should be presented to
@@ -338,7 +338,7 @@ public class PropertySheet extends Control {
      
     // --- titleFilterProperty
     private final SimpleStringProperty titleFilterProperty = 
-            new SimpleStringProperty(this, "titleFilter", "");
+            new SimpleStringProperty(this, "titleFilter", ""); //$NON-NLS-1$ //$NON-NLS-2$
     
     /**
      * Regardless of whether the {@link #searchBoxVisibleProperty() search box}
@@ -368,6 +368,6 @@ public class PropertySheet extends Control {
      *                                                                         *
      **************************************************************************/
 
-    private static final String DEFAULT_STYLE_CLASS = "property-sheet";
+    private static final String DEFAULT_STYLE_CLASS = "property-sheet"; //$NON-NLS-1$
     
 }

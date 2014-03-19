@@ -55,7 +55,7 @@ public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				getSkinnable().getProperties().put("plusminusslidervalue",
+				getSkinnable().getProperties().put("plusminusslidervalue", //$NON-NLS-1$
 						newValue.doubleValue());
 			}
 		});
@@ -87,10 +87,10 @@ public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
 		});
 
 		plusRegion = new Region();
-		plusRegion.getStyleClass().add("adjust-plus");
+		plusRegion.getStyleClass().add("adjust-plus"); //$NON-NLS-1$
 
 		minusRegion = new Region();
-		minusRegion.getStyleClass().add("adjust-minus");
+		minusRegion.getStyleClass().add("adjust-minus"); //$NON-NLS-1$
 
 		borderPane = new BorderPane();
 

@@ -29,7 +29,6 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.NotificationPaneSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,7 +37,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -155,31 +153,31 @@ public class NotificationPane extends Control {
      * 
      **************************************************************************/
     
-    public static final String STYLE_CLASS_DARK = "dark";
+    public static final String STYLE_CLASS_DARK = "dark"; //$NON-NLS-1$
     
     /**
      * Called when the NotificationPane <b>will</b> be shown.
      */
     public static final EventType<Event> ON_SHOWING =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWING");
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWING"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane shows.
      */
     public static final EventType<Event> ON_SHOWN =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWN");
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWN"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane <b>will</b> be hidden.
      */
     public static final EventType<Event> ON_HIDING =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDING");
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDING"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane is hidden.
      */
     public static final EventType<Event> ON_HIDDEN =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDDEN");
+            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDDEN"); //$NON-NLS-1$
     
     
     
@@ -232,7 +230,7 @@ public class NotificationPane extends Control {
     
     /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
-        return NotificationPane.class.getResource("notificationpane.css").toExternalForm();
+        return NotificationPane.class.getResource("notificationpane.css").toExternalForm(); //$NON-NLS-1$
     }
     
     
@@ -244,7 +242,7 @@ public class NotificationPane extends Control {
      **************************************************************************/
     
     // --- content
-    private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this, "content");
+    private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this, "content"); //$NON-NLS-1$
     
     /**
      * The content property represents what is shown in the scene 
@@ -269,7 +267,7 @@ public class NotificationPane extends Control {
     
     
     // --- text
-    private StringProperty text = new SimpleStringProperty(this, "text");
+    private StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
     
     /**
      * The text property represents the text to show within the popup 
@@ -290,7 +288,7 @@ public class NotificationPane extends Control {
     
     
     // --- graphic
-    private ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>(this, "graphic");
+    private ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>(this, "graphic"); //$NON-NLS-1$
     
     /**
      * The graphic property represents the {@link Node} to show within the popup 
@@ -313,7 +311,7 @@ public class NotificationPane extends Control {
     
     
     // --- showing
-    private ReadOnlyBooleanWrapper showing = new ReadOnlyBooleanWrapper(this, "showing");
+    private ReadOnlyBooleanWrapper showing = new ReadOnlyBooleanWrapper(this, "showing"); //$NON-NLS-1$
     
     /**
      * A read-only property that represents whether the notification bar popup
@@ -334,7 +332,7 @@ public class NotificationPane extends Control {
     
     
     // --- show from top
-    private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true) {
+    private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true) { //$NON-NLS-1$
         protected void invalidated() {
 //            pseudoClassStateChanged(SHOW_FROM_TOP_PSEUDOCLASS_STATE,      isShowFromTop());
 //            pseudoClassStateChanged(SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE, ! isShowFromTop());
@@ -368,7 +366,7 @@ public class NotificationPane extends Control {
      */
     public final void setOnShowing(EventHandler<Event> value) { onShowingProperty().set(value); }
     public final EventHandler<Event> getOnShowing() { return onShowingProperty().get(); }
-    private ObjectProperty<EventHandler<Event>> onShowing = new SimpleObjectProperty<EventHandler<Event>>(this, "onShowing") {
+    private ObjectProperty<EventHandler<Event>> onShowing = new SimpleObjectProperty<EventHandler<Event>>(this, "onShowing") { //$NON-NLS-1$
         @Override protected void invalidated() {
             setEventHandler(ON_SHOWING, get());
          }
@@ -382,7 +380,7 @@ public class NotificationPane extends Control {
      */
     public final void setOnShown(EventHandler<Event> value) { onShownProperty().set(value); }
     public final EventHandler<Event> getOnShown() { return onShownProperty().get(); }
-    private ObjectProperty<EventHandler<Event>> onShown = new SimpleObjectProperty<EventHandler<Event>>(this, "onShown") {
+    private ObjectProperty<EventHandler<Event>> onShown = new SimpleObjectProperty<EventHandler<Event>>(this, "onShown") { //$NON-NLS-1$
         @Override protected void invalidated() {
             setEventHandler(ON_SHOWN, get());
         }
@@ -396,7 +394,7 @@ public class NotificationPane extends Control {
      */
     public final void setOnHiding(EventHandler<Event> value) { onHidingProperty().set(value); }
     public final EventHandler<Event> getOnHiding() { return onHidingProperty().get(); }
-    private ObjectProperty<EventHandler<Event>> onHiding = new SimpleObjectProperty<EventHandler<Event>>(this, "onHiding") {
+    private ObjectProperty<EventHandler<Event>> onHiding = new SimpleObjectProperty<EventHandler<Event>>(this, "onHiding") { //$NON-NLS-1$
         @Override protected void invalidated() {
             setEventHandler(ON_HIDING, get());
         }
@@ -410,7 +408,7 @@ public class NotificationPane extends Control {
      */
     public final void setOnHidden(EventHandler<Event> value) { onHiddenProperty().set(value); }
     public final EventHandler<Event> getOnHidden() { return onHiddenProperty().get(); }
-    private ObjectProperty<EventHandler<Event>> onHidden = new SimpleObjectProperty<EventHandler<Event>>(this, "onHidden") {
+    private ObjectProperty<EventHandler<Event>> onHidden = new SimpleObjectProperty<EventHandler<Event>>(this, "onHidden") { //$NON-NLS-1$
         @Override protected void invalidated() {
             setEventHandler(ON_HIDDEN, get());
         }
@@ -530,8 +528,8 @@ public class NotificationPane extends Control {
      **************************************************************************/
     
     private void updateStyleClasses() {
-        getStyleClass().removeAll("top", "bottom");
-        getStyleClass().add(isShowFromTop() ? "top" : "bottom");
+        getStyleClass().removeAll("top", "bottom"); //$NON-NLS-1$ //$NON-NLS-2$
+        getStyleClass().add(isShowFromTop() ? "top" : "bottom"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     private void hideAndThen(final Runnable r) {
@@ -557,7 +555,7 @@ public class NotificationPane extends Control {
      *                                                                         *
      **************************************************************************/
      
-     private static final String DEFAULT_STYLE_CLASS = "notification-pane";
+     private static final String DEFAULT_STYLE_CLASS = "notification-pane"; //$NON-NLS-1$
      
 //     private static final PseudoClass SHOW_FROM_TOP_PSEUDOCLASS_STATE =
 //             PseudoClass.getPseudoClass("top");

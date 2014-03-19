@@ -57,7 +57,7 @@ public class GridCell<T> extends IndexedCell<T> {
      * Creates a default GridCell instance.
      */
 	public GridCell() {
-		getStyleClass().add("grid-cell");
+		getStyleClass().add("grid-cell"); //$NON-NLS-1$
 		
 //		itemProperty().addListener(new ChangeListener<T>() {
 //            @Override public void changed(ObservableValue<? extends T> arg0, T oldItem, T newItem) {
@@ -104,7 +104,7 @@ public class GridCell<T> extends IndexedCell<T> {
         return gridView;
     }
     private final SimpleObjectProperty<GridView<T>> gridView = 
-            new SimpleObjectProperty<>(this, "gridView");
+            new SimpleObjectProperty<>(this, "gridView"); //$NON-NLS-1$
     
     /**
      * Sets the {@link GridView} that this GridCell exists within.

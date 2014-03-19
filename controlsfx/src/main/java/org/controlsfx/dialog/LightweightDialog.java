@@ -91,7 +91,7 @@ class LightweightDialog extends FXDialog {
         } else if (_owner instanceof Node) {
             owner = getFirstParent((Node)_owner);
         } else {
-            throw new IllegalArgumentException("Unknown owner: " + _owner.getClass());
+            throw new IllegalArgumentException("Unknown owner: " + _owner.getClass()); //$NON-NLS-1$
         }
         
         if (scene == null && owner != null) {
@@ -101,7 +101,7 @@ class LightweightDialog extends FXDialog {
         
         // *** The rest is for adding window decorations ***
         init(title, true);
-        lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome");
+        lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
         
         // add window dragging
         toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -202,7 +202,7 @@ class LightweightDialog extends FXDialog {
     
     @Override public StringProperty titleProperty() {
         if (title == null) {
-            title = new SimpleStringProperty(this, "title");
+            title = new SimpleStringProperty(this, "title"); //$NON-NLS-1$
         }
         return title;
     }
@@ -238,7 +238,7 @@ class LightweightDialog extends FXDialog {
 
     @Override BooleanProperty resizableProperty() {
         if (resizable == null) {
-            resizable = new SimpleBooleanProperty(this, "resizable", false);
+            resizable = new SimpleBooleanProperty(this, "resizable", false); //$NON-NLS-1$
         }
         return resizable;
     }
@@ -261,7 +261,7 @@ class LightweightDialog extends FXDialog {
     
     @Override BooleanProperty focusedProperty() {
         if (focused == null) {
-            focused = new SimpleBooleanProperty(this, "focused", true);
+            focused = new SimpleBooleanProperty(this, "focused", true); //$NON-NLS-1$
         }
         return focused;
     }
@@ -312,7 +312,7 @@ class LightweightDialog extends FXDialog {
         
         // reset the scene root
         dialogStack.getChildren().remove(originalParent);
-        originalParent.getStyleClass().remove("root");
+        originalParent.getStyleClass().remove("root"); //$NON-NLS-1$
         
         scene.setRoot(originalParent);
     }
@@ -435,12 +435,12 @@ class LightweightDialog extends FXDialog {
             dialogStack.getProperties().putAll(parent.getProperties());
         }
         
-        opaqueLayer = new Region();
-        dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
-        
-        
         if (effect == null) {
-            opaqueLayer.getStyleClass().add("lightweight-dialog-background");    
+            // opaque layer
+            opaqueLayer = new Region();
+            opaqueLayer.getStyleClass().add("lightweight-dialog-background"); //$NON-NLS-1$
+            
+            dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
         } else {
             if (parent != null) {
                 tempEffect = parent.getEffect();
@@ -487,7 +487,7 @@ class LightweightDialog extends FXDialog {
         ObservableList<Node> children = null;
         
         try {
-            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren");
+            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
             
             if (getChildrenMethod != null) {
                 if (! getChildrenMethod.isAccessible()) {

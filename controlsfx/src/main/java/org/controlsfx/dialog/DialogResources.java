@@ -29,7 +29,6 @@ package org.controlsfx.dialog;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -46,34 +45,34 @@ class DialogResources {
     }
 
     static void reset() {
-        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialog.resources.oxygen.dialog-resources");
+        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialog.resources.oxygen.dialog-resources"); //$NON-NLS-1$
     }
 
 
     /**
      * Method to get an internationalized string from the deployment resource.
      */
-    static String getMessage(String key) {
-        try {
-            return rbFX.getString(key);
-        } catch (MissingResourceException ex) {
-            // Do not trace this exception, because the key could be
-            // an already translated string.
-            System.out.println("Failed to get string for key '" + key + "'");
-            return key;
-        }
-    }
+//    static String getMessage(String key) {
+//        try {
+//            return rbFX.getString(key);
+//        } catch (MissingResourceException ex) {
+//            // Do not trace this exception, because the key could be
+//            // an already translated string.
+//            System.out.println("Failed to get string for key '" + key + "'");
+//            return key;
+//        }
+//    }
 
     /**
      * Returns a string from the resources
      */
-    static String getString(String key) {
+    private static String getString(String key) {
         try {
             return rbFX.getString(key);
         } catch (MissingResourceException mre) {
             // Do not trace this exception, because the key could be
             // an already translated string.
-            System.out.println("Failed to get string for key '" + key + "'");
+            System.out.println("Failed to get string for key '" + key + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             return key;
         }
     }
@@ -81,9 +80,9 @@ class DialogResources {
     /**
      * Returns a string from a resource, substituting argument 1
      */
-    static String getString(String key, Object... args) {
-        return MessageFormat.format(getString(key), args);
-    }
+//    static String getString(String key, Object... args) {
+//        return MessageFormat.format(getString(key), args);
+//    }
 
 
     /**
@@ -107,9 +106,9 @@ class DialogResources {
         String resourceName = getString(key);
         URL url = DialogResources.class.getResource(resourceName);
         if (url == null) {
-            System.out.println("Can't create ImageView for key '" + key + 
-                    "', which has resource name '" + resourceName + 
-                    "' and URL 'null'");
+            System.out.println("Can't create ImageView for key '" + key +  //$NON-NLS-1$
+                    "', which has resource name '" + resourceName +  //$NON-NLS-1$
+                    "' and URL 'null'"); //$NON-NLS-1$
             return null;
         }
         return getImage(url);

@@ -143,17 +143,17 @@ public final class ButtonBar extends Control {
     /**
      * The default button ordering on Windows.
      */
-    public static final String BUTTON_ORDER_WINDOWS = "L_E+U+FBI_YNOCAH_R";
+    public static final String BUTTON_ORDER_WINDOWS = "L_E+U+FBI_YNOCAH_R"; //$NON-NLS-1$
     
     /**
      * The default button ordering on Mac OS.
      */
-    public static final String BUTTON_ORDER_MAC_OS  = "L_HE+U+FBI_NCYOA_R";
+    public static final String BUTTON_ORDER_MAC_OS  = "L_HE+U+FBI_NCYOA_R"; //$NON-NLS-1$
     
     /**
      * The default button ordering on Linux (specifically, GNOME).
      */
-    public static final String BUTTON_ORDER_LINUX   = "L_HE+UNYACBXIO_R";
+    public static final String BUTTON_ORDER_LINUX   = "L_HE+UNYACBXIO_R"; //$NON-NLS-1$
     
     
     
@@ -177,91 +177,91 @@ public final class ButtonBar extends Control {
          * 
          * <p><strong>Button order code:</strong> L
          */
-        LEFT("L"),
+        LEFT("L"), //$NON-NLS-1$
         
         /**
          * Buttons with this style tag will statically end up on the right end of the bar.
          * 
          * <p><strong>Button order code:</strong> R 
          */
-        RIGHT("R"),
+        RIGHT("R"), //$NON-NLS-1$
         
         /**
          * A tag for the "help" button that normally is supposed to be on the right.
          * 
          * <p><strong>Button order code:</strong> H
          */
-        HELP("H"),
+        HELP("H"), //$NON-NLS-1$
         
         /**
          * A tag for the "help2" button that normally is supposed to be on the left.
          * 
          * <p><strong>Button order code:</strong> E
          */
-        HELP_2("E"),
+        HELP_2("E"), //$NON-NLS-1$
         
         /**
          * A tag for the "yes" button.
          * 
          * <p><strong>Button order code:</strong> Y
          */
-        YES("Y"),
+        YES("Y"), //$NON-NLS-1$
         
         /**
          * A tag for the "no" button.
          * 
          * <p><strong>Button order code:</strong> N
          */
-        NO("N"),
+        NO("N"), //$NON-NLS-1$
         
         /**
          * A tag for the "next" or "forward" button.
          * 
          * <p><strong>Button order code:</strong> X
          */
-        NEXT_FORWARD("X"),
+        NEXT_FORWARD("X"), //$NON-NLS-1$
         
         /**
          * A tag for the "back" or "previous" button.
          * 
          * <p><strong>Button order code:</strong> B
          */
-        BACK_PREVIOUS("B"),
+        BACK_PREVIOUS("B"), //$NON-NLS-1$
         
         /**
          * A tag for the "finish".
          * 
          * <p><strong>Button order code:</strong> I
          */
-        FINISH("I"),
+        FINISH("I"), //$NON-NLS-1$
         
         /**
          * A tag for the "apply" button.
          * 
          * <p><strong>Button order code:</strong> A
          */
-        APPLY("A"),
+        APPLY("A"), //$NON-NLS-1$
         
         /**
          * A tag for the "cancel" or "close" button.
          * 
          * <p><strong>Button order code:</strong> C
          */
-        CANCEL_CLOSE("C"),
+        CANCEL_CLOSE("C"), //$NON-NLS-1$
         
         /**
          * A tag for the "ok" or "done" button.
          * 
          * <p><strong>Button order code:</strong> O
          */
-        OK_DONE("O"),
+        OK_DONE("O"), //$NON-NLS-1$
         
         /**
          * All Uncategorized, Other, or "Unknown" buttons. Tag will be "other".
          * 
          * <p><strong>Button order code:</strong> U
          */
-        OTHER("U"),
+        OTHER("U"), //$NON-NLS-1$
 
         
         /**
@@ -270,14 +270,14 @@ public final class ButtonBar extends Control {
          * 
          * <p><strong>Button order code:</strong> +
          */
-        BIG_GAP("+"),
+        BIG_GAP("+"), //$NON-NLS-1$
         
         /**
          * An "unrelated" gap. (Platform dependent)
          * 
          * <p><strong>Button order code:</strong> _ (underscore)
          */
-        SMALL_GAP("_");
+        SMALL_GAP("_"); //$NON-NLS-1$
         
         private final String typeCode;
         private ButtonType(String type) {
@@ -363,7 +363,7 @@ public final class ButtonBar extends Control {
      * @param buttonOrder The button order to use in this button bar instance.
      */
     public ButtonBar(final String buttonOrder) {
-        getStyleClass().add("button-bar");
+        getStyleClass().add("button-bar"); //$NON-NLS-1$
         
         final boolean buttonOrderEmpty = buttonOrder == null || buttonOrder.isEmpty();
         
@@ -524,7 +524,7 @@ public final class ButtonBar extends Control {
         return buttonOrderProperty;
     }
     private final StringProperty buttonOrderProperty = 
-            new SimpleStringProperty(this, "buttonOrder");
+            new SimpleStringProperty(this, "buttonOrder"); //$NON-NLS-1$
     
     /**
      * Sets the {@link #buttonOrderProperty() button order}
@@ -552,7 +552,7 @@ public final class ButtonBar extends Control {
         return buttonMinWidthProperty;
     }
     private final DoubleProperty buttonMinWidthProperty =
-            new SimpleDoubleProperty(this, "buttonMinWidthProperty");
+            new SimpleDoubleProperty(this, "buttonMinWidthProperty"); //$NON-NLS-1$
     
     /**
      * Sets the minimum width of all buttons placed in this button bar.
@@ -577,7 +577,7 @@ public final class ButtonBar extends Control {
     public final BooleanProperty buttonUniformSizeProperty() {
         return buttonUniformSizeProperty;
     }
-    private final BooleanProperty buttonUniformSizeProperty = new SimpleBooleanProperty(this, "buttonUniformSize", true);
+    private final BooleanProperty buttonUniformSizeProperty = new SimpleBooleanProperty(this, "buttonUniformSize", true); //$NON-NLS-1$
     
     /**
      * Sets all buttons to be uniform size

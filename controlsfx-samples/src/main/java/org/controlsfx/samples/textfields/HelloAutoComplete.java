@@ -59,7 +59,7 @@ public class HelloAutoComplete extends ControlsFXSample {
     }
 
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/textfield/AutoComplete.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/textfield/TextFields.html";
     }
 
     @Override public String getSampleDescription() {

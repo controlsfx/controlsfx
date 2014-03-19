@@ -77,7 +77,7 @@ class NumericField extends TextField {
     	private NumericField field;
     	
     	public DoubleValidator(NumericField field) {
-    		super(field, "value", 0.0);
+    		super(field, "value", 0.0); //$NON-NLS-1$
     		this.field = field;
 		}
     	
@@ -89,8 +89,8 @@ class NumericField extends TextField {
 		public Double toNumber(String s) {
 			if ( s == null || s.trim().isEmpty() ) return 0d;
 	    	String d = s.trim();
-	    	if ( d.endsWith("f") || d.endsWith("d") || d.endsWith("F") || d.endsWith("D") ) {
-	    		throw new NumberFormatException("There should be no alpha symbols");
+	    	if ( d.endsWith("f") || d.endsWith("d") || d.endsWith("F") || d.endsWith("D") ) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	    		throw new NumberFormatException("There should be no alpha symbols"); //$NON-NLS-1$
 	    	}
 	    	return new Double(d);
 		};
@@ -103,7 +103,7 @@ class NumericField extends TextField {
     	private NumericField field;
     	
     	public LongValidator(NumericField field) {
-    		super(field, "value", 0l);
+    		super(field, "value", 0l); //$NON-NLS-1$
     		this.field = field;
 		}
     	

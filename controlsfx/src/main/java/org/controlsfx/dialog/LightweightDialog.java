@@ -435,12 +435,12 @@ class LightweightDialog extends FXDialog {
             dialogStack.getProperties().putAll(parent.getProperties());
         }
         
+        // always add opaque layer, to block input events to parent scene
+        opaqueLayer = new Region();
+        dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
+        
         if (effect == null) {
-            // opaque layer
-            opaqueLayer = new Region();
             opaqueLayer.getStyleClass().add("lightweight-dialog-background"); //$NON-NLS-1$
-            
-            dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
         } else {
             if (parent != null) {
                 tempEffect = parent.getEffect();

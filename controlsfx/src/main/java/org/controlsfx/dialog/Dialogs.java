@@ -902,9 +902,9 @@ public final class Dialogs {
     
     public Optional<UserInfo> showLogin( final UserInfo userInfo, final Callback<UserInfo, Void> authenticator ) {
     	
-    	final TextField txUserName     = new TextField();
-    	final PasswordField txPassword = new PasswordField();
-    	final Label lbMessage          = new Label(""); 
+    	TextField txUserName     = new TextField();
+		PasswordField txPassword = new PasswordField();
+		Label lbMessage          = new Label(""); 
 		lbMessage.setStyle("-fx-text-fill: red;");
 		
 		lbMessage.setVisible(false);
@@ -921,7 +921,7 @@ public final class Dialogs {
 //		NotificationPane notificationPane = new NotificationPane(content);
 //		notificationPane.setShowFromTop(true);
 		
-		final Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
 
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
@@ -976,7 +976,7 @@ public final class Dialogs {
 		txUserName.setText( userInfo.getUserName());
 		txPassword.setText(new String(userInfo.getPassword()));
 
-		//Platform.runLater( () -> txUserName.requestFocus() );
+		Platform.runLater( () -> txUserName.requestFocus() );
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
@@ -998,7 +998,6 @@ public final class Dialogs {
         Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
-        
         Image image = dlgType.getImage();
         if (image != null) {
             dlg.setGraphic(new ImageView(image));

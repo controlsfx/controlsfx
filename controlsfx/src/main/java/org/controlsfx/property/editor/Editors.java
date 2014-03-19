@@ -45,7 +45,7 @@ public class Editors {
     }
     
     @SuppressWarnings("unchecked")
-    public static final PropertyEditor<?> createNumericEditor( final Item property ) {
+    public static final PropertyEditor<?> createNumericEditor( Item property ) {
 
     	return new AbstractPropertyEditor<Number, NumericField>(property, new NumericField( (Class<? extends Number>) property.getType())) {
 

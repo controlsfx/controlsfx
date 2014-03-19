@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Cell;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 import javafx.scene.layout.Region;
@@ -63,7 +62,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * * Private Fields * *
      **************************************************************************/
     private SpreadsheetView spreadSheetView;
-    private GridViewSkin gridViewSkin;
+    private final GridViewSkin gridViewSkin;
     /**
      * Variable used for improvement;
      */
@@ -75,8 +74,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * Store the fixedRow in order to place them at the top when necessary.
      * That is to say, when the VirtualFlow has not already placed one.
      */
-    private ArrayList<T> myFixedCells = new ArrayList<>();
-    private List<Node> sheetChildren;
+    private final ArrayList<T> myFixedCells = new ArrayList<>();
+    private final List<Node> sheetChildren;
     
     /***************************************************************************
      * * Constructor * *
@@ -91,6 +90,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             }
         };
         getVbar().valueProperty().addListener(listenerY);
+        getHbar().valueProperty().addListener(hBarValueChangeListener);
+        widthProperty().addListener(hBarValueChangeListener);
         
 
         // FIXME Until RT-31777 is resolved
@@ -227,8 +228,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         previousHbarValue = getHbar().getValue();
         previousHBarAmount = getHbar().getVisibleAmount();*/
         
-        for (Cell<?> cell : getCells()) {
-            if (cell != null) {
+        for (GridRow cell : (List<GridRow>)getCells()) {
+            if (cell != null &&  (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
                 cell.requestLayout();
             }
         }
@@ -352,5 +353,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             r.toFront();
         }
     }
+    
+    private final ChangeListener<Number> hBarValueChangeListener = new ChangeListener<Number>() {
+        @Override
+        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+            gridViewSkin.hBarValue.clear();
+        }
+    };
 }
 

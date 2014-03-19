@@ -290,8 +290,6 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid) {
         super();
-        // Reactivate that after
-        verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
@@ -435,6 +433,8 @@ public class SpreadsheetView extends Control {
      *            the new Grid
      */
     public final void setGrid(Grid grid) {
+        // Reactivate that after
+//        verifyGrid(grid);
         gridProperty.set(grid);
         initRowFix(grid);
 

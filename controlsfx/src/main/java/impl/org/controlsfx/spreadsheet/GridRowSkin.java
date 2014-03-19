@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,8 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 
 import com.sun.javafx.scene.control.skin.TableRowSkin;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     
@@ -98,6 +100,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             super.layoutChildren(x, y, w, h);
             return;
         }
+        handle.getCellsViewSkin().hBarValue.set(index, true);
+
         // determine the width of the visible portion of the table
         double headerWidth =  gridView.getWidth();
         
@@ -143,6 +147,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
          */
         int rightPlace = 0;
         double fixedColumnWidth = 0;
+        List<CellView> fixedCells = new ArrayList();
         for (int column = 0; column < cells.size(); column++) {
 	
             final CellView tableCell = (CellView) cells.get(column);
@@ -170,9 +175,10 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                 
                  if(hbarValue + fixedColumnWidth >x){
                 	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
-                	 tableCell.toFront();
+//                	 tableCell.toFront();
                 	 fixedColumnWidth += tableCell.getWidth();
                 	 isVisible = true; // If in fixedColumn, it's obviously visible
+                         fixedCells.add(tableCell);
                  }
             }
 
@@ -271,6 +277,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             x += width;
            
         }
+        for(CellView cell:fixedCells){
+            cell.toFront();
+    }
     }
 
     /**
@@ -280,7 +289,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
      */
     private double getTableRowHeight(int i) {
         return handle.getCellsViewSkin().getRowHeight(i);
-//    	return handle.getView().getGrid().getRowHeight(i);
 	}
 
 	/**

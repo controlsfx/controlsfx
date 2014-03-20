@@ -41,6 +41,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -157,20 +158,18 @@ public class HelloValidation extends ControlsFXSample {
         ColorPicker colorPicker =  new ColorPicker(Color.RED);
         validationSupport.registerValidator(colorPicker, 
         	Validators.createEqualsValidator("Color should be WHITE", Arrays.asList(Color.WHITE))	
-//        		(Control c, Color newValue) -> {
-//        	return new ValidationResultBuilder(c)
-//    			.addErrorIf( "Color should be WHITE", () -> !Color.WHITE.equals(newValue))
-//    			.build();
-//			}
         );
        
         grid.add(new Label("Color Picker"), 0, row);
         grid.add(colorPicker, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
+        
         row++;
-        grid.add(messageList, 0, row, 2, 1);
-        GridPane.setHgrow(messageList, Priority.ALWAYS);
+        TitledPane pane = new TitledPane("Validation Results", messageList);
+        pane.setCollapsible(false);
+        grid.add(pane, 0, row, 2, 1);
+        GridPane.setHgrow(pane, Priority.ALWAYS);
        
         root.setTop(grid);
         return root;

@@ -12,6 +12,8 @@ commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
 group = commons.controlsfx_group
 version = commons.fxsampler_version
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 configurations {
     //samples.extendsFrom mainRuntime

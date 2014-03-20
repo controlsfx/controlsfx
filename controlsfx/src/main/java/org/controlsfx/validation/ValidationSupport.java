@@ -28,8 +28,6 @@ public class ValidationSupport {
 	private ObservableMap<Control,ValidationResult> validationResults = 
 			FXCollections.observableMap(new WeakHashMap<>());
 	
-	
-	
 	// this can probably be done better
 	private static class ObservableValueExtractor {
 		
@@ -41,7 +39,7 @@ public class ValidationSupport {
 			this.extract = extract;
 		}
 		
-		public boolean isAppicable( Control c ) {
+		public boolean isApplicable( Control c ) {
 			return check.call(c);
 		}
 		
@@ -99,7 +97,7 @@ public class ValidationSupport {
 	
 	private Optional<ObservableValueExtractor> getExtractor(final Control c) {
 		for( ObservableValueExtractor e: extractors ) {
-			if ( e.isAppicable(c)) return Optional.of(e);
+			if ( e.isApplicable(c)) return Optional.of(e);
 		}
 		return Optional.empty();
 	}
@@ -109,10 +107,10 @@ public class ValidationSupport {
 	
 	// TODO: Need weak listeners to avoid memory leaks
     // TODO: Should both old and new value be passed into a validator? 
-    // TODO: Add 'required' flag
-	public <T> void registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
+	@SuppressWarnings("unchecked")
+	public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
 		
-		getExtractor(c).ifPresent(e->{
+		return getExtractor(c).map(e->{
 			
 			ObservableValue<T> ov = (ObservableValue<T>) e.extract(c);
 			ValidationControlUtils.setRequired( c, required );
@@ -123,13 +121,12 @@ public class ValidationSupport {
 				};
 		    });
 			validationResults.put(c, validator.validate(c, ov.getValue()));
-			
-		});
-		
+			return e;
+		}).isPresent();
 	}
 	
-	public <T> void registerValidator( final Control c, final Validator<T> validator  ) {
-		registerValidator(c, true, validator);
+	public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
+		return registerValidator(c, true, validator);
 	}
 
 }

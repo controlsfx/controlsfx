@@ -74,7 +74,7 @@ public class BreadCrumbBar<T> extends Control {
          */
         @SuppressWarnings("rawtypes")
         public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = 
-                new EventType<BreadCrumbActionEvent>("CRUMB_ACTION");
+                new EventType<BreadCrumbActionEvent>("CRUMB_ACTION"); //$NON-NLS-1$
 
         private final TreeItem<TE> selectedCrumb;
 
@@ -133,7 +133,7 @@ public class BreadCrumbBar<T> extends Control {
     private final Callback<TreeItem<T>, Button> defaultCrumbNodeFactory = new Callback<TreeItem<T>, Button>(){
         @Override
         public Button call(TreeItem<T> crumb) {
-            return new BreadCrumbBarSkin.BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : "");
+            return new BreadCrumbBarSkin.BreadCrumbButton(crumb.getValue() != null ? crumb.getValue().toString() : ""); //$NON-NLS-1$
         }
     };
     
@@ -200,7 +200,7 @@ public class BreadCrumbBar<T> extends Control {
         return selectedCrumb;
     }
     private final ObjectProperty<TreeItem<T>> selectedCrumb = 
-            new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb");
+            new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb"); //$NON-NLS-1$
     
     /**
      * Get the current target path
@@ -223,7 +223,7 @@ public class BreadCrumbBar<T> extends Control {
         return autoNavigation;
     }
     private final BooleanProperty autoNavigation = 
-            new SimpleBooleanProperty(this, "autoNavigationEnabled", true);
+            new SimpleBooleanProperty(this, "autoNavigationEnabled", true); //$NON-NLS-1$
     
     public final boolean isAutoNavigationEnabled() {
         return autoNavigation.get();
@@ -245,7 +245,7 @@ public class BreadCrumbBar<T> extends Control {
     }
     
     private final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactory = 
-            new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory");
+            new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory"); //$NON-NLS-1$
 
     public final void setCrumbFactory(Callback<TreeItem<T>, Button> value) {
         if(value == null){
@@ -289,7 +289,7 @@ public class BreadCrumbBar<T> extends Control {
 
         @Override
         public String getName() {
-            return "onCrumbAction";
+            return "onCrumbAction"; //$NON-NLS-1$
         }
     };
     
@@ -300,7 +300,7 @@ public class BreadCrumbBar<T> extends Control {
      *                                                                         *
      **************************************************************************/
 
-    private static final String DEFAULT_STYLE_CLASS = "bread-crumb-bar";
+    private static final String DEFAULT_STYLE_CLASS = "bread-crumb-bar"; //$NON-NLS-1$
 
     /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
@@ -309,6 +309,6 @@ public class BreadCrumbBar<T> extends Control {
 
     /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
-        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm();
+        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm(); //$NON-NLS-1$
     }
 }

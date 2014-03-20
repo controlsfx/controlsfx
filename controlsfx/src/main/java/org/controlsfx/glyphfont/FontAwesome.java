@@ -71,7 +71,7 @@ import javafx.scene.Node;
  */
 public class FontAwesome extends GlyphFont {
 
-	private static String fontName = "FontAwesome";
+	private static String fontName = "FontAwesome"; //$NON-NLS-1$
 	
 	private Map<String, Character> glyphs;
 	
@@ -482,7 +482,7 @@ public class FontAwesome extends GlyphFont {
 	 */
 	public FontAwesome() {
 		
-		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf" ); 
+		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf" );  //$NON-NLS-1$
 		
 		Map<String, Character> map = new HashMap<>();
 		for (Glyph e:  Glyph.values()) {

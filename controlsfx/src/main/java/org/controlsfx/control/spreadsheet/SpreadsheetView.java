@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -109,11 +109,9 @@ import javafx.util.Duration;
  * <br/>
  * 
  * <h3>Fixing Rows and Columns</h3> You can fix some rows and some columns by
- * right-clicking on their header (if it has a dot, then it means it can be
- * fixed). A context menu will appear if it's possible to fix them. The label
- * will then be in italic and the dot will be replaced by a colon to confirm
- * that the fixing has been done properly. Keep in mind that only columns
- * without any spanning cells can be fixed.
+ * right-clicking on their header. A context menu will appear if it's possible to fix them. 
+ * The label will then be in italic and the background will turn to dark grey. 
+ * Keep in mind that only columns without any spanning cells can be fixed.
  * 
  * And that and only rows without row-spanning cells can be fixed. <br/>
  * You have also the possibility to fix them manually by adding and removing
@@ -292,8 +290,6 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid) {
         super();
-        // Reactivate that after
-        verifyGrid(grid);
         getStyleClass().add("SpreadsheetView");
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
@@ -371,6 +367,7 @@ public class SpreadsheetView extends Control {
                     @SuppressWarnings("unchecked")
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
+                    cellsView.setEditWithKey(true);
                     cellsView.edit(position.getRow(), position.getTableColumn());
                 }
             }
@@ -436,6 +433,8 @@ public class SpreadsheetView extends Control {
      *            the new Grid
      */
     public final void setGrid(Grid grid) {
+        // Reactivate that after
+//        verifyGrid(grid);
         gridProperty.set(grid);
         initRowFix(grid);
 
@@ -462,6 +461,14 @@ public class SpreadsheetView extends Control {
         }
         getFixedColumns().clear();
 
+        /**
+         * We try to save the width of the column as we save the height of our rows so that we preserve the state.
+         */
+        List<Double> widthColumns = new ArrayList<>();
+        for(SpreadsheetColumn column:columns){
+            widthColumns.add(column.getWidth());
+        }
+        
         // TODO move into a property
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
@@ -505,6 +512,9 @@ public class SpreadsheetView extends Control {
                 });
                 cellsView.getColumns().add(column);
                 final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
+                if(widthColumns.size() > i){
+                    spreadsheetColumn.setPrefWidth(widthColumns.get(i));
+                }
                 columns.add(spreadsheetColumn);
                 // We verify if this column was fixed before and try to re-fix
                 // it.
@@ -686,6 +696,15 @@ public class SpreadsheetView extends Control {
     }
     
     /**
+     * Return the height of a particular row of the SpreadsheetView. \n
+     * @param row
+     * @return 
+     */
+    public double getRowHeight(int row) {
+         return getCellsViewSkin().getRowHeight(row);
+    }
+    
+    /**
      * You can fix or unfix a column by modifying this list. Call
      * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
      * an item.
@@ -843,43 +862,12 @@ public class SpreadsheetView extends Control {
 
             @SuppressWarnings("unchecked")
             final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
-            // TODO algorithm very bad
-            int minRow = getGrid().getRowCount();
-            int minCol = getGrid().getColumnCount();
-            int maxRow = 0;
-            int maxCol = 0;
-            for (final GridChange p : list) {
-                final int tempcol = p.getColumn();
-                final int temprow = p.getRow();
-                if (tempcol < minCol) {
-                    minCol = tempcol;
-                }
-                if (tempcol > maxCol) {
-                    maxCol = tempcol;
-                }
-                if (temprow < minRow) {
-                    minRow = temprow;
-                }
-                if (temprow > maxRow) {
-                    maxRow = temprow;
-                }
-            }
-
-            final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
-
-            final int offsetRow = p.getRow() - minRow;
-            final int offsetCol = p.getColumn() - minCol;
-            int row;
-            int column;
-
-            for (final GridChange change : list) {
-                row = change.getRow();
-                column = change.getColumn();
-                if (row + offsetRow < getGrid().getRowCount() && column + offsetCol < getGrid().getColumnCount()
-                        && row + offsetRow >= 0 && column + offsetCol >= 0) {
-                    final SpanType type = getSpanType(row + offsetRow, column + offsetCol);
+            if(list.size() == 1){
+                GridChange change = list.get(0);
+                for(TablePosition position:getSelectionModel().getSelectedCells()){
+                    final SpanType type = getSpanType(position.getRow(), position.getColumn());
                     if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
-                        SpreadsheetCell cell = getGrid().getRows().get(row + offsetRow).get(column + offsetCol);
+                        SpreadsheetCell cell = getGrid().getRows().get(position.getRow()).get(position.getColumn());
                         boolean succeed = cell.getCellType().match(change.getNewValue());
                         if (succeed) {
                             getGrid().setCellValue(cell.getRow(), cell.getColumn(),
@@ -887,8 +875,53 @@ public class SpreadsheetView extends Control {
                         }
                     }
                 }
-            }
+            }else{
+                // TODO algorithm very bad
+                int minRow = getGrid().getRowCount();
+                int minCol = getGrid().getColumnCount();
+                int maxRow = 0;
+                int maxCol = 0;
+                for (final GridChange p : list) {
+                    final int tempcol = p.getColumn();
+                    final int temprow = p.getRow();
+                    if (tempcol < minCol) {
+                        minCol = tempcol;
+                    }
+                    if (tempcol > maxCol) {
+                        maxCol = tempcol;
+                    }
+                    if (temprow < minRow) {
+                        minRow = temprow;
+                    }
+                    if (temprow > maxRow) {
+                        maxRow = temprow;
+                    }
+                }
 
+                final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
+
+                final int offsetRow = p.getRow() - minRow;
+                final int offsetCol = p.getColumn() - minCol;
+                int row;
+                int column;
+
+                for (final GridChange change : list) {
+                    row = change.getRow();
+                    column = change.getColumn();
+                    if (row + offsetRow < getGrid().getRowCount() && column + offsetCol < getGrid().getColumnCount()
+                            && row + offsetRow >= 0 && column + offsetCol >= 0) {
+                        final SpanType type = getSpanType(row + offsetRow, column + offsetCol);
+                        if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
+                            SpreadsheetCell cell = getGrid().getRows().get(row + offsetRow).get(column + offsetCol);
+                            boolean succeed = cell.getCellType().match(change.getNewValue());
+                            if (succeed) {
+                                getGrid().setCellValue(cell.getRow(), cell.getColumn(),
+                                        cell.getCellType().convertValue(change.getNewValue()));
+                            }
+                        }
+                    }
+                }
+            }
             // To be improved
         } else if (clipboard.hasString()) {
             // final TablePosition<?,?> p =

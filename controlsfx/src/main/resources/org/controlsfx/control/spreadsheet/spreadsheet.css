@@ -4,14 +4,27 @@
 
 .spreadsheet-cell {
     -fx-background-color: green;
+     -fx-padding: 0 0 0 0.2em;
 }
 
-/* CELLULE ROW HEADER */
+.tooltip {
+    -fx-background-radius: 0px;
+    -fx-background-color:
+        linear-gradient(#cec340, #a59c31),
+        linear-gradient(#fefefc, #e6dd71),
+        linear-gradient(#fef592, #e5d848);
+    -fx-background-insets: 0,1,2;
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em; /* 4 8 4 8 */
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
+    -fx-text-fill:black;
+}
+
+/* ROW HEADER CELL */
 .spreadsheet-cell.row_header:filled:selected ,
 .spreadsheet-cell.row_header:filled:focused:selected,
 .spreadsheet-cell.row_header:filled:focused:selected:hover {
     -fx-background-color: #26ADE4;
-   /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
+    /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
     -fx-text-fill: -fx-selection-bar-text;
 }
 .spreadsheet-cell.row_header:hover,
@@ -74,11 +87,11 @@
 .spreadsheet-cell:filled:focused:selected,
 .spreadsheet-cell:filled:focused:selected:hover {
     -fx-background-color: #26ADE4;
-   /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
+    /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
     -fx-border-color: #a9a9a9;
     -fx-border-width : 0.5px;
     -fx-text-fill: -fx-selection-bar-text;
-    
+
 }
 .spreadsheet-cell:hover,
 .spreadsheet-cell:filled:focused {
@@ -93,12 +106,23 @@
     -fx-alignment: center;
 }
 /*.spreadsheet-cell.modified{
-	-fx-background-radius : 0 15 0 0;
+        -fx-background-radius : 0 15 0 0;
 }*/
+
+/* FIXED HEADERS  */
+VerticalHeader > Label.fixed{
+    -fx-background-color: -fx-box-border, -fx-inner-border,   linear-gradient(to left, derive(-fx-color,-20%) ,derive(-fx-color,-10%));
+    -fx-font-style : italic;
+}
+
+HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.fixed{
+    -fx-background-color: -fx-box-border, -fx-inner-border,   linear-gradient(to top, derive(-fx-color,-20%) ,derive(-fx-color,-10%));
+    -fx-font-style : italic;
+}
 
 /* HORIZONTAL AND VERTICAL HEADER SELECTION */
 VerticalHeader > Label {
-   	-fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+    -fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to left, derive(-fx-color,-5%) ,derive(-fx-color,5%));
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
@@ -110,7 +134,7 @@ VerticalHeader > Label {
 }  
 
 VerticalHeader > Label.selected{
--fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to right, derive(#FFDB6D,-10%) ,derive(#FFDB6D,10%));
+    -fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to right, derive(#FFDB6D,-10%) ,derive(#FFDB6D,10%));
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
@@ -120,7 +144,7 @@ VerticalHeader > Label.selected{
 }
 
 HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
-	-fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to bottom, derive(#FFDB6D,-10%) ,derive(#FFDB6D,10%));
+    -fx-background-color: -fx-box-border, -fx-inner-border,  linear-gradient(to bottom, derive(#FFDB6D,-10%) ,derive(#FFDB6D,10%));
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
     -fx-size: 2em;
@@ -129,30 +153,25 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
     -fx-border-color : #FFDB6D;
 }  
 
-/* FIXED HEADERS  */
-VerticalHeader > Label.fixed,
-HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.fixed{
-	-fx-font-style : italic;
-}
 
 .text-field.error{
-	-fx-background-color: red;
+    -fx-background-color: red;
 }
 
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 
 .comment{
-	-fx-background-color: red;
-	-fx-shape : "M 0 0 L -1 0 L 0 1 z";
+    -fx-background-color: red;
+    -fx-shape : "M 0 0 L -1 0 L 0 1 z";
 }
 
 /* TextField must squeeze tight, so no padding
 on top and bottom */
 .spreadsheet-cell TextField{
-	-fx-padding : 0 7 0 7 ;
+    -fx-padding : 0 7 0 7 ;
 }
 
 .indicationLabel{
-	-fx-font-style : italic;
+    -fx-font-style : italic;
 }

@@ -235,7 +235,7 @@ public class HorizontalHeader extends TableHeaderRow {
 	 * @param i
 	 */
 	private void removeStyleHeader(Integer i) {
-        	getRootHeader().getColumnHeaders().get(i).getStyleClass().removeAll("fixed");
+        	getRootHeader().getColumnHeaders().get(i).getStyleClass().removeAll("fixed"); //$NON-NLS-1$
     }
 	/**
 	 * Remove the fix style of the header Label of the specified column
@@ -243,7 +243,7 @@ public class HorizontalHeader extends TableHeaderRow {
 	 */
 	private void addStyleHeader(Integer i) {
             getRootHeader().getColumnHeaders().get((Integer) i).getStyleClass()
-                    .addAll("fixed");
+                    .addAll("fixed"); //$NON-NLS-1$
     }
     
     /**
@@ -261,13 +261,13 @@ public class HorizontalHeader extends TableHeaderRow {
      */
     private void updateHighlightSelection() {
     	for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-            i.getStyleClass().removeAll("selected");
+            i.getStyleClass().removeAll("selected"); //$NON-NLS-1$
 
         }
         final List<Integer> selectedColumns = gridViewSkin.getSelectedColumns();
         for (final Object i : selectedColumns) {
             getRootHeader().getColumnHeaders().get((Integer) i).getStyleClass()
-                    .addAll("selected");
+                    .addAll("selected"); //$NON-NLS-1$
         }
 
     }
@@ -276,9 +276,9 @@ public class HorizontalHeader extends TableHeaderRow {
         working = visible;
         setManaged(working);
         if(!visible){
-            getStyleClass().add("invisible");
+            getStyleClass().add("invisible"); //$NON-NLS-1$
         }else{
-            getStyleClass().remove("invisible");
+            getStyleClass().remove("invisible"); //$NON-NLS-1$
             requestLayout();
             getRootHeader().layoutFixedColumns();
             updateHighlightSelection();

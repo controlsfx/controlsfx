@@ -49,7 +49,7 @@ public class ColorGridCell extends GridCell<Color> {
 	 * Creates a default ColorGridCell instance.
 	 */
     public ColorGridCell() {
-		getStyleClass().add("color-grid-cell");
+		getStyleClass().add("color-grid-cell"); //$NON-NLS-1$
 		
 		colorRect = new Rectangle();
 		colorRect.setStroke(Color.BLACK);
@@ -76,7 +76,7 @@ public class ColorGridCell extends GridCell<Color> {
 	    }
 	    
 	    if (debug) {
-	        setText(getIndex() + "");
+	        setText(getIndex() + ""); //$NON-NLS-1$
 	    }
 	}
 }

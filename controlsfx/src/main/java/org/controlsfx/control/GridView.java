@@ -146,7 +146,7 @@ public class GridView<T> extends Control {
      * {@inheritDoc}
      */
     @Override protected String getUserAgentStylesheet() {
-        return GridView.class.getResource("gridview.css").toExternalForm();
+        return GridView.class.getResource("gridview.css").toExternalForm(); //$NON-NLS-1$
     }
     
     
@@ -174,7 +174,7 @@ public class GridView<T> extends Control {
                 }
 
                 @Override public String getName() {
-                    return "horizontalCellSpacing";
+                    return "horizontalCellSpacing"; //$NON-NLS-1$
                 }
             };
         }
@@ -219,7 +219,7 @@ public class GridView<T> extends Control {
                 }
 
                 @Override public String getName() {
-                    return "verticalCellSpacing";
+                    return "verticalCellSpacing"; //$NON-NLS-1$
                 }
             };
         }
@@ -261,7 +261,7 @@ public class GridView<T> extends Control {
                 }
 
                 @Override public String getName() {
-                    return "cellWidth";
+                    return "cellWidth"; //$NON-NLS-1$
                 }
             };
         }
@@ -300,7 +300,7 @@ public class GridView<T> extends Control {
                 }
 
                 @Override public String getName() {
-                    return "cellHeight";
+                    return "cellHeight"; //$NON-NLS-1$
                 }
             };
         }
@@ -369,7 +369,7 @@ public class GridView<T> extends Control {
      */
     public final ObjectProperty<Callback<GridView<T>, GridCell<T>>> cellFactoryProperty() {
         if (cellFactory == null) {
-            cellFactory = new SimpleObjectProperty<Callback<GridView<T>, GridCell<T>>>(this, "cellFactory");
+            cellFactory = new SimpleObjectProperty<Callback<GridView<T>, GridCell<T>>>(this, "cellFactory"); //$NON-NLS-1$
         }
         return cellFactory;
     }
@@ -407,7 +407,7 @@ public class GridView<T> extends Control {
      */
     public final ObjectProperty<ObservableList<T>> itemsProperty() {
         if (items == null) {
-            items = new SimpleObjectProperty<ObservableList<T>>(this, "items");
+            items = new SimpleObjectProperty<ObservableList<T>>(this, "items"); //$NON-NLS-1$
         }
         return items;
     }
@@ -439,12 +439,12 @@ public class GridView<T> extends Control {
      *                                                                         *
      **************************************************************************/
 
-    private static final String DEFAULT_STYLE_CLASS = "grid-view";
+    private static final String DEFAULT_STYLE_CLASS = "grid-view"; //$NON-NLS-1$
 
     /** @treatAsPrivate */
     private static class StyleableProperties {
         private static final CssMetaData<GridView<?>,Number> HORIZONTAL_CELL_SPACING = 
-            new CssMetaData<GridView<?>,Number>("-fx-horizontal-cell-spacing", StyleConverter.getSizeConverter(), 12d) {
+            new CssMetaData<GridView<?>,Number>("-fx-horizontal-cell-spacing", StyleConverter.getSizeConverter(), 12d) { //$NON-NLS-1$
 
             @Override public Double getInitialValue(GridView<?> node) {
                 return node.getHorizontalCellSpacing();
@@ -462,7 +462,7 @@ public class GridView<T> extends Control {
         };
         
         private static final CssMetaData<GridView<?>,Number> VERTICAL_CELL_SPACING = 
-            new CssMetaData<GridView<?>,Number>("-fx-vertical-cell-spacing", StyleConverter.getSizeConverter(), 12d) {
+            new CssMetaData<GridView<?>,Number>("-fx-vertical-cell-spacing", StyleConverter.getSizeConverter(), 12d) { //$NON-NLS-1$
 
             @Override public Double getInitialValue(GridView<?> node) {
                 return node.getVerticalCellSpacing();
@@ -480,7 +480,7 @@ public class GridView<T> extends Control {
         };
         
         private static final CssMetaData<GridView<?>,Number> CELL_WIDTH = 
-            new CssMetaData<GridView<?>,Number>("-fx-cell-width", StyleConverter.getSizeConverter(), 64d) {
+            new CssMetaData<GridView<?>,Number>("-fx-cell-width", StyleConverter.getSizeConverter(), 64d) { //$NON-NLS-1$
 
             @Override public Double getInitialValue(GridView<?> node) {
                 return node.getCellWidth();
@@ -498,7 +498,7 @@ public class GridView<T> extends Control {
         };
         
         private static final CssMetaData<GridView<?>,Number> CELL_HEIGHT = 
-            new CssMetaData<GridView<?>,Number>("-fx-cell-height", StyleConverter.getSizeConverter(), 64d) {
+            new CssMetaData<GridView<?>,Number>("-fx-cell-height", StyleConverter.getSizeConverter(), 64d) { //$NON-NLS-1$
 
             @Override public Double getInitialValue(GridView<?> node) {
                 return node.getCellHeight();

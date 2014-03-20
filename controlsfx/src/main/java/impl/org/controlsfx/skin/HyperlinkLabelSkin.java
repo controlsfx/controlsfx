@@ -54,8 +54,8 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
      **************************************************************************/
     
     // The strings used to delimit the hyperlinks
-    private static final String HYPERLINK_START = "[";
-    private static final String HYPERLINK_END = "]";
+    private static final String HYPERLINK_START = "["; //$NON-NLS-1$
+    private static final String HYPERLINK_END = "]"; //$NON-NLS-1$
     
     
     
@@ -90,7 +90,7 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
         getChildren().add(textFlow);
         updateText();
         
-        registerChangeListener(control.textProperty(), "TEXT");
+        registerChangeListener(control.textProperty(), "TEXT"); //$NON-NLS-1$
     }
 
     
@@ -104,7 +104,7 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if (p == "TEXT") {
+        if (p == "TEXT") { //$NON-NLS-1$
             updateText();
         }
     }

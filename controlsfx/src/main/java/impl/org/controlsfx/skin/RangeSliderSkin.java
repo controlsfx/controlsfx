@@ -86,15 +86,15 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         initFirstThumb();
         initSecondThumb();
         initRangeBar();
-        registerChangeListener(rangeSlider.lowValueProperty(), "LOW_VALUE");
-        registerChangeListener(rangeSlider.highValueProperty(), "HIGH_VALUE");
-        registerChangeListener(rangeSlider.minProperty(), "MIN");
-        registerChangeListener(rangeSlider.maxProperty(), "MAX");
-        registerChangeListener(rangeSlider.orientationProperty(), "ORIENTATION");
-        registerChangeListener(rangeSlider.showTickMarksProperty(), "SHOW_TICK_MARKS");
-        registerChangeListener(rangeSlider.showTickLabelsProperty(), "SHOW_TICK_LABELS");
-        registerChangeListener(rangeSlider.majorTickUnitProperty(), "MAJOR_TICK_UNIT");
-        registerChangeListener(rangeSlider.minorTickCountProperty(), "MINOR_TICK_COUNT");
+        registerChangeListener(rangeSlider.lowValueProperty(), "LOW_VALUE"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.highValueProperty(), "HIGH_VALUE"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.minProperty(), "MIN"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.maxProperty(), "MAX"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.orientationProperty(), "ORIENTATION"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.showTickMarksProperty(), "SHOW_TICK_MARKS"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.showTickLabelsProperty(), "SHOW_TICK_LABELS"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.majorTickUnitProperty(), "MAJOR_TICK_UNIT"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.minorTickCountProperty(), "MINOR_TICK_COUNT"); //$NON-NLS-1$
         lowThumb.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean hasFocus) {
                 if (hasFocus) {
@@ -165,10 +165,10 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
     
     private void initFirstThumb() {
         lowThumb = new ThumbPane();
-        lowThumb.getStyleClass().setAll("low-thumb");
+        lowThumb.getStyleClass().setAll("low-thumb"); //$NON-NLS-1$
         lowThumb.setFocusTraversable(true);
         track = new StackPane();
-        track.getStyleClass().setAll("track");
+        track.getStyleClass().setAll("track"); //$NON-NLS-1$
 
         getChildren().clear();
         getChildren().addAll(track, lowThumb);
@@ -222,7 +222,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
 
     private void initSecondThumb() {
         highThumb = new ThumbPane();
-        highThumb.getStyleClass().setAll("high-thumb");
+        highThumb.getStyleClass().setAll("high-thumb"); //$NON-NLS-1$
         highThumb.setFocusTraversable(true);
         if (!getChildren().contains(highThumb)) {
             getChildren().add(highThumb);
@@ -266,7 +266,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                 return rangeBar.isHover() ? Cursor.HAND : Cursor.DEFAULT;
             }
         });
-        rangeBar.getStyleClass().setAll("range-bar");
+        rangeBar.getStyleClass().setAll("range-bar"); //$NON-NLS-1$
         
         rangeBar.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent e) {
@@ -326,42 +326,42 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
 
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
-        if ("ORIENTATION".equals(p)) {
+        if ("ORIENTATION".equals(p)) { //$NON-NLS-1$
             orientation = getSkinnable().getOrientation();
             if (showTickMarks && tickLine != null) {
                 tickLine.setSide(isHorizontal() ? Side.BOTTOM : Side.RIGHT);
             }
             getSkinnable().requestLayout();
-        } else if ("MIN".equals(p) ) {
+        } else if ("MIN".equals(p) ) { //$NON-NLS-1$
             if (showTickMarks && tickLine != null) {
                 tickLine.setLowerBound(getSkinnable().getMin());
             }
             getSkinnable().requestLayout();
-        } else if ("MAX".equals(p)) {
+        } else if ("MAX".equals(p)) { //$NON-NLS-1$
             if (showTickMarks && tickLine != null) {
                 tickLine.setUpperBound(getSkinnable().getMax());
             }
             getSkinnable().requestLayout();
-        } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) {
+        } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
             setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
-        }  else if ("MAJOR_TICK_UNIT".equals(p)) {
+        }  else if ("MAJOR_TICK_UNIT".equals(p)) { //$NON-NLS-1$
             if (tickLine != null) {
                 tickLine.setTickUnit(getSkinnable().getMajorTickUnit());
                 getSkinnable().requestLayout();
             }
-        } else if ("MINOR_TICK_COUNT".equals(p)) {
+        } else if ("MINOR_TICK_COUNT".equals(p)) { //$NON-NLS-1$
             if (tickLine != null) {
                 tickLine.setMinorTickCount(Math.max(getSkinnable().getMinorTickCount(),0) + 1);
                 getSkinnable().requestLayout();
             }
-        } else if ("LOW_VALUE".equals(p)) {
+        } else if ("LOW_VALUE".equals(p)) { //$NON-NLS-1$
             positionLowThumb();
             rangeBar.resizeRelocate(rangeStart, rangeBar.getLayoutY(), 
                     rangeEnd - rangeStart, rangeBar.getHeight());
-        } else if ("HIGH_VALUE".equals(p)) {
+        } else if ("HIGH_VALUE".equals(p)) { //$NON-NLS-1$
             positionHighThumb();
             rangeBar.resize(rangeEnd-rangeStart, rangeBar.getHeight());
-        } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) {
+        } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
             if (!getChildren().contains(highThumb))
                 getChildren().add(highThumb);
         }

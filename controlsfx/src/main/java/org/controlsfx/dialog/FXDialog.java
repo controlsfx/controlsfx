@@ -42,6 +42,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
+import javafx.scene.effect.Effect;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -61,7 +62,7 @@ abstract class FXDialog {
      * 
      **************************************************************************/
     
-    protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css");
+    protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css"); //$NON-NLS-1$
     protected static final int HEADER_HEIGHT = 28;
     
     
@@ -145,11 +146,11 @@ abstract class FXDialog {
             }
         };
         lightweightDialog.getChildren().add(root);
-        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root", 
+        lightweightDialog.getStyleClass().addAll("dialog", "decorated-root",  //$NON-NLS-1$ //$NON-NLS-2$
                        Platform.getCurrent().getPlatformId());
         
         resizeCorner = new Rectangle(10, 10);
-        resizeCorner.getStyleClass().add("window-resize-corner");
+        resizeCorner.getStyleClass().add("window-resize-corner"); //$NON-NLS-1$
         resizeCorner.setManaged(false);
         
         
@@ -166,14 +167,14 @@ abstract class FXDialog {
         });
 
         toolBar = new ToolBar();
-        toolBar.getStyleClass().add("window-header");
+        toolBar.getStyleClass().add("window-header"); //$NON-NLS-1$
         toolBar.setPrefHeight(HEADER_HEIGHT);
         toolBar.setMinHeight(HEADER_HEIGHT);
         toolBar.setMaxHeight(HEADER_HEIGHT);
         
         titleLabel = new Label();
         titleLabel.setMaxHeight(Double.MAX_VALUE);
-        titleLabel.getStyleClass().add("window-title");
+        titleLabel.getStyleClass().add("window-title"); //$NON-NLS-1$
         titleLabel.setText(titleProperty().get());
 
         titleProperty().addListener(new InvalidationListener() {
@@ -186,14 +187,14 @@ abstract class FXDialog {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add close min max
-        closeButton = new WindowButton("close");
+        closeButton = new WindowButton("close"); //$NON-NLS-1$
         closeButton.setFocusTraversable(false);
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 FXDialog.this.hide();
             }
         });
-        minButton = new WindowButton("minimize");
+        minButton = new WindowButton("minimize"); //$NON-NLS-1$
         minButton.setFocusTraversable(false);
         minButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
@@ -201,11 +202,11 @@ abstract class FXDialog {
             }
         });
 
-        maxButton = new WindowButton("maximize");
+        maxButton = new WindowButton("maximize"); //$NON-NLS-1$
         maxButton.setFocusTraversable(false);
 
         windowBtns = new HBox(3);
-        windowBtns.getStyleClass().add("window-buttons");
+        windowBtns.getStyleClass().add("window-buttons"); //$NON-NLS-1$
         windowBtns.getChildren().addAll(minButton, maxButton, closeButton);
 
         toolBar.getItems().addAll(titleLabel, spacer, windowBtns);
@@ -284,7 +285,7 @@ abstract class FXDialog {
     
     abstract boolean isModal();
     
-    
+    abstract void setEffect(Effect e);
     
     /***************************************************************************
      *                                                                         
@@ -294,10 +295,10 @@ abstract class FXDialog {
     
     private static class WindowButton extends Button {
         WindowButton(String name) {
-            getStyleClass().setAll("window-button");
-            getStyleClass().add("window-"+name+"-button");
+            getStyleClass().setAll("window-button"); //$NON-NLS-1$
+            getStyleClass().add("window-"+name+"-button"); //$NON-NLS-1$ //$NON-NLS-2$
             StackPane graphic = new StackPane();
-            graphic.getStyleClass().setAll("graphic");
+            graphic.getStyleClass().setAll("graphic"); //$NON-NLS-1$
             setGraphic(graphic);
             setMinSize(17, 17);
             setPrefSize(17, 17);
@@ -311,6 +312,7 @@ abstract class FXDialog {
      * Stylesheet Handling                                                     
      *                                                                         
      **************************************************************************/
-    protected static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active");
+    protected static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active"); //$NON-NLS-1$
+
 
 }

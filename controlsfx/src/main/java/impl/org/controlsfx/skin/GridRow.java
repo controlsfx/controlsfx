@@ -52,7 +52,7 @@ class GridRow<T> extends IndexedCell<T>{
      */
     public GridRow() {
         super();
-        getStyleClass().add("grid-row");
+        getStyleClass().add("grid-row"); //$NON-NLS-1$
 
         // we need to do this (or something similar) to allow for mouse wheel
         // scrolling, as the GridRow has to report that it is non-empty (which
@@ -86,7 +86,7 @@ class GridRow<T> extends IndexedCell<T>{
         return gridView;
     }
     private final SimpleObjectProperty<GridView<T>> gridView = 
-            new SimpleObjectProperty<>(this, "gridView");
+            new SimpleObjectProperty<>(this, "gridView"); //$NON-NLS-1$
     
     /**
      * Sets the {@link GridView} that this GridRow exists within.

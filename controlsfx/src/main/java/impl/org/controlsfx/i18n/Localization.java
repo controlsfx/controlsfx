@@ -35,9 +35,9 @@ public class Localization {
 	private Localization() {
 	}
 
-	public static final String KEY_PREFIX = "@@";
+	public static final String KEY_PREFIX = "@@"; //$NON-NLS-1$
 
-	private static final String LOCALE_BUNDLE_NAME = "controlsfx";
+	private static final String LOCALE_BUNDLE_NAME = "controlsfx"; //$NON-NLS-1$
 	private static Locale locale = null;
 
 	/**
@@ -85,7 +85,7 @@ public class Localization {
 		try {
 			return getLocaleBundle().getString(key);
 		} catch (MissingResourceException ex) {
-			return String.format("<%s>", key);
+			return String.format("<%s>", key); //$NON-NLS-1$
 		}
 	}
 

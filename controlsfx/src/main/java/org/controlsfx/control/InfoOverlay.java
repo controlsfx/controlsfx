@@ -125,7 +125,7 @@ public class InfoOverlay extends Control {
     public final ObjectProperty<Node> contentProperty() {
         return content;
     }
-    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content");
+    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content"); //$NON-NLS-1$
 
     public final void setContent(Node content) {
         contentProperty().set(content);
@@ -143,7 +143,7 @@ public class InfoOverlay extends Control {
     public final StringProperty textProperty() {
         return text;
     }
-    private StringProperty text = new SimpleStringProperty(this, "text");
+    private StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
 
     public final String getText() {
         return textProperty().get();
@@ -163,7 +163,7 @@ public class InfoOverlay extends Control {
     public final BooleanProperty showOnHoverProperty() {
         return showOnHover;
     }
-    private BooleanProperty showOnHover = new SimpleBooleanProperty(this, "showOnHover", true);
+    private BooleanProperty showOnHover = new SimpleBooleanProperty(this, "showOnHover", true); //$NON-NLS-1$
 
     public final boolean isShowOnHover() {
         return showOnHoverProperty().get();
@@ -181,9 +181,9 @@ public class InfoOverlay extends Control {
      *                                                                         *
      **************************************************************************/
     
-    private static final String DEFAULT_STYLE_CLASS = "info-overlay";
+    private static final String DEFAULT_STYLE_CLASS = "info-overlay"; //$NON-NLS-1$
 
     @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("info-overlay.css").toExternalForm();
+        return getClass().getResource("info-overlay.css").toExternalForm(); //$NON-NLS-1$
     }
 }

@@ -89,7 +89,7 @@ public class MasterDetailPane extends Control {
         Objects.requireNonNull(masterNode);
         Objects.requireNonNull(detailNode);
         
-        getStyleClass().add("master-detail-pane");
+        getStyleClass().add("master-detail-pane"); //$NON-NLS-1$
 
         setDetailSide(side);
         setMasterNode(masterNode);
@@ -155,13 +155,13 @@ public class MasterDetailPane extends Control {
     
     /** {@inheritDoc} */
     @Override protected String getUserAgentStylesheet() {
-        return MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm();
+        return MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm(); //$NON-NLS-1$
     }
 
     // Detail postion support
 
     private final ObjectProperty<Side> detailSide = new SimpleObjectProperty<>(
-            this, "detailSide", Side.RIGHT);
+            this, "detailSide", Side.RIGHT); //$NON-NLS-1$
 
     /**
      * The property used to store the side where the detail node will be shown.
@@ -197,7 +197,7 @@ public class MasterDetailPane extends Control {
     // Show / hide detail node support.
 
     private final BooleanProperty showDetailNode = new SimpleBooleanProperty(
-            this, "showDetailNode", true);
+            this, "showDetailNode", true); //$NON-NLS-1$
 
     /**
      * The property used to store the visibility of the detail node.
@@ -230,7 +230,7 @@ public class MasterDetailPane extends Control {
     // Master node support.
 
     private final ObjectProperty<Node> masterNode = new SimpleObjectProperty<>(
-            this, "masterNode");
+            this, "masterNode"); //$NON-NLS-1$
 
     /**
      * The property used to store the master node.
@@ -264,7 +264,7 @@ public class MasterDetailPane extends Control {
     // Detail node support.
 
     private final ObjectProperty<Node> detailNode = new SimpleObjectProperty<>(
-            this, "detailNode");
+            this, "detailNode"); //$NON-NLS-1$
 
     /**
      * The property used to store the detail node.
@@ -298,7 +298,7 @@ public class MasterDetailPane extends Control {
     // Animation support.
 
     private final BooleanProperty animated = new SimpleBooleanProperty(this,
-            "animated", true);
+            "animated", true); //$NON-NLS-1$
 
     /**
      * The property used to store the "animated" flag. If true then the detail
@@ -332,7 +332,7 @@ public class MasterDetailPane extends Control {
     }
 
     private DoubleProperty dividerPosition = new SimpleDoubleProperty(this,
-            "dividerPosition", .33);
+            "dividerPosition", .33); //$NON-NLS-1$
 
     /**
      * Stores the location of the divider.
@@ -359,6 +359,14 @@ public class MasterDetailPane extends Control {
      *            the new divider position.
      */
     public final void setDividerPosition(double position) {
+        /**
+         * See https://bitbucket.org/controlsfx/controlsfx/issue/145/divider-position-in-masterdetailpane-is
+         * 
+         * Thie work-around is not the best ever found but at least it works.
+         */
+        if(getDividerPosition() == position){
+            dividerPosition.set(-1);
+        }
         dividerPosition.set(position);
     }
 
@@ -369,14 +377,14 @@ public class MasterDetailPane extends Control {
     private static final class Placeholder extends Label {
 
         public Placeholder(boolean master) {
-            super(master ? "Master" : "Detail");
+            super(master ? "Master" : "Detail"); //$NON-NLS-1$ //$NON-NLS-2$
 
             setAlignment(Pos.CENTER);
 
             if (master) {
-                setStyle("-fx-background-color: -fx-background;");
+                setStyle("-fx-background-color: -fx-background;"); //$NON-NLS-1$
             } else {
-                setStyle("-fx-background-color: derive(-fx-background, -10%);");
+                setStyle("-fx-background-color: derive(-fx-background, -10%);"); //$NON-NLS-1$
             }
         }
     }

@@ -74,6 +74,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -357,6 +358,7 @@ public final class Dialogs {
     private boolean lightweight;
     private boolean nativeTitleBar;
     private Set<Action> actions = new LinkedHashSet<>();
+    private Effect backgroundEffect;
 
     /**
      * Creates the initial dialog
@@ -430,6 +432,19 @@ public final class Dialogs {
      */
     public Dialogs actions( Action... actions) {
         return actions( Arrays.asList(actions));
+    }
+    
+    /**
+     * Sets the effect which should be applied to background components when dialog appears.
+     * If not set or set to null, default semi-transparent panel will be used
+     * Good example of effect to use is GaussianBlur 
+     * Currently works only with lightweight dialogs.
+     * @param effect to be applied
+     * @return dialog instance
+     */
+    public Dialogs backgroundEffect(Effect effect) {
+        this.backgroundEffect = effect;
+        return this;
     }
     
     /**
@@ -989,6 +1004,7 @@ public final class Dialogs {
         }
         dlg.setMasthead(actualMasthead);
         dlg.getActions().addAll(dlgType.getActions());
+        dlg.setBackgroundEffect(backgroundEffect);
         return dlg;
     }
 

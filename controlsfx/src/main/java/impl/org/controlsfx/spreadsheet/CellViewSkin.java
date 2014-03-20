@@ -94,7 +94,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             }
             commentTriangle.resize(TRIANGLE_SIZE, TRIANGLE_SIZE);
             // Setting the style class is important for the shape.
-            commentTriangle.getStyleClass().add("comment");
+            commentTriangle.getStyleClass().add("comment"); //$NON-NLS-1$
             commentTriangle.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, snappedTopInset() - 1);
         } else if (commentTriangle != null) {
             getChildren().remove(commentTriangle);

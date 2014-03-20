@@ -150,7 +150,7 @@ public class HyperlinkLabel extends Control implements EventTarget {
     public final StringProperty textProperty() { 
         return text; 
     }
-    private final StringProperty text = new SimpleStringProperty(this, "text");
+    private final StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
     public final String getText() {
         return text.get();
     }
@@ -167,7 +167,7 @@ public class HyperlinkLabel extends Control implements EventTarget {
      */
     public final ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
         if (onAction == null) {
-            onAction = new SimpleObjectProperty<EventHandler<ActionEvent>>(this, "onAction") {
+            onAction = new SimpleObjectProperty<EventHandler<ActionEvent>>(this, "onAction") { //$NON-NLS-1$
                 @Override protected void invalidated() {
                     eventHandlerManager.setEventHandler(ActionEvent.ACTION, get());
                 }

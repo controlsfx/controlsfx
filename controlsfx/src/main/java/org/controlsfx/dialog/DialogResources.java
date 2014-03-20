@@ -45,7 +45,7 @@ class DialogResources {
     }
 
     static void reset() {
-        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialog.resources.oxygen.dialog-resources");
+        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialog.resources.oxygen.dialog-resources"); //$NON-NLS-1$
     }
 
 
@@ -72,7 +72,7 @@ class DialogResources {
         } catch (MissingResourceException mre) {
             // Do not trace this exception, because the key could be
             // an already translated string.
-            System.out.println("Failed to get string for key '" + key + "'");
+            System.out.println("Failed to get string for key '" + key + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             return key;
         }
     }
@@ -106,9 +106,9 @@ class DialogResources {
         String resourceName = getString(key);
         URL url = DialogResources.class.getResource(resourceName);
         if (url == null) {
-            System.out.println("Can't create ImageView for key '" + key + 
-                    "', which has resource name '" + resourceName + 
-                    "' and URL 'null'");
+            System.out.println("Can't create ImageView for key '" + key +  //$NON-NLS-1$
+                    "', which has resource name '" + resourceName +  //$NON-NLS-1$
+                    "' and URL 'null'"); //$NON-NLS-1$
             return null;
         }
         return getImage(url);

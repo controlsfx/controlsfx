@@ -60,7 +60,7 @@ public class Utils {
         } else if (owner instanceof Node) {
             return ((Node) owner).getScene().getWindow();
         } else {
-            throw new IllegalArgumentException("Unknown owner: " + owner.getClass());
+            throw new IllegalArgumentException("Unknown owner: " + owner.getClass()); //$NON-NLS-1$
         }
     }
 }

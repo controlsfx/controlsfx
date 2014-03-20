@@ -89,7 +89,7 @@ public abstract class AbstractAction implements Action {
      **************************************************************************/
     
     // --- text
-    private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text");
+    private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"); //$NON-NLS-1$
     
     /** {@inheritDoc} */
     @Override public StringProperty textProperty() {
@@ -108,7 +108,7 @@ public abstract class AbstractAction implements Action {
     
     
     // --- disabled
-    private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled");
+    private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"); //$NON-NLS-1$
     
     /** {@inheritDoc} */
     @Override public BooleanProperty disabledProperty() {
@@ -127,7 +127,7 @@ public abstract class AbstractAction implements Action {
 
     
     // --- longText
-    private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText");
+    private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"); //$NON-NLS-1$
     
     /** {@inheritDoc} */
     @Override public StringProperty longTextProperty() {
@@ -146,7 +146,7 @@ public abstract class AbstractAction implements Action {
     
     
     // --- graphic
-    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic");
+    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"); //$NON-NLS-1$
     
     /** {@inheritDoc} */
     @Override public ObjectProperty<Node> graphicProperty() {
@@ -165,7 +165,7 @@ public abstract class AbstractAction implements Action {
     
     
     // --- accelerator
-    private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator");
+    private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"); //$NON-NLS-1$
     
     /** {@inheritDoc} */
     @Override public ObjectProperty<KeyCombination> acceleratorProperty() {

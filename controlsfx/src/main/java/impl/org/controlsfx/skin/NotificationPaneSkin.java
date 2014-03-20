@@ -86,29 +86,29 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         
         updateContent();
         
-        registerChangeListener(control.contentProperty(), "CONTENT");
-        registerChangeListener(control.textProperty(), "TEXT");
-        registerChangeListener(control.graphicProperty(), "GRAPHIC");
-        registerChangeListener(control.showingProperty(), "SHOWING");
-        registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP");
+        registerChangeListener(control.contentProperty(), "CONTENT"); //$NON-NLS-1$
+        registerChangeListener(control.textProperty(), "TEXT"); //$NON-NLS-1$
+        registerChangeListener(control.graphicProperty(), "GRAPHIC"); //$NON-NLS-1$
+        registerChangeListener(control.showingProperty(), "SHOWING"); //$NON-NLS-1$
+        registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP"); //$NON-NLS-1$
     }
     
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if ("CONTENT".equals(p)) {
+        if ("CONTENT".equals(p)) { //$NON-NLS-1$
             updateContent();
-        } else if ("TEXT".equals(p)) {
+        } else if ("TEXT".equals(p)) { //$NON-NLS-1$
             notificationBar.label.setText(getSkinnable().getText());
-        } else if ("GRAPHIC".equals(p)) {
+        } else if ("GRAPHIC".equals(p)) { //$NON-NLS-1$
             notificationBar.label.setGraphic(getSkinnable().getGraphic());
-        } else if ("SHOWING".equals(p)) {
+        } else if ("SHOWING".equals(p)) { //$NON-NLS-1$
             if (getSkinnable().isShowing()) {
                 notificationBar.doShow();
             } else {
                 notificationBar.doHide();
             }
-        } else if ("SHOW_FROM_TOP".equals(p)) {
+        } else if ("SHOW_FROM_TOP".equals(p)) { //$NON-NLS-1$
             if (getSkinnable().isShowing()) {
                 getSkinnable().requestLayout();
             }

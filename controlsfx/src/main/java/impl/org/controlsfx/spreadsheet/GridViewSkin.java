@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,11 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
+import java.util.BitSet;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
+import org.controlsfx.control.spreadsheet.Grid;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -84,7 +88,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     public static final double DEFAULT_CELL_HEIGHT;
 
     /** Default width of the VerticalHeader. */
-    protected static final double DEFAULT_VERTICAL_HEADER_WIDTH = 40.0;
+    protected static final double DEFAULT_VERTICAL_HEADER_WIDTH = 30.0;
 
     // FIXME This should seriously be investigated ..
     private static final double DATE_CELL_MIN_WIDTH = 200 - Screen.getPrimary().getDpi();
@@ -93,7 +97,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         double cell_size = 24.0;
         try {
             Class<?> clazz = com.sun.javafx.scene.control.skin.CellSkinBase.class;
-            Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE");
+            Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE"); //$NON-NLS-1$
             f.setAccessible(true);
             cell_size = f.getDouble(null);
         } catch (NoSuchFieldException e) {
@@ -129,6 +133,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader verticalHeader;
+    
     /**
      * The currently fixedRow. This handles an Integer's set of rows being
      * fixed. NOT Fixable but truly fixed.
@@ -154,6 +159,19 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      */
     private double fixedRowHeight = 0;
 
+    /**
+     * These variable try to optimize the layout of the rows in order not to layout
+     * every time every row.
+     * 
+     * So rowToLayout contains the rows that really needs layout(contain span or fixed).
+     * 
+     * And hBarValue is an indicator for the VirtualFlow. When the Hbar is touched, this BitSet
+     * is set to false. And when a row is drawing, it flips its value in this BitSet. 
+     * So that we know when scrolling up or down whether a row has taken into account
+     * that the HBar was moved (otherwise, blank area may appear).
+     */
+    BitSet hBarValue;
+    BitSet rowToLayout;
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -173,13 +191,22 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                     }
                 });
 
-        tableView.getStyleClass().add("cell-spreadsheet");
+        tableView.getStyleClass().add("cell-spreadsheet"); //$NON-NLS-1$
 
         getCurrentlyFixedRow().addListener(currentlyFixedRowListener);
         spreadsheetView.getFixedRows().addListener(fixedRowsListener);
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 
         init();
+        handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Grid> ov, Grid t, Grid t1) {
+                 rowToLayout = initRowToLayoutBitSet();
+            }
+        });
+        hBarValue = new BitSet(handle.getView().getGrid().getRowCount());
+        rowToLayout = initRowToLayoutBitSet();
         // Because fixedRow Listener is not reacting first time.
         computeFixedRowHeight();
     }
@@ -202,7 +229,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * @param row
      * @return
      */
-    public Double getRowHeight(int row) {
+    public double getRowHeight(int row) {
         Double rowHeight = handle.getCellsViewSkin().rowHeightMap.get(row);
         return rowHeight == null ? handle.getView().getGrid().getRowHeight(row) : rowHeight;
     }
@@ -281,7 +308,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
-        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE);
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
         
         // determine cell padding
         double padding = 10;
@@ -357,7 +384,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
-        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE);
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
 
         // determine cell padding
         double padding = 10;
@@ -690,6 +717,26 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     /**
+     * Return a BitSet of the rows that needs layout all the time. This
+     * includes any row containing a span, or a fixed row.
+     * @return 
+     */
+    private BitSet initRowToLayoutBitSet(){
+        Grid grid =  handle.getView().getGrid();
+        BitSet bitSet = new BitSet(grid.getRowCount());
+        for(int row = 0;row<grid.getRowCount();++row){
+           List<SpreadsheetCell> myRow = grid.getRows().get(row);
+           for(SpreadsheetCell cell:myRow){
+               if(cell.getRowSpan()>1 || cell.getColumnSpan() >1){
+                   bitSet.set(row);
+                   break;
+               }
+           }
+        }
+        return bitSet;
+    }
+    
+    /**
      * When the vertical moves, we update the verticalHeader
      */
     private final InvalidationListener vbarValueListener = new InvalidationListener() {
@@ -706,6 +753,13 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
         @Override
         public void onChanged(Change<? extends Integer> c) {
+            hBarValue.clear();
+            while(c.next()){
+                //FIXME If row is un-fixed, look if it needs to be removed from rowToLayout
+                for(Integer fixedRow:c.getAddedSubList()){
+                    rowToLayout.set(fixedRow, true);
+                }
+            }
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
@@ -714,7 +768,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     /**
      * We listen on the currentlyFixedRow in order to do the modification in the
-     * FixedRowHeight
+     * FixedRowHeight.
      */
     private final SetChangeListener<? super Integer> currentlyFixedRowListener = new SetChangeListener<Integer>() {
         @Override
@@ -736,16 +790,19 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     /**
      * We listen on the FixedColumns in order to do the modification in the
-     * VirtualFlow
+     * VirtualFlow.
      */
     private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
         @Override
         public void onChanged(Change<? extends SpreadsheetColumn> c) {
+            hBarValue.clear();
             if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
                 for (int i = 0; i < getFlow().getCells().size(); ++i) {
                     ((GridRow) getFlow().getCells().get(i)).putFixedColumnToBack();
                 }
             }
+            
+            
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }

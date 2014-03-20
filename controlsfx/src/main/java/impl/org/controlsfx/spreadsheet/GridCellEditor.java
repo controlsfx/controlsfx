@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,11 @@ package impl.org.controlsfx.spreadsheet;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.scene.control.TablePosition;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
@@ -46,7 +51,7 @@ public class GridCellEditor {
     private CellView viewCell;
 
     // private internal fields
-    private SpreadsheetEditor spreadsheetEditor;
+    private final SpreadsheetEditor spreadsheetEditor;
     private InvalidationListener editorListener;
     private InvalidationListener il;
     private boolean editing = false;
@@ -129,6 +134,13 @@ public class GridCellEditor {
                 viewCell.commitEdit(modelCell);
                 end();
                 spreadsheetCellEditor.end();
+                if(lastKeyPressed == KeyCode.ENTER){
+                   TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
+                            getFocusModel().getFocusedCell();
+                    if (position != null) {
+                        handle.getGridView().getSelectionModel().clearAndSelect(position.getRow() + 1, position.getTableColumn());
+                    }
+                }
             }
         }
         if (viewCell != null) {
@@ -151,11 +163,13 @@ public class GridCellEditor {
         return modelCell;
     }
 
+    KeyCode lastKeyPressed;
     /***************************************************************************
      * * Protected/Private Methods * *
      **************************************************************************/
     void startEdit() {
         editing = true;
+        handle.getGridView().addEventFilter(KeyEvent.KEY_PRESSED, enterKeyPressed);
         spreadsheetEditor.startEdit();
 
         // If the SpreadsheetCell is deselected, we commit.
@@ -192,12 +206,18 @@ public class GridCellEditor {
         Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), MAX_EDITOR_HEIGHT);
         spreadsheetCellEditor.getEditor().setMaxHeight(maxHeight);
         spreadsheetCellEditor.getEditor().setPrefWidth(viewCell.getWidth());
+        if(handle.getGridView().getEditWithKey()){
+            handle.getGridView().setEditWithKey(false);
+            spreadsheetCellEditor.startEdit("");
+        }else{
         spreadsheetCellEditor.startEdit(value);
+        }
     }
 
     private void end() {
         editing = false;
         spreadsheetEditor.end();
+        handle.getGridView().removeEventFilter(KeyEvent.KEY_PRESSED, enterKeyPressed);
         if (viewCell != null) {
             viewCell.selectedProperty().removeListener(il);
         }
@@ -216,6 +236,16 @@ public class GridCellEditor {
         this.viewCell = null;
     }
 
+    /**
+     * When we stop editing a cell, if enter was pressed, we want to go to the next line.
+     */
+    private final EventHandler<KeyEvent> enterKeyPressed = new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent t) {
+            lastKeyPressed = t.getCode();
+        }
+    };
+    
     private class SpreadsheetEditor {
 
         /***********************************************************************

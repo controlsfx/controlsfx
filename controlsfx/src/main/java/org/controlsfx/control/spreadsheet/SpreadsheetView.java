@@ -862,43 +862,12 @@ public class SpreadsheetView extends Control {
 
             @SuppressWarnings("unchecked")
             final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
-            // TODO algorithm very bad
-            int minRow = getGrid().getRowCount();
-            int minCol = getGrid().getColumnCount();
-            int maxRow = 0;
-            int maxCol = 0;
-            for (final GridChange p : list) {
-                final int tempcol = p.getColumn();
-                final int temprow = p.getRow();
-                if (tempcol < minCol) {
-                    minCol = tempcol;
-                }
-                if (tempcol > maxCol) {
-                    maxCol = tempcol;
-                }
-                if (temprow < minRow) {
-                    minRow = temprow;
-                }
-                if (temprow > maxRow) {
-                    maxRow = temprow;
-                }
-            }
-
-            final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
-
-            final int offsetRow = p.getRow() - minRow;
-            final int offsetCol = p.getColumn() - minCol;
-            int row;
-            int column;
-
-            for (final GridChange change : list) {
-                row = change.getRow();
-                column = change.getColumn();
-                if (row + offsetRow < getGrid().getRowCount() && column + offsetCol < getGrid().getColumnCount()
-                        && row + offsetRow >= 0 && column + offsetCol >= 0) {
-                    final SpanType type = getSpanType(row + offsetRow, column + offsetCol);
+            if(list.size() == 1){
+                GridChange change = list.get(0);
+                for(TablePosition position:getSelectionModel().getSelectedCells()){
+                    final SpanType type = getSpanType(position.getRow(), position.getColumn());
                     if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
-                        SpreadsheetCell cell = getGrid().getRows().get(row + offsetRow).get(column + offsetCol);
+                        SpreadsheetCell cell = getGrid().getRows().get(position.getRow()).get(position.getColumn());
                         boolean succeed = cell.getCellType().match(change.getNewValue());
                         if (succeed) {
                             getGrid().setCellValue(cell.getRow(), cell.getColumn(),
@@ -906,8 +875,53 @@ public class SpreadsheetView extends Control {
                         }
                     }
                 }
-            }
+            }else{
+                // TODO algorithm very bad
+                int minRow = getGrid().getRowCount();
+                int minCol = getGrid().getColumnCount();
+                int maxRow = 0;
+                int maxCol = 0;
+                for (final GridChange p : list) {
+                    final int tempcol = p.getColumn();
+                    final int temprow = p.getRow();
+                    if (tempcol < minCol) {
+                        minCol = tempcol;
+                    }
+                    if (tempcol > maxCol) {
+                        maxCol = tempcol;
+                    }
+                    if (temprow < minRow) {
+                        minRow = temprow;
+                    }
+                    if (temprow > maxRow) {
+                        maxRow = temprow;
+                    }
+                }
 
+                final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
+
+                final int offsetRow = p.getRow() - minRow;
+                final int offsetCol = p.getColumn() - minCol;
+                int row;
+                int column;
+
+                for (final GridChange change : list) {
+                    row = change.getRow();
+                    column = change.getColumn();
+                    if (row + offsetRow < getGrid().getRowCount() && column + offsetCol < getGrid().getColumnCount()
+                            && row + offsetRow >= 0 && column + offsetCol >= 0) {
+                        final SpanType type = getSpanType(row + offsetRow, column + offsetCol);
+                        if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
+                            SpreadsheetCell cell = getGrid().getRows().get(row + offsetRow).get(column + offsetCol);
+                            boolean succeed = cell.getCellType().match(change.getNewValue());
+                            if (succeed) {
+                                getGrid().setCellValue(cell.getRow(), cell.getColumn(),
+                                        cell.getCellType().convertValue(change.getNewValue()));
+                            }
+                        }
+                    }
+                }
+            }
             // To be improved
         } else if (clipboard.hasString()) {
             // final TablePosition<?,?> p =

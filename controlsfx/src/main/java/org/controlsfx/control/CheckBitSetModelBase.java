@@ -286,7 +286,7 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
             final int index = i;
             final T item = getItem(index);
             
-            final BooleanProperty booleanProperty = new SimpleBooleanProperty(item, "selected", false);
+            final BooleanProperty booleanProperty = new SimpleBooleanProperty(item, "selected", false); //$NON-NLS-1$
             itemBooleanMap.put(item, booleanProperty);
             
             // this is where we listen to changes to the boolean properties,

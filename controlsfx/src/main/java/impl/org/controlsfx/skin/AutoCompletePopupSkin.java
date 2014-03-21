@@ -27,7 +27,7 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         suggestionList.getStyleClass().add(AutoCompletePopup.DEFAULT_STYLE_CLASS);
 
         suggestionList.getStylesheets().add(AutoCompletionBinding.class
-        		.getResource("autocompletion.css").toExternalForm());
+        		.getResource("autocompletion.css").toExternalForm()); //$NON-NLS-1$
         suggestionList.prefHeightProperty().bind(
                 Bindings.size(suggestionList.getItems()).multiply(LIST_CELL_HEIGHT)
                 .add(15));

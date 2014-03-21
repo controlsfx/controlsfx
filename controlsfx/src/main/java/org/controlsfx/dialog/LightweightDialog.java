@@ -14,14 +14,19 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.effect.Effect;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -43,7 +48,7 @@ class LightweightDialog extends FXDialog {
     private Parent owner;
     
     private Region opaqueLayer;
-    private Pane dialogStack;
+    private Group dialogStack;
     private Parent originalParent;
     
     private BooleanProperty focused;
@@ -86,7 +91,7 @@ class LightweightDialog extends FXDialog {
         } else if (_owner instanceof Node) {
             owner = getFirstParent((Node)_owner);
         } else {
-            throw new IllegalArgumentException("Unknown owner: " + _owner.getClass());
+            throw new IllegalArgumentException("Unknown owner: " + _owner.getClass()); //$NON-NLS-1$
         }
         
         if (scene == null && owner != null) {
@@ -96,7 +101,7 @@ class LightweightDialog extends FXDialog {
         
         // *** The rest is for adding window decorations ***
         init(title, true);
-        lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome");
+        lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
         
         // add window dragging
         toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -191,13 +196,13 @@ class LightweightDialog extends FXDialog {
         return scene.getStylesheets();
     }
     
-    public void setEffect(Effect e) {
+    @Override public void setEffect(Effect e) {
         this.effect = e;
     }
     
     @Override public StringProperty titleProperty() {
         if (title == null) {
-            title = new SimpleStringProperty(this, "title");
+            title = new SimpleStringProperty(this, "title"); //$NON-NLS-1$
         }
         return title;
     }
@@ -233,7 +238,7 @@ class LightweightDialog extends FXDialog {
 
     @Override BooleanProperty resizableProperty() {
         if (resizable == null) {
-            resizable = new SimpleBooleanProperty(this, "resizable", false);
+            resizable = new SimpleBooleanProperty(this, "resizable", false); //$NON-NLS-1$
         }
         return resizable;
     }
@@ -256,7 +261,7 @@ class LightweightDialog extends FXDialog {
     
     @Override BooleanProperty focusedProperty() {
         if (focused == null) {
-            focused = new SimpleBooleanProperty(this, "focused", true);
+            focused = new SimpleBooleanProperty(this, "focused", true); //$NON-NLS-1$
         }
         return focused;
     }
@@ -307,7 +312,7 @@ class LightweightDialog extends FXDialog {
         
         // reset the scene root
         dialogStack.getChildren().remove(originalParent);
-        originalParent.getStyleClass().remove("root");
+        originalParent.getStyleClass().remove("root"); //$NON-NLS-1$
         
         scene.setRoot(originalParent);
     }
@@ -381,7 +386,7 @@ class LightweightDialog extends FXDialog {
     }
     
     private void buildDialogStack(final Node parent) {
-        dialogStack = new Pane(lightweightDialog) {
+        dialogStack = new Group(lightweightDialog) {
             private boolean isFirstRun = true;
             
             protected void layoutChildren() {
@@ -401,7 +406,7 @@ class LightweightDialog extends FXDialog {
                 
                 final double dialogWidth = lightweightDialog.prefWidth(-1);
                 final double dialogHeight = lightweightDialog.prefHeight(-1);
-                lightweightDialog.resize(snapSize(dialogWidth), snapSize(dialogHeight));
+                lightweightDialog.resize((int)(dialogWidth), (int)(dialogHeight));
                 
                 // hacky, but we only want to position the dialog the first time 
                 // it is laid out - after that the only way it should move is if
@@ -415,10 +420,11 @@ class LightweightDialog extends FXDialog {
                     double dialogY = lightweightDialog.getLayoutY();
                     dialogY = dialogY == 0.0 ? h / 2.0 - dialogHeight / 2.0 : dialogY;
                     
-                    lightweightDialog.relocate(snapPosition(dialogX), snapPosition(dialogY));
+                    lightweightDialog.relocate((int)(dialogX), (int)(dialogY));
                 }
             }
         };
+                
         dialogStack.setManaged(true);
         
         if (parent != null) {
@@ -429,12 +435,12 @@ class LightweightDialog extends FXDialog {
             dialogStack.getProperties().putAll(parent.getProperties());
         }
         
+        // always add opaque layer, to block input events to parent scene
+        opaqueLayer = new Region();
+        dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
+        
         if (effect == null) {
-            // opaque layer
-            opaqueLayer = new Region();
-            opaqueLayer.getStyleClass().add("lightweight-dialog-background");
-            
-            dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
+            opaqueLayer.getStyleClass().add("lightweight-dialog-background"); //$NON-NLS-1$
         } else {
             if (parent != null) {
                 tempEffect = parent.getEffect();
@@ -481,7 +487,7 @@ class LightweightDialog extends FXDialog {
         ObservableList<Node> children = null;
         
         try {
-            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren");
+            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
             
             if (getChildrenMethod != null) {
                 if (! getChildrenMethod.isAccessible()) {

@@ -150,7 +150,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
                 this.stringConverter = new Callback<T, String>() {
                     @Override
                     public String call(T obj) {
-                        return obj != null ? obj.toString() : "";
+                        return obj != null ? obj.toString() : ""; //$NON-NLS-1$
                     }
                 };
             }

@@ -41,7 +41,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
@@ -231,8 +230,8 @@ public class SpreadsheetCell {
         this.rowSpan = rowSpan;
         this.columnSpan = columnSpan;
         this.type = type;
-        text = new SimpleStringProperty("");
-        format = new SimpleStringProperty("");
+        text = new SimpleStringProperty(""); //$NON-NLS-1$
+        format = new SimpleStringProperty(""); //$NON-NLS-1$
         graphic = new SimpleObjectProperty<>();
         format.addListener(new ChangeListener<String>() {
             @Override
@@ -240,7 +239,7 @@ public class SpreadsheetCell {
                 updateText();
             }
         });
-        getStyleClass().add("spreadsheet-cell");
+        getStyleClass().add("spreadsheet-cell"); //$NON-NLS-1$
     }
 
     /***************************************************************************
@@ -267,7 +266,7 @@ public class SpreadsheetCell {
      ***************************************************************************/
 
     // --- item
-    private final ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") {
+    private final ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") { //$NON-NLS-1$
         @Override
         protected void invalidated() {
             updateText();
@@ -334,13 +333,13 @@ public class SpreadsheetCell {
      */
     public final BooleanProperty editableProperty() {
         if (editable == null) {
-            editable = new SimpleBooleanProperty(this, "editable", true);
+            editable = new SimpleBooleanProperty(this, "editable", true); //$NON-NLS-1$
         }
         return editable;
     }
 
     // --- comment
-    private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false);
+    private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false); //$NON-NLS-1$
 
     /**
      * Return if this cell has a comment or not.
@@ -566,7 +565,7 @@ public class SpreadsheetCell {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan;
+        return "cell[" + row + "][" + column + "]" + rowSpan + "-" + columnSpan; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     /** {@inheritDoc} */
@@ -604,7 +603,7 @@ public class SpreadsheetCell {
      */
     @SuppressWarnings("unchecked")
     private void updateText() {
-        if (!("").equals(getFormat())) {
+        if (!("").equals(getFormat())) { //$NON-NLS-1$
             text.setValue(type.toString(getItem(), getFormat()));
         } else {
             text.setValue(type.toString(getItem()));

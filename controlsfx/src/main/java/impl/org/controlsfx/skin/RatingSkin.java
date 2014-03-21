@@ -58,7 +58,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
      * 
      **************************************************************************/
     
-    private static final String STRONG = "strong";
+    private static final String STRONG = "strong"; //$NON-NLS-1$
     
     private boolean updateOnHover;
     private boolean partialRating;
@@ -129,11 +129,11 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         updateRating(getSkinnable().getRating());
         // -- end init
         
-        registerChangeListener(control.ratingProperty(), "RATING");
-        registerChangeListener(control.maxProperty(), "MAX");
-        registerChangeListener(control.orientationProperty(), "ORIENTATION");
-        registerChangeListener(control.updateOnHoverProperty(), "UPDATE_ON_HOVER");
-        registerChangeListener(control.partialRatingProperty(), "PARTIAL_RATING");
+        registerChangeListener(control.ratingProperty(), "RATING"); //$NON-NLS-1$
+        registerChangeListener(control.maxProperty(), "MAX"); //$NON-NLS-1$
+        registerChangeListener(control.orientationProperty(), "ORIENTATION"); //$NON-NLS-1$
+        registerChangeListener(control.updateOnHoverProperty(), "UPDATE_ON_HOVER"); //$NON-NLS-1$
+        registerChangeListener(control.partialRatingProperty(), "PARTIAL_RATING"); //$NON-NLS-1$
     }
 
     
@@ -147,16 +147,16 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if (p == "RATING") {
+        if (p == "RATING") { //$NON-NLS-1$
             updateRating();
-        } else if (p == "MAX") {
+        } else if (p == "MAX") { //$NON-NLS-1$
             recreateButtons();
-        } else if (p == "ORIENTATION") {
+        } else if (p == "ORIENTATION") { //$NON-NLS-1$
             recreateButtons();
-        } else if (p == "PARTIAL_RATING") {
+        } else if (p == "PARTIAL_RATING") { //$NON-NLS-1$
             this.partialRating = getSkinnable().isPartialRating();
             recreateButtons();
-        } else if (p == "UPDATE_ON_HOVER") {
+        } else if (p == "UPDATE_ON_HOVER") { //$NON-NLS-1$
             this.updateOnHover = getSkinnable().isUpdateOnHover();
             recreateButtons();
         }
@@ -167,12 +167,12 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         foregroundContainer = null;
         
         backgroundContainer = isVertical() ? new VBox() : new HBox();
-        backgroundContainer.getStyleClass().add("container");
+        backgroundContainer.getStyleClass().add("container"); //$NON-NLS-1$
         getChildren().setAll(backgroundContainer);
         
         if (updateOnHover || partialRating) {
             foregroundContainer = isVertical() ? new VBox() : new HBox();
-            foregroundContainer.getStyleClass().add("container");
+            foregroundContainer.getStyleClass().add("container"); //$NON-NLS-1$
             foregroundContainer.setMouseTransparent(true);
             getChildren().add(foregroundContainer);
             
@@ -259,7 +259,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     
     private Node createButton() {
         Region btn = new Region();
-        btn.getStyleClass().add("button");
+        btn.getStyleClass().add("button"); //$NON-NLS-1$
         
         btn.setOnMouseMoved(mouseMoveHandler);
         btn.setOnMouseClicked(mouseClickHandler);

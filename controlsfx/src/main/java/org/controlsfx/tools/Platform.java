@@ -33,10 +33,10 @@ import com.sun.javafx.Utils;
  */
 public enum Platform {
     
-    WINDOWS("windows"),
-    OSX("mac"),
-    UNIX("unix"),
-    UNKNOWN("");
+    WINDOWS("windows"), //$NON-NLS-1$
+    OSX("mac"), //$NON-NLS-1$
+    UNIX("unix"), //$NON-NLS-1$
+    UNKNOWN(""); //$NON-NLS-1$
     
     private static Platform current = getCurrentPlatform();
     

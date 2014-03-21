@@ -73,7 +73,7 @@ public class CustomTextField extends TextField {
      * Instantiates a default CustomTextField.
      */
     public CustomTextField() {
-        getStyleClass().add("custom-text-field");
+        getStyleClass().add("custom-text-field"); //$NON-NLS-1$
     }
 
     
@@ -85,7 +85,7 @@ public class CustomTextField extends TextField {
      **************************************************************************/
     
     // --- left
-    private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this, "left");
+    private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this, "left"); //$NON-NLS-1$
     
     /**
      * Property representing the {@link Node} that is placed on the left of
@@ -105,7 +105,7 @@ public class CustomTextField extends TextField {
     
     
     // --- right
-    private ObjectProperty<Node> right = new SimpleObjectProperty<Node>(this, "right");
+    private ObjectProperty<Node> right = new SimpleObjectProperty<Node>(this, "right"); //$NON-NLS-1$
     
     /**
      * Property representing the {@link Node} that is placed on the right of
@@ -142,6 +142,6 @@ public class CustomTextField extends TextField {
      * {@inheritDoc}
      */
     @Override protected String getUserAgentStylesheet() {
-        return CustomTextField.class.getResource("customtextfield.css").toExternalForm();
+        return CustomTextField.class.getResource("customtextfield.css").toExternalForm(); //$NON-NLS-1$
     }
 }

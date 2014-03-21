@@ -43,6 +43,7 @@ import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.effect.Effect;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -115,8 +116,8 @@ class HeavyweightDialog extends FXDialog {
 
         // *** The rest is for adding window decorations ***
         init(title, useCustomChrome);
-        lightweightDialog.getStyleClass().add("heavyweight");
-        lightweightDialog.getStyleClass().add(useCustomChrome ? "custom-chrome" : "native-chrome");
+        lightweightDialog.getStyleClass().add("heavyweight"); //$NON-NLS-1$
+        lightweightDialog.getStyleClass().add(useCustomChrome ? "custom-chrome" : "native-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
 
         Scene scene = new Scene(lightweightDialog);
         scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
@@ -290,6 +291,11 @@ class HeavyweightDialog extends FXDialog {
     @Override boolean isIconified() {
         return stage.isIconified();
     }
+    
+    @Override
+    void setEffect(Effect e) {
+        // not implemented for heavyweight dialogs
+    }
 
     
     
@@ -298,7 +304,7 @@ class HeavyweightDialog extends FXDialog {
      * Stylesheet Handling                                                     *
      *                                                                         *
      **************************************************************************/
-    private static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active");
+    private static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active"); //$NON-NLS-1$
 
 }
 

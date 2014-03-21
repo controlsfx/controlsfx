@@ -75,7 +75,7 @@ import javafx.util.Duration;
  */
 public class PopOver extends PopupControl {
 
-    private static final String DEFAULT_STYLE_CLASS = "popover";
+    private static final String DEFAULT_STYLE_CLASS = "popover"; //$NON-NLS-1$
 
     private static final Duration DEFAULT_FADE_IN_DURATION = Duration
             .seconds(.2);
@@ -103,7 +103,7 @@ public class PopOver extends PopupControl {
         /*
          * Create some initial content.
          */
-        Label label = new Label("<No Content>");
+        Label label = new Label("<No Content>"); //$NON-NLS-1$
         label.setPadding(new Insets(4));
         setContentNode(label);
 
@@ -142,12 +142,12 @@ public class PopOver extends PopupControl {
     // Content support.
 
     private final ObjectProperty<Node> contentNode = new SimpleObjectProperty<Node>(
-            this, "contentNode") {
+            this, "contentNode") { //$NON-NLS-1$
         @Override
         public void setValue(Node node) {
             if (node == null) {
                 throw new IllegalArgumentException(
-                        "content node can not be null");
+                        "content node can not be null"); //$NON-NLS-1$
             }
         };
     };
@@ -260,7 +260,7 @@ public class PopOver extends PopupControl {
         setDetached(false);
 
         if (owner == null) {
-            throw new IllegalArgumentException("owner can not be null");
+            throw new IllegalArgumentException("owner can not be null"); //$NON-NLS-1$
         }
 
         if (fadeInDuration == null) {
@@ -414,7 +414,7 @@ public class PopOver extends PopupControl {
     // detach support
 
     private final BooleanProperty detachable = new SimpleBooleanProperty(this,
-            "detachable", true);
+            "detachable", true); //$NON-NLS-1$
 
     /**
      * Determines if the pop over is detachable at all.
@@ -447,7 +447,7 @@ public class PopOver extends PopupControl {
     }
 
     private final BooleanProperty detached = new SimpleBooleanProperty(this,
-            "detached", false);
+            "detached", false); //$NON-NLS-1$
 
     /**
      * Determines whether the pop over is detached from the owning node or not.
@@ -489,7 +489,7 @@ public class PopOver extends PopupControl {
     // TODO: make styleable
 
     private final DoubleProperty arrowSize = new SimpleDoubleProperty(this,
-            "arrowSize", 12);
+            "arrowSize", 12); //$NON-NLS-1$
 
     /**
      * Controls the size of the arrow. Default value is 12.
@@ -528,7 +528,7 @@ public class PopOver extends PopupControl {
     // TODO: make styleable
 
     private final DoubleProperty arrowIndent = new SimpleDoubleProperty(this,
-            "arrowIndent", 12);
+            "arrowIndent", 12); //$NON-NLS-1$
 
     /**
      * Controls the distance between the arrow and the corners of the pop over.
@@ -568,7 +568,7 @@ public class PopOver extends PopupControl {
     // TODO: make styleable
 
     private final DoubleProperty cornerRadius = new SimpleDoubleProperty(this,
-            "cornerRadius", 6);
+            "cornerRadius", 6); //$NON-NLS-1$
 
     /**
      * Returns the corner radius property for the pop over.
@@ -605,7 +605,7 @@ public class PopOver extends PopupControl {
     // Detached stage title
 
     private final StringProperty detachedTitle = new SimpleStringProperty(this,
-            "detachedTitle", "Info");
+            "detachedTitle", "Info"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Stores the title to display when the pop over becomes detached.
@@ -637,14 +637,14 @@ public class PopOver extends PopupControl {
      */
     public final void setDetachedTitle(String title) {
         if (title == null) {
-            throw new IllegalArgumentException("title can not be null");
+            throw new IllegalArgumentException("title can not be null"); //$NON-NLS-1$
         }
 
         detachedTitleProperty().set(title);
     }
 
     private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<PopOver.ArrowLocation>(
-            this, "arrowLocation", ArrowLocation.LEFT_TOP);
+            this, "arrowLocation", ArrowLocation.LEFT_TOP); //$NON-NLS-1$
 
     /**
      * Stores the preferred arrow location. This might not be the actual

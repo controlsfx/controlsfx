@@ -112,10 +112,10 @@ public class ValidationSupport {
 		
 			ov.addListener(new ChangeListener<T>(){
 				public void changed(ObservableValue<? extends T> o, T oldValue, T newValue) {
-					validationResults.put(c, validator.validate(c, newValue));
+					validationResults.put(c, validator.apply(c, newValue));
 				};
 		    });
-			validationResults.put(c, validator.validate(c, ov.getValue()));
+			validationResults.put(c, validator.apply(c, ov.getValue()));
 			return e;
 			
 		}).isPresent();

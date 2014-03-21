@@ -53,9 +53,8 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.samples.Utils;
 import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.ValidationResultBuilder;
 import org.controlsfx.validation.ValidationSupport;
-import org.controlsfx.validation.Validators;
+import org.controlsfx.validation.Validator;
 
 public class HelloValidation extends ControlsFXSample {
 
@@ -96,7 +95,7 @@ public class HelloValidation extends ControlsFXSample {
         // TextField with static auto-complete functionality
         //
         TextField textField = new TextField();
-        validationSupport.registerValidator(textField, Validators.createEmptyValidator("Text is required"));
+        validationSupport.registerValidator(textField, Validator.createEmptyValidator("Text is required"));
         
         TextFields.bindAutoCompletion(
                 textField,
@@ -110,7 +109,7 @@ public class HelloValidation extends ControlsFXSample {
         ComboBox<String> combobox = new ComboBox<String>();
         combobox.getItems().addAll("Item A", "Item B", "Item C");
         validationSupport.registerValidator(combobox,
-        		Validators.createEmptyValidator( "ComboBox Selection required"));
+        		Validator.createEmptyValidator( "ComboBox Selection required"));
         
         grid.add(new Label("Combobox"), 0, row);
         grid.add(combobox, 1, row);
@@ -120,7 +119,7 @@ public class HelloValidation extends ControlsFXSample {
         ChoiceBox<String> choiceBox = new ChoiceBox<String>();
         choiceBox.getItems().addAll("Item A", "Item B", "Item C");
         validationSupport.registerValidator(choiceBox, 
-        	Validators.createEmptyValidator("ChoiceBox Selection required"));
+        	Validator.createEmptyValidator("ChoiceBox Selection required"));
         
         grid.add(new Label("ChoiceBox"), 0, row);
         grid.add(choiceBox, 1, row);
@@ -128,12 +127,8 @@ public class HelloValidation extends ControlsFXSample {
         
         row++;
         CheckBox checkBox =  new CheckBox("CheckBox");
-        validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> {
-
-        	return new ValidationResultBuilder(checkBox)
-    			.addErrorIf( "Checkbox should be checked", () -> !newValue)
-    			.build();
-			}
+        validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> 
+        	ValidationResult.fromErrorIf( c, "Checkbox should be checked", () -> !newValue)
         );
         grid.add(checkBox, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
@@ -141,12 +136,8 @@ public class HelloValidation extends ControlsFXSample {
         row++;
         Slider slider =  new Slider(-50d, 50d, -10d);
         slider.setShowTickLabels(true);
-        validationSupport.registerValidator(slider, (Control c, Double newValue) -> {
-
-        	return new ValidationResultBuilder(slider)
-    			.addErrorIf( "Slider value should be > 0", () -> newValue <= 0 )
-    			.build();
-			}
+        validationSupport.registerValidator(slider, (Control c, Double newValue) -> 
+        	ValidationResult.fromErrorIf( slider, "Slider value should be > 0", () -> newValue <= 0 )
         );
        
         grid.add(new Label("Slider"), 0, row);
@@ -156,7 +147,7 @@ public class HelloValidation extends ControlsFXSample {
         row++;
         ColorPicker colorPicker =  new ColorPicker(Color.RED);
         validationSupport.registerValidator(colorPicker, 
-        	Validators.createEqualsValidator("Color should be WHITE", Arrays.asList(Color.WHITE))	
+        	Validator.createEqualsValidator("Color should be WHITE or BLACK", Arrays.asList(Color.WHITE, Color.BLACK))	
         );
        
         grid.add(new Label("Color Picker"), 0, row);

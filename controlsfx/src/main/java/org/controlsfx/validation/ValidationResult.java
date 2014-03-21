@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
+
+import javafx.scene.control.Control;
 
 public class ValidationResult {
 
@@ -12,6 +15,22 @@ public class ValidationResult {
 	private List<ValidationMessage> warnings = new ArrayList<>();
 	
 	public ValidationResult() {}
+	
+	public static final ValidationResult fromMessageIf( Control target, String text, Severity severity, Supplier<Boolean> condition ) {
+		return new ValidationResult().addMessageIf(target, text, severity, condition);
+	}
+	
+	public static final ValidationResult fromErrorIf( Control target, String text, Supplier<Boolean> condition ) {
+		return new ValidationResult().addErrorIf(target, text, condition);
+	}
+	
+	public static final ValidationResult fromWarningIf( Control target, String text, Supplier<Boolean> condition ) {
+		return new ValidationResult().addWarningIf(target, text, condition);
+	}
+	
+	public static final ValidationResult fromWarning( Control target, String text ) {
+		return fromMessages( ValidationMessage.warning(target, text));
+	}
 	
 	public static final ValidationResult fromMessages( ValidationMessage... messages ) {
 		return new ValidationResult().addAll(messages);
@@ -43,6 +62,21 @@ public class ValidationResult {
 		}
 		
 		return this;
+	}
+	
+	public ValidationResult addMessageIf( Control target, String text, Severity severity, Supplier<Boolean> condition) {
+		if ( condition == null || condition.get() ) {
+			add( new SimpleValidationMessage(target, text, severity));
+		}
+		return this;
+	}
+	
+	public ValidationResult addErrorIf( Control target, String text, Supplier<Boolean> condition) {
+		return addMessageIf(target,text,Severity.ERROR,condition);
+	}
+	
+	public ValidationResult addWarningIf( Control target, String text, Supplier<Boolean> condition) {
+		return addMessageIf(target,text,Severity.WARNING,condition);
 	}
 	
 	public ValidationResult addAll( Collection<? extends ValidationMessage> messages ) {

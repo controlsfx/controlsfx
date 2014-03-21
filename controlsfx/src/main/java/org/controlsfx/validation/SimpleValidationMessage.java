@@ -2,24 +2,15 @@ package org.controlsfx.validation;
 
 import javafx.scene.control.Control;
 
-public class SimpleValidationMessage implements ValidationMessage {
+class SimpleValidationMessage implements ValidationMessage {
 	
 	private final String text;
 	private final Severity severity;
 	private final Control target;
 	
-	
-	public static SimpleValidationMessage error( Control target, String text ) {
-		return new SimpleValidationMessage(target, text, Severity.ERROR);
-	}
-	
-	public static SimpleValidationMessage warning( Control target, String text ) {
-		return new SimpleValidationMessage(target, text, Severity.WARNING);
-	}
-	
 	public SimpleValidationMessage( Control target, String text, Severity severity ) {
 		this.text = text;
-		this.severity = severity;
+		this.severity = severity == null? Severity.ERROR: severity;
 		this.target = target;
 	}
 

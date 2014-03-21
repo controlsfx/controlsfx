@@ -577,6 +577,7 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.INPUT);
         // Workaround: need final variable without custom change listener
         final Object[] response = new Object[1];
+        response[0]=defaultChoice;
         ChangeListener<T> changeListener = new ChangeListener<T>() {
             @Override public void changed(ObservableValue<? extends T> ov, T t, T t1) {
                 response[0] = t1;

@@ -86,8 +86,7 @@ public class HelloValidation extends ControlsFXSample {
         final ListView<ValidationMessage> messageList = new ListView<>();
         validationSupport.validationResultProperty().addListener( new ChangeListener<ValidationResult>(){
 			public void changed(ObservableValue<? extends ValidationResult> o, ValidationResult oldValue, ValidationResult newValue) {
-				messageList.getItems().clear();
-				newValue.getMessages().stream().forEach(msg -> messageList.getItems().addAll(msg) );
+				messageList.getItems().setAll(newValue.getMessages());
 			};
         });
         

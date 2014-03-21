@@ -78,7 +78,7 @@ public class ValidationSupport {
 			@Override
 			public void onChanged(MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) {
 				// TODO: lazy binding??
-				validationResultProperty.set(new ValidationResult().addValidationResults(validationResults.values()));
+				validationResultProperty.set(ValidationResult.fromResults(validationResults.values()));
 			}
 		});
 	}
@@ -101,16 +101,11 @@ public class ValidationSupport {
 		}
 		return Optional.empty();
 	}
-	
-	
-	
-	
-	// TODO: Need weak listeners to avoid memory leaks
-    // TODO: Should both old and new value be passed into a validator? 
+
 	@SuppressWarnings("unchecked")
 	public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
 		
-		return getExtractor(c).map(e->{
+		return getExtractor(c).map( e -> {
 			
 			ObservableValue<T> ov = (ObservableValue<T>) e.extract(c);
 			ValidationControlUtils.setRequired( c, required );
@@ -122,6 +117,7 @@ public class ValidationSupport {
 		    });
 			validationResults.put(c, validator.validate(c, ov.getValue()));
 			return e;
+			
 		}).isPresent();
 	}
 	

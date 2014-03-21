@@ -594,10 +594,11 @@ public final class Dialogs {
             selectionModel = choiceBox.getSelectionModel();
             dlg.setContent(buildInputContent(choiceBox));
         }
-        if (defaultChoice==null)
-        	selectionModel.selectFirst();
-        else
-        	selectionModel.select(defaultChoice);
+        if (defaultChoice==null) {
+            selectionModel.selectFirst();
+        } else {
+            selectionModel.select(defaultChoice);
+        }
 
         return dlg.show() == OK ? selectionModel.getSelectedItem() : null;
 

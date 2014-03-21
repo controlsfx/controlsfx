@@ -70,6 +70,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -575,35 +576,30 @@ public final class Dialogs {
     @SuppressWarnings("unchecked") public <T> T showChoices(T defaultChoice, Collection<T> choices) {
 
         Dialog dlg = buildDialog(Type.INPUT);
-        // Workaround: need final variable without custom change listener
-        final Object[] response = new Object[1];
-        response[0]=defaultChoice;
-        ChangeListener<T> changeListener = new ChangeListener<T>() {
-            @Override public void changed(ObservableValue<? extends T> ov, T t, T t1) {
-                response[0] = t1;
-            }
-        };
         
         final double MIN_WIDTH = 150;
+        SelectionModel<T> selectionModel=null;
         if (choices.size() > 10) {
             // use ComboBox
             ComboBox<T> comboBox = new ComboBox<T>();
             comboBox.setMinWidth(MIN_WIDTH);
             comboBox.getItems().addAll(choices);
-            comboBox.getSelectionModel().select(defaultChoice);
-            comboBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
+            selectionModel = comboBox.getSelectionModel();
             dlg.setContent(buildInputContent(comboBox));
         } else {
             // use ChoiceBox
             ChoiceBox<T> choiceBox = new ChoiceBox<T>();
             choiceBox.setMinWidth(MIN_WIDTH);
             choiceBox.getItems().addAll(choices);
-            choiceBox.getSelectionModel().select(defaultChoice);
-            choiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
+            selectionModel = choiceBox.getSelectionModel();
             dlg.setContent(buildInputContent(choiceBox));
         }
+        if (defaultChoice==null)
+        	selectionModel.selectFirst();
+        else
+        	selectionModel.select(defaultChoice);
 
-        return dlg.show() == OK ? (T) response[0] : null;
+        return dlg.show() == OK ? selectionModel.getSelectedItem() : null;
 
     }
 

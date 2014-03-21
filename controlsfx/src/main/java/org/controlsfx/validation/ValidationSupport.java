@@ -28,8 +28,6 @@ public class ValidationSupport {
 	private ObservableMap<Control,ValidationResult> validationResults = 
 			FXCollections.observableMap(new WeakHashMap<>());
 	
-	
-	
 	// this can probably be done better
 	private static class ObservableValueExtractor {
 		
@@ -41,7 +39,7 @@ public class ValidationSupport {
 			this.extract = extract;
 		}
 		
-		public boolean isAppicable( Control c ) {
+		public boolean isApplicable( Control c ) {
 			return check.call(c);
 		}
 		
@@ -80,7 +78,7 @@ public class ValidationSupport {
 			@Override
 			public void onChanged(MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) {
 				// TODO: lazy binding??
-				validationResultProperty.set(new ValidationResult().addValidationResults(validationResults.values()));
+				validationResultProperty.set(ValidationResult.fromResults(validationResults.values()));
 			}
 		});
 	}
@@ -99,32 +97,18 @@ public class ValidationSupport {
 	
 	private Optional<ObservableValueExtractor> getExtractor(final Control c) {
 		for( ObservableValueExtractor e: extractors ) {
-			if ( e.isAppicable(c)) return Optional.of(e);
+			if ( e.isApplicable(c)) return Optional.of(e);
 		}
 		return Optional.empty();
 	}
-	
-	private static String CTRL_REQUIRED_FLAG = "controlsfx.required.control";
-	
-	private void setRequired( Control c, boolean required ) {
-		c.getProperties().put(CTRL_REQUIRED_FLAG, required );
-	}
-	
-	public boolean getRequired( Control c ) {
-		Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
-		return value instanceof Boolean? (Boolean)value: false;
-	}
-	
-	
-	// TODO: Need weak listeners to avoid memory leaks
-    // TODO: Should both old and new value be passed into a validator? 
-    // TODO: Add 'required' flag
-	public <T> void registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
+
+	@SuppressWarnings("unchecked")
+	public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
 		
-		getExtractor(c).ifPresent(e->{
+		return getExtractor(c).map( e -> {
 			
 			ObservableValue<T> ov = (ObservableValue<T>) e.extract(c);
-			setRequired( c, required );
+			ValidationControlUtils.setRequired( c, required );
 		
 			ov.addListener(new ChangeListener<T>(){
 				public void changed(ObservableValue<? extends T> o, T oldValue, T newValue) {
@@ -132,13 +116,13 @@ public class ValidationSupport {
 				};
 		    });
 			validationResults.put(c, validator.validate(c, ov.getValue()));
+			return e;
 			
-		});
-		
+		}).isPresent();
 	}
 	
-	public <T> void registerValidator( final Control c, final Validator<T> validator  ) {
-		registerValidator(c, true, validator);
+	public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
+		return registerValidator(c, true, validator);
 	}
 
 }

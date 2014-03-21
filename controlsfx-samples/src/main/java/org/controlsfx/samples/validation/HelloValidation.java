@@ -26,6 +26,8 @@
  */
 package org.controlsfx.samples.validation;
 
+import java.util.Arrays;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
@@ -39,6 +41,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -83,8 +86,7 @@ public class HelloValidation extends ControlsFXSample {
         final ListView<ValidationMessage> messageList = new ListView<>();
         validationSupport.validationResultProperty().addListener( new ChangeListener<ValidationResult>(){
 			public void changed(ObservableValue<? extends ValidationResult> o, ValidationResult oldValue, ValidationResult newValue) {
-				messageList.getItems().clear();
-				newValue.getMessages().stream().forEach(msg -> messageList.getItems().addAll(msg) );
+				messageList.getItems().setAll(newValue.getMessages());
 			};
         });
         
@@ -94,8 +96,7 @@ public class HelloValidation extends ControlsFXSample {
         // TextField with static auto-complete functionality
         //
         TextField textField = new TextField();
-        validationSupport.registerValidator(textField, Validators.getEmptyValidator("Text is required"));
-
+        validationSupport.registerValidator(textField, Validators.createEmptyValidator("Text is required"));
         
         TextFields.bindAutoCompletion(
                 textField,
@@ -108,13 +109,8 @@ public class HelloValidation extends ControlsFXSample {
         row++;
         ComboBox<String> combobox = new ComboBox<String>();
         combobox.getItems().addAll("Item A", "Item B", "Item C");
-        validationSupport.registerValidator(combobox, (Control c, String newValue) -> {
-
-        	return new ValidationResultBuilder(combobox)
-    			.addErrorIf( "ComboBox Selection required", () -> newValue == null)
-    			.build();
-			}
-        );
+        validationSupport.registerValidator(combobox,
+        		Validators.createEmptyValidator( "ComboBox Selection required"));
         
         grid.add(new Label("Combobox"), 0, row);
         grid.add(combobox, 1, row);
@@ -123,13 +119,8 @@ public class HelloValidation extends ControlsFXSample {
         row++;
         ChoiceBox<String> choiceBox = new ChoiceBox<String>();
         choiceBox.getItems().addAll("Item A", "Item B", "Item C");
-        validationSupport.registerValidator(choiceBox, (Control c, String newValue) -> {
-
-        	return new ValidationResultBuilder(choiceBox)
-    			.addErrorIf( "ChoiceBox Selection required", () -> newValue == null)
-    			.build();
-			}
-        );
+        validationSupport.registerValidator(choiceBox, 
+        	Validators.createEmptyValidator("ChoiceBox Selection required"));
         
         grid.add(new Label("ChoiceBox"), 0, row);
         grid.add(choiceBox, 1, row);
@@ -164,21 +155,20 @@ public class HelloValidation extends ControlsFXSample {
         
         row++;
         ColorPicker colorPicker =  new ColorPicker(Color.RED);
-        validationSupport.registerValidator(colorPicker, (Control c, Color newValue) -> {
-
-        	return new ValidationResultBuilder(c)
-    			.addErrorIf( "Color should be WHITE", () -> !Color.WHITE.equals(newValue))
-    			.build();
-			}
+        validationSupport.registerValidator(colorPicker, 
+        	Validators.createEqualsValidator("Color should be WHITE", Arrays.asList(Color.WHITE))	
         );
        
         grid.add(new Label("Color Picker"), 0, row);
         grid.add(colorPicker, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
+        
         row++;
-        grid.add(messageList, 0, row, 2, 1);
-        GridPane.setHgrow(messageList, Priority.ALWAYS);
+        TitledPane pane = new TitledPane("Validation Results", messageList);
+        pane.setCollapsible(false);
+        grid.add(pane, 0, row, 2, 1);
+        GridPane.setHgrow(pane, Priority.ALWAYS);
        
         root.setTop(grid);
         return root;

@@ -573,7 +573,7 @@ public final class Dialogs {
      * @param choices dialog choices
      * @return selected choice or null if dialog is cancelled.
      */
-    @SuppressWarnings("unchecked") public <T> T showChoices(T defaultChoice, Collection<T> choices) {
+    public <T> T showChoices(T defaultChoice, Collection<T> choices) {
 
         Dialog dlg = buildDialog(Type.INPUT);
         
@@ -897,8 +897,19 @@ public final class Dialogs {
 		
     }
     
-    
-    public Optional<UserInfo> showLogin( final UserInfo userInfo, final Callback<UserInfo, Void> authenticator ) {
+    /**
+     * Creates a Login {@link Dialog} whith user name and password  fields
+     * 
+     * @param initialUserInfo user information initially shown in the dialog
+     * @param authenticator callback to execute actual authentication process. Exceptions coming from this callback are interpreted as
+     * authentication errors and will be shown as error message. In case of an exception the dialog will not close to give the user 
+     * an opportunity to correct their information and try again
+     * 
+     * @return optional of UserInfo. Empty optional in case of cancelled dialog otherwise Optional of USerInfo value with provided user name
+     * and password
+     *  
+     */
+    public Optional<UserInfo> showLogin( final UserInfo initialUserInfo, final Callback<UserInfo, Void> authenticator ) {
     	
     	TextField txUserName     = new TextField();
 		PasswordField txPassword = new PasswordField();
@@ -930,7 +941,9 @@ public final class Dialogs {
 			public void execute(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
-					authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
+					if ( authenticator != null ) {
+						authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
+					}
 					lbMessage.setVisible(false);
 					dlg.hide();
 					dlg.setResult(this);
@@ -971,8 +984,8 @@ public final class Dialogs {
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
 		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
-		txUserName.setText( userInfo.getUserName());
-		txPassword.setText(new String(userInfo.getPassword()));
+		txUserName.setText( initialUserInfo.getUserName());
+		txPassword.setText(new String(initialUserInfo.getPassword()));
 
 		Platform.runLater( () -> txUserName.requestFocus() );
 

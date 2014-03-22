@@ -550,19 +550,19 @@ public final class Dialogs {
      * @param defaultValue text field default value 
      * @return text from input field if OK action is used otherwise null 
      */
-    public String showTextInput(String defaultValue) {
+    public Optional<String> showTextInput(String defaultValue) {
         Dialog dlg = buildDialog(Type.INPUT);
         final TextField textField = new TextField(defaultValue);
         dlg.setContent(buildInputContent(textField));
         
-        return dlg.show() == OK ? textField.getText() : null;
+        return Optional.ofNullable( dlg.show() == OK ? textField.getText() : null );
     }
 
     /**
      * Shows dialog with one text field 
      * @return text from input field or null if dialog is cancelled 
      */
-    public String showTextInput() {
+    public Optional<String> showTextInput() {
         return showTextInput("");
     }
 
@@ -573,7 +573,7 @@ public final class Dialogs {
      * @param choices dialog choices
      * @return selected choice or null if dialog is cancelled.
      */
-    public <T> T showChoices(T defaultChoice, Collection<T> choices) {
+    public <T> Optional<T> showChoices(T defaultChoice, Collection<T> choices) {
 
         Dialog dlg = buildDialog(Type.INPUT);
         
@@ -600,7 +600,7 @@ public final class Dialogs {
             selectionModel.select(defaultChoice);
         }
 
-        return dlg.show() == OK ? selectionModel.getSelectedItem() : null;
+        return Optional.ofNullable( dlg.show() == OK ? selectionModel.getSelectedItem() : null);
 
     }
 
@@ -609,7 +609,7 @@ public final class Dialogs {
      * @param choices dialog choices
      * @return selected choice or null if dialog is cancelled
      */
-    public <T> T showChoices(Collection<T> choices) {
+    public <T> Optional<T> showChoices(Collection<T> choices) {
         return showChoices(null, choices);
     }
 
@@ -618,7 +618,7 @@ public final class Dialogs {
      * @param choices dialog choices
      * @return selected choice or null if dialog is cancelled
      */
-    public <T> T showChoices(@SuppressWarnings("unchecked") T... choices) {
+    public <T> Optional<T> showChoices(@SuppressWarnings("unchecked") T... choices) {
         return showChoices(Arrays.asList(choices));
     }
 

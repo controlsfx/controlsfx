@@ -1,5 +1,7 @@
 package org.controlsfx.dialog;
 
+import impl.org.controlsfx.ImplUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -311,10 +313,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scene root
-        dialogStack.getChildren().remove(originalParent);
-        originalParent.getStyleClass().remove("root"); //$NON-NLS-1$
-        
-        scene.setRoot(originalParent);
+        ImplUtils.stripRootPane(scene, originalParent);
     }
     
     private void hideInParent() {
@@ -332,7 +331,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scenegraph
-        getChildren(owner.getParent()).setAll(owner);
+        ImplUtils.getChildren(owner.getParent()).setAll(owner);
         
         dialogStack = null;
     }
@@ -345,24 +344,17 @@ class LightweightDialog extends FXDialog {
         buildDialogStack(originalParent);
         
         lightweightDialog.setVisible(true);
-        scene.setRoot(dialogStack);
+        ImplUtils.injectAsRootPane(scene, dialogStack);
+        configureDialogStack(originalParent);
         lightweightDialog.requestFocus();
     }
     
     private void showInParent() {
         installCSSInScene();
         
-        ObservableList<Node> ownerParentChildren = getChildren(owner.getParent());
-        
-        // we've got the children list, now we need to insert a temporary
-        // layout container holding our dialogs and opaque layer / effect
-        // in place of the owner (the owner will become a child of the dialog
-        // stack)
-        int ownerPos = ownerParentChildren.indexOf(owner);
-        ownerParentChildren.remove(ownerPos);
         buildDialogStack(owner);
-        ownerParentChildren.add(ownerPos, dialogStack);
-        
+        ImplUtils.injectPane(owner, dialogStack);
+        configureDialogStack(owner);
         lightweightDialog.setVisible(true);
         lightweightDialog.requestFocus();
     }
@@ -426,15 +418,9 @@ class LightweightDialog extends FXDialog {
         };
                 
         dialogStack.setManaged(true);
-        
-        if (parent != null) {
-            dialogStack.getChildren().add(0, parent);
-            
-            // copy in layout properties, etc, so that the dialogStack displays
-            // properly in (hopefully) whatever layout the owner node is in
-            dialogStack.getProperties().putAll(parent.getProperties());
-        }
-        
+    }
+    
+    private void configureDialogStack(Node parent) {
         // always add opaque layer, to block input events to parent scene
         opaqueLayer = new Region();
         dialogStack.getChildren().add(parent == null ? 0 : 1, opaqueLayer);
@@ -480,35 +466,5 @@ class LightweightDialog extends FXDialog {
     private Parent getFirstParent(Node n) {
         if (n == null) return null;
         return n instanceof Parent ? (Parent) n : getFirstParent(n.getParent());
-    }
-    
-    @SuppressWarnings("unchecked")
-    private ObservableList<Node> getChildren(Parent p) {
-        ObservableList<Node> children = null;
-        
-        try {
-            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
-            
-            if (getChildrenMethod != null) {
-                if (! getChildrenMethod.isAccessible()) {
-                    getChildrenMethod.setAccessible(true);
-                }
-                children = (ObservableList<Node>) getChildrenMethod.invoke(p);
-            } else {
-                // uh oh, trouble
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        
-        return children;
     }
 }

@@ -26,8 +26,8 @@
  */
 package org.controlsfx.samples;
 
-import static org.controlsfx.control.decoration.DecorationUtils.registerDecoration;
-import static org.controlsfx.control.decoration.DecorationUtils.unregisterAllDecorations;
+import static org.controlsfx.control.decoration.Decorator.addDecoration;
+import static org.controlsfx.control.decoration.Decorator.removeAllDecorations;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -47,7 +47,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.DecorationPane;
 import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.control.decoration.StyleClassDecoration;
 
@@ -70,18 +69,18 @@ public class HelloDecorationPane extends ControlsFXSample {
         
         root.getChildren().add(field);
         
-        DecorationPane pane = new DecorationPane(root);
-        
         // for the sake of this sample we have to install a custom css file to
         // style the sample - but we can't do this until the scene is set on the
         // pane
-        pane.sceneProperty().addListener(new InvalidationListener() {
+        root.sceneProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable o) {
-                pane.getScene().getStylesheets().add(HelloDecorationPane.class.getResource("decorations.css").toExternalForm());
+                if (root.getScene() != null) {
+                    root.getScene().getStylesheets().add(HelloDecorationPane.class.getResource("decorations.css").toExternalForm());
+                }
             }
         });
         
-        return pane;
+        return root;
     }
     
     @Override
@@ -100,28 +99,28 @@ public class HelloDecorationPane extends ControlsFXSample {
         ChoiceBox<String> decorationTypeBox = new ChoiceBox<>(FXCollections.observableArrayList("None", "Node", "CSS", "Node + CSS"));
         decorationTypeBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> o, String old, String newItem) {
-                unregisterAllDecorations(field);
+                removeAllDecorations(field);
                 switch (newItem) {
                     case "None": break;
                     case "Node": {
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_LEFT));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_CENTER));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_RIGHT));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_LEFT));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_LEFT));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_CENTER));
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_RIGHT));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_LEFT));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_CENTER));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.RED),Pos.TOP_RIGHT));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_LEFT));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_LEFT));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_CENTER));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.BLUE),Pos.BOTTOM_RIGHT));
                         break;
                     }
                     case "CSS": {
-                        registerDecoration(field, new StyleClassDecoration("warning"));
+                        addDecoration(field, new StyleClassDecoration("warning"));
                         break;
                     }
                     case "Node + CSS": {
-                        registerDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
-                        registerDecoration(field, new StyleClassDecoration("success"));
+                        addDecoration(field, new GraphicDecoration(createDecoratorNode(Color.GREEN),Pos.CENTER_RIGHT));
+                        addDecoration(field, new StyleClassDecoration("success"));
                         break;
                     }
                 }

@@ -45,33 +45,25 @@ public class GraphicDecoration implements Decoration {
         this.decorationNode = decorationNode;
         this.pos = position;
     }
-
-    public final Node getDecorationNode() {
-        return decorationNode;
-    }
-
-    public final Pos getPosition() {
-        return pos;
-    }
     
-    @Override public Node decorate(Node targetNode) {
-        Bounds targetBounds = targetNode.getBoundsInParent();
-        Bounds dbounds = decorationNode.getBoundsInLocal();
+    @Override public Node run(Node targetNode, boolean add) {
+        if (add) {
+            Bounds targetBounds = targetNode.getBoundsInParent();
+            Bounds dbounds = decorationNode.getBoundsInLocal();
+            
+            double top = targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds);
+            double left = targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(targetBounds);
+            Insets margin = new Insets(top, 0, 0, left);
+            StackPane.setMargin(decorationNode, margin);
+            
+            return decorationNode;
+        }
         
-        double top = targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds);
-        double left = targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(targetBounds);
-        Insets margin = new Insets(top, 0, 0, left);
-        StackPane.setMargin(decorationNode, margin);
-        
-        return decorationNode;
-    }
-    
-    @Override public void undecorate(Node targetNode) {
-        // no-op
+        return null;
     }
     
     private double getHInset(Bounds targetBounds) {
-        switch (getPosition().getHpos()) {
+        switch (pos.getHpos()) {
             case CENTER:
                 return targetBounds.getWidth() / 2;
             case RIGHT:
@@ -82,7 +74,7 @@ public class GraphicDecoration implements Decoration {
     }
 
     private double getVInset(Bounds targetBounds) {
-        switch (getPosition().getVpos()) {
+        switch (pos.getVpos()) {
             case CENTER:
                 return targetBounds.getHeight() / 2;
             case BOTTOM:

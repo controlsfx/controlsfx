@@ -28,22 +28,33 @@ package org.controlsfx.control.decoration;
 
 import javafx.scene.Node;
 
+/**
+ * Decoration is a functional interface used by the ControlsFX {@link Decorator} class
+ * for adding and removing decorations on a node. ControlsFX
+ * ships with pre-built decorations, including {@link GraphicDecoration} and
+ * {@link StyleClassDecoration}.
+ * 
+ * @see Decorator
+ * @see GraphicDecoration
+ * @see StyleClassDecoration
+ */
+@FunctionalInterface
 public interface Decoration {
 
     /**
-     * Decorates the given target node with the relevant decorations, returning
-     * any 'decoration node' that needs to be added to the scenegraph (although
-     * normally this can be null).
+     * Depending on the boolean 'add' parameter, this method is responsible for
+     * decorating or undecorating the given target node. 
      * 
-     * @param targetNode The node to decorate.
-     * @return The decoration, but null is a valid return value.
-     */
-    public Node decorate(Node targetNode);
-    
-    /**
-     * Removes the decoration from the given node.
+     * <p>When the boolean parameter is true, this method decorates the given 
+     * target node with the relevant decorations, returning any 'decoration node' 
+     * that needs to be added to the scenegraph (although this can be null).
      * 
-     * @param targetNode The node to remove the decoration from.
+     * <p>When the boolean parameter is false, this method removes the decoration 
+     * from the given target node, always returning null.
+     * 
+     * @param targetNode The node to decorate or undecorate.
+     * @return If the add parameter is true, the decoration, but null is a 
+     *         valid return value. If the add parameter is false, always null.
      */
-    public void undecorate(Node targetNode);
+    public Node run(Node targetNode, boolean add);
 }

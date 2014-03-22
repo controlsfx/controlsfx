@@ -36,25 +36,17 @@ public class StyleClassDecoration implements Decoration {
         this.styleClass = styleClass;
     }
 
-    public final Node getDecorationNode() {
-        return null;
-    }
-    
-    public final String getStyleClass() {
-        return styleClass;
-    }
-    
-    @Override public Node decorate(Node targetNode) {
-       if (targetNode.getStyleClass().contains(styleClass)) return null;
-       
-       targetNode.getStyleClass().add(styleClass);
-       
-       // no decoration node, so return null
-       return null;
-    }
-    
-    @Override
-    public void undecorate(Node targetNode) {
-        targetNode.getStyleClass().remove(styleClass);
+    @Override public Node run(Node targetNode, boolean add) {
+        if (add) {
+            if (targetNode.getStyleClass().contains(styleClass)) return null;
+
+            targetNode.getStyleClass().add(styleClass);
+
+            // no decoration node, so return null
+            return null;
+        } else {
+            targetNode.getStyleClass().remove(styleClass);
+            return null;
+        }
     }
 }

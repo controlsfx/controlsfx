@@ -50,7 +50,7 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.control.decoration.StyleClassDecoration;
 
-public class HelloDecorationPane extends ControlsFXSample {
+public class HelloDecorator extends ControlsFXSample {
     
     private final TextField field = new TextField();
     
@@ -59,7 +59,7 @@ public class HelloDecorationPane extends ControlsFXSample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/DecorationPane.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/decorator/Decorator.html";
     }
     
     @Override public Node getPanel(final Stage stage) {
@@ -75,7 +75,7 @@ public class HelloDecorationPane extends ControlsFXSample {
         root.sceneProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable o) {
                 if (root.getScene() != null) {
-                    root.getScene().getStylesheets().add(HelloDecorationPane.class.getResource("decorations.css").toExternalForm());
+                    root.getScene().getStylesheets().add(HelloDecorator.class.getResource("decorations.css").toExternalForm());
                 }
             }
         });

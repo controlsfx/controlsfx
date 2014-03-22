@@ -27,10 +27,8 @@
 package org.controlsfx.control.decoration;
 
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.layout.StackPane;
 
 public class GraphicDecoration implements Decoration {
 
@@ -45,33 +43,34 @@ public class GraphicDecoration implements Decoration {
         this.decorationNode = decorationNode;
         this.pos = position;
     }
-
-    public final Node getDecorationNode() {
-        return decorationNode;
-    }
-
-    public final Pos getPosition() {
-        return pos;
+    
+    @Override public Node run(Node targetNode, RunType operation) {
+        if (operation == RunType.ADD) {
+            updateGraphicPosition(targetNode);
+            return decorationNode;
+        } else if (operation == RunType.REMOVE) {
+            // no-op - don't need to do anything on uninstall as the node will
+            // be removed from the scenegraph by the decorator code itself
+        } else if (operation == RunType.LAYOUT) {
+            updateGraphicPosition(targetNode);
+        }
+        
+        return null;
     }
     
-    @Override public Node decorate(Node targetNode) {
+    private void updateGraphicPosition(Node targetNode) {
         Bounds targetBounds = targetNode.getBoundsInParent();
         Bounds dbounds = decorationNode.getBoundsInLocal();
         
         double top = targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds);
         double left = targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(targetBounds);
-        Insets margin = new Insets(top, 0, 0, left);
-        StackPane.setMargin(decorationNode, margin);
         
-        return decorationNode;
-    }
-    
-    @Override public void undecorate(Node targetNode) {
-        // no-op
+        decorationNode.setTranslateX(left);
+        decorationNode.setTranslateY(top);
     }
     
     private double getHInset(Bounds targetBounds) {
-        switch (getPosition().getHpos()) {
+        switch (pos.getHpos()) {
             case CENTER:
                 return targetBounds.getWidth() / 2;
             case RIGHT:
@@ -82,7 +81,7 @@ public class GraphicDecoration implements Decoration {
     }
 
     private double getVInset(Bounds targetBounds) {
-        switch (getPosition().getVpos()) {
+        switch (pos.getVpos()) {
             case CENTER:
                 return targetBounds.getHeight() / 2;
             case BOTTOM:

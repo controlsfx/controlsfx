@@ -304,7 +304,7 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink8.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				String response = configureSampleDialog(
+				Optional<String> response = configureSampleDialog(
 						Dialogs.create()
 								.title("Name Check")
 								.masthead(
@@ -320,7 +320,7 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink9.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				String response = configureSampleDialog(
+				Optional<String> response = configureSampleDialog(
 						Dialogs.create()
 								.title("Name Guess")
 								.masthead(
@@ -335,7 +335,7 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink10.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				String response = configureSampleDialog(
+				Optional<String> response = configureSampleDialog(
 						Dialogs.create()
 								.title("Name Guess")
 								.masthead(
@@ -352,7 +352,7 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink11.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				String response = configureSampleDialog(
+				Optional<String> response = configureSampleDialog(
 						Dialogs.create()
 								.title("Name Guess")
 								.masthead(
@@ -408,7 +408,7 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12a.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Font response = configureSampleDialog(Dialogs.create())
+				Optional<Font> response = configureSampleDialog(Dialogs.create())
 						.showFontSelector(null);
 
 				System.out.println("font: " + response);

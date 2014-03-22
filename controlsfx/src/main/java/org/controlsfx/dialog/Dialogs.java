@@ -548,7 +548,7 @@ public final class Dialogs {
     /**
      * Shows dialog with one text field
      * @param defaultValue text field default value 
-     * @return text from input field if OK action is used otherwise null 
+     * @return Optional of text from input field if OK action is used otherwise Optional.EMPTY 
      */
     public Optional<String> showTextInput(String defaultValue) {
         Dialog dlg = buildDialog(Type.INPUT);
@@ -560,7 +560,7 @@ public final class Dialogs {
 
     /**
      * Shows dialog with one text field 
-     * @return text from input field or null if dialog is cancelled 
+     * @return Optional of text from input field or Optional.EMPTY if dialog is cancelled 
      */
     public Optional<String> showTextInput() {
         return showTextInput("");
@@ -571,7 +571,7 @@ public final class Dialogs {
      * will be set to a default value if one is provided.
      * @param defaultChoice default combobox selection 
      * @param choices dialog choices
-     * @return selected choice or null if dialog is cancelled.
+     * @return Optional of selected choice or Optional.EMPTY if dialog is cancelled.
      */
     public <T> Optional<T> showChoices(T defaultChoice, Collection<T> choices) {
 
@@ -607,7 +607,7 @@ public final class Dialogs {
     /**
      * Show a dialog with one combobox filled with provided choices 
      * @param choices dialog choices
-     * @return selected choice or null if dialog is cancelled
+     * @return Optional of selected choice or Optinal.EMPTY if dialog is cancelled
      */
     public <T> Optional<T> showChoices(Collection<T> choices) {
         return showChoices(null, choices);
@@ -616,7 +616,7 @@ public final class Dialogs {
     /**
      * Show a dialog with one combobox filled with provided choices 
      * @param choices dialog choices
-     * @return selected choice or null if dialog is cancelled
+     * @return Optional of selected choice or Optional.EMPTY if dialog is cancelled
      */
     public <T> Optional<T> showChoices(@SuppressWarnings("unchecked") T... choices) {
         return showChoices(Arrays.asList(choices));
@@ -720,16 +720,16 @@ public final class Dialogs {
      * Show font selection dialog, allowing to manipulate font name, style and size. 
      * 
      * @param font default font value 
-     * @return selected font or null if the dialog is canceled.
+     * @return Optional of selected font. Optional.Empty returned if dialog is cancelled.
      */
-    public Font showFontSelector(Font font) {
+    public Optional<Font> showFontSelector(Font font) {
         FontPanel fontPanel = new FontPanel();
         fontPanel.setFont(font);
         title(Dialogs.USE_DEFAULT);
         Dialog dlg = buildDialog(Type.FONT);
         dlg.setIconifiable(false);
         dlg.setContent(fontPanel);
-        return Dialog.Actions.OK == dlg.show() ? fontPanel.getFont(): null;
+        return Optional.ofNullable( Dialog.Actions.OK == dlg.show() ? fontPanel.getFont(): null );
     }
     
     /**
@@ -905,7 +905,7 @@ public final class Dialogs {
      * authentication errors and will be shown as error message. In case of an exception the dialog will not close to give the user 
      * an opportunity to correct their information and try again
      * 
-     * @return optional of UserInfo. Empty optional in case of cancelled dialog otherwise Optional of USerInfo value with provided user name
+     * @return optional of UserInfo. Optional.EMPTY returned in case of cancelled dialog otherwise Optional of UserInfo value with provided user name
      * and password
      *  
      */

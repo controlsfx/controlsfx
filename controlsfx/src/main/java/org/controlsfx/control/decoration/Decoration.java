@@ -40,6 +40,12 @@ import javafx.scene.Node;
  */
 @FunctionalInterface
 public interface Decoration {
+    
+    public static enum RunType {
+        ADD,
+        REMOVE,
+        LAYOUT
+    }
 
     /**
      * Depending on the boolean 'add' parameter, this method is responsible for
@@ -56,5 +62,5 @@ public interface Decoration {
      * @return If the add parameter is true, the decoration, but null is a 
      *         valid return value. If the add parameter is false, always null.
      */
-    public Node run(Node targetNode, boolean add);
+    public Node run(Node targetNode, RunType operation);
 }

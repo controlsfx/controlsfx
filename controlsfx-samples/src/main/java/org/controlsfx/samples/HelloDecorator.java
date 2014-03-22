@@ -38,12 +38,16 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
@@ -67,7 +71,10 @@ public class HelloDecorator extends ControlsFXSample {
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
         
-        root.getChildren().add(field);
+        Rectangle topRect = new Rectangle(100, 500, Color.RED);
+        Rectangle bottomRect = new Rectangle(100, 500, Color.GREEN);
+        
+        root.getChildren().addAll(topRect, field, bottomRect);
         
         // for the sake of this sample we have to install a custom css file to
         // style the sample - but we can't do this until the scene is set on the
@@ -80,7 +87,9 @@ public class HelloDecorator extends ControlsFXSample {
             }
         });
         
-        return root;
+        
+        ScrollPane scrollPane = new ScrollPane(root);
+        return scrollPane;
     }
     
     @Override
@@ -96,7 +105,7 @@ public class HelloDecorator extends ControlsFXSample {
         Label showDecorationsLabel = new Label("Show decorations: ");
         showDecorationsLabel.getStyleClass().add("property");
         grid.add(showDecorationsLabel, 0, row);
-        ChoiceBox<String> decorationTypeBox = new ChoiceBox<>(FXCollections.observableArrayList("None", "Node", "CSS", "Node + CSS"));
+        ChoiceBox<String> decorationTypeBox = new ChoiceBox<>(FXCollections.observableArrayList("None", "Node", "CSS", "Node + CSS", "Image"));
         decorationTypeBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> o, String old, String newItem) {
                 removeAllDecorations(field);
@@ -123,6 +132,10 @@ public class HelloDecorator extends ControlsFXSample {
                         addDecoration(field, new StyleClassDecoration("success"));
                         break;
                     }
+                    case "Image": {
+                        addDecoration(field, new GraphicDecoration(createImageNode(),Pos.CENTER_RIGHT));
+                        break;
+                    }
                 }
             }
         });
@@ -144,6 +157,11 @@ public class HelloDecorator extends ControlsFXSample {
     	Circle d = new Circle(5);
         d.setFill(color);
         return d;
+    }
+    
+    private Node createImageNode() {
+        Image image = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/security-low.png");
+        return new ImageView(image);
     }
     
     public static void main(String[] args) {

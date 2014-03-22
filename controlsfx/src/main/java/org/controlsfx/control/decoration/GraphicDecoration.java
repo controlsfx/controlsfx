@@ -27,10 +27,8 @@
 package org.controlsfx.control.decoration;
 
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.layout.StackPane;
 
 public class GraphicDecoration implements Decoration {
 
@@ -46,20 +44,29 @@ public class GraphicDecoration implements Decoration {
         this.pos = position;
     }
     
-    @Override public Node run(Node targetNode, boolean add) {
-        if (add) {
-            Bounds targetBounds = targetNode.getBoundsInParent();
-            Bounds dbounds = decorationNode.getBoundsInLocal();
-            
-            double top = targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds);
-            double left = targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(targetBounds);
-            Insets margin = new Insets(top, 0, 0, left);
-            StackPane.setMargin(decorationNode, margin);
-            
+    @Override public Node run(Node targetNode, RunType operation) {
+        if (operation == RunType.ADD) {
+            updateGraphicPosition(targetNode);
             return decorationNode;
+        } else if (operation == RunType.REMOVE) {
+            // no-op - don't need to do anything on uninstall as the node will
+            // be removed from the scenegraph by the decorator code itself
+        } else if (operation == RunType.LAYOUT) {
+            updateGraphicPosition(targetNode);
         }
         
         return null;
+    }
+    
+    private void updateGraphicPosition(Node targetNode) {
+        Bounds targetBounds = targetNode.getBoundsInParent();
+        Bounds dbounds = decorationNode.getBoundsInLocal();
+        
+        double top = targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds);
+        double left = targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(targetBounds);
+        
+        decorationNode.setTranslateX(left);
+        decorationNode.setTranslateY(top);
     }
     
     private double getHInset(Bounds targetBounds) {

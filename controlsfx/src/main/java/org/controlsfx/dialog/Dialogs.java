@@ -291,6 +291,21 @@ import org.controlsfx.dialog.Dialog.Actions;
  * <br>
  * <center><img src="lightweight.png"></center>
  * 
+ * <h3>Java 8 API elements</h3>
+ * 
+ * <p>Many methods in this class are taking advantage of {@link Optional}. There are many benefits of this, but the main one 
+ * is that there no more checking for null and thus no possibility of NullPointerExceptions. Here some things you can do with
+ * {@link Optional}s: <br>
+ *  
+ * <pre>{@code 
+ *   optional.isPresent(value->{...}) //perform an operation only if there is a value 
+ *   optional.orElse(default)         //get the value of optional with default if it does not exists
+ *   optional.map( value -> {...} ).orElse(default) //convert to other type with default
+ * </pre>
+ * and many more - check {@link Optional} API.<br>
+ * {@link Optional} can be thought of as a stream collection of one or none elements, allowing for functional approach - 
+ * chaining methods without keeping state. This especially beneficial in concurrent environments.  
+ * 
  * <h3>Code Examples</h3>
  * 
  * <p>The code below will setup and show a confirmation dialog:
@@ -342,6 +357,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  * @see Action
  * @see Actions
  * @see AbstractAction
+ * @see Optional
  */
 public final class Dialogs {
 

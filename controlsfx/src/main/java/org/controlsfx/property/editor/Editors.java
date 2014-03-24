@@ -147,7 +147,7 @@ public class Editors {
                     }
         
                     @Override protected Font edit(Font font) {
-                        return Dialogs.create().owner(this.getScene().getWindow()).showFontSelector(font);
+                        return Dialogs.create().owner(this.getScene().getWindow()).showFontSelector(font).orElse(null);
                     }
                 }) {
 

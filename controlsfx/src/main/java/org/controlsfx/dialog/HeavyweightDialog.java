@@ -97,8 +97,24 @@ class HeavyweightDialog extends FXDialog {
                 if (owner != null) {
                     // because Stage does not seem to centre itself over its owner, we
                     // do it here.
-                    final double x = owner.getX() + (owner.getWidth() / 2.0) - (root.prefWidth(-1) / 2.0);
-                    final double y = owner.getY() + (owner.getHeight() / 2.0) - (root.prefHeight(-1)) / 2.0 - 50;
+                    double x, y;
+                    
+                    final double dialogWidth = root.prefWidth(-1);
+                    final double dialogHeight = root.prefHeight(-1);
+                    
+                    if (owner.getX() < 0 || owner.getY() < 0) {
+                        // Fix for #165
+                        Screen screen = Screen.getPrimary(); // todo something more sensible
+                        double maxW = screen.getVisualBounds().getWidth();
+                        double maxH = screen.getVisualBounds().getHeight();
+                        
+                        x = maxW / 2.0 - dialogWidth / 2.0;
+                        y = maxH / 2.0 - dialogHeight / 2.0 - 50;
+                    } else {
+                        x = owner.getX() + (owner.getWidth() / 2.0) - (dialogWidth / 2.0);
+                        y = owner.getY() + (owner.getHeight() / 2.0) - dialogHeight / 2.0 - 50;
+                    }
+                    
                     setX(x);
                     setY(y);
                 }

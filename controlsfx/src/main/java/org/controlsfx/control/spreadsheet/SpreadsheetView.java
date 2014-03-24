@@ -44,6 +44,7 @@ import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.collections.NonIterableChange.GenericAddRemoveChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 import com.sun.javafx.scene.control.SelectedCellsMap;
+import java.util.Optional;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -774,13 +775,16 @@ public class SpreadsheetView extends Control {
      * @param cellType
      * @return the editor associated with the CellType.
      */
-    public final SpreadsheetCellEditor getEditor(SpreadsheetCellType<?> cellType) {
+    public final Optional<SpreadsheetCellEditor> getEditor(SpreadsheetCellType<?> cellType) {
         SpreadsheetCellEditor cellEditor = editors.get(cellType);
         if (cellEditor == null) {
             cellEditor = cellType.createEditor(this);
+            if(cellEditor == null){
+                return Optional.empty();
+            }
             editors.put(cellType, cellEditor);
         }
-        return cellEditor;
+        return Optional.of(cellEditor);
     }
 
     /**

@@ -225,9 +225,8 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
 
     /** {@inheritDoc} */
     @Override public void clearSelection() {
-        for( int index = 0; index < selectedIndices.length(); index++)
-        {
-        	clearSelection(index);
+        for( int index = 0; index < selectedIndices.length(); index++) {
+            clearSelection(index);
         }
     }
 

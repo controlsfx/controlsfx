@@ -26,6 +26,7 @@
  */
 package org.controlsfx.samples.validation;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 
 import javafx.beans.value.ChangeListener;
@@ -37,6 +38,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
@@ -90,10 +92,8 @@ public class HelloValidation extends ControlsFXSample {
         });
         
         int row = 0;
-        
-        //
-        // TextField with static auto-complete functionality
-        //
+
+        // text field
         TextField textField = new TextField();
         validationSupport.registerValidator(textField, Validator.createEmptyValidator("Text is required"));
         
@@ -105,6 +105,7 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(textField, 1, row);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         
+        //combobox
         row++;
         ComboBox<String> combobox = new ComboBox<String>();
         combobox.getItems().addAll("Item A", "Item B", "Item C");
@@ -115,6 +116,7 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(combobox, 1, row);
         GridPane.setHgrow(combobox, Priority.ALWAYS);
 
+        //choicebox
         row++;
         ChoiceBox<String> choiceBox = new ChoiceBox<String>();
         choiceBox.getItems().addAll("Item A", "Item B", "Item C");
@@ -125,6 +127,7 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(choiceBox, 1, row);
         GridPane.setHgrow(combobox, Priority.ALWAYS);
         
+        //checkbox
         row++;
         CheckBox checkBox =  new CheckBox("CheckBox");
         validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> 
@@ -133,6 +136,7 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(checkBox, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
+        //slider
         row++;
         Slider slider =  new Slider(-50d, 50d, -10d);
         slider.setShowTickLabels(true);
@@ -143,7 +147,8 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(new Label("Slider"), 0, row);
         grid.add(slider, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
-        
+
+        // color picker
         row++;
         ColorPicker colorPicker =  new ColorPicker(Color.RED);
         validationSupport.registerValidator(colorPicker, 
@@ -153,8 +158,19 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(new Label("Color Picker"), 0, row);
         grid.add(colorPicker, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
+
+        // date picker
+        row++;
+        DatePicker datePicker =  new DatePicker();
+        validationSupport.registerValidator(datePicker, (Control c, LocalDate newValue) -> 
+        	ValidationResult.fromErrorIf( datePicker, "The date should be today", () ->  !LocalDate.now().equals(newValue) )	
+        );
+       
+        grid.add(new Label("Date Picker"), 0, row);
+        grid.add(datePicker, 1, row);
+        GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
-        
+        // validation results
         row++;
         TitledPane pane = new TitledPane("Validation Results", messageList);
         pane.setCollapsible(false);
@@ -173,7 +189,6 @@ public class HelloValidation extends ControlsFXSample {
         grid.setPadding(new Insets(30, 30, 0, 30));
 
         // TODO Add customization example controls
-
 
         return grid;
     }

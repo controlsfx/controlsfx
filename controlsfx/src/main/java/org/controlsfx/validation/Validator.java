@@ -41,7 +41,7 @@ import javafx.scene.control.Control;
 public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 	
 	/**
-	 * Factory method to create a validator, which if value exists. 
+	 * Factory method to create a validator, which checks if value exists. 
 	 * @param message text of a message to be created if value is invalid
 	 * @param severity severity of a message to be created if value is invalid
 	 * @return new validator
@@ -60,7 +60,8 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 	}
 	
 	/**
-	 * Factory method to create a validator, which if value exists. Error is created if not if it does not 
+	 * Factory method to create a validator, which checks if value exists. 
+	 * Error is created if not if value does not exist 
 	 * @param text of a error to be created if value is invalid
 	 * @return new validator
 	 */
@@ -87,7 +88,8 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 	}
 	
 	/**
-	 * Factory method to create a validator, which if value exists in the provided collection. Error is created if not found 
+	 * Factory method to create a validator, which checks if value exists in the provided collection. 
+	 * Error is created if not found 
 	 * @param message text of a error to be created if value is not found
 	 * @return new validator
 	 */

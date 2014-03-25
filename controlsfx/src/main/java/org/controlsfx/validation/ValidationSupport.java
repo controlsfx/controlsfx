@@ -96,6 +96,11 @@ public class ValidationSupport {
 
 	private static List<ObservableValueExtractor> extractors = FXCollections.observableArrayList(); 
 	
+	/**
+	 * Add "obervable value extractor" for custom controls.
+	 * @param test applicability test
+	 * @param extract extraction of observable value
+	 */
 	public static void addObservableValueExtractor( Predicate<Control> test, Callback<Control, ObservableValue<?>> extract ) {
 		extractors.add( new ObservableValueExtractor(test, extract));
 	}
@@ -116,12 +121,22 @@ public class ValidationSupport {
 		//addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
 	}
 	
-	private static String CTRL_REQUIRED_FLAG = "controlsfx.required.control";
+	private static String CTRL_REQUIRED_FLAG = "controlsfx..validation.required";
 	
+	/**
+	 * Set control's required flag
+	 * @param c control
+	 * @param required flag
+	 */
 	public static void setRequired( Control c, boolean required ) {
 		c.getProperties().put(CTRL_REQUIRED_FLAG, required );
 	}
 	
+	/**
+	 * Check control's required flag
+	 * @param c control
+	 * @return true if required 
+	 */
 	public static boolean isRequired( Control c ) {
 		Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
 		return value instanceof Boolean? (Boolean)value: false;
@@ -131,6 +146,9 @@ public class ValidationSupport {
 	private ObservableMap<Control,ValidationResult> validationResults = 
 			FXCollections.observableMap(new WeakHashMap<>());
 	
+	/**
+	 * Creates validation support instance
+	 */
 	public ValidationSupport() {
 		validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
 			validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
@@ -141,10 +159,18 @@ public class ValidationSupport {
 			new ReadOnlyObjectWrapper<ValidationResult>();
 	
 	
+	/**
+	 * Retrieves current validation result
+	 * @return validation result
+	 */
 	public ValidationResult getValidationResult() {
 		return validationResultProperty.get();
 	}
 	
+	/**
+	 * Validation result property. Can be used to track validation result changes 
+	 * @return
+	 */
 	public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
 		return validationResultProperty.getReadOnlyProperty();
 	}
@@ -156,6 +182,13 @@ public class ValidationSupport {
 		return Optional.empty();
 	}
 
+	/**
+	 * Registers {@link Validator} for specified control with additional possiblity to mark control as required or not.
+	 * @param c control to validate
+	 * @param required true if controls should be required
+	 * @param validator {@link Validator} to be used
+	 * @return true if registration is successful
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
 		
@@ -174,6 +207,12 @@ public class ValidationSupport {
 		}).isPresent();
 	}
 	
+	/**
+	 * Registers {@link Validator} for specified control and makes control required
+	 * @param c control to validate
+	 * @param validator {@link Validator} to be used
+	 * @return true if registration is successful
+	 */
 	public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
 		return registerValidator(c, true, validator);
 	}

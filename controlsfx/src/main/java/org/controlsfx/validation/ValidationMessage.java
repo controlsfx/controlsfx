@@ -28,16 +28,47 @@ package org.controlsfx.validation;
 
 import javafx.scene.control.Control;
 
+
+/**
+ * Interface to define basic contract for validation message  
+ */
 public interface ValidationMessage {
 	
+	/**
+	 * Message text
+	 * @return message text
+	 */
 	String getText();
+	
+	/**
+	 * Message {@link Severity} 
+	 * @return message severity
+	 */
 	Severity getSeverity();
+	
+
+	/**
+	 * Message target - {@link javafx.scene.Control} which message is related to . 
+	 * @return message target
+	 */
 	Control getTarget();
 	
+	/**
+	 * Factory method to create a simple error message 
+	 * @param target message target
+	 * @param text message text 
+	 * @return error message
+	 */
 	static ValidationMessage error( Control target, String text ) {
 		return new SimpleValidationMessage(target, text, Severity.ERROR);
 	}
 	
+	/**
+	 * Factory method to create a simple warning message 
+	 * @param target message target
+	 * @param text message text 
+	 * @return warning message
+	 */
 	static ValidationMessage warning( Control target, String text ) {
 		return new SimpleValidationMessage(target, text, Severity.WARNING);
 	}

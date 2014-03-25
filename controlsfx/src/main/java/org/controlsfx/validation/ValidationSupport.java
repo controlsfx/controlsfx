@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2014, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.validation;
 
 import java.util.List;
@@ -25,6 +51,35 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
+/**
+ * Provides validation support for UI components. The idea is create an instance of this class the component group, usually a panel.<br>
+ * Once created, {@link Validator}s can be registered for components, to provide the validation:
+ * 
+ *     <pre>
+ *        ValidationSupport validationSupport = new ValidationSupport();
+ *        validationSupport.registerValidator(textField, Validator.createEmptyValidator("Text is required"));
+ *        validationSupport.registerValidator(combobox, Validator.createEmptyValidator( "ComboBox Selection required"));
+ *        validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> 
+ *        	    ValidationResult.fromErrorIf( c, "Checkbox should be checked", !newValue)
+ *         );
+ *     </pre>
+ *     
+ *  validationResultProperty provides an ability to react on overall validation result changes:
+ *  <pre>
+ *     validationSupport.validationResultProperty().addListener( (o, oldValue, newValue) ->
+        	 messageList.getItems().setAll(newValue.getMessages()));
+ *  </pre>   
+ *  
+ *  Standard JavaFX UI controls are supported out of the box. There is also an ability to add support for custom controls.
+ *  To do that "observable value extractor" should be added for specific controls. Such "extractor" consists of two functional interfaces:
+ *  a {@link Predicate} to check the applicability of the control and a {@link Callback} to extract control's observable value. 
+ *  Here is an sample of internal registration of such "extractor" for  a few  controls :
+ *  <pre>
+ *     addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
+ *     addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
+ *  </pre>
+ *   
+ */
 public class ValidationSupport {
 	
 	private static class ObservableValueExtractor {

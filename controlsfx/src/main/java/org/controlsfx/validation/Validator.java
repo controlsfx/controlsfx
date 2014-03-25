@@ -31,8 +31,21 @@ import java.util.function.BiFunction;
 
 import javafx.scene.control.Control;
 
+/**
+ * Interface defining the contract for validation of specific component
+ * This interface is a {@link BiFunction} which when given the control and its current value 
+ * computes the validation result 
+ * 
+ * @param <T> type of the controls value
+ */
 public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 	
+	/**
+	 * Factory method to create a validator, which if value exists. 
+	 * @param message text of a message to be created if value is invalid
+	 * @param severity severity of a message to be created if value is invalid
+	 * @return new validator
+	 */
 	static <T> Validator<T> createEmptyValidator(final String message, final Severity severity ) {
 		return new Validator<T>() {
 
@@ -46,10 +59,21 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 		};
 	}
 	
+	/**
+	 * Factory method to create a validator, which if value exists. Error is created if not if it does not 
+	 * @param text of a error to be created if value is invalid
+	 * @return new validator
+	 */
 	static <T> Validator<T> createEmptyValidator(final String message ) {
 		return createEmptyValidator(message, Severity.ERROR);
 	}
 	
+	/**
+	 * Factory method to create a validator, which if value exists in the provided collection. 
+	 * @param message text of a message to be created if value is not found
+	 * @param severity severity of a message to be created if value is found
+	 * @return new validator
+	 */
 	static <T> Validator<T> createEqualsValidator(final String message, final Severity severity, final Collection<T> values ) {
 		
 		return new Validator<T>() {
@@ -62,7 +86,11 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 		};
 	}
 	
-	
+	/**
+	 * Factory method to create a validator, which if value exists in the provided collection. Error is created if not found 
+	 * @param message text of a error to be created if value is not found
+	 * @return new validator
+	 */
     static <T> Validator<T> createEqualsValidator(final String message, final Collection<T> values ) {
 		return createEqualsValidator(message, Severity.ERROR, values);
 	}

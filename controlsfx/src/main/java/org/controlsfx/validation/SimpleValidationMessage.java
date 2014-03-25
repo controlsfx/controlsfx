@@ -28,6 +28,9 @@ package org.controlsfx.validation;
 
 import javafx.scene.control.Control;
 
+/**
+ * Internal implementation of simple validation message 
+ */
 class SimpleValidationMessage implements ValidationMessage {
 	
 	private final String text;

@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
@@ -366,16 +367,20 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     private GridCellEditor getEditor(final SpreadsheetCell cell, final SpreadsheetView spv) {
         SpreadsheetCellType<?> cellType = cell.getCellType();
-        SpreadsheetCellEditor cellEditor = spv.getEditor(cellType);
+        Optional<SpreadsheetCellEditor> cellEditor = spv.getEditor(cellType);
 
-        GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
-        if (editor.isEditing()) {
+        if(cellEditor.isPresent()){
+            GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
+            if (editor.isEditing()) {
+                return null;
+            } else {
+                editor.updateSpreadsheetCell(this);
+                editor.updateDataCell(cell);
+                editor.updateSpreadsheetCellEditor(cellEditor.get());
+                return editor;
+            }
+        }else{
             return null;
-        } else {
-            editor.updateSpreadsheetCell(this);
-            editor.updateDataCell(cell);
-            editor.updateSpreadsheetCellEditor(cellEditor);
-            return editor;
         }
     }
 

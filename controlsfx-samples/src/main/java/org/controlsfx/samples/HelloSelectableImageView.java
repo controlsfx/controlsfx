@@ -29,6 +29,8 @@ package org.controlsfx.samples;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 
+import javafx.animation.AnimationTimer;
+import javafx.animation.RotateTransition;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -36,17 +38,24 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.SnapshotResult;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
@@ -78,20 +87,17 @@ public class HelloSelectableImageView extends ControlsFXSample {
     /**
      * The names of the displayed images.
      */
-    private static final String[] imageNames = new String[] {
+    private final String[] nodeNames = new String[] {
         "ControlsFX Logo",
         "Java's Duke in 3D",
+        "Rotating Node",
         "The Null Image",
     };
-
+    
     /**
-     * the displayed images.
+     * the displayed nodes.
      */
-    private static final Image[] images = new Image[] {
-        new Image("http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png"),
-        new Image("http://upload.wikimedia.org/wikipedia/commons/4/45/Duke3D.png"),
-        null,
-    };
+    private Node[] nodes;
 
     // INSTANCE
 
@@ -118,7 +124,20 @@ public class HelloSelectableImageView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        imageView.setPreserveImageRatio(true);
+        Rectangle rotatingRect = new Rectangle(200, 300, Color.GREEN);
+        RotateTransition rotator = new RotateTransition(Duration.seconds(3), rotatingRect);
+        rotator.setAutoReverse(true);
+        rotator.setByAngle(360);
+        rotator.setCycleCount(Integer.MAX_VALUE);
+        rotator.play();
+        
+        nodes = new Node[] {
+            new ImageView(new Image("http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png")),
+            new ImageView(new Image("http://upload.wikimedia.org/wikipedia/commons/4/45/Duke3D.png")),
+            rotatingRect,
+            null,
+        };
+        
         displayImageAndNameforIndex(imageIndex);
         return imageView;
     }
@@ -130,29 +149,54 @@ public class HelloSelectableImageView extends ControlsFXSample {
      *            the index used to access {@link #images} and {@link #imageNames}
      */
     private void displayImageAndNameforIndex(int index) {
-        imageNameTestField.setText(imageNames[index]);
-        imageView.setImage(images[index]);
+        imageNameTestField.setText(nodeNames[index]);
+        imageView.setNode(nodes[index]);
     }
 
     @Override
     public Node getControlPanel() {
-        return new VBox(createImageControl(), createSelectionControl(), createRatioControl());
+        return new VBox(createSettingsControl(), createSelectionControl(), createSnapshot());
     }
-
+    
+    private ImageView snapshotImageView;
+    
     /**
      * @return a control for all the image related properties
      */
-    private Node createImageControl() {
+    private Node createSettingsControl() {
         Label imageNameLabel = new Label("Image Name: ");
         Font currentFont = imageNameTestField.getFont();
         imageNameTestField.setFont(Font.font(currentFont.getFamily(), FontPosture.ITALIC, currentFont.getSize()));
         GridPane imageNamePane = createPaneWithGapAndRow(GAP, imageNameLabel, imageNameTestField);
 
-        CheckBox preserveImageRatio = new CheckBox("Preserve Image Ratio");
-        preserveImageRatio.selectedProperty().bindBidirectional(imageView.preserveImageRatioProperty());
+        
+        TextField ratioTextField = new TextField();
+        ratioTextField.textProperty().bindBidirectional(imageView.fixedSelectionRatioProperty(),
+                new StringConverter<Number>() {
+            @Override
+            public Number fromString(String value) {
+                try {
+                    return format.parse(value);
+                } catch (ParseException e) {
+                    return 1;
+                }
+            }
 
-        GridPane imageControlPane = createPaneWithGapAndColumn(GAP, imageNamePane, preserveImageRatio, createButtons());
-        return new TitledPane("Image", imageControlPane);
+            @Override
+            public String toString(Number value) {
+                return format.format(value);
+            }
+        });
+        GridPane ratio = createPaneWithGapAndRow(GAP, new Label("Fixed Ratio:"), ratioTextField);
+
+        CheckBox ratioFixed = new CheckBox("Ratio Fixed");
+        ratioFixed.selectedProperty().bindBidirectional(imageView.selectionRatioFixedProperty());
+
+        
+        GridPane settingsPane = createPaneWithGapAndColumn(GAP, imageNamePane, createButtons(), ratio, ratioFixed);
+        
+        
+        return new TitledPane("Settings", settingsPane);
     }
 
     /**
@@ -163,8 +207,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         previousImageButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent arg0) {
-                // (imageIndex - 1) % 3 produces negative for image index = 0; instead of going down, go up.
-                imageIndex = (imageIndex + 2) % 3;
+                imageIndex = imageIndex == 0 ? nodes.length - 1 : imageIndex - 1;
                 displayImageAndNameforIndex(imageIndex);
             }
         });
@@ -173,7 +216,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         nextImageButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent arg0) {
-                imageIndex = (imageIndex + 1) % 3;
+                imageIndex = (imageIndex + 1) % nodes.length;
                 displayImageAndNameforIndex(imageIndex);
             }
         });
@@ -271,34 +314,25 @@ public class HelloSelectableImageView extends ControlsFXSample {
         });
     }
 
-    /**
-     * @return a control for all the ratio related properties
-     */
-    private Node createRatioControl() {
-        TextField ratioTextField = new TextField();
-        ratioTextField.textProperty().bindBidirectional(imageView.fixedSelectionRatioProperty(),
-                new StringConverter<Number>() {
-            @Override
-            public Number fromString(String value) {
-                try {
-                    return format.parse(value);
-                } catch (ParseException e) {
-                    return 1;
+    private Node createSnapshot() {
+        AnimationTimer timer = new AnimationTimer() {
+            @Override public void handle(long arg0) {
+                if (imageView.getNode() != null) {
+                    SnapshotParameters params = new SnapshotParameters();
+                    params.setViewport(imageView.getSelection());
+                    imageView.getNode().snapshot(new Callback<SnapshotResult, Void>() {
+                        @Override public Void call(SnapshotResult result) {
+                            snapshotImageView.setImage(result.getImage());
+                            return null;
+                        }
+                    }, params, null);
                 }
             }
-
-            @Override
-            public String toString(Number value) {
-                return format.format(value);
-            }
-        });
-        GridPane ratio = createPaneWithGapAndRow(GAP, new Label("Fixed Ratio:"), ratioTextField);
-
-        CheckBox ratioFixed = new CheckBox("Ratio Fixed");
-        ratioFixed.selectedProperty().bindBidirectional(imageView.selectionRatioFixedProperty());
-
-        GridPane ratioPane = createPaneWithGapAndColumn(GAP, ratio, ratioFixed);
-        return new TitledPane("Ratio", ratioPane);
+        };
+        timer.start();
+        
+        snapshotImageView = new ImageView();
+        return new TitledPane("Snapshot", snapshotImageView);
     }
 
     /* ************************************************************************

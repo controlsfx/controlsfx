@@ -39,9 +39,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * A {@code SelectableImageView} is (in the colloquial not the inheritance sense) an
@@ -154,13 +156,7 @@ public class SelectableImageView extends Control {
     /**
      * The {@link Image} to be painted by this {@code SelectableImageView}.
      */
-    private final ObjectProperty<Image> image;
-
-    /**
-     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
-     * control's bounding box.
-     */
-    private final BooleanProperty preserveImageRatio;
+    private final ObjectProperty<Node> node;
 
     // SELECTION
 
@@ -222,6 +218,8 @@ public class SelectableImageView extends Control {
      * another property.
      */
     private final BooleanProperty selectionActivityExplicitlyManaged;
+    
+    
 
     /* ************************************************************************
      *                                                                         *
@@ -236,19 +234,17 @@ public class SelectableImageView extends Control {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // IMAGE VIEW
-        this.image = new SimpleObjectProperty<Image>(this, "imageProperty");
-        this.preserveImageRatio = new SimpleBooleanProperty(this, "preserveImageRatioProperty", false);
+        this.node = new SimpleObjectProperty<Node>(this, "node");
 
         // SELECTION
-        this.selection = new SimpleObjectProperty<Rectangle2D>(this, "selectionProperty");
-        this.selectionValid = new SimpleBooleanProperty(this, "selectionValidProperty", false);
-        this.selectionActive = new SimpleBooleanProperty(this, "selectionActiveProperty", false);
-        this.selectionChanging = new SimpleBooleanProperty(this, "selectionChangingProperty", false);
+        this.selection = new SimpleObjectProperty<Rectangle2D>(this, "selection");
+        this.selectionValid = new SimpleBooleanProperty(this, "selectionValid", false);
+        this.selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
+        this.selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false);
 
-        this.selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixedProperty", false);
-        this.fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatioProperty", 1) {
-            @Override
-            public void set(double newValue) {
+        this.selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixed", false);
+        this.fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatio", 1) {
+            @Override public void set(double newValue) {
                 if (newValue <= 0)
                     throw new IllegalArgumentException("The fixed selection ratio must be positive.");
                 super.set(newValue);
@@ -256,8 +252,7 @@ public class SelectableImageView extends Control {
         };
 
         // META
-        this.selectionActivityExplicitlyManaged =
-                new SimpleBooleanProperty(this, "selectionActivityExplicitlyManagedProperty", false);
+        this.selectionActivityExplicitlyManaged = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
 
         addStateUpdatingListeners();
     }
@@ -267,9 +262,9 @@ public class SelectableImageView extends Control {
      */
     private void addStateUpdatingListeners() {
         // valid & active
-        image.addListener(new ChangeListener<Image>() {
+        node.addListener(new ChangeListener<Node>() {
             @Override
-            public void changed(ObservableValue<? extends Image> observable, Image oldValue, Image newValue) {
+            public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
                 updateSelectionValidity();
             }
         });
@@ -308,7 +303,7 @@ public class SelectableImageView extends Control {
      */
     public SelectableImageView(Image image) {
         this();
-        setImage(image);
+        setNode(new ImageView(image));
     }
 
     /**
@@ -320,7 +315,7 @@ public class SelectableImageView extends Control {
     public SelectableImageView(String url) {
         this();
         Image image = new Image(url);
-        setImage(image);
+        setNode(new ImageView(image));
     }
 
     /* ************************************************************************
@@ -333,11 +328,11 @@ public class SelectableImageView extends Control {
      * Fixes the ratio of the current selection (if it exists).
      */
     private void fixSelectionRatio() {
-        boolean noSelectionToFix = getImage() == null || !isSelectionValid();
+        boolean noSelectionToFix = getNode() == null || !isSelectionValid();
         if (noSelectionToFix)
             return;
 
-        Rectangle2D resizeBounds = new Rectangle2D(0, 0, getImage().getWidth(), getImage().getHeight());
+        Rectangle2D resizeBounds = new Rectangle2D(0, 0, getNodeWidth(), getNodeHeight());
         Rectangle2D resizedSelection = Rectangles2D.fixRatioWithinBounds(
                 getSelection(), getFixedSelectionRatio(), resizeBounds);
         setSelection(resizedSelection);
@@ -348,15 +343,15 @@ public class SelectableImageView extends Control {
      * property accordingly.
      */
     private void updateSelectionValidity() {
-        if (getImage() == null || getSelection() == null)
+        if (getNode() == null || getSelection() == null)
             selectionValid.set(false);
         else {
             boolean upperLeftInImage =
-                    isInInterval(0, getSelection().getMinX(), getImage().getWidth()) &&
-                    isInInterval(0, getSelection().getMinY(), getImage().getHeight());
+                    isInInterval(0, getSelection().getMinX(), getNodeWidth()) &&
+                    isInInterval(0, getSelection().getMinY(), getNodeHeight());
             boolean lowerRightInImage =
-                    isInInterval(0, getSelection().getMaxX(), getImage().getWidth()) &&
-                    isInInterval(0, getSelection().getMaxY(), getImage().getHeight());
+                    isInInterval(0, getSelection().getMaxX(), getNodeWidth()) &&
+                    isInInterval(0, getSelection().getMaxY(), getNodeHeight());
 
             selectionValid.set(upperLeftInImage && lowerRightInImage);
         }
@@ -375,6 +370,17 @@ public class SelectableImageView extends Control {
         boolean selectionActive = getSelection() != null;
         setSelectionActive(selectionActive);
     }
+    
+    private double getNodeWidth() {
+        final Node n = getNode();
+        return n == null ? 0 : n.prefWidth(-1);
+    }
+    
+    private double getNodeHeight() {
+        final Node n = getNode();
+        return n == null ? 0 : n.prefHeight(-1);
+    }
+    
 
     /* ************************************************************************
      *                                                                         *
@@ -416,8 +422,8 @@ public class SelectableImageView extends Control {
      * 
      * @return the image as a property
      */
-    public ObjectProperty<Image> imageProperty() {
-        return image;
+    public final ObjectProperty<Node> nodeProperty() {
+        return node;
     }
 
     /**
@@ -425,8 +431,8 @@ public class SelectableImageView extends Control {
      * 
      * @return the image
      */
-    public Image getImage() {
-        return imageProperty().get();
+    public final Node getNode() {
+        return nodeProperty().get();
     }
 
     /**
@@ -435,40 +441,10 @@ public class SelectableImageView extends Control {
      * @param image
      *            the image to set
      */
-    public void setImage(Image image) {
-        imageProperty().set(image);
+    public void setNode(Node node) {
+        nodeProperty().set(node);
     }
 
-    /**
-     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
-     * control's bounding box.
-     * 
-     * @return the preserveImageRatio as a property
-     */
-    public BooleanProperty preserveImageRatioProperty() {
-        return preserveImageRatio;
-    }
-
-    /**
-     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
-     * control's bounding box.
-     * 
-     * @return the preserveImageRatio
-     */
-    public boolean isPreserveImageRatio() {
-        return preserveImageRatioProperty().get();
-    }
-
-    /**
-     * Indicates whether to preserve the aspect ratio of the source image when scaling to fit the image within the
-     * control's bounding box.
-     * 
-     * @param preserveImageRatio
-     *            the preserveImageRatio to set
-     */
-    public void setPreserveImageRatio(boolean preserveImageRatio) {
-        preserveImageRatioProperty().set(preserveImageRatio);
-    }
 
     // SELECTION
 

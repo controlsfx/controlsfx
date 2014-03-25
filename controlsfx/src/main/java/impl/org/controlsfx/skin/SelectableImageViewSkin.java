@@ -27,21 +27,16 @@
 package impl.org.controlsfx.skin;
 
 import impl.org.controlsfx.behavior.SelectableImageViewBehavior;
-import impl.org.controlsfx.behavior.SelectableImageViewBehavior.SelectionEvent;
 import impl.org.controlsfx.tools.MathTools;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.SnapshotResult;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -49,6 +44,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.util.Callback;
 
 import org.controlsfx.control.SelectableImageView;
 
@@ -119,7 +115,7 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
     /**
      * The image view which displays the image.
      */
-    private final ImageView imageView;
+    private Node node;
 
     /**
      * The rectangle which represents the selected area.
@@ -149,20 +145,35 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * @param selectableImageView
      *            the control which this skin will display
      */
-    public SelectableImageViewSkin(SelectableImageView selectableImageView) {
-        super(selectableImageView, new SelectableImageViewBehavior(selectableImageView));
+    public SelectableImageViewSkin(SelectableImageView control) {
+        super(control, new SelectableImageViewBehavior(control));
 
         this.pane = createClippingPane();
-        this.imageView = new ImageView();
         this.selectedArea = new Rectangle();
         this.unselectedArea = new Rectangle();
         this.mouseNode = createMouseNode(pane);
 
         buildSceneGraph();
-        bindImageViewProperties();
-        enableResizing();
         initializeAreas();
-        listenToMouseEvents();
+        
+        registerChangeListener(control.nodeProperty(), "NODE");
+        registerChangeListener(control.selectionProperty(), "SELECTION");
+        registerChangeListener(control.widthProperty(), "WIDTH");
+        registerChangeListener(control.heightProperty(), "HEIGHT");
+    }
+    
+    @Override
+    protected void handleControlPropertyChanged(String p) {
+        super.handleControlPropertyChanged(p);
+        
+        if ("NODE".equals(p)) {
+            updateNode();
+            updateSelection();
+        } else if ("WIDTH".equals(p) || "HEIGHT".equals(p)) {
+            updateSelection();
+        } else if ("SELECTION".equals(p)) {
+            updateSelection();
+        }
     }
 
     /**
@@ -174,11 +185,11 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         Pane pane = new Pane();
 
         // create the clipping rectangle which always resizes with the pane
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(pane.widthProperty());
-        clip.heightProperty().bind(pane.heightProperty());
+//        Rectangle clip = new Rectangle();
+//        clip.widthProperty().bind(pane.widthProperty());
+//        clip.heightProperty().bind(pane.heightProperty());
 
-        pane.setClip(clip);
+//        pane.setClip(clip);
         return pane;
     }
 
@@ -190,7 +201,7 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      * @return a region whose {@link Region#widthProperty() width} and {@link Region#heightProperty() height} properties
      *         are bound to the root's width and height
      */
-    private static Node createMouseNode(Region root) {
+    private Node createMouseNode(Region root) {
         Rectangle mouseNode = new Rectangle();
 
         // make the node transparent and make sure its size does not affect the control's size
@@ -200,6 +211,12 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         // bind width and height to the root region
         mouseNode.widthProperty().bind(root.widthProperty());
         mouseNode.heightProperty().bind(root.heightProperty());
+        
+        mouseNode.addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {
+                handleMouseEvent(event);
+            }
+        });
 
         return mouseNode;
     }
@@ -217,40 +234,20 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
 
         // add the pane to the outer pane and the other controls to first one
         outerPane.add(pane, 0, 0);
-        pane.getChildren().addAll(imageView, unselectedArea, selectedArea, mouseNode);
+        
+        pane.getChildren().addAll(unselectedArea, selectedArea, mouseNode);
+        updateNode();
     }
+    
+    private void updateNode() {
+        if (node != null) {
+            pane.getChildren().remove(node);
+        }
 
-    /**
-     * Some of the {@link SelectableImageView}'s properties origin from {@link ImageView}. Those properties of the
-     * {@link #getSkinnable() skinnable} and the {@link #imageView} are bidirectionally bound together.
-     */
-    private void bindImageViewProperties() {
-        SelectableImageView selectableImageView = getSkinnable();
-        Bindings.bindBidirectional(imageView.imageProperty(), selectableImageView.imageProperty());
-        Bindings.bindBidirectional(imageView.preserveRatioProperty(), selectableImageView.preserveImageRatioProperty());
-    }
-
-    /**
-     * Binds the {@link #imageView}'s {@link ImageView#fitHeightProperty() fitHeight} and
-     * {@link ImageView#fitWidthProperty() fitWidth} properties to he {@link #getSkinnable() skinnable}'s height and
-     * width property.
-     */
-    private void enableResizing() {
-        SelectableImageView selectableImageView = getSkinnable();
-
-        // resize all the internal controls when the selectable image view is resized
-        selectableImageView.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                resize();
-            }
-        });
-        selectableImageView.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                resize();
-            }
-        });
+        node = getSkinnable().getNode();
+        if (node != null) {
+            pane.getChildren().add(0, node);
+        }
     }
 
     /**
@@ -261,7 +258,6 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         styleAreas();
         bindAreaCoordinatesTogether();
         bindAreaVisibilityToSelection();
-        bindAreaToImageAndSelection();
     }
 
     /**
@@ -310,90 +306,6 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
         unselectedArea.visibleProperty().bind(validAndVisible);
     }
 
-    /**
-     * Binds the position and size of {@link #selectedArea} to the {@link SelectableImageView}'s
-     * {@link SelectableImageView#selectionProperty() selection} property.
-     */
-    private void bindAreaToImageAndSelection() {
-        SelectableImageView selectableImageView = getSkinnable();
-
-        // image
-        selectableImageView.imageProperty().addListener(new ChangeListener<Image>() {
-            @Override
-            public void changed(ObservableValue<? extends Image> observable, Image oldValue, Image newValue) {
-                updateSelection();
-            }
-        });
-
-        // image ratio
-        selectableImageView.preserveImageRatioProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                updateSelection();
-            }
-        });
-
-        // selection
-        selectableImageView.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
-            @Override
-            public void changed(ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue,
-                    Rectangle2D newValue) {
-                updateSelection();
-            }
-        });
-    }
-
-    /**
-     * Lets this control listen to all relevant mouse events.
-     */
-    private void listenToMouseEvents() {
-        mouseNode.addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                handleMouseEvent(event);
-            }
-        });
-    }
-
-    /* ************************************************************************
-     *                                                                         *
-     * Resizing                                                                *
-     *                                                                         *
-     **************************************************************************/
-
-    /*
-     * When the control is resized, the following steps are taking place:
-     *  - the ImageView's fitWidth and fitHeight properties are explicitly set to the new size
-     *  - this triggers a resize of the containing pane since the view is the largest control in it
-     *  - by bindings the resizing pane resizes the clipping rectangle and the unselected area's stroke width
-     * This brings the control to a coherent visual state but the selection is displayed relative to the old size,
-     * so it must be updates as well.
-     */
-
-    /**
-     * Resizes the contained controls when the control itself is resized.
-     */
-    private void resize() {
-        imageView.setFitWidth(getSkinnable().getWidth());
-        imageView.setFitHeight(getSkinnable().getHeight());
-
-        updateSelection();
-    }
-
-//    /**
-//     * Prints the sizes of the most relevant controls to {@link System#out}. Can be used to debug the control.
-//     */
-//    private void outputSizes() {
-//        System.out.println("Scene: " + getNode().getScene().getWidth() + " x " + getNode().getScene().getHeight());
-//        System.out.println("Selectable Image View: " + getSkinnable().getWidth() + " x " + getSkinnable().getHeight());
-//        System.out.println("Pane: " + pane.getWidth() + " x " + pane.getHeight());
-//        System.out.println("Image View: " + imageView.getFitWidth() + " x " + imageView.getFitHeight());
-//        System.out.println("Image View local bounds: " + imageView.getBoundsInLocal().getWidth() + " x "
-//                + imageView.getBoundsInLocal().getHeight());
-//        System.out.println("Selection: " + selectedArea.getWidth() + " x " + selectedArea.getHeight() + " at ("
-//                + selectedArea.getX() + ", " + selectedArea.getY() + ")");
-//        System.out.println();
-//    }
 
     /* ************************************************************************
      *                                                                         *
@@ -417,16 +329,17 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      */
     private void updateSelection() {
         boolean showSelection =
-                getSkinnable().getImage() != null && getSkinnable().isSelectionValid();
+                getSkinnable().getNode() != null && getSkinnable().isSelectionValid();
 
-        if (showSelection)
+        if (showSelection) {
             // the selection can be properly displayed
             setTransformedSelection();
-        else
+        } else {
             // in this case the selection areas are invisible,
             // so the only thing left to do is to make sure their coordinates are not all over the place
             // (this is not strictly necessary but makes the skin's state cleaner)
             setSelectionDirectly(0, 0, 0, 0);
+        }
     }
 
     /**
@@ -437,10 +350,11 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      */
     private void setTransformedSelection() {
         // get the image view's width and height and compute the ratio between the image size and the view's size
-        double imageViewWidth = imageView.getBoundsInLocal().getWidth();
-        double imageViewHeight = imageView.getBoundsInLocal().getHeight();
-        double widthRatio = imageViewWidth / imageView.getImage().getWidth();
-        double heightRatio = imageViewHeight / imageView.getImage().getHeight();
+        Node n = getSkinnable().getNode();
+        double imageViewWidth = n == null ? 0 : n.getBoundsInLocal().getWidth();
+        double imageViewHeight = n == null ? 0 : n.getBoundsInLocal().getHeight();
+        double widthRatio = imageViewWidth / n.prefWidth(-1);
+        double heightRatio = imageViewHeight / n.prefHeight(-1);
 
         // compute the new position and size such that it is always within the image view's area
         Rectangle2D selection = getImageSelection();
@@ -493,87 +407,13 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      */
     private void handleMouseEvent(MouseEvent event) {
         Cursor newCursor;
-        boolean imageExists = imageView.getImage() != null;
+        boolean imageExists = getSkinnable().getNode() != null;
         if (imageExists) {
-            Point2D pointInImage = transformToImageCoordiantes(event.getX(), event.getY());
-            SelectionEvent selectionEvent = new SimpleSelectionEvent(event, pointInImage);
-            newCursor = getBehavior().handleSelectionEvent(selectionEvent);
-        } else
+            newCursor = getBehavior().handleSelectionEvent(event);
+        } else {
             newCursor = Cursor.DEFAULT;
+        }
 
         mouseNode.setCursor(newCursor);
-    }
-
-    /**
-     * Transforms the specified x and y coordinates from the mouse node to a point which has the coordinates of the
-     * corresponding position in the displayed image (which must not be null).
-     * 
-     * @param x
-     *            the x coordinate within the mouse node
-     * @param y
-     *            the y coordinate within the mouse node
-     * @return a point which represents the specified coordinates in the image
-     */
-    private Point2D transformToImageCoordiantes(double x, double y) {
-        double xRatio = mouseNode.getBoundsInParent().getWidth() / imageView.getImage().getWidth();
-        double yRatio = mouseNode.getBoundsInParent().getHeight() / imageView.getImage().getHeight();
-
-        double xInPicture = MathTools.inInterval(0, x / xRatio, imageView.getImage().getWidth());
-        double yInPicture = MathTools.inInterval(0, y / yRatio, imageView.getImage().getHeight());
-
-        return new Point2D(xInPicture, yInPicture);
-    }
-
-    /* ************************************************************************
-     *                                                                         *
-     * Private Classes                                                         *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * Simple implementation of {@link impl.org.controlsfx.behavior.SelectableImageViewBehavior.SelectionEvent}.
-     */
-    private class SimpleSelectionEvent implements SelectableImageViewBehavior.SelectionEvent {
-
-        /**
-         * The mouse event.
-         */
-        private final MouseEvent mouseEvent;
-
-        /**
-         * The event's x/y-coordinates transformed to a point in the image.
-         */
-        private final Point2D pointInImage;
-
-        /**
-         * Creates a new selection event with the specified arguments.
-         * 
-         * @param mouseEvent
-         *            the mouse event
-         * @param pointInImage
-         *            the event's x/y-coordinates transformed to a point in the image
-         */
-        public SimpleSelectionEvent(MouseEvent mouseEvent, Point2D pointInImage) {
-            super();
-            this.mouseEvent = mouseEvent;
-            this.pointInImage = pointInImage;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public MouseEvent getMouseEvent() {
-            return mouseEvent;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Point2D getPointInImage() {
-            return pointInImage;
-        }
-
     }
 }

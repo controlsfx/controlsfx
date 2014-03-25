@@ -131,7 +131,7 @@ public class HelloValidation extends ControlsFXSample {
         row++;
         CheckBox checkBox =  new CheckBox("CheckBox");
         validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> 
-        	ValidationResult.fromErrorIf( c, "Checkbox should be checked", () -> !newValue)
+        	ValidationResult.fromErrorIf( c, "Checkbox should be checked", !newValue)
         );
         grid.add(checkBox, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
@@ -141,7 +141,7 @@ public class HelloValidation extends ControlsFXSample {
         Slider slider =  new Slider(-50d, 50d, -10d);
         slider.setShowTickLabels(true);
         validationSupport.registerValidator(slider, (Control c, Double newValue) -> 
-        	ValidationResult.fromErrorIf( slider, "Slider value should be > 0", () -> newValue <= 0 )
+        	ValidationResult.fromErrorIf( slider, "Slider value should be > 0",  newValue <= 0 )
         );
        
         grid.add(new Label("Slider"), 0, row);
@@ -163,7 +163,7 @@ public class HelloValidation extends ControlsFXSample {
         row++;
         DatePicker datePicker =  new DatePicker();
         validationSupport.registerValidator(datePicker, (Control c, LocalDate newValue) -> 
-        	ValidationResult.fromErrorIf( datePicker, "The date should be today", () ->  !LocalDate.now().equals(newValue) )	
+        	ValidationResult.fromErrorIf( datePicker, "The date should be today", !LocalDate.now().equals(newValue) )	
         );
        
         grid.add(new Label("Date Picker"), 0, row);

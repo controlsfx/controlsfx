@@ -14,7 +14,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 			public ValidationResult apply( Control c, T value) {
 				return ValidationResult
 				  .fromMessageIf(c, message, severity,
-				     () -> value instanceof String? value.toString().trim().isEmpty(): value == null);
+				     value instanceof String? value.toString().trim().isEmpty(): value == null);
 			}
 			
 		};
@@ -30,7 +30,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 
 			@Override
 			public ValidationResult apply( Control c, T value) {
-				return ValidationResult.fromMessageIf(c,message,severity,() -> !values.contains(value)); 
+				return ValidationResult.fromMessageIf(c,message,severity, !values.contains(value)); 
 			}
 			
 		};

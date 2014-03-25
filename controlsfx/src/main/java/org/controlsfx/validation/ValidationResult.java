@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 import javafx.scene.control.Control;
 
@@ -16,15 +15,15 @@ public class ValidationResult {
 	
 	public ValidationResult() {}
 	
-	public static final ValidationResult fromMessageIf( Control target, String text, Severity severity, Supplier<Boolean> condition ) {
+	public static final ValidationResult fromMessageIf( Control target, String text, Severity severity, boolean condition ) {
 		return new ValidationResult().addMessageIf(target, text, severity, condition);
 	}
 	
-	public static final ValidationResult fromErrorIf( Control target, String text, Supplier<Boolean> condition ) {
+	public static final ValidationResult fromErrorIf( Control target, String text, boolean condition ) {
 		return new ValidationResult().addErrorIf(target, text, condition);
 	}
 	
-	public static final ValidationResult fromWarningIf( Control target, String text, Supplier<Boolean> condition ) {
+	public static final ValidationResult fromWarningIf( Control target, String text, boolean condition ) {
 		return new ValidationResult().addWarningIf(target, text, condition);
 	}
 	
@@ -64,18 +63,15 @@ public class ValidationResult {
 		return this;
 	}
 	
-	public ValidationResult addMessageIf( Control target, String text, Severity severity, Supplier<Boolean> condition) {
-		if ( condition == null || condition.get() ) {
-			add( new SimpleValidationMessage(target, text, severity));
-		}
-		return this;
+	public ValidationResult addMessageIf( Control target, String text, Severity severity, boolean condition) {
+		return  condition? add( new SimpleValidationMessage(target, text, severity)): this;
 	}
 	
-	public ValidationResult addErrorIf( Control target, String text, Supplier<Boolean> condition) {
+	public ValidationResult addErrorIf( Control target, String text, boolean condition) {
 		return addMessageIf(target,text,Severity.ERROR,condition);
 	}
 	
-	public ValidationResult addWarningIf( Control target, String text, Supplier<Boolean> condition) {
+	public ValidationResult addWarningIf( Control target, String text, boolean condition) {
 		return addMessageIf(target,text,Severity.WARNING,condition);
 	}
 	

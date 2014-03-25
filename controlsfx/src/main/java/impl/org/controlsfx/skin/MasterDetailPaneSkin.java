@@ -39,6 +39,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
@@ -53,30 +54,49 @@ import org.controlsfx.control.MasterDetailPane;
 
 public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
-    private double lastDividerPosition;
+//    private double lastDividerPosition;
 
+    private boolean changing = false;
     private SplitPane splitPane;
     private Timeline timeline;
 
     public MasterDetailPaneSkin(MasterDetailPane pane) {
         super(pane);
 
-        this.lastDividerPosition = pane.getDividerPosition();
+//        this.lastDividerPosition = pane.getDividerPosition();
 
         this.splitPane = new SplitPane();
-        this.splitPane.setDividerPosition(0, lastDividerPosition);
+        this.splitPane.setDividerPosition(0, pane.getDividerPosition());
 
+        /**
+         * We listen to the change of dividers (when adding or removing node), and then
+         * we listen to their position to update correctly the dividerPosition of 
+         * the MasterDetailPane.
+         */
+        this.splitPane.getDividers().addListener(new ListChangeListener<Divider>() {
+
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends Divider> change) {
+                while (change.next()) {
+                    if (change.wasAdded()) {
+                        change.getAddedSubList().get(0).positionProperty().addListener(listener);
+                    } else if (change.wasRemoved()) {
+                        change.getRemoved().get(0).positionProperty().removeListener(listener);
+                    }
+                }
+            }
+        });
         SplitPane.setResizableWithParent(getSkinnable().getDetailNode(), false);
 
         switch (getSkinnable().getDetailSide()) {
-        case BOTTOM:
-        case TOP:
-            splitPane.setOrientation(VERTICAL);
-            break;
-        case LEFT:
-        case RIGHT:
-            splitPane.setOrientation(HORIZONTAL);
-            break;
+            case BOTTOM:
+            case TOP:
+                splitPane.setOrientation(VERTICAL);
+                break;
+            case LEFT:
+            case RIGHT:
+                splitPane.setOrientation(HORIZONTAL);
+                break;
         }
 
         getSkinnable().masterNodeProperty().addListener(
@@ -95,42 +115,42 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
                             int masterIndex = 0;
                             switch (splitPane.getOrientation()) {
-                            case HORIZONTAL:
-                                switch (getSkinnable().getDetailSide()) {
-                                case LEFT:
-                                    masterIndex = 1;
-                                    break;
-                                case RIGHT:
-                                    masterIndex = 0;
-                                    break;
-                                default:
-                                    throw new IllegalArgumentException(
-                                            "illegal details position " //$NON-NLS-1$
+                                case HORIZONTAL:
+                                    switch (getSkinnable().getDetailSide()) {
+                                        case LEFT:
+                                            masterIndex = 1;
+                                            break;
+                                        case RIGHT:
+                                            masterIndex = 0;
+                                            break;
+                                        default:
+                                            throw new IllegalArgumentException(
+                                                    "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
-                                                            .getDetailSide()
+                                                    .getDetailSide()
                                                     + " for orientation " //$NON-NLS-1$
                                                     + splitPane
-                                                            .getOrientation());
-                                }
-                                break;
-                            case VERTICAL:
-                                switch (getSkinnable().getDetailSide()) {
-                                case TOP:
-                                    masterIndex = 1;
+                                                    .getOrientation());
+                                    }
                                     break;
-                                case BOTTOM:
-                                    masterIndex = 0;
-                                    break;
-                                default:
-                                    throw new IllegalArgumentException(
-                                            "illegal details position " //$NON-NLS-1$
+                                case VERTICAL:
+                                    switch (getSkinnable().getDetailSide()) {
+                                        case TOP:
+                                            masterIndex = 1;
+                                            break;
+                                        case BOTTOM:
+                                            masterIndex = 0;
+                                            break;
+                                        default:
+                                            throw new IllegalArgumentException(
+                                                    "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
-                                                            .getDetailSide()
+                                                    .getDetailSide()
                                                     + " for orientation " //$NON-NLS-1$
                                                     + splitPane
-                                                            .getOrientation());
-                                }
-                                break;
+                                                    .getOrientation());
+                                    }
+                                    break;
                             }
                             List<Node> items = splitPane.getItems();
                             if (items.isEmpty()) {
@@ -160,42 +180,42 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
                             int detailsIndex = 0;
                             switch (splitPane.getOrientation()) {
-                            case HORIZONTAL:
-                                switch (getSkinnable().getDetailSide()) {
-                                case LEFT:
-                                    detailsIndex = 0;
-                                    break;
-                                case RIGHT:
-                                    detailsIndex = 1;
-                                    break;
-                                default:
-                                    throw new IllegalArgumentException(
-                                            "illegal details position " //$NON-NLS-1$
+                                case HORIZONTAL:
+                                    switch (getSkinnable().getDetailSide()) {
+                                        case LEFT:
+                                            detailsIndex = 0;
+                                            break;
+                                        case RIGHT:
+                                            detailsIndex = 1;
+                                            break;
+                                        default:
+                                            throw new IllegalArgumentException(
+                                                    "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
-                                                            .getDetailSide()
+                                                    .getDetailSide()
                                                     + " for orientation " //$NON-NLS-1$
                                                     + splitPane
-                                                            .getOrientation());
-                                }
-                                break;
-                            case VERTICAL:
-                                switch (getSkinnable().getDetailSide()) {
-                                case TOP:
-                                    detailsIndex = 0;
+                                                    .getOrientation());
+                                    }
                                     break;
-                                case BOTTOM:
-                                    detailsIndex = 1;
-                                    break;
-                                default:
-                                    throw new IllegalArgumentException(
-                                            "illegal details position " //$NON-NLS-1$
+                                case VERTICAL:
+                                    switch (getSkinnable().getDetailSide()) {
+                                        case TOP:
+                                            detailsIndex = 0;
+                                            break;
+                                        case BOTTOM:
+                                            detailsIndex = 1;
+                                            break;
+                                        default:
+                                            throw new IllegalArgumentException(
+                                                    "illegal details position " //$NON-NLS-1$
                                                     + getSkinnable()
-                                                            .getDetailSide()
+                                                    .getDetailSide()
                                                     + " for orientation " //$NON-NLS-1$
                                                     + splitPane
-                                                            .getOrientation());
-                                }
-                                break;
+                                                    .getOrientation());
+                                    }
+                                    break;
                             }
                             List<Node> items = splitPane.getItems();
                             if (items.isEmpty()) {
@@ -213,12 +233,12 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                     public void changed(
                             ObservableValue<? extends Boolean> value,
                             Boolean oldShow, Boolean newShow) {
-                        if (newShow) {
-                            open();
-                        } else {
-                            close();
-                        }
-                    }
+                                if (newShow) {
+                                    open();
+                                } else {
+                                    close();
+                                }
+                            }
                 });
 
         getSkinnable().detailSideProperty().addListener(
@@ -227,57 +247,59 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                     public void changed(ObservableValue<? extends Side> value,
                             Side oldPos, Side newPos) {
                         if (getSkinnable().isShowDetailNode()) {
-                            lastDividerPosition = splitPane.getDividers()
-                                    .get(0).getPosition();
+//                            lastDividerPosition = splitPane.getDividers()
+//                            .get(0).getPosition();
                             splitPane.getItems().clear();
                         }
                         switch (newPos) {
-                        case TOP:
-                        case BOTTOM:
-                            splitPane.setOrientation(VERTICAL);
-                            break;
-                        case LEFT:
-                        case RIGHT:
-                            splitPane.setOrientation(HORIZONTAL);
+                            case TOP:
+                            case BOTTOM:
+                                splitPane.setOrientation(VERTICAL);
+                                break;
+                            case LEFT:
+                            case RIGHT:
+                                splitPane.setOrientation(HORIZONTAL);
                         }
                         switch (newPos) {
-                        case TOP:
-                        case LEFT:
-                            if (getSkinnable().isShowDetailNode()) {
-                                splitPane.getItems().add(
-                                        getSkinnable().getDetailNode());
-                                splitPane.getItems().add(
-                                        getSkinnable().getMasterNode());
-                            }
-                            switch (oldPos) {
-                            case BOTTOM:
-                            case RIGHT:
-                                lastDividerPosition = 1 - lastDividerPosition;
-                                break;
-                            default:
-                                break;
-                            }
-                            break;
-                        case BOTTOM:
-                        case RIGHT:
-                            if (getSkinnable().isShowDetailNode()) {
-                                splitPane.getItems().add(
-                                        getSkinnable().getMasterNode());
-                                splitPane.getItems().add(
-                                        getSkinnable().getDetailNode());
-                            }
-                            switch (oldPos) {
                             case TOP:
                             case LEFT:
-                                lastDividerPosition = 1 - lastDividerPosition;
+                                if (getSkinnable().isShowDetailNode()) {
+                                    splitPane.getItems().add(
+                                            getSkinnable().getDetailNode());
+                                    splitPane.getItems().add(
+                                            getSkinnable().getMasterNode());
+                                }
+                                switch (oldPos) {
+                                    case BOTTOM:
+                                    case RIGHT:
+                                        getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
+//                                        lastDividerPosition = 1 - lastDividerPosition;
+                                        break;
+                                    default:
+                                        break;
+                                }
                                 break;
-                            default:
+                            case BOTTOM:
+                            case RIGHT:
+                                if (getSkinnable().isShowDetailNode()) {
+                                    splitPane.getItems().add(
+                                            getSkinnable().getMasterNode());
+                                    splitPane.getItems().add(
+                                            getSkinnable().getDetailNode());
+                                }
+                                switch (oldPos) {
+                                    case TOP:
+                                    case LEFT:
+                                        getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
+//                                        lastDividerPosition = 1 - lastDividerPosition;
+                                        break;
+                                    default:
+                                        break;
+                                }
                                 break;
-                            }
-                            break;
                         }
                         if (getSkinnable().isShowDetailNode()) {
-                            splitPane.setDividerPositions(lastDividerPosition);
+                            splitPane.setDividerPositions(getSkinnable().getDividerPosition());
                         }
                     }
                 });
@@ -290,14 +312,14 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
         if (getSkinnable().isShowDetailNode()) {
             switch (getSkinnable().getDetailSide()) {
-            case TOP:
-            case LEFT:
-                splitPane.getItems().add(0, getSkinnable().getDetailNode());
-                break;
-            case BOTTOM:
-            case RIGHT:
-                splitPane.getItems().add(getSkinnable().getDetailNode());
-                break;
+                case TOP:
+                case LEFT:
+                    splitPane.getItems().add(0, getSkinnable().getDetailNode());
+                    break;
+                case BOTTOM:
+                case RIGHT:
+                    splitPane.getItems().add(getSkinnable().getDetailNode());
+                    break;
             }
 
             bindDividerPosition();
@@ -307,10 +329,12 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     private InvalidationListener listenersDivider = new InvalidationListener() {
         @Override
         public void invalidated(Observable arg0) {
+            changing = true;
             splitPane.setDividerPosition(0, getSkinnable().getDividerPosition());
-            
+            changing = false;
         }
     };
+
     private void bindDividerPosition() {
         getSkinnable().dividerPositionProperty().addListener(listenersDivider);
     }
@@ -334,30 +358,32 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     }
 
     private void open() {
+        changing = true;
         Node node = getSkinnable().getDetailNode();
 
         switch (getSkinnable().getDetailSide()) {
-        case TOP:
-        case LEFT:
-            splitPane.getItems().add(0, node);
-            splitPane.setDividerPositions(0);
-            break;
-        case BOTTOM:
-        case RIGHT:
-            splitPane.getItems().add(node);
-            splitPane.setDividerPositions(1);
-            break;
+            case TOP:
+            case LEFT:
+                splitPane.getItems().add(0, node);
+                splitPane.setDividerPositions(0);
+                break;
+            case BOTTOM:
+            case RIGHT:
+                splitPane.getItems().add(node);
+                splitPane.setDividerPositions(1);
+                break;
         }
 
-        maybeAnimatePositionChange(lastDividerPosition, true);
+        maybeAnimatePositionChange(getSkinnable().getDividerPosition(), true);
     }
 
     private void close() {
+        changing = true;
         if (!splitPane.getDividers().isEmpty()) {
 
-            Divider divider = splitPane.getDividers().get(0);
+//            Divider divider = splitPane.getDividers().get(0);
 
-            lastDividerPosition = divider.getPosition();
+//            lastDividerPosition = divider.getPosition();
 
             /*
              * Do we collapse by moving the divider to the left/right or
@@ -365,12 +391,12 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
              */
             double targetLocation = 0;
             switch (getSkinnable().getDetailSide()) {
-            case BOTTOM:
-            case RIGHT:
-                targetLocation = 1;
-                break;
-            default:
-                break;
+                case BOTTOM:
+                case RIGHT:
+                    targetLocation = 1;
+                    break;
+                default:
+                    break;
             }
 
             maybeAnimatePositionChange(targetLocation, false);
@@ -379,7 +405,6 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
     private void maybeAnimatePositionChange(final double position,
             final boolean showDetail) {
-
         Divider divider = splitPane.getDividers().get(0);
 
         if (getSkinnable().isAnimated()) {
@@ -404,6 +429,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                         splitPane.getItems().remove(
                                 getSkinnable().getDetailNode());
                     }
+                    changing = false;
                 }
             });
             timeline.play();
@@ -419,6 +445,17 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                 unbindDividerPosition();
                 splitPane.getItems().remove(getSkinnable().getDetailNode());
             }
+            changing = false;
         }
     }
+    
+    private ChangeListener<Number> listener = new ChangeListener<Number>() {
+
+        @Override
+        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+            if (!changing) {
+                getSkinnable().setDividerPosition(t1.doubleValue());
+            }
+        }
+    };
 }

@@ -63,6 +63,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     public MasterDetailPaneSkin(MasterDetailPane pane) {
         super(pane);
 
+        
 //        this.lastDividerPosition = pane.getDividerPosition();
 
         this.splitPane = new SplitPane();

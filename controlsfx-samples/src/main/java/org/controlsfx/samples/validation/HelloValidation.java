@@ -29,8 +29,6 @@ package org.controlsfx.samples.validation;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -85,11 +83,8 @@ public class HelloValidation extends ControlsFXSample {
 
         
         final ListView<ValidationMessage> messageList = new ListView<>();
-        validationSupport.validationResultProperty().addListener( new ChangeListener<ValidationResult>(){
-			public void changed(ObservableValue<? extends ValidationResult> o, ValidationResult oldValue, ValidationResult newValue) {
-				messageList.getItems().setAll(newValue.getMessages());
-			};
-        });
+        validationSupport.validationResultProperty().addListener( (o, oldValue, newValue) ->
+        	messageList.getItems().setAll(newValue.getMessages()));
         
         int row = 0;
 

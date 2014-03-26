@@ -24,11 +24,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples.validation;
+package org.controlsfx.samples;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -48,7 +50,6 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.samples.Utils;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -71,11 +72,24 @@ public class HelloValidation extends ControlsFXSample {
     @Override public Node getPanel(final Stage stage) {
 
     	ValidationSupport validationSupport = new ValidationSupport();
+    	
+    	
+    	
 
         GridPane root = new GridPane();
         root.setVgap(10);
         root.setHgap(10);
         root.setPadding(new Insets(30, 30, 0, 30));
+        
+        root.sceneProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {
+                if (root.getScene() != null) {
+                    root.getScene().getStylesheets().add(HelloDecorator.class.getResource("validation.css").toExternalForm());
+                }
+            }
+        });
+//        message.getTarget().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
+
 
         
 //        final ListView<ValidationMessage> messageList = new ListView<>();

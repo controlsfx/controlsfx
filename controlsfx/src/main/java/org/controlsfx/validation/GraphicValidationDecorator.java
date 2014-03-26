@@ -1,5 +1,8 @@
 package org.controlsfx.validation;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 
@@ -19,8 +22,8 @@ public abstract class GraphicValidationDecorator implements ValidationDecorator 
 	}
 	
 	@Override
-	public final Decoration createDecoration(ValidationMessage message) {
-		return new GraphicDecoration(createDecorationNode(message),getDecorationPosition());
+	public final Collection<Decoration> createDecorations(ValidationMessage message) {
+		return Arrays.asList(new GraphicDecoration(createDecorationNode(message),getDecorationPosition()));
 	}
 
 	protected abstract Node createDecorationNode(ValidationMessage message);

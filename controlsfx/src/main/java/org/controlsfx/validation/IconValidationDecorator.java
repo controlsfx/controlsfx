@@ -34,5 +34,11 @@ public class IconValidationDecorator extends GraphicValidationDecorator {
         label.setStyle("-fx-margin: 0; -fx-padding:0;-fx-border-width:0;-fx-background-color:blue;");
 		return label;
 	}
+    
+	@Override
+	public String toString() {
+		return "Icon Validation Decorator";
+	}
+
 
 }

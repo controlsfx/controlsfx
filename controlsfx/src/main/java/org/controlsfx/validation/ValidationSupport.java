@@ -173,9 +173,9 @@ public class ValidationSupport {
 	        	for( Control target: getKnownControls()) {
 	        		try {
 		        		Decorator.removeAllDecorations(target);
-	 	        		getHighestMessage(target).ifPresent( msg -> {
-			        		addDecoration(target, decorator.createDecoration(msg));
-		        		});
+	 	        		getHighestMessage(target).ifPresent( msg -> 
+	 	        			decorator.createDecorations(msg).stream().forEach( d -> addDecoration(target,d))
+		        		);
 	        		} catch ( Throwable ex ) {
 	        			// FIXME Decorator throws an exception on the first run
 	        			ex.printStackTrace();
@@ -207,7 +207,7 @@ public class ValidationSupport {
 	}
 	
 	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
-			new SimpleObjectProperty<>(new IconValidationDecorator());
+			new SimpleObjectProperty<>(new StyleClassValidationDecorator());//new IconValidationDecorator());
 	
 	public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
 		return validationDecoratorProperty;

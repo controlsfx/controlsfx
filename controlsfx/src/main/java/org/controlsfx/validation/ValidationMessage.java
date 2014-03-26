@@ -26,13 +26,15 @@
  */
 package org.controlsfx.validation;
 
+import java.util.Comparator;
+
 import javafx.scene.control.Control;
 
 
 /**
  * Interface to define basic contract for validation message  
  */
-public interface ValidationMessage {
+public interface ValidationMessage extends Comparable<ValidationMessage>{
 	
 	/**
 	 * Message text
@@ -72,4 +74,17 @@ public interface ValidationMessage {
 	static ValidationMessage warning( Control target, String text ) {
 		return new SimpleValidationMessage(target, text, Severity.WARNING);
 	}
+	
+	static Comparator<ValidationMessage> COMPARATOR = new Comparator<ValidationMessage>() {
+
+		@Override
+		public int compare(ValidationMessage m1, ValidationMessage m2) {
+			if ( m1 == null ) {
+			    return m2 == null? 0: m2.compareTo(m1);
+			} else {
+				return m1.compareTo(m2);
+			}
+		}
+	};
+		
 }

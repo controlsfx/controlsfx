@@ -26,12 +26,14 @@
  */
 package org.controlsfx.validation;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.function.Predicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -39,6 +41,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -142,7 +145,7 @@ public class ValidationSupport {
 		return value instanceof Boolean? (Boolean)value: false;
 	}
 	
-	
+	private ObservableSet<Control> controls = FXCollections.observableSet();
 	private ObservableMap<Control,ValidationResult> validationResults = 
 			FXCollections.observableMap(new WeakHashMap<>());
 	
@@ -199,12 +202,32 @@ public class ValidationSupport {
 			
 			Consumer<T> updateResults = value -> validationResults.put(c, validator.apply(c, value));
 			
+			controls.add(c);
 			observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
 			updateResults.accept(observable.getValue());
 			
 			return e;
 			
 		}).isPresent();
+	}
+	
+	public Set<Control> getKnownControls() {
+		return Collections.unmodifiableSet(controls);
+	}
+	
+	public Optional<ValidationMessage> getHighestMessage(Control target) {
+		return Optional.ofNullable(validationResults.get(target)).map( result -> {
+			
+			return result.getMessages().stream().max( ValidationMessage.COMPARATOR).get();
+			
+//		    ValidationMessage msg = null;
+//		    for( ValidationMessage m: result.getMessages()) {
+//		    	if ( m.compareTo(msg) > 0 ) {
+//		    		msg = m;
+//		    	}
+//		    }
+//		    return msg;
+		});
 	}
 	
 	/**

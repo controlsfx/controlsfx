@@ -26,7 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.behavior.SelectableImageViewBehavior;
+import impl.org.controlsfx.behavior.NodeRangeSelectorBehavior;
 import impl.org.controlsfx.tools.MathTools;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -46,15 +46,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.util.Callback;
 
-import org.controlsfx.control.SelectableImageView;
+import org.controlsfx.control.NodeRangeSelector;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
- * View for the {@link SelectableImageView}. It displays the image and the selection and manages their positioning.
- * MouseEvents are handed over to the {@link SelectableImageViewBehavior} which uses them to change the selection.
+ * View for the {@link NodeRangeSelector}. It displays the image and the selection and manages their positioning.
+ * MouseEvents are handed over to the {@link NodeRangeSelectorBehavior} which uses them to change the selection.
  */
-public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageView, SelectableImageViewBehavior> {
+public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, NodeRangeSelectorBehavior> {
 
     /*
      * IMAGE:
@@ -140,13 +140,13 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      **************************************************************************/
 
     /**
-     * Creates a new skin for the specified {@link SelectableImageView}.
+     * Creates a new skin for the specified {@link NodeRangeSelector}.
      * 
      * @param selectableImageView
      *            the control which this skin will display
      */
-    public SelectableImageViewSkin(SelectableImageView control) {
-        super(control, new SelectableImageViewBehavior(control));
+    public NodeRangeSelectorSkin(NodeRangeSelector control) {
+        super(control, new NodeRangeSelectorBehavior(control));
 
         this.pane = createClippingPane();
         this.selectedArea = new Rectangle();
@@ -252,7 +252,7 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
 
     /**
      * Initializes the {@link #selectedArea} and the {@link #unselectedArea}. This includes their style and their
-     * bindings to the {@link SelectableImageView#selectionProperty() selection} property.
+     * bindings to the {@link NodeRangeSelector#selectionProperty() selection} property.
      */
     private void initializeAreas() {
         styleAreas();
@@ -294,8 +294,8 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
 
     /**
      * Binds the visibility of {@link #selectedArea} and {@link #unselectedArea unselected} to the
-     * {@link SelectableImageView}'s {@link SelectableImageView#selectionActiveProperty() selectionActive} and
-     * {@link SelectableImageView#selectionValidProperty() selectionValid} properties.
+     * {@link NodeRangeSelector}'s {@link NodeRangeSelector#selectionActiveProperty() selectionActive} and
+     * {@link NodeRangeSelector#selectionValidProperty() selectionValid} properties.
      */
     private void bindAreaVisibilityToSelection() {
         ReadOnlyBooleanProperty selectionValid = getSkinnable().selectionValidProperty();
@@ -314,8 +314,8 @@ public class SelectableImageViewSkin extends BehaviorSkinBase<SelectableImageVie
      **************************************************************************/
 
     /**
-     * Usability method. Returns the value contained in the {@link SelectableImageView}'s
-     * {@link SelectableImageView#selectionProperty() selection} property.
+     * Usability method. Returns the value contained in the {@link NodeRangeSelector}'s
+     * {@link NodeRangeSelector#selectionProperty() selection} property.
      * 
      * @return the image's selection
      */

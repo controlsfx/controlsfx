@@ -61,12 +61,12 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.SelectableImageView;
+import org.controlsfx.control.NodeRangeSelector;
 
 /**
- * Demonstrates the {@link SelectableImageView}.
+ * Demonstrates the {@link NodeRangeSelector}.
  */
-public class HelloSelectableImageView extends ControlsFXSample {
+public class HelloNodeRangeSelector extends ControlsFXSample {
 
     /* ************************************************************************
      *                                                                         *
@@ -107,7 +107,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
     /**
      * The demoed view.
      */
-    private final SelectableImageView imageView = new SelectableImageView();
+    private final NodeRangeSelector selector = new NodeRangeSelector();
 
     /**
      * The label showing the name of the currently displayed image.
@@ -142,7 +142,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         };
         
         displayImageAndNameforIndex(imageIndex);
-        return imageView;
+        return selector;
     }
 
     /**
@@ -153,7 +153,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
      */
     private void displayImageAndNameforIndex(int index) {
         imageNameTestField.setText(nodeNames[index]);
-        imageView.setNode(nodes[index]);
+        selector.setNode(nodes[index]);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         fixedRatioLabel.getStyleClass().add("property");
         grid.add(fixedRatioLabel, 0, row);
         CheckBox ratioFixed = new CheckBox();
-        ratioFixed.selectedProperty().bindBidirectional(imageView.selectionRatioFixedProperty());
+        ratioFixed.selectedProperty().bindBidirectional(selector.selectionRatioFixedProperty());
         grid.add(ratioFixed, 1, row++);
         
         // --- ratio
@@ -204,7 +204,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         ratioLabel.getStyleClass().add("property");
         grid.add(ratioLabel, 0, row);
         TextField ratioTextField = new TextField();
-        ratioTextField.textProperty().bindBidirectional(imageView.fixedSelectionRatioProperty(), new StringConverter<Number>() {
+        ratioTextField.textProperty().bindBidirectional(selector.fixedSelectionRatioProperty(), new StringConverter<Number>() {
             @Override public Number fromString(String value) {
                 try {
                     return twoDpFormat.parse(value);
@@ -261,7 +261,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         ratio.setPrefColumnCount(3);
         
         // set up the binding
-        imageView.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
+        selector.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
             @Override
             public void changed(
                     ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) {
@@ -299,10 +299,10 @@ public class HelloSelectableImageView extends ControlsFXSample {
 
         CheckBox selectionChanging = new CheckBox();
         selectionChanging.setDisable(true);
-        selectionChanging.selectedProperty().bindBidirectional(imageView.selectionChangingProperty());
+        selectionChanging.selectedProperty().bindBidirectional(selector.selectionChangingProperty());
 
         CheckBox selectionValid = new CheckBox();
-        selectionValid.selectedProperty().bind(imageView.selectionValidProperty());
+        selectionValid.selectedProperty().bind(selector.selectionValidProperty());
         selectionValid.setDisable(true);
         
         grid.addRow(row++, new Label("Selection Changing:"), selectionChanging);
@@ -314,10 +314,10 @@ public class HelloSelectableImageView extends ControlsFXSample {
     private Node createSnapshot() {
         AnimationTimer timer = new AnimationTimer() {
             @Override public void handle(long arg0) {
-                if (imageView.getNode() != null || imageView.getSelection() == null) {
+                if (selector.getNode() != null || selector.getSelection() == null) {
                     SnapshotParameters params = new SnapshotParameters();
-                    params.setViewport(imageView.getSelection());
-                    imageView.getNode().snapshot(new Callback<SnapshotResult, Void>() {
+                    params.setViewport(selector.getSelection());
+                    selector.getNode().snapshot(new Callback<SnapshotResult, Void>() {
                         @Override public Void call(SnapshotResult result) {
                             snapshotImageView.setImage(result.getImage());
                             return null;
@@ -345,18 +345,18 @@ public class HelloSelectableImageView extends ControlsFXSample {
 
     @Override
     public String getSampleName() {
-        return "SelectableImageView";
+        return "NodeRangeSelector";
     }
 
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE
-                + "org/controlsfx/control/SelectableImageView.html";
+                + "org/controlsfx/control/NodeRangeSelector.html";
     }
 
     @Override
     public String getSampleDescription() {
-        return "An image view which allows the user to select a rectangular area of the displayed image. " +
+        return "A tool which allows the user to select a rectangular area of the displayed node. " +
                 "The selection's ratio can be fixed so that the user can only make selections with that ratio.";
     }
 }

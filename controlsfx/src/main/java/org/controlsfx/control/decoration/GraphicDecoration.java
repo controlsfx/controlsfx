@@ -26,68 +26,113 @@
  */
 package org.controlsfx.control.decoration;
 
+import impl.org.controlsfx.ImplUtils;
+
+import java.util.List;
+
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.layout.StackPane;
 
 public class GraphicDecoration implements Decoration {
 
     private final Node decorationNode;
     private final Pos pos;
+    private final double xOffset;
+    private final double yOffset;
 
     public GraphicDecoration(Node decoration) {
         this(decoration, Pos.TOP_LEFT);
     }
     
     public GraphicDecoration(Node decorationNode, Pos position) {
-        this.decorationNode = decorationNode;
-        this.pos = position;
+        this(decorationNode, position, 0, 0);
     }
     
-    @Override public Node run(Node targetNode, RunType operation) {
-        if (operation == RunType.ADD) {
-            updateGraphicPosition(targetNode);
-            return decorationNode;
-        } else if (operation == RunType.REMOVE) {
-            // no-op - don't need to do anything on uninstall as the node will
-            // be removed from the scenegraph by the decorator code itself
-        } else if (operation == RunType.LAYOUT) {
-            updateGraphicPosition(targetNode);
-        }
+    public GraphicDecoration(Node decorationNode, Pos position, double xOffset, double yOffset) {
+        this.decorationNode = decorationNode;
+        this.decorationNode.setManaged(false);
+        this.pos = position;
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+    }
+    
+    @Override public Node run(Node targetNode, boolean add) {
+        List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
         
-        return null;
+        if (add) {
+            updateGraphicPosition(targetNode);
+            if (!targetNodeChildren.contains(decorationNode)) {
+                targetNodeChildren.add(decorationNode);
+            }
+            return null;
+        } else {
+            if (targetNodeChildren.contains(decorationNode)) {
+                targetNodeChildren.remove(decorationNode);
+            }
+            return null;
+        }
     }
     
     private void updateGraphicPosition(Node targetNode) {
-        Bounds targetBounds = targetNode.getBoundsInParent();
-        Bounds dbounds = decorationNode.getBoundsInLocal();
+        final double decorationNodeWidth = decorationNode.prefWidth(-1);
+        final double decorationNodeHeight = decorationNode.prefHeight(-1);
         
-        double top = targetBounds.getMinY() - dbounds.getHeight() / 2 + getVInset(targetBounds);
-        double left = targetBounds.getMinX() - dbounds.getWidth() / 2 + getHInset(targetBounds);
-        
-        decorationNode.setTranslateX(left);
-        decorationNode.setTranslateY(top);
-    }
-    
-    private double getHInset(Bounds targetBounds) {
-        switch (pos.getHpos()) {
-            case CENTER:
-                return targetBounds.getWidth() / 2;
-            case RIGHT:
-                return targetBounds.getWidth();
-            default:
-                return 0;
-        }
-    }
+        Bounds targetBounds = targetNode.getLayoutBounds();
+        double x = targetBounds.getMinX();
+        double y = targetBounds.getMinY();
 
-    private double getVInset(Bounds targetBounds) {
-        switch (pos.getVpos()) {
-            case CENTER:
-                return targetBounds.getHeight() / 2;
-            case BOTTOM:
-                return targetBounds.getHeight();
-            default:
-                return 0;
+        double targetWidth = targetBounds.getWidth();
+        if (targetWidth <= 0) {
+            targetWidth = targetNode.prefWidth(-1);
         }
+        
+        double targetHeight = targetBounds.getHeight();
+        if (targetHeight <= 0) {
+            targetHeight = targetNode.prefHeight(-1);
+        }
+
+        // x
+        switch (pos) {
+            case TOP_CENTER:
+            case CENTER:
+            case BOTTOM_CENTER:
+            case BASELINE_CENTER:
+                x += targetWidth / 2 - decorationNodeWidth / 2.0;
+                break;
+                
+            case TOP_RIGHT:
+            case CENTER_RIGHT:
+            case BOTTOM_RIGHT:
+            case BASELINE_RIGHT:
+                x += targetWidth - decorationNodeWidth;
+                break;
+        }
+        
+        // y
+        switch (pos) {
+            case CENTER_LEFT:
+            case CENTER:
+            case CENTER_RIGHT:
+                y += targetHeight / 2 - decorationNodeHeight / 2.0;
+                break;
+                
+            case BOTTOM_LEFT:
+            case BOTTOM_CENTER:
+            case BOTTOM_RIGHT:
+                y += targetHeight - decorationNodeHeight;
+                break;
+                
+            case BASELINE_LEFT:
+            case BASELINE_CENTER:
+            case BASELINE_RIGHT:
+                y += targetNode.getBaselineOffset() - decorationNode.getBaselineOffset() - decorationNodeHeight / 2.0;
+                break;
+        }
+        
+        decorationNode.setLayoutX(x + xOffset);
+        decorationNode.setLayoutY(y + yOffset);
     }
 }

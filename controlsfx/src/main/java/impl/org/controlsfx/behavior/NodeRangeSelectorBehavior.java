@@ -51,15 +51,15 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-import org.controlsfx.control.SelectableImageView;
+import org.controlsfx.control.NodeRangeSelector;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 
 /**
- * The behavior for the {@link SelectableImageView}.
+ * The behavior for the {@link NodeRangeSelector}.
  */
-public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageView> {
+public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
 
     /**
      * The percentage of the image's width/height used as a tolerance for determining whether the cursor is on an edge.
@@ -84,12 +84,12 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
      **************************************************************************/
 
     /**
-     * Creates a new behavior for the specified {@link SelectableImageView}.
+     * Creates a new behavior for the specified {@link NodeRangeSelector}.
      * 
      * @param selectableImageView
      *            the control which this behavior will control
      */
-    public SelectableImageViewBehavior(SelectableImageView selectableImageView) {
+    public NodeRangeSelectorBehavior(NodeRangeSelector selectableImageView) {
         super(selectableImageView, new ArrayList<KeyBinding>());
     }
 
@@ -113,7 +113,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     /**
      * The current selection.
      * 
-     * @return {@link SelectableImageView#getSelection()}
+     * @return {@link NodeRangeSelector#getSelection()}
      */
     private Rectangle2D getSelection() {
         return getControl().getSelection();
@@ -122,7 +122,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     /**
      * The image's width.
      * 
-     * @return {@link Image#getWidth() width} of {@link SelectableImageView#getImage()}
+     * @return {@link Image#getWidth() width} of {@link NodeRangeSelector#getImage()}
      */
     private double getImageWidth() {
         return getControl().getNode().prefWidth(-1);
@@ -131,7 +131,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     /**
      * The image's height.
      * 
-     * @return {@link Image#getHeight() height} of {@link SelectableImageView#getImage()}
+     * @return {@link Image#getHeight() height} of {@link NodeRangeSelector#getImage()}
      */
     private double getImageHeight() {
         return getControl().getNode().prefHeight(-1);
@@ -140,7 +140,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     /**
      * Indicates whether the current selection has a fixed ratio.
      * 
-     * @return {@link SelectableImageView#isSelectionRatioFixed()}
+     * @return {@link NodeRangeSelector#isSelectionRatioFixed()}
      */
     private boolean isSelectionRatioFixed() {
         return getControl().isSelectionRatioFixed();
@@ -149,7 +149,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
     /**
      * The current selection's fixed ratio.
      * 
-     * @return {@link SelectableImageView#getFixedSelectionRatio()}
+     * @return {@link NodeRangeSelector#getFixedSelectionRatio()}
      */
     private double getSelectionRatio() {
         return getControl().getFixedSelectionRatio();
@@ -382,8 +382,8 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
      **************************************************************************/
 
     /**
-     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link SelectableImageView}'s
-     * {@link SelectableImageView#selectionProperty() selection} property. This includes to check whether the mouse
+     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link NodeRangeSelector}'s
+     * {@link NodeRangeSelector#selectionProperty() selection} property. This includes to check whether the mouse
      * moved from the change's start to end and to possibly deactivate the selection if not.
      */
     private static class SelectionChange {
@@ -393,7 +393,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
         /**
          * The image view whose selection will be changed.
          */
-        private final SelectableImageView selectableImageView;
+        private final NodeRangeSelector selectableImageView;
 
         /**
          * The executed change strategy.
@@ -424,11 +424,11 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
         // Constructor
 
         /**
-         * Creates a new selection change for the specified {@link SelectableImageView} using the specified
+         * Creates a new selection change for the specified {@link NodeRangeSelector} using the specified
          * {@link Rectangle2DChangeStrategy}.
          * 
          * @param selectableImageView
-         *            the {@link SelectableImageView} whose selection will be changed
+         *            the {@link NodeRangeSelector} whose selection will be changed
          * @param selectionChangeStrategy
          *            the {@link Rectangle2DChangeStrategy} used to change the selection
          * @param cursor
@@ -436,7 +436,7 @@ public class SelectableImageViewBehavior extends BehaviorBase<SelectableImageVie
          * @param deactivateSelectionIfClick
          *            indicates whether the selection will be deactivated if the change is only a click
          */
-        public SelectionChange(SelectableImageView selectableImageView, Rectangle2DChangeStrategy selectionChangeStrategy,
+        public SelectionChange(NodeRangeSelector selectableImageView, Rectangle2DChangeStrategy selectionChangeStrategy,
                 Cursor cursor, boolean deactivateSelectionIfClick) {
             super();
             this.selectableImageView = selectableImageView;

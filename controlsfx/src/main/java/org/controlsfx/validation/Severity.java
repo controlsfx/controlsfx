@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,29 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.decoration;
+package org.controlsfx.validation;
 
-import javafx.scene.Node;
+/**
+ * Defines severity of validation messages 
+ */
+public enum Severity {
 
-public class StyleClassDecoration implements Decoration {
-
-    private final String styleClass;
-
-    public StyleClassDecoration(String styleClass) {
-        this.styleClass = styleClass;
-    }
-
-    @Override public Node run(Node targetNode, boolean add) {
-        if (add) {
-            if (targetNode.getStyleClass().contains(styleClass)) return null;
-
-            targetNode.getStyleClass().add(styleClass);
-
-            // no decoration node, so return null
-            return null;
-        } else {
-            targetNode.getStyleClass().remove(styleClass);
-            return null;
-        }
-    }
+	ERROR,
+	WARNING
+	
 }

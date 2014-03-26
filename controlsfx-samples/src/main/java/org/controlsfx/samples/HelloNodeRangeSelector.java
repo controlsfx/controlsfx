@@ -32,39 +32,41 @@ import java.text.ParseException;
 import javafx.animation.AnimationTimer;
 import javafx.animation.RotateTransition;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.SelectableImageView;
+import org.controlsfx.control.NodeRangeSelector;
 
 /**
- * Demonstrates the {@link SelectableImageView}.
+ * Demonstrates the {@link NodeRangeSelector}.
  */
-public class HelloSelectableImageView extends ControlsFXSample {
+public class HelloNodeRangeSelector extends ControlsFXSample {
 
     /* ************************************************************************
      *                                                                         *
@@ -80,9 +82,10 @@ public class HelloSelectableImageView extends ControlsFXSample {
     private static final double GAP = 5;
 
     /**
-     * The format used to display all numbers in thext fields.
+     * The format used to display all numbers in the text fields.
      */
-    private static final DecimalFormat format = new DecimalFormat("0.00");
+    private static final DecimalFormat zeroDpFormat = new DecimalFormat("0");
+    private static final DecimalFormat twoDpFormat = new DecimalFormat("0.00");
 
     /**
      * The names of the displayed images.
@@ -104,7 +107,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
     /**
      * The demoed view.
      */
-    private final SelectableImageView imageView = new SelectableImageView();
+    private final NodeRangeSelector selector = new NodeRangeSelector();
 
     /**
      * The label showing the name of the currently displayed image.
@@ -139,7 +142,7 @@ public class HelloSelectableImageView extends ControlsFXSample {
         };
         
         displayImageAndNameforIndex(imageIndex);
-        return imageView;
+        return selector;
     }
 
     /**
@@ -150,12 +153,12 @@ public class HelloSelectableImageView extends ControlsFXSample {
      */
     private void displayImageAndNameforIndex(int index) {
         imageNameTestField.setText(nodeNames[index]);
-        imageView.setNode(nodes[index]);
+        selector.setNode(nodes[index]);
     }
 
     @Override
     public Node getControlPanel() {
-        return new VBox(createSettingsControl(), createSelectionControl(), createSnapshot());
+        return new VBox(10, createSettingsControl(), createSelectionControl(), createSnapshot());
     }
     
     private ImageView snapshotImageView;
@@ -164,132 +167,101 @@ public class HelloSelectableImageView extends ControlsFXSample {
      * @return a control for all the image related properties
      */
     private Node createSettingsControl() {
-        Label imageNameLabel = new Label("Image Name: ");
-        Font currentFont = imageNameTestField.getFont();
-        imageNameTestField.setFont(Font.font(currentFont.getFamily(), FontPosture.ITALIC, currentFont.getSize()));
-        GridPane imageNamePane = createPaneWithGapAndRow(GAP, imageNameLabel, imageNameTestField);
-
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(10));
         
+        int row = 0;
+        
+        // --- Node
+        Label nodeTypeLabel = new Label("Node type: ");
+        nodeTypeLabel.getStyleClass().add("property");
+        grid.add(nodeTypeLabel, 0, row);
+        final ChoiceBox<String> graphicOptions = new ChoiceBox<>(FXCollections.observableArrayList(nodeNames));
+        graphicOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(graphicOptions, Priority.ALWAYS);
+        final SelectionModel<String> sm = graphicOptions.getSelectionModel();
+        sm.selectedItemProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {
+                imageIndex = sm.getSelectedIndex();
+                displayImageAndNameforIndex(imageIndex);
+            }
+        });
+        sm.select(0);
+        grid.add(graphicOptions, 1, row++);
+        
+        // --- fixed ratio
+        Label fixedRatioLabel = new Label("Fixed selection ratio: ");
+        fixedRatioLabel.getStyleClass().add("property");
+        grid.add(fixedRatioLabel, 0, row);
+        CheckBox ratioFixed = new CheckBox();
+        ratioFixed.selectedProperty().bindBidirectional(selector.selectionRatioFixedProperty());
+        grid.add(ratioFixed, 1, row++);
+        
+        // --- ratio
+        Label ratioLabel = new Label("Fixed ratio: ");
+        ratioLabel.getStyleClass().add("property");
+        grid.add(ratioLabel, 0, row);
         TextField ratioTextField = new TextField();
-        ratioTextField.textProperty().bindBidirectional(imageView.fixedSelectionRatioProperty(),
-                new StringConverter<Number>() {
-            @Override
-            public Number fromString(String value) {
+        ratioTextField.textProperty().bindBidirectional(selector.fixedSelectionRatioProperty(), new StringConverter<Number>() {
+            @Override public Number fromString(String value) {
                 try {
-                    return format.parse(value);
+                    return twoDpFormat.parse(value);
                 } catch (ParseException e) {
                     return 1;
                 }
             }
 
-            @Override
-            public String toString(Number value) {
-                return format.format(value);
+            @Override public String toString(Number value) {
+                return twoDpFormat.format(value);
             }
         });
-        GridPane ratio = createPaneWithGapAndRow(GAP, new Label("Fixed Ratio:"), ratioTextField);
-
-        CheckBox ratioFixed = new CheckBox("Ratio Fixed");
-        ratioFixed.selectedProperty().bindBidirectional(imageView.selectionRatioFixedProperty());
-
+        grid.add(ratioTextField, 1, row++);
         
-        GridPane settingsPane = createPaneWithGapAndColumn(GAP, imageNamePane, createButtons(), ratio, ratioFixed);
-        
-        
-        return new TitledPane("Settings", settingsPane);
+        return new TitledPane("Settings", grid);
     }
 
-    /**
-     * @return buttons to show the previous and the next image
-     */
-    private Node createButtons() {
-        Button previousImageButton = new Button("Previous Image");
-        previousImageButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent arg0) {
-                imageIndex = imageIndex == 0 ? nodes.length - 1 : imageIndex - 1;
-                displayImageAndNameforIndex(imageIndex);
-            }
-        });
-
-        Button nextImageButton = new Button("Next Image");
-        nextImageButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent arg0) {
-                imageIndex = (imageIndex + 1) % nodes.length;
-                displayImageAndNameforIndex(imageIndex);
-            }
-        });
-
-        return createPaneWithGapAndRow(GAP, previousImageButton, nextImageButton);
-    }
-
+    private TextField upperLeftX;
+    private TextField upperLeftY;
+    private TextField lowerRightX;
+    private TextField lowerRightY;
+    private TextField width;
+    private TextField height;
+    private TextField ratio;
+    
     /**
      * @return a control for all the selection related properties
      */
     private Node createSelectionControl() {
         // upper left
-        TextField upperLeftX = new TextField();
-        upperLeftX.setPrefColumnCount(4);
+        upperLeftX = new TextField();
+        upperLeftX.setPrefColumnCount(3);
         upperLeftX.setEditable(false);
-        TextField upperLeftY = new TextField();
-        upperLeftY.setPrefColumnCount(4);
+        upperLeftY = new TextField();
+        upperLeftY.setPrefColumnCount(3);
         upperLeftY.setEditable(false);
 
         // lower right
-        TextField lowerRightX = new TextField();
-        lowerRightX.setPrefColumnCount(4);
+        lowerRightX = new TextField();
+        lowerRightX.setPrefColumnCount(3);
         lowerRightX.setEditable(false);
-        TextField lowerRightY = new TextField();
-        lowerRightY.setPrefColumnCount(4);
+        lowerRightY = new TextField();
+        lowerRightY.setPrefColumnCount(3);
         lowerRightY.setEditable(false);
 
         // size
-        TextField width = new TextField();
-        width.setPrefColumnCount(4);
+        width = new TextField();
+        width.setPrefColumnCount(3);
         width.setEditable(false);
-        TextField height = new TextField();
-        height.setPrefColumnCount(4);
+        height = new TextField();
+        height.setPrefColumnCount(3);
         height.setEditable(false);
-        TextField ratio = new TextField();
-        ratio.setPrefColumnCount(2);
-        ratio.setEditable(false);
-
-        bindTextFieldsToSelection(upperLeftX, upperLeftY, lowerRightX, lowerRightY, width, height, ratio);
-        GridPane selectionCoordiantes = createPaneWithGap(GAP);
-        selectionCoordiantes.addRow(0, new Label("Upper Left Corner:"), upperLeftX, new Label("/"), upperLeftY);
-        selectionCoordiantes.addRow(1, new Label("Lower Right Corner:"), lowerRightX, new Label("/"), lowerRightY);
-        selectionCoordiantes.addRow(2,
-                new Label("Size (Ratio):"), width, new Label("x"), height, new Label(" ("), ratio, new Label(")"));
-
-        CheckBox selectionChanging = new CheckBox("Selection Changing");
-        selectionChanging.setDisable(true);
-        selectionChanging.selectedProperty().bindBidirectional(imageView.selectionChangingProperty());
-
-        CheckBox selectionValid = new CheckBox("Selection Valid");
-        selectionValid.selectedProperty().bind(imageView.selectionValidProperty());
-        selectionValid.setDisable(true);
-
-        CheckBox selectionActive = new CheckBox("Selection Active");
-        selectionActive.selectedProperty().bindBidirectional(imageView.selectionActiveProperty());
-
-        CheckBox selectionManaged = new CheckBox("Selection Activity Explicitly Managed");
-        selectionManaged.selectedProperty().bindBidirectional(imageView.selectionActivityExplicitlyManagedProperty());
-
-        GridPane selectionPane = createPaneWithGapAndColumn(GAP, selectionCoordiantes,
-                selectionChanging, selectionValid, selectionActive, selectionManaged);
-        return new TitledPane("Selection", selectionPane);
-    }
-
-    /**
-     * Binds the text fields content to the current selection.
-     */
-    private void bindTextFieldsToSelection(
-            final TextField upperLeftX, final TextField upperLeftY,
-            final TextField lowerRightX, final TextField lowerRightY,
-            final TextField width, final TextField height, final TextField ratio) {
-
-        imageView.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
+        ratio = new TextField();
+        ratio.setPrefColumnCount(3);
+        
+        // set up the binding
+        selector.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
             @Override
             public void changed(
                     ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) {
@@ -302,25 +274,50 @@ public class HelloSelectableImageView extends ControlsFXSample {
                     height.setText("");
                     ratio.setText("");
                 } else {
-                    upperLeftX.setText(format.format(newValue.getMinX()));
-                    upperLeftY.setText(format.format(newValue.getMinY()));
-                    lowerRightX.setText(format.format(newValue.getMaxX()));
-                    lowerRightY.setText(format.format(newValue.getMaxY()));
-                    width.setText(format.format(newValue.getWidth()));
-                    height.setText(format.format(newValue.getHeight()));
-                    ratio.setText(format.format(newValue.getWidth() / newValue.getHeight()));
+                    upperLeftX.setText(zeroDpFormat.format(newValue.getMinX()));
+                    upperLeftY.setText(zeroDpFormat.format(newValue.getMinY()));
+                    lowerRightX.setText(zeroDpFormat.format(newValue.getMaxX()));
+                    lowerRightY.setText(zeroDpFormat.format(newValue.getMaxY()));
+                    width.setText(zeroDpFormat.format(newValue.getWidth()));
+                    height.setText(zeroDpFormat.format(newValue.getHeight()));
+                    ratio.setText(twoDpFormat.format(newValue.getWidth() / newValue.getHeight()));
                 }
             }
         });
+        
+        // put it all together
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(10));
+        
+        int row = 0;
+
+        grid.addRow(row++, new Label("Upper Left Corner:"), upperLeftX, new Label("/"), upperLeftY);
+        grid.addRow(row++, new Label("Lower Right Corner:"), lowerRightX, new Label("/"), lowerRightY);
+        grid.addRow(row++, new Label("Size (Ratio):"), width, new Label("x"), height, new Label(" ("), ratio, new Label(")"));
+
+        CheckBox selectionChanging = new CheckBox();
+        selectionChanging.setDisable(true);
+        selectionChanging.selectedProperty().bindBidirectional(selector.selectionChangingProperty());
+
+        CheckBox selectionValid = new CheckBox();
+        selectionValid.selectedProperty().bind(selector.selectionValidProperty());
+        selectionValid.setDisable(true);
+        
+        grid.addRow(row++, new Label("Selection Changing:"), selectionChanging);
+        grid.addRow(row++, new Label("Selection Valid:"), selectionValid);
+
+        return new TitledPane("Selection Stats", grid);
     }
 
     private Node createSnapshot() {
         AnimationTimer timer = new AnimationTimer() {
             @Override public void handle(long arg0) {
-                if (imageView.getNode() != null) {
+                if (selector.getNode() != null || selector.getSelection() == null) {
                     SnapshotParameters params = new SnapshotParameters();
-                    params.setViewport(imageView.getSelection());
-                    imageView.getNode().snapshot(new Callback<SnapshotResult, Void>() {
+                    params.setViewport(selector.getSelection());
+                    selector.getNode().snapshot(new Callback<SnapshotResult, Void>() {
                         @Override public Void call(SnapshotResult result) {
                             snapshotImageView.setImage(result.getImage());
                             return null;
@@ -335,44 +332,6 @@ public class HelloSelectableImageView extends ControlsFXSample {
         return new TitledPane("Snapshot", snapshotImageView);
     }
 
-    /* ************************************************************************
-     *                                                                         *
-     * Utility                                                                 *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * @param gap
-     *            the gap to set
-     * @return a {@link GridPane} with the specified horizontal and vertical gap
-     */
-    private static GridPane createPaneWithGap(double gap) {
-        GridPane pane = new GridPane();
-        pane.setHgap(gap);
-        pane.setVgap(gap);
-
-        return pane;
-    }
-
-    /**
-     * @return a {@link GridPane} with the specified horizontal and vertical gap
-     */
-    private static GridPane createPaneWithGapAndColumn(double gap, Node... nodes) {
-        GridPane pane = createPaneWithGap(gap);
-        pane.addColumn(0, nodes);
-
-        return pane;
-    }
-
-    /**
-     * @return a {@link GridPane} with the specified horizontal and vertical gap
-     */
-    private static GridPane createPaneWithGapAndRow(double gap, Node... nodes) {
-        GridPane pane = createPaneWithGap(gap);
-        pane.addRow(0, nodes);
-
-        return pane;
-    }
 
     /* ************************************************************************
      *                                                                         *
@@ -386,18 +345,18 @@ public class HelloSelectableImageView extends ControlsFXSample {
 
     @Override
     public String getSampleName() {
-        return "SelectableImageView";
+        return "NodeRangeSelector";
     }
 
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE
-                + "org/controlsfx/control/SelectableImageView.html";
+                + "org/controlsfx/control/NodeRangeSelector.html";
     }
 
     @Override
     public String getSampleDescription() {
-        return "An image view which allows the user to select a rectangular area of the displayed image. " +
+        return "A tool which allows the user to select a rectangular area of the displayed node. " +
                 "The selection's ratio can be fixed so that the user can only make selections with that ratio.";
     }
 }

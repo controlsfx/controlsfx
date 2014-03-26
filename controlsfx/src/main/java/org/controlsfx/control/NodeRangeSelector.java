@@ -27,7 +27,7 @@
 package org.controlsfx.control;
 
 import static impl.org.controlsfx.tools.MathTools.isInInterval;
-import impl.org.controlsfx.skin.SelectableImageViewSkin;
+import impl.org.controlsfx.skin.NodeRangeSelectorSkin;
 import impl.org.controlsfx.tools.rectangle.Rectangles2D;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -96,7 +96,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Selection</h3>
  * 
- * The selected area is represented by the {@link SelectableImageView#selectionProperty() selection} property. It
+ * The selected area is represented by the {@link NodeRangeSelector#selectionProperty() selection} property. It
  * contains a {@link Rectangle2D}, which is immutable so the selection can only be changed by setting a new one. The
  * rectangle's coordinates are interpreted relative to the image.
  * <p>
@@ -109,7 +109,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h4>Active</h4>
  * 
- * The {@link SelectableImageView#selectionActiveProperty() selectionActive} property indicates whether the selection is
+ * The {@link NodeRangeSelector#selectionActiveProperty() selectionActive} property indicates whether the selection is
  * currently active.
  * <p>
  * By default this property is managed by this control which means the selection is automatically activated when a new
@@ -121,7 +121,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h4>Changing</h4>
  * 
- * The selection can be changed by simply setting a new value in the {@link SelectableImageView#selectionProperty()
+ * The selection can be changed by simply setting a new value in the {@link NodeRangeSelector#selectionProperty()
  * selection} property. But it can also change due to user interaction with the control. During the latter changes the
  * {@link #selectionChangingProperty() selectionChanging} property is set to {@code true}.
  * 
@@ -143,7 +143,7 @@ import javafx.scene.image.ImageView;
  * If a selection is explicitly set, its ratio <em>not</em> checked and hence not changed to match a possibly fixed
  * ratio!
  */
-public class SelectableImageView extends Control {
+public class NodeRangeSelector extends Control {
 
     /* ************************************************************************
      *                                                                         *
@@ -230,7 +230,7 @@ public class SelectableImageView extends Control {
     /**
      * Creates a new SelectableImageView.
      */
-    public SelectableImageView() {
+    public NodeRangeSelector() {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // IMAGE VIEW
@@ -301,7 +301,7 @@ public class SelectableImageView extends Control {
      * @param image
      *            the image to show after construction
      */
-    public SelectableImageView(Image image) {
+    public NodeRangeSelector(Image image) {
         this();
         setNode(new ImageView(image));
     }
@@ -312,7 +312,7 @@ public class SelectableImageView extends Control {
      * @param url
      *            the string representing the URL from which to load the image
      */
-    public SelectableImageView(String url) {
+    public NodeRangeSelector(String url) {
         this();
         Image image = new Image(url);
         setNode(new ImageView(image));
@@ -406,7 +406,7 @@ public class SelectableImageView extends Control {
      */
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new SelectableImageViewSkin(this);
+        return new NodeRangeSelectorSkin(this);
     }
 
     /* ************************************************************************

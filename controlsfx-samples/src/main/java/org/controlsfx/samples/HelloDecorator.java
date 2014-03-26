@@ -71,10 +71,7 @@ public class HelloDecorator extends ControlsFXSample {
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
         
-        Rectangle topRect = new Rectangle(100, 500, Color.RED);
-        Rectangle bottomRect = new Rectangle(100, 500, Color.GREEN);
-        
-        root.getChildren().addAll(topRect, field, bottomRect);
+        root.getChildren().addAll(field);
         
         // for the sake of this sample we have to install a custom css file to
         // style the sample - but we can't do this until the scene is set on the
@@ -141,31 +138,31 @@ public class HelloDecorator extends ControlsFXSample {
         });
         grid.add(decorationTypeBox, 1, row++);
         
-        // --- Toggle text field visibility
-        Label showTextFieldLabel = new Label("TextField visible: ");
-        showTextFieldLabel.getStyleClass().add("property");
-        grid.add(showTextFieldLabel, 0, row);
-        ToggleButton fieldVisibleBtn = new ToggleButton("Press");
-        fieldVisibleBtn.setSelected(true);
-        field.visibleProperty().bindBidirectional(fieldVisibleBtn.selectedProperty());
-        grid.add(fieldVisibleBtn, 1, row++);
+//        // --- Toggle text field visibility
+//        Label showTextFieldLabel = new Label("TextField visible: ");
+//        showTextFieldLabel.getStyleClass().add("property");
+//        grid.add(showTextFieldLabel, 0, row);
+//        ToggleButton fieldVisibleBtn = new ToggleButton("Press");
+//        fieldVisibleBtn.setSelected(true);
+//        field.visibleProperty().bindBidirectional(fieldVisibleBtn.selectedProperty());
+//        grid.add(fieldVisibleBtn, 1, row++);
         
         return grid;
     }
     
     private Node createDecoratorNode(Color color) {
-    	Circle d = new Circle(5);
+    	Rectangle d = new Rectangle(5, 5);
         d.setFill(color);
         return d;
     }
     
     private Node createImageNode() {
         Image image = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/security-low.png");
-        return new ImageView(image);
+        ImageView imageView = new ImageView(image);
+        return imageView;
     }
     
     public static void main(String[] args) {
         launch(args);
-    }
-    
+    } 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,29 +24,52 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.decoration;
+package org.controlsfx.validation;
 
-import javafx.scene.Node;
+import javafx.scene.control.Control;
 
-public class StyleClassDecoration implements Decoration {
 
-    private final String styleClass;
+/**
+ * Interface to define basic contract for validation message  
+ */
+public interface ValidationMessage {
+	
+	/**
+	 * Message text
+	 * @return message text
+	 */
+	String getText();
+	
+	/**
+	 * Message {@link Severity} 
+	 * @return message severity
+	 */
+	Severity getSeverity();
+	
 
-    public StyleClassDecoration(String styleClass) {
-        this.styleClass = styleClass;
-    }
-
-    @Override public Node run(Node targetNode, boolean add) {
-        if (add) {
-            if (targetNode.getStyleClass().contains(styleClass)) return null;
-
-            targetNode.getStyleClass().add(styleClass);
-
-            // no decoration node, so return null
-            return null;
-        } else {
-            targetNode.getStyleClass().remove(styleClass);
-            return null;
-        }
-    }
+	/**
+	 * Message target - {@link javafx.scene.Control} which message is related to . 
+	 * @return message target
+	 */
+	Control getTarget();
+	
+	/**
+	 * Factory method to create a simple error message 
+	 * @param target message target
+	 * @param text message text 
+	 * @return error message
+	 */
+	static ValidationMessage error( Control target, String text ) {
+		return new SimpleValidationMessage(target, text, Severity.ERROR);
+	}
+	
+	/**
+	 * Factory method to create a simple warning message 
+	 * @param target message target
+	 * @param text message text 
+	 * @return warning message
+	 */
+	static ValidationMessage warning( Control target, String text ) {
+		return new SimpleValidationMessage(target, text, Severity.WARNING);
+	}
 }

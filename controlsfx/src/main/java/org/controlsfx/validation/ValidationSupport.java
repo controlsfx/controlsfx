@@ -26,6 +26,8 @@
  */
 package org.controlsfx.validation;
 
+import static org.controlsfx.control.decoration.Decorator.addDecoration;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -35,8 +37,10 @@ import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -53,6 +57,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
+
+import org.controlsfx.control.decoration.Decorator;
 
 /**
  * Provides validation support for UI components. The idea is create an instance of this class the component group, usually a panel.<br>
@@ -153,9 +159,31 @@ public class ValidationSupport {
 	 * Creates validation support instance
 	 */
 	public ValidationSupport() {
+		
+		// notify validation result observers
 		validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
 			validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
 		);
+		
+		// validation decoration
+		// TODO needs optimizaion
+		validationResultProperty().addListener( (o, oldValue, validationResult) -> {
+			ValidationDecorator decorator = getValidationDecorator();
+			if ( decorator != null ) {
+	        	for( Control target: getKnownControls()) {
+	        		try {
+		        		Decorator.removeAllDecorations(target);
+	 	        		getHighestMessage(target).ifPresent( msg -> {
+			        		addDecoration(target, decorator.createDecoration(msg));
+		        		});
+	        		} catch ( Throwable ex ) {
+	        			// FIXME Decorator throws an exception on the first run
+	        			ex.printStackTrace();
+	        		}
+	        	}
+        	}
+        }
+        );
 	}
 	
 	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
@@ -176,6 +204,26 @@ public class ValidationSupport {
 	 */
 	public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
 		return validationResultProperty.getReadOnlyProperty();
+	}
+	
+	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
+			new SimpleObjectProperty<>(new IconValidationDecorator());
+	
+	public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
+		return validationDecoratorProperty;
+	}
+	
+	public ValidationDecorator getValidationDecorator() {
+		return validationDecoratorProperty.get();
+	}
+	
+	public void setValidationDecorator( ValidationDecorator decorator ) {
+		if ( getValidationDecorator() != null && decorator == null ) {
+			for( Control target: getKnownControls()) {
+	           Decorator.removeAllDecorations(target);
+			}
+		}
+		validationDecoratorProperty.set(decorator);
 	}
 	
 	private Optional<ObservableValueExtractor> getExtractor(final Control c) {
@@ -216,18 +264,9 @@ public class ValidationSupport {
 	}
 	
 	public Optional<ValidationMessage> getHighestMessage(Control target) {
-		return Optional.ofNullable(validationResults.get(target)).map( result -> {
-			
-			return result.getMessages().stream().max( ValidationMessage.COMPARATOR).get();
-			
-//		    ValidationMessage msg = null;
-//		    for( ValidationMessage m: result.getMessages()) {
-//		    	if ( m.compareTo(msg) > 0 ) {
-//		    		msg = m;
-//		    	}
-//		    }
-//		    return msg;
-		});
+		return Optional.ofNullable(validationResults.get(target)).map( result -> 
+			result.getMessages().stream().max( ValidationMessage.COMPARATOR).orElse(null)
+		);
 	}
 	
 	/**

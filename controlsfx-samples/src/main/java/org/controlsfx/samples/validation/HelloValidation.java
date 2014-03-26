@@ -26,13 +26,10 @@
  */
 package org.controlsfx.samples.validation;
 
-import static org.controlsfx.control.decoration.Decorator.addDecoration;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -41,25 +38,17 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.decoration.Decorator;
-import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.samples.Utils;
-import org.controlsfx.validation.Severity;
-import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -78,26 +67,10 @@ public class HelloValidation extends ControlsFXSample {
     @Override public String getSampleDescription() {
         return "Component Validation";
     }
-    
-//    private Node createDecoratorNode(Severity severity) {
-//    	Rectangle d = new Rectangle(7, 7);
-//        d.setFill(Severity.ERROR == severity? Color.RED: Color.YELLOW);
-//        return d;
-//    }
-    
-    private static Image errorIcon = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/decoration-error.png");
-    private static Image warningIcon = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/decoration-warning.png");
-    
-    private Node createImageNode( Severity severity ) {
-        ImageView imageView = new ImageView(Severity.ERROR == severity?errorIcon:warningIcon);
-        imageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
-        return imageView;
-    }
 
     @Override public Node getPanel(final Stage stage) {
 
     	ValidationSupport validationSupport = new ValidationSupport();
-        //BorderPane root = new BorderPane();
 
         GridPane root = new GridPane();
         root.setVgap(10);
@@ -105,22 +78,12 @@ public class HelloValidation extends ControlsFXSample {
         root.setPadding(new Insets(30, 30, 0, 30));
 
         
-        final ListView<ValidationMessage> messageList = new ListView<>();
-        validationSupport.validationResultProperty().addListener( (o, oldValue, validationResult) -> {
-        	messageList.getItems().setAll(validationResult.getMessages());
-        	for( Control target: validationSupport.getKnownControls()) {
-        		try {
-        		Decorator.removeAllDecorations(target);
-        		validationSupport.getHighestMessage(target).ifPresent( msg -> {
-	        		addDecoration(target, new GraphicDecoration(createImageNode(msg.getSeverity()),Pos.BOTTOM_LEFT));
-        		});
-        		} catch ( Throwable ex ) {
-        			// FIXME Decorator throws an exception on the first run
-        			ex.printStackTrace();
-        		}
-        	}
-        }
-        );
+//        final ListView<ValidationMessage> messageList = new ListView<>();
+//        validationSupport.validationResultProperty().addListener( (o, oldValue, validationResult) -> {
+//        	messageList.getItems().setAll(validationResult.getMessages());
+//        }
+//        );
+        
         
         int row = 0;
 
@@ -201,12 +164,12 @@ public class HelloValidation extends ControlsFXSample {
         root.add(datePicker, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
-        // validation results
-        row++;
-        TitledPane pane = new TitledPane("Validation Results", messageList);
-        pane.setCollapsible(false);
-        root.add(pane, 0, row, 2, 1);
-        GridPane.setHgrow(pane, Priority.ALWAYS);
+//        // validation results
+//        row++;
+//        TitledPane pane = new TitledPane("Validation Results", messageList);
+//        pane.setCollapsible(false);
+//        root.add(pane, 0, row, 2, 1);
+//        GridPane.setHgrow(pane, Priority.ALWAYS);
        
         //root.setTop(grid);
         ScrollPane scrollPane = new ScrollPane(root);

@@ -36,21 +36,17 @@ public class StyleClassDecoration implements Decoration {
         this.styleClass = styleClass;
     }
 
-    @Override public Node run(Node targetNode, RunType operation) {
-        if (operation == RunType.ADD) {
+    @Override public Node run(Node targetNode, boolean add) {
+        if (add) {
             if (targetNode.getStyleClass().contains(styleClass)) return null;
 
             targetNode.getStyleClass().add(styleClass);
 
             // no decoration node, so return null
             return null;
-        } else if (operation == RunType.REMOVE) {
+        } else {
             targetNode.getStyleClass().remove(styleClass);
             return null;
-        } else if (operation == RunType.LAYOUT) {
-            // no-op
         }
-        
-        return null;
     }
 }

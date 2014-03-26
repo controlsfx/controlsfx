@@ -41,19 +41,16 @@ import javafx.scene.Node;
 @FunctionalInterface
 public interface Decoration {
     
-    public static enum RunType {
-        ADD,
-        REMOVE,
-        LAYOUT
-    }
-
     /**
      * Depending on the boolean 'add' parameter, this method is responsible for
      * decorating or undecorating the given target node. 
      * 
      * <p>When the boolean parameter is true, this method decorates the given 
      * target node with the relevant decorations, returning any 'decoration node' 
-     * that needs to be added to the scenegraph (although this can be null).
+     * that needs to be added to the scenegraph (although this can be null). When
+     * the returned Node is null, this indicates that the decoration will be 
+     * handled internally by the decorator (which is preferred, as the default
+     * implementation is not ideal in most circumstances).
      * 
      * <p>When the boolean parameter is false, this method removes the decoration 
      * from the given target node, always returning null.
@@ -62,5 +59,5 @@ public interface Decoration {
      * @return If the add parameter is true, the decoration, but null is a 
      *         valid return value. If the add parameter is false, always null.
      */
-    public Node run(Node targetNode, RunType operation);
+    public Node run(Node targetNode, boolean add);
 }

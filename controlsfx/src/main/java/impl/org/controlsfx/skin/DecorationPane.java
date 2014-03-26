@@ -36,11 +36,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
 import org.controlsfx.control.decoration.Decoration;
-import org.controlsfx.control.decoration.Decoration.RunType;
 import org.controlsfx.control.decoration.Decorator;
 
 public class DecorationPane extends StackPane {
@@ -49,9 +47,6 @@ public class DecorationPane extends StackPane {
 
     // maps from a node to a list of its decoration nodes
     private final Map<Node, List<Node>> nodeDecorationMap = new WeakHashMap<>();
-    
-    //
-//    private final Map<Node, Decoration> installedDecorations = new ArrayList<>();
     
     ChangeListener<Boolean> visibilityListener = new ChangeListener<Boolean>() {
         @Override public void changed(ObservableValue<? extends Boolean> o, Boolean wasVisible, Boolean isVisible) {
@@ -72,36 +67,13 @@ public class DecorationPane extends StackPane {
         getChildren().setAll(root);
     }
     
-    @Override protected void layoutChildren() {
-        layoutDecoration(root);
-        
-        super.layoutChildren();
-    }
-    
-    private void layoutDecoration(Node targetNode) {
-        // layout the given node
-        List<Decoration> decorations = Decorator.getDecorations(targetNode);
-        if (decorations != null) {
-            for (Decoration decoration : decorations) {
-                decoration.run(targetNode, RunType.LAYOUT);
-            }
-        }
-        
-        // and then do its children recursively
-        if (targetNode instanceof Parent) {
-            for (Node n : ((Parent) targetNode).getChildrenUnmodifiable()) {
-                layoutDecoration(n);
-            }
-        }
-    }
-    
     public void updateDecorationsOnNode(Node targetNode, List<Decoration> added, List<Decoration> removed) {
         removeAllDecorationsOnNode(targetNode, removed);
         addAllDecorationsOnNode(targetNode, added);
     }
 
     private void showDecoration(Node targetNode, Decoration decoration) {
-        Node decorationNode = decoration.run(targetNode, RunType.ADD);
+        Node decorationNode = decoration.run(targetNode, true);
         if (decorationNode != null) {
             List<Node> decorationNodes = nodeDecorationMap.get(targetNode);
             if (decorationNodes == null) {
@@ -109,11 +81,11 @@ public class DecorationPane extends StackPane {
                 nodeDecorationMap.put(targetNode, decorationNodes);
             }
             decorationNodes.add(decorationNode);
-        }
-        
-        if (decorationNode != null && !getChildren().contains(decorationNode)) {
-            getChildren().add(decorationNode);
-            StackPane.setAlignment(decorationNode, Pos.TOP_LEFT); // TODO support for all positions.
+            
+            if (decorationNode != null && !getChildren().contains(decorationNode)) {
+                getChildren().add(decorationNode);
+                StackPane.setAlignment(decorationNode, Pos.TOP_LEFT); // TODO support for all positions.
+            }
         }
         
         targetNode.visibleProperty().addListener(visibilityListener);
@@ -139,7 +111,7 @@ public class DecorationPane extends StackPane {
         
         // 2) Tell the decoration to remove itself from the target node (if necessary)
         for (Decoration decoration : decorations) {
-            decoration.run(targetNode, RunType.REMOVE);
+            decoration.run(targetNode, false);
         }
     }
     

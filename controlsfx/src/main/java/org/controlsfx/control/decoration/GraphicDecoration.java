@@ -34,7 +34,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.layout.StackPane;
 
 public class GraphicDecoration implements Decoration {
 
@@ -95,41 +94,32 @@ public class GraphicDecoration implements Decoration {
         }
 
         // x
-        switch (pos) {
-            case TOP_CENTER:
-            case CENTER:
-            case BOTTOM_CENTER:
-            case BASELINE_CENTER:
-                x += targetWidth / 2 - decorationNodeWidth / 2.0;
-                break;
-                
-            case TOP_RIGHT:
-            case CENTER_RIGHT:
-            case BOTTOM_RIGHT:
-            case BASELINE_RIGHT:
-                x += targetWidth - decorationNodeWidth;
-                break;
+        switch (pos.getHpos()) {
+        	case CENTER: 
+        		x += targetWidth/2 - decorationNodeWidth / 2.0;
+        		break;
+        	case LEFT: 
+        		x -= decorationNodeWidth / 2.0;
+        		break;
+        	case RIGHT:
+        		x += targetWidth - decorationNodeWidth / 2.0;
+        		break;
         }
         
         // y
-        switch (pos) {
-            case CENTER_LEFT:
-            case CENTER:
-            case CENTER_RIGHT:
-                y += targetHeight / 2 - decorationNodeHeight / 2.0;
-                break;
-                
-            case BOTTOM_LEFT:
-            case BOTTOM_CENTER:
-            case BOTTOM_RIGHT:
-                y += targetHeight - decorationNodeHeight;
-                break;
-                
-            case BASELINE_LEFT:
-            case BASELINE_CENTER:
-            case BASELINE_RIGHT:
-                y += targetNode.getBaselineOffset() - decorationNode.getBaselineOffset() - decorationNodeHeight / 2.0;
-                break;
+        switch (pos.getVpos()) {
+        	case CENTER: 
+        		y += targetHeight/2 - decorationNodeHeight / 2.0;
+        		break;
+        	case TOP: 
+        		y -= decorationNodeHeight / 2.0;
+        		break;
+        	case BOTTOM:
+        		y += targetHeight - decorationNodeWidth / 2.0;
+        		break;
+        	case BASELINE: 
+        		y += targetNode.getBaselineOffset() - decorationNode.getBaselineOffset() - decorationNodeHeight / 2.0;
+        		break;
         }
         
         decorationNode.setLayoutX(x + xOffset);

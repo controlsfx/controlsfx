@@ -100,6 +100,8 @@ import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialog.Actions;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 
 /**
@@ -929,18 +931,20 @@ public final class Dialogs {
     	
     	TextField txUserName     = new TextField();
 		PasswordField txPassword = new PasswordField();
-		Label lbMessage          = new Label(""); 
-		lbMessage.setStyle("-fx-text-fill: red;");
 		
+		Label lbMessage= new Label(""); 
+		lbMessage.setMaxWidth(Double.MAX_VALUE);
+		lbMessage.getStyleClass().addAll("message-banner");
 		lbMessage.setVisible(false);
+		
 		final GridPane content = new GridPane();
 		content.setHgap(10);
 		content.setVgap(10);
 		content.add(lbMessage, 0, 0, 2, 1);
 		GridPane.setHgrow(lbMessage, Priority.ALWAYS);
-		content.addRow(1, new Label( getString("login.dlg.user.caption")),txUserName);
+		content.addRow(1, new Label( null, new ImageView( DialogResources.getImage("login.user.icon")) ),txUserName);
 		GridPane.setHgrow(txUserName, Priority.ALWAYS);
-		content.addRow(2,new Label(getString("login.dlg.pswd.caption")), txPassword);
+		content.addRow(2,new Label(null, new ImageView( DialogResources.getImage("login.password.icon"))), txPassword);
 		GridPane.setHgrow(txPassword, Priority.ALWAYS);
 		
 //		NotificationPane notificationPane = new NotificationPane(content);
@@ -976,20 +980,6 @@ public final class Dialogs {
 				return "LOGIN";
 			};
 		};
-
-		ChangeListener<String> fieldChangeListener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> observable,
-					String oldValue, String newValue) {
-				actionLogin.disabledProperty().set(
-						txUserName.getText().trim().isEmpty()
-					 || txPassword.getText().trim().isEmpty());
-			}
-		};
-
-		txUserName.textProperty().addListener(fieldChangeListener);
-		txPassword.textProperty().addListener(fieldChangeListener);		
 		
 		final Dialog dlg = buildDialog(Type.LOGIN);
         dlg.setContent(content);
@@ -1000,10 +990,21 @@ public final class Dialogs {
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
 		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
+		String userNameCation = getString("login.dlg.user.caption");
+		String passwordCaption = getString("login.dlg.pswd.caption");
+		txUserName.setPromptText(userNameCation);
 		txUserName.setText( initialUserInfo.getUserName());
+		txPassword.setPromptText(passwordCaption);
 		txPassword.setText(new String(initialUserInfo.getPassword()));
 
-		Platform.runLater( () -> txUserName.requestFocus() );
+		ValidationSupport validationSupport = new ValidationSupport();
+		Platform.runLater( () -> {
+			String requiredFormat = "'%s' is required";
+			validationSupport.registerValidator(txUserName, Validator.createEmptyValidator( String.format( requiredFormat, userNameCation )));
+			validationSupport.registerValidator(txPassword, Validator.createEmptyValidator(String.format( requiredFormat, passwordCaption )));
+			actionLogin.disabledProperty().bind(validationSupport.invalidProperty());
+			txUserName.requestFocus();
+	    } );
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 

@@ -64,8 +64,6 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         super(pane);
 
         
-//        this.lastDividerPosition = pane.getDividerPosition();
-
         this.splitPane = new SplitPane();
         this.splitPane.setDividerPosition(0, pane.getDividerPosition());
 
@@ -80,9 +78,9 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
             public void onChanged(ListChangeListener.Change<? extends Divider> change) {
                 while (change.next()) {
                     if (change.wasAdded()) {
-                        change.getAddedSubList().get(0).positionProperty().addListener(listener);
+                        change.getAddedSubList().get(0).positionProperty().addListener(updateDividerPositionListener);
                     } else if (change.wasRemoved()) {
-                        change.getRemoved().get(0).positionProperty().removeListener(listener);
+                        change.getRemoved().get(0).positionProperty().removeListener(updateDividerPositionListener);
                     }
                 }
             }
@@ -248,8 +246,6 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                     public void changed(ObservableValue<? extends Side> value,
                             Side oldPos, Side newPos) {
                         if (getSkinnable().isShowDetailNode()) {
-//                            lastDividerPosition = splitPane.getDividers()
-//                            .get(0).getPosition();
                             splitPane.getItems().clear();
                         }
                         switch (newPos) {
@@ -274,7 +270,6 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     case BOTTOM:
                                     case RIGHT:
                                         getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
-//                                        lastDividerPosition = 1 - lastDividerPosition;
                                         break;
                                     default:
                                         break;
@@ -292,7 +287,6 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                     case TOP:
                                     case LEFT:
                                         getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
-//                                        lastDividerPosition = 1 - lastDividerPosition;
                                         break;
                                     default:
                                         break;
@@ -382,10 +376,6 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         changing = true;
         if (!splitPane.getDividers().isEmpty()) {
 
-//            Divider divider = splitPane.getDividers().get(0);
-
-//            lastDividerPosition = divider.getPosition();
-
             /*
              * Do we collapse by moving the divider to the left/right or
              * top/bottom?
@@ -450,7 +440,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         }
     }
     
-    private ChangeListener<Number> listener = new ChangeListener<Number>() {
+    private ChangeListener<Number> updateDividerPositionListener = new ChangeListener<Number>() {
 
         @Override
         public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {

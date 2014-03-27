@@ -50,6 +50,10 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.TextFields;
+import org.controlsfx.validation.CompoundValidationDecorator;
+import org.controlsfx.validation.IconValidationDecorator;
+import org.controlsfx.validation.StyleClassValidationDecorator;
+import org.controlsfx.validation.ValidationDecorator;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -68,12 +72,10 @@ public class HelloValidation extends ControlsFXSample {
     @Override public String getSampleDescription() {
         return "Component Validation";
     }
+    
+    ValidationSupport validationSupport = new ValidationSupport();
 
     @Override public Node getPanel(final Stage stage) {
-
-    	ValidationSupport validationSupport = new ValidationSupport();
-    	
-    	
     	
 
         GridPane root = new GridPane();
@@ -88,8 +90,6 @@ public class HelloValidation extends ControlsFXSample {
                 }
             }
         });
-//        message.getTarget().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
-
 
         
 //        final ListView<ValidationMessage> messageList = new ListView<>();
@@ -196,8 +196,25 @@ public class HelloValidation extends ControlsFXSample {
         grid.setVgap(10);
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        
+        
+        IconValidationDecorator iconDecorator = new IconValidationDecorator();
+        StyleClassValidationDecorator cssDecorator = new StyleClassValidationDecorator();
 
-        // TODO Add customization example controls
+        int row = 0;
+        ComboBox<ValidationDecorator> checkbox =  new ComboBox<>();
+        checkbox.getItems().addAll( iconDecorator, cssDecorator, new CompoundValidationDecorator(cssDecorator,iconDecorator));
+        checkbox.getSelectionModel().selectedItemProperty().addListener( (o,old,decorator) ->
+           validationSupport.setValidationDecorator(decorator)
+        );
+        checkbox.getSelectionModel().select(0);
+        
+        
+        grid.add(new Label("Validation Decorator"), 0, row);
+        grid.add(checkbox, 1, row);
+        GridPane.setHgrow(checkbox, Priority.ALWAYS);
+        
 
         return grid;
     }

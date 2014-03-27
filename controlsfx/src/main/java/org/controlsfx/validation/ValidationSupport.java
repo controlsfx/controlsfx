@@ -166,24 +166,25 @@ public class ValidationSupport {
 		);
 		
 		// validation decoration
-		// TODO needs optimizaion
-		validationResultProperty().addListener( (o, oldValue, validationResult) -> {
-			ValidationDecorator decorator = getValidationDecorator();
-			if ( decorator != null ) {
-	        	for( Control target: getKnownControls()) {
-	        		try {
-		        		Decorator.removeAllDecorations(target);
-	 	        		getHighestMessage(target).ifPresent( msg -> 
-	 	        			decorator.createDecorations(msg).stream().forEach( d -> addDecoration(target,d))
-		        		);
-	        		} catch ( Throwable ex ) {
-	        			// FIXME Decorator throws an exception on the first run
-	        			ex.printStackTrace();
-	        		}
-	        	}
+		validationResultProperty().addListener( (o, oldValue, validationResult) -> redecorate());
+	}
+	
+	// TODO needs optimizaion
+	public void redecorate() {
+		ValidationDecorator decorator = getValidationDecorator();
+		if ( decorator != null ) {
+        	for( Control target: getKnownControls()) {
+        		try {
+	        		Decorator.removeAllDecorations(target);
+ 	        		getHighestMessage(target).ifPresent( msg -> 
+ 	        			decorator.createDecorations(msg).stream().forEach( d -> addDecoration(target,d))
+	        		);
+        		} catch ( Throwable ex ) {
+        			// FIXME Decorator throws an exception on the first run
+        			ex.printStackTrace();
+        		}
         	}
-        }
-        );
+    	}
 	}
 	
 	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
@@ -223,6 +224,7 @@ public class ValidationSupport {
 	           Decorator.removeAllDecorations(target);
 			}
 		}
+		if ( decorator != null )  redecorate();
 		validationDecoratorProperty.set(decorator);
 	}
 	

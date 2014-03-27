@@ -26,19 +26,26 @@
  */
 package org.controlsfx.validation;
 
+import static org.controlsfx.control.decoration.Decorator.addDecoration;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.function.Predicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -50,6 +57,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
+
+import org.controlsfx.control.decoration.Decorator;
 
 /**
  * Provides validation support for UI components. The idea is create an instance of this class the component group, usually a panel.<br>
@@ -142,7 +151,7 @@ public class ValidationSupport {
 		return value instanceof Boolean? (Boolean)value: false;
 	}
 	
-	
+	private ObservableSet<Control> controls = FXCollections.observableSet();
 	private ObservableMap<Control,ValidationResult> validationResults = 
 			FXCollections.observableMap(new WeakHashMap<>());
 	
@@ -150,9 +159,32 @@ public class ValidationSupport {
 	 * Creates validation support instance
 	 */
 	public ValidationSupport() {
+		
+		// notify validation result observers
 		validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
 			validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
 		);
+		
+		// validation decoration
+		validationResultProperty().addListener( (o, oldValue, validationResult) -> redecorate());
+	}
+	
+	// TODO needs optimizaion
+	public void redecorate() {
+		ValidationDecorator decorator = getValidationDecorator();
+		if ( decorator != null ) {
+        	for( Control target: getKnownControls()) {
+        		try {
+	        		Decorator.removeAllDecorations(target);
+ 	        		getHighestMessage(target).ifPresent( msg -> 
+ 	        			decorator.createDecorations(msg).stream().forEach( d -> addDecoration(target,d))
+	        		);
+        		} catch ( Throwable ex ) {
+        			// FIXME Decorator throws an exception on the first run
+        			ex.printStackTrace();
+        		}
+        	}
+    	}
 	}
 	
 	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
@@ -173,6 +205,27 @@ public class ValidationSupport {
 	 */
 	public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
 		return validationResultProperty.getReadOnlyProperty();
+	}
+	
+	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
+			new SimpleObjectProperty<>(new StyleClassValidationDecorator());//new IconValidationDecorator());
+	
+	public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
+		return validationDecoratorProperty;
+	}
+	
+	public ValidationDecorator getValidationDecorator() {
+		return validationDecoratorProperty.get();
+	}
+	
+	public void setValidationDecorator( ValidationDecorator decorator ) {
+		if ( getValidationDecorator() != null && decorator == null ) {
+			for( Control target: getKnownControls()) {
+	           Decorator.removeAllDecorations(target);
+			}
+		}
+		if ( decorator != null )  redecorate();
+		validationDecoratorProperty.set(decorator);
 	}
 	
 	private Optional<ObservableValueExtractor> getExtractor(final Control c) {
@@ -199,12 +252,23 @@ public class ValidationSupport {
 			
 			Consumer<T> updateResults = value -> validationResults.put(c, validator.apply(c, value));
 			
+			controls.add(c);
 			observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
 			updateResults.accept(observable.getValue());
 			
 			return e;
 			
 		}).isPresent();
+	}
+	
+	public Set<Control> getKnownControls() {
+		return Collections.unmodifiableSet(controls);
+	}
+	
+	public Optional<ValidationMessage> getHighestMessage(Control target) {
+		return Optional.ofNullable(validationResults.get(target)).map( result -> 
+			result.getMessages().stream().max( ValidationMessage.COMPARATOR).orElse(null)
+		);
 	}
 	
 	/**

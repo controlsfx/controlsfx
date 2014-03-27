@@ -94,6 +94,10 @@ class SimpleValidationMessage implements ValidationMessage {
 		return true;
 	}
 	
+	public int compareTo(ValidationMessage msg) {
+		return msg == null || this.target != msg.getTarget()? -1: this.severity.compareTo(msg.getSeverity());
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s(%s)", severity, text);

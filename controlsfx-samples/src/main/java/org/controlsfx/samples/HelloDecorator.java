@@ -40,13 +40,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -70,7 +68,6 @@ public class HelloDecorator extends ControlsFXSample {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMaxHeight(Double.MAX_VALUE);
-        
         root.getChildren().addAll(field);
         
         // for the sake of this sample we have to install a custom css file to
@@ -130,7 +127,7 @@ public class HelloDecorator extends ControlsFXSample {
                         break;
                     }
                     case "Image": {
-                        addDecoration(field, new GraphicDecoration(createImageNode(),Pos.CENTER_RIGHT));
+                        addDecoration(field, new GraphicDecoration(createImageNode(),Pos.BOTTOM_LEFT));
                         break;
                     }
                 }
@@ -151,7 +148,7 @@ public class HelloDecorator extends ControlsFXSample {
     }
     
     private Node createDecoratorNode(Color color) {
-    	Rectangle d = new Rectangle(5, 5);
+    	Rectangle d = new Rectangle(7, 7);
         d.setFill(color);
         return d;
     }

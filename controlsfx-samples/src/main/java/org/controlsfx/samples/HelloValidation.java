@@ -24,11 +24,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples.validation;
+package org.controlsfx.samples;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -38,11 +40,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
@@ -50,8 +50,10 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.samples.Utils;
-import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.CompoundValidationDecorator;
+import org.controlsfx.validation.IconValidationDecorator;
+import org.controlsfx.validation.StyleClassValidationDecorator;
+import org.controlsfx.validation.ValidationDecorator;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -70,21 +72,32 @@ public class HelloValidation extends ControlsFXSample {
     @Override public String getSampleDescription() {
         return "Component Validation";
     }
+    
+    ValidationSupport validationSupport = new ValidationSupport();
 
     @Override public Node getPanel(final Stage stage) {
+    	
 
-    	ValidationSupport validationSupport = new ValidationSupport();
-        BorderPane root = new BorderPane();
-
-        GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(30, 30, 0, 30));
+        GridPane root = new GridPane();
+        root.setVgap(10);
+        root.setHgap(10);
+        root.setPadding(new Insets(30, 30, 0, 30));
+        
+        root.sceneProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {
+                if (root.getScene() != null) {
+                    root.getScene().getStylesheets().add(HelloDecorator.class.getResource("validation.css").toExternalForm());
+                }
+            }
+        });
 
         
-        final ListView<ValidationMessage> messageList = new ListView<>();
-        validationSupport.validationResultProperty().addListener( (o, oldValue, newValue) ->
-        	messageList.getItems().setAll(newValue.getMessages()));
+//        final ListView<ValidationMessage> messageList = new ListView<>();
+//        validationSupport.validationResultProperty().addListener( (o, oldValue, validationResult) -> {
+//        	messageList.getItems().setAll(validationResult.getMessages());
+//        }
+//        );
+        
         
         int row = 0;
 
@@ -96,8 +109,8 @@ public class HelloValidation extends ControlsFXSample {
                 textField,
                 "Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola");
 
-        grid.add(new Label("Auto-complete Text"), 0, row);
-        grid.add(textField, 1, row);
+        root.add(new Label("Auto-complete Text"), 0, row);
+        root.add(textField, 1, row);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         
         //combobox
@@ -107,8 +120,8 @@ public class HelloValidation extends ControlsFXSample {
         validationSupport.registerValidator(combobox,
         		Validator.createEmptyValidator( "ComboBox Selection required"));
         
-        grid.add(new Label("Combobox"), 0, row);
-        grid.add(combobox, 1, row);
+        root.add(new Label("Combobox"), 0, row);
+        root.add(combobox, 1, row);
         GridPane.setHgrow(combobox, Priority.ALWAYS);
 
         //choicebox
@@ -118,8 +131,8 @@ public class HelloValidation extends ControlsFXSample {
         validationSupport.registerValidator(choiceBox, 
         	Validator.createEmptyValidator("ChoiceBox Selection required"));
         
-        grid.add(new Label("ChoiceBox"), 0, row);
-        grid.add(choiceBox, 1, row);
+        root.add(new Label("ChoiceBox"), 0, row);
+        root.add(choiceBox, 1, row);
         GridPane.setHgrow(combobox, Priority.ALWAYS);
         
         //checkbox
@@ -128,7 +141,7 @@ public class HelloValidation extends ControlsFXSample {
         validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> 
         	ValidationResult.fromErrorIf( c, "Checkbox should be checked", !newValue)
         );
-        grid.add(checkBox, 1, row);
+        root.add(checkBox, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
         //slider
@@ -139,8 +152,8 @@ public class HelloValidation extends ControlsFXSample {
         	ValidationResult.fromErrorIf( slider, "Slider value should be > 0",  newValue <= 0 )
         );
        
-        grid.add(new Label("Slider"), 0, row);
-        grid.add(slider, 1, row);
+        root.add(new Label("Slider"), 0, row);
+        root.add(slider, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
 
         // color picker
@@ -150,30 +163,31 @@ public class HelloValidation extends ControlsFXSample {
         	Validator.createEqualsValidator("Color should be WHITE or BLACK", Arrays.asList(Color.WHITE, Color.BLACK))	
         );
        
-        grid.add(new Label("Color Picker"), 0, row);
-        grid.add(colorPicker, 1, row);
+        root.add(new Label("Color Picker"), 0, row);
+        root.add(colorPicker, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
 
         // date picker
         row++;
         DatePicker datePicker =  new DatePicker();
         validationSupport.registerValidator(datePicker, (Control c, LocalDate newValue) -> 
-        	ValidationResult.fromErrorIf( datePicker, "The date should be today", !LocalDate.now().equals(newValue) )	
+        	ValidationResult.fromWarningIf( datePicker, "The date should be today", !LocalDate.now().equals(newValue) )	
         );
        
-        grid.add(new Label("Date Picker"), 0, row);
-        grid.add(datePicker, 1, row);
+        root.add(new Label("Date Picker"), 0, row);
+        root.add(datePicker, 1, row);
         GridPane.setHgrow(checkBox, Priority.ALWAYS);
         
-        // validation results
-        row++;
-        TitledPane pane = new TitledPane("Validation Results", messageList);
-        pane.setCollapsible(false);
-        grid.add(pane, 0, row, 2, 1);
-        GridPane.setHgrow(pane, Priority.ALWAYS);
+//        // validation results
+//        row++;
+//        TitledPane pane = new TitledPane("Validation Results", messageList);
+//        pane.setCollapsible(false);
+//        root.add(pane, 0, row, 2, 1);
+//        GridPane.setHgrow(pane, Priority.ALWAYS);
        
-        root.setTop(grid);
-        return root;
+        //root.setTop(grid);
+        ScrollPane scrollPane = new ScrollPane(root);
+        return scrollPane;
     }
 
 
@@ -182,8 +196,25 @@ public class HelloValidation extends ControlsFXSample {
         grid.setVgap(10);
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
+        
+        
+        
+        IconValidationDecorator iconDecorator = new IconValidationDecorator();
+        StyleClassValidationDecorator cssDecorator = new StyleClassValidationDecorator();
 
-        // TODO Add customization example controls
+        int row = 0;
+        ComboBox<ValidationDecorator> checkbox =  new ComboBox<>();
+        checkbox.getItems().addAll( iconDecorator, cssDecorator, new CompoundValidationDecorator(cssDecorator,iconDecorator));
+        checkbox.getSelectionModel().selectedItemProperty().addListener( (o,old,decorator) ->
+           validationSupport.setValidationDecorator(decorator)
+        );
+        checkbox.getSelectionModel().select(0);
+        
+        
+        grid.add(new Label("Validation Decorator"), 0, row);
+        grid.add(checkbox, 1, row);
+        GridPane.setHgrow(checkbox, Priority.ALWAYS);
+        
 
         return grid;
     }

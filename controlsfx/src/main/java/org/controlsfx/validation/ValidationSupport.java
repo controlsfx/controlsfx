@@ -166,7 +166,10 @@ public class ValidationSupport {
 		);
 		
 		// validation decoration
-		validationResultProperty().addListener( (o, oldValue, validationResult) -> redecorate());
+		validationResultProperty().addListener( (o, oldValue, validationResult) -> {
+			invalidProperty.set(!validationResult.getErrors().isEmpty());
+			redecorate();
+	    });
 	}
 	
 	// TODO needs optimizaion
@@ -207,8 +210,20 @@ public class ValidationSupport {
 		return validationResultProperty.getReadOnlyProperty();
 	}
 	
+	private ReadOnlyObjectWrapper<Boolean> invalidProperty = new ReadOnlyObjectWrapper<Boolean>(); 
+	
+	
+	public Boolean isInvalid() {
+		return invalidProperty.get();
+	}
+	
+	public ReadOnlyObjectProperty<Boolean> invalidProperty() {
+		return invalidProperty.getReadOnlyProperty();
+	}
+	
+	
 	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
-			new SimpleObjectProperty<>(new StyleClassValidationDecorator());//new IconValidationDecorator());
+			new SimpleObjectProperty<>(new IconValidationDecorator());
 	
 	public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
 		return validationDecoratorProperty;

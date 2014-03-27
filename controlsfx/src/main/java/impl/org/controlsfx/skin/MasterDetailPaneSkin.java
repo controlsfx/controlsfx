@@ -54,8 +54,6 @@ import org.controlsfx.control.MasterDetailPane;
 
 public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
-//    private double lastDividerPosition;
-
     private boolean changing = false;
     private SplitPane splitPane;
     private Timeline timeline;

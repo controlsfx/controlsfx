@@ -72,13 +72,20 @@ public class IconValidationDecorator implements ValidationDecorator {
         imageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
         Label label = new Label();
         label.setGraphic(imageView);
-        Tooltip tooltip = new Tooltip(message.getText());
-        tooltip.setOpacity(.9);
-        tooltip.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);"
-        		       + "-fx-background-color:ffffcc; -fx-text-fill: black;");
-		label.setTooltip( tooltip);
+		label.setTooltip( createTooltip(message));
         label.setAlignment(Pos.CENTER);
 		return label;
+	}
+	
+	protected Tooltip createTooltip(ValidationMessage message) {
+		Tooltip tooltip = new Tooltip(message.getText());
+        tooltip.setOpacity(.9);
+        tooltip.setAutoFix(true);
+        tooltip.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);"
+        		       + "-fx-background-color: FBEFEF; -fx-text-fill: cc0033;"
+        		       + "-fx-font-weight: bold; -fx-padding: 5;" 
+        		       + "-fx-border-width:1; -fx-border-color:cc0033;");
+        return tooltip;
 	}
     
 	  /**

@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control.decoration;
 
+import java.util.Properties;
+
 import javafx.scene.Node;
 
 /**
@@ -41,7 +43,7 @@ import javafx.scene.Node;
 @FunctionalInterface
 public interface Decoration {
     
-    /**
+	/**
      * Depending on the boolean 'add' parameter, this method is responsible for
      * decorating or undecorating the given target node. 
      * 
@@ -60,4 +62,18 @@ public interface Decoration {
      *         valid return value. If the add parameter is false, always null.
      */
     public Node run(Node targetNode, boolean add);
+    
+    
+    Properties[] props = new Properties[]{null}; // array allows for lazy initialization of final variable
+    
+    /**
+     * Custom decoration properties
+     * @return decoration properties
+     */
+    default Properties getProperties() {
+    	if ( props[0] == null  ) {
+    		props[0] = new Properties();
+    	}
+    	return props[0];
+    }
 }

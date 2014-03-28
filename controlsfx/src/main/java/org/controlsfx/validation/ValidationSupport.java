@@ -46,6 +46,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -58,6 +59,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
+import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.Decorator;
 
 /**
@@ -130,7 +132,8 @@ public class ValidationSupport {
 		//addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
 	}
 	
-	private static String CTRL_REQUIRED_FLAG = "controlsfx..validation.required";
+	private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$";
+	private static final String VALIDATION_DECORATION = "$org.controlsfx.vaidation.decoration$";
 	
 	/**
 	 * Set control's required flag
@@ -149,6 +152,16 @@ public class ValidationSupport {
 	public static boolean isRequired( Control c ) {
 		Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
 		return value instanceof Boolean? (Boolean)value: false;
+	}
+	
+	private static boolean isValidationDecoration( Decoration decoration) {
+		return decoration == null || decoration.getProperties().get(VALIDATION_DECORATION) == Boolean.TRUE;
+	}
+	
+	private static void setValidationDecoration( Decoration decoration ) {
+		if ( decoration != null ) {
+			decoration.getProperties().put(VALIDATION_DECORATION, Boolean.TRUE);
+		}
 	}
 	
 	private ObservableSet<Control> controls = FXCollections.observableSet();
@@ -172,24 +185,41 @@ public class ValidationSupport {
 	    });
 	}
 	
-	// TODO needs optimizaion
-	public void redecorate() {
-		ValidationDecorator decorator = getValidationDecorator();
-		if ( decorator != null ) {
-        	for( Control target: getKnownControls()) {
-        		try {
-	        		Decorator.removeAllDecorations(target);
- 	        		getHighestMessage(target).ifPresent( msg -> 
- 	        			decorator.createDecorations(msg).stream().forEach( d -> addDecoration(target,d))
-	        		);
-        		} catch ( Throwable ex ) {
-        			// FIXME Decorator throws an exception on the first run
-        			ex.printStackTrace();
-        		}
-        	}
-    	}
+	private void removeDecorations( Node target) {
+		
+		// remove only decorations related to validation
+		List<Decoration> decorations = Decorator.getDecorations(target);
+		if ( decorations != null ) {
+			for ( Decoration d: decorations.toArray(new Decoration[0]) ) {
+				if (isValidationDecoration(d)) {
+					Decorator.removeDecoration(target, d);
+				}
+			}
+		}
+		
 	}
 	
+	// TODO needs optimization
+	public void redecorate() {
+		ValidationDecorator decorator = getValidationDecorator();
+		for (Control target : getKnownControls()) {
+			try {
+				removeDecorations(target);
+				if (decorator != null) {
+					getHighestMessage(target).ifPresent(msg -> {
+						for (Decoration d : decorator.createDecorations(msg)) {
+							setValidationDecoration(d); // mark for validation
+							addDecoration(target, d);
+						}
+					});
+				}
+			} catch (Throwable ex) {
+				// FIXME Decorator throws an exception on the first run
+				ex.printStackTrace();
+			}
+		}
+	}
+
 	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
 			new ReadOnlyObjectWrapper<ValidationResult>();
 	
@@ -234,12 +264,7 @@ public class ValidationSupport {
 	}
 	
 	public void setValidationDecorator( ValidationDecorator decorator ) {
-		if ( getValidationDecorator() != null && decorator == null ) {
-			for( Control target: getKnownControls()) {
-	           Decorator.removeAllDecorations(target);
-			}
-		}
-		if ( decorator != null )  redecorate();
+		if ( decorator != null ) redecorate();
 		validationDecoratorProperty.set(decorator);
 	}
 	

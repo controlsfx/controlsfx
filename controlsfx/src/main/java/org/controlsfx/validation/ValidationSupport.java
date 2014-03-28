@@ -198,11 +198,15 @@ public class ValidationSupport {
 		}
 		
 	}
-	
+
+	/**
+	 * Redecorates all known components
+	 * Only decorations related to validation are affected
+	 */
 	// TODO needs optimization
 	public void redecorate() {
 		ValidationDecorator decorator = getValidationDecorator();
-		for (Control target : getKnownControls()) {
+		for (Control target : getRegisteredControls()) {
 			try {
 				removeDecorations(target);
 				if (decorator != null) {
@@ -243,10 +247,18 @@ public class ValidationSupport {
 	private ReadOnlyObjectWrapper<Boolean> invalidProperty = new ReadOnlyObjectWrapper<Boolean>(); 
 	
 	
+	/**
+	 * Returns current validation state. 
+	 * @return true if there is at least one error
+	 */
 	public Boolean isInvalid() {
 		return invalidProperty.get();
 	}
 	
+	/**
+	 * Validation state property
+	 * @return
+	 */
 	public ReadOnlyObjectProperty<Boolean> invalidProperty() {
 		return invalidProperty.getReadOnlyProperty();
 	}
@@ -255,14 +267,26 @@ public class ValidationSupport {
 	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
 			new SimpleObjectProperty<>(new IconValidationDecorator());
 	
+	/**
+	 * Return validation decorator property
+	 * @return
+	 */
 	public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
 		return validationDecoratorProperty;
 	}
 	
+	/**
+	 * Returns current validation decorator
+	 * @return current validation decorator or null if none
+	 */
 	public ValidationDecorator getValidationDecorator() {
 		return validationDecoratorProperty.get();
 	}
 	
+	/**
+	 * Sets new validation decorator
+	 * @param decorator new validation decorator. Null value is valid - no decoration will occur
+	 */
 	public void setValidationDecorator( ValidationDecorator decorator ) {
 		if ( decorator != null ) redecorate();
 		validationDecoratorProperty.set(decorator);
@@ -301,16 +325,6 @@ public class ValidationSupport {
 		}).isPresent();
 	}
 	
-	public Set<Control> getKnownControls() {
-		return Collections.unmodifiableSet(controls);
-	}
-	
-	public Optional<ValidationMessage> getHighestMessage(Control target) {
-		return Optional.ofNullable(validationResults.get(target)).map( result -> 
-			result.getMessages().stream().max( ValidationMessage.COMPARATOR).orElse(null)
-		);
-	}
-	
 	/**
 	 * Registers {@link Validator} for specified control and makes control required
 	 * @param c control to validate
@@ -320,5 +334,25 @@ public class ValidationSupport {
 	public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
 		return registerValidator(c, true, validator);
 	}
+	
+	/**
+	 * Returns currently registered controls
+	 * @return set of currently registered controls
+	 */
+	public Set<Control> getRegisteredControls() {
+		return Collections.unmodifiableSet(controls);
+	}
+	
+	/**
+	 * Returns optional highest severity message for a control
+	 * @param target control
+	 * @return Optional highest severity message for a control
+	 */
+	public Optional<ValidationMessage> getHighestMessage(Control target) {
+		return Optional.ofNullable(validationResults.get(target)).map( result -> 
+			result.getMessages().stream().max( ValidationMessage.COMPARATOR).orElse(null)
+		);
+	}
+
 
 }

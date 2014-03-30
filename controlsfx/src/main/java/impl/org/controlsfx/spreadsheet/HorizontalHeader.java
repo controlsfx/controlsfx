@@ -61,7 +61,7 @@ public class HorizontalHeader extends TableHeaderRow {
 
     /***************************************************************************
      * 
-     * Constructors
+     * Constructor
      * 
      **************************************************************************/
     public HorizontalHeader(final GridViewSkin skin) {

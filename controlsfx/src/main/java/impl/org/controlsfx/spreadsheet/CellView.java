@@ -245,15 +245,17 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    @Override
-    public String toString() {
-        return getItem().getRow() + "/" + getItem().getColumn(); //$NON-NLS-1$
-
-    }
+//    @Override
+//    public String toString() {
+//        //FIXME
+//        return getItem().getRow() + "/" + getItem().getColumn(); //$NON-NLS-1$
+//
+//    }
 
     /**
      * Called in the gridRowSkinBase when doing layout This allow not to
      * override opacity in the row and let the cell handle itself
+     * @param item
      */
     public void show(final SpreadsheetCell item) {
         // We reset the settings
@@ -269,15 +271,13 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * because an exception can be thrown otherwise. This should use
              * Lambda expression but I cannot use 1.8 compliance..
              */
-            getValue(new Runnable() {
-                @Override
-                public void run() {
+            getValue(()->{
                     Tooltip toolTip = new Tooltip(item.getItem().toString());
                     toolTip.setWrapText(true);
                     toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
                     setTooltip(toolTip);
                 }
-            });
+            );
         }
         // We want the text to wrap onto another line
 //        setWrapText(true);
@@ -303,7 +303,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * So this is a work-around in order to set the wrap property only if this has a bit of sense,
      * aka, the height could allow a second line.
      */
-     private ChangeListener<Number> wrapHeightChangeListener = new ChangeListener<Number>() {
+     private final ChangeListener<Number> wrapHeightChangeListener = new ChangeListener<Number>() {
 
         @Override
         public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {

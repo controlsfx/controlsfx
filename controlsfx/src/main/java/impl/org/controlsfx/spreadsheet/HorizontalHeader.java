@@ -243,7 +243,9 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param i
      */
     private void removeStyleHeader(Integer i) {
-        getRootHeader().getColumnHeaders().get(i).getStyleClass().removeAll("fixed"); //$NON-NLS-1$
+        if (getRootHeader().getColumnHeaders().size() > i) {
+            getRootHeader().getColumnHeaders().get(i).getStyleClass().removeAll("fixed"); //$NON-NLS-1$
+        }
     }
 
     /**
@@ -252,8 +254,11 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param i
      */
     private void addStyleHeader(Integer i) {
-        getRootHeader().getColumnHeaders().get((Integer) i).getStyleClass()
-                .addAll("fixed"); //$NON-NLS-1$
+        //FIXME Sometimes getColumnHeader is not updated..
+        if (getRootHeader().getColumnHeaders().size() > i) {
+            getRootHeader().getColumnHeaders().get(i).getStyleClass()
+                    .addAll("fixed"); //$NON-NLS-1$
+        }
     }
 
     /**

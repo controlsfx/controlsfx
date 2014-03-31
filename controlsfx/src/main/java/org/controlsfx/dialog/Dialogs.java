@@ -1158,7 +1158,7 @@ public final class Dialogs {
     
     private static enum Type {
         ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("error.dlg.masthead"), OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), OK),
         WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), OK),
         CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
         INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),

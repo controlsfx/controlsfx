@@ -103,7 +103,6 @@
 .spreadsheet-cell{
     -fx-background-color: -fx-table-cell-border-color, #d9d6dd;
     -fx-background-insets: 0, 0 1 1 0;
-    -fx-alignment: center;
 }
 /*.spreadsheet-cell.modified{
         -fx-background-radius : 0 15 0 0;

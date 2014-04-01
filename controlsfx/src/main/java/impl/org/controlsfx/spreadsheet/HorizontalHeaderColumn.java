@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,19 +48,20 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
     @Override
     protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
-    	if(col.getColumns().isEmpty()){
-    		final TableColumnHeader columnHeader = new TableColumnHeader(getTableViewSkin(), col);
-    		columnHeader.setOnMousePressed(new EventHandler<MouseEvent>() {
-    			@Override
-    			public void handle(MouseEvent arg0) {
-    				 if (arg0.getClickCount() == 2 && arg0.isPrimaryButtonDown()) {
-    					 ((GridViewSkin) getTableViewSkin()).resize(col);
-    				 }
-    			}
-    		});
-    		return columnHeader;
-    	}else
-    		return new HorizontalHeaderColumn(getTableViewSkin(),col);
+        if (col.getColumns().isEmpty()) {
+            final TableColumnHeader columnHeader = new TableColumnHeader(getTableViewSkin(), col);
+            columnHeader.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent arg0) {
+                    if (arg0.getClickCount() == 2 && arg0.isPrimaryButtonDown()) {
+                        ((GridViewSkin) getTableViewSkin()).resize(col);
+                    }
+                }
+            });
+            return columnHeader;
+        } else {
+            return new HorizontalHeaderColumn(getTableViewSkin(), col);
+        }
     }
 
     @Override
@@ -71,40 +72,39 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
     /**
      * We want ColumnHeader to be fixed when we freeze some columns
-     * 
-     * @param scrollX
+     *
      */
     public void layoutFixedColumns() {
-    	SpreadsheetHandle handle = ((GridViewSkin) getTableViewSkin()).handle;
-    	final SpreadsheetView spreadsheetView = handle.getView();
-    	if(handle.getCellsViewSkin() == null){
-    	    return;
-    	}
+        SpreadsheetHandle handle = ((GridViewSkin) getTableViewSkin()).handle;
+        final SpreadsheetView spreadsheetView = handle.getView();
+        if (handle.getCellsViewSkin() == null) {
+            return;
+        }
         double hbarValue = handle.getCellsViewSkin().getHBar().getValue();
-        
+
         final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
         double fixedColumnWidth = 0;
         double x = snappedLeftInset();
-        
+
         for (int j = 0, max = getColumnHeaders().size(); j < max; j++) {
-        	final TableColumnHeader n = getColumnHeaders().get(j);
-        	final double prefWidth = snapSize(n.prefWidth(-1));
-        	n.setPrefHeight(24.0);
-        	//If the column is fixed
-        	if(spreadsheetView.getFixedColumns().indexOf(spreadsheetView.getColumns().get(j)) != -1){
-                 double tableCellX = 0;
-                 //If the column is hidden we have to translate it
-                 if(hbarValue + fixedColumnWidth > x){
+            final TableColumnHeader n = getColumnHeaders().get(j);
+            final double prefWidth = snapSize(n.prefWidth(-1));
+            n.setPrefHeight(24.0);
+            //If the column is fixed
+            if (spreadsheetView.getFixedColumns().indexOf(spreadsheetView.getColumns().get(j)) != -1) {
+                double tableCellX = 0;
+                //If the column is hidden we have to translate it
+                if (hbarValue + fixedColumnWidth > x) {
 
-                 	tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
+                    tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 
-                 	n.toFront();
-                 	fixedColumnWidth += prefWidth;
-                 }
-                 n.relocate(x+tableCellX , labelHeight + snappedTopInset());
-        	}
-        	
-           x+= prefWidth;
+                    n.toFront();
+                    fixedColumnWidth += prefWidth;
+                }
+                n.relocate(x + tableCellX, labelHeight + snappedTopInset());
+            }
+
+            x += prefWidth;
         }
 
     }

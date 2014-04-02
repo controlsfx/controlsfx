@@ -198,6 +198,10 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         spreadsheetView.getFixedColumns().addListener(fixedColumnsListener);
 
         init();
+        /**
+         * When we are changing the grid we re-instantiate the rowToLayout because
+         * spans and fixedRow may have changed.
+         */
         handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
 
             @Override
@@ -433,7 +437,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     /***************************************************************************
      * * PRIVATE/PROTECTED METHOD * *
      **************************************************************************/
-    protected void init() {
+    protected final void init() {
         getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle, verticalHeaderWidth);
         getChildren().addAll(verticalHeader);
@@ -471,7 +475,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         });
     }
 
-    protected ObservableSet<Integer> getCurrentlyFixedRow() {
+    protected final ObservableSet<Integer> getCurrentlyFixedRow() {
         return currentlyFixedRow;
     }
 
@@ -725,13 +729,17 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         Grid grid =  handle.getView().getGrid();
         BitSet bitSet = new BitSet(grid.getRowCount());
         for(int row = 0;row<grid.getRowCount();++row){
-           List<SpreadsheetCell> myRow = grid.getRows().get(row);
-           for(SpreadsheetCell cell:myRow){
-               if(cell.getRowSpan()>1 || cell.getColumnSpan() >1){
-                   bitSet.set(row);
-                   break;
-               }
-           }
+            if(spreadsheetView.getFixedRows().contains(row)){
+                bitSet.set(row);
+                continue;
+            }
+            List<SpreadsheetCell> myRow = grid.getRows().get(row);
+            for(SpreadsheetCell cell:myRow){
+                if(cell.getRowSpan()>1 || cell.getColumnSpan() >1){
+                    bitSet.set(row);
+                    break;
+                }
+            }
         }
         return bitSet;
     }
@@ -755,7 +763,23 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         public void onChanged(Change<? extends Integer> c) {
             hBarValue.clear();
             while(c.next()){
-                //FIXME If row is un-fixed, look if it needs to be removed from rowToLayout
+                
+                for(Integer unfixedRow:c.getRemoved()){
+                    rowToLayout.set(unfixedRow, false);
+                    //If the grid permits it, we check the spanning in order not
+                    //to remove a row that might need layout.
+                    if(spreadsheetView.getGrid().getRows().size() > unfixedRow){
+                        List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
+                        for(SpreadsheetCell cell:myRow){
+                            if(cell.getRowSpan()>1 || cell.getColumnSpan() >1){
+                                rowToLayout.set(unfixedRow, true);
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                //We check for the newly fixedRow
                 for(Integer fixedRow:c.getAddedSubList()){
                     rowToLayout.set(fixedRow, true);
                 }
@@ -763,7 +787,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }
-
     };
 
     /**

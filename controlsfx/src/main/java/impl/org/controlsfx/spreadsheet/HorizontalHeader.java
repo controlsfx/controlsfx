@@ -118,6 +118,22 @@ public class HorizontalHeader extends TableHeaderRow {
             }
         };
         Platform.runLater(r);
+        
+        /**
+         * When we are setting a new Grid (model) on the SpreadsheetView, it 
+         * appears that the headers are re-created. So we need to listen to 
+         * those changes in order to re-apply our css style class. Otherwise
+         * we'll end up with fixedColumns but no graphic confirmation.
+         */
+        getRootHeader().getColumnHeaders().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable o) {
+               for (SpreadsheetColumn fixItem : gridViewSkin.spreadsheetView.getFixedColumns()) {
+                   fixColumn(fixItem);
+               }
+               updateHighlightSelection();
+            }
+        });
 
     }
 
@@ -196,17 +212,16 @@ public class HorizontalHeader extends TableHeaderRow {
     private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
 
         @Override
-        public void onChanged(
-                javafx.collections.ListChangeListener.Change<? extends SpreadsheetColumn> arg0) {
-            while (arg0.next()) {
-                //If we unfix a column
-                for (SpreadsheetColumn remitem : arg0.getRemoved()) {
-                    unfixColumn(remitem);
-                }
-                //If we fix one
-                for (SpreadsheetColumn additem : arg0.getAddedSubList()) {
-                    fixColumn(additem);
-                }
+        public void onChanged(javafx.collections.ListChangeListener.Change<? extends SpreadsheetColumn> change) {
+            while (change.next()) {
+               //If we unfix a column
+               for (SpreadsheetColumn remitem : change.getRemoved()) {
+                   unfixColumn(remitem);
+               }
+               //If we fix one
+               for (SpreadsheetColumn additem : change.getAddedSubList()) {
+                   fixColumn(additem);
+               }
             }
             updateHighlightSelection();
         }
@@ -219,7 +234,6 @@ public class HorizontalHeader extends TableHeaderRow {
      */
     private void fixColumn(SpreadsheetColumn column) {
         addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
-//		column.setText(column.getText().replace(".", "")+":");
     }
 
     /**
@@ -229,7 +243,6 @@ public class HorizontalHeader extends TableHeaderRow {
      */
     private void unfixColumn(SpreadsheetColumn column) {
         removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
-//		 column.setText(column.getText().replace(":", "."));
     }
 
     /**
@@ -249,10 +262,8 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param i
      */
     private void addStyleHeader(Integer i) {
-        //FIXME Sometimes getColumnHeader is not updated..
         if (getRootHeader().getColumnHeaders().size() > i) {
-            getRootHeader().getColumnHeaders().get(i).getStyleClass()
-                    .addAll("fixed"); //$NON-NLS-1$
+            getRootHeader().getColumnHeaders().get(i).getStyleClass().addAll("fixed"); //$NON-NLS-1$
         }
     }
 
@@ -275,9 +286,11 @@ public class HorizontalHeader extends TableHeaderRow {
 
         }
         final List<Integer> selectedColumns = gridViewSkin.getSelectedColumns();
-        for (final Object i : selectedColumns) {
-            getRootHeader().getColumnHeaders().get((Integer) i).getStyleClass()
-                    .addAll("selected"); //$NON-NLS-1$
+        for (final Integer i : selectedColumns) {
+            if (getRootHeader().getColumnHeaders().size() > i) {
+                getRootHeader().getColumnHeaders().get(i).getStyleClass()
+                        .addAll("selected"); //$NON-NLS-1$
+            }
         }
 
     }

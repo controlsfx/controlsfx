@@ -216,23 +216,11 @@ public class VerticalHeader extends StackPane {
             // We iterate over the visibleRows
             while (cellSize != 0 && row != null && row.getIndex() < modelRowCount) {
                 rowIndex = row.getIndex();
-                // row = skin.getRow(i);
                 label = getLabel(rowCount);
-                // label.minHeightProperty().bind(row.minHeightProperty());
                 getChildren().add(label);
-                // label.textProperty().bind(row.indexProperty().asString());
                 label.setText(getRowHeader(rowIndex));
-//                if (spreadsheetView.getFixedRows().contains(rowIndex)) {
-//                    label.setText(getRowHeader(rowIndex) + ":");
-//                } else if (spreadsheetView.isRowFixable(row.getIndex())) {
-//                    label.setText(getRowHeader(rowIndex) + ".");
-//                } else {
-//                    label.setText(getRowHeader(rowIndex) + " ");
-//                }
-                // label.setPrefWidth(verticalHeaderWidth.get());
                 label.resize(verticalHeaderWidth.get(), row.getHeight());
                 label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
-                // label.relocate(x, y);
                 label.setContextMenu(getRowContextMenu(rowIndex));
 
                 // We want to highlight selected rows
@@ -248,7 +236,6 @@ public class VerticalHeader extends StackPane {
                     css.removeAll("fixed");
                 }
 
-                // ++i;
                 y += row.getHeight();
 
                 // position drag overlay to intercept column resize requests
@@ -292,16 +279,7 @@ public class VerticalHeader extends StackPane {
                     
                     spaceUsedByFixedRows += skin.getRowHeight(rowIndex);
 
-//                    y += skin.getRowHeight(rowIndex);
-
-//                    Rectangle dragRect = getDragRect(rowCount++);
-//                    dragRect.getProperties().put(TABLE_ROW_KEY, row);
-//                    dragRect.getProperties().put(TABLE_LABEL_KEY, label);
-//                    dragRect.setWidth(label.getWidth());
-//                    dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
                     getChildren().add(label);
-//                    getChildren().add(dragRect);
-
                 }
             }
 
@@ -329,11 +307,6 @@ public class VerticalHeader extends StackPane {
                 label.setContextMenu(blankContextMenu);
                 getChildren().add(label);
             }
-            // Flush the rest of the children if any
-            // while (getChildren().size() > rowCount) {
-            // getChildren().remove(rowCount);
-            // }
-            // getChildren().addAll(dragRects);
         } else {
             getChildren().clear();
         }

@@ -101,6 +101,7 @@ import javafx.util.Duration;
  * they are always visible on screen. Only columns without any spanning cells
  * can be fixed.</li>
  * <li>A row header can be switched on in order to display the row number.</li>
+ * <li>Rows can be resized just like columns with click & drag.</li>
  * <li>Both row and column header can be visible or invisible.</li>
  * <li>Selection of several cells can be made with a click and drag.</li>
  * <li>A copy/paste context menu is accessible with a right-click or the usual

@@ -381,25 +381,27 @@ public class SpreadsheetView extends Control {
         this.contextMenuProperty().addListener(new ChangeListener<ContextMenu>() {
             @Override
             public void changed(ObservableValue<? extends ContextMenu> arg0, ContextMenu arg1, final ContextMenu arg2) {
-                arg2.setOnShowing(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent arg0) {
-                        // We don't want to open a contextMenu when editing
-                        // because editors
-                        // have their own contextMenu
-                        if (getEditingCell() != null) {
-                            // We're being reactive but we want to be pro-active
-                            // so we may need a work-around.
-                            final Runnable r = new Runnable() {
-                                @Override
-                                public void run() {
-                                    arg2.hide();
-                                }
-                            };
-                            Platform.runLater(r);
+                if(arg2 != null){
+                    arg2.setOnShowing(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent arg0) {
+                            // We don't want to open a contextMenu when editing
+                            // because editors
+                            // have their own contextMenu
+                            if (getEditingCell() != null) {
+                                // We're being reactive but we want to be pro-active
+                                // so we may need a work-around.
+                                final Runnable r = new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        arg2.hide();
+                                    }
+                                };
+                                Platform.runLater(r);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
         // The contextMenu creation must be on the JFX thread

@@ -31,6 +31,7 @@ import java.util.List;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -762,6 +763,13 @@ public final class Borders {
                     }
                 }
                 
+                private final InvalidationListener updateTitleListener = new InvalidationListener() {
+                    @Override public void invalidated(Observable arg0) {
+                        if(n.getScene() != null){
+                            updateTitleLabelFillFromScene(n.getScene());
+                        }
+                    }
+                };
                 @Override protected void layoutChildren() {
                     super.layoutChildren();
                     
@@ -782,11 +790,7 @@ public final class Borders {
                         titleLabel.setBackground(new Background(fill));
                     } else {
                         updateTitleLabelFillFromScene(s);
-                        s.fillProperty().addListener(new InvalidationListener() {
-                            @Override public void invalidated(Observable arg0) {
-                                updateTitleLabelFillFromScene(s);
-                            }
-                        });
+                        s.fillProperty().addListener(new WeakInvalidationListener(updateTitleListener));
                     }
                 }
                 

@@ -71,8 +71,6 @@ public class ImageGridCell extends GridCell<Image> {
 	@Override protected void updateItem(Image item, boolean empty) {
 	    super.updateItem(item, empty);
 	    
-	    getChildren().clear();
-	    
 	    if (empty) {
 	        setGraphic(null);
 	    } else {

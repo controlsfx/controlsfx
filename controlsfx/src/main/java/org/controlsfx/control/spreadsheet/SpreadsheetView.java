@@ -61,6 +61,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
@@ -1262,7 +1263,9 @@ public class SpreadsheetView extends Control {
         /**
          * Make the tableView move when selection operating outside bounds
          */
-        private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
+        private final Timeline timer;
+
+        EventHandler<ActionEvent> timerEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 GridViewSkin skin = (GridViewSkin) getCellsViewSkin();
@@ -1284,8 +1287,7 @@ public class SpreadsheetView extends Control {
                         skin.getVBar().decrement();
                 }
             }
-        }));
-
+        };
         /**
          * When the drag is over, we remove the listener and stop the timer
          */
@@ -1298,6 +1300,45 @@ public class SpreadsheetView extends Control {
             }
         };
 
+        private final EventHandler<KeyEvent> keyPressedEventHandler = new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+                key = true;
+                ctrl = t.isControlDown();
+                shift = t.isShiftDown();
+            }
+        };
+        private final EventHandler<MouseEvent> mousePressedEventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                key = false;
+                ctrl = t.isControlDown();
+                shift = t.isShiftDown();
+            }
+        };
+        
+        private final EventHandler<MouseEvent> onDragDetectedEventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+                cellsView.addEventHandler(MouseEvent.MOUSE_RELEASED, dragDoneHandler);
+                drag = true;
+                timer.setCycleCount(Timeline.INDEFINITE);
+                timer.play();
+            }
+        };
+        private final EventHandler<MouseEvent> onMouseDragEventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+                mouseEvent = e;
+            }
+        };
+        private final ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>> listChangeListener = new ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
+            @Override
+            public void onChanged(
+                    final ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
+                handleSelectedCellsListChangeEvent(c);
+            }
+        };
         /***********************************************************************
          * 
          * Constructors
@@ -1307,48 +1348,16 @@ public class SpreadsheetView extends Control {
         public SpreadsheetViewSelectionModel(SpreadsheetView spreadsheetView) {
             super(spreadsheetView.cellsView);
             final SpreadsheetGridView cellsView = spreadsheetView.cellsView;
-            cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent t) {
-                    key = true;
-                    ctrl = t.isControlDown();
-                    shift = t.isShiftDown();
-                }
-            });
+            timer = new Timeline(new KeyFrame(Duration.millis(100), new WeakEventHandler<>((timerEventHandler))));
+            cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new WeakEventHandler<>(keyPressedEventHandler));
 
-            cellsView.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent t) {
-                    key = false;
-                    ctrl = t.isControlDown();
-                    shift = t.isShiftDown();
-                }
-            });
-            cellsView.setOnDragDetected(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent e) {
-                    cellsView.addEventHandler(MouseEvent.MOUSE_RELEASED, dragDoneHandler);
-                    drag = true;
-                    timer.setCycleCount(Timeline.INDEFINITE);
-                    timer.play();
-                }
-            });
+            cellsView.setOnMousePressed(new WeakEventHandler<>(mousePressedEventHandler));
+            cellsView.setOnDragDetected(new WeakEventHandler<>(onDragDetectedEventHandler));
 
-            cellsView.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent e) {
-                    mouseEvent = e;
-                }
-            });
+            cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));
 
-            selectedCellsMap = new SelectedCellsMap<>(
-                    new ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
-                        @Override
-                        public void onChanged(
-                                final Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
-                            handleSelectedCellsListChangeEvent(c);
-                        }
-                    });
+            selectedCellsMap = new SelectedCellsMap<>(new WeakListChangeListener<>(listChangeListener));
+                    
 
             selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
                 @Override

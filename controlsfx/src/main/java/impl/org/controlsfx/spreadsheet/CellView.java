@@ -34,6 +34,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
@@ -101,19 +102,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         });
         // When we detect a drag, we start the Full Drag so that other event
         // will be fired
-        this.addEventHandler(MouseEvent.DRAG_DETECTED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent arg0) {
-                startFullDrag();
-            }
-        });
+        this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
 
-        setOnMouseDragEntered(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent arg0) {
-                dragSelect(arg0);
-            }
-        });
+        setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
+        
         this.itemProperty().addListener(new ChangeListener<SpreadsheetCell>() {
 
             @Override
@@ -544,5 +536,19 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     @Override
     protected javafx.scene.control.Skin<?> createDefaultSkin() {
         return new CellViewSkin(this);
+    };
+    
+    private final EventHandler<MouseEvent> startFullDragEventHandler = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent arg0) {
+            startFullDrag();
+        }
+    };
+    
+    private final EventHandler<MouseEvent> dragMouseEventHandler = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent arg0) {
+            dragSelect(arg0);
+        }
     };
 }

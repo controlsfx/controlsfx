@@ -84,15 +84,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     public CellView(SpreadsheetHandle handle) {
         this.handle = handle;
-        hoverProperty().addListener(new WeakChangeListener<>(hoverChangeListener));
+        hoverProperty().addListener(hoverChangeListener);
         // When we detect a drag, we start the Full Drag so that other event
         // will be fired
         this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
 
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
-        this.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
-        heightProperty().addListener(new WeakChangeListener<>(wrapHeightChangeListener));
+        itemProperty().addListener(itemChangeListener);
+        heightProperty().addListener(wrapHeightChangeListener);
     }
 
     /***************************************************************************
@@ -392,14 +392,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    private ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
+    private final ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
         @Override
         public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node newGraphic) {
             setCellGraphic(getItem());
         }
     };
 
-    private SetChangeListener<String> styleClassListener = new SetChangeListener<String>() {
+    private final WeakChangeListener<Node> weakGraphicListener = new WeakChangeListener<>(graphicListener);
+    
+    private final SetChangeListener<String> styleClassListener = new SetChangeListener<String>() {
         @Override
         public void onChanged(javafx.collections.SetChangeListener.Change<? extends String> arg0) {
             if (arg0.wasAdded()) {
@@ -409,7 +411,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
         }
     };
-
+    
+    private final WeakSetChangeListener<String> weakStyleClassListener = new WeakSetChangeListener<>(styleClassListener);
+    
     /**
      * Method that will select all the cells between the drag place and that
      * cell.
@@ -543,16 +547,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldItem,
                 SpreadsheetCell newItem) {
             if (oldItem != null) {
-                oldItem.getStyleClass().removeListener(styleClassListener);
-                oldItem.graphicProperty().removeListener(graphicListener);
+                oldItem.getStyleClass().removeListener(weakStyleClassListener);
+                oldItem.graphicProperty().removeListener(weakGraphicListener);
             }
             if (newItem != null) {
                 getStyleClass().clear();
                 getStyleClass().setAll(newItem.getStyleClass());
 
-                newItem.getStyleClass().addListener(new WeakSetChangeListener<>(styleClassListener));
+                newItem.getStyleClass().addListener(weakStyleClassListener);
                 setCellGraphic(newItem);
-                newItem.graphicProperty().addListener(new WeakChangeListener<>(graphicListener));
+                newItem.graphicProperty().addListener(weakGraphicListener);
             }
         }
     };

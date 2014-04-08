@@ -108,19 +108,19 @@ public class BeanProperty implements PropertySheet.Item {
         return beanPropertyDescriptor.isExpert()? "Expert": "Basic";
     }
 	
-	/** 
-	 * @return The object passed in to the constructor of the BeanProperty.
-	 */
-	public Object getBean() {
-		return bean;
-	}
-	
-	/** 
-	 * @return The {@link PropertyDescriptor} passed in to the constructor of 
-	 * the BeanProperty.
-	 */
-	public PropertyDescriptor getPropertyDescriptor() {
-		return beanPropertyDescriptor;
-	}
-	
+    /** 
+     * @return The object passed in to the constructor of the BeanProperty.
+     */
+    public Object getBean() {
+        return bean;
+    }
+
+    /** 
+     * @return The {@link PropertyDescriptor} passed in to the constructor of 
+     * the BeanProperty.
+     */
+    public PropertyDescriptor getPropertyDescriptor() {
+        return beanPropertyDescriptor;
+    }
+
 }

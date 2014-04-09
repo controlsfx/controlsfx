@@ -57,11 +57,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -378,32 +381,7 @@ public class SpreadsheetView extends Control {
         /**
          * ContextMenu handling.
          */
-        this.contextMenuProperty().addListener(new ChangeListener<ContextMenu>() {
-            @Override
-            public void changed(ObservableValue<? extends ContextMenu> arg0, ContextMenu arg1, final ContextMenu arg2) {
-                if(arg2 != null){
-                    arg2.setOnShowing(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent arg0) {
-                            // We don't want to open a contextMenu when editing
-                            // because editors
-                            // have their own contextMenu
-                            if (getEditingCell() != null) {
-                                // We're being reactive but we want to be pro-active
-                                // so we may need a work-around.
-                                final Runnable r = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        arg2.hide();
-                                    }
-                                };
-                                Platform.runLater(r);
-                            }
-                        }
-                    });
-                }
-            }
-        });
+        this.contextMenuProperty().addListener(new WeakChangeListener<>(contextMenuChangeListener));
         // The contextMenu creation must be on the JFX thread
         final Runnable r = new Runnable() {
             @Override
@@ -422,7 +400,6 @@ public class SpreadsheetView extends Control {
 
         // getModifiedCells().addListener(modifiedCellsListener);
     }
-
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
@@ -1286,7 +1263,9 @@ public class SpreadsheetView extends Control {
         /**
          * Make the tableView move when selection operating outside bounds
          */
-        private final Timeline timer = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
+        private final Timeline timer;
+
+        EventHandler<ActionEvent> timerEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 GridViewSkin skin = (GridViewSkin) getCellsViewSkin();
@@ -1308,8 +1287,7 @@ public class SpreadsheetView extends Control {
                         skin.getVBar().decrement();
                 }
             }
-        }));
-
+        };
         /**
          * When the drag is over, we remove the listener and stop the timer
          */
@@ -1322,6 +1300,45 @@ public class SpreadsheetView extends Control {
             }
         };
 
+        private final EventHandler<KeyEvent> keyPressedEventHandler = new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+                key = true;
+                ctrl = t.isControlDown();
+                shift = t.isShiftDown();
+            }
+        };
+        private final EventHandler<MouseEvent> mousePressedEventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                key = false;
+                ctrl = t.isControlDown();
+                shift = t.isShiftDown();
+            }
+        };
+        
+        private final EventHandler<MouseEvent> onDragDetectedEventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+                cellsView.addEventHandler(MouseEvent.MOUSE_RELEASED, dragDoneHandler);
+                drag = true;
+                timer.setCycleCount(Timeline.INDEFINITE);
+                timer.play();
+            }
+        };
+        private final EventHandler<MouseEvent> onMouseDragEventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+                mouseEvent = e;
+            }
+        };
+        private final ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>> listChangeListener = new ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
+            @Override
+            public void onChanged(
+                    final ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
+                handleSelectedCellsListChangeEvent(c);
+            }
+        };
         /***********************************************************************
          * 
          * Constructors
@@ -1331,48 +1348,16 @@ public class SpreadsheetView extends Control {
         public SpreadsheetViewSelectionModel(SpreadsheetView spreadsheetView) {
             super(spreadsheetView.cellsView);
             final SpreadsheetGridView cellsView = spreadsheetView.cellsView;
-            cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent t) {
-                    key = true;
-                    ctrl = t.isControlDown();
-                    shift = t.isShiftDown();
-                }
-            });
+            timer = new Timeline(new KeyFrame(Duration.millis(100), new WeakEventHandler<>((timerEventHandler))));
+            cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new WeakEventHandler<>(keyPressedEventHandler));
 
-            cellsView.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent t) {
-                    key = false;
-                    ctrl = t.isControlDown();
-                    shift = t.isShiftDown();
-                }
-            });
-            cellsView.setOnDragDetected(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent e) {
-                    cellsView.addEventHandler(MouseEvent.MOUSE_RELEASED, dragDoneHandler);
-                    drag = true;
-                    timer.setCycleCount(Timeline.INDEFINITE);
-                    timer.play();
-                }
-            });
+            cellsView.setOnMousePressed(new WeakEventHandler<>(mousePressedEventHandler));
+            cellsView.setOnDragDetected(new WeakEventHandler<>(onDragDetectedEventHandler));
 
-            cellsView.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent e) {
-                    mouseEvent = e;
-                }
-            });
+            cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));
 
-            selectedCellsMap = new SelectedCellsMap<>(
-                    new ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
-                        @Override
-                        public void onChanged(
-                                final Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
-                            handleSelectedCellsListChangeEvent(c);
-                        }
-                    });
+            selectedCellsMap = new SelectedCellsMap<>(new WeakListChangeListener<>(listChangeListener));
+                    
 
             selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
                 @Override
@@ -1964,12 +1949,33 @@ public class SpreadsheetView extends Control {
 
         return letter;
     }
-    /*
-     * private EventHandler<GridChange> gridChangeEventHandler = new
-     * EventHandler<GridChange>() {
-     * 
-     * @Override public void handle(GridChange change) {
-     * modifiedCells.add(getGrid
-     * ().getRows().get(change.getRow()).get(change.getColumn())); } };
-     */
+    
+    private final ChangeListener<ContextMenu> contextMenuChangeListener = new ChangeListener<ContextMenu>() {
+        
+        @Override
+        public void changed(ObservableValue<? extends ContextMenu> arg0, ContextMenu oldContextMenu, final ContextMenu newContextMenu) {
+            if(oldContextMenu !=null){
+                oldContextMenu.setOnShowing(null);
+            }
+            if(newContextMenu != null){
+                newContextMenu.setOnShowing(new WeakEventHandler<>(hideContextMenuEventHandler));
+            }
+        }
+    };
+    
+    private final EventHandler<WindowEvent> hideContextMenuEventHandler = new EventHandler<WindowEvent>() {
+        @Override
+        public void handle(WindowEvent arg0) {
+            // We don't want to open a contextMenu when editing
+            // because editors
+            // have their own contextMenu
+            if (getEditingCell() != null) {
+                // We're being reactive but we want to be pro-active
+                // so we may need a work-around.
+                Platform.runLater(()->{
+                    getContextMenu().hide();
+                });
+            }
+        }
+    };
 }

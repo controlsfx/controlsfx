@@ -48,6 +48,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import javafx.event.WeakEventHandler;
 
 /**
  * The set of horizontal (column) headers.
@@ -91,33 +92,30 @@ public class HorizontalHeader extends TableHeaderRow {
         //Fixed Column listener to change style of header
         view.getFixedColumns().addListener(fixedColumnsListener);
 
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                //We are doing that because some columns may be already fixed.
-                for (SpreadsheetColumn column : view.getFixedColumns()) {
-                    fixColumn(column);
-                }
-                requestLayout();
-                /**
-                 * Clicking on header select the cell situated in that column.
-                 * This may be replaced by selecting the entire Column/Row.
-                 */
-                for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-                    i.getChildrenUnmodifiable().get(0).setOnMousePressed(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent arg0) {
-                            if (arg0.isPrimaryButtonDown()) {
-                                TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
-                                TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
-                                sm.clearAndSelect(fm.getFocusedCell().getRow(), i.getTableColumn());
-                            }
-                        }
-                    });
-                }
+        Platform.runLater(()->{
+             //We are doing that because some columns may be already fixed.
+            for (SpreadsheetColumn column : view.getFixedColumns()) {
+                fixColumn(column);
             }
-        };
-        Platform.runLater(r);
+            requestLayout();
+            /**
+             * Clicking on header select the cell situated in that column.
+             * This may be replaced by selecting the entire Column/Row.
+             */
+            for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
+                EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent arg0) {
+                        if (arg0.isPrimaryButtonDown()) {
+                            TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+                            TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
+                            sm.clearAndSelect(fm.getFocusedCell().getRow(), i.getTableColumn());
+                        }
+                    }
+                };
+                i.getChildrenUnmodifiable().get(0).setOnMousePressed(new WeakEventHandler<>(mouseEventHandler));
+            }
+        });
         
         /**
          * When we are setting a new Grid (model) on the SpreadsheetView, it 

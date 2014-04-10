@@ -51,6 +51,7 @@ import org.controlsfx.control.RangeSlider;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.traversal.Direction;
+import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import com.sun.javafx.scene.traversal.TraversalEngine;
 
 public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBehavior> {
@@ -134,7 +135,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                     if (lowThumb.isFocused()) {
                         if (event.isShiftDown()) {
                             lowThumb.setFocus(false);
-                            new TraversalEngine(rangeSlider, false).trav(rangeSlider, Direction.PREVIOUS);
+                            new ParentTraversalEngine(rangeSlider).select(rangeSlider, Direction.PREVIOUS);
                         } else {
                             lowThumb.setFocus(false);
                             highThumb.setFocus(true);
@@ -146,7 +147,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                             lowThumb.setFocus(true);
                         } else {
                             highThumb.setFocus(false);
-                            new TraversalEngine(rangeSlider, false).trav(rangeSlider, Direction.NEXT);
+                            new ParentTraversalEngine(rangeSlider).select(rangeSlider, Direction.NEXT);
                         }
                         event.consume();
                     }

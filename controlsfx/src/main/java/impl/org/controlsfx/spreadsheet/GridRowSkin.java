@@ -92,7 +92,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             return;
         }
         control.setOpacity(1);
-        checkState(true);
+//        checkState(true);
         if (cellsMap.isEmpty()) { return; }
 
         final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = getVisibleLeafColumns();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014  ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.TableCellSkin;
+import javafx.beans.value.WeakChangeListener;
 
 /**
  * 
@@ -58,21 +59,10 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
         super(tableCell);
-        tableCell.itemProperty().addListener(new ChangeListener<SpreadsheetCell>() {
-            @Override
-            public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
-                    SpreadsheetCell newCell) {
-                if (oldCell != null) {
-                    oldCell.commentedProperty().removeListener(triangleListener);
-                }
-                if (newCell != null) {
-                    newCell.commentedProperty().addListener(triangleListener);
-                }
-            }
-        });
+        tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
 
         if (tableCell.getItem() != null) {
-            tableCell.getItem().commentedProperty().addListener(triangleListener);
+            tableCell.getItem().commentedProperty().addListener(new WeakChangeListener<>(triangleListener));
         }
     }
 
@@ -103,10 +93,23 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         getSkinnable().requestLayout();
     }
 
-    private ChangeListener<Boolean> triangleListener = new ChangeListener<Boolean>() {
+    private final ChangeListener<Boolean> triangleListener = new ChangeListener<Boolean>() {
         @Override
         public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
             getSkinnable().requestLayout();
+        }
+    };
+    
+    private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
+        @Override
+        public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
+                SpreadsheetCell newCell) {
+            if (oldCell != null) {
+                oldCell.commentedProperty().removeListener(triangleListener);
+            }
+            if (newCell != null) {
+                newCell.commentedProperty().addListener(new WeakChangeListener<>(triangleListener));
+            }
         }
     };
 }

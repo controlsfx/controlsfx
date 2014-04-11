@@ -64,13 +64,6 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     private SpreadsheetView spreadSheetView;
     private final GridViewSkin gridViewSkin;
     /**
-     * Variable used for improvement;
-     */
-//    private int firstIndex = -1;
-//    private double previousHbarValue = -1;
-//    private double previousHBarAmount = -1;
-//    private boolean copyPaste = true;//We're copy/pasting so layout is necessary
-    /**
      * Store the fixedRow in order to place them at the top when necessary.
      * That is to say, when the VirtualFlow has not already placed one.
      */
@@ -211,23 +204,6 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             reconfigureCells();
         }
         
-        //FIXME This is put on hold until performance review.
-        
-        /*//We do not need to layout if nothing has changed really..
-        //FIXME This will be improved for performance.
-        T firstCell = getFirstVisibleCellWithinViewPort();
-        int newFirstIndex = firstCell != null? firstCell.getIndex(): -2;
-        if(copyPaste &&
-        		newFirstIndex == firstIndex 
-        		&& previousHbarValue == getHbar().getValue() 
-        		&& previousHBarAmount == getHbar().getVisibleAmount()){
-        	return;
-        }
-        
-        firstIndex = newFirstIndex;
-        previousHbarValue = getHbar().getValue();
-        previousHBarAmount = getHbar().getVisibleAmount();*/
-        
         for (GridRow cell : (List<GridRow>)getCells()) {
             if (cell != null &&  (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
                 cell.requestLayout();
@@ -274,13 +250,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             rows:
             for (int i = spreadSheetView.getFixedRows().size() - 1; i >= 0; i--) {
                 fixedRowIndex = spreadSheetView.getFixedRows().get(i);
+                T lastCell = getLastVisibleCellWithinViewPort();
                 //If the fixed row is out of bounds
-                if (fixedRowIndex > getLastVisibleCellWithinViewPort().getIndex()) {
+                if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {
                     if (cell != null) {
                         cell.setVisible(false);
                         cell.setManaged(false);
                     }
-                    continue rows;
+                    continue;
                 }
 
                 //We see if the row is laid out by the VirtualFlow

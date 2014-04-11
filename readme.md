@@ -4,11 +4,12 @@
 
 ## Build Status
 
-ControlsFX: ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX)
+|                                                                                                                 |
+|--------------------|--------------------------------------------------------------------------------------------|
+| ControlsFX         | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX)         |
+| ControlsFX Samples | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX Samples) |
+| FXSampler          | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=FXSampler)          |                                                                              |
 
-ControlsFX Samples: ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX Samples)
-
-FXSampler: ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=FXSampler)
 
 ## Overview
 

@@ -582,7 +582,11 @@ public class HelloDialog extends ControlsFXSample {
 		grid.add(createLabel("Locale: ", "property"), 0, row);
 		final ComboBox<Locale> localeCombobox = new ComboBox<Locale>();
 		localeCombobox.getItems()
-				.addAll(Locale.ENGLISH, new Locale("ru", "RU"));
+				.addAll(Locale.ENGLISH,
+                                        new Locale("ru", "RU"),
+                                        Locale.FRENCH,
+                                        new Locale("es","ES"),
+                                        new Locale("pt","PT"));
 		localeCombobox.valueProperty().addListener(
 				new ChangeListener<Locale>() {
 					@Override

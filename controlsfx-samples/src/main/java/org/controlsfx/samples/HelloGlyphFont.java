@@ -26,10 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
-
-import java.util.Map;
-
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -38,11 +34,14 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
+import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
+
+import java.util.Map;
 
 public class HelloGlyphFont extends ControlsFXSample {
 
@@ -92,10 +91,19 @@ public class HelloGlyphFont extends ControlsFXSample {
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);
+
+        Glyph effectGlyph = icoMoon.fontColor(Color.BLUE).fontSize(48).create(IM_UNDERSCORED);
+        effectGlyph.getStyleClass().addAll(Glyph.STYLE_HOVER_EFFECT);
+
+        Glyph effectGlyph2 = icoMoon.fontColor(Color.BLUE).fontSize(48).create(IM_UNDERSCORED);
+        effectGlyph2.getStyleClass().addAll(Glyph.STYLE_GRADIENT, Glyph.STYLE_HOVER_EFFECT);
+
 		toolbar = new ToolBar(
 				new Button("", icoMoon.fontSize(16).create(IM_BOLD)),
 				new Button("", icoMoon.fontColor(Color.GREEN).fontSize(32).create(IM_UNDERSCORED)), 
-				new Button("", icoMoon.fontSize(48).create(IM_ITALIC)));
+				new Button("", icoMoon.fontSize(48).create(IM_ITALIC)),
+                new Button("", effectGlyph),
+                new Button("", effectGlyph2));
 		root.getChildren().add(toolbar);
 		return root;
 

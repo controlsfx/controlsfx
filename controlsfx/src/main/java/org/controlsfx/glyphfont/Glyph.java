@@ -39,6 +39,10 @@ import javafx.scene.paint.Color;
  */
 public class Glyph extends Label implements Duplicatable<Glyph>{
 
+
+    public final static String STYLE_GRADIENT = "gradient";
+    public final static String STYLE_HOVER_EFFECT = "hover-effect";
+
     private final String fontFamily;
     private final Character character;
     private double size;

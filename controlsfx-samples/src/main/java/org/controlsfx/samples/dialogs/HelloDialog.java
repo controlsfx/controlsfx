@@ -265,7 +265,7 @@ public class HelloDialog extends ControlsFXSample {
 								.masthead(
 										isMastheadVisible() ? "Exception Encountered"
 												: null)).showException(
-						new RuntimeException("Pending Bad Decision Exception"));
+						new RuntimeException("Exception text"));
 
 				System.out.println("response: " + response);
 			}

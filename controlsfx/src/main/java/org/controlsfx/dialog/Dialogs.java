@@ -533,6 +533,12 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.ERROR);
         dlg.setContent(message != null && ! message.isEmpty() ? message : exception.getMessage());
         dlg.setExpandableContent(buildExceptionDetails(exception));
+        
+        if ( !actions.isEmpty()) {
+            dlg.getActions().clear();
+            dlg.getActions().addAll(actions);
+        }
+        
         return dlg.show();
     }
     
@@ -546,6 +552,8 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.ERROR);
         dlg.setContent(exception.getMessage());
         
+        dlg.getActions().clear();
+        
         Action openExceptionAction = new AbstractAction("Open Exception") {
             @Override public void execute(ActionEvent ae) {
                 StringWriter sw = new StringWriter();
@@ -557,6 +565,10 @@ public final class Dialogs {
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
+        
+        if ( !actions.isEmpty()) {
+            dlg.getActions().addAll(actions);
+        }
         
         return dlg.show();
     }

@@ -531,7 +531,7 @@ public final class Dialogs {
      */
     public Action showException(Throwable exception) {
         Dialog dlg = buildDialog(Type.ERROR);
-        dlg.setContent(message);
+        dlg.setContent(message != null && ! message.isEmpty() ? message : exception.getMessage());
         dlg.setExpandableContent(buildExceptionDetails(exception));
         return dlg.show();
     }

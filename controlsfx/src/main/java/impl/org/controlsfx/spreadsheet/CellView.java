@@ -31,8 +31,10 @@ import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
+import javafx.collections.WeakSetChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
@@ -82,49 +84,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     public CellView(SpreadsheetHandle handle) {
         this.handle = handle;
-        hoverProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
-                final int row = getIndex();
-                if (getItem() == null) {
-                    getTableRow().requestLayout();
-                    // We only need to re-route if the rowSpan is large because
-                    // it's the only case where it's not handled correctly.
-                } else if (getItem().getRowSpan() > 1) {
-                    // If we are not at the top of the Spanned Cell
-                    if (t1 && row != getItem().getRow()) {
-                        hoverGridCell(getItem());
-                    } else if (!t1 && row != getItem().getRow()) {
-                        unHoverGridCell();
-                    }
-                }
-            }
-        });
+        hoverProperty().addListener(hoverChangeListener);
         // When we detect a drag, we start the Full Drag so that other event
         // will be fired
         this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
 
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
-        this.itemProperty().addListener(new ChangeListener<SpreadsheetCell>() {
-
-            @Override
-            public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldItem,
-                    SpreadsheetCell newItem) {
-                if (oldItem != null) {
-                    oldItem.getStyleClass().removeListener(styleClassListener);
-                    oldItem.graphicProperty().removeListener(graphicListener);
-                }
-                if (newItem != null) {
-                    getStyleClass().clear();
-                    getStyleClass().setAll(newItem.getStyleClass());
-
-                    newItem.getStyleClass().addListener(styleClassListener);
-                    setCellGraphic(newItem);
-                    newItem.graphicProperty().addListener(graphicListener);
-                }
-            }
-        });
+        itemProperty().addListener(itemChangeListener);
         heightProperty().addListener(wrapHeightChangeListener);
     }
 
@@ -425,14 +392,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    private ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
+    private final ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
         @Override
         public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node newGraphic) {
             setCellGraphic(getItem());
         }
     };
 
-    private SetChangeListener<String> styleClassListener = new SetChangeListener<String>() {
+    private final WeakChangeListener<Node> weakGraphicListener = new WeakChangeListener<>(graphicListener);
+    
+    private final SetChangeListener<String> styleClassListener = new SetChangeListener<String>() {
         @Override
         public void onChanged(javafx.collections.SetChangeListener.Change<? extends String> arg0) {
             if (arg0.wasAdded()) {
@@ -442,7 +411,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
         }
     };
-
+    
+    private final WeakSetChangeListener<String> weakStyleClassListener = new WeakSetChangeListener<>(styleClassListener);
+    
     /**
      * Method that will select all the cells between the drag place and that
      * cell.
@@ -549,6 +520,44 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         @Override
         public void handle(MouseEvent arg0) {
             dragSelect(arg0);
+        }
+    };
+    
+    private final ChangeListener<Boolean> hoverChangeListener = new ChangeListener<Boolean>() {
+        @Override
+        public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
+            final int row = getIndex();
+            if (getItem() == null) {
+                getTableRow().requestLayout();
+                // We only need to re-route if the rowSpan is large because
+                // it's the only case where it's not handled correctly.
+            } else if (getItem().getRowSpan() > 1) {
+                // If we are not at the top of the Spanned Cell
+                if (t1 && row != getItem().getRow()) {
+                    hoverGridCell(getItem());
+                } else if (!t1 && row != getItem().getRow()) {
+                    unHoverGridCell();
+                }
+            }
+        }
+    };
+    private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
+
+        @Override
+        public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldItem,
+                SpreadsheetCell newItem) {
+            if (oldItem != null) {
+                oldItem.getStyleClass().removeListener(weakStyleClassListener);
+                oldItem.graphicProperty().removeListener(weakGraphicListener);
+            }
+            if (newItem != null) {
+                getStyleClass().clear();
+                getStyleClass().setAll(newItem.getStyleClass());
+
+                newItem.getStyleClass().addListener(weakStyleClassListener);
+                setCellGraphic(newItem);
+                newItem.graphicProperty().addListener(weakGraphicListener);
+            }
         }
     };
 }

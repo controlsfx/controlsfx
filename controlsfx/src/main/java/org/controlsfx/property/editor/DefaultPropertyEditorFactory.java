@@ -46,11 +46,11 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
             return Editors.createCheckEditor(item);
         }
 
-        if (type != null && type.equals(LocalDate.class)) {
+        if (/*type != null &&*/type == LocalDate.class) {
             return Editors.createDateEditor(item);
         }
         
-        if (type != null && type.equals(Color.class)) {
+        if (/*type != null &&*/type == Color.class) {
             return Editors.createColorEditor(item);
         }
 
@@ -58,7 +58,7 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
             return Editors.createChoiceEditor(item, Arrays.<Object>asList(type.getEnumConstants()));
         }
         
-        if (type != null && type == Font.class) {
+        if (/*type != null &&*/type == Font.class) {
             return Editors.createFontEditor(item);
         }
         

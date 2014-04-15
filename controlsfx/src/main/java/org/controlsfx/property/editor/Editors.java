@@ -1,13 +1,13 @@
 package org.controlsfx.property.editor;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Collection;
-
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.scene.control.CheckBox;
@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-
+import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
 
@@ -160,18 +160,42 @@ public class Editors {
             }
         };
         
-    }    
+    }
+    
+    public static final Optional<PropertyEditor<?>> createCustomEditor( Item property ) {
+        
+        if (property.getPropertyEditorClass().isPresent()) {
+
+            PropertyEditor<?> ed = null;
+            
+            Class<? extends PropertyEditor> c = property.getPropertyEditorClass().get();
+
+            Constructor cn;
+            try {
+                cn = c.getConstructor(PropertySheet.Item.class);
+                if (cn != null) {
+                    ed = (PropertyEditor<?>) cn.newInstance(property);
+                }
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
+            
+            if (ed != null) {
+                return Optional.of(ed);
+            }
+            
+        }
+        return Optional.empty();
+        
+    }
+    
     
     private static void enableAutoSelectAll(final TextInputControl control) {
-        control.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override public void changed(ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    Platform.runLater(new Runnable() {
-                        @Override public void run() {
-                            control.selectAll();
-                        }
-                    });
-                }
+        control.focusedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) -> {
+            if (newValue) {
+                Platform.runLater(() -> {
+                    control.selectAll();
+                });
             }
         });
     }

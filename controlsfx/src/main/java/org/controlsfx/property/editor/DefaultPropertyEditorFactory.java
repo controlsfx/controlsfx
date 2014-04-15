@@ -4,11 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Arrays;
-
+import java.util.Optional;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
-
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 
@@ -29,6 +28,12 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
         Class<?> type = item.getType();
         
         //TODO: add support for char and collection editors
+        
+        if (item.getPropertyEditorClass().isPresent()) {
+            Optional<PropertyEditor<?>> ed = Editors.createCustomEditor(item);
+            if (ed.isPresent()) return ed.get();
+        }
+        
         if (/*type != null &&*/ type == String.class) {
             return Editors.createTextEditor(item);  
         }
@@ -41,11 +46,11 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
             return Editors.createCheckEditor(item);
         }
 
-        if (type != null && type.isAssignableFrom(LocalDate.class)) {
+        if (type != null && type.equals(LocalDate.class)) {
             return Editors.createDateEditor(item);
         }
-
-        if (type != null && type.isAssignableFrom(Color.class)) {
+        
+        if (type != null && type.equals(Color.class)) {
             return Editors.createColorEditor(item);
         }
 

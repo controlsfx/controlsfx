@@ -163,13 +163,9 @@ public class Editors {
     }
     
     public static final Optional<PropertyEditor<?>> createCustomEditor( Item property ) {
-        
         if (property.getPropertyEditorClass().isPresent()) {
-
             PropertyEditor<?> ed = null;
-            
             Class<? extends PropertyEditor> c = property.getPropertyEditorClass().get();
-
             Constructor cn;
             try {
                 cn = c.getConstructor(PropertySheet.Item.class);
@@ -179,16 +175,12 @@ public class Editors {
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 ex.printStackTrace();
             }
-            
             if (ed != null) {
                 return Optional.of(ed);
             }
-            
         }
         return Optional.empty();
-        
     }
-    
     
     private static void enableAutoSelectAll(final TextInputControl control) {
         control.focusedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) -> {

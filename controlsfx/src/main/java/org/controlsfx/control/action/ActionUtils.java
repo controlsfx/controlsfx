@@ -140,6 +140,11 @@ public class ActionUtils {
         return configure(new Button(), action, ActionTextBehavior.SHOW);
     }
     
+	
+	public static Button configureButton(final Action action, Button button) {
+        return configure(button, action, ActionTextBehavior.SHOW);
+    }
+	
     
     /**
      * Takes the provided {@link Action} and returns a {@link MenuButton} instance

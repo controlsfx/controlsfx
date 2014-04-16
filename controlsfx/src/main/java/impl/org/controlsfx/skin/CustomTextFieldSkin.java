@@ -26,17 +26,17 @@
  */
 package impl.org.controlsfx.skin;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
-
-import org.controlsfx.control.textfield.CustomTextField;
 
 import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
 import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
-public class CustomTextFieldSkin extends TextFieldSkin {
+public abstract class CustomTextFieldSkin extends TextFieldSkin {
     
     private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes"); //$NON-NLS-1$
     private static final PseudoClass HAS_LEFT_NODE = PseudoClass.getPseudoClass("left-node-visible"); //$NON-NLS-1$
@@ -47,18 +47,21 @@ public class CustomTextFieldSkin extends TextFieldSkin {
     private Node right;
     private StackPane rightPane;
     
-    private final CustomTextField control;
+    private final TextField control;
     
-    public CustomTextFieldSkin(final CustomTextField control) {
+    public CustomTextFieldSkin(final TextField control) {
         super(control, new TextFieldBehavior(control));
         
         this.control = control;
         updateChildren();
         
-        registerChangeListener(control.leftProperty(), "LEFT_NODE"); //$NON-NLS-1$
-        registerChangeListener(control.rightProperty(), "RIGHT_NODE"); //$NON-NLS-1$
+        registerChangeListener(leftProperty(), "LEFT_NODE"); //$NON-NLS-1$
+        registerChangeListener(rightProperty(), "RIGHT_NODE"); //$NON-NLS-1$
         registerChangeListener(control.focusedProperty(), "FOCUSED"); //$NON-NLS-1$
     }
+    
+    public abstract ObjectProperty<Node> leftProperty();
+    public abstract ObjectProperty<Node> rightProperty();
     
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
@@ -69,7 +72,7 @@ public class CustomTextFieldSkin extends TextFieldSkin {
     }
     
     private void updateChildren() {
-        Node newLeft = control.getLeft();
+        Node newLeft = leftProperty().get();
         if (newLeft != null) {
             leftPane = new StackPane(newLeft);
             leftPane.setAlignment(Pos.CENTER_LEFT);
@@ -79,7 +82,7 @@ public class CustomTextFieldSkin extends TextFieldSkin {
             left = newLeft;
         }
         
-        Node newRight = control.getRight();
+        Node newRight = rightProperty().get();
         if (newRight != null) {
             rightPane = new StackPane(newRight);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
@@ -122,14 +125,8 @@ public class CustomTextFieldSkin extends TextFieldSkin {
         final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
         final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
         
-//        return textField.prefWidth(h) + leftInset + rightInset;
         return pw + leftWidth + rightWidth + leftInset + rightInset;
     }
-    
-//    @Override
-//    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-//        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
-//    }
     
     @Override
     protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {

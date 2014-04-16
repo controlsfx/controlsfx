@@ -89,7 +89,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         new ActionChangeMode(Mode.NAME),
         new ActionChangeMode(Mode.CATEGORY)
     );
-    private final TextField searchField = TextFields.createSearchField();
+    private final TextField searchField = TextFields.createClearableTextField();
     
     
     /**************************************************************************

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,30 +30,22 @@ import impl.org.controlsfx.skin.CustomTextFieldSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TextField;
 
 /**
- * A base class for people wanting to customize a {@link TextField} to contain nodes
- * inside the text field itself, without being on top of the users typed-in text.
+ * A base class for people wanting to customize a {@link PasswordField} to contain nodes
+ * inside the input field area itself, without being on top of the users typed-in text.
  * 
- * <h3>Screenshot</h3>
- * <p>The following screenshot is taken from the HelloControlsFX sample application,
- * and shows a normal TextField, with a {@link TextFields#createClearableTextField() clearable text field},
- * followed by three CustomTextFields. Note what happens with long text input - 
- * it is prevented from going beneath the left and right graphics. Of course, if 
- * the keyboard caret moves to the right, the text will become visible, but this
- * is because it will all scroll to the left (as is the case in a normal {@link TextField}.
+ * <p>Whilst not exactly the same, refer to the {@link CustomTextField} javadoc
+ * for a screenshot and more detail. The obvious difference is that of course
+ * the CustomPasswordField masks the input from users, but in all other ways
+ * is equivalent to {@link CustomTextField}.
  * 
- * <br/>
- * <center>
- * <img src="customTextField.png" />
- * </center>
- * 
- * @see TextFields
  * @see CustomPasswordField
+ * @see TextFields
  */
-public class CustomTextField extends TextField {
+public class CustomPasswordField extends PasswordField {
 
     /**************************************************************************
      * 
@@ -71,10 +63,10 @@ public class CustomTextField extends TextField {
      **************************************************************************/
     
     /**
-     * Instantiates a default CustomTextField.
+     * Instantiates a default CustomPasswordField.
      */
-    public CustomTextField() {
-        getStyleClass().add("custom-text-field"); //$NON-NLS-1$
+    public CustomPasswordField() {
+        getStyleClass().addAll("custom-text-field", "custom-password-field"); //$NON-NLS-1$
     }
 
     
@@ -90,7 +82,7 @@ public class CustomTextField extends TextField {
     
     /**
      * Property representing the {@link Node} that is placed on the left of
-     * the text field.
+     * the password field.
      */
     public final ObjectProperty<Node> leftProperty() {
         return left;
@@ -110,7 +102,7 @@ public class CustomTextField extends TextField {
     
     /**
      * Property representing the {@link Node} that is placed on the right of
-     * the text field.
+     * the password field.
      */
     public final ObjectProperty<Node> rightProperty() {
         return right;
@@ -138,11 +130,11 @@ public class CustomTextField extends TextField {
     @Override protected Skin<?> createDefaultSkin() {
         return new CustomTextFieldSkin(this) {
             @Override public ObjectProperty<Node> leftProperty() {
-                return CustomTextField.this.leftProperty();
+                return CustomPasswordField.this.leftProperty();
             }
             
             @Override public ObjectProperty<Node> rightProperty() {
-                return CustomTextField.this.rightProperty();
+                return CustomPasswordField.this.rightProperty();
             }
         };
     }
@@ -153,4 +145,5 @@ public class CustomTextField extends TextField {
     @Override protected String getUserAgentStylesheet() {
         return CustomTextField.class.getResource("customtextfield.css").toExternalForm(); //$NON-NLS-1$
     }
+    
 }

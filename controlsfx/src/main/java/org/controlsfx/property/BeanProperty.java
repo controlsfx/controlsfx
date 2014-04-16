@@ -30,10 +30,12 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.property.editor.PropertyEditor;
 
 /**
  * A convenience class for creating a {@link Item} for use in the 
@@ -50,6 +52,7 @@ public class BeanProperty implements PropertySheet.Item {
     private final Object bean;
     private final PropertyDescriptor beanPropertyDescriptor;
     private final Method readMethod;
+    private boolean editable = true;
 
     public BeanProperty(Object bean, PropertyDescriptor propertyDescriptor) {
         this.bean = bean;
@@ -122,5 +125,30 @@ public class BeanProperty implements PropertySheet.Item {
     public PropertyDescriptor getPropertyDescriptor() {
         return beanPropertyDescriptor;
     }
-
+    
+    /** {@inheritDoc} */
+    @Override public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+        
+        if (beanPropertyDescriptor.getPropertyEditorClass() != null && 
+                PropertyEditor.class.isAssignableFrom(beanPropertyDescriptor.getPropertyEditorClass())) {
+            
+            return Optional.of((Class<PropertyEditor>)beanPropertyDescriptor.getPropertyEditorClass());
+        }
+        
+        return Item.super.getPropertyEditorClass();
+    }
+    
+    /** {@inheritDoc} */
+    @Override public boolean isEditable() {
+        return editable;
+    }
+    
+    /**
+     * @param editable Whether this property should be editable in the PropertySheet.
+     */
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+    
+    
 }

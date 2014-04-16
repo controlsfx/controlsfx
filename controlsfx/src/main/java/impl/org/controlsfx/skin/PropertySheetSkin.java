@@ -352,6 +352,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                         getEditor().setText(value == null? "": value.toString());
                     }
                 };
+            } else if (! item.isEditable()) {
+                editor.getEditor().setDisable(true);
             }
             editor.setValue(item.getValue());
             return editor.getEditor();

@@ -65,7 +65,7 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
      * @param control The control that is responsible for editing the property.
      */
     public AbstractPropertyEditor(Item property, C control) {
-        this(property, control, false);
+        this(property, control, ! property.isEditable());
     }
     
     /**
@@ -81,10 +81,8 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
         this.control = control;
         this.property = property;
         if (! readonly) {
-            getObservableValue().addListener(new ChangeListener<Object>() {
-                @Override public void changed(ObservableValue<? extends Object> o, Object oldValue, Object newValue) {
-                    AbstractPropertyEditor.this.property.setValue(getValue());
-                }
+            getObservableValue().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
+                AbstractPropertyEditor.this.property.setValue(getValue());
             });
         }
     }

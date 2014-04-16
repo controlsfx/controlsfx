@@ -64,7 +64,7 @@ public final class BeanPropertyUtils {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
             for (PropertyDescriptor p : beanInfo.getPropertyDescriptors()) {
-                if (isProperty(p)) {
+                if (isProperty(p) && ! p.isHidden()) {
                     list.add(new BeanProperty(bean, p));
                 }
             }

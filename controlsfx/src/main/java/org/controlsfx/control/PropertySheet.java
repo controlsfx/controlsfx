@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
+import java.util.Optional;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -35,7 +36,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
-
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
 import org.controlsfx.property.editor.PropertyEditor;
@@ -161,6 +161,27 @@ public class PropertySheet extends Control {
          * Sets the current value of the property.
          */
         public void setValue(Object value);
+        
+        /**
+         * Returns an Optional wrapping the class of the PropertyEditor that 
+         * should be used for editing this item. The default implementation 
+         * returns Optional.empty()
+         * 
+         * The class must have a constructor that can accept a single argument 
+         * of type PropertySheet.Item
+         */
+        default public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+            return Optional.empty();
+        }
+        
+        /**
+         *  Indicates whether the PropertySheet should allow editing of this 
+         * property, or whether it is read-only. The default implementation 
+         * returns true.
+         */
+        default public boolean isEditable() {
+            return true;
+        }
    }
     
     

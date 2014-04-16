@@ -9,10 +9,11 @@ import java.util.Collection;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.event.EventHandler;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
@@ -46,9 +47,24 @@ public class TextFields {
      * Creates a TextField that shows a clear button inside the TextField (on
      * the right hand side of it) when text is entered by the user.
      */
-    public static TextField createSearchField() {
-        final CustomTextField searchField = new CustomTextField();
-        searchField.getStyleClass().add("search-field"); //$NON-NLS-1$
+    public static TextField createClearableTextField() {
+        CustomTextField inputField = new CustomTextField();
+        setupClearButtonField(inputField, inputField.rightProperty());
+        return inputField;
+    }
+    
+    /**
+     * Creates a PasswordField that shows a clear button inside the PasswordField
+     * (on the right hand side of it) when text is entered by the user.
+     */
+    public static PasswordField createClearablePasswordField() {
+        CustomPasswordField inputField = new CustomPasswordField();
+        setupClearButtonField(inputField, inputField.rightProperty());
+        return inputField;
+    }
+    
+    private static void setupClearButtonField(TextField inputField, ObjectProperty<Node> rightProperty) {
+        inputField.getStyleClass().add("clearable-field"); //$NON-NLS-1$
 
         Region clearButton = new Region();
         clearButton.getStyleClass().addAll("graphic"); //$NON-NLS-1$
@@ -56,23 +72,16 @@ public class TextFields {
         clearButtonPane.getStyleClass().addAll("clear-button"); //$NON-NLS-1$
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
+        clearButtonPane.setOnMouseReleased(e -> inputField.clear());
 
-        clearButtonPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent e) {
-                searchField.clear();
-            }
-        });
-
-        searchField.setRight(clearButtonPane);
+        rightProperty.set(clearButtonPane);
 
         final FadeTransition fader = new FadeTransition(FADE_DURATION, clearButtonPane);
         fader.setCycleCount(1);
 
-        searchField.textProperty().addListener(new InvalidationListener() {
-
+        inputField.textProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
-                String text = searchField.getText();
+                String text = inputField.getText();
                 boolean isTextEmpty = text == null || text.isEmpty();
                 boolean isButtonVisible = fader.getNode().getOpacity() > 0;
 
@@ -89,10 +98,7 @@ public class TextFields {
                 fader.play();
             }
         });
-
-        return searchField;
     }
-
 
     /***************************************************************************
      *                                                                         *

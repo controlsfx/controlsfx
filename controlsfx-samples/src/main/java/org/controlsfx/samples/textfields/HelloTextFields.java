@@ -26,16 +26,20 @@
  */
 package org.controlsfx.samples.textfields;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
+import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.samples.Utils;
@@ -59,38 +63,64 @@ public class HelloTextFields extends ControlsFXSample {
         grid.setPadding(new Insets(30, 30, 0, 30));
         
         int row = 0;
+        
+        // TextField and PasswordField labels
+        Label textFieldLabel = new Label("TextField");
+        textFieldLabel.setFont(Font.font(24));
+        GridPane.setHalignment(textFieldLabel, HPos.CENTER);
+        Label passwordFieldLabel = new Label("PasswordField");
+        passwordFieldLabel.setFont(Font.font(24));
+        GridPane.setHalignment(passwordFieldLabel, HPos.CENTER);
+        grid.add(textFieldLabel, 1, row);
+        grid.add(passwordFieldLabel, 2, row);
+        row++;
 
-        // normal TextField
-        grid.add(new Label("Normal TextField: "), 0, row);
-        grid.add(new TextField(), 1, row++);
+        // normal TextField / PasswordField
+        grid.add(new Label("Normal TextField / PasswordField: "), 0, row);
+        grid.add(new TextField(), 1, row);
+        grid.add(new PasswordField(), 2, row++);
         
-        // SearchField
-        grid.add(new Label("SearchField: "), 0, row);
-        grid.add(TextFields.createSearchField(), 1, row++);
+        // Clearable*Field
+        grid.add(new Label("Clearable*Field: "), 0, row);
+        grid.add(TextFields.createClearableTextField(), 1, row);
+        grid.add(TextFields.createClearablePasswordField(), 2, row++);
         
-        // CustomTextField
-        grid.add(new Label("CustomTextField (no additional nodes): "), 0, row);
-        grid.add(new CustomTextField(), 1, row++);
+        // Custom*Field
+        grid.add(new Label("Custom*Field (no additional nodes): "), 0, row);
+        grid.add(new CustomTextField(), 1, row);
+        grid.add(new CustomPasswordField(), 2, row++);
         
-        // CustomTextField (w/ right node)
-        grid.add(new Label("CustomTextField (w/ right node): "), 0, row);
+        // Custom*Field (w/ right node)
+        grid.add(new Label("Custom*Field (w/ right node): "), 0, row);
         CustomTextField customTextField1 = new CustomTextField();
         customTextField1.setRight(new ImageView(image));
-        grid.add(customTextField1, 1, row++);
+        grid.add(customTextField1, 1, row);
         
-        // CustomTextField (w/ left node)
-        grid.add(new Label("CustomTextField (w/ left node): "), 0, row);
+        CustomPasswordField customPasswordField1 = new CustomPasswordField();
+        customPasswordField1.setRight(new ImageView(image));
+        grid.add(customPasswordField1, 2, row++);
+        
+        // Custom*Field (w/ left node)
+        grid.add(new Label("Custom*Field (w/ left node): "), 0, row);
         CustomTextField customTextField2 = new CustomTextField();
         customTextField2.setLeft(new ImageView(image));
-        grid.add(customTextField2, 1, row++);
+        grid.add(customTextField2, 1, row);
         
-        // CustomTextField (w/ left + right node)
-        grid.add(new Label("CustomTextField (w/ left + right node): "), 0, row);
+        CustomPasswordField customPasswordField2 = new CustomPasswordField();
+        customPasswordField2.setLeft(new ImageView(image));
+        grid.add(customPasswordField2, 2, row++);
+        
+        // Custom*Field (w/ left + right node)
+        grid.add(new Label("Custom*Field (w/ left + right node): "), 0, row);
         CustomTextField customTextField3 = new CustomTextField();
-        ImageView imageView = new ImageView(image);
-        customTextField3.setLeft(imageView);
+        customTextField3.setLeft(new ImageView(image));
         customTextField3.setRight(new ImageView(image));
-        grid.add(customTextField3, 1, row++);
+        grid.add(customTextField3, 1, row);
+        
+        CustomPasswordField customPasswordField3 = new CustomPasswordField();
+        customPasswordField3.setLeft(new ImageView(image));
+        customPasswordField3.setRight(new ImageView(image));
+        grid.add(customPasswordField3, 2, row++);
         
         return grid;
     }

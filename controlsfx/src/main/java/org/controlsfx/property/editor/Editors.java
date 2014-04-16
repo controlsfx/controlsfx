@@ -162,6 +162,18 @@ public class Editors {
         
     }
     
+    /**
+     * Static method used to create an instance of the custom editor returned 
+     * via a call to {@link PropertySheet.Item#getPropertyEditorClass()} 
+     * 
+     * The class returned must declare a constructor that takes a single 
+     * parameter of type PropertySheet.Item into which the parameter supplied 
+     * to this method will be passed.
+     * 
+     * @param property The {@link PropertySheet.Item} that this editor will be 
+     * associated with.
+     * @return The {@link PropertyEditor} wrapped in an {@link Optional}
+     */
     public static final Optional<PropertyEditor<?>> createCustomEditor(final Item property ) {
         return property.getPropertyEditorClass().map(cls -> {
             try {

@@ -162,24 +162,18 @@ public class Editors {
         
     }
     
-    public static final Optional<PropertyEditor<?>> createCustomEditor( Item property ) {
-        if (property.getPropertyEditorClass().isPresent()) {
-            PropertyEditor<?> ed = null;
-            Class<? extends PropertyEditor> c = property.getPropertyEditorClass().get();
-            Constructor cn;
+    public static final Optional<PropertyEditor<?>> createCustomEditor(final Item property ) {
+        return property.getPropertyEditorClass().map(cls -> {
             try {
-                cn = c.getConstructor(PropertySheet.Item.class);
+                Constructor cn = cls.getConstructor(PropertySheet.Item.class);
                 if (cn != null) {
-                    ed = (PropertyEditor<?>) cn.newInstance(property);
+                    return (PropertyEditor<?>) cn.newInstance(property);
                 }
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 ex.printStackTrace();
             }
-            if (ed != null) {
-                return Optional.of(ed);
-            }
-        }
-        return Optional.empty();
+            return null;
+        });
     }
     
     private static void enableAutoSelectAll(final TextInputControl control) {

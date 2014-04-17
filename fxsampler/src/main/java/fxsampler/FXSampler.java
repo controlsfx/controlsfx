@@ -46,7 +46,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -56,7 +55,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -64,7 +62,10 @@ import javafx.util.Callback;
 import fxsampler.model.EmptySample;
 import fxsampler.model.Project;
 import fxsampler.model.SampleTree.TreeNode;
+import fxsampler.model.WelcomePage;
 import fxsampler.util.SampleScanner;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 public class FXSampler extends Application {
     
@@ -143,10 +144,12 @@ public class FXSampler extends Application {
             @Override public void changed(ObservableValue<? extends TreeItem<Sample>> observable, TreeItem<Sample> oldValue, TreeItem<Sample> newSample) {
                 if (newSample == null) {
                     return;
-                } else if (newSample == root) {
-                    changeToWelcomeTab();
-                    return;
                 } else if (newSample.getValue() instanceof EmptySample) {
+                    Sample selectedSample = newSample.getValue();
+                    Project selectedProject = projectsMap.get(selectedSample.getSampleName());
+                    if(selectedProject != null) {
+                        changeToWelcomeTab(selectedProject.getWelcomePage());
+                    }
                     return;
                 }
                 selectedSample = newSample.getValue();
@@ -179,8 +182,15 @@ public class FXSampler extends Application {
         sourceTab.setContent(sourceWebView);
 
 
-        // by default we'll have a welcome message in the right-hand side
-        changeToWelcomeTab();
+        // by default we'll show the welcome message of first project in the tree
+        // if no projects are available, we'll show the default page
+        List<TreeItem<Sample>> projects = samplesTreeView.getRoot().getChildren();
+        if(!projects.isEmpty()) {
+            TreeItem<Sample> firstProject = projects.get(0);
+            samplesTreeView.getSelectionModel().select(firstProject);
+        } else {
+            changeToWelcomeTab(null);
+        }
 
         // put it all together
         Scene scene = new Scene(grid);
@@ -347,7 +357,16 @@ public class FXSampler extends Application {
         return SampleBase.buildSample(sample, stage);
     }
 
-    private void changeToWelcomeTab() {
+    private void changeToWelcomeTab(WelcomePage wPage) {
+        if(null == wPage) {
+            wPage = getDefaultWelcomePage();
+        }
+        welcomeTab = new Tab(wPage.getTitle());
+        welcomeTab.setContent(wPage.getContent());
+        tabPane.getTabs().setAll(welcomeTab);
+    }
+    
+    private WelcomePage getDefaultWelcomePage() {
         // line 1
         Label welcomeLabel1 = new Label("Welcome to FXSampler!");
         welcomeLabel1.setStyle("-fx-font-size: 2em; -fx-padding: 0 0 0 5;");
@@ -358,11 +377,7 @@ public class FXSampler extends Application {
                 + "by clicking on the options to the left.");
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
 
-        VBox initialVBox = new VBox(5, welcomeLabel1, welcomeLabel2);
-
-        welcomeTab = new Tab("Welcome!");
-        welcomeTab.setContent(initialVBox);
-
-        tabPane.getTabs().setAll(welcomeTab);
+        WelcomePage wPage = new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
+        return wPage;
     }
 }

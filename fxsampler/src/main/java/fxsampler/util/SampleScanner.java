@@ -39,7 +39,7 @@ public class SampleScanner {
         ILLEGAL_CLASS_NAMES.add("/com/javafx/main/NoJavaFXFallback.class");
     }
     
-    private static Map<String, String> packageToProjectMap = new HashMap<String, String>();
+    private static Map<String, FXSamplerProject> packageToProjectMap = new HashMap<>();
     static {
         System.out.println("Initialising FXSampler sample scanner...");
         System.out.println("\tDiscovering projects...");
@@ -49,7 +49,7 @@ public class SampleScanner {
         for (FXSamplerProject project : loader) {
             final String projectName = project.getProjectName();
             final String basePackage = project.getSampleBasePackage();
-            packageToProjectMap.put(basePackage, projectName);
+            packageToProjectMap.put(basePackage, project);
             System.out.println("\t\tFound project '" + projectName + 
                     "', with sample base package '" + basePackage + "'");
         }
@@ -101,11 +101,12 @@ public class SampleScanner {
             
             for (String key : packageToProjectMap.keySet()) {
                 if (packageName.contains(key)) {
-                    final String prettyProjectName = packageToProjectMap.get(key);
+                    final String prettyProjectName = packageToProjectMap.get(key).getProjectName();
                     
                     Project project;
                     if (! projectsMap.containsKey(prettyProjectName)) {
                         project = new Project(prettyProjectName, key);
+                        project.setWelcomePage(packageToProjectMap.get(key).getWelcomePage());
                         projectsMap.put(prettyProjectName, project);
                     } else {
                         project = projectsMap.get(prettyProjectName);

@@ -14,6 +14,9 @@ public class Project {
     // A Project has a Tree of samples
     private final SampleTree sampleTree;
     
+    // Pojo that holds the welcome tab content and title
+    private WelcomePage welcomePage;
+    
     public Project(String name, String basePackage) {
         this.name = name;
         this.basePackage = basePackage;
@@ -55,6 +58,16 @@ public class Project {
         return sampleTree;
     }
     
+    public void setWelcomePage(WelcomePage welcomePage) {
+        if(null != welcomePage) {
+            this.welcomePage = welcomePage;
+        }
+    }
+    
+    public WelcomePage getWelcomePage() {
+        return this.welcomePage;
+    }
+
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         

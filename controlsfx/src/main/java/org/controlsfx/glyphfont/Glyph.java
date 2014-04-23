@@ -26,18 +26,19 @@
  */
 package org.controlsfx.glyphfont;
 
-import org.controlsfx.tools.Duplicatable;
-
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.tools.Duplicatable;
 
 /**
  * Represents one glyph from the font.
  * The glyph is actually a label showing one character from the specified font. It can be used as 'graphic' on any UI
- * control or {@link Action}  
+ * control or {@link Action}
  *
  */
-public class Glyph extends Label implements Duplicatable<Glyph>{
+public class Glyph extends Label implements Duplicatable<Glyph> {
 
 
     public final static String STYLE_GRADIENT = "gradient";
@@ -70,19 +71,41 @@ public class Glyph extends Label implements Duplicatable<Glyph>{
     /**
      * Sets glyph size in pixels
      * @param size
+     * @return Returns this instance for fluent API
      */
-    public void setSize(double size) {
+    public Glyph setSize(double size) {
         this.size = size;
         updateStyle();
+        return this;
     }
     
     /**
      * Sets glyph color
      * @param color
+     * @return Returns this instance for fluent API
      */
-    public void setColor(Color color) {
+    public Glyph setColor(Color color) {
         this.color = color;
         updateStyle();
+        return this;
+    }
+
+    /**
+     * Adds the hover effect style
+     * @return Returns this instance for fluent API
+     */
+    public Glyph useHoverEffect(){
+        this.getStyleClass().addAll(Glyph.STYLE_HOVER_EFFECT);
+        return this;
+    }
+
+    /**
+     * Adds the gradient effect style
+     * @return Returns this instance for fluent API
+     */
+    public Glyph useGradientEffect(){
+        this.getStyleClass().addAll(Glyph.STYLE_GRADIENT);
+        return this;
     }
     
     //TODO: Need to be able to use external styles

@@ -92,11 +92,11 @@ public class HelloGlyphFont extends ControlsFXSample {
 		title = new Label("Using IcoMoon (Local)");
 		root.getChildren().add(title);
 
-        Glyph effectGlyph = icoMoon.fontColor(Color.BLUE).fontSize(48).create(IM_UNDERSCORED);
-        effectGlyph.getStyleClass().addAll(Glyph.STYLE_HOVER_EFFECT);
+        Glyph effectGlyph = icoMoon.fontColor(Color.BLUE).fontSize(48).create(IM_UNDERSCORED)
+                .useHoverEffect();
 
-        Glyph effectGlyph2 = icoMoon.fontColor(Color.BLUE).fontSize(48).create(IM_UNDERSCORED);
-        effectGlyph2.getStyleClass().addAll(Glyph.STYLE_GRADIENT, Glyph.STYLE_HOVER_EFFECT);
+        Glyph effectGlyph2 = icoMoon.fontColor(Color.BLUE).fontSize(48).create(IM_UNDERSCORED)
+                .useGradientEffect().useHoverEffect();
 
 		toolbar = new ToolBar(
 				new Button("", icoMoon.fontSize(16).create(IM_BOLD)),

@@ -73,7 +73,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * @param size
      * @return Returns this instance for fluent API
      */
-    public Glyph setSize(double size) {
+    public Glyph size(double size) {
         this.size = size;
         updateStyle();
         return this;
@@ -84,7 +84,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * @param color
      * @return Returns this instance for fluent API
      */
-    public Glyph setColor(Color color) {
+    public Glyph color(Color color) {
         this.color = color;
         updateStyle();
         return this;

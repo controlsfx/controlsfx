@@ -455,7 +455,6 @@ public class SpreadsheetView extends Control {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
                     .observableArrayList(grid.getRows());
             cellsView.getItems().clear();
-            cellsView.getColumns().clear();
             cellsView.setItems(observableRows);
 
             final int columnCount = grid.getColumnCount();
@@ -491,7 +490,6 @@ public class SpreadsheetView extends Control {
                         return new CellView(handle);
                     }
                 });
-                cellsView.getColumns().add(column);
                 final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
                 if(widthColumns.size() > i){
                     spreadsheetColumn.setPrefWidth(widthColumns.get(i));
@@ -503,9 +501,17 @@ public class SpreadsheetView extends Control {
                     spreadsheetColumn.setFixed(true);
                 }
             }
-            // grid.addEventHandler(GridChange.GRID_CHANGE_EVENT,
-            // gridChangeEventHandler);
         }
+        /**
+         * We need to set the columns of the TableView in the JFX thread. Since
+         * this method can be called from another thread, we execute the code here.
+         */
+        Platform.runLater(()->{
+            cellsView.getColumns().clear();
+            for(SpreadsheetColumn spreadsheetColumn:columns){
+                cellsView.getColumns().add(spreadsheetColumn.column);
+            }
+        });
     }
 
     /**

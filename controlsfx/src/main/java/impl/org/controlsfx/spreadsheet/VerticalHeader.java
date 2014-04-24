@@ -186,7 +186,8 @@ public class VerticalHeader extends StackPane {
         if (resizing) {
             return;
         }
-        if (working) {
+        if (working && skin.getCellsSize() > 0){
+              
             getChildren().clear();
 
             final double x = snappedLeftInset();
@@ -210,6 +211,7 @@ public class VerticalHeader extends StackPane {
             int i = 0;
             // We don't want to add Label if there are no rows associated with.
             final int modelRowCount = spreadsheetView.getGrid().getRowCount();
+
             GridRow row = skin.getRow(i);
             int rowIndex;
 

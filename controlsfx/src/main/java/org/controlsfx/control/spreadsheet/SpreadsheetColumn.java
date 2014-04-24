@@ -80,7 +80,7 @@ public final class SpreadsheetColumn {
      * * Private Fields * *
      **************************************************************************/
     private final SpreadsheetView spreadsheetView;
-    private final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
+    final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
     private final boolean canFix;
     private final Integer indexColumn;
     private MenuItem fixItem;

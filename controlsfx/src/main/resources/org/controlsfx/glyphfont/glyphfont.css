@@ -1,12 +1,17 @@
-.glyph-font{
+
+.glyph-font {
+    -fx-text-fill: -glyphs-color;
+}
+
+.glyph-font.gradient{
     -fx-effect: innershadow( three-pass-box , derive(-glyphs-color,-70%) , 0.1em, 0.0 , 0.07em, 0.07em );
     -fx-text-fill: linear-gradient(to bottom, derive(-glyphs-color,20%) 10%, derive(-glyphs-color,-40%) 80%);
 }
 
-.glyph-font:hover{
+.glyph-font.hover-effect:hover{
     -fx-effect: dropshadow( three-pass-box , derive(-glyphs-color,0%) , 0.01em, 0.0 , 0, 0);
 }
 
-.glyph-font:selected{
+.glyph-font.hover-effect:selected{
     -fx-effect: dropshadow( three-pass-box , derive(-glyphs-color,0%) , 0.01em, 0.0 , 0, 0);
 }

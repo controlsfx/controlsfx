@@ -1,13 +1,13 @@
 package org.controlsfx.property.editor;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Collection;
-
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.scene.control.CheckBox;
@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-
+import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
 
@@ -160,18 +160,40 @@ public class Editors {
             }
         };
         
-    }    
+    }
+    
+    /**
+     * Static method used to create an instance of the custom editor returned 
+     * via a call to {@link PropertySheet.Item#getPropertyEditorClass()} 
+     * 
+     * The class returned must declare a constructor that takes a single 
+     * parameter of type PropertySheet.Item into which the parameter supplied 
+     * to this method will be passed.
+     * 
+     * @param property The {@link PropertySheet.Item} that this editor will be 
+     * associated with.
+     * @return The {@link PropertyEditor} wrapped in an {@link Optional}
+     */
+    public static final Optional<PropertyEditor<?>> createCustomEditor(final Item property ) {
+        return property.getPropertyEditorClass().map(cls -> {
+            try {
+                Constructor cn = cls.getConstructor(PropertySheet.Item.class);
+                if (cn != null) {
+                    return (PropertyEditor<?>) cn.newInstance(property);
+                }
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        });
+    }
     
     private static void enableAutoSelectAll(final TextInputControl control) {
-        control.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override public void changed(ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    Platform.runLater(new Runnable() {
-                        @Override public void run() {
-                            control.selectAll();
-                        }
-                    });
-                }
+        control.focusedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) -> {
+            if (newValue) {
+                Platform.runLater(() -> {
+                    control.selectAll();
+                });
             }
         });
     }

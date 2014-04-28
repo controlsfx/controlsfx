@@ -225,11 +225,14 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
 
     /** {@inheritDoc} */
     @Override public void clearSelection() {
-        selectedIndices.clear();
+        for( int index = 0; index < selectedIndices.length(); index++) {
+            clearSelection(index);
+        }
     }
 
     /** {@inheritDoc} */
     @Override public void clearSelection(int index) {
+        if (index < 0 || index >= getItemCount()) return;
         selectedIndices.clear(index);
         
         final int changeIndex = selectedIndicesList.indexOf(index);
@@ -248,7 +251,7 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
 
     /** {@inheritDoc} */
     @Override public void select(int index) {
-        if (index < 0 || index >= selectedIndices.size());
+        if (index < 0 || index >= getItemCount()) return;
         selectedIndices.set(index);
         
         final int changeIndex = selectedIndicesList.indexOf(index);

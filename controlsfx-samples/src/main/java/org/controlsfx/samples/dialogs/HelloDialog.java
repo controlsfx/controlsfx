@@ -265,7 +265,7 @@ public class HelloDialog extends ControlsFXSample {
 								.masthead(
 										isMastheadVisible() ? "Exception Encountered"
 												: null)).showException(
-						new RuntimeException("Pending Bad Decision Exception"));
+						new RuntimeException("Exception text"));
 
 				System.out.println("response: " + response);
 			}
@@ -582,7 +582,12 @@ public class HelloDialog extends ControlsFXSample {
 		grid.add(createLabel("Locale: ", "property"), 0, row);
 		final ComboBox<Locale> localeCombobox = new ComboBox<Locale>();
 		localeCombobox.getItems()
-				.addAll(Locale.ENGLISH, new Locale("ru", "RU"));
+				.addAll(Locale.ENGLISH,
+                                        new Locale("ru", "RU"),
+                                        Locale.FRENCH,
+                                        new Locale("es","ES"),
+                                        new Locale("pt","PT"),
+                                        new Locale("gl","ES"));
 		localeCombobox.valueProperty().addListener(
 				new ChangeListener<Locale>() {
 					@Override

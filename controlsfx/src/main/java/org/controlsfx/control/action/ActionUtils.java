@@ -140,7 +140,19 @@ public class ActionUtils {
         return configure(new Button(), action, ActionTextBehavior.SHOW);
     }
     
-    
+	/**
+     * Takes the provided {@link Action} and binds the relevant properties to 
+     * the supplied {@link Button}. This allows for the use of Actions 
+     * within custom Button subclasses.
+     * 
+     * @param action The {@link Action} that the {@link Button} should bind to.
+     * @param button The {@link Button} that the {@link Action} should be bound to.
+     * @return The {@link Button} that was bound to the {@link Action}.
+     */
+	public static Button configureButton(final Action action, Button button) {
+        return configure(button, action, ActionTextBehavior.SHOW);
+    }
+	    
     /**
      * Takes the provided {@link Action} and returns a {@link MenuButton} instance
      * with all relevant properties bound to the properties of the Action.

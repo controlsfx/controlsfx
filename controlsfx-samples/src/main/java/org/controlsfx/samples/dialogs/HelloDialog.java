@@ -586,7 +586,8 @@ public class HelloDialog extends ControlsFXSample {
                                         new Locale("ru", "RU"),
                                         Locale.FRENCH,
                                         new Locale("es","ES"),
-                                        new Locale("pt","PT"));
+                                        new Locale("pt","PT"),
+                                        new Locale("gl","ES"));
 		localeCombobox.valueProperty().addListener(
 				new ChangeListener<Locale>() {
 					@Override

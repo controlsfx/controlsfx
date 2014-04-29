@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -373,7 +373,7 @@ public final class Dialogs {
     private String message;
     private String masthead = USE_DEFAULT;
     private boolean lightweight;
-    private boolean nativeTitleBar;
+    private DialogStyle style;
     private Set<Action> actions = new LinkedHashSet<>();
     private Effect backgroundEffect;
 
@@ -484,12 +484,26 @@ public final class Dialogs {
     /**
      * Specifies that the dialog should use the native title bar of the users 
      * operating system rather than the custom cross-platform rendering used by 
-     * default. Refer to the Dialogs class JavaDoc for more information.
+     * default. 
      * 
+     * @deprecated This method is deprecated. Please use {@link #dialogStyle(DialogStyle)} instead.
      * @return dialog instance.
      */
     public Dialogs nativeTitleBar() {
-        this.nativeTitleBar = true;
+        this.style = DialogStyle.NATIVE;
+        return this;
+    }
+    
+    /**
+     * Specifies that the dialog should use the given {@code DialogStyle}
+     * rather than the custom cross-platform rendering used by default.
+     * Refer to the Dialogs class JavaDoc for more information.
+     * 
+     * @param style The {@code DialogStyle} of the dialog.
+     * @return dialog instance.
+     */
+    public Dialogs dialogStyle(DialogStyle style) {
+        this.style = style;
         return this;
     }
     
@@ -560,7 +574,7 @@ public final class Dialogs {
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
                 String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails, nativeTitleBar).show();
+                new ExceptionDialog((Window)owner, moreDetails, style).show();
             }
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
@@ -1034,7 +1048,7 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight, style);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         Image image = dlgType.getImage();

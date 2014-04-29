@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,16 +80,26 @@ class HeavyweightDialog extends FXDialog {
      **************************************************************************/
     
     HeavyweightDialog(String title, Window owner, boolean modal) {
-        this(title, owner, modal, false);
+        this(title, owner, modal, DialogStyle.JAVAFX_DARK);
     }
 
-    HeavyweightDialog(String title, Window owner, boolean modal, boolean nativeChrome) {
+    HeavyweightDialog(String title, Window owner, boolean modal, DialogStyle dialogStyle) {
         super();
         this.owner = owner;
         
-        final StageStyle style = ! nativeChrome ? StageStyle.TRANSPARENT :
-            (DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
-                     StageStyle.DECORATED : StageStyle.UTILITY);
+        final StageStyle style;
+        
+        if (dialogStyle == DialogStyle.JAVAFX_DARK) {
+            style = StageStyle.TRANSPARENT;
+        } else if (dialogStyle == DialogStyle.NATIVE) {
+            style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
+                     StageStyle.DECORATED : StageStyle.UTILITY;
+        } else if (dialogStyle == DialogStyle.UNDECORATED) {
+            style = StageStyle.UNDECORATED;
+        } else {
+            dialogStyle = DialogStyle.JAVAFX_DARK;
+            style = StageStyle.TRANSPARENT;
+        }
         
         stage = new Stage(style) {
             @Override public void showAndWait() {
@@ -128,7 +138,7 @@ class HeavyweightDialog extends FXDialog {
 
         setModal(modal);
         
-        boolean useCustomChrome = ! nativeChrome;
+        boolean useCustomChrome = (dialogStyle == DialogStyle.JAVAFX_DARK);
 
         // *** The rest is for adding window decorations ***
         init(title, useCustomChrome);
@@ -323,4 +333,3 @@ class HeavyweightDialog extends FXDialog {
     private static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active"); //$NON-NLS-1$
 
 }
-

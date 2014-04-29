@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,17 +41,17 @@ class DialogFactory {
     }
 
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
-        return createDialog(useLightweight, title, owner, modal, false);
+        return createDialog(useLightweight, title, owner, modal, DialogStyle.JAVAFX_DARK);
     }
 
-    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, boolean nativeChrome) {
+    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, DialogStyle style) {
         if (useLightweight) {
             return new LightweightDialog(title, owner);
         } else {
 
             Window window = Utils.getWindow(owner);
 
-            return new HeavyweightDialog(title, window, modal, nativeChrome);
+            return new HeavyweightDialog(title, window, modal, style);
         }
     }
 

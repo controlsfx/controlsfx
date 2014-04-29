@@ -301,7 +301,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  *   optional.isPresent(value->{...}) //perform an operation only if there is a value 
  *   optional.orElse(default)         //get the value of optional with default if it does not exists
  *   optional.map( value -> {...} ).orElse(default) //convert to other type with default
- * </pre>
+ * }</pre>
  * and many more - check {@link Optional} API.<br>
  * {@link Optional} can be thought of as a stream collection of one or none elements, allowing for functional approach - 
  * chaining methods without keeping state. This especially beneficial in concurrent environments.  

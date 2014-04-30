@@ -88,7 +88,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     public static final double DEFAULT_CELL_HEIGHT;
 
     /** Default width of the VerticalHeader. */
-    protected static final double DEFAULT_VERTICAL_HEADER_WIDTH = 30.0;
+    protected static final double DEFAULT_VERTICAL_HEADER_WIDTH = 70.0;
 
     // FIXME This should seriously be investigated ..
     private static final double DATE_CELL_MIN_WIDTH = 200 - Screen.getPrimary().getDpi();

@@ -174,3 +174,13 @@ on top and bottom */
 .indicationLabel{
     -fx-font-style : italic;
 }
+
+.picker-label{
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+}
+
+.picker-label:hover{
+    -fx-effect:dropshadow(gaussian, black, 10, 0.1, 0, 0);
+    -fx-cursor:hand;
+}

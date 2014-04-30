@@ -235,14 +235,15 @@ public class SpreadsheetView extends Control {
     private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
     private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(true);
     private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
+    private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
+    private Callback<Integer,Void> rowPickerCallback;
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private BitSet rowFix; // Compute if we can fix the rows or not.
-    // private ObservableSet<SpreadsheetCell> modifiedCells =
-    // FXCollections.observableSet();
+
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
         @Override
@@ -604,6 +605,17 @@ public class SpreadsheetView extends Control {
         return showRowHeader;
     }
 
+    public ObservableList<Integer> getRowPickers() {
+        return rowPickers;
+    }
+    
+    public void setRowPickerCallback(Callback<Integer,Void> callback){
+        this.rowPickerCallback = callback;
+    }
+    
+    public Callback<Integer,Void> getRowPickerCallback(){
+        return rowPickerCallback;
+    }
     /**
      * You can fix or unfix a row by modifying this list. Call
      * {@link #isRowFixable(int)} before trying to fix a row. See

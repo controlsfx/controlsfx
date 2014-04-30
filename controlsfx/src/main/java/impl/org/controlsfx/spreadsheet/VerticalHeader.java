@@ -27,9 +27,10 @@
 
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Stack;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -45,17 +46,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
-import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
  * Display the vertical header on the left of the cells (view), the index of the
@@ -63,20 +63,24 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
  */
 public class VerticalHeader extends StackPane {
 
+    private static final int PICKER_SIZE = 16;
     private static final int DRAG_RECT_HEIGHT = 5;
     private static final String TABLE_ROW_KEY = "TableRow";
+    private static final String PICKER_INDEX = "TableRow";
     private static final String TABLE_LABEL_KEY = "Label";
 
-    /***************************************************************************
+    /**
+     * *************************************************************************
      * * Private Fields * *
-     **************************************************************************/
+     * ************************************************************************
+     */
     private final SpreadsheetHandle handle;
     private final SpreadsheetView spreadsheetView;
     private double horizontalHeaderHeight;
     private final DoubleProperty verticalHeaderWidth;
     private Double savedWidth;
     private boolean working = true; // Whether or not we are showing the
-                                    // verticalHeader
+    // verticalHeader
     private Rectangle clip; // Ensure that children do not go out of bounds
     private ContextMenu blankContextMenu;
 
@@ -91,8 +95,11 @@ public class VerticalHeader extends StackPane {
     GridViewSkin skin;
     private boolean resizing = false;
 
+    private Stack<Label> pickerPile;
+    private Stack<Label> pickerUsed;
+
     /***************************************************************************
-     * * Listeners * *
+     * *  Listeners * *
      **************************************************************************/
     private final InvalidationListener layout = new InvalidationListener() {
         @Override
@@ -105,24 +112,27 @@ public class VerticalHeader extends StackPane {
 
     /******************************************************************
      * CONSTRUCTOR
-     * 
+     *
      * @param handle
      * @param verticalHeaderWidth
-     ******************************************************************/
+     * ****************************************************************/
     public VerticalHeader(final SpreadsheetHandle handle, DoubleProperty verticalHeaderWidth) {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
         this.verticalHeaderWidth = verticalHeaderWidth;
         working = spreadsheetView.showRowHeaderProperty().get();
+        pickerPile = new Stack<>();
+        pickerUsed = new Stack<>();
     }
 
     /***************************************************************************
      * * Private/Protected Methods *
-     * 
-     * @param horizontalHeader
-     *            *
-     **************************************************************************/
-
+     * ************************************************************************/
+    /**
+     * Init
+     * @param skin
+     * @param horizontalHeader 
+     */
     void init(final GridViewSkin skin, HorizontalHeader horizontalHeader) {
         this.skin = skin;
         // Adjust position upon HorizontalHeader height
@@ -159,7 +169,7 @@ public class VerticalHeader extends StackPane {
                     savedWidth = verticalHeaderWidth.get();
                     verticalHeaderWidth.set(0);
                 } else {
-                    verticalHeaderWidth.set(savedWidth == null ? skin.DEFAULT_VERTICAL_HEADER_WIDTH : savedWidth);
+                    verticalHeaderWidth.set(savedWidth == null ? GridViewSkin.DEFAULT_VERTICAL_HEADER_WIDTH : savedWidth);
                 }
                 requestLayout();
             }
@@ -172,7 +182,7 @@ public class VerticalHeader extends StackPane {
         spreadsheetView.fixingRowsAllowedProperty().addListener(layout);
 
         // In case we resize the view in any manners
-         spreadsheetView.heightProperty().addListener(layout);
+        spreadsheetView.heightProperty().addListener(layout);
 
         // For layout properly the verticalHeader when there are some selected
         // items
@@ -186,8 +196,10 @@ public class VerticalHeader extends StackPane {
         if (resizing) {
             return;
         }
-        if (working && skin.getCellsSize() > 0){
-              
+        if (working && skin.getCellsSize() > 0) {
+
+            pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
+            pickerUsed.clear();
             getChildren().clear();
 
             final double x = snappedLeftInset();
@@ -217,11 +229,24 @@ public class VerticalHeader extends StackPane {
 
             // We iterate over the visibleRows
             while (cellSize != 0 && row != null && row.getIndex() < modelRowCount) {
+
                 rowIndex = row.getIndex();
-                label = getLabel(rowCount);
+                /**
+                 * Picker
+                 */
+                if (spreadsheetView.getRowPickers().contains(rowIndex)) {
+                    Label picker = getPicker(rowIndex);
+                    picker.resize(PICKER_SIZE, row.getHeight());
+                    picker.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
+                    getChildren().add(picker);
+                }
+
+                label = getLabel(rowCount++);
+
                 getChildren().add(label);
                 label.setText(getRowHeader(rowIndex));
-                label.resize(verticalHeaderWidth.get(), row.getHeight());
+                label.resize(verticalHeaderWidth.get() - PICKER_SIZE, row.getHeight());
+                label.setLayoutX(16);
                 label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 label.setContextMenu(getRowContextMenu(rowIndex));
 
@@ -245,20 +270,21 @@ public class VerticalHeader extends StackPane {
                 dragRect.getProperties().put(TABLE_ROW_KEY, row);
                 dragRect.getProperties().put(TABLE_LABEL_KEY, label);
                 dragRect.setWidth(label.getWidth());
-                dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
+                dragRect.relocate(snappedLeftInset() + x + PICKER_SIZE, y - DRAG_RECT_HEIGHT);
                 getChildren().add(dragRect);
 
                 row = skin.getRow(++i);
             }
             double spaceUsedByFixedRows = 0;
-            
+
             // Then we iterate over the FixedRows if any
             if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
                 for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
                     rowIndex = spreadsheetView.getFixedRows().get(j);
                     if (!handle.getCellsViewSkin().getCurrentlyFixedRow()
-                            .contains(rowIndex))
+                            .contains(rowIndex)) {
                         break;
+                    }
                     label = getLabel(rowCount++);
 
                     label.setText(getRowHeader(rowIndex));
@@ -278,7 +304,7 @@ public class VerticalHeader extends StackPane {
                         css.removeAll("selected");
                     }
                     css.addAll("fixed");
-                    
+
                     spaceUsedByFixedRows += skin.getRowHeight(rowIndex);
 
                     getChildren().add(label);
@@ -335,23 +361,23 @@ public class VerticalHeader extends StackPane {
             Rectangle rect = (Rectangle) me.getSource();
             GridRow row = (GridRow) rect.getProperties().get(TABLE_ROW_KEY);
             Label label = (Label) rect.getProperties().get(TABLE_LABEL_KEY);
-            columnResizing(row, label, me);
+            rowResizing(row, label, me);
             me.consume();
         }
     };
 
-    private void columnResizing(GridRow gridRow, Label label, MouseEvent me) {
+    private void rowResizing(GridRow gridRow, Label label, MouseEvent me) {
         double draggedY = me.getSceneY() - dragAnchorY;
         if (gridRow.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
             draggedY = -draggedY;
         }
-        
+
         double delta = draggedY - lastY;
 
         // FIXME Can gridRow be null?
         Double newHeight = gridRow.getHeight() + delta;
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
-        label.resize(verticalHeaderWidth.get(), newHeight);
+        label.resize(verticalHeaderWidth.get()-PICKER_SIZE, newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
 
@@ -379,7 +405,7 @@ public class VerticalHeader extends StackPane {
 
     /**
      * Create a new label and put it in the pile or just grab one from the pile.
-     * 
+     *
      * @param rowNumber
      * @return
      */
@@ -412,10 +438,36 @@ public class VerticalHeader extends StackPane {
         }
     }
 
+    private Label getPicker(int rowNumber) {
+        Label picker;
+        if (pickerPile.isEmpty()) {
+            picker = new Label();
+            picker.getStyleClass().add("picker-label");
+            picker.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("add.png"))));
+            picker.setOnMouseClicked(pickerMouseEvent);
+        } else {
+            picker = pickerPile.pop();
+        }
+        pickerUsed.push(picker);
+        picker.getProperties().put(PICKER_INDEX, rowNumber);
+        return picker;
+    }
+
+    EventHandler<MouseEvent> pickerMouseEvent = new EventHandler<MouseEvent>() {
+
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            Label picker = (Label) mouseEvent.getSource();
+
+            spreadsheetView.getRowPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
+            System.out.println("click on " + picker.getProperties().get(PICKER_INDEX));
+        }
+    };
+
     /**
      * Create a new Rectangle and put it in the pile or just grab one from the
      * pile.
-     * 
+     *
      * @param rowNumber
      * @return
      */
@@ -439,7 +491,7 @@ public class VerticalHeader extends StackPane {
 
     /**
      * Return a contextMenu for fixing a row if possible.
-     * 
+     *
      * @param i
      * @return
      */
@@ -471,7 +523,7 @@ public class VerticalHeader extends StackPane {
 
     /**
      * Return the String header associated with this row index.
-     * 
+     *
      * @param index
      * @return
      */

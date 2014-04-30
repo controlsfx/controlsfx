@@ -291,8 +291,7 @@ public class Dialog {
      *      the difference between heavyweight and lightweight dialogs.
      * @param nativeTitleBar Specifies that the dialog should use the native 
      *      titlebar of the users operating system rather than the custom 
-     *      cross-platform rendering used by default. Refer to the 
-     *      {@link Dialogs} class javadoc for more information.
+     *      cross-platform rendering used by default. 
      */
     @Deprecated
     public Dialog(Object owner, String title, boolean lightweight, boolean nativeTitleBar) {
@@ -312,7 +311,8 @@ public class Dialog {
      *      owner, rather than in a separate window (as heavyweight dialogs are).
      *      Refer to the {@link Dialogs} class documentation for more details on
      *      the difference between heavyweight and lightweight dialogs.
-     * @param style The {@code DialogStyle} of the dialog.
+     * @param style The {@code DialogStyle} of the dialog. Refer to the 
+     *      {@link Dialogs} class javadoc for more information.
      */
     public Dialog(Object owner, String title, boolean lightweight, DialogStyle style) {
         this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, style);

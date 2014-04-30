@@ -489,6 +489,7 @@ public final class Dialogs {
      * @deprecated This method is deprecated. Please use {@link #dialogStyle(DialogStyle)} instead.
      * @return dialog instance.
      */
+    @Deprecated
     public Dialogs nativeTitleBar() {
         this.style = DialogStyle.NATIVE;
         return this;

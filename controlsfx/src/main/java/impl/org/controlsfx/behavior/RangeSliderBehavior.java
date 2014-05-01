@@ -283,9 +283,9 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
         final double min = slider.getMin();
         final double max = slider.getMax();
         final double lowValue = slider.getLowValue();
-        final double newLowValue = Utils.clamp(min, lowValue + position, max);
+        final double newLowValue = Utils.clamp(min, lowValue + position *(max-min) / slider.getWidth(), max);
         final double highValue = slider.getHighValue();
-        final double newHighValue = Utils.clamp(min, highValue + position, max);
+        final double newHighValue = Utils.clamp(min, highValue + position*(max-min) / slider.getWidth(), max);
         
         if (newLowValue <= min || newHighValue >= max) return;
         

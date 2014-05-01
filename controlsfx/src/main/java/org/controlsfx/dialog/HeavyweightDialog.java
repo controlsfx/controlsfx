@@ -145,7 +145,7 @@ class HeavyweightDialog extends FXDialog {
         boolean useCustomChrome = (dialogStyle == DialogStyle.CROSS_PLATFORM_DARK);
 
         // *** The rest is for adding window decorations ***
-        init(title, useCustomChrome);
+        init(title, dialogStyle);
         lightweightDialog.getStyleClass().add("heavyweight"); //$NON-NLS-1$
         lightweightDialog.getStyleClass().add(useCustomChrome ? "custom-chrome" : "native-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
 

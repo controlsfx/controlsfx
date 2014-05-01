@@ -45,8 +45,12 @@ class DialogFactory {
     }
 
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, DialogStyle style) {
+        if (style == null) {
+            style = DialogStyle.CROSS_PLATFORM_DARK;
+        }
+        
         if (useLightweight) {
-            return new LightweightDialog(title, owner);
+            return new LightweightDialog(title, owner, style);
         } else {
 
             Window window = Utils.getWindow(owner);
@@ -54,5 +58,4 @@ class DialogFactory {
             return new HeavyweightDialog(title, window, modal, style);
         }
     }
-
 }

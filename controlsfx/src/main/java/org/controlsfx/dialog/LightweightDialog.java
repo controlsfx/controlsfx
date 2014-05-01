@@ -88,7 +88,7 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
-    LightweightDialog(final String title, final Object incomingOwner) {
+    LightweightDialog(final String title, final Object incomingOwner, final DialogStyle style) {
         super();
         
         Object _owner = incomingOwner;
@@ -118,9 +118,14 @@ class LightweightDialog extends FXDialog {
             this.scene = owner.getScene();
         }
         
+        // Don't add window decorations if style is undecorated
+        if (style == DialogStyle.UNDECORATED) {
+            init(title, style);
+            return;
+        }
         
         // *** The rest is for adding window decorations ***
-        init(title, true);
+        init(title, DialogStyle.CROSS_PLATFORM_DARK);
         lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
         
         // add window dragging

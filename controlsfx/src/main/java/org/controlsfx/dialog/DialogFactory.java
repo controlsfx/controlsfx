@@ -41,7 +41,7 @@ class DialogFactory {
     }
 
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
-        return createDialog(useLightweight, title, owner, modal, DialogStyle.JAVAFX_DARK);
+        return createDialog(useLightweight, title, owner, modal, DialogStyle.CROSS_PLATFORM_DARK);
     }
 
     static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, DialogStyle style) {

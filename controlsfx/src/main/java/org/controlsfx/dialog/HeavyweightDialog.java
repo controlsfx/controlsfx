@@ -80,7 +80,7 @@ class HeavyweightDialog extends FXDialog {
      **************************************************************************/
     
     HeavyweightDialog(String title, Window owner, boolean modal) {
-        this(title, owner, modal, DialogStyle.JAVAFX_DARK);
+        this(title, owner, modal, DialogStyle.CROSS_PLATFORM_DARK);
     }
 
     HeavyweightDialog(String title, Window owner, boolean modal, DialogStyle dialogStyle) {
@@ -89,7 +89,7 @@ class HeavyweightDialog extends FXDialog {
         
         final StageStyle style;
         
-        if (dialogStyle == DialogStyle.JAVAFX_DARK) {
+        if (dialogStyle == DialogStyle.CROSS_PLATFORM_DARK) {
             style = StageStyle.TRANSPARENT;
         } else if (dialogStyle == DialogStyle.NATIVE) {
             style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
@@ -97,7 +97,7 @@ class HeavyweightDialog extends FXDialog {
         } else if (dialogStyle == DialogStyle.UNDECORATED) {
             style = StageStyle.UNDECORATED;
         } else {
-            dialogStyle = DialogStyle.JAVAFX_DARK;
+            dialogStyle = DialogStyle.CROSS_PLATFORM_DARK;
             style = StageStyle.TRANSPARENT;
         }
         
@@ -138,7 +138,7 @@ class HeavyweightDialog extends FXDialog {
 
         setModal(modal);
         
-        boolean useCustomChrome = (dialogStyle == DialogStyle.JAVAFX_DARK);
+        boolean useCustomChrome = (dialogStyle == DialogStyle.CROSS_PLATFORM_DARK);
 
         // *** The rest is for adding window decorations ***
         init(title, useCustomChrome);

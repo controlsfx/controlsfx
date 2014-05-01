@@ -296,7 +296,7 @@ public class Dialog {
     @Deprecated
     public Dialog(Object owner, String title, boolean lightweight, boolean nativeTitleBar) {
         this(owner, title, lightweight, 
-               (nativeTitleBar ? DialogStyle.NATIVE : DialogStyle.JAVAFX_DARK)
+               (nativeTitleBar ? DialogStyle.NATIVE : DialogStyle.CROSS_PLATFORM_DARK)
         );
     }
     /**

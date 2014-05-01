@@ -221,13 +221,13 @@ import org.controlsfx.dialog.Dialog.Actions;
  * <p>
  * A dialog has one of the following styles:
  * <ul>
- * <li>{@link DialogStyle#JAVAFX_DARK} - a dialog with a cross-platform title bar.</li>
+ * <li>{@link DialogStyle#CROSS_PLATFORM_DARK} - a dialog with a cross-platform title bar.</li>
  * <li>{@link DialogStyle#NATIVE} - a dialog with a native title bar.</li>
  * <li>{@link DialogStyle#UNDECORATED} - a dialog without a title bar.</li>
  * </ul>
  * </p>
  * <p>If no style is specified, the dialogs will be rendered using the default
- * {@link DialogStyle#JAVAFX_DARK} style.</p>
+ * {@link DialogStyle#CROSS_PLATFORM_DARK} style.</p>
  * 
  * To enable this in the Dialogs fluent API, simply call {@link #dialogStyle(DialogStyle)}
  * when creating the dialog. If you're using the {@link Dialog} class,
@@ -245,7 +245,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  *   </tr>
  *   <tr>
  *     <td valign="center" style="text-align:center;"><strong>Cross-Platform (default)</strong></td>
- *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.JAVAFX_DARK}</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.CROSS_PLATFORM_DARK}</strong></td>
  *     <td><center><img src="dialog-style/cross-platform.png"></center></td>
  *   </tr>
  *   <tr>

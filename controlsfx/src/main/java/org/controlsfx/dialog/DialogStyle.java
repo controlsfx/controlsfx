@@ -36,7 +36,7 @@ public enum DialogStyle {
      * Defines a cross-platform dialog style.
      * The dialogs rendered using this style will have a cross-platform title bar.
      */
-    JAVAFX_DARK,
+    CROSS_PLATFORM_DARK,
 
     /**
      * Defines a native dialog style.

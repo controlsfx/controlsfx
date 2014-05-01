@@ -107,7 +107,7 @@ abstract class FXDialog {
      * 
      **************************************************************************/
     
-    protected final void init(String title, boolean useCustomChrome) {
+    protected final void init(String title, DialogStyle style) {
         titleProperty().set(title);
         
         resizableProperty().addListener(new InvalidationListener() {
@@ -154,7 +154,7 @@ abstract class FXDialog {
         resizeCorner.setManaged(false);
         
         
-        if (! useCustomChrome) {
+        if (style != DialogStyle.CROSS_PLATFORM_DARK) {
             return;
         }
         

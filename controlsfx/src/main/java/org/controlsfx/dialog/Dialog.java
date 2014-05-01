@@ -273,32 +273,9 @@ public class Dialog {
      *      the difference between heavyweight and lightweight dialogs.
      */
     public Dialog(Object owner, String title, boolean lightweight) {
-        this(owner, title, lightweight, false);
+        this(owner, title, lightweight, DialogStyle.CROSS_PLATFORM_DARK);
     }
     
-    /**
-     * Creates a dialog using specified owner and title, which may be rendered
-     * in either a heavyweight or lightweight fashion.
-     * 
-     * @deprecated This method is deprecated. Please use {@link #Dialog(Object, String, boolean, DialogStyle)} instead.
-     * @param owner The dialog window owner - if specified the dialog will be
-     *      centered over the owner, otherwise the dialog will be shown in the 
-     *      middle of the screen.
-     * @param title The dialog title to be shown at the top of the dialog.
-     * @param lightweight If true this dialog will be rendered inside the given
-     *      owner, rather than in a separate window (as heavyweight dialogs are).
-     *      Refer to the {@link Dialogs} class documentation for more details on
-     *      the difference between heavyweight and lightweight dialogs.
-     * @param nativeTitleBar Specifies that the dialog should use the native 
-     *      titlebar of the users operating system rather than the custom 
-     *      cross-platform rendering used by default. 
-     */
-    @Deprecated
-    public Dialog(Object owner, String title, boolean lightweight, boolean nativeTitleBar) {
-        this(owner, title, lightweight, 
-               (nativeTitleBar ? DialogStyle.NATIVE : DialogStyle.CROSS_PLATFORM_DARK)
-        );
-    }
     /**
      * Creates a dialog using specified owner, title and {@code DialogStyle}
      * which may be rendered in either a heavyweight or lightweight fashion.

@@ -89,16 +89,20 @@ class HeavyweightDialog extends FXDialog {
         
         final StageStyle style;
         
-        if (dialogStyle == DialogStyle.CROSS_PLATFORM_DARK) {
-            style = StageStyle.TRANSPARENT;
-        } else if (dialogStyle == DialogStyle.NATIVE) {
-            style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
+        switch (dialogStyle) {
+            case CROSS_PLATFORM_DARK:
+                style = StageStyle.TRANSPARENT;
+                break;
+            case NATIVE:
+                style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
                      StageStyle.DECORATED : StageStyle.UTILITY;
-        } else if (dialogStyle == DialogStyle.UNDECORATED) {
-            style = StageStyle.UNDECORATED;
-        } else {
-            dialogStyle = DialogStyle.CROSS_PLATFORM_DARK;
-            style = StageStyle.TRANSPARENT;
+                break;
+            case UNDECORATED:
+                style = StageStyle.UNDECORATED;
+                break;
+            default:
+                dialogStyle = DialogStyle.CROSS_PLATFORM_DARK;
+                style = StageStyle.TRANSPARENT;
         }
         
         stage = new Stage(style) {

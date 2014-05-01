@@ -212,11 +212,11 @@ import org.controlsfx.dialog.Dialog.Actions;
  * 
  * <h3>Styled Dialogs</h3>
  * 
- * <p>The ControlsFX dialogs API supports displaying dialogs with a consistent
- * cross-platform titlebar area, by using the titlebar of the users operating system,
- * or without a titlebar. All of the screenshots above are taken using the cross-platform
- * style, whereas the screenshots below are the same dialog code being rendered
- * using different dialog styles.</p>
+ * <p>The ControlsFX dialogs API supports displaying dialogs with either a
+ * consistent cross-platform titlebar area, or by using the titlebar of the users
+ * operating system, or without a titlebar. All of the screenshots above are taken
+ * using the cross-platform style, whereas the screenshots below are the
+ * same dialog code being rendered using different dialog styles.</p>
  * 
  * <p>
  * A dialog has one of the following styles:
@@ -229,7 +229,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  * <p>If no style is specified, the dialogs will be rendered using the default
  * {@link DialogStyle#CROSS_PLATFORM_DARK} style.</p>
  * 
- * To enable this in the Dialogs fluent API, simply call {@link #dialogStyle(DialogStyle)}
+ * To enable this in the Dialogs fluent API, simply call {@link #style(DialogStyle)}
  * when creating the dialog. If you're using the {@link Dialog} class,
  * you can specify the {@code DialogStyle} you want to use as part of the 
  * {@link Dialog#Dialog(Object, String, boolean, DialogStyle)} constructor.
@@ -293,7 +293,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  * 
  * <p>One limitation of lightweight dialogs is that it is not possible to use
  * the dialog style feature. If you call both {@link #lightweight()} and
- * {@link #dialogStyle(DialogStyle)}, the call to enable lightweight takes precedence
+ * {@link #style(DialogStyle)}, the call to enable lightweight takes precedence
  * over the use of the {@code DialogStyle}, so you will end up seeing what is shown
  * in the screenshot below (that is, a cross-platform-looking dialog that is 
  * lightweight).
@@ -503,20 +503,6 @@ public final class Dialogs {
     }
     
     /**
-     * Specifies that the dialog should use the native title bar of the users 
-     * operating system rather than the custom cross-platform rendering used by 
-     * default. 
-     * 
-     * @deprecated This method is deprecated. Please use {@link #dialogStyle(DialogStyle)} instead.
-     * @return dialog instance.
-     */
-    @Deprecated
-    public Dialogs nativeTitleBar() {
-        this.style = DialogStyle.NATIVE;
-        return this;
-    }
-    
-    /**
      * Specifies that the dialog should use the given {@code DialogStyle}
      * rather than the custom cross-platform rendering used by default.
      * Refer to the Dialogs class JavaDoc for more information.
@@ -524,7 +510,7 @@ public final class Dialogs {
      * @param style The {@code DialogStyle} of the dialog.
      * @return dialog instance.
      */
-    public Dialogs dialogStyle(DialogStyle style) {
+    public Dialogs style(DialogStyle style) {
         this.style = style;
         return this;
     }

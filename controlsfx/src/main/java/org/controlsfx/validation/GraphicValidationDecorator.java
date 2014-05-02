@@ -44,35 +44,36 @@ import javafx.scene.image.ImageView;
  */
 public class GraphicValidationDecorator implements ValidationDecorator {
 	
-	private final Node errorNode;
-    private final Node warningNode;
+    // FIXME we shouldn't hardcode this - defer to CSS eventually
+    private static final Image ERROR_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-error.png");
+    private static final Image WARNING_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-warning.png");
+    
+    // TODO shouldn't we also support a SUCCESS_IMAGE?
+    
     
     /**
      * Creates default instance
      */
     public GraphicValidationDecorator() {
-		this(null,null);
+		
 	}
     
-    /**
-     * Creates an instance using custom graphic to decorate validation states
-     * @param errorNode error graphic, if null default image is used
-     * @param warningNode warning graphic, if null default image is used
-     */
-    public GraphicValidationDecorator( Node errorNode, Node warningNode ) {
-		this.errorNode   = errorNode != null? 
-		   errorNode: new ImageView(new Image("/impl/org/controlsfx/control/validation/decoration-error.png"));
-		this.warningNode = warningNode != null? 
-		   warningNode: new ImageView(new Image("/impl/org/controlsfx/control/validation/decoration-warning.png"));
-	}
+    // TODO write javadoc that users should override these methods to customise
+    // the error / warning / success nodes to use 
+    protected Node createErrorNode() {
+        return new ImageView(ERROR_IMAGE);
+    }
     
+    protected Node createWarningNode() {
+        return new ImageView(WARNING_IMAGE);
+    }
   
-	protected Node createDecorationNode(ValidationMessage message) {
-		Node graphic = Severity.ERROR == message.getSeverity()?errorNode:warningNode;
+	private Node createDecorationNode(ValidationMessage message) {
+		Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
         graphic.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
         Label label = new Label();
         label.setGraphic(graphic);
-		label.setTooltip( createTooltip(message));
+		label.setTooltip(createTooltip(message));
         label.setAlignment(Pos.CENTER);
 		return label;
 	}
@@ -100,6 +101,4 @@ public class GraphicValidationDecorator implements ValidationDecorator {
 	public String toString() {
 		return "Icon Validation Decorator";
 	}
-
-
 }

@@ -275,6 +275,14 @@ class LightweightDialog extends FXDialog {
     @Override public Node getRoot() {
         return lightweightDialog;
     }
+    
+    public double getX() {
+        return lightweightDialog.getLayoutX();
+    }
+    
+    public void setX(double x) {
+        lightweightDialog.setLayoutX(x);
+    }
 
     @Override ReadOnlyDoubleProperty widthProperty() {
         return lightweightDialog.widthProperty();

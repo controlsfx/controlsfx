@@ -33,23 +33,19 @@ import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.SpreadsheetViewSelectionModel;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -99,18 +95,8 @@ import org.controlsfx.tools.Utils;
  * 
  * <br/>
  * 
- * <h3>Fixing Rows and Columns</h3> You can fix some rows and some columns by
- * right-clicking on their header. A context menu will appear if it's possible to fix them. 
- * The label will then be in italic and the background will turn to dark grey. 
- * Keep in mind that only columns without any spanning cells can be fixed.
- * 
- * And that and only rows without row-spanning cells can be fixed. <br/>
- * You have also the possibility to fix them manually by adding and removing
- * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
- * are strongly advised to check if it's possible to do so with
- * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
- * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior
- * every move will ensure that no exception will be thrown.
+ * <h3>Fixing Rows and Columns</h3> 
+ * Everything related to that feature is accessible and documented in {@link Axes}.
  * 
  * <br/>
  * <br/>
@@ -217,10 +203,7 @@ public class SpreadsheetView extends Control {
     private final SpreadsheetGridView cellsView;// The main cell container.
     private SimpleObjectProperty<Grid> gridProperty = new SimpleObjectProperty<>();
     private DataFormat fmt;
-    private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
-    private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
-    private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(true);
-    private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
+    private final Axes axes;
     private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
     private Callback<Integer,Void> rowPickerCallback;
 
@@ -228,7 +211,6 @@ public class SpreadsheetView extends Control {
     // is the VirtualFlow)
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
-    private BitSet rowFix; // Compute if we can fix the rows or not.
 
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
@@ -377,11 +359,7 @@ public class SpreadsheetView extends Control {
         setGrid(grid);
         setEditable(true);
 
-        // Listeners & handlers
-        fixedRows.addListener(fixedRowsListener);
-        fixedColumns.addListener(fixedColumnsListener);
-
-        // getModifiedCells().addListener(modifiedCellsListener);
+        axes = new Axes(this);
     }
     /***************************************************************************
      * * Public Methods * *
@@ -399,7 +377,7 @@ public class SpreadsheetView extends Control {
         // Reactivate that after
 //        verifyGrid(grid);
         gridProperty.set(grid);
-        initRowFix(grid);
+        axes.initRowFix(grid);
 
         /**
          * We need to verify that the previous fixedRows are still compatible
@@ -407,22 +385,22 @@ public class SpreadsheetView extends Control {
          */
 
         List<Integer> newFixedRows = new ArrayList<>();
-        for (Integer rowFixed : getFixedRows()) {
-            if (isRowFixable(rowFixed)) {
+        for (Integer rowFixed : axes.getFixedRows()) {
+            if (axes.isRowFixable(rowFixed)) {
                 newFixedRows.add(rowFixed);
             }
         }
-        getFixedRows().setAll(newFixedRows);
+        axes.getFixedRows().setAll(newFixedRows);
 
         /**
          * We need to store the index of the fixedColumns and clear then because
          * we will keep reference to SpreadsheetColumn that no longer exist.
          */
         List<Integer> columnsFixed = new ArrayList<>();
-        for (SpreadsheetColumn column : getFixedColumns()) {
+        for (SpreadsheetColumn column : axes.getFixedColumns()) {
             columnsFixed.add(getColumns().indexOf(column));
         }
-        getFixedColumns().clear();
+        axes.getFixedColumns().clear();
 
         /**
          * We try to save the width of the column as we save the height of our rows so that we preserve the state.
@@ -528,64 +506,14 @@ public class SpreadsheetView extends Control {
         return gridProperty;
     }
 
-    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true);
-
     /**
-     * Activate and deactivate the Column Header
-     * 
-     * @param b
+     * Return the Axes class for this SpreadsheetView in order to handle 
+     * everything regarding axes (headers and fixed axes).
+     * @return Axes class.
      */
-    public final void setShowColumnHeader(final boolean b) {
-        showColumnHeader.setValue(b);
+    public Axes getAxes(){
+        return axes;
     }
-
-    /**
-     * Return if the Column Header is showing.
-     * 
-     * @return a boolean telling whether the column Header is shown
-     */
-    public final boolean isShowColumnHeader() {
-        return showColumnHeader.get();
-    }
-
-    /**
-     * BooleanProperty associated with the column Header.
-     * 
-     * @return the BooleanProperty associated with the column Header.
-     */
-    public final BooleanProperty showColumnHeaderProperty() {
-        return showColumnHeader;
-    }
-
-    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader", true);
-
-    /**
-     * Activate and deactivate the Row Header.
-     * 
-     * @param b
-     */
-    public final void setShowRowHeader(final boolean b) {
-        showRowHeader.setValue(b);
-    }
-
-    /**
-     * Return if the row Header is showing.
-     * 
-     * @return a boolean telling if the row Header is being shown
-     */
-    public final boolean isShowRowHeader() {
-        return showRowHeader.get();
-    }
-
-    /**
-     * BooleanProperty associated with the row Header.
-     * 
-     * @return the BooleanProperty associated with the row Header.
-     */
-    public final BooleanProperty showRowHeaderProperty() {
-        return showRowHeader;
-    }
-
     public ObservableList<Integer> getRowPickers() {
         return rowPickers;
     }
@@ -597,56 +525,7 @@ public class SpreadsheetView extends Control {
     public Callback<Integer,Void> getRowPickerCallback(){
         return rowPickerCallback;
     }
-    /**
-     * You can fix or unfix a row by modifying this list. Call
-     * {@link #isRowFixable(int)} before trying to fix a row. See
-     * {@link SpreadsheetView} description for information.
-     * 
-     * @return an ObservableList of integer representing the fixedRows.
-     */
-    public ObservableList<Integer> getFixedRows() {
-        return fixedRows;
-    }
-
-    /**
-     * Indicate whether a row can be fixed or not. Call that method before
-     * adding an item with {@link #getFixedRows()} .
-     * 
-     * @param row
-     * @return true if the row can be fixed.
-     */
-    public boolean isRowFixable(int row) {
-        return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
-    }
-
-    /**
-     * Return whether change to Fixed rows are allowed.
-     * 
-     * @return whether change to Fixed rows are allowed.
-     */
-    public boolean isFixingRowsAllowed() {
-        return fixingRowsAllowedProperty.get();
-    }
-
-    /**
-     * If set to true, user will be allowed to fix and unfix the rows.
-     * 
-     * @param b
-     */
-    public void setFixingRowsAllowed(boolean b) {
-        fixingRowsAllowedProperty.set(b);
-    }
-
-    /**
-     * Return the Boolean property associated with the allowance of fixing or
-     * unfixing some rows.
-     * 
-     * @return the Boolean property associated with the allowance of fixing or
-     *         unfixing some rows.
-     */
-    public ReadOnlyBooleanProperty fixingRowsAllowedProperty() {
-        return fixingRowsAllowedProperty;
-    }
+    
 
     /**
      * This method will compute the best height for each line. That is to say
@@ -685,59 +564,6 @@ public class SpreadsheetView extends Control {
     }
     
     /**
-     * You can fix or unfix a column by modifying this list. Call
-     * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
-     * an item.
-     * 
-     * @return an ObservableList of the fixed columns.
-     */
-    public ObservableList<SpreadsheetColumn> getFixedColumns() {
-        return fixedColumns;
-    }
-
-    /**
-     * Indicate whether this column can be fixed or not. If you have a
-     * {@link SpreadsheetColumn}, call
-     * {@link SpreadsheetColumn#isColumnFixable()} on it directly. Call that
-     * method before adding an item with {@link #getFixedColumns()} .
-     * 
-     * @param columnIndex
-     * @return true if the column if fixable
-     */
-    public boolean isColumnFixable(int columnIndex) {
-        return columnIndex < getColumns().size() ? getColumns().get(columnIndex).isColumnFixable() : null;
-    }
-
-    /**
-     * Return whether change to Fixed columns are allowed.
-     * 
-     * @return whether change to Fixed columns are allowed.
-     */
-    public boolean isFixingColumnsAllowed() {
-        return fixingColumnsAllowedProperty.get();
-    }
-
-    /**
-     * If set to true, user will be allowed to fix and unfix the columns.
-     * 
-     * @param b
-     */
-    public void setFixingColumnsAllowed(boolean b) {
-        fixingColumnsAllowedProperty.set(b);
-    }
-
-    /**
-     * Return the Boolean property associated with the allowance of fixing or
-     * unfixing some columns.
-     * 
-     * @return the Boolean property associated with the allowance of fixing or
-     *         unfixing some columns.
-     */
-    public ReadOnlyBooleanProperty fixingColumnsAllowedProperty() {
-        return fixingColumnsAllowedProperty;
-    }
-
-    /**
      * Return the selectionModel used by the SpreadsheetView.
      * 
      * @return {@link TableViewSelectionModel}
@@ -765,15 +591,6 @@ public class SpreadsheetView extends Control {
         }
         return Optional.of(cellEditor);
     }
-
-    /**
-     * Return an ObservableSet of the modified {@link SpreadsheetCell}.
-     * 
-     * @return an ObservableSet of the modified {@link SpreadsheetCell}.
-     */
-    // public ObservableSet<SpreadsheetCell> getModifiedCells() {
-    // return modifiedCells;
-    // }
 
     /**
      * Sets the value of the property editable.
@@ -805,6 +622,11 @@ public class SpreadsheetView extends Control {
         return cellsView.editableProperty();
     }
 
+    
+    /***************************************************************************
+     * COPY / PASTE METHODS
+     **************************************************************************/
+    
     /**
      * Put the current selection into the ClipBoard. This can be overridden by
      * developers for custom behavior.
@@ -973,6 +795,21 @@ public class SpreadsheetView extends Control {
             getGrid().setCellValue(position.getRow(), position.getColumn(), null);
         }
     }
+    
+     /**
+     * Return the {@link SpanType} of a cell, this is a shorcut for 
+     * {@link Grid#getSpanType(org.controlsfx.control.spreadsheet.SpreadsheetView, int, int) }.
+     * 
+     * @param row
+     * @param column
+     * @return
+     */
+    public SpanType getSpanType(final int row, final int column) {
+        if (getGrid() == null) {
+            return SpanType.NORMAL_CELL;
+        }
+        return getGrid().getSpanType(this, row, column);
+    }
 
     /***************************************************************************
      * * Private/Protected Implementation * *
@@ -1019,39 +856,6 @@ public class SpreadsheetView extends Control {
         }
     }
 
-    /**
-     * Return the {@link SpanType} of a cell.
-     * 
-     * @param row
-     * @param column
-     * @return
-     */
-    public SpanType getSpanType(final int row, final int column) {
-        if (getGrid() == null) {
-            return SpanType.NORMAL_CELL;
-        }
-        return getGrid().getSpanType(this, row, column);
-    }
-
-
-    private void initRowFix(Grid grid) {
-        ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
-        rowFix = new BitSet(rows.size());
-        rows: for (int r = 0; r < rows.size(); ++r) {
-            ObservableList<SpreadsheetCell> row = rows.get(r);
-            for (SpreadsheetCell cell : row) {
-                if (cell.getRowSpan() > 1) {
-                    continue rows;
-                }
-            }
-            rowFix.set(r);
-        }
-    }
-
-    /***************************************************************************
-     * COPY / PASTE METHODS
-     **************************************************************************/
-
     private void checkFormat() {
         if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
             fmt = new DataFormat("SpreadsheetView");
@@ -1063,66 +867,6 @@ public class SpreadsheetView extends Control {
      * private listeners
      * ********************************************************************
      */
-
-    private ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
-        @Override
-        public void onChanged(Change<? extends Integer> c) {
-            while (c.next()) {
-                if (c.wasAdded() || c.wasRemoved()) {
-                    List<? extends Integer> newRows = c.getAddedSubList();
-                    for (int row : newRows) {
-                        if (!isRowFixable(row)) {
-                            throw new IllegalArgumentException(computeReason(row));
-                        }
-                    }
-                    FXCollections.sort(fixedRows);
-                }
-            }
-        }
-
-        private String computeReason(Integer element) {
-            String reason = "\n This row cannot be fixed.";
-            for (SpreadsheetCell cell : getGrid().getRows().get(element)) {
-                if (cell.getRowSpan() > 1) {
-                    reason += "The cell situated at line " + cell.getRow() + " and column " + cell.getColumn()
-                            + "\n has a rowSpan of " + cell.getRowSpan() + ", it must be 1.";
-                    return reason;
-                }
-            }
-            return reason;
-        }
-    };
-
-    private ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
-        @Override
-        public void onChanged(Change<? extends SpreadsheetColumn> c) {
-            while (c.next()) {
-                if (c.wasAdded()) {
-                    List<? extends SpreadsheetColumn> newColumns = c.getAddedSubList();
-                    for (SpreadsheetColumn column : newColumns) {
-                        if (!column.isColumnFixable()) {
-                            throw new IllegalArgumentException(computeReason(column));
-                        }
-                    }
-                }
-            }
-        }
-
-        private String computeReason(SpreadsheetColumn element) {
-            int indexColumn = getColumns().indexOf(element);
-
-            String reason = "\n This column cannot be fixed.";
-            for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
-                int columnSpan = row.get(indexColumn).getColumnSpan();
-                if (columnSpan > 1 || row.get(indexColumn).getRowSpan() > 1) {
-                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column "
-                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1.";
-                    return reason;
-                }
-            }
-            return reason;
-        }
-    };
 
     private final ChangeListener<ContextMenu> contextMenuChangeListener = new ChangeListener<ContextMenu>() {
         

@@ -119,14 +119,14 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
          * FOR FIXED ROWS
          */
         double tableCellY = 0;
-        int positionY = spreadsheetView.getFixedRows().indexOf(index);
+        int positionY = spreadsheetView.getAxes().getFixedRows().indexOf(index);
         
         //FIXME Integrate if fixedCellSize is enabled
         //Computing how much space we need to translate
         //because each row has different space.
         double space = 0;
         for(int o = 0;o< positionY; ++o){
-        	space += getTableRowHeight(spreadsheetView.getFixedRows().get(o));
+        	space += getTableRowHeight(spreadsheetView.getAxes().getFixedRows().get(o));
         }
         
         //If true, this row is fixed

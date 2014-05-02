@@ -52,6 +52,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import org.controlsfx.control.spreadsheet.Axes;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -76,6 +77,7 @@ public class VerticalHeader extends StackPane {
      */
     private final SpreadsheetHandle handle;
     private final SpreadsheetView spreadsheetView;
+    private final Axes axes;
     private double horizontalHeaderHeight;
     private final DoubleProperty verticalHeaderWidth;
     private Double savedWidth;
@@ -119,8 +121,9 @@ public class VerticalHeader extends StackPane {
     public VerticalHeader(final SpreadsheetHandle handle, DoubleProperty verticalHeaderWidth) {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
+        this.axes = spreadsheetView.getAxes();
         this.verticalHeaderWidth = verticalHeaderWidth;
-        working = spreadsheetView.showRowHeaderProperty().get();
+        working = spreadsheetView.getAxes().showRowHeaderProperty().get();
         pickerPile = new Stack<>();
         pickerUsed = new Stack<>();
     }
@@ -161,7 +164,7 @@ public class VerticalHeader extends StackPane {
         VerticalHeader.this.setClip(clip);
 
         // We desactivate and activate the verticalHeader upon request
-        spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
+        axes.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
                 working = newValue;
@@ -177,9 +180,9 @@ public class VerticalHeader extends StackPane {
 
         // When the Column header is showing or not, we need to update the
         // position of the verticalHeader
-        spreadsheetView.showColumnHeaderProperty().addListener(layout);
-        spreadsheetView.getFixedRows().addListener(layout);
-        spreadsheetView.fixingRowsAllowedProperty().addListener(layout);
+        spreadsheetView.getAxes().showColumnHeaderProperty().addListener(layout);
+        spreadsheetView.getAxes().getFixedRows().addListener(layout);
+        spreadsheetView.getAxes().fixingRowsAllowedProperty().addListener(layout);
 
         // In case we resize the view in any manners
         spreadsheetView.heightProperty().addListener(layout);
@@ -209,7 +212,7 @@ public class VerticalHeader extends StackPane {
             // take the other header into account.
             double y = snappedTopInset();
 
-            if (spreadsheetView.showColumnHeaderProperty().get()) {
+            if (axes.showColumnHeaderProperty().get()) {
                 y += horizontalHeaderHeight;
             }
 
@@ -257,7 +260,7 @@ public class VerticalHeader extends StackPane {
                 } else {
                     css.removeAll("selected");
                 }
-                if (spreadsheetView.getFixedRows().contains(rowIndex)) {
+                if (axes.getFixedRows().contains(rowIndex)) {
                     css.addAll("fixed");
                 } else {
                     css.removeAll("fixed");
@@ -278,9 +281,9 @@ public class VerticalHeader extends StackPane {
             double spaceUsedByFixedRows = 0;
 
             // Then we iterate over the FixedRows if any
-            if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
-                for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
-                    rowIndex = spreadsheetView.getFixedRows().get(j);
+            if (!axes.getFixedRows().isEmpty() && cellSize != 0) {
+                for (int j = 0; j < axes.getFixedRows().size(); ++j) {
+                    rowIndex = axes.getFixedRows().get(j);
                     if (!handle.getCellsViewSkin().getCurrentlyFixedRow()
                             .contains(rowIndex)) {
                         break;
@@ -292,7 +295,7 @@ public class VerticalHeader extends StackPane {
                     label.setContextMenu(getRowContextMenu(rowIndex));
                     label.layoutYProperty().unbind();
                     // If the columnHeader is here, we need to translate a bit
-                    if (spreadsheetView.showColumnHeaderProperty().get()) {
+                    if (axes.showColumnHeaderProperty().get()) {
                         label.relocate(x, snappedTopInset() + horizontalHeaderHeight + spaceUsedByFixedRows);
                     } else {
                         label.relocate(x, snappedTopInset() + spaceUsedByFixedRows);
@@ -312,7 +315,7 @@ public class VerticalHeader extends StackPane {
             }
 
             // First one blank and on top (z-order) of the others
-            if (spreadsheetView.showColumnHeaderProperty().get()) {
+            if (axes.showColumnHeaderProperty().get()) {
                 label = getLabel(rowCount++);
                 label.setText("");
                 label.resize(verticalHeaderWidth.get(), horizontalHeaderHeight);
@@ -496,7 +499,7 @@ public class VerticalHeader extends StackPane {
      * @return
      */
     private ContextMenu getRowContextMenu(final Integer i) {
-        if (spreadsheetView.isRowFixable(i)) {
+        if (axes.isRowFixable(i)) {
             final ContextMenu contextMenu = new ContextMenu();
 
             MenuItem fixItem = new MenuItem("Fix");
@@ -506,10 +509,10 @@ public class VerticalHeader extends StackPane {
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
-                    if (spreadsheetView.getFixedRows().contains(i)) {
-                        spreadsheetView.getFixedRows().remove(i);
+                    if (axes.getFixedRows().contains(i)) {
+                        axes.getFixedRows().remove(i);
                     } else {
-                        spreadsheetView.getFixedRows().add(i);
+                        axes.getFixedRows().add(i);
                     }
                 }
             });

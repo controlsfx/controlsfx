@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation;
+package org.controlsfx.validation.decorator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,43 +34,37 @@ import java.util.List;
 import java.util.Set;
 
 import org.controlsfx.control.decoration.Decoration;
+import org.controlsfx.validation.ValidationMessage;
 
 /**
  * Validation decorator which combines several decorators into one 
  */
-public class CompoundValidationDecorator implements ValidationDecorator{
+public class CompoundValidationDecorator implements ValidationDecorator {
 
-	private final Set<ValidationDecorator> decorators = new HashSet<>();
-	
-	/**
-	 * Creates an instance of validator using a collection of validators
-	 * @param decorators collection of validators
-	 */
-	public CompoundValidationDecorator( Collection<ValidationDecorator> decorators ) {
-		this.decorators.addAll(decorators); 
-	}
-	
-	/**
-	 * Creates an instance of validator using a set of validators
-	 * @param decorators set of validators
-	 */
-	public CompoundValidationDecorator( ValidationDecorator... decorators ) {
-		this( Arrays.asList(decorators));
-	}	
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Collection<Decoration> createDecorations(ValidationMessage message) {
-		List<Decoration> decorations = new ArrayList<>();
-		decorators.stream().forEach( d -> decorations.addAll(d.createDecorations(message)));
-		return decorations;
-	}
-	
-	@Override
-	public String toString() {
-		return "Compound Validation Decorator";
-	}
-	
+    private final Set<ValidationDecorator> decorators = new HashSet<>();
+
+    /**
+     * Creates an instance of validator using a collection of validators
+     * @param decorators collection of validators
+     */
+    public CompoundValidationDecorator(Collection<ValidationDecorator> decorators) {
+        this.decorators.addAll(decorators); 
+    }
+
+    /**
+     * Creates an instance of validator using a set of validators
+     * @param decorators set of validators
+     */
+    public CompoundValidationDecorator(ValidationDecorator... decorators) {
+        this(Arrays.asList(decorators));
+    }	
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override public Collection<Decoration> createDecorations(ValidationMessage message) {
+        List<Decoration> decorations = new ArrayList<>();
+        decorators.stream().forEach( d -> decorations.addAll(d.createDecorations(message)));
+        return decorations;
+    }
 }

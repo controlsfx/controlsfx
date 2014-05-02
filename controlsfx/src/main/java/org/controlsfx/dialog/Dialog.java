@@ -334,6 +334,13 @@ public class Dialog {
     }
     
     /**
+     * Visibly shakes the dialog to get the users attention.
+     */
+    public void shake() {
+        dialog.shake();
+    }
+    
+    /**
      * Returns this dialog's window. For lightweight dialogs,
      * this is the window in which this dialog is displayed. 
      * @return
@@ -874,7 +881,14 @@ public class Dialog {
      * Private Implementation
      * 
      **************************************************************************/
-
+    
+    // TODO we use this with the login dialog to change the content, but the longer
+    // term solution is to automatically call sizeToScene on the FXDialog when
+    // the content changes.
+    void sizeToScene() {
+        dialog.sizeToScene();
+    }
+    
     /**
      * TODO delete me - this is just for testing!!
      */
@@ -1072,6 +1086,7 @@ public class Dialog {
         });
         return button;
     }
+    
 
     
     /***************************************************************************

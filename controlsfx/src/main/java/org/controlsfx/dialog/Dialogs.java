@@ -974,6 +974,7 @@ public final class Dialogs {
 		Label lbMessage= new Label(""); 
 		lbMessage.getStyleClass().addAll("message-banner");
 		lbMessage.setVisible(false);
+		lbMessage.setManaged(false);
 		
 		final VBox content = new VBox(10);
 		content.getChildren().add(lbMessage);
@@ -984,29 +985,29 @@ public final class Dialogs {
 //		notificationPane.setShowFromTop(true);
 		
 		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
-
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 			}
 			
-			
-			@Override
-			public void execute(ActionEvent ae) {
+			@Override public void execute(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
 						authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
 					}
 					lbMessage.setVisible(false);
+					lbMessage.setManaged(false);
 					dlg.hide();
 					dlg.setResult(this);
 				} catch( Throwable ex ) {
 					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
 					lbMessage.setVisible(true);
+					lbMessage.setManaged(true);
 					lbMessage.setText(ex.getMessage());
+					dlg.sizeToScene();
+					dlg.shake();
 					ex.printStackTrace();
 				}
-				
 			}
 
 			public String toString() {

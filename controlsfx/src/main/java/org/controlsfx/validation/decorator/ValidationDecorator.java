@@ -24,55 +24,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation;
+package org.controlsfx.validation.decorator;
 
-import javafx.scene.control.Control;
+import java.util.Collection;
+
+import org.controlsfx.control.decoration.Decoration;
+import org.controlsfx.validation.ValidationMessage;
 
 /**
- * Interface to define basic contract for validation message  
+ * Contract for validation decorators
  */
-public interface ValidationMessage extends Comparable<ValidationMessage>{
+@FunctionalInterface
+public interface ValidationDecorator {
 
     /**
-     * Message text
-     * @return message text
+     * Creates decorations for a given validation message
+     * @param message validation message
+     * @return collection of decorations
      */
-    public String getText();
-
-    /**
-     * Message {@link Severity} 
-     * @return message severity
-     */
-    public Severity getSeverity();
-
-
-    /**
-     * Message target - {@link javafx.scene.Control} which message is related to . 
-     * @return message target
-     */
-    public Control getTarget();
-
-    /**
-     * Factory method to create a simple error message 
-     * @param target message target
-     * @param text message text 
-     * @return error message
-     */
-    public static ValidationMessage error( Control target, String text ) {
-        return new SimpleValidationMessage(target, text, Severity.ERROR);
-    }
-
-    /**
-     * Factory method to create a simple warning message 
-     * @param target message target
-     * @param text message text 
-     * @return warning message
-     */
-    public static ValidationMessage warning( Control target, String text ) {
-        return new SimpleValidationMessage(target, text, Severity.WARNING);
-    }
-
-    default public int compareTo(ValidationMessage msg) {
-        return msg == null || getTarget() != msg.getTarget() ? -1: getSeverity().compareTo(msg.getSeverity());
-    }
+    public Collection<? extends Decoration> createDecorations(ValidationMessage message);
 }

@@ -290,6 +290,14 @@ class HeavyweightDialog extends FXDialog {
         return stage.getScene().getRoot();
     }
     
+    public double getX() {
+        return stage.getX();
+    }
+    
+    public void setX(double x) {
+        stage.setX(x);
+    }
+    
     @Override ReadOnlyDoubleProperty heightProperty() {
         return stage.heightProperty();
     }

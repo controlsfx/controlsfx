@@ -296,11 +296,11 @@ import org.controlsfx.validation.Validator;
  * all other tabs will continue to be interactive and execute as per usual.
  * 
  * <p>One limitation of lightweight dialogs is that it is not possible to use
- * the dialog style feature. If you call both {@link #lightweight()} and
- * {@link #style(DialogStyle)}, the call to enable lightweight takes precedence
- * over the use of the {@code DialogStyle}, so you will end up seeing what is shown
- * in the screenshot below (that is, a cross-platform-looking dialog that is 
- * lightweight).
+ * the native titlebar feature. If you call both {@link #lightweight()} and
+ * {@link #style(DialogStyle)} with {@link DialogStyle#NATIVE} option,
+ * the call to enable lightweight takes precedence over the use of the
+ * {@code DialogStyle}, so you will end up seeing what is shown in the screenshot
+ * below (that is, a cross-platform-looking dialog that is lightweight).
  * 
  * <p>To make a dialog lightweight, you simply call {@link #lightweight()} when
  * constructing the dialog using this Dialogs API. If you are using the 
@@ -308,13 +308,18 @@ import org.controlsfx.validation.Validator;
  * lightweight dialogs must be made in the
  * {@link Dialog#Dialog(Object, String, boolean)} constructor.
  * 
- * <p>Shown below is a screenshot of a lightweight dialog whose owner is the
+ * <p>Shown below are screenshots of a lightweight dialog whose owner is the
  * Tab. This means that whilst the first tab is blocked for input until the
  * dialog is dismissed by the user, the rest of the UI (including going to other
  * tabs) remains interactive):
  * 
+ * <h4>Lightweight dialog whose style is {@link DialogStyle#CROSS_PLATFORM_DARK}</h4>
  * <br>
- * <center><img src="lightweight.png"></center>
+ * <center><img src="dialog-style/linux-lightweight-cross-platform.png"></center>
+ * 
+ * <h4>Lightweight dialog whose style is {@link DialogStyle#UNDECORATED}</h4>
+ * <br>
+ * <center><img src="dialog-style/linux-lightweight-undecorated.png"></center>
  * 
  * <h3>Java 8 API elements</h3>
  * 

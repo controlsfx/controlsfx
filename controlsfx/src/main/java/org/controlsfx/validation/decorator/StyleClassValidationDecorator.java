@@ -55,9 +55,9 @@ public class StyleClassValidationDecorator implements ValidationDecorator {
      * @param errorClass class name for error decoration
      * @param warningClass class name for warning decoration
      */
-    public StyleClassValidationDecorator( String errorClass, String warningClass ) {
-        this.errorClass = errorClass != null? errorClass: "error";
-        this.warningClass = warningClass != null? warningClass: "warning";	
+    public StyleClassValidationDecorator(String errorClass, String warningClass) {
+        this.errorClass = errorClass != null? errorClass : "error";
+        this.warningClass = warningClass != null? warningClass : "warning";	
     }
 
     /**

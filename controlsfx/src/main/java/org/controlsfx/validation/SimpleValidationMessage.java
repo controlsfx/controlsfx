@@ -43,24 +43,19 @@ class SimpleValidationMessage implements ValidationMessage {
         this.target = target;
     }
 
-    @Override
-    public Control getTarget() {
+    @Override public Control getTarget() {
         return target;
     }
 
-
-    @Override
-    public String getText() {
+    @Override public String getText() {
         return text;
     }
 
-    @Override
-    public Severity getSeverity() {
+    @Override public Severity getSeverity() {
         return severity;
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result
@@ -70,8 +65,7 @@ class SimpleValidationMessage implements ValidationMessage {
         return result;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -94,8 +88,7 @@ class SimpleValidationMessage implements ValidationMessage {
         return true;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return String.format("%s(%s)", severity, text);
     }
 

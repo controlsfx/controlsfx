@@ -266,12 +266,12 @@ public class ValidationSupport {
 	
 	
 	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
-			new SimpleObjectProperty<ValidationDecorator>(new GraphicValidationDecorator()) {
-		      public void set(ValidationDecorator decorator) {
-//		    	  if ( decorator != null ) redecorate();
-		  		  super.set(decorator);
-		      };
-			};
+	        new SimpleObjectProperty<ValidationDecorator>(this, "validationDecorator", new GraphicValidationDecorator()) {
+	    protected void invalidated() {
+	        // when the decorator changes, rerun the decoration to update the visuals immediately.
+	        redecorate();
+	    }
+	};
 	
 	/**
 	 * Return validation decorator property

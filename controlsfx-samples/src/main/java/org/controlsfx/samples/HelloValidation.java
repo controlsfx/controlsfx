@@ -197,24 +197,20 @@ public class HelloValidation extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
         
-        
-        
         GraphicValidationDecorator iconDecorator = new GraphicValidationDecorator();
         StyleClassValidationDecorator cssDecorator = new StyleClassValidationDecorator();
 
         int row = 0;
         ComboBox<ValidationDecorator> checkbox =  new ComboBox<>();
         checkbox.getItems().addAll( iconDecorator, cssDecorator, new CompoundValidationDecorator(cssDecorator,iconDecorator));
-        checkbox.getSelectionModel().selectedItemProperty().addListener( (o,old,decorator) ->
-           validationSupport.setValidationDecorator(decorator)
+        checkbox.getSelectionModel().selectedItemProperty().addListener((o,old,decorator) ->
+            validationSupport.setValidationDecorator(decorator)
         );
         checkbox.getSelectionModel().select(0);
-        
         
         grid.add(new Label("Validation Decorator"), 0, row);
         grid.add(checkbox, 1, row);
         GridPane.setHgrow(checkbox, Priority.ALWAYS);
-        
 
         return grid;
     }

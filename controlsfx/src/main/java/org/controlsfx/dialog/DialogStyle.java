@@ -24,23 +24,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation;
 
-import java.util.Collection;
-
-import org.controlsfx.control.decoration.Decoration;
+package org.controlsfx.dialog;
 
 /**
- * Contract for validation decorators
+ * This enum defines the possible styles for a dialog.
  */
-@FunctionalInterface
-public interface ValidationDecorator {
-	
-	/**
-	 * Creates decorations for a given validation message
-	 * @param message validation message
-	 * @return collection of decorations
-	 */
-     Collection<? extends Decoration> createDecorations( ValidationMessage message );
-     
+public enum DialogStyle {
+    
+    /**
+     * Defines a cross-platform dialog style.
+     * The dialogs rendered using this style will have a cross-platform title bar.
+     */
+    CROSS_PLATFORM_DARK,
+
+    /**
+     * Defines a native dialog style.
+     * The dialogs rendered using this style will have a native title bar.
+     */
+    NATIVE,
+
+    /**
+     * Defines a dialog style with no decorations.
+     * The dialogs rendered using this style will not have a title bar.
+     */
+    UNDECORATED
 }

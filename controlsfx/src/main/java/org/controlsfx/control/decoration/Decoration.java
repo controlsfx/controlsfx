@@ -26,6 +26,9 @@
  */
 package org.controlsfx.control.decoration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.scene.Node;
 
 /**
@@ -41,7 +44,7 @@ import javafx.scene.Node;
 @FunctionalInterface
 public interface Decoration {
     
-    /**
+	/**
      * Depending on the boolean 'add' parameter, this method is responsible for
      * decorating or undecorating the given target node. 
      * 
@@ -60,4 +63,15 @@ public interface Decoration {
      *         valid return value. If the add parameter is false, always null.
      */
     public Node run(Node targetNode, boolean add);
+    
+    //TODO: Move to abstract class - too public :)
+    final Map<String,Object> properties = new HashMap<>(); 
+    
+    /**
+     * Custom decoration properties
+     * @return decoration properties
+     */
+    default Map<String,Object> getProperties() {
+    	return properties;
+    }
 }

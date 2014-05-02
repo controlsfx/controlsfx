@@ -75,6 +75,10 @@ public interface ValidationMessage extends Comparable<ValidationMessage>{
 		return new SimpleValidationMessage(target, text, Severity.WARNING);
 	}
 	
+	default int compareTo(ValidationMessage msg) {
+		return msg == null || getTarget() != msg.getTarget()? -1: getSeverity().compareTo(msg.getSeverity());
+	}
+	
 	static Comparator<ValidationMessage> COMPARATOR = new Comparator<ValidationMessage>() {
 
 		@Override

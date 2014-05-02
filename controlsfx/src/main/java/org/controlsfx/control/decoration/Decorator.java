@@ -158,6 +158,9 @@ public class Decorator {
         if (p == null) {
             // install decoration pane
             Scene scene = target.getScene();
+            if (scene == null) {
+                return null;
+            }
             p = new DecorationPane();
             Node oldRoot = scene.getRoot();
             ImplUtils.injectAsRootPane(scene, p);

@@ -50,13 +50,13 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.validation.CompoundValidationDecorator;
-import org.controlsfx.validation.GraphicValidationDecorator;
-import org.controlsfx.validation.StyleClassValidationDecorator;
-import org.controlsfx.validation.ValidationDecorator;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.controlsfx.validation.decorator.CompoundValidationDecorator;
+import org.controlsfx.validation.decorator.GraphicValidationDecorator;
+import org.controlsfx.validation.decorator.StyleClassValidationDecorator;
+import org.controlsfx.validation.decorator.ValidationDecorator;
 
 public class HelloValidation extends ControlsFXSample {
 

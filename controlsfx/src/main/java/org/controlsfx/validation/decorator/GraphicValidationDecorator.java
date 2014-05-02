@@ -24,13 +24,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation;
+package org.controlsfx.validation.decorator;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.GraphicDecoration;
+import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationMessage;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;

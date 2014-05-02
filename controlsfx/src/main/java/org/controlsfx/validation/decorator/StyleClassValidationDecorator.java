@@ -24,53 +24,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation;
+package org.controlsfx.validation.decorator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.controlsfx.control.decoration.Decoration;
+import org.controlsfx.control.decoration.StyleClassDecoration;
+import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationMessage;
 
 /**
- * Validation decorator which combines several decorators into one 
+ * Validation decorator to decorate component validation state using two
+ * CSS classes for errors and warnings 
  */
-public class CompoundValidationDecorator implements ValidationDecorator{
-
-	private final Set<ValidationDecorator> decorators = new HashSet<>();
+public class StyleClassValidationDecorator implements ValidationDecorator {
+	
+	private final String errorClass;
+	private final String warningClass;
 	
 	/**
-	 * Creates an instance of validator using a collection of validators
-	 * @param decorators collection of validators
+	 * Creates a default instance of a decorator
 	 */
-	public CompoundValidationDecorator( Collection<ValidationDecorator> decorators ) {
-		this.decorators.addAll(decorators); 
+	public StyleClassValidationDecorator() {
+		this(null,null);
 	}
 	
 	/**
-	 * Creates an instance of validator using a set of validators
-	 * @param decorators set of validators
+	 * Creates an instance of validator using custom class names
+	 * @param errorClass class name for error decoration
+	 * @param warningClass class name for warning decoration
 	 */
-	public CompoundValidationDecorator( ValidationDecorator... decorators ) {
-		this( Arrays.asList(decorators));
-	}	
+	public StyleClassValidationDecorator( String errorClass, String warningClass ) {
+		this.errorClass = errorClass != null? errorClass: "error";
+		this.warningClass = warningClass != null? warningClass: "warning";	
+	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Collection<Decoration> createDecorations(ValidationMessage message) {
-		List<Decoration> decorations = new ArrayList<>();
-		decorators.stream().forEach( d -> decorations.addAll(d.createDecorations(message)));
-		return decorations;
+		return Arrays.asList(new StyleClassDecoration( Severity.ERROR == message.getSeverity()? errorClass:warningClass));
 	}
 	
 	@Override
 	public String toString() {
-		return "Compound Validation Decorator";
+		return "Style Class Validation Decorator";
 	}
-	
+
 }

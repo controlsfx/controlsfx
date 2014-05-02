@@ -690,6 +690,10 @@ public class Dialog {
          */
         boolean hasTrait( ActionTrait trait);
         
+        /**
+         * Implementation of default dialog action execution logic:
+         * if action is enabled set it as dialog result.
+         */
         default public void execute(ActionEvent ae) {
             if (! disabledProperty().get()) {
                 if (ae.getSource() instanceof Dialog ) {

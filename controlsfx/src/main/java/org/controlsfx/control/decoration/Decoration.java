@@ -26,7 +26,8 @@
  */
 package org.controlsfx.control.decoration;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.Node;
 
@@ -63,17 +64,14 @@ public interface Decoration {
      */
     public Node run(Node targetNode, boolean add);
     
-    
-    Properties[] props = new Properties[]{null}; // array allows for lazy initialization of final variable
+    //TODO: Move to abstract class - too public :)
+    final Map<String,Object> properties = new HashMap<>(); 
     
     /**
      * Custom decoration properties
      * @return decoration properties
      */
-    default Properties getProperties() {
-    	if ( props[0] == null  ) {
-    		props[0] = new Properties();
-    	}
-    	return props[0];
+    default Map<String,Object> getProperties() {
+    	return properties;
     }
 }

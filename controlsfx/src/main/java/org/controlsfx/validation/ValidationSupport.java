@@ -37,6 +37,7 @@ import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -205,18 +206,18 @@ public class ValidationSupport {
 	 */
 	// TODO needs optimization
 	public void redecorate() {
-		ValidationDecorator decorator = getValidationDecorator();
+		Optional<ValidationDecorator> odecorator = Optional.ofNullable(getValidationDecorator());
 		for (Control target : getRegisteredControls()) {
 			try {
 				removeDecorations(target);
-				if (decorator != null) {
+				odecorator.ifPresent( decorator -> 
 					getHighestMessage(target).ifPresent(msg -> {
 						for (Decoration d : decorator.createDecorations(msg)) {
 							setValidationDecoration(d); // mark for validation
 							addDecoration(target, d);
 						}
-					});
-				}
+					})
+				);
 			} catch (Throwable ex) {
 				// FIXME Decorator throws an exception on the first run
 				ex.printStackTrace();
@@ -265,7 +266,12 @@ public class ValidationSupport {
 	
 	
 	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
-			new SimpleObjectProperty<>(new IconValidationDecorator());
+			new SimpleObjectProperty<ValidationDecorator>(new GraphicValidationDecorator()) {
+		      public void set(ValidationDecorator decorator) {
+//		    	  if ( decorator != null ) redecorate();
+		  		  super.set(decorator);
+		      };
+			};
 	
 	/**
 	 * Return validation decorator property
@@ -288,7 +294,6 @@ public class ValidationSupport {
 	 * @param decorator new validation decorator. Null value is valid - no decoration will occur
 	 */
 	public void setValidationDecorator( ValidationDecorator decorator ) {
-		if ( decorator != null ) redecorate();
 		validationDecoratorProperty.set(decorator);
 	}
 	
@@ -314,9 +319,13 @@ public class ValidationSupport {
 			ObservableValue<T> observable = (ObservableValue<T>) e.extraction.call(c);
 			setRequired( c, required );
 			
-			Consumer<T> updateResults = value -> validationResults.put(c, validator.apply(c, value));
+			Consumer<T> updateResults = value -> { 
+				Platform.runLater(() -> validationResults.put(c, validator.apply(c, value)));
+			};
 			
 			controls.add(c);
+			//TODO: Mark required components 
+			
 			observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
 			updateResults.accept(observable.getValue());
 			
@@ -350,7 +359,7 @@ public class ValidationSupport {
 	 */
 	public Optional<ValidationMessage> getHighestMessage(Control target) {
 		return Optional.ofNullable(validationResults.get(target)).map( result -> 
-			result.getMessages().stream().max( ValidationMessage.COMPARATOR).orElse(null)
+			result.getMessages().stream().max(ValidationMessage.COMPARATOR).orElse(null)
 		);
 	}
 

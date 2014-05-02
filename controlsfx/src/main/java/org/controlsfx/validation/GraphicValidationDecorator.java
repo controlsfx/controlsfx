@@ -42,36 +42,36 @@ import javafx.scene.image.ImageView;
 /**
  * Validation decorator to decorate validation state using images 
  */
-public class IconValidationDecorator implements ValidationDecorator {
+public class GraphicValidationDecorator implements ValidationDecorator {
 	
-	private final Image errorImage;
-    private final Image warningImage;
+	private final Node errorNode;
+    private final Node warningNode;
     
     /**
      * Creates default instance
      */
-    public IconValidationDecorator() {
+    public GraphicValidationDecorator() {
 		this(null,null);
 	}
     
     /**
-     * Creates an instance using custom images to decorate validation states
-     * @param errorImage error image, if null default image is used
-     * @param warningImage warning image, if null default image is used
+     * Creates an instance using custom graphic to decorate validation states
+     * @param errorNode error graphic, if null default image is used
+     * @param warningNode warning graphic, if null default image is used
      */
-    public IconValidationDecorator( Image errorImage, Image warningImage ) {
-		this.errorImage   = errorImage != null? 
-		   errorImage: new Image("/impl/org/controlsfx/control/validation/decoration-error.png");
-		this.warningImage = warningImage != null? 
-		   warningImage: new Image("/impl/org/controlsfx/control/validation/decoration-warning.png");
+    public GraphicValidationDecorator( Node errorNode, Node warningNode ) {
+		this.errorNode   = errorNode != null? 
+		   errorNode: new ImageView(new Image("/impl/org/controlsfx/control/validation/decoration-error.png"));
+		this.warningNode = warningNode != null? 
+		   warningNode: new ImageView(new Image("/impl/org/controlsfx/control/validation/decoration-warning.png"));
 	}
     
   
 	protected Node createDecorationNode(ValidationMessage message) {
-		ImageView imageView = new ImageView(Severity.ERROR == message.getSeverity()?errorImage:warningImage);
-        imageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
+		Node graphic = Severity.ERROR == message.getSeverity()?errorNode:warningNode;
+        graphic.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
         Label label = new Label();
-        label.setGraphic(imageView);
+        label.setGraphic(graphic);
 		label.setTooltip( createTooltip(message));
         label.setAlignment(Pos.CENTER);
 		return label;

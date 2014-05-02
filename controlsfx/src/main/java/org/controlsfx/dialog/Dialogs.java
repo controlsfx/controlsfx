@@ -68,7 +68,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Tab;
@@ -98,6 +97,9 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.control.textfield.CustomPasswordField;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.validation.ValidationSupport;
@@ -394,7 +396,7 @@ public final class Dialogs {
     private Object owner;
     private String title = USE_DEFAULT;
     private String message;
-    private String masthead = USE_DEFAULT;
+    private String masthead;
     private boolean lightweight;
     private DialogStyle style;
     private Set<Action> actions = new LinkedHashSet<>();
@@ -953,33 +955,30 @@ public final class Dialogs {
      * Creates a Login {@link Dialog} whith user name and password  fields
      * 
      * @param initialUserInfo user information initially shown in the dialog
-     * @param authenticator callback to execute actual authentication process. Exceptions coming from this callback are interpreted as
-     * authentication errors and will be shown as error message. In case of an exception the dialog will not close to give the user 
+     * @param authenticator callback represents actual authentication process. Exceptions coming from this callback are interpreted as
+     * authentication errors and will be shown as error message. In case of an exception the dialog will not closed to give the user 
      * an opportunity to correct their information and try again
      * 
-     * @return optional of UserInfo. Optional.EMPTY returned in case of cancelled dialog otherwise Optional of UserInfo value with provided user name
+     * @return optional UserInfo. Optional.EMPTY returned in case of cancelled dialog otherwise Optional of UserInfo value with provided user name
      * and password
      *  
      */
     public Optional<UserInfo> showLogin( final UserInfo initialUserInfo, final Callback<UserInfo, Void> authenticator ) {
     	
-    	TextField txUserName     = new TextField();
-		PasswordField txPassword = new PasswordField();
+    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();// new CustomTextField();
+    	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
+    	
+    	CustomPasswordField txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
+    	txPassword.setLeft(new ImageView( DialogResources.getImage("login.password.icon")));
 		
 		Label lbMessage= new Label(""); 
-		lbMessage.setMaxWidth(Double.MAX_VALUE);
 		lbMessage.getStyleClass().addAll("message-banner");
 		lbMessage.setVisible(false);
 		
-		final GridPane content = new GridPane();
-		content.setHgap(10);
-		content.setVgap(10);
-		content.add(lbMessage, 0, 0, 2, 1);
-		GridPane.setHgrow(lbMessage, Priority.ALWAYS);
-		content.addRow(1, new Label( null, new ImageView( DialogResources.getImage("login.user.icon")) ),txUserName);
-		GridPane.setHgrow(txUserName, Priority.ALWAYS);
-		content.addRow(2,new Label(null, new ImageView( DialogResources.getImage("login.password.icon"))), txPassword);
-		GridPane.setHgrow(txPassword, Priority.ALWAYS);
+		final VBox content = new VBox(10);
+		content.getChildren().add(lbMessage);
+		content.getChildren().add(txUserName);
+		content.getChildren().add(txPassword);
 		
 //		NotificationPane notificationPane = new NotificationPane(content);
 //		notificationPane.setShowFromTop(true);

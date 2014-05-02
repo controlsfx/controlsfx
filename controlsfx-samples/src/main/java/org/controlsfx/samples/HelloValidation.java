@@ -51,7 +51,7 @@ import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.CompoundValidationDecorator;
-import org.controlsfx.validation.IconValidationDecorator;
+import org.controlsfx.validation.GraphicValidationDecorator;
 import org.controlsfx.validation.StyleClassValidationDecorator;
 import org.controlsfx.validation.ValidationDecorator;
 import org.controlsfx.validation.ValidationResult;
@@ -199,7 +199,7 @@ public class HelloValidation extends ControlsFXSample {
         
         
         
-        IconValidationDecorator iconDecorator = new IconValidationDecorator();
+        GraphicValidationDecorator iconDecorator = new GraphicValidationDecorator();
         StyleClassValidationDecorator cssDecorator = new StyleClassValidationDecorator();
 
         int row = 0;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -212,42 +212,63 @@ import org.controlsfx.validation.Validator;
  * </table>
  * 
  * 
- * <h3>Native and Cross-Platform Dialogs</h3>
+ * <h3>Styled Dialogs</h3>
  * 
  * <p>The ControlsFX dialogs API supports displaying dialogs with either a
  * consistent cross-platform titlebar area, or by using the titlebar of the users
- * operating system. All of the screenshots above are taken using the cross-platform
- * style, whereas the screenshots below are the same dialog code being rendered
- * using the users native platform titlebar. To enable this in the Dialogs
- * fluent API, simply call {@link #nativeTitleBar()} when creating the dialog.
- * If you're using the {@link Dialog} class, you can specify that you want to
- * use the native titlebar as part of the 
- * {@link Dialog#Dialog(Object, String, boolean, boolean)} constructor (where the
- * fourth parameter is used to represent whether to use the native titlebar or not).
+ * operating system, or without a titlebar. All of the screenshots above are taken
+ * using the cross-platform style, whereas the screenshots below are the
+ * same dialog code being rendered using different dialog styles.</p>
  * 
- * <p>Here are the screenshots of dialogs with their native title bars:
+ * <p>
+ * A dialog has one of the following styles:
+ * <ul>
+ * <li>{@link DialogStyle#CROSS_PLATFORM_DARK} - a dialog with a cross-platform title bar.</li>
+ * <li>{@link DialogStyle#NATIVE} - a dialog with a native title bar.</li>
+ * <li>{@link DialogStyle#UNDECORATED} - a dialog without a title bar.</li>
+ * </ul>
+ * </p>
+ * <p>If no style is specified, the dialogs will be rendered using the default
+ * {@link DialogStyle#CROSS_PLATFORM_DARK} style.</p>
+ * 
+ * To enable this in the Dialogs fluent API, simply call {@link #style(DialogStyle)}
+ * when creating the dialog. If you're using the {@link Dialog} class,
+ * you can specify the {@code DialogStyle} you want to use as part of the 
+ * {@link Dialog#Dialog(Object, String, boolean, DialogStyle)} constructor.
+ * 
+ * <p>Here are the screenshots of dialogs using different dialog styles:
  * 
  * <br/>
  * <table style="border: 1px solid gray;">
  *   <tr>
  *     <th><center><h3>Platform</h3></center></th>
+ *     <th><center><h3>DialogStyle</h3></center></th>
  *     <th><center><h3>Screenshot</h3></center></th>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Cross-Platform (default)</strong></td>
- *     <td><center><img src="native-titlebar/cross-platform.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Cross-Platform (default)</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.CROSS_PLATFORM_DARK}</strong></td>
+ *     <td><center><img src="dialog-style/cross-platform.png"></center></td>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Mac OS X</strong></td>
- *     <td><center><img src="native-titlebar/mac-native-titlebar.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Mac OS X</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.NATIVE}</strong></td>
+ *     <td><center><img src="dialog-style/mac-native-titlebar.png"></center></td>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Windows 8</strong></td>
- *     <td><center><img src="native-titlebar/windows-8-native-titlebar.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Windows 8</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.NATIVE}</strong></td>
+ *     <td><center><img src="dialog-style/windows-8-native-titlebar.png"></center></td>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Linux (Ubuntu)</strong></td>
- *     <td><center><img src="native-titlebar/linux-native-titlebar.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Linux (Ubuntu)</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.NATIVE}</strong></td>
+ *     <td><center><img src="dialog-style/linux-native-titlebar.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:center;"><strong>Linux (Ubuntu)</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.UNDECORATED}</strong></td>
+ *     <td><center><img src="dialog-style/linux-undecorated-dialog.png"></center></td>
  *   </tr>
  * </table>
  * 
@@ -273,9 +294,9 @@ import org.controlsfx.validation.Validator;
  * all other tabs will continue to be interactive and execute as per usual.
  * 
  * <p>One limitation of lightweight dialogs is that it is not possible to use
- * the native titlebar feature. If you call both {@link #lightweight()} and
- * {@link #nativeTitleBar()}, the call to enable lightweight takes precedence
- * over the use of the native titlebar, so you will end up seeing what is shown
+ * the dialog style feature. If you call both {@link #lightweight()} and
+ * {@link #style(DialogStyle)}, the call to enable lightweight takes precedence
+ * over the use of the {@code DialogStyle}, so you will end up seeing what is shown
  * in the screenshot below (that is, a cross-platform-looking dialog that is 
  * lightweight).
  * 
@@ -303,7 +324,7 @@ import org.controlsfx.validation.Validator;
  *   optional.isPresent(value->{...}) //perform an operation only if there is a value 
  *   optional.orElse(default)         //get the value of optional with default if it does not exists
  *   optional.map( value -> {...} ).orElse(default) //convert to other type with default
- * </pre>
+ * }</pre>
  * and many more - check {@link Optional} API.<br>
  * {@link Optional} can be thought of as a stream collection of one or none elements, allowing for functional approach - 
  * chaining methods without keeping state. This especially beneficial in concurrent environments.  
@@ -375,7 +396,7 @@ public final class Dialogs {
     private String message;
     private String masthead = USE_DEFAULT;
     private boolean lightweight;
-    private boolean nativeTitleBar;
+    private DialogStyle style;
     private Set<Action> actions = new LinkedHashSet<>();
     private Effect backgroundEffect;
 
@@ -484,14 +505,15 @@ public final class Dialogs {
     }
     
     /**
-     * Specifies that the dialog should use the native title bar of the users 
-     * operating system rather than the custom cross-platform rendering used by 
-     * default. Refer to the Dialogs class JavaDoc for more information.
+     * Specifies that the dialog should use the given {@code DialogStyle}
+     * rather than the custom cross-platform rendering used by default.
+     * Refer to the Dialogs class JavaDoc for more information.
      * 
+     * @param style The {@code DialogStyle} of the dialog.
      * @return dialog instance.
      */
-    public Dialogs nativeTitleBar() {
-        this.nativeTitleBar = true;
+    public Dialogs style(DialogStyle style) {
+        this.style = style;
         return this;
     }
     
@@ -562,7 +584,7 @@ public final class Dialogs {
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
                 String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails, nativeTitleBar).show();
+                new ExceptionDialog((Window)owner, moreDetails, style).show();
             }
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
@@ -1035,7 +1057,7 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight, style);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         Image image = dlgType.getImage();

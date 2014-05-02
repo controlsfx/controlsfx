@@ -45,62 +45,57 @@ import javafx.scene.image.ImageView;
  * Validation decorator to decorate validation state using images 
  */
 public class GraphicValidationDecorator implements ValidationDecorator {
-	
+
     // FIXME we shouldn't hardcode this - defer to CSS eventually
     private static final Image ERROR_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-error.png");
     private static final Image WARNING_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-warning.png");
-    
+
     // TODO shouldn't we also support a SUCCESS_IMAGE?
-    
-    
+
+
     /**
      * Creates default instance
      */
     public GraphicValidationDecorator() {
-		
-	}
-    
+
+    }
+
     // TODO write javadoc that users should override these methods to customise
     // the error / warning / success nodes to use 
     protected Node createErrorNode() {
         return new ImageView(ERROR_IMAGE);
     }
-    
+
     protected Node createWarningNode() {
         return new ImageView(WARNING_IMAGE);
     }
-  
-	private Node createDecorationNode(ValidationMessage message) {
-		Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
+
+    private Node createDecorationNode(ValidationMessage message) {
+        Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
         graphic.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);");
         Label label = new Label();
         label.setGraphic(graphic);
-		label.setTooltip(createTooltip(message));
+        label.setTooltip(createTooltip(message));
         label.setAlignment(Pos.CENTER);
-		return label;
-	}
-	
-	protected Tooltip createTooltip(ValidationMessage message) {
-		Tooltip tooltip = new Tooltip(message.getText());
+        return label;
+    }
+
+    protected Tooltip createTooltip(ValidationMessage message) {
+        Tooltip tooltip = new Tooltip(message.getText());
         tooltip.setOpacity(.9);
         tooltip.setAutoFix(true);
         tooltip.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);"
-        		       + "-fx-background-color: FBEFEF; -fx-text-fill: cc0033;"
-        		       + "-fx-font-weight: bold; -fx-padding: 5;" 
-        		       + "-fx-border-width:1; -fx-border-color:cc0033;");
+                + "-fx-background-color: FBEFEF; -fx-text-fill: cc0033;"
+                + "-fx-font-weight: bold; -fx-padding: 5;" 
+                + "-fx-border-width:1; -fx-border-color:cc0033;");
         return tooltip;
-	}
-    
-	  /**
-	   * {@inheritDoc}
-	   */
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-	public final Collection<? extends Decoration> createDecorations(ValidationMessage message) {
-		return Arrays.asList(new GraphicDecoration(createDecorationNode(message),Pos.BOTTOM_LEFT));
-	}
-    
-	@Override
-	public String toString() {
-		return "Icon Validation Decorator";
-	}
+    public final Collection<? extends Decoration> createDecorations(ValidationMessage message) {
+        return Arrays.asList(new GraphicDecoration(createDecorationNode(message),Pos.BOTTOM_LEFT));
+    }
 }

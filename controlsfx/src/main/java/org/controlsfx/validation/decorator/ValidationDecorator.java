@@ -42,6 +42,5 @@ public interface ValidationDecorator {
      * @param message validation message
      * @return collection of decorations
      */
-    Collection<? extends Decoration> createDecorations(ValidationMessage message);
-
+    public Collection<? extends Decoration> createDecorations(ValidationMessage message);
 }

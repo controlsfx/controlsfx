@@ -47,7 +47,7 @@ import org.controlsfx.dialog.Dialog.DialogAction;
  * @see Action
  * @see DialogAction
  */
-public class AbstractDialogAction extends AbstractAction implements DialogAction {
+public class DefaultDialogAction extends AbstractAction implements DialogAction {
     
     private final EnumSet<ActionTrait> traits;
 
@@ -56,7 +56,7 @@ public class AbstractDialogAction extends AbstractAction implements DialogAction
      * @param text
      * @param traits
      */
-    public AbstractDialogAction(String text, ActionTrait... traits) {
+    public DefaultDialogAction(String text, ActionTrait... traits) {
         super(text);
         this.traits = (traits == null || traits.length == 0) ? 
                 EnumSet.noneOf(ActionTrait.class) : 
@@ -67,7 +67,7 @@ public class AbstractDialogAction extends AbstractAction implements DialogAction
      * Creates a dialog action with given text and common set of traits: CLOSING and DEFAULT
      * @param text
      */
-    public AbstractDialogAction(String text) {
+    public DefaultDialogAction(String text) {
         this(text, ActionTrait.CLOSING, ActionTrait.DEFAULT);
     }
     

@@ -64,7 +64,7 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.AbstractDialogAction;
+import org.controlsfx.dialog.DefaultDialogAction;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.DialogStyle;
@@ -478,7 +478,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new AbstractDialogAction("Login",
+			final Action actionLogin = new DefaultDialogAction("Login",
 					ActionTrait.CLOSING, ActionTrait.DEFAULT) {
 
 				{

@@ -204,8 +204,6 @@ public class SpreadsheetView extends Control {
     private SimpleObjectProperty<Grid> gridProperty = new SimpleObjectProperty<>();
     private DataFormat fmt;
     private final Axes axes;
-    private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
-    private Callback<Integer,Void> rowPickerCallback;
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -514,18 +512,6 @@ public class SpreadsheetView extends Control {
     public Axes getAxes(){
         return axes;
     }
-    public ObservableList<Integer> getRowPickers() {
-        return rowPickers;
-    }
-    
-    public void setRowPickerCallback(Callback<Integer,Void> callback){
-        this.rowPickerCallback = callback;
-    }
-    
-    public Callback<Integer,Void> getRowPickerCallback(){
-        return rowPickerCallback;
-    }
-    
 
     /**
      * This method will compute the best height for each line. That is to say

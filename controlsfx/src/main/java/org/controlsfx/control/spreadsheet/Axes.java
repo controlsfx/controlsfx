@@ -34,15 +34,19 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.util.Callback;
 
 /**
- * This class handles everything related to the Axes of the {@link SpreadsheetView}.
+ * This class handles everything related to the Axes of the
+ * {@link SpreadsheetView}.
  * <br/>
- * 
- * You can fix some rows and some columns by
- * right-clicking on their header. A context menu will appear if it's possible to fix them. 
- * The label will then be in italic and the background will turn to dark grey. 
- * Keep in mind that only columns without any spanning cells can be fixed.
+ *
+ * <h3>Fixing Rows and Columns</h3>
+ * <br/>
+ * You can fix some rows and some columns by right-clicking on their header. A
+ * context menu will appear if it's possible to fix them. The label will then be
+ * in italic and the background will turn to dark grey. Keep in mind that only
+ * columns without any spanning cells can be fixed.
  * <br/>
  * And that and only rows without row-spanning cells can be fixed. <br/>
  * You have also the possibility to fix them manually by adding and removing
@@ -51,11 +55,44 @@ import javafx.collections.ObservableList;
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
  * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior
  * every move will ensure that no exception will be thrown.
+ *
+ * <br/>
+ *
+ * <h3>Headers</h3>
+ * <br/>
+ * You can also access and toggle header's visibility by using the methods
+ * provided like {@link #setShowRowHeader(boolean) } or {@link #setShowColumnHeader(boolean)
+ * }.
  * 
  * <br/>
  * 
- * You can also access and toggle header's visibility by using the methods provided
- * like {@link #setShowRowHeader(boolean) } or {@link #setShowColumnHeader(boolean) }.
+ * <h3>Pickers</h3>
+ * <br/>
+ * 
+ * You can show some little images next to the Axes. They will appear on the 
+ * left of the VerticalHeader and on top on the HorizontalHeader. They are called
+ * "picker" because they were used originally for picking a row or a column to 
+ * insert in the SpreadsheetView.
+ * <br/>
+ * But you can do anything you want with it. Simply add a row or a column index in 
+ * {@link #getRowPickers() } and {@link #getColumnPickers() }. Then you can provide 
+ * a custom CallBack with {@link #setRowPickerCallback(javafx.util.Callback) } and 
+ * {@link #setColumnPickerCallback(javafx.util.Callback) } in order to react when 
+ * the user click on the picker. The Callback gives you the index of the picker.
+ * <br/>
+ * 
+ * You can also override the default graphic of the picker by overriding its css,
+ * example:
+ * <br/>
+ * <pre>
+ * .picker-label{
+ *   -fx-graphic: url("add.png"); 
+ *   -fx-background-color: transparent;
+ *   -fx-padding: 0 0 0 0;
+ * }
+ * </pre>
+ * 
+ * 
  */
 public class Axes {
 
@@ -70,6 +107,12 @@ public class Axes {
 
     private final SpreadsheetView spreadsheetView;
     private BitSet rowFix; // Compute if we can fix the rows or not.
+
+    private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
+    private Callback<Integer, Void> rowPickerCallback = DEFAULT_CALLBACK;
+
+    private final ObservableList<Integer> columnPickers = FXCollections.observableArrayList();
+    private Callback<Integer, Void> columnPickerCallback = DEFAULT_CALLBACK;
 
     public Axes(SpreadsheetView spreadsheetView) {
         this.spreadsheetView = spreadsheetView;
@@ -151,8 +194,8 @@ public class Axes {
      * @return true if the column if fixable
      */
     public boolean isColumnFixable(int columnIndex) {
-        return columnIndex < spreadsheetView.getColumns().size() ? 
-                spreadsheetView.getColumns().get(columnIndex).isColumnFixable() : null;
+        return columnIndex < spreadsheetView.getColumns().size()
+                ? spreadsheetView.getColumns().get(columnIndex).isColumnFixable() : null;
     }
 
     /**
@@ -238,7 +281,59 @@ public class Axes {
         return showRowHeader;
     }
 
-    
+    /**
+     * Return an ObservableList of row indexes that display a picker.
+     * See {@link Axes} description.
+     * @return 
+     */
+    public ObservableList<Integer> getRowPickers() {
+        return rowPickers;
+    }
+
+    /**
+     * Set a custom callback for the Row picker. Row number is given to you in 
+     * the callback.
+     * @param callback 
+     */
+    public void setRowPickerCallback(Callback<Integer, Void> callback) {
+        this.rowPickerCallback = callback;
+    }
+
+    /**
+     * Return the row Picker Callback.
+     * @return 
+     */
+    public Callback<Integer, Void> getRowPickerCallback() {
+        return rowPickerCallback;
+    }
+
+//    /**
+//     * Return an ObservableList of column indexes that display a picker.
+//     * See {@link Axes} description.
+//     * @
+//     * @return 
+//     */
+//    public ObservableList<Integer> getColumnPickers() {
+//        return columnPickers;
+//    }
+//
+//     /**
+//     * Set a custom callback for the Column picker. Column number is given to you in 
+//     * the callback.
+//     * @param callback 
+//     */
+//    public void setColumnPickerCallback(Callback<Integer, Void> callback) {
+//        this.columnPickerCallback = callback;
+//    }
+//
+//    /**
+//     * Return the columnPicker Callback.
+//     * @return 
+//     */
+//    public Callback<Integer, Void> getColumnPickerCallback() {
+//        return columnPickerCallback;
+//    }
+
     void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         rowFix = new BitSet(rows.size());
@@ -311,6 +406,15 @@ public class Axes {
                 }
             }
             return reason;
+        }
+    };
+
+    private static final Callback<Integer, Void> DEFAULT_CALLBACK = new Callback<Integer, Void>() {
+
+        @Override
+        public Void call(Integer p) {
+            //no-op
+            return null;
         }
     };
 }

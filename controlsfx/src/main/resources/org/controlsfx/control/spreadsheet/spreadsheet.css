@@ -175,9 +175,12 @@ on top and bottom */
     -fx-font-style : italic;
 }
 
+/* PICKERS */
 .picker-label{
+    -fx-graphic: url("add.png"); 
     -fx-background-color: transparent;
     -fx-padding: 0 0 0 0;
+    -fx-alignment: center;
 }
 
 .picker-label:hover{

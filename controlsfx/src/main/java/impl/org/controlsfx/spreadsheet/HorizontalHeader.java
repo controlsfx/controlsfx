@@ -150,7 +150,7 @@ public class HorizontalHeader extends TableHeaderRow {
         if (working && gridViewSkin != null
                 && gridViewSkin.spreadsheetView != null
                 && gridViewSkin.spreadsheetView.getAxes().showRowHeaderProperty().get()) {
-            padding += gridViewSkin.getVerticalHeaderWidth();
+            padding += gridViewSkin.verticalHeader.getVerticalHeaderWidth();
         }
 
         Rectangle clip = ((Rectangle) getClip());

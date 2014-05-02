@@ -1251,11 +1251,6 @@ public final class Dialogs {
             this(null, message, comment);
         }
 
-        @Override public final void execute(ActionEvent ae) {
-            Dialog dlg = (Dialog)ae.getSource();
-            dlg.setResult(this);
-        }
-
         @Override public String toString() {
             return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
         }

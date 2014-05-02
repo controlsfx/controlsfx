@@ -689,6 +689,15 @@ public class Dialog {
          * Returns true if {@link Action} has given trait 
          */
         boolean hasTrait( ActionTrait trait);
+        
+        default public void execute(ActionEvent ae) {
+            if (! disabledProperty().get()) {
+                if (ae.getSource() instanceof Dialog ) {
+                    ((Dialog) ae.getSource()).setResult(this);
+                }
+            }
+        }
+        
     }
     
     /**
@@ -861,11 +870,7 @@ public class Dialog {
 
         /** {@inheritDoc} */
         @Override public void execute(ActionEvent ae) {
-            if (! action.isDisabled()) {
-                if (ae.getSource() instanceof Dialog ) {
-                    ((Dialog) ae.getSource()).setResult(this);
-                }
-            }
+        	DialogAction.super.execute(ae);
         }
         
         /** {@inheritDoc} */

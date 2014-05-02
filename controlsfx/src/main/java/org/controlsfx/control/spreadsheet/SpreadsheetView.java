@@ -285,6 +285,8 @@ public class SpreadsheetView extends Control {
 
         this.cellsView = new SpreadsheetGridView(handle);
         getChildren().add(cellsView);
+        
+        axes = new Axes(this);
 
         /**
          * Add a listener to the selection model in order to edit the spanned
@@ -358,8 +360,6 @@ public class SpreadsheetView extends Control {
 
         setGrid(grid);
         setEditable(true);
-
-        axes = new Axes(this);
     }
     /***************************************************************************
      * * Public Methods * *

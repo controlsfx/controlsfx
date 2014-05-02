@@ -264,9 +264,9 @@ abstract class FXDialog {
         timeline.getKeyFrames().clear();
         timeline.getKeyFrames().addAll(
             new KeyFrame(Duration.ZERO, keyValue0),
-            new KeyFrame(Duration.millis(sectionDuration),     keyValue1),  // 100
-            new KeyFrame(Duration.millis(sectionDuration * 3), keyValue2),  // 300
-            new KeyFrame(Duration.millis(sectionDuration * 4), keyValue0)   // 400
+            new KeyFrame(Duration.millis(sectionDuration),     keyValue1),
+            new KeyFrame(Duration.millis(sectionDuration * 3), keyValue2),
+            new KeyFrame(Duration.millis(sectionDuration * 4), keyValue0)
         );
         timeline.play();
     }

@@ -37,6 +37,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import org.controlsfx.tools.Utils;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn}
@@ -128,7 +129,7 @@ public final class SpreadsheetColumn {
             public void invalidated(Observable arg0) {
                 List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeaders();
                 if (columnsHeader.size() <= indexColumn) {
-                    setText(SpreadsheetView.getExcelLetterFromNumber(indexColumn));
+                    setText(Utils.getExcelLetterFromNumber(indexColumn));
                 } else if (!columnsHeader.get(indexColumn).equals(getText())) {
                     setText(columnsHeader.get(indexColumn));
                 }

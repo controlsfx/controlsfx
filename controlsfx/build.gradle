@@ -40,8 +40,8 @@ javadoc {
     classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
     
     options.windowTitle("ControlsFX Project ${version}")
-    options.links("http://download.oracle.com/javase/7/docs/api/");
-    options.links("http://docs.oracle.com/javafx/2/api/");
+    options.links("http://docs.oracle.com/javase/8/docs/api/");
+    options.links("http://docs.oracle.com/javase/8/javafx/api/");
     options.addBooleanOption("Xdoclint:none").setValue(true);
     options.overview("src/main/docs/overview.html");
     

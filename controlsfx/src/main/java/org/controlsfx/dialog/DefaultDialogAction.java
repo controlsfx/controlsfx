@@ -29,6 +29,8 @@ package org.controlsfx.dialog;
 import java.util.Arrays;
 import java.util.EnumSet;
 
+import javafx.event.ActionEvent;
+
 import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog.ActionTrait;
@@ -45,7 +47,7 @@ import org.controlsfx.dialog.Dialog.DialogAction;
  * @see Action
  * @see DialogAction
  */
-public abstract class AbstractDialogAction extends AbstractAction implements DialogAction {
+public class DefaultDialogAction extends AbstractAction implements DialogAction {
     
     private final EnumSet<ActionTrait> traits;
 
@@ -54,7 +56,7 @@ public abstract class AbstractDialogAction extends AbstractAction implements Dia
      * @param text
      * @param traits
      */
-    public AbstractDialogAction(String text, ActionTrait... traits) {
+    public DefaultDialogAction(String text, ActionTrait... traits) {
         super(text);
         this.traits = (traits == null || traits.length == 0) ? 
                 EnumSet.noneOf(ActionTrait.class) : 
@@ -65,7 +67,7 @@ public abstract class AbstractDialogAction extends AbstractAction implements Dia
      * Creates a dialog action with given text and common set of traits: CLOSING and DEFAULT
      * @param text
      */
-    public AbstractDialogAction(String text ) {
+    public DefaultDialogAction(String text) {
         this(text, ActionTrait.CLOSING, ActionTrait.DEFAULT);
     }
     
@@ -73,6 +75,12 @@ public abstract class AbstractDialogAction extends AbstractAction implements Dia
     /** {@inheritDoc} */
     @Override public boolean hasTrait(ActionTrait trait) {
         return traits.contains(trait);
+    }
+
+    
+    /** {@inheritDoc} */
+    @Override public void execute(ActionEvent ae) {
+    	DialogAction.super.execute(ae);
     }
 
 }

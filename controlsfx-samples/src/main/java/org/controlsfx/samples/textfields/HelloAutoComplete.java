@@ -70,8 +70,8 @@ public class HelloAutoComplete extends ControlsFXSample {
                 + "\"Hey\", \"Hello\", \"Hello World\", \"Apple\", \"Cool\", "
                 + "\"Costa\", \"Cola\", \"Coca Cola\""
                 + "\n\n"
-                + "The 'Learning TextField' will add whatever words are typed"
-                + "to the auto-complete popup, as long as you press Enter once"
+                + "The 'Learning TextField' will add whatever words are typed "
+                + "to the auto-complete popup, as long as you press Enter once "
                 + "you've finished typing the word.";
     }
 

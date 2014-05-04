@@ -984,7 +984,7 @@ public final class Dialogs {
 //		NotificationPane notificationPane = new NotificationPane(content);
 //		notificationPane.setShowFromTop(true);
 		
-		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+		Action actionLogin = new DefaultDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 			}
@@ -1239,7 +1239,7 @@ public final class Dialogs {
      * Command Link class.
      * Represents one command link in command links dialog. 
      */
-    public static class CommandLink extends AbstractDialogAction {
+    public static class CommandLink extends DefaultDialogAction {
         
         public CommandLink( Node graphic, String text, String longText ) {
             super(text);
@@ -1249,11 +1249,6 @@ public final class Dialogs {
         
         public CommandLink( String message, String comment ) {
             this(null, message, comment);
-        }
-
-        @Override public final void execute(ActionEvent ae) {
-            Dialog dlg = (Dialog)ae.getSource();
-            dlg.setResult(this);
         }
 
         @Override public String toString() {

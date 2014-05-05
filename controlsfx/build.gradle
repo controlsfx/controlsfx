@@ -68,6 +68,15 @@ jar {
     }
 }
 
+task i18nResourceGen(type: Copy) {
+	from 'src/main/resources'
+    into 'src/main/resources'
+    include "controlsfx_en.properties"
+    rename{ String fileName -> fileName.replace("_en.prop", ".prop") }
+}
+
+processResources.dependsOn("i18nResourceGen")
+
 task sourceJar(type: Jar) {
     from sourceSets.main.java
     from sourceSets.main.resources

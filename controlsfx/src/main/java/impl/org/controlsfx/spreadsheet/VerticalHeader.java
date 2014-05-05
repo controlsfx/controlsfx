@@ -86,7 +86,6 @@ public class VerticalHeader extends StackPane {
      * The vertical header width, just for the Label, not the Pickers.
      */
     private final DoubleProperty verticalHeaderWidth = new SimpleDoubleProperty(DEFAULT_VERTICAL_HEADER_WIDTH);
-    private boolean working = true; // Whether or not we are showing the verticalHeader
     private Rectangle clip; // Ensure that children do not go out of bounds
     private ContextMenu blankContextMenu;
 
@@ -115,7 +114,6 @@ public class VerticalHeader extends StackPane {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
         this.axes = spreadsheetView.getAxes();
-        working = spreadsheetView.getAxes().showRowHeaderProperty().get();
         pickerPile = new Stack<>();
         pickerUsed = new Stack<>();
     }
@@ -162,13 +160,6 @@ public class VerticalHeader extends StackPane {
         axes.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
-                working = newValue;
-                if (!working) {
-                    verticalHeaderWidth.setValue(0);
-                } else {
-                    verticalHeaderWidth.setValue(axes.getRowPickers().isEmpty()
-                            ? DEFAULT_VERTICAL_HEADER_WIDTH : DEFAULT_VERTICAL_HEADER_WIDTH + PICKER_SIZE);
-                }
                 requestLayout();
             }
         });
@@ -193,12 +184,23 @@ public class VerticalHeader extends StackPane {
         return verticalHeaderWidth.get();
     }
 
+    public double computeHeaderWidth() {
+        double width = 0;
+        if (!axes.getRowPickers().isEmpty()) {
+            width += PICKER_SIZE;
+        }
+        if (axes.isShowRowHeader()) {
+            width += DEFAULT_VERTICAL_HEADER_WIDTH;
+        }
+        return width;
+    }
+
     @Override
     protected void layoutChildren() {
         if (resizing) {
             return;
         }
-        if (working && skin.getCellsSize() > 0) {
+        if ((axes.isShowRowHeader() || !axes.getColumnPickers().isEmpty()) && skin.getCellsSize() > 0) {
 
             double x = snappedLeftInset();
             /**
@@ -207,11 +209,13 @@ public class VerticalHeader extends StackPane {
             pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
             pickerUsed.clear();
             if (!axes.getRowPickers().isEmpty()) {
-                verticalHeaderWidth.setValue(DEFAULT_VERTICAL_HEADER_WIDTH + PICKER_SIZE);
-//                clip.setWidth(getVerticalHeaderWidth());
+                verticalHeaderWidth.setValue(PICKER_SIZE);
                 x += PICKER_SIZE;
-            } else {
-                verticalHeaderWidth.setValue(DEFAULT_VERTICAL_HEADER_WIDTH);
+            }else{
+                verticalHeaderWidth.setValue(0);
+            }
+            if (axes.isShowRowHeader()) {
+                verticalHeaderWidth.setValue(getVerticalHeaderWidth() + DEFAULT_VERTICAL_HEADER_WIDTH);
             }
 
             getChildren().clear();
@@ -223,8 +227,9 @@ public class VerticalHeader extends StackPane {
 
             rowCount = addVisibleRows(rowCount, x, cellSize);
 
-            rowCount = addFixedRows(rowCount, x, cellSize);
-
+            if (axes.isShowRowHeader()) {
+                rowCount = addFixedRows(rowCount, x, cellSize);
+            }
             // First one blank and on top (z-order) of the others
             if (axes.showColumnHeaderProperty().get()) {
                 label = getLabel(rowCount++);
@@ -239,13 +244,14 @@ public class VerticalHeader extends StackPane {
             }
 
             VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
+            //FIXME handle height.
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
                 label = getLabel(rowCount++);
                 label.setText("");
                 label.resize(getVerticalHeaderWidth(), hbar.getHeight());
                 label.layoutYProperty().unbind();
-                label.relocate(snappedLeftInset(), skin.getSkinnable().getHeight() - hbar.getHeight());
+                label.relocate(snappedLeftInset(), getHeight() - hbar.getHeight());
                 label.getStyleClass().clear();
                 label.setContextMenu(blankContextMenu);
                 getChildren().add(label);
@@ -332,39 +338,39 @@ public class VerticalHeader extends StackPane {
                 getChildren().add(picker);
             }
 
-            label = getLabel(rowCount++);
+            if (axes.isShowRowHeader()) {
+                label = getLabel(rowCount++);
 
-            
-            label.setText(getRowHeader(rowIndex));
-            label.resize(DEFAULT_VERTICAL_HEADER_WIDTH, row.getHeight());
-            label.setLayoutX(x);
-            label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
-            label.setContextMenu(getRowContextMenu(rowIndex));
+                label.setText(getRowHeader(rowIndex));
+                label.resize(DEFAULT_VERTICAL_HEADER_WIDTH, row.getHeight());
+                label.setLayoutX(x);
+                label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
+                label.setContextMenu(getRowContextMenu(rowIndex));
 
-            getChildren().add(label);
-            // We want to highlight selected rows
-            final ObservableList<String> css = label.getStyleClass();
-            if (skin.getSelectedRows().contains(rowIndex)) {
-                css.addAll("selected");
-            } else {
-                css.removeAll("selected");
+                getChildren().add(label);
+                // We want to highlight selected rows
+                final ObservableList<String> css = label.getStyleClass();
+                if (skin.getSelectedRows().contains(rowIndex)) {
+                    css.addAll("selected");
+                } else {
+                    css.removeAll("selected");
+                }
+                if (axes.getFixedRows().contains(rowIndex)) {
+                    css.addAll("fixed");
+                } else {
+                    css.removeAll("fixed");
+                }
+
+                y += row.getHeight();
+
+                // position drag overlay to intercept column resize requests
+                Rectangle dragRect = getDragRect(rowCount++);
+                dragRect.getProperties().put(TABLE_ROW_KEY, row);
+                dragRect.getProperties().put(TABLE_LABEL_KEY, label);
+                dragRect.setWidth(label.getWidth());
+                dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
+                getChildren().add(dragRect);
             }
-            if (axes.getFixedRows().contains(rowIndex)) {
-                css.addAll("fixed");
-            } else {
-                css.removeAll("fixed");
-            }
-
-            y += row.getHeight();
-
-            // position drag overlay to intercept column resize requests
-            Rectangle dragRect = getDragRect(rowCount++);
-            dragRect.getProperties().put(TABLE_ROW_KEY, row);
-            dragRect.getProperties().put(TABLE_LABEL_KEY, label);
-            dragRect.setWidth(label.getWidth());
-            dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
-            getChildren().add(dragRect);
-
             row = skin.getRow(++i);
         }
         return rowCount;
@@ -425,15 +431,6 @@ public class VerticalHeader extends StackPane {
     };
 
     /**
-     * Called when value of vertical scrollbar change
-     */
-    void updateScrollY() {
-        if (working) {
-            requestLayout();
-        }
-    }
-
-    /**
      * Create a new label and put it in the pile or just grab one from the pile.
      *
      * @param rowNumber
@@ -489,7 +486,6 @@ public class VerticalHeader extends StackPane {
             Label picker = (Label) mouseEvent.getSource();
 
             axes.getRowPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
-            System.out.println("click on " + picker.getProperties().get(PICKER_INDEX));
         }
     };
 
@@ -569,9 +565,7 @@ public class VerticalHeader extends StackPane {
     private final InvalidationListener layout = new InvalidationListener() {
         @Override
         public void invalidated(Observable arg0) {
-            if (working) {
-                requestLayout();
-            }
+            requestLayout();
         }
     };
 }

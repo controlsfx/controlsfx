@@ -126,7 +126,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader verticalHeader;
-//    protected HorizontalPickers horizontalPickers;
+    protected HorizontalPicker horizontalPickers;
     
     /**
      * The currently fixedRow. This handles an Integer's set of rows being
@@ -166,6 +166,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      */
     BitSet hBarValue;
     BitSet rowToLayout;
+    
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -427,8 +428,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         ((HorizontalHeader) getTableHeaderRow()).init();
         verticalHeader.init(this, (HorizontalHeader) getTableHeaderRow());
         
-//        horizontalPickers = new HorizontalPickers(((HorizontalHeader) getTableHeaderRow()).getRootHeader(), spreadsheetView.getAxes());
-//        handle.getGridView().getChildren().add(horizontalPickers);
+        horizontalPickers = new HorizontalPicker((HorizontalHeader) getTableHeaderRow(),spreadsheetView.getAxes());
+        getChildren().add(horizontalPickers);
         getFlow().init(spreadsheetView);
 
         /**
@@ -478,18 +479,24 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         if (spreadsheetView == null) {
             return;
         }
-        if (spreadsheetView.getAxes().showRowHeaderProperty().get()) {
-            x += verticalHeader.getVerticalHeaderWidth();
-            w -= verticalHeader.getVerticalHeaderWidth();
+        double verticalHeaderWidth = verticalHeader.computeHeaderWidth();
+        double horizontalPickerHeight = spreadsheetView.getAxes().getColumnPickers().isEmpty() ? 0: VerticalHeader.PICKER_SIZE;
+        
+        if (spreadsheetView.getAxes().isShowRowHeader() || !spreadsheetView.getAxes().getRowPickers().isEmpty()) {
+            x += verticalHeaderWidth;//verticalHeader.getVerticalHeaderWidth();
+            w -=  verticalHeaderWidth;//verticalHeader.getVerticalHeaderWidth();
         }
 
-//        y+=16;
-        super.layoutChildren(x, y, w, h);
+        
+        y += horizontalPickerHeight;
+        super.layoutChildren(x, y, w, h-horizontalPickerHeight);
 
         final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
         double tableHeaderRowHeight = 0;
 
-//        layoutInArea(horizontalPickers, x, y, w, tableHeaderRowHeight, baselineOffset, HPos.CENTER, VPos.CENTER);
+        if(!spreadsheetView.getAxes().getColumnPickers().isEmpty()){
+            layoutInArea(horizontalPickers, x, y - VerticalHeader.PICKER_SIZE, w, tableHeaderRowHeight, baselineOffset, HPos.CENTER, VPos.CENTER);
+        }
         
         if (spreadsheetView.getAxes().showColumnHeaderProperty().get()) {
             // position the table header
@@ -499,11 +506,11 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             y += tableHeaderRowHeight;
         } else {
             // This is temporary handled in the HorizontalHeader with Css
-            // FIXME tweak open in RT-32673
+            // FIXME tweak open in https://javafx-jira.kenai.com/browse/RT-32673
         }
 
-        if (spreadsheetView.getAxes().showRowHeaderProperty().get()) {
-            layoutInArea(verticalHeader, x - verticalHeader.getVerticalHeaderWidth(), y - tableHeaderRowHeight, w, h, baselineOffset,
+        if (spreadsheetView.getAxes().isShowRowHeader() || !spreadsheetView.getAxes().getRowPickers().isEmpty()) {
+            layoutInArea(verticalHeader, x - verticalHeaderWidth, y - tableHeaderRowHeight, w, h, baselineOffset,
                     HPos.CENTER, VPos.CENTER);
         }
     }
@@ -650,7 +657,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     private void verticalScroll() {
-        verticalHeader.updateScrollY();
+        verticalHeader.requestLayout();
     }
 
     private GridVirtualFlow<?> getFlow() {
@@ -670,7 +677,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             return;
 
         TablePosition focusedCell = getFocusedCell();
-        int currentRow = focusedCell.getRow();
         int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
         if (currentColumn == getVisibleLeafColumns().size() - 1)
             return;
@@ -695,7 +701,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             return;
 
         TablePosition focusedCell = getFocusedCell();
-        int currentRow = focusedCell.getRow();
         int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
         if (currentColumn == 0)
             return;

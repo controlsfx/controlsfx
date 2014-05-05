@@ -128,7 +128,7 @@ public class HorizontalHeader extends TableHeaderRow {
                updateHighlightSelection();
             }
         });
-
+        
     }
 
     @Override
@@ -154,13 +154,15 @@ public class HorizontalHeader extends TableHeaderRow {
         }
 
         Rectangle clip = ((Rectangle) getClip());
+        
         clip.setWidth(clip.getWidth() == 0 ? 0 : clip.getWidth() - padding);
     }
 
     @Override
     protected void updateScrollX() {
         super.updateScrollX();
-
+        gridViewSkin.horizontalPickers.updateScrollX();
+        
         if (working) {
             requestLayout();
             getRootHeader().layoutFixedColumns();

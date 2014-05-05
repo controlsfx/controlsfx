@@ -307,32 +307,32 @@ public class Axes {
         return rowPickerCallback;
     }
 
-//    /**
-//     * Return an ObservableList of column indexes that display a picker.
-//     * See {@link Axes} description.
-//     * @
-//     * @return 
-//     */
-//    public ObservableList<Integer> getColumnPickers() {
-//        return columnPickers;
-//    }
-//
-//     /**
-//     * Set a custom callback for the Column picker. Column number is given to you in 
-//     * the callback.
-//     * @param callback 
-//     */
-//    public void setColumnPickerCallback(Callback<Integer, Void> callback) {
-//        this.columnPickerCallback = callback;
-//    }
-//
-//    /**
-//     * Return the columnPicker Callback.
-//     * @return 
-//     */
-//    public Callback<Integer, Void> getColumnPickerCallback() {
-//        return columnPickerCallback;
-//    }
+    /**
+     * Return an ObservableList of column indexes that display a picker.
+     * See {@link Axes} description.
+     * @
+     * @return 
+     */
+    public ObservableList<Integer> getColumnPickers() {
+        return columnPickers;
+    }
+
+     /**
+     * Set a custom callback for the Column picker. Column number is given to you in 
+     * the callback.
+     * @param callback 
+     */
+    public void setColumnPickerCallback(Callback<Integer, Void> callback) {
+        this.columnPickerCallback = callback;
+    }
+
+    /**
+     * Return the columnPicker Callback.
+     * @return 
+     */
+    public Callback<Integer, Void> getColumnPickerCallback() {
+        return columnPickerCallback;
+    }
 
     void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();

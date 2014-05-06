@@ -315,11 +315,11 @@ import org.controlsfx.validation.Validator;
  * 
  * <h4>Lightweight dialog whose style is {@link DialogStyle#CROSS_PLATFORM_DARK}</h4>
  * <br>
- * <center><img src="dialog-style/linux-lightweight-cross-platform.png"></center>
+ * <center><img src="dialog-style/windows-8-lightweight-cross-platform.png"></center>
  * 
  * <h4>Lightweight dialog whose style is {@link DialogStyle#UNDECORATED}</h4>
  * <br>
- * <center><img src="dialog-style/linux-lightweight-undecorated.png"></center>
+ * <center><img src="dialog-style/windows-8-lightweight-undecorated.png"></center>
  * 
  * <h3>Java 8 API elements</h3>
  * 

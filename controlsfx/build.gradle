@@ -34,6 +34,15 @@ dependencies {
     }
 }
 
+task generatei18nResources(type: Copy) {
+    from "src/main/resources"
+    into "$buildDir/resources/main"
+    include "controlsfx.properties"
+    rename{ String fileName -> fileName.replace("fx.prop", "fx_en.prop") }
+}
+
+processResources.dependsOn(generatei18nResources)
+
 javadoc {
     exclude 'impl/*'
     failOnError = false
@@ -67,6 +76,7 @@ jar {
         attributes 'Implementation-Title': 'ControlsFX', 'Implementation-Version': project.version
     }
 }
+
 
 task sourceJar(type: Jar) {
     from sourceSets.main.java

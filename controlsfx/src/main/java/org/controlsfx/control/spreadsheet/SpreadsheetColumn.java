@@ -37,6 +37,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import org.controlsfx.tools.Utils;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn}
@@ -117,10 +118,10 @@ public final class SpreadsheetColumn {
 //            column.setText(column.getText() + ".");
 
         // When changing FixedColumns, we set header in order to add "." or ":"
-        spreadsheetView.getFixedColumns().addListener(updateTextListener);
+        spreadsheetView.getAxes().getFixedColumns().addListener(updateTextListener);
 
         // When changing frozen fixed columns, we need to update the header.
-        spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
+        spreadsheetView.getAxes().fixingColumnsAllowedProperty().addListener(updateTextListener);
 
         // When ColumnsHeaders are changing, we update the text
         ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
@@ -128,7 +129,7 @@ public final class SpreadsheetColumn {
             public void invalidated(Observable arg0) {
                 List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeaders();
                 if (columnsHeader.size() <= indexColumn) {
-                    setText(SpreadsheetView.getExcelLetterFromNumber(indexColumn));
+                    setText(Utils.getExcelLetterFromNumber(indexColumn));
                 } else if (!columnsHeader.get(indexColumn).equals(getText())) {
                     setText(columnsHeader.get(indexColumn));
                 }
@@ -154,7 +155,7 @@ public final class SpreadsheetColumn {
      * @return true if this column is fixed.
      */
     public boolean isFixed() {
-        return spreadsheetView.getFixedColumns().contains(this);
+        return spreadsheetView.getAxes().getFixedColumns().contains(this);
     }
 
     /**
@@ -165,9 +166,9 @@ public final class SpreadsheetColumn {
      */
     public void setFixed(boolean fixed) {
         if (fixed) {
-            spreadsheetView.getFixedColumns().add(this);
+            spreadsheetView.getAxes().getFixedColumns().add(this);
         } else {
-            spreadsheetView.getFixedColumns().removeAll(this);
+            spreadsheetView.getAxes().getFixedColumns().removeAll(this);
         }
     }
 
@@ -216,7 +217,7 @@ public final class SpreadsheetColumn {
      * @return true if this column is fixable.
      */
     public boolean isColumnFixable() {
-        return canFix && spreadsheetView.isFixingColumnsAllowed();
+        return canFix && spreadsheetView.getAxes().isFixingColumnsAllowed();
     }
 
     /***************************************************************************

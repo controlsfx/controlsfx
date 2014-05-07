@@ -26,8 +26,10 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.util.List;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -36,19 +38,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-
+import org.controlsfx.control.spreadsheet.Axes;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import javafx.event.WeakEventHandler;
 
 /**
  * The set of horizontal (column) headers.
@@ -76,25 +73,24 @@ public class HorizontalHeader extends TableHeaderRow {
      * 
      **************************************************************************/
     public void init() {
-        updateHorizontalHeaderVisibility(gridViewSkin.spreadsheetView.isShowColumnHeader());
-
-        final SpreadsheetView view = gridViewSkin.spreadsheetView;
+        Axes axes = gridViewSkin.spreadsheetView.getAxes();
+        updateHorizontalHeaderVisibility(axes.isShowColumnHeader());
 
         //Visibility of vertical Header listener
-        view.showRowHeaderProperty().addListener(verticalHeaderListener);
+        axes.showRowHeaderProperty().addListener(verticalHeaderListener);
 
         //Visibility of horizontal Header listener
-        view.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
+        axes.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
 
         //Selection listener to highlight header
         gridViewSkin.getSelectedColumns().addListener(selectionListener);
 
         //Fixed Column listener to change style of header
-        view.getFixedColumns().addListener(fixedColumnsListener);
+        axes.getFixedColumns().addListener(fixedColumnsListener);
 
         Platform.runLater(()->{
              //We are doing that because some columns may be already fixed.
-            for (SpreadsheetColumn column : view.getFixedColumns()) {
+            for (SpreadsheetColumn column : axes.getFixedColumns()) {
                 fixColumn(column);
             }
             requestLayout();
@@ -126,13 +122,13 @@ public class HorizontalHeader extends TableHeaderRow {
         getRootHeader().getColumnHeaders().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable o) {
-               for (SpreadsheetColumn fixItem : gridViewSkin.spreadsheetView.getFixedColumns()) {
+               for (SpreadsheetColumn fixItem : axes.getFixedColumns()) {
                    fixColumn(fixItem);
                }
                updateHighlightSelection();
             }
         });
-
+        
     }
 
     @Override
@@ -153,18 +149,20 @@ public class HorizontalHeader extends TableHeaderRow {
 
         if (working && gridViewSkin != null
                 && gridViewSkin.spreadsheetView != null
-                && gridViewSkin.spreadsheetView.showRowHeaderProperty().get()) {
-            padding += gridViewSkin.getVerticalHeaderWidth();
+                && gridViewSkin.spreadsheetView.getAxes().showRowHeaderProperty().get()) {
+            padding += gridViewSkin.verticalHeader.getVerticalHeaderWidth();
         }
 
         Rectangle clip = ((Rectangle) getClip());
+        
         clip.setWidth(clip.getWidth() == 0 ? 0 : clip.getWidth() - padding);
     }
 
     @Override
     protected void updateScrollX() {
         super.updateScrollX();
-
+        gridViewSkin.horizontalPickers.updateScrollX();
+        
         if (working) {
             requestLayout();
             getRootHeader().layoutFixedColumns();

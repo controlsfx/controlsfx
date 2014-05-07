@@ -91,7 +91,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
             final double prefWidth = snapSize(n.prefWidth(-1));
             n.setPrefHeight(24.0);
             //If the column is fixed
-            if (spreadsheetView.getFixedColumns().indexOf(spreadsheetView.getColumns().get(j)) != -1) {
+            if (spreadsheetView.getAxes().getFixedColumns().indexOf(spreadsheetView.getColumns().get(j)) != -1) {
                 double tableCellX = 0;
                 //If the column is hidden we have to translate it
                 if (hbarValue + fixedColumnWidth > x) {

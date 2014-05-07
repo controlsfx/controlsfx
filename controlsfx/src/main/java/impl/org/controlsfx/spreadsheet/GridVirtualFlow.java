@@ -119,7 +119,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     public void init(SpreadsheetView spv) {
         this.spreadSheetView = spv;
        
-        spv.getFixedRows().addListener(new ListChangeListener<Integer>(){
+        spv.getAxes().getFixedRows().addListener(new ListChangeListener<Integer>(){
 			@Override
 			public void onChanged(javafx.collections.ListChangeListener.Change<? extends Integer> arg0) {
 				while(arg0.next()){
@@ -151,7 +151,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     @Override
     public void scrollTo(int index) {
     	//If we have some fixedRows, we check if the selected row is not below them
-    	if(!getCells().isEmpty() && spreadSheetView.getFixedRows().size()>0){
+    	if(!getCells().isEmpty() && spreadSheetView.getAxes().getFixedRows().size()>0){
     		double offset = gridViewSkin.getFixedRowHeight();
     		
 			while(offset >=0 && index >0){
@@ -234,7 +234,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
 		//We must have a cell in ViewPort because otherwise
         //we short-circuit the VirtualFlow.
-        if (spreadSheetView.getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null) {
+        if (spreadSheetView.getAxes().getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null) {
             sortRows();
             /**
              * What I do is just going after the VirtualFlow in order to ADD
@@ -248,8 +248,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             Integer fixedRowIndex;
             
             rows:
-            for (int i = spreadSheetView.getFixedRows().size() - 1; i >= 0; i--) {
-                fixedRowIndex = spreadSheetView.getFixedRows().get(i);
+            for (int i = spreadSheetView.getAxes().getFixedRows().size() - 1; i >= 0; i--) {
+                fixedRowIndex = spreadSheetView.getAxes().getFixedRows().get(i);
                 T lastCell = getLastVisibleCellWithinViewPort();
                 //If the fixed row is out of bounds
                 if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {

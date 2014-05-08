@@ -26,6 +26,8 @@
  */
 package org.controlsfx.validation;
 
+import java.util.Comparator;
+
 import javafx.scene.control.Control;
 
 /**
@@ -33,6 +35,17 @@ import javafx.scene.control.Control;
  */
 public interface ValidationMessage extends Comparable<ValidationMessage>{
 
+	public static final Comparator<ValidationMessage> COMPARATOR = new Comparator<ValidationMessage>() {
+
+		@Override
+		public int compare(ValidationMessage vm1, ValidationMessage vm2) {
+			if ( vm1 == vm2 ) return  0;
+			if ( vm1 == null) return  1;
+			if ( vm2 == null) return -1;
+			return vm1.compareTo(vm2);
+		}
+	};
+	
     /**
      * Message text
      * @return message text

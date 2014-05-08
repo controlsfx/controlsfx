@@ -26,8 +26,6 @@
  */
 package org.controlsfx.validation;
 
-import static org.controlsfx.control.decoration.Decorator.addDecoration;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +45,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
-import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -60,8 +57,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
-import org.controlsfx.control.decoration.Decoration;
-import org.controlsfx.control.decoration.Decorator;
 import org.controlsfx.validation.decorator.GraphicValidationDecorator;
 import org.controlsfx.validation.decorator.ValidationDecorator;
 
@@ -95,7 +90,7 @@ import org.controlsfx.validation.decorator.ValidationDecorator;
  *   
  */
 public class ValidationSupport {
-
+	
     private static class ObservableValueExtractor {
 
         public final Predicate<Control> applicability;
@@ -136,8 +131,7 @@ public class ValidationSupport {
     }
 
     private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$";
-    private static final String VALIDATION_DECORATION = "$org.controlsfx.vaidation.decoration$";
-
+    
     /**
      * Set control's required flag
      * @param c control
@@ -155,16 +149,6 @@ public class ValidationSupport {
     public static boolean isRequired( Control c ) {
         Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
         return value instanceof Boolean? (Boolean)value: false;
-    }
-
-    private static boolean isValidationDecoration( Decoration decoration) {
-        return decoration == null || decoration.getProperties().get(VALIDATION_DECORATION) == Boolean.TRUE;
-    }
-
-    private static void setValidationDecoration( Decoration decoration ) {
-        if ( decoration != null ) {
-            decoration.getProperties().put(VALIDATION_DECORATION, Boolean.TRUE);
-        }
     }
 
     private ObservableSet<Control> controls = FXCollections.observableSet();
@@ -188,20 +172,6 @@ public class ValidationSupport {
         });
     }
 
-    private void removeDecorations( Node target) {
-
-        // remove only decorations related to validation
-        List<Decoration> decorations = Decorator.getDecorations(target);
-        if ( decorations != null ) {
-            for ( Decoration d: decorations.toArray(new Decoration[0]) ) {
-                if (isValidationDecoration(d)) {
-                    Decorator.removeDecoration(target, d);
-                }
-            }
-        }
-
-    }
-
     /**
      * Redecorates all known components
      * Only decorations related to validation are affected
@@ -210,20 +180,11 @@ public class ValidationSupport {
     public void redecorate() {
         Optional<ValidationDecorator> odecorator = Optional.ofNullable(getValidationDecorator());
         for (Control target : getRegisteredControls()) {
-            try {
-                removeDecorations(target);
-                odecorator.ifPresent( decorator -> 
-                getHighestMessage(target).ifPresent(msg -> {
-                    for (Decoration d : decorator.createDecorations(msg)) {
-                        setValidationDecoration(d); // mark for validation
-                        addDecoration(target, d);
-                    }
-                })
-                        );
-            } catch (Throwable ex) {
-                // FIXME Decorator throws an exception on the first run
-                ex.printStackTrace();
-            }
+            odecorator.ifPresent( decorator -> {
+            	decorator.removeDecorations(target);
+                decorator.applyRequiredDecoration(target);
+                getHighestMessage(target).ifPresent(msg -> decorator.applyValidationDecoration(msg));
+            });
         }
     }
 
@@ -326,7 +287,6 @@ public class ValidationSupport {
             };
 
             controls.add(c);
-            //TODO: Mark required components 
 
             observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
             updateResults.accept(observable.getValue());
@@ -360,13 +320,8 @@ public class ValidationSupport {
      * @return Optional highest severity message for a control
      */
     public Optional<ValidationMessage> getHighestMessage(Control target) {
-        return Optional.ofNullable(validationResults.get(target)).map(result -> 
-            result.getMessages().stream().max((vm1, vm2) -> {
-                if (vm1 == null) {
-                    return vm2 == null? 0 : vm2.compareTo(vm1);
-                } else {
-                    return vm1.compareTo(vm2);
-                }
-            }).orElse(null));
+    	return Optional.ofNullable(validationResults.get(target)).flatMap( result ->
+    	   result.getMessages().stream().max(ValidationMessage.COMPARATOR)   
+    	);
     }
 }

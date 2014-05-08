@@ -28,6 +28,9 @@ package org.controlsfx.validation.decorator;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+
+import javafx.scene.control.Control;
 
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.StyleClassDecoration;
@@ -38,7 +41,7 @@ import org.controlsfx.validation.ValidationMessage;
  * Validation decorator to decorate component validation state using two
  * CSS classes for errors and warnings 
  */
-public class StyleClassValidationDecorator implements ValidationDecorator {
+public class StyleClassValidationDecorator extends AbstractValidationDecorator {
 
     private final String errorClass;
     private final String warningClass;
@@ -60,11 +63,15 @@ public class StyleClassValidationDecorator implements ValidationDecorator {
         this.warningClass = warningClass != null? warningClass : "warning";	
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<Decoration> createDecorations(ValidationMessage message) {
-        return Arrays.asList(new StyleClassDecoration( Severity.ERROR == message.getSeverity()? errorClass:warningClass));
-    }
+
+	@Override
+	protected Collection<Decoration> createValidationDecorations(ValidationMessage message) {
+		return Arrays.asList(new StyleClassDecoration( Severity.ERROR == message.getSeverity()? errorClass:warningClass));
+	}
+
+	@Override
+	protected Collection<Decoration> createRequiredDecorations(Control target) {
+		return Collections.emptyList();
+	}
+    
 }

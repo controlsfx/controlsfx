@@ -18,7 +18,7 @@ public abstract class AbstractValidationDecoration implements ValidationDecorati
 	private static final String VALIDATION_DECORATION = "$org.controlsfx.decoration.vaidation$";
 	
 	private static boolean isValidationDecoration( Decoration decoration) {
-        return decoration == null || decoration.getProperties().get(VALIDATION_DECORATION) == Boolean.TRUE;
+        return decoration != null && decoration.getProperties().get(VALIDATION_DECORATION) == Boolean.TRUE;
     }
 
 	private static void setValidationDecoration( Decoration decoration ) {

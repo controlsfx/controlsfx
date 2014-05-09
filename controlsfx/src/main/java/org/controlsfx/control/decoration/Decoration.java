@@ -43,7 +43,7 @@ import javafx.scene.Node;
  */
 public abstract class Decoration {
     
-    private Map<String,Object> properties;
+    private volatile Map<String,Object> properties;
     
 	/**
      * This method decorates the given 
@@ -72,7 +72,7 @@ public abstract class Decoration {
      * Custom decoration properties
      * @return decoration properties
      */
-    public final Map<String,Object> getProperties() {
+    public synchronized final Map<String,Object> getProperties() {
         if (properties == null) {
             properties = new HashMap<>();
         }

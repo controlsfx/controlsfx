@@ -177,7 +177,7 @@ on top and bottom */
 
 /* PICKERS */
 .picker-label{
-    -fx-graphic: url("add.png"); 
+    -fx-graphic: url("picker.png"); 
     -fx-background-color: transparent;
     -fx-padding: 0 0 0 0;
     -fx-alignment: center;

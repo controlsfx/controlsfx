@@ -28,7 +28,7 @@ package org.controlsfx.control.decoration;
 
 import javafx.scene.Node;
 
-public class StyleClassDecoration implements Decoration {
+public class StyleClassDecoration extends Decoration {
 
     private final String styleClass;
 
@@ -36,17 +36,16 @@ public class StyleClassDecoration implements Decoration {
         this.styleClass = styleClass;
     }
 
-    @Override public Node run(Node targetNode, boolean add) {
-        if (add) {
-            if (targetNode.getStyleClass().contains(styleClass)) return null;
+    @Override public Node applyDecoration(Node targetNode) {
+        if (targetNode.getStyleClass().contains(styleClass)) return null;
 
-            targetNode.getStyleClass().add(styleClass);
+        targetNode.getStyleClass().add(styleClass);
 
-            // no decoration node, so return null
-            return null;
-        } else {
-            targetNode.getStyleClass().remove(styleClass);
-            return null;
-        }
+        // no decoration node, so return null
+        return null;
+    }
+    
+    @Override public void removeDecoration(Node targetNode) {
+        targetNode.getStyleClass().remove(styleClass);
     }
 }

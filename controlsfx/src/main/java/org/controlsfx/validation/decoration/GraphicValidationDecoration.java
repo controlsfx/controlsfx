@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation.decorator;
+package org.controlsfx.validation.decoration;
 
 
 import java.util.Arrays;
@@ -46,7 +46,7 @@ import org.controlsfx.validation.ValidationMessage;
 /**
  * Validation decorator to decorate validation state using images 
  */
-public class GraphicValidationDecorator extends AbstractValidationDecorator {
+public class GraphicValidationDecoration extends AbstractValidationDecoration {
 
     // TODO we shouldn't hardcode this - defer to CSS eventually
 	
@@ -66,7 +66,7 @@ public class GraphicValidationDecorator extends AbstractValidationDecorator {
     /**
      * Creates default instance
      */
-    public GraphicValidationDecorator() {
+    public GraphicValidationDecoration() {
 
     }
 

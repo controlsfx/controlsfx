@@ -57,8 +57,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
-import org.controlsfx.validation.decorator.GraphicValidationDecorator;
-import org.controlsfx.validation.decorator.ValidationDecorator;
+import org.controlsfx.validation.decoration.GraphicValidationDecoration;
+import org.controlsfx.validation.decoration.ValidationDecoration;
 
 /**
  * Provides validation support for UI components. The idea is create an instance of this class the component group, usually a panel.<br>
@@ -178,7 +178,7 @@ public class ValidationSupport {
      */
     // TODO needs optimization
     public void redecorate() {
-        Optional<ValidationDecorator> odecorator = Optional.ofNullable(getValidationDecorator());
+        Optional<ValidationDecoration> odecorator = Optional.ofNullable(getValidationDecorator());
         for (Control target : getRegisteredControls()) {
             odecorator.ifPresent( decorator -> {
             	decorator.removeDecorations(target);
@@ -228,8 +228,8 @@ public class ValidationSupport {
     }
 
 
-    private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
-            new SimpleObjectProperty<ValidationDecorator>(this, "validationDecorator", new GraphicValidationDecorator()) {
+    private ObjectProperty<ValidationDecoration> validationDecoratorProperty =
+            new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) {
         protected void invalidated() {
             // when the decorator changes, rerun the decoration to update the visuals immediately.
             redecorate();
@@ -240,7 +240,7 @@ public class ValidationSupport {
      * Return validation decorator property
      * @return
      */
-    public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
+    public ObjectProperty<ValidationDecoration> validationDecoratorProperty() {
         return validationDecoratorProperty;
     }
 
@@ -248,7 +248,7 @@ public class ValidationSupport {
      * Returns current validation decorator
      * @return current validation decorator or null if none
      */
-    public ValidationDecorator getValidationDecorator() {
+    public ValidationDecoration getValidationDecorator() {
         return validationDecoratorProperty.get();
     }
 
@@ -256,7 +256,7 @@ public class ValidationSupport {
      * Sets new validation decorator
      * @param decorator new validation decorator. Null value is valid - no decoration will occur
      */
-    public void setValidationDecorator( ValidationDecorator decorator ) {
+    public void setValidationDecorator( ValidationDecoration decorator ) {
         validationDecoratorProperty.set(decorator);
     }
 

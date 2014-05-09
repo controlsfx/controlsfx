@@ -55,10 +55,10 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
-import org.controlsfx.validation.decorator.CompoundValidationDecorator;
-import org.controlsfx.validation.decorator.GraphicValidationDecorator;
-import org.controlsfx.validation.decorator.StyleClassValidationDecorator;
-import org.controlsfx.validation.decorator.ValidationDecorator;
+import org.controlsfx.validation.decoration.CompoundValidationDecoration;
+import org.controlsfx.validation.decoration.GraphicValidationDecoration;
+import org.controlsfx.validation.decoration.StyleClassValidationDecoration;
+import org.controlsfx.validation.decoration.ValidationDecoration;
 
 public class HelloValidation extends ControlsFXSample {
 
@@ -188,25 +188,25 @@ public class HelloValidation extends ControlsFXSample {
         grid.setHgap(10);
         grid.setPadding(new Insets(30, 30, 0, 30));
 
-        ValidationDecorator iconDecorator = new GraphicValidationDecorator();
-        ValidationDecorator cssDecorator = new StyleClassValidationDecorator();
-        ValidationDecorator compoundDecorator = new CompoundValidationDecorator(cssDecorator, iconDecorator);
+        ValidationDecoration iconDecorator = new GraphicValidationDecoration();
+        ValidationDecoration cssDecorator = new StyleClassValidationDecoration();
+        ValidationDecoration compoundDecorator = new CompoundValidationDecoration(cssDecorator, iconDecorator);
 
         int row = 0;
         
         // --- validation decorator
-        Callback<ListView<ValidationDecorator>, ListCell<ValidationDecorator>> cellFactory = listView -> new ListCell<ValidationDecorator>() {
-            @Override protected void updateItem(ValidationDecorator decorator, boolean empty) {
+        Callback<ListView<ValidationDecoration>, ListCell<ValidationDecoration>> cellFactory = listView -> new ListCell<ValidationDecoration>() {
+            @Override protected void updateItem(ValidationDecoration decorator, boolean empty) {
                 super.updateItem(decorator, empty);
 
                 if (empty) {
                     setText("");
                 } else {
-                    if (decorator instanceof StyleClassValidationDecorator) {
+                    if (decorator instanceof StyleClassValidationDecoration) {
                         setText("Style Class Validation Decorator");
-                    } else if (decorator instanceof GraphicValidationDecorator) {
+                    } else if (decorator instanceof GraphicValidationDecoration) {
                         setText("Graphic Validation Decorator");
-                    } else if (decorator instanceof CompoundValidationDecorator) {
+                    } else if (decorator instanceof CompoundValidationDecoration) {
                         setText("Compound Validation Decorator");
                     } else {
                         setText("Unknown decorator type!");
@@ -214,7 +214,7 @@ public class HelloValidation extends ControlsFXSample {
                 }
             }
         };
-        ComboBox<ValidationDecorator> decoratorBox = new ComboBox<>();
+        ComboBox<ValidationDecoration> decoratorBox = new ComboBox<>();
         decoratorBox.getItems().addAll(iconDecorator, cssDecorator, compoundDecorator);
         decoratorBox.setCellFactory(cellFactory);
         decoratorBox.setButtonCell(cellFactory.call(null));

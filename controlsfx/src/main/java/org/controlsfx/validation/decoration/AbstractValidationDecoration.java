@@ -1,4 +1,4 @@
-package org.controlsfx.validation.decorator;
+package org.controlsfx.validation.decoration;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.controlsfx.validation.ValidationMessage;
  * Implements common functionality for validation decorators.
  * Inherit from this class to create custom validation decorator   
  */
-public abstract class AbstractValidationDecorator implements ValidationDecorator {
+public abstract class AbstractValidationDecoration implements ValidationDecoration {
 	
 	private static final String VALIDATION_DECORATION = "$org.controlsfx.decoration.vaidation$";
 	

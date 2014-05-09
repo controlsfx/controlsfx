@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.validation.decorator;
+package org.controlsfx.validation.decoration;
 
 import javafx.scene.control.Control;
 
@@ -33,7 +33,7 @@ import org.controlsfx.validation.ValidationMessage;
 /**
  * Contract for validation decorators
  */
-public interface ValidationDecorator {
+public interface ValidationDecoration {
 
     /**
      * Removes all validation decorations from the target control

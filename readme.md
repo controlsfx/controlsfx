@@ -4,9 +4,11 @@ ControlsFX is an [open source project][1] for JavaFX that aims to provide really
 
 You can learn more about [ControlsFX][1] on its website, and be sure to check out the [features page][2] for an overview of everything ControlsFX offers.
 
+If you think you have a feature you can contribute, a bug you want to fix please review our [guide for contributors][3]
 
    [1]: http://controlsfx.org
    [2]: http://controlsfx.org/features
+   [3]: https://bitbucket.org/controlsfx/controlsfx/wiki/Contributing%20to%20ControlsFX
    
    
 

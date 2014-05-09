@@ -43,9 +43,9 @@ import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Axes;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  * The set of horizontal (column) headers.
@@ -73,24 +73,24 @@ public class HorizontalHeader extends TableHeaderRow {
      * 
      **************************************************************************/
     public void init() {
-        Axes axes = gridViewSkin.spreadsheetView.getAxes();
-        updateHorizontalHeaderVisibility(axes.isShowColumnHeader());
+        SpreadsheetView spv = gridViewSkin.handle.getView();
+        updateHorizontalHeaderVisibility(spv.isShowColumnHeader());
 
         //Visibility of vertical Header listener
-        axes.showRowHeaderProperty().addListener(verticalHeaderListener);
+        spv.showRowHeaderProperty().addListener(verticalHeaderListener);
 
         //Visibility of horizontal Header listener
-        axes.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
+        spv.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
 
         //Selection listener to highlight header
         gridViewSkin.getSelectedColumns().addListener(selectionListener);
 
         //Fixed Column listener to change style of header
-        axes.getFixedColumns().addListener(fixedColumnsListener);
+        spv.getFixedColumns().addListener(fixedColumnsListener);
 
         Platform.runLater(()->{
              //We are doing that because some columns may be already fixed.
-            for (SpreadsheetColumn column : axes.getFixedColumns()) {
+            for (SpreadsheetColumn column : spv.getFixedColumns()) {
                 fixColumn(column);
             }
             requestLayout();
@@ -122,7 +122,7 @@ public class HorizontalHeader extends TableHeaderRow {
         getRootHeader().getColumnHeaders().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable o) {
-               for (SpreadsheetColumn fixItem : axes.getFixedColumns()) {
+               for (SpreadsheetColumn fixItem : spv.getFixedColumns()) {
                    fixColumn(fixItem);
                }
                updateHighlightSelection();
@@ -149,7 +149,7 @@ public class HorizontalHeader extends TableHeaderRow {
 
         if (working && gridViewSkin != null
                 && gridViewSkin.spreadsheetView != null
-                && gridViewSkin.spreadsheetView.getAxes().showRowHeaderProperty().get()) {
+                && gridViewSkin.spreadsheetView.showRowHeaderProperty().get()) {
             padding += gridViewSkin.verticalHeader.getVerticalHeaderWidth();
         }
 

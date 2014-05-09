@@ -33,19 +33,23 @@ import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.SpreadsheetViewSelectionModel;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -96,10 +100,56 @@ import org.controlsfx.tools.Utils;
  * <br/>
  * 
  * <h3>Fixing Rows and Columns</h3> 
- * Everything related to that feature is accessible and documented in {@link Axes}.
+ * <br/>
+ * You can fix some rows and some columns by right-clicking on their header. A
+ * context menu will appear if it's possible to fix them. The label will then be
+ * in italic and the background will turn to dark grey. Keep in mind that only
+ * columns without any spanning cells can be fixed.
+ * <br/>
+ * And that and only rows without row-spanning cells can be fixed. <br/>
+ * You have also the possibility to fix them manually by adding and removing
+ * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
+ * are strongly advised to check if it's possible to do so with
+ * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
+ * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior
+ * every move will ensure that no exception will be thrown.
+ *
+ * <br/>
+ * <br/>
+ * 
+ * <h3>Headers</h3>
+ * <br/>
+ * You can also access and toggle header's visibility by using the methods
+ * provided like {@link #setShowRowHeader(boolean) } or {@link #setShowColumnHeader(boolean)
+ * }.
  * 
  * <br/>
+ * 
+ * <h3>Pickers</h3>
  * <br/>
+ * 
+ * You can show some little images next to the headers. They will appear on the 
+ * left of the VerticalHeader and on top on the HorizontalHeader. They are called
+ * "picker" because they were used originally for picking a row or a column to 
+ * insert in the SpreadsheetView.
+ * <br/>
+ * But you can do anything you want with it. Simply add a row or a column index in 
+ * {@link #getRowPickers() } and {@link #getColumnPickers() }. Then you can provide 
+ * a custom CallBack with {@link #setRowPickerCallback(javafx.util.Callback) } and 
+ * {@link #setColumnPickerCallback(javafx.util.Callback) } in order to react when 
+ * the user click on the picker. The Callback gives you the index of the picker.
+ * <br/>
+ * 
+ * You can also override the default graphic of the picker by overriding its css,
+ * example:
+ * <br/>
+ * <pre>
+ * .picker-label{
+ *   -fx-graphic: url("add.png"); 
+ *   -fx-background-color: transparent;
+ *   -fx-padding: 0 0 0 0;
+ * }
+ * </pre>
  * 
  * <h3>Copy pasting</h3> You can copy every cell you want to paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
@@ -203,7 +253,23 @@ public class SpreadsheetView extends Control {
     private final SpreadsheetGridView cellsView;// The main cell container.
     private SimpleObjectProperty<Grid> gridProperty = new SimpleObjectProperty<>();
     private DataFormat fmt;
-    private final Axes axes;
+    
+    private final ObservableList<Integer> fixedRows = FXCollections.observableArrayList();
+    private final ObservableList<SpreadsheetColumn> fixedColumns = FXCollections.observableArrayList();
+
+    private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
+
+    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true);
+    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader", true);
+
+    private BitSet rowFix; // Compute if we can fix the rows or not.
+
+    private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
+    private Callback<Integer, Void> rowPickerCallback = DEFAULT_CALLBACK;
+
+    private final ObservableList<Integer> columnPickers = FXCollections.observableArrayList();
+    private Callback<Integer, Void> columnPickerCallback = DEFAULT_CALLBACK;
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -284,8 +350,6 @@ public class SpreadsheetView extends Control {
         this.cellsView = new SpreadsheetGridView(handle);
         getChildren().add(cellsView);
         
-        axes = new Axes(this);
-
         /**
          * Add a listener to the selection model in order to edit the spanned
          * cells when clicked
@@ -358,6 +422,10 @@ public class SpreadsheetView extends Control {
 
         setGrid(grid);
         setEditable(true);
+        
+        // Listeners & handlers
+        fixedRows.addListener(fixedRowsListener);
+        fixedColumns.addListener(fixedColumnsListener);
     }
     /***************************************************************************
      * * Public Methods * *
@@ -375,7 +443,7 @@ public class SpreadsheetView extends Control {
         // Reactivate that after
 //        verifyGrid(grid);
         gridProperty.set(grid);
-        axes.initRowFix(grid);
+        initRowFix(grid);
 
         /**
          * We need to verify that the previous fixedRows are still compatible
@@ -383,22 +451,22 @@ public class SpreadsheetView extends Control {
          */
 
         List<Integer> newFixedRows = new ArrayList<>();
-        for (Integer rowFixed : axes.getFixedRows()) {
-            if (axes.isRowFixable(rowFixed)) {
+        for (Integer rowFixed : getFixedRows()) {
+            if (isRowFixable(rowFixed)) {
                 newFixedRows.add(rowFixed);
             }
         }
-        axes.getFixedRows().setAll(newFixedRows);
+        getFixedRows().setAll(newFixedRows);
 
         /**
          * We need to store the index of the fixedColumns and clear then because
          * we will keep reference to SpreadsheetColumn that no longer exist.
          */
         List<Integer> columnsFixed = new ArrayList<>();
-        for (SpreadsheetColumn column : axes.getFixedColumns()) {
+        for (SpreadsheetColumn column : getFixedColumns()) {
             columnsFixed.add(getColumns().indexOf(column));
         }
-        axes.getFixedColumns().clear();
+        getFixedColumns().clear();
 
         /**
          * We try to save the width of the column as we save the height of our rows so that we preserve the state.
@@ -505,14 +573,217 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return the Axes class for this SpreadsheetView in order to handle 
-     * everything regarding axes (headers and fixed axes).
-     * @return Axes class.
+     * You can fix or unfix a row by modifying this list. Call
+     * {@link #isRowFixable(int)} before trying to fix a row. See
+     * {@link SpreadsheetView} description for information.
+     *
+     * @return an ObservableList of integer representing the fixedRows.
      */
-    public Axes getAxes(){
-        return axes;
+    public ObservableList<Integer> getFixedRows() {
+        return fixedRows;
     }
 
+    /**
+     * Indicate whether a row can be fixed or not. Call that method before
+     * adding an item with {@link #getFixedRows()} .
+     *
+     * @param row
+     * @return true if the row can be fixed.
+     */
+    public boolean isRowFixable(int row) {
+        return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
+    }
+
+    /**
+     * Return whether change to Fixed rows are allowed.
+     *
+     * @return whether change to Fixed rows are allowed.
+     */
+    public boolean isFixingRowsAllowed() {
+        return fixingRowsAllowedProperty.get();
+    }
+
+    /**
+     * If set to true, user will be allowed to fix and unfix the rows.
+     *
+     * @param b
+     */
+    public void setFixingRowsAllowed(boolean b) {
+        fixingRowsAllowedProperty.set(b);
+    }
+
+    /**
+     * Return the Boolean property associated with the allowance of fixing or
+     * unfixing some rows.
+     *
+     * @return the Boolean property associated with the allowance of fixing or
+     * unfixing some rows.
+     */
+    public ReadOnlyBooleanProperty fixingRowsAllowedProperty() {
+        return fixingRowsAllowedProperty;
+    }
+
+    /**
+     * You can fix or unfix a column by modifying this list. Call
+     * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
+     * an item.
+     *
+     * @return an ObservableList of the fixed columns.
+     */
+    public ObservableList<SpreadsheetColumn> getFixedColumns() {
+        return fixedColumns;
+    }
+
+    /**
+     * Indicate whether this column can be fixed or not. If you have a
+     * {@link SpreadsheetColumn}, call
+     * {@link SpreadsheetColumn#isColumnFixable()} on it directly. Call that
+     * method before adding an item with {@link #getFixedColumns()} .
+     *
+     * @param columnIndex
+     * @return true if the column if fixable
+     */
+    public boolean isColumnFixable(int columnIndex) {
+        return columnIndex < getColumns().size()
+                ? getColumns().get(columnIndex).isColumnFixable() : null;
+    }
+
+    /**
+     * Return whether change to Fixed columns are allowed.
+     *
+     * @return whether change to Fixed columns are allowed.
+     */
+    public boolean isFixingColumnsAllowed() {
+        return fixingColumnsAllowedProperty.get();
+    }
+
+    /**
+     * If set to true, user will be allowed to fix and unfix the columns.
+     *
+     * @param b
+     */
+    public void setFixingColumnsAllowed(boolean b) {
+        fixingColumnsAllowedProperty.set(b);
+    }
+
+    /**
+     * Return the Boolean property associated with the allowance of fixing or
+     * unfixing some columns.
+     *
+     * @return the Boolean property associated with the allowance of fixing or
+     * unfixing some columns.
+     */
+    public ReadOnlyBooleanProperty fixingColumnsAllowedProperty() {
+        return fixingColumnsAllowedProperty;
+    }
+
+    /**
+     * Activate and deactivate the Column Header
+     *
+     * @param b
+     */
+    public final void setShowColumnHeader(final boolean b) {
+        showColumnHeader.setValue(b);
+    }
+
+    /**
+     * Return if the Column Header is showing.
+     *
+     * @return a boolean telling whether the column Header is shown
+     */
+    public final boolean isShowColumnHeader() {
+        return showColumnHeader.get();
+    }
+
+    /**
+     * BooleanProperty associated with the column Header.
+     *
+     * @return the BooleanProperty associated with the column Header.
+     */
+    public final BooleanProperty showColumnHeaderProperty() {
+        return showColumnHeader;
+    }
+
+    /**
+     * Activate and deactivate the Row Header.
+     *
+     * @param b
+     */
+    public final void setShowRowHeader(final boolean b) {
+        showRowHeader.setValue(b);
+    }
+
+    /**
+     * Return if the row Header is showing.
+     *
+     * @return a boolean telling if the row Header is being shown
+     */
+    public final boolean isShowRowHeader() {
+        return showRowHeader.get();
+    }
+
+    /**
+     * BooleanProperty associated with the row Header.
+     *
+     * @return the BooleanProperty associated with the row Header.
+     */
+    public final BooleanProperty showRowHeaderProperty() {
+        return showRowHeader;
+    }
+
+    /**
+     * Return an ObservableList of row indexes that display a picker.
+     * See {@link Axes} description.
+     * @return 
+     */
+    public ObservableList<Integer> getRowPickers() {
+        return rowPickers;
+    }
+
+    /**
+     * Set a custom callback for the Row picker. Row number is given to you in 
+     * the callback.
+     * @param callback 
+     */
+    public void setRowPickerCallback(Callback<Integer, Void> callback) {
+        this.rowPickerCallback = callback;
+    }
+
+    /**
+     * Return the row Picker Callback.
+     * @return 
+     */
+    public Callback<Integer, Void> getRowPickerCallback() {
+        return rowPickerCallback;
+    }
+
+    /**
+     * Return an ObservableList of column indexes that display a picker.
+     * See {@link Axes} description.
+     * @
+     * @return 
+     */
+    public ObservableList<Integer> getColumnPickers() {
+        return columnPickers;
+    }
+
+     /**
+     * Set a custom callback for the Column picker. Column number is given to you in 
+     * the callback.
+     * @param callback 
+     */
+    public void setColumnPickerCallback(Callback<Integer, Void> callback) {
+        this.columnPickerCallback = callback;
+    }
+
+    /**
+     * Return the columnPicker Callback.
+     * @return 
+     */
+    public Callback<Integer, Void> getColumnPickerCallback() {
+        return columnPickerCallback;
+    }
+    
     /**
      * This method will compute the best height for each line. That is to say
      * a height where each content of each cell could be fully visible.\n
@@ -801,6 +1072,21 @@ public class SpreadsheetView extends Control {
      * * Private/Protected Implementation * *
      **************************************************************************/
 
+    private void initRowFix(Grid grid) {
+        ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
+        rowFix = new BitSet(rows.size());
+        rows:
+        for (int r = 0; r < rows.size(); ++r) {
+            ObservableList<SpreadsheetCell> row = rows.get(r);
+            for (SpreadsheetCell cell : row) {
+                if (cell.getRowSpan() > 1) {
+                    continue rows;
+                }
+            }
+            rowFix.set(r);
+        }
+    }
+    
     /**
      * Verify that the grid is well-formed. Can be quite time-consuming I guess
      * so I would like it not to be compulsory..
@@ -854,6 +1140,77 @@ public class SpreadsheetView extends Control {
      * ********************************************************************
      */
 
+    private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<Integer>() {
+        @Override
+        public void onChanged(ListChangeListener.Change<? extends Integer> c) {
+            while (c.next()) {
+                if (c.wasAdded() || c.wasRemoved()) {
+                    List<? extends Integer> newRows = c.getAddedSubList();
+                    for (int row : newRows) {
+                        if (!isRowFixable(row)) {
+                            throw new IllegalArgumentException(computeReason(row));
+                        }
+                    }
+                    FXCollections.sort(fixedRows);
+                }
+            }
+        }
+
+        private String computeReason(Integer element) {
+            String reason = "\n This row cannot be fixed.";
+            for (SpreadsheetCell cell : getGrid().getRows().get(element)) {
+                if (cell.getRowSpan() > 1) {
+                    reason += "The cell situated at line " + cell.getRow() + " and column " + cell.getColumn()
+                            + "\n has a rowSpan of " + cell.getRowSpan() + ", it must be 1.";
+                    return reason;
+                }
+            }
+            return reason;
+        }
+    };
+
+    private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
+        @Override
+        public void onChanged(ListChangeListener.Change<? extends SpreadsheetColumn> c) {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    List<? extends SpreadsheetColumn> newColumns = c.getAddedSubList();
+                    for (SpreadsheetColumn column : newColumns) {
+                        if (!column.isColumnFixable()) {
+                            throw new IllegalArgumentException(computeReason(column));
+                        }
+                    }
+                }
+            }
+        }
+
+        private String computeReason(SpreadsheetColumn element) {
+            int indexColumn = getColumns().indexOf(element);
+
+            String reason = "\n This column cannot be fixed.";
+            for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
+                int columnSpan = row.get(indexColumn).getColumnSpan();
+                if (columnSpan > 1 || row.get(indexColumn).getRowSpan() > 1) {
+                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column "
+                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1.";
+                    return reason;
+                }
+            }
+            return reason;
+        }
+    };
+
+    /**
+     * Default Callback for the Row and column picker. It does nothing.
+     */
+    private static final Callback<Integer, Void> DEFAULT_CALLBACK = new Callback<Integer, Void>() {
+
+        @Override
+        public Void call(Integer p) {
+            //no-op
+            return null;
+        }
+    };
     private final ChangeListener<ContextMenu> contextMenuChangeListener = new ChangeListener<ContextMenu>() {
         
         @Override

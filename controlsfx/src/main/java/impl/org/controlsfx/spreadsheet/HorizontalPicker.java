@@ -36,7 +36,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Axes;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  *
@@ -50,16 +50,16 @@ public class HorizontalPicker extends StackPane {
     private static final String PICKER_INDEX = "PickerIndex";
 
     private final HorizontalHeader horizontalHeader;
-    private final Axes axes;
 
+    private final SpreadsheetView spv;
     private final Stack<Label> pickerPile;
     private final Stack<Label> pickerUsed;
 
     private final InnerHorizontalPicker innerPicker = new InnerHorizontalPicker();
 
-    public HorizontalPicker(HorizontalHeader horizontalHeader, Axes axes) {
+    public HorizontalPicker(HorizontalHeader horizontalHeader, SpreadsheetView spv) {
         this.horizontalHeader = horizontalHeader;
-        this.axes = axes;
+        this.spv = spv;
 
         pickerPile = new Stack<>();
         pickerUsed = new Stack<>();
@@ -115,7 +115,7 @@ public class HorizontalPicker extends StackPane {
         public void handle(MouseEvent mouseEvent) {
             Label picker = (Label) mouseEvent.getSource();
 
-           axes.getColumnPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
+           spv.getColumnPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
         }
     };
 
@@ -133,7 +133,7 @@ public class HorizontalPicker extends StackPane {
             double x = 0;
             for (int index = 0; index < horizontalHeader.getRootHeader().getColumnHeaders().size(); ++index) {
                 TableColumnHeader column = horizontalHeader.getRootHeader().getColumnHeaders().get(index);
-                if (axes.getColumnPickers().contains(index)) {
+                if (spv.getColumnPickers().contains(index)) {
                     Label label = getPicker(index);
                     label.resize(column.getWidth(), VerticalHeader.PICKER_SIZE);
                     label.setLayoutX(x);

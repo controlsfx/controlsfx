@@ -118,10 +118,10 @@ public final class SpreadsheetColumn {
 //            column.setText(column.getText() + ".");
 
         // When changing FixedColumns, we set header in order to add "." or ":"
-        spreadsheetView.getAxes().getFixedColumns().addListener(updateTextListener);
+        spreadsheetView.getFixedColumns().addListener(updateTextListener);
 
         // When changing frozen fixed columns, we need to update the header.
-        spreadsheetView.getAxes().fixingColumnsAllowedProperty().addListener(updateTextListener);
+        spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
 
         // When ColumnsHeaders are changing, we update the text
         ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
@@ -155,7 +155,7 @@ public final class SpreadsheetColumn {
      * @return true if this column is fixed.
      */
     public boolean isFixed() {
-        return spreadsheetView.getAxes().getFixedColumns().contains(this);
+        return spreadsheetView.getFixedColumns().contains(this);
     }
 
     /**
@@ -166,9 +166,9 @@ public final class SpreadsheetColumn {
      */
     public void setFixed(boolean fixed) {
         if (fixed) {
-            spreadsheetView.getAxes().getFixedColumns().add(this);
+            spreadsheetView.getFixedColumns().add(this);
         } else {
-            spreadsheetView.getAxes().getFixedColumns().removeAll(this);
+            spreadsheetView.getFixedColumns().removeAll(this);
         }
     }
 
@@ -217,7 +217,7 @@ public final class SpreadsheetColumn {
      * @return true if this column is fixable.
      */
     public boolean isColumnFixable() {
-        return canFix && spreadsheetView.getAxes().isFixingColumnsAllowed();
+        return canFix && spreadsheetView.isFixingColumnsAllowed();
     }
 
     /***************************************************************************

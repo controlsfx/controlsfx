@@ -325,7 +325,7 @@ public class SpreadsheetViewSelectionModel extends
          * We don't want to do any scroll when dragging or selecting with click.
          * Only keyboard action arrow action.
          */
-        if (!drag && key && getCellsViewSkin().getCellsSize() != 0 && spreadsheetView.getAxes().getFixedRows().size() != 0) {
+        if (!drag && key && getCellsViewSkin().getCellsSize() != 0 && spreadsheetView.getFixedRows().size() != 0) {
 
             int start = getCellsViewSkin().getRow(0).getIndex();
             double posFinalOffset = 0;

@@ -98,11 +98,11 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         buildGrid(grid, true);// Build both Grid
 
         spreadSheetView = new SpreadsheetView(grid);
-        spreadSheetView.getAxes().setShowRowHeader(rowHeader.isSelected());
-        spreadSheetView.getAxes().setShowColumnHeader(columnHeader.isSelected());
+        spreadSheetView.setShowRowHeader(rowHeader.isSelected());
+        spreadSheetView.setShowColumnHeader(columnHeader.isSelected());
         spreadSheetView.setEditable(editable.isSelected());
-        spreadSheetView.getAxes().getRowPickers().addAll(3);
-        spreadSheetView.getAxes().getColumnPickers().addAll(0,2,4,6);
+        spreadSheetView.getRowPickers().addAll(3);
+        spreadSheetView.getColumnPickers().addAll(0,2,4,6);
 
         centerPane.getChildren().setAll(spreadSheetView);
 
@@ -331,12 +331,12 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         rowHeaderLabel.getStyleClass().add("property");
         grid.add(rowHeaderLabel, 0, row);
         rowHeader.setSelected(true);
-        spreadSheetView.getAxes().setShowRowHeader(true);
+        spreadSheetView.setShowRowHeader(true);
         grid.add(rowHeader, 1, row++);
         rowHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                spreadSheetView.getAxes().setShowRowHeader(arg2);
+                spreadSheetView.setShowRowHeader(arg2);
             }
         });
 
@@ -346,12 +346,12 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         grid.add(columnHeaderLabel, 0, row);
         columnHeader = new CheckBox();
         columnHeader.setSelected(true);
-        spreadSheetView.getAxes().setShowColumnHeader(true);
+        spreadSheetView.setShowColumnHeader(true);
         grid.add(columnHeader, 1, row++);
         columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                spreadSheetView.getAxes().setShowColumnHeader(arg2);
+                spreadSheetView.setShowColumnHeader(arg2);
             }
         });
 

@@ -50,7 +50,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Axes;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -80,7 +79,6 @@ public class VerticalHeader extends StackPane {
      */
     private final SpreadsheetHandle handle;
     private final SpreadsheetView spreadsheetView;
-    private final Axes axes;
     private double horizontalHeaderHeight;
     /**
      * The vertical header width, just for the Label, not the Pickers.
@@ -113,7 +111,6 @@ public class VerticalHeader extends StackPane {
     public VerticalHeader(final SpreadsheetHandle handle) {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
-        this.axes = spreadsheetView.getAxes();
         pickerPile = new Stack<>();
         pickerUsed = new Stack<>();
     }
@@ -157,7 +154,7 @@ public class VerticalHeader extends StackPane {
         VerticalHeader.this.setClip(clip);
 
         // We desactivate and activate the verticalHeader upon request
-        axes.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
+        spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
                 requestLayout();
@@ -166,9 +163,9 @@ public class VerticalHeader extends StackPane {
 
         // When the Column header is showing or not, we need to update the
         // position of the verticalHeader
-        spreadsheetView.getAxes().showColumnHeaderProperty().addListener(layout);
-        spreadsheetView.getAxes().getFixedRows().addListener(layout);
-        spreadsheetView.getAxes().fixingRowsAllowedProperty().addListener(layout);
+        spreadsheetView.showColumnHeaderProperty().addListener(layout);
+        spreadsheetView.getFixedRows().addListener(layout);
+        spreadsheetView.fixingRowsAllowedProperty().addListener(layout);
 
         // In case we resize the view in any manners
         spreadsheetView.heightProperty().addListener(layout);
@@ -186,10 +183,10 @@ public class VerticalHeader extends StackPane {
 
     public double computeHeaderWidth() {
         double width = 0;
-        if (!axes.getRowPickers().isEmpty()) {
+        if (!spreadsheetView.getRowPickers().isEmpty()) {
             width += PICKER_SIZE;
         }
-        if (axes.isShowRowHeader()) {
+        if (spreadsheetView.isShowRowHeader()) {
             width += DEFAULT_VERTICAL_HEADER_WIDTH;
         }
         return width;
@@ -200,7 +197,7 @@ public class VerticalHeader extends StackPane {
         if (resizing) {
             return;
         }
-        if ((axes.isShowRowHeader() || !axes.getColumnPickers().isEmpty()) && skin.getCellsSize() > 0) {
+        if ((spreadsheetView.isShowRowHeader() || !spreadsheetView.getColumnPickers().isEmpty()) && skin.getCellsSize() > 0) {
 
             double x = snappedLeftInset();
             /**
@@ -208,13 +205,13 @@ public class VerticalHeader extends StackPane {
              */
             pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
             pickerUsed.clear();
-            if (!axes.getRowPickers().isEmpty()) {
+            if (!spreadsheetView.getRowPickers().isEmpty()) {
                 verticalHeaderWidth.setValue(PICKER_SIZE);
                 x += PICKER_SIZE;
             }else{
                 verticalHeaderWidth.setValue(0);
             }
-            if (axes.isShowRowHeader()) {
+            if (spreadsheetView.isShowRowHeader()) {
                 verticalHeaderWidth.setValue(getVerticalHeaderWidth() + DEFAULT_VERTICAL_HEADER_WIDTH);
             }
 
@@ -227,11 +224,11 @@ public class VerticalHeader extends StackPane {
 
             rowCount = addVisibleRows(rowCount, x, cellSize);
 
-            if (axes.isShowRowHeader()) {
+            if (spreadsheetView.isShowRowHeader()) {
                 rowCount = addFixedRows(rowCount, x, cellSize);
             }
             // First one blank and on top (z-order) of the others
-            if (axes.showColumnHeaderProperty().get()) {
+            if (spreadsheetView.showColumnHeaderProperty().get()) {
                 label = getLabel(rowCount++);
                 label.setText("");
                 label.resize(getVerticalHeaderWidth(), horizontalHeaderHeight);
@@ -267,9 +264,9 @@ public class VerticalHeader extends StackPane {
         Label label;
 
         // Then we iterate over the FixedRows if any
-        if (!axes.getFixedRows().isEmpty() && cellSize != 0) {
-            for (int j = 0; j < axes.getFixedRows().size(); ++j) {
-                rowIndex = axes.getFixedRows().get(j);
+        if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
+            for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
+                rowIndex = spreadsheetView.getFixedRows().get(j);
                 if (!handle.getCellsViewSkin().getCurrentlyFixedRow()
                         .contains(rowIndex)) {
                     break;
@@ -281,7 +278,7 @@ public class VerticalHeader extends StackPane {
                 label.setContextMenu(getRowContextMenu(rowIndex));
                 label.layoutYProperty().unbind();
                 // If the columnHeader is here, we need to translate a bit
-                if (axes.showColumnHeaderProperty().get()) {
+                if (spreadsheetView.showColumnHeaderProperty().get()) {
                     label.relocate(snappedLeftInset(), snappedTopInset() + horizontalHeaderHeight + spaceUsedByFixedRows);
                 } else {
                     label.relocate(snappedLeftInset(), snappedTopInset() + spaceUsedByFixedRows);
@@ -308,7 +305,7 @@ public class VerticalHeader extends StackPane {
         // take the other header into account.
         double y = snappedTopInset();
 
-        if (axes.showColumnHeaderProperty().get()) {
+        if (spreadsheetView.showColumnHeaderProperty().get()) {
             y += horizontalHeaderHeight;
         }
 
@@ -331,14 +328,14 @@ public class VerticalHeader extends StackPane {
             /**
              * Picker
              */
-            if (axes.getRowPickers().contains(rowIndex)) {
+            if (spreadsheetView.getRowPickers().contains(rowIndex)) {
                 Label picker = getPicker(rowIndex);
                 picker.resize(PICKER_SIZE, row.getHeight());
                 picker.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 getChildren().add(picker);
             }
 
-            if (axes.isShowRowHeader()) {
+            if (spreadsheetView.isShowRowHeader()) {
                 label = getLabel(rowCount++);
 
                 label.setText(getRowHeader(rowIndex));
@@ -355,7 +352,7 @@ public class VerticalHeader extends StackPane {
                 } else {
                     css.removeAll("selected");
                 }
-                if (axes.getFixedRows().contains(rowIndex)) {
+                if (spreadsheetView.getFixedRows().contains(rowIndex)) {
                     css.addAll("fixed");
                 } else {
                     css.removeAll("fixed");
@@ -485,7 +482,7 @@ public class VerticalHeader extends StackPane {
         public void handle(MouseEvent mouseEvent) {
             Label picker = (Label) mouseEvent.getSource();
 
-            axes.getRowPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
+            spreadsheetView.getRowPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
         }
     };
 
@@ -521,7 +518,7 @@ public class VerticalHeader extends StackPane {
      * @return
      */
     private ContextMenu getRowContextMenu(final Integer row) {
-        if (axes.isRowFixable(row)) {
+        if (spreadsheetView.isRowFixable(row)) {
             final ContextMenu contextMenu = new ContextMenu();
 
             MenuItem fixItem = new MenuItem("Fix");
@@ -531,10 +528,10 @@ public class VerticalHeader extends StackPane {
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
-                    if (axes.getFixedRows().contains(row)) {
-                        axes.getFixedRows().remove(row);
+                    if (spreadsheetView.getFixedRows().contains(row)) {
+                        spreadsheetView.getFixedRows().remove(row);
                     } else {
-                        axes.getFixedRows().add(row);
+                        spreadsheetView.getFixedRows().add(row);
                     }
                 }
             });

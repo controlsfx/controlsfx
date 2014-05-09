@@ -26,30 +26,33 @@
  */
 package org.controlsfx.validation.decorator;
 
+
 import java.util.Arrays;
 import java.util.Collection;
+
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
 /**
  * Validation decorator to decorate validation state using images 
  */
-public class GraphicValidationDecorator implements ValidationDecorator {
+public class GraphicValidationDecorator extends AbstractValidationDecorator {
 
     // TODO we shouldn't hardcode this - defer to CSS eventually
 	
     private static final Image ERROR_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-error.png");
     private static final Image WARNING_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-warning.png");
+    private static final Image REQUIRED_IMAGE = new Image("/impl/org/controlsfx/control/validation/required-indicator.png");
 
     private static final String SHADOW_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);";
     private static final String TOOLTIP_COMMON_EFFECTS = "-fx-font-weight: bold; -fx-padding: 5; -fx-border-width:1;";
@@ -99,7 +102,17 @@ public class GraphicValidationDecorator implements ValidationDecorator {
      * {@inheritDoc}
      */
     @Override
-    public final Collection<? extends Decoration> createDecorations(ValidationMessage message) {
-        return Arrays.asList(new GraphicDecoration(createDecorationNode(message),Pos.BOTTOM_LEFT));
-    }
+	protected Collection<Decoration> createValidationDecorations(ValidationMessage message) {
+    	return Arrays.asList(new GraphicDecoration(createDecorationNode(message),Pos.BOTTOM_LEFT));
+	}
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+	protected Collection<Decoration> createRequiredDecorations(Control target) {
+    	return Arrays.asList(new GraphicDecoration(new ImageView(REQUIRED_IMAGE),Pos.TOP_LEFT, REQUIRED_IMAGE.getWidth()/2, REQUIRED_IMAGE.getHeight()/2));
+	}
+    
+    
 }

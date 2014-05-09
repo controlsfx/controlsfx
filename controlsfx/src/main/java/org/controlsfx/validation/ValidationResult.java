@@ -250,7 +250,7 @@ public class ValidationResult {
      * Retrieve errors represented by validation result
      * @return collection of errors
      */
-    public Collection<? extends ValidationMessage> getErrors() {
+    public Collection<ValidationMessage> getErrors() {
         return Collections.unmodifiableList(errors);
     }
 
@@ -258,7 +258,7 @@ public class ValidationResult {
      * Retrieve warnings represented by validation result
      * @return collection of warnings
      */
-    public Collection<? extends ValidationMessage> getWarnings() {
+    public Collection<ValidationMessage> getWarnings() {
         return Collections.unmodifiableList(warnings);
     }
 
@@ -266,7 +266,7 @@ public class ValidationResult {
      * Retrieve all messages represented by validation result
      * @return collection of messages
      */
-    public Collection<? extends ValidationMessage> getMessages() {
+    public Collection<ValidationMessage> getMessages() {
         List<ValidationMessage> messages = new ArrayList<>();
         messages.addAll(errors);
         messages.addAll(warnings);

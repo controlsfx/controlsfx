@@ -26,21 +26,31 @@
  */
 package org.controlsfx.validation.decorator;
 
-import java.util.Collection;
+import javafx.scene.control.Control;
 
-import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.validation.ValidationMessage;
 
 /**
  * Contract for validation decorators
  */
-@FunctionalInterface
 public interface ValidationDecorator {
 
     /**
-     * Creates decorations for a given validation message
-     * @param message validation message
-     * @return collection of decorations
+     * Removes all validation decorations from the target control
+     * @param target
      */
-    public Collection<? extends Decoration> createDecorations(ValidationMessage message);
+    void removeDecorations(Control target);
+	
+    /**
+     * Applies validation decoration for a given validation message
+     * @param message validation message
+     */
+    void applyValidationDecoration(ValidationMessage message);
+    
+    
+    /**
+     * Applies 'required' decoration to a given control
+     * @param target control
+     */
+    void applyRequiredDecoration(Control target);
 }

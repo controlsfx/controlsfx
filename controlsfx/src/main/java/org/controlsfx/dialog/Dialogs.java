@@ -1113,7 +1113,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label( localize("exception.dlg.label"));
+        Label label = new Label( localize(asKey("exception.dlg.label")));
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

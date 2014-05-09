@@ -26,6 +26,9 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.util.ArrayList;
 import java.util.List;
@@ -521,7 +524,7 @@ public class VerticalHeader extends StackPane {
         if (spreadsheetView.isRowFixable(row)) {
             final ContextMenu contextMenu = new ContextMenu();
 
-            MenuItem fixItem = new MenuItem("Fix");
+            MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.header.menu.fix")));
 
             // fixItem.setGraphic(new ImageView(new
             // Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));

@@ -585,7 +585,7 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new AbstractAction("Open Exception") {
+        Action openExceptionAction = new AbstractAction(localize(asKey("exception.button.label"))) {
             @Override public void execute(ActionEvent ae) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
@@ -1113,7 +1113,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label( localize(asKey("exception.dlg.label")));
+        Label label = new Label( localize("exception.dlg.label"));
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -1389,7 +1389,7 @@ public final class Dialogs {
         private final ListView<String> fontListView = new ListView<String>(filteredFontList);
         private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
         private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
-        private final Text sample = new Text("Sample");
+        private final Text sample = new Text(localize(asKey("font.dlg.sample.text")));
         
         public FontPanel() {
             setHgap(HGAP);
@@ -1449,7 +1449,7 @@ public final class Dialogs {
 //            });
             
             // layout dialog
-            add( new Label("Font"), 0, 0);
+            add( new Label(localize(asKey("font.dlg.font.label"))), 0, 0);
 //            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( fontSearch, 0, 1);
             add(fontListView, 0, 1);
@@ -1485,13 +1485,13 @@ public final class Dialogs {
                     refreshSample();
                 }});
 
-            add( new Label("Style"), 1, 0);
+            add( new Label(localize(asKey("font.dlg.style.label"))), 1, 0);
 //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( postureSearch, 1, 1);
             add(styleListView, 1, 1);
             styleListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
             
-            add( new Label("Size"), 2, 0);
+            add( new Label(localize(asKey("font.dlg.size.label"))), 2, 0);
 //            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( sizeSearch, 2, 1);
             add(sizeListView, 2, 1);

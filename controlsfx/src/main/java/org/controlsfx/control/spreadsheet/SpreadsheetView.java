@@ -26,6 +26,9 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
@@ -1006,7 +1009,7 @@ public class SpreadsheetView extends Control {
     public ContextMenu getSpreadsheetViewContextMenu() {
         final ContextMenu contextMenu = new ContextMenu();
 
-        final MenuItem copyItem = new MenuItem("Copy");
+        final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy")));
         copyItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("copySpreadsheetView.png"))));
         copyItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -1016,7 +1019,7 @@ public class SpreadsheetView extends Control {
             }
         });
 
-        final MenuItem pasteItem = new MenuItem("Paste");
+        final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste")));
         pasteItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("pasteSpreadsheetView.png"))));
         pasteItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -1026,7 +1029,7 @@ public class SpreadsheetView extends Control {
             }
         });
         
-        final MenuItem commentedItem = new MenuItem("Comment cell");
+        final MenuItem commentedItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment")));
         commentedItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("comment.png"))));
         commentedItem.setOnAction(new EventHandler<ActionEvent>() {

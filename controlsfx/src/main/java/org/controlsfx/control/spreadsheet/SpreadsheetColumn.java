@@ -26,6 +26,9 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.util.List;
 
 import javafx.application.Platform;
@@ -248,7 +251,7 @@ public final class SpreadsheetColumn {
         if (isColumnFixable()) {
             final ContextMenu contextMenu = new ContextMenu();
 
-            this.fixItem = new MenuItem("Fix");
+            this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix")));
             // fixItem.setGraphic(new ImageView(new
             // Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
             fixItem.setOnAction(new EventHandler<ActionEvent>() {

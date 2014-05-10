@@ -5,6 +5,7 @@ syntax: glob
 build/*
 .idea/*
 .gradle/*
+.nb-gradle/*
 bin/*
 doc/*
 .settings/*

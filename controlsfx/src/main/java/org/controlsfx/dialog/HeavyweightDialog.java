@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,16 +80,30 @@ class HeavyweightDialog extends FXDialog {
      **************************************************************************/
     
     HeavyweightDialog(String title, Window owner, boolean modal) {
-        this(title, owner, modal, false);
+        this(title, owner, modal, DialogStyle.CROSS_PLATFORM_DARK);
     }
 
-    HeavyweightDialog(String title, Window owner, boolean modal, boolean nativeChrome) {
+    HeavyweightDialog(String title, Window owner, boolean modal, DialogStyle dialogStyle) {
         super();
         this.owner = owner;
         
-        final StageStyle style = ! nativeChrome ? StageStyle.TRANSPARENT :
-            (DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
-                     StageStyle.DECORATED : StageStyle.UTILITY);
+        final StageStyle style;
+        
+        switch (dialogStyle) {
+            case CROSS_PLATFORM_DARK:
+                style = StageStyle.TRANSPARENT;
+                break;
+            case NATIVE:
+                style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
+                     StageStyle.DECORATED : StageStyle.UTILITY;
+                break;
+            case UNDECORATED:
+                style = StageStyle.UNDECORATED;
+                break;
+            default:
+                dialogStyle = DialogStyle.CROSS_PLATFORM_DARK;
+                style = StageStyle.TRANSPARENT;
+        }
         
         stage = new Stage(style) {
             @Override public void showAndWait() {
@@ -128,10 +142,10 @@ class HeavyweightDialog extends FXDialog {
 
         setModal(modal);
         
-        boolean useCustomChrome = ! nativeChrome;
+        boolean useCustomChrome = (dialogStyle == DialogStyle.CROSS_PLATFORM_DARK);
 
         // *** The rest is for adding window decorations ***
-        init(title, useCustomChrome);
+        init(title, dialogStyle);
         lightweightDialog.getStyleClass().add("heavyweight"); //$NON-NLS-1$
         lightweightDialog.getStyleClass().add(useCustomChrome ? "custom-chrome" : "native-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -276,6 +290,14 @@ class HeavyweightDialog extends FXDialog {
         return stage.getScene().getRoot();
     }
     
+    public double getX() {
+        return stage.getX();
+    }
+    
+    public void setX(double x) {
+        stage.setX(x);
+    }
+    
     @Override ReadOnlyDoubleProperty heightProperty() {
         return stage.heightProperty();
     }
@@ -323,4 +345,3 @@ class HeavyweightDialog extends FXDialog {
     private static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active"); //$NON-NLS-1$
 
 }
-

@@ -34,14 +34,23 @@ dependencies {
     }
 }
 
+task generatei18nResources(type: Copy) {
+    from "src/main/resources"
+    into "$buildDir/resources/main"
+    include "controlsfx.properties"
+    rename{ String fileName -> fileName.replace("fx.prop", "fx_en.prop") }
+}
+
+processResources.dependsOn(generatei18nResources)
+
 javadoc {
     exclude 'impl/*'
     failOnError = false
     classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
     
     options.windowTitle("ControlsFX Project ${version}")
-    options.links("http://download.oracle.com/javase/7/docs/api/");
-    options.links("http://docs.oracle.com/javafx/2/api/");
+    options.links("http://docs.oracle.com/javase/8/docs/api/");
+    options.links("http://docs.oracle.com/javase/8/javafx/api/");
     options.addBooleanOption("Xdoclint:none").setValue(true);
     options.overview("src/main/docs/overview.html");
     
@@ -67,6 +76,7 @@ jar {
         attributes 'Implementation-Title': 'ControlsFX', 'Implementation-Version': project.version
     }
 }
+
 
 task sourceJar(type: Jar) {
     from sourceSets.main.java

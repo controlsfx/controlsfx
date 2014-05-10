@@ -26,6 +26,9 @@
  */
 package impl.org.controlsfx.skin;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,7 +114,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         toolbar.getItems().add(modeButton);
         
         // property sheet search
-        searchField.setPromptText("Search");
+        searchField.setPromptText( localize(asKey("property.sheet.search.field.prompt")));
         searchField.setMinWidth(0);
         HBox.setHgrow(searchField, Priority.SOMETIMES);
         searchField.managedProperty().bind(searchField.visibleProperty());
@@ -227,9 +230,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
     }
 
-    private String capitalize( String s ) {
-        return s.substring(0,1).toUpperCase() + s.substring(1).toLowerCase();
-    }
     
     /**************************************************************************
      * 
@@ -248,16 +248,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             super("");
             this.mode = mode;
             
-            final String text = "By " + capitalize(mode.toString());
-            
             if (mode == Mode.CATEGORY) {
                 setGraphic( new ImageView(CATEGORY_IMAGE));
-                setLongText(text);
+                setLongText(localize(asKey("property.sheet.group.mode.bycategory")));
             } else if (mode == Mode.NAME) {
                 setGraphic(new ImageView(NAME_IMAGE));
-                setLongText(text);
+                setLongText(localize(asKey("property.sheet.group.mode.byname")));
             } else {
-                setText(text);
+                setText("???");
             }
         }
 

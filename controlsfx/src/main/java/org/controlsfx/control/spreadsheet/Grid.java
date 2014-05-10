@@ -77,11 +77,13 @@ public interface Grid {
     
     /**
      * Return how many rows are inside the grid.
+     * @return 
      */
     public int getRowCount();
     
     /**
      * Return how many columns are inside the grid.
+     * @return 
      */
     public int getColumnCount();
     
@@ -127,6 +129,7 @@ public interface Grid {
      * registration of listeners which will be notified as a {@link SpreadsheetCell}'s value 
      * will change.
      *
+     * @param <E>
      * @param eventType the type of the events to receive by the handler
      * @param eventHandler the handler to register
      * @throws NullPointerException if the event type or handler is null
@@ -139,6 +142,7 @@ public interface Grid {
      * caller needs to specify the particular event type from which to
      * unregister the handler.
      *
+     * @param <E>
      * @param eventType the event type from which to unregister
      * @param eventHandler the handler to unregister
      * @throws NullPointerException if the event type or handler is null

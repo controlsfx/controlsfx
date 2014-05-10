@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,38 +24,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.dialog;
+package org.controlsfx.validation.decoration;
 
-import org.controlsfx.tools.Utils;
+import javafx.scene.control.Control;
 
-import javafx.stage.Window;
+import org.controlsfx.validation.ValidationMessage;
 
-class DialogFactory {
+/**
+ * Contract for validation decorators
+ */
+public interface ValidationDecoration {
 
-    static FXDialog createDialog(String title) {
-        return createDialog(false, title);
-    }
-
-    static FXDialog createDialog(boolean useLightweight, String title) {
-        return createDialog(false, title, null, false);
-    }
-
-    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal) {
-        return createDialog(useLightweight, title, owner, modal, DialogStyle.CROSS_PLATFORM_DARK);
-    }
-
-    static FXDialog createDialog(boolean useLightweight, String title, Object owner, boolean modal, DialogStyle style) {
-        if (style == null) {
-            style = DialogStyle.CROSS_PLATFORM_DARK;
-        }
-        
-        if (useLightweight) {
-            return new LightweightDialog(title, owner, style);
-        } else {
-
-            Window window = Utils.getWindow(owner);
-
-            return new HeavyweightDialog(title, window, modal, style);
-        }
-    }
+    /**
+     * Removes all validation decorations from the target control
+     * @param target
+     */
+    void removeDecorations(Control target);
+	
+    /**
+     * Applies validation decoration for a given validation message
+     * @param message validation message
+     */
+    void applyValidationDecoration(ValidationMessage message);
+    
+    
+    /**
+     * Applies 'required' decoration to a given control
+     * @param target control
+     */
+    void applyRequiredDecoration(Control target);
 }

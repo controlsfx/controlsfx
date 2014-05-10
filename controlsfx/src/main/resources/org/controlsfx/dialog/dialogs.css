@@ -137,6 +137,18 @@
     -fx-padding: 0 0 0 10;
 }
 
+.dialog .message-banner {
+    -fx-opacity:1; 
+    -fx-text-fill: A94442;
+    -fx-background-color: F2DEDE;
+    -fx-border-width: 1; 
+    -fx-border-color: EBCCD1; 
+    -fx-padding: 5 10 5 10;
+    -fx-font-weight:bold;
+    -fx-graphic-text-gap: 10;
+    /*-fx-graphic: url("../../../impl/org/controlsfx/dialog/resources/error_message.png");*/
+}
+
 
 /*******************************************************************************
  *                                                                             *

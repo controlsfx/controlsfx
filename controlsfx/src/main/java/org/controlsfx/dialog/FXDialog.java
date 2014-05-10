@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,17 @@ package org.controlsfx.dialog;
 
 import java.net.URL;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -51,6 +57,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
 import org.controlsfx.tools.Platform;
 
@@ -86,6 +93,14 @@ abstract class FXDialog {
     
     protected StackPane lightweightDialog;
     
+    // shake support
+    private double initialX = 0;
+    private final DoubleProperty shakeProperty = new SimpleDoubleProperty(this, "shakeProperty", 0.0) {
+        @Override protected void invalidated() {
+            setX(initialX + shakeProperty.get() * 25);
+        }
+    };
+    
     
     
     /**************************************************************************
@@ -107,7 +122,7 @@ abstract class FXDialog {
      * 
      **************************************************************************/
     
-    protected final void init(String title, boolean useCustomChrome) {
+    protected final void init(String title, DialogStyle style) {
         titleProperty().set(title);
         
         resizableProperty().addListener(new InvalidationListener() {
@@ -154,7 +169,7 @@ abstract class FXDialog {
         resizeCorner.setManaged(false);
         
         
-        if (! useCustomChrome) {
+        if (style != DialogStyle.CROSS_PLATFORM_DARK) {
             return;
         }
         
@@ -230,6 +245,31 @@ abstract class FXDialog {
     public abstract Window getWindow();
     
     public abstract void sizeToScene();
+    
+    public abstract double getX();
+    
+    public abstract void setX(double x);
+    
+    public void shake() {
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(2);
+
+        KeyValue keyValue0 = new KeyValue(shakeProperty, 0.0, Interpolator.EASE_BOTH);
+        KeyValue keyValue1 = new KeyValue(shakeProperty, -1.0, Interpolator.EASE_BOTH);
+        KeyValue keyValue2 = new KeyValue(shakeProperty, 1.0, Interpolator.EASE_BOTH);
+        
+        initialX = getX();
+        
+        final double sectionDuration = 50;
+        timeline.getKeyFrames().clear();
+        timeline.getKeyFrames().addAll(
+            new KeyFrame(Duration.ZERO, keyValue0),
+            new KeyFrame(Duration.millis(sectionDuration),     keyValue1),
+            new KeyFrame(Duration.millis(sectionDuration * 3), keyValue2),
+            new KeyFrame(Duration.millis(sectionDuration * 4), keyValue0)
+        );
+        timeline.play();
+    }
     
     // --- resizable
     abstract BooleanProperty resizableProperty();

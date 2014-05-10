@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,28 +24,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.decoration;
 
-import javafx.scene.Node;
+package org.controlsfx.dialog;
 
-public class StyleClassDecoration extends Decoration {
-
-    private final String styleClass;
-
-    public StyleClassDecoration(String styleClass) {
-        this.styleClass = styleClass;
-    }
-
-    @Override public Node applyDecoration(Node targetNode) {
-        if (targetNode.getStyleClass().contains(styleClass)) return null;
-
-        targetNode.getStyleClass().add(styleClass);
-
-        // no decoration node, so return null
-        return null;
-    }
+/**
+ * This enum defines the possible styles for a dialog.
+ */
+public enum DialogStyle {
     
-    @Override public void removeDecoration(Node targetNode) {
-        targetNode.getStyleClass().remove(styleClass);
-    }
+    /**
+     * Defines a cross-platform dialog style.
+     * The dialogs rendered using this style will have a cross-platform title bar.
+     */
+    CROSS_PLATFORM_DARK,
+
+    /**
+     * Defines a native dialog style.
+     * The dialogs rendered using this style will have a native title bar.
+     */
+    NATIVE,
+
+    /**
+     * Defines a dialog style with no decorations.
+     * The dialogs rendered using this style will not have a title bar.
+     */
+    UNDECORATED
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,8 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 // Not public API (class is package-protected), so no JavaDoc is required.
 class ExceptionDialog extends HeavyweightDialog {
 
-    public ExceptionDialog(Window owner, String moreDetails, boolean nativeChrome) {
-        super(localize(asKey("exception.dlg.title")), owner, false, nativeChrome); //$NON-NLS-1$
+    public ExceptionDialog(Window owner, String moreDetails, DialogStyle style) {
+        super(localize(asKey("exception.dlg.title")), owner, false, style); //$NON-NLS-1$
         initComponents(moreDetails);
     }
 

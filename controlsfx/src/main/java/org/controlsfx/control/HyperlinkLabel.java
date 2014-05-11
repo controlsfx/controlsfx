@@ -84,7 +84,7 @@ import com.sun.javafx.event.EventHandlerManager;
  * was passed in to the HyperlinkLabel instance:
  * 
  * <br/><br/>
- * <center><img src="hyperlinkLabel.png"/></center>
+ * <center><img src="hyperlinkLabel.PNG"/></center>
  * 
  * @see Hyperlink
  * @see ActionEvent

@@ -63,4 +63,29 @@ public class Utils {
             throw new IllegalArgumentException("Unknown owner: " + owner.getClass()); //$NON-NLS-1$
         }
     }
+    
+    /**
+     * Return a letter (just like Excel) associated with the number. When the
+     * number is under 26, a simple letter is returned. When the number is
+     * superior, concatenated letters are returned.
+     * 
+     * 
+     * For example: 0 -> A 1 -> B 26 -> AA 32 -> AG 45 -> AT
+     * 
+     * 
+     * @param number
+     * @return a letter (like) associated with the number.
+     */
+    public static final String getExcelLetterFromNumber(int number) {
+        String letter = "";
+        // Repeatedly divide the number by 26 and convert the
+        // remainder into the appropriate letter.
+        while (number >= 0) {
+            final int remainder = number % 26;
+            letter = (char) (remainder + 'A') + letter;
+            number = number / 26 - 1;
+        }
+
+        return letter;
+    }
 }

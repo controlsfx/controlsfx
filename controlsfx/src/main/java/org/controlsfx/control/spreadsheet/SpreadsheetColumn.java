@@ -26,6 +26,9 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.util.List;
 
 import javafx.application.Platform;
@@ -37,6 +40,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import org.controlsfx.tools.Utils;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn}
@@ -128,7 +132,7 @@ public final class SpreadsheetColumn {
             public void invalidated(Observable arg0) {
                 List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeaders();
                 if (columnsHeader.size() <= indexColumn) {
-                    setText(SpreadsheetView.getExcelLetterFromNumber(indexColumn));
+                    setText(Utils.getExcelLetterFromNumber(indexColumn));
                 } else if (!columnsHeader.get(indexColumn).equals(getText())) {
                     setText(columnsHeader.get(indexColumn));
                 }
@@ -247,7 +251,7 @@ public final class SpreadsheetColumn {
         if (isColumnFixable()) {
             final ContextMenu contextMenu = new ContextMenu();
 
-            this.fixItem = new MenuItem("Fix");
+            this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix")));
             // fixItem.setGraphic(new ImageView(new
             // Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
             fixItem.setOnAction(new EventHandler<ActionEvent>() {

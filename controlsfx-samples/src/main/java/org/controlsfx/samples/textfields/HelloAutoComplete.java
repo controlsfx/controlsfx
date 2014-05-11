@@ -26,10 +26,6 @@
  */
 package org.controlsfx.samples.textfields;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -40,11 +36,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.samples.Utils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HelloAutoComplete extends ControlsFXSample {
 
@@ -70,8 +69,8 @@ public class HelloAutoComplete extends ControlsFXSample {
                 + "\"Hey\", \"Hello\", \"Hello World\", \"Apple\", \"Cool\", "
                 + "\"Costa\", \"Cola\", \"Coca Cola\""
                 + "\n\n"
-                + "The 'Learning TextField' will add whatever words are typed"
-                + "to the auto-complete popup, as long as you press Enter once"
+                + "The 'Learning TextField' will add whatever words are typed "
+                + "to the auto-complete popup, as long as you press Enter once "
                 + "you've finished typing the word.";
     }
 
@@ -103,7 +102,7 @@ public class HelloAutoComplete extends ControlsFXSample {
         // Learn the word when user presses ENTER
         //
         learningTextField = new TextField();
-        TextFields.bindAutoCompletion(learningTextField, possibleSuggestions);
+        autoCompletionBinding = TextFields.bindAutoCompletion(learningTextField, possibleSuggestions);
         learningTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent ke) {
@@ -132,7 +131,7 @@ public class HelloAutoComplete extends ControlsFXSample {
         if (autoCompletionBinding != null) {
             autoCompletionBinding.dispose();
         }
-        TextFields.bindAutoCompletion(learningTextField, possibleSuggestions);
+        autoCompletionBinding = TextFields.bindAutoCompletion(learningTextField, possibleSuggestions);
     }
 
     @Override public Node getControlPanel() {

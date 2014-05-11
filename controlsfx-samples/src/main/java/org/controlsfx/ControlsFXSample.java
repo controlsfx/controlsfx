@@ -34,7 +34,7 @@ public abstract class ControlsFXSample extends SampleBase {
 		public ProjectInfo() {
 			
 			InputStream s = getClass().getClassLoader().getResourceAsStream(
-					"META-INF/manifest.mf");
+					"META-INF/MANIFEST.MF");
 			
 			try {
 				Manifest manifest = new Manifest(s);

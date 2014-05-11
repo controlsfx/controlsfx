@@ -35,7 +35,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 
-public class GraphicDecoration implements Decoration {
+public class GraphicDecoration extends Decoration {
 
     private final Node decorationNode;
     private final Pos pos;
@@ -58,20 +58,20 @@ public class GraphicDecoration implements Decoration {
         this.yOffset = yOffset;
     }
     
-    @Override public Node run(Node targetNode, boolean add) {
+    @Override public Node applyDecoration(Node targetNode) {
+        List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
+        updateGraphicPosition(targetNode);
+        if (!targetNodeChildren.contains(decorationNode)) {
+            targetNodeChildren.add(decorationNode);
+        }
+        return null;
+    }
+    
+    @Override public void removeDecoration(Node targetNode) {
         List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
         
-        if (add) {
-            updateGraphicPosition(targetNode);
-            if (!targetNodeChildren.contains(decorationNode)) {
-                targetNodeChildren.add(decorationNode);
-            }
-            return null;
-        } else {
-            if (targetNodeChildren.contains(decorationNode)) {
-                targetNodeChildren.remove(decorationNode);
-            }
-            return null;
+        if (targetNodeChildren.contains(decorationNode)) {
+            targetNodeChildren.remove(decorationNode);
         }
     }
     

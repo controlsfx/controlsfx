@@ -26,6 +26,9 @@
  */
 package org.controlsfx.property;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
@@ -95,9 +98,9 @@ public class BeanProperty implements PropertySheet.Item {
                 e.printStackTrace();
             } catch (Throwable e) {
 				if (e instanceof PropertyVetoException) {
-					Dialogs.create().title("Property Change Error")
+					Dialogs.create().title(localize(asKey("bean.property.change.error.title")))
 							.message(e.getLocalizedMessage())
-							.masthead("Change is not allowed")
+							.masthead(localize(asKey("bean.property.change.error.masthead")))
 							.showError();
 				} else {
 					throw e;
@@ -108,7 +111,8 @@ public class BeanProperty implements PropertySheet.Item {
 
     /** {@inheritDoc} */
     @Override public String getCategory() {
-        return beanPropertyDescriptor.isExpert()? "Expert": "Basic";
+        return localize(asKey(beanPropertyDescriptor.isExpert()?
+        		   "bean.property.category.expert":"bean.property.category.basic"));
     }
 	
     /** 
@@ -127,7 +131,8 @@ public class BeanProperty implements PropertySheet.Item {
     }
     
     /** {@inheritDoc} */
-    @Override public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
         
         if (beanPropertyDescriptor.getPropertyEditorClass() != null && 
                 PropertyEditor.class.isAssignableFrom(beanPropertyDescriptor.getPropertyEditorClass())) {

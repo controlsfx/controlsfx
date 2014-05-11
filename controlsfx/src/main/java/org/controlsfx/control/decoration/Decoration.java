@@ -26,10 +26,13 @@
  */
 package org.controlsfx.control.decoration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.scene.Node;
 
 /**
- * Decoration is a functional interface used by the ControlsFX {@link Decorator} class
+ * Decoration is an abstract class used by the ControlsFX {@link Decorator} class
  * for adding and removing decorations on a node. ControlsFX
  * ships with pre-built decorations, including {@link GraphicDecoration} and
  * {@link StyleClassDecoration}.
@@ -38,26 +41,41 @@ import javafx.scene.Node;
  * @see GraphicDecoration
  * @see StyleClassDecoration
  */
-@FunctionalInterface
-public interface Decoration {
+public abstract class Decoration {
     
-    /**
-     * Depending on the boolean 'add' parameter, this method is responsible for
-     * decorating or undecorating the given target node. 
-     * 
-     * <p>When the boolean parameter is true, this method decorates the given 
+    private volatile Map<String,Object> properties;
+    
+	/**
+     * This method decorates the given 
      * target node with the relevant decorations, returning any 'decoration node' 
      * that needs to be added to the scenegraph (although this can be null). When
      * the returned Node is null, this indicates that the decoration will be 
-     * handled internally by the decorator (which is preferred, as the default
+     * handled internally by the decoration (which is preferred, as the default
      * implementation is not ideal in most circumstances).
      * 
      * <p>When the boolean parameter is false, this method removes the decoration 
      * from the given target node, always returning null.
      * 
-     * @param targetNode The node to decorate or undecorate.
-     * @return If the add parameter is true, the decoration, but null is a 
-     *         valid return value. If the add parameter is false, always null.
+     * @param targetNode The node to decorate.
+     * @return The decoration, but null is a valid return value.
      */
-    public Node run(Node targetNode, boolean add);
+    public abstract Node applyDecoration(Node targetNode);
+    
+    /**
+     * This method removes the decoration from the given target node.
+     * 
+     * @param targetNode The node to undecorate.
+     */
+    public abstract void removeDecoration(Node targetNode);
+    
+    /**
+     * Custom decoration properties
+     * @return decoration properties
+     */
+    public synchronized final Map<String,Object> getProperties() {
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
+    	return properties;
+    }
 }

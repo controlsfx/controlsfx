@@ -64,9 +64,10 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.AbstractDialogAction;
+import org.controlsfx.dialog.DefaultDialogAction;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
+import org.controlsfx.dialog.DialogStyle;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.Dialogs.UserInfo;
@@ -477,7 +478,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new AbstractDialogAction("Login",
+			final Action actionLogin = new DefaultDialogAction("Login",
 					ActionTrait.CLOSING, ActionTrait.DEFAULT) {
 
 				{
@@ -506,7 +507,7 @@ public class HelloDialog extends ControlsFXSample {
 			public void handle(ActionEvent arg0) {
 				Dialog dlg = new Dialog(includeOwner() ? stage : null,
 						"Login Dialog", cbUseLightweightDialog.isSelected(),
-						cbUseNativeTitleBar.isSelected());
+						cbUseNativeTitleBar.isSelected()?DialogStyle.NATIVE: DialogStyle.CROSS_PLATFORM_DARK);
 				if (cbShowMasthead.isSelected()) {
 					dlg.setMasthead("Login to ControlsFX");
 				}
@@ -564,7 +565,7 @@ public class HelloDialog extends ControlsFXSample {
 		}
 
 		if (cbUseNativeTitleBar.isSelected()) {
-			dialog.nativeTitleBar();
+			dialog.style(DialogStyle.NATIVE);
 		}
 
 		return dialog;

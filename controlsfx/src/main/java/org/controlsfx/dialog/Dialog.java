@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -273,12 +273,12 @@ public class Dialog {
      *      the difference between heavyweight and lightweight dialogs.
      */
     public Dialog(Object owner, String title, boolean lightweight) {
-        this(owner, title, lightweight, false);
+        this(owner, title, lightweight, DialogStyle.CROSS_PLATFORM_DARK);
     }
     
     /**
-     * Creates a dialog using specified owner and title, which may be rendered
-     * in either a heavyweight or lightweight fashion.
+     * Creates a dialog using specified owner, title and {@code DialogStyle}
+     * which may be rendered in either a heavyweight or lightweight fashion.
      * 
      * @param owner The dialog window owner - if specified the dialog will be
      *      centered over the owner, otherwise the dialog will be shown in the 
@@ -288,13 +288,11 @@ public class Dialog {
      *      owner, rather than in a separate window (as heavyweight dialogs are).
      *      Refer to the {@link Dialogs} class documentation for more details on
      *      the difference between heavyweight and lightweight dialogs.
-     * @param nativeTitleBar Specifies that the dialog should use the native 
-     *      titlebar of the users operating system rather than the custom 
-     *      cross-platform rendering used by default. Refer to the 
+     * @param style The {@code DialogStyle} of the dialog. Refer to the 
      *      {@link Dialogs} class javadoc for more information.
      */
-    public Dialog(Object owner, String title, boolean lightweight, boolean nativeTitleBar) {
-        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, nativeTitleBar);
+    public Dialog(Object owner, String title, boolean lightweight, DialogStyle style) {
+        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, style);
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane"); //$NON-NLS-1$
@@ -333,6 +331,13 @@ public class Dialog {
      */
     public void hide() {
         dialog.hide();
+    }
+    
+    /**
+     * Visibly shakes the dialog to get the users attention.
+     */
+    public void shake() {
+        dialog.shake();
     }
     
     /**
@@ -684,6 +689,19 @@ public class Dialog {
          * Returns true if {@link Action} has given trait 
          */
         boolean hasTrait( ActionTrait trait);
+        
+        /**
+         * Implementation of default dialog action execution logic:
+         * if action is enabled set it as dialog result.
+         */
+        default public void execute(ActionEvent ae) {
+            if (! disabledProperty().get()) {
+                if (ae.getSource() instanceof Dialog ) {
+                    ((Dialog) ae.getSource()).setResult(this);
+                }
+            }
+        }
+        
     }
     
     /**
@@ -856,11 +874,7 @@ public class Dialog {
 
         /** {@inheritDoc} */
         @Override public void execute(ActionEvent ae) {
-            if (! action.isDisabled()) {
-                if (ae.getSource() instanceof Dialog ) {
-                    ((Dialog) ae.getSource()).setResult(this);
-                }
-            }
+        	DialogAction.super.execute(ae);
         }
         
         /** {@inheritDoc} */
@@ -876,7 +890,14 @@ public class Dialog {
      * Private Implementation
      * 
      **************************************************************************/
-
+    
+    // TODO we use this with the login dialog to change the content, but the longer
+    // term solution is to automatically call sizeToScene on the FXDialog when
+    // the content changes.
+    void sizeToScene() {
+        dialog.sizeToScene();
+    }
+    
     /**
      * TODO delete me - this is just for testing!!
      */
@@ -1074,6 +1095,7 @@ public class Dialog {
         });
         return button;
     }
+    
 
     
     /***************************************************************************

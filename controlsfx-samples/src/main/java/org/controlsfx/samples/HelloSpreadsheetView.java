@@ -101,6 +101,8 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.setShowRowHeader(rowHeader.isSelected());
         spreadSheetView.setShowColumnHeader(columnHeader.isSelected());
         spreadSheetView.setEditable(editable.isSelected());
+        spreadSheetView.getRowPickers().addAll(3);
+        spreadSheetView.getColumnPickers().addAll(0,2,4,6);
 
         centerPane.getChildren().setAll(spreadSheetView);
 

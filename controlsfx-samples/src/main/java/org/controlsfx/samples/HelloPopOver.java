@@ -63,7 +63,7 @@ import org.controlsfx.control.PopOver.ArrowLocation;
 
 public class HelloPopOver extends ControlsFXSample {
 
-    private PopOver popOver = new PopOver();
+    private PopOver popOver;
 
     private DoubleProperty masterArrowSize;
     private DoubleProperty masterArrowIndent;
@@ -103,11 +103,10 @@ public class HelloPopOver extends ControlsFXSample {
          * will be applied to all popovers that are currently visible (this
          * includes the detached ones).
          */
-        masterArrowSize = new SimpleDoubleProperty(popOver.getArrowSize());
-        masterArrowIndent = new SimpleDoubleProperty(popOver.getArrowIndent());
-        masterCornerRadius = new SimpleDoubleProperty(popOver.getCornerRadius());
-        masterArrowLocation = new SimpleObjectProperty<>(
-                popOver.getArrowLocation());
+        masterArrowSize = new SimpleDoubleProperty(12);
+        masterArrowIndent = new SimpleDoubleProperty(12);
+        masterCornerRadius = new SimpleDoubleProperty(6);
+        masterArrowLocation = new SimpleObjectProperty<>(ArrowLocation.LEFT_TOP);
 
         popOver = createPopOver();
 
@@ -174,8 +173,9 @@ public class HelloPopOver extends ControlsFXSample {
 
         return borderPane;
     }
-    
-    @Override public Node getControlPanel() {
+
+    @Override
+    public Node getControlPanel() {
         Slider arrowSize = new Slider(0, 50, masterArrowSize.getValue());
         masterArrowSize.bind(arrowSize.valueProperty());
         GridPane.setFillWidth(arrowSize, true);
@@ -259,7 +259,7 @@ public class HelloPopOver extends ControlsFXSample {
         Bindings.bindBidirectional(masterArrowLocation,
                 locationBox.valueProperty());
         controls.add(locationBox, 1, 3);
-        
+
         return controls;
     }
 

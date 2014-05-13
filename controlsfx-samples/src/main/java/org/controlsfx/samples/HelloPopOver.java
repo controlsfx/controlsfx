@@ -42,6 +42,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -56,10 +58,12 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
+import org.scenicview.ScenicView;
 
 public class HelloPopOver extends ControlsFXSample {
 
@@ -72,6 +76,10 @@ public class HelloPopOver extends ControlsFXSample {
 
     private double targetX;
     private double targetY;
+
+    private CheckBox detached;
+
+    private CheckBox detachable;
 
     @Override
     public Node getPanel(Stage stage) {
@@ -108,8 +116,6 @@ public class HelloPopOver extends ControlsFXSample {
         masterCornerRadius = new SimpleDoubleProperty(6);
         masterArrowLocation = new SimpleObjectProperty<>(ArrowLocation.LEFT_TOP);
 
-        popOver = createPopOver();
-
         rect.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent evt) {
@@ -124,17 +130,19 @@ public class HelloPopOver extends ControlsFXSample {
         rect.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent evt) {
-                if (!popOver.isDetached()) {
+                if (popOver != null && !popOver.isDetached()) {
                     popOver.hide();
                 }
 
                 if (evt.getClickCount() == 2) {
+                    if (popOver != null && popOver.isShowing()) {
+                        popOver.hide(Duration.ZERO);
+                    }
+                    
                     targetX = evt.getScreenX();
                     targetY = evt.getScreenY();
 
-                    if (popOver.isDetached()) {
-                        popOver = createPopOver();
-                    }
+                    popOver = createPopOver();
 
                     double size = 3;
                     line1.setStartX(evt.getX() - size);
@@ -211,15 +219,12 @@ public class HelloPopOver extends ControlsFXSample {
         controls.add(cornerRadius, 1, 2);
 
         final Label arrowSizeValue = new Label();
-        GridPane.setHalignment(arrowSizeValue, HPos.RIGHT);
         controls.add(arrowSizeValue, 2, 0);
 
         final Label arrowIndentValue = new Label();
-        GridPane.setHalignment(arrowIndentValue, HPos.RIGHT);
         controls.add(arrowIndentValue, 2, 1);
 
         final Label cornerRadiusValue = new Label();
-        GridPane.setHalignment(cornerRadiusValue, HPos.RIGHT);
         controls.add(cornerRadiusValue, 2, 2);
 
         arrowSize.valueProperty().addListener(new ChangeListener<Number>() {
@@ -255,16 +260,27 @@ public class HelloPopOver extends ControlsFXSample {
 
         ComboBox<ArrowLocation> locationBox = new ComboBox<>();
         locationBox.getItems().addAll(ArrowLocation.values());
-        locationBox.setValue(popOver.getArrowLocation());
+        locationBox.setValue(ArrowLocation.TOP_CENTER);
         Bindings.bindBidirectional(masterArrowLocation,
                 locationBox.valueProperty());
         controls.add(locationBox, 1, 3);
+
+        detachable = new CheckBox("Detachable");
+        detachable.setSelected(true);
+        controls.add(detachable, 0, 4);
+        GridPane.setColumnSpan(detachable, 2);
+
+        detached = new CheckBox("Initially detached");
+        controls.add(detached, 0, 5);
+        GridPane.setColumnSpan(detached, 2);
 
         return controls;
     }
 
     private PopOver createPopOver() {
         PopOver popOver = new PopOver();
+        popOver.setDetachable(detachable.isSelected());
+        popOver.setDetached(detached.isSelected());
         popOver.arrowSizeProperty().bind(masterArrowSize);
         popOver.arrowIndentProperty().bind(masterArrowIndent);
         popOver.arrowLocationProperty().bind(masterArrowLocation);

@@ -206,7 +206,7 @@ public class PopOverSkin implements Skin<PopOver> {
 
         final EventHandler<MouseEvent> mousePressedHandler = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent evt) {
-                if (popOver.isDetachable()) {
+                if (popOver.isDetachable() || popOver.isDetached()) {
                     tornOff = false;
 
                     xOffset = evt.getScreenX();
@@ -229,7 +229,7 @@ public class PopOverSkin implements Skin<PopOver> {
         final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
 
             public void handle(MouseEvent evt) {
-                if (popOver.isDetachable()) {
+                if (popOver.isDetachable() || popOver.isDetached()) {
                     double deltaX = evt.getScreenX() - xOffset;
                     double deltaY = evt.getScreenY() - yOffset;
 

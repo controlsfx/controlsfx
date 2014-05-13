@@ -26,7 +26,11 @@
  */
 package org.controlsfx.control;
 
+import static java.util.Objects.requireNonNull;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
+
+import java.util.Objects;
+
 import impl.org.controlsfx.skin.PopOverSkin;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
@@ -77,8 +81,7 @@ public class PopOver extends PopupControl {
 
     private static final String DEFAULT_STYLE_CLASS = "popover"; //$NON-NLS-1$
 
-    private static final Duration DEFAULT_FADE_IN_DURATION = Duration
-            .seconds(.2);
+    private static final Duration DEFAULT_FADE_DURATION = Duration.seconds(.2);
 
     private double targetX;
 
@@ -237,7 +240,7 @@ public class PopOver extends PopupControl {
      */
     @Override
     public final void show(Node owner, double x, double y) {
-        show(owner, x, y, DEFAULT_FADE_IN_DURATION);
+        show(owner, x, y, DEFAULT_FADE_DURATION);
     }
 
     /**
@@ -265,7 +268,7 @@ public class PopOver extends PopupControl {
         }
 
         if (fadeInDuration == null) {
-            fadeInDuration = DEFAULT_FADE_IN_DURATION;
+            fadeInDuration = DEFAULT_FADE_DURATION;
         }
 
         if (!owner.equals(getOwnerNode())) {
@@ -296,32 +299,28 @@ public class PopOver extends PopupControl {
         ownerWindow.widthProperty().addListener(weakHideListener);
         ownerWindow.heightProperty().addListener(weakHideListener);
 
-        setOnShown(new EventHandler<WindowEvent>() {
+        setOnShown(evt -> {
 
-            @Override
-            public void handle(WindowEvent evt) {
-                /*
-                 * The user clicked somewhere into the transparent background.
-                 * If this is the case the hide the window (when attached).
-                 */
-                getScene().addEventHandler(MOUSE_CLICKED,
-                        new EventHandler<MouseEvent>() {
-                            public void handle(MouseEvent evt) {
-                                if (evt.getTarget()
-                                        .equals(getScene().getRoot())) {
-                                    if (!isDetached()) {
-                                        hide();
-                                    }
+            /*
+             * The user clicked somewhere into the transparent background. If
+             * this is the case the hide the window (when attached).
+             */
+            getScene().addEventHandler(MOUSE_CLICKED,
+                    new EventHandler<MouseEvent>() {
+                        public void handle(MouseEvent evt) {
+                            if (evt.getTarget().equals(getScene().getRoot())) {
+                                if (!isDetached()) {
+                                    hide();
                                 }
-                            };
-                        });
+                            }
+                        };
+                    });
 
-                /*
-                 * Move the window so that the arrow will end up pointing at the
-                 * target coordinates.
-                 */
-                adjustWindowLocation();
-            }
+            /*
+             * Move the window so that the arrow will end up pointing at the
+             * target coordinates.
+             */
+            adjustWindowLocation();
         });
 
         super.show(owner, x, y);
@@ -334,6 +333,43 @@ public class PopOver extends PopupControl {
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
         fadeIn.play();
+    }
+
+    /**
+     * Hides the pop over by quickly changing its opacity to 0.
+     * 
+     * @see #hide(Duration)
+     */
+    @Override
+    public final void hide() {
+        hide(DEFAULT_FADE_DURATION);
+    }
+
+    /**
+     * Hides the pop over by quickly changing its opacity to 0.
+     * 
+     * @param fadeOutDuration
+     *            the duration of the fade transition that is being used to
+     *            change the opacity of the pop over
+     * @since 1.0
+     */
+    public final void hide(Duration fadeOutDuration) {
+        if (fadeOutDuration == null) {
+            fadeOutDuration = DEFAULT_FADE_DURATION;
+        }
+
+        if (isShowing()) {
+            // Fade Out
+            Node skinNode = getSkin().getNode();
+            skinNode.setOpacity(0);
+
+            FadeTransition fadeOut = new FadeTransition(fadeOutDuration,
+                    skinNode);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.setOnFinished(evt -> super.hide());
+            fadeOut.play();
+        }
     }
 
     private void adjustWindowLocation() {

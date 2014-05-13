@@ -260,8 +260,6 @@ public class PopOver extends PopupControl {
         targetX = x;
         targetY = y;
 
-        setDetached(false);
-
         if (owner == null) {
             throw new IllegalArgumentException("owner can not be null"); //$NON-NLS-1$
         }

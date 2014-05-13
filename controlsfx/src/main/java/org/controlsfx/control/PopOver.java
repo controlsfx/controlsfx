@@ -227,6 +227,70 @@ public class PopOver extends PopupControl {
     private Window ownerWindow;
 
     /**
+     * Shows the pop over in a position relative to the edges of the given owner
+     * node. The position is dependent on the arrow location. If the arrow is
+     * pointing to the right then the pop over will be placed to the left of the
+     * given owner. If the arrow points up then the pop over will be placed
+     * below the given owner node. The arrow will slightly overlap with the
+     * owner node.
+     * 
+     * @param owner
+     *            the owner of the pop over
+     */
+    public final void show(Node owner) {
+        show(owner, 4);
+    }
+
+    /**
+     * Shows the pop over in a position relative to the edges of the given owner
+     * node. The position is dependent on the arrow location. If the arrow is
+     * pointing to the right then the pop over will be placed to the left of the
+     * given owner. If the arrow points up then the pop over will be placed
+     * below the given owner node.
+     * 
+     * @param owner
+     *            the owner of the pop over
+     * @param offset
+     *            if negative specifies the distance to the owner node or when
+     *            positive specifies the number of pixels that the arrow will
+     *            overlap with the owner node (positive values are recommended)
+     */
+    public final void show(Node owner, double offset) {
+        requireNonNull(owner);
+
+        Bounds bounds = owner.localToScreen(owner.getBoundsInLocal());
+
+        switch (getArrowLocation()) {
+        case BOTTOM_CENTER:
+        case BOTTOM_LEFT:
+        case BOTTOM_RIGHT:
+            show(owner, bounds.getMinX() + bounds.getWidth() / 2,
+                    bounds.getMinY() + offset);
+            break;
+        case LEFT_BOTTOM:
+        case LEFT_CENTER:
+        case LEFT_TOP:
+            show(owner, bounds.getMaxX() - offset,
+                    bounds.getMinY() + bounds.getHeight() / 2);
+            break;
+        case RIGHT_BOTTOM:
+        case RIGHT_CENTER:
+        case RIGHT_TOP:
+            show(owner, bounds.getMinX() + offset,
+                    bounds.getMinY() + bounds.getHeight() / 2);
+            break;
+        case TOP_CENTER:
+        case TOP_LEFT:
+        case TOP_RIGHT:
+            show(owner, bounds.getMinX() + bounds.getWidth() / 2,
+                    bounds.getMinY() + bounds.getHeight() - offset);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
      * Makes the pop over visible at the give location and associates it with
      * the given owner node. The x and y coordinate will be the target location
      * of the arrow of the pop over and not the location of the window.

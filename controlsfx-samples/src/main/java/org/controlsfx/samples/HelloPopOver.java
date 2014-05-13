@@ -81,6 +81,14 @@ public class HelloPopOver extends ControlsFXSample {
 
     private CheckBox detachable;
 
+    private CheckBox autoPosition;
+
+    private Circle circle;
+
+    private Line line1;
+
+    private Line line2;
+
     @Override
     public Node getPanel(Stage stage) {
         Group group = new Group();
@@ -92,16 +100,16 @@ public class HelloPopOver extends ControlsFXSample {
         rect.setHeight(220);
         group.getChildren().add(rect);
 
-        final Circle circle = new Circle();
+        circle = new Circle();
         circle.setStroke(Color.BLACK);
         circle.setFill(Color.WHITE);
         group.getChildren().add(circle);
 
-        final Line line1 = new Line();
+        line1 = new Line();
         line1.setFill(Color.BLACK);
         group.getChildren().add(line1);
 
-        final Line line2 = new Line();
+        line2 = new Line();
         line2.setFill(Color.BLACK);
         group.getChildren().add(line2);
 
@@ -138,7 +146,7 @@ public class HelloPopOver extends ControlsFXSample {
                     if (popOver != null && popOver.isShowing()) {
                         popOver.hide(Duration.ZERO);
                     }
-                    
+
                     targetX = evt.getScreenX();
                     targetY = evt.getScreenY();
 
@@ -159,7 +167,11 @@ public class HelloPopOver extends ControlsFXSample {
                     circle.setCenterY(evt.getY());
                     circle.setRadius(size * 3);
 
-                    popOver.show(rect, targetX, targetY);
+                    if (autoPosition.isSelected()) {
+                        popOver.show(rect);
+                    } else {
+                        popOver.show(rect, targetX, targetY);
+                    }
                 }
             }
         });
@@ -273,6 +285,23 @@ public class HelloPopOver extends ControlsFXSample {
         detached = new CheckBox("Initially detached");
         controls.add(detached, 0, 5);
         GridPane.setColumnSpan(detached, 2);
+
+        autoPosition = new CheckBox("Auto Position");
+        controls.add(autoPosition, 0, 6);
+        GridPane.setColumnSpan(autoPosition, 2);
+
+        autoPosition.setOnAction(evt -> {
+            if (popOver != null) {
+                popOver.hide();
+            }
+        });
+        
+        circle.visibleProperty().bind(
+                Bindings.not(autoPosition.selectedProperty()));
+        line1.visibleProperty().bind(
+                Bindings.not(autoPosition.selectedProperty()));
+        line2.visibleProperty().bind(
+                Bindings.not(autoPosition.selectedProperty()));
 
         return controls;
     }

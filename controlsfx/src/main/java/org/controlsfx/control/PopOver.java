@@ -131,6 +131,8 @@ public class PopOver extends PopupControl {
      *            content shown by the pop over
      */
     public PopOver(Node content) {
+        this();
+        
         setContentNode(content);
     }
 

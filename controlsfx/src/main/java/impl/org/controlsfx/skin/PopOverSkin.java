@@ -624,12 +624,6 @@ public class PopOverSkin implements Skin<PopOver> {
     }
 
     private void updatePath() {
-        // Point2D targetPoint = new Point2D(getSkinnable().getTargetX(),
-        // getSkinnable().getTargetY());
-        //
-        // Point2D windowPoint = new Point2D(getPopupWindow().getX(),
-        // getPopupWindow().getY());
-
         List<PathElement> elements = new ArrayList<>();
         elements.add(moveTo);
 

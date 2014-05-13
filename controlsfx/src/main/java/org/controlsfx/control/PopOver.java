@@ -321,6 +321,14 @@ public class PopOver extends PopupControl {
     public final void show(Node owner, double x, double y,
             Duration fadeInDuration) {
 
+        /*
+         * Calling show() a second time without first closing the
+         * pop over causes it to be placed at the wrong location.
+         */
+        if (ownerWindow != null && isShowing()) {
+            super.hide();
+        }
+        
         targetX = x;
         targetY = y;
 

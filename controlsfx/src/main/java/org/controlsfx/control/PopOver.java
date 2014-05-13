@@ -104,6 +104,7 @@ public class PopOver extends PopupControl {
          * Create some initial content.
          */
         Label label = new Label("<No Content>"); //$NON-NLS-1$
+        label.setPrefSize(200, 200);
         label.setPadding(new Insets(4));
         setContentNode(label);
 
@@ -132,7 +133,7 @@ public class PopOver extends PopupControl {
      */
     public PopOver(Node content) {
         this();
-        
+
         setContentNode(content);
     }
 
@@ -386,21 +387,24 @@ public class PopOver extends PopupControl {
     }
 
     private double computeYOffset() {
+        double prefContentHeight = getContentNode().prefHeight(-1);
+
         switch (getArrowLocation()) {
         case LEFT_TOP:
         case RIGHT_TOP:
             return getCornerRadius() + getArrowIndent() + getArrowSize();
         case LEFT_CENTER:
         case RIGHT_CENTER:
-            return getContentNode().prefHeight(-1) / 2;
+            return Math.max(prefContentHeight, 2 * (getCornerRadius()
+                    + getArrowIndent() + getArrowSize())) / 2;
         case LEFT_BOTTOM:
         case RIGHT_BOTTOM:
-            return getContentNode().prefHeight(-1) - getCornerRadius()
-                    - getArrowIndent() - getArrowSize();
+            return Math.max(prefContentHeight - getCornerRadius()
+                    - getArrowIndent() - getArrowSize(), getCornerRadius()
+                    + getArrowIndent() + getArrowSize());
         default:
             return 0;
         }
-
     }
 
     /**

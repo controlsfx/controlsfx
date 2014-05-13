@@ -28,9 +28,6 @@ package org.controlsfx.control;
 
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
-
-import java.util.Objects;
-
 import impl.org.controlsfx.skin.PopOverSkin;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
@@ -92,7 +89,7 @@ public class PopOver extends PopupControl {
      */
     public PopOver() {
         super();
-
+        
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
@@ -333,17 +330,6 @@ public class PopOver extends PopupControl {
 
         if (fadeInDuration == null) {
             fadeInDuration = DEFAULT_FADE_DURATION;
-        }
-
-        if (!owner.equals(getOwnerNode())) {
-            if (getOwnerNode() != null) {
-                getOwnerNode().boundsInLocalProperty().removeListener(
-                        weakHideListener);
-                getOwnerNode().boundsInParentProperty().removeListener(
-                        weakHideListener);
-            }
-            owner.boundsInLocalProperty().addListener(weakHideListener);
-            owner.boundsInParentProperty().addListener(weakHideListener);
         }
 
         /*

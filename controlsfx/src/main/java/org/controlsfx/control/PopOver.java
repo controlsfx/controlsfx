@@ -191,7 +191,7 @@ public class PopOver extends PopupControl {
         @Override
         public void invalidated(Observable observable) {
             if (!isDetached()) {
-                hide();
+                hide(Duration.ZERO);
             }
         }
     };

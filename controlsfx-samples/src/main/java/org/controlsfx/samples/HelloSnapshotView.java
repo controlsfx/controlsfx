@@ -61,12 +61,12 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.NodeRangeSelector;
+import org.controlsfx.control.SnapshotView;
 
 /**
- * Demonstrates the {@link NodeRangeSelector}.
+ * Demonstrates the {@link SnapshotView}.
  */
-public class HelloNodeRangeSelector extends ControlsFXSample {
+public class HelloSnapshotView extends ControlsFXSample {
 
     /* ************************************************************************
      *                                                                         *
@@ -107,7 +107,7 @@ public class HelloNodeRangeSelector extends ControlsFXSample {
     /**
      * The demoed view.
      */
-    private final NodeRangeSelector selector = new NodeRangeSelector();
+    private final SnapshotView selector = new SnapshotView();
 
     /**
      * The label showing the name of the currently displayed image.
@@ -345,13 +345,13 @@ public class HelloNodeRangeSelector extends ControlsFXSample {
 
     @Override
     public String getSampleName() {
-        return "NodeRangeSelector";
+        return "SnapshotView";
     }
 
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE
-                + "org/controlsfx/control/NodeRangeSelector.html";
+                + "org/controlsfx/control/SnapshotView.html";
     }
 
     @Override

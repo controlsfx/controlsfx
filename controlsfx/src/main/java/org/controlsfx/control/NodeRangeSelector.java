@@ -46,7 +46,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
- * A {@code SelectableImageView} is (in the colloquial not the inheritance sense) an
+ * A {@code NodeRangeSelector} is (in the colloquial not the inheritance sense) an
  * {@link javafx.scene.image.ImageView ImageView} which allows the user to select an area of the image in the typical
  * manner used by picture editors:
  * <p>
@@ -56,22 +56,22 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Screenshots</h3>
  * TODO Does this src-path work? It doesn't in my Eclipse instance.
- * <center><img src="selectable-image-view-screenshot.png"></center>
+ * <center><img src="node-range-selector-screenshot.png"></center>
  * 
  * <h3>Code Samples</h3>
  * 
- * {@code SelectableImageView} offers the same constructors as {@code ImageView}. All additional functionality regarding
+ * {@code NodeRangeSelector} offers the same constructors as {@code ImageView}. All additional functionality regarding
  * the selection must be set using the typical accessor functions.
  * <p>
  * The following snippet creates a new instance with the ControlsFX logo loaded from the web, sets a selected area and
  * fixes its ratio:
  * 
  * <pre>
- * SelectableImageView selectableImageView =
- *         new SelectableImageView(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
- * selectableImageView.setSelection(33, 50, 100, 100);
- * selectableImageView.setFixedSelectionRatio(1); // (this is actually the default value)
- * selectableImageView.setSelectionRatioFixed(true);
+ * NodeRangeSelector nodeRangeSelector =
+ *         new NodeRangeSelector(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
+ * nodeRangeSelector.setSelection(33, 50, 100, 100);
+ * nodeRangeSelector.setFixedSelectionRatio(1); // (this is actually the default value)
+ * nodeRangeSelector.setSelectionRatioFixed(true);
  * </pre>
  * 
  * <h3>Image</h3>
@@ -154,7 +154,7 @@ public class NodeRangeSelector extends Control {
     // IMAGE VIEW
 
     /**
-     * The {@link Image} to be painted by this {@code SelectableImageView}.
+     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
      */
     private final ObjectProperty<Node> node;
 
@@ -228,7 +228,7 @@ public class NodeRangeSelector extends Control {
      **************************************************************************/
 
     /**
-     * Creates a new SelectableImageView.
+     * Creates a new NodeRangeSelector.
      */
     public NodeRangeSelector() {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
@@ -296,7 +296,7 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * Creates a new SelectableImageView using the specified image.
+     * Creates a new NodeRangeSelector using the specified image.
      * 
      * @param image
      *            the image to show after construction
@@ -307,7 +307,7 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * Creates a new SelectableImageView using the image loaded from the specified URL.
+     * Creates a new NodeRangeSelector using the image loaded from the specified URL.
      * 
      * @param url
      *            the string representing the URL from which to load the image
@@ -391,14 +391,14 @@ public class NodeRangeSelector extends Control {
     /**
      * The name of the style class used in CSS for instances of this class.
      */
-    private static final String DEFAULT_STYLE_CLASS = "selectable-image-view";
+    private static final String DEFAULT_STYLE_CLASS = "node-range-selector";
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected String getUserAgentStylesheet() {
-        return getClass().getResource("selectableimageview.css").toExternalForm();
+        return getClass().getResource("node-range-selector.css").toExternalForm();
     }
 
     /**
@@ -418,7 +418,7 @@ public class NodeRangeSelector extends Control {
     // IMAGE VIEW
 
     /**
-     * The {@link Image} to be painted by this {@code SelectableImageView}.
+     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
      * 
      * @return the image as a property
      */
@@ -427,7 +427,7 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * The {@link Image} to be painted by this {@code SelectableImageView}.
+     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
      * 
      * @return the image
      */
@@ -436,10 +436,9 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * The {@link Image} to be painted by this {@code SelectableImageView}.
+     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
      * 
-     * @param image
-     *            the image to set
+     * @param node the image to set
      */
     public void setNode(Node node) {
         nodeProperty().set(node);
@@ -582,7 +581,7 @@ public class NodeRangeSelector extends Control {
      */
     public BooleanProperty selectionChangingProperty() {
         // TODO It would be very nice if this could be a read only property
-        // but it is unclear how it could then be edited by 'SelectableImageViewBehavior'.
+        // but it is unclear how it could then be edited by 'NodeRangeSelectorBehavior'.
         return selectionChanging;
     }
 

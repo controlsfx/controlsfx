@@ -36,7 +36,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.SnapshotResult;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -44,7 +43,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
-import javafx.util.Callback;
 
 import org.controlsfx.control.NodeRangeSelector;
 
@@ -76,7 +74,7 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
      * 
      * MOUSE:
      * To capture mouse events an additional node is added on top of the image view and the selection areas (see
-     * below). These events are handed over to the 'SelectableImageViewBehavior' which uses them to determine a cursor
+     * below). These events are handed over to the 'NodeRangeSelectorBehavior' which uses them to determine a cursor
      * and change the selection.
      * 
      * SELECTION:
@@ -142,11 +140,11 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
     /**
      * Creates a new skin for the specified {@link NodeRangeSelector}.
      * 
-     * @param selectableImageView
+     * @param nodeRangeSelector
      *            the control which this skin will display
      */
-    public NodeRangeSelectorSkin(NodeRangeSelector control) {
-        super(control, new NodeRangeSelectorBehavior(control));
+    public NodeRangeSelectorSkin(NodeRangeSelector nodeRangeSelector) {
+        super(nodeRangeSelector, new NodeRangeSelectorBehavior(nodeRangeSelector));
 
         this.pane = createClippingPane();
         this.selectedArea = new Rectangle();
@@ -156,10 +154,10 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
         buildSceneGraph();
         initializeAreas();
         
-        registerChangeListener(control.nodeProperty(), "NODE");
-        registerChangeListener(control.selectionProperty(), "SELECTION");
-        registerChangeListener(control.widthProperty(), "WIDTH");
-        registerChangeListener(control.heightProperty(), "HEIGHT");
+        registerChangeListener(nodeRangeSelector.nodeProperty(), "NODE");
+        registerChangeListener(nodeRangeSelector.selectionProperty(), "SELECTION");
+        registerChangeListener(nodeRangeSelector.widthProperty(), "WIDTH");
+        registerChangeListener(nodeRangeSelector.heightProperty(), "HEIGHT");
     }
     
     @Override

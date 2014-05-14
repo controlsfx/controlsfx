@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control;
 
+import static java.util.Objects.requireNonNull;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import impl.org.controlsfx.skin.PopOverSkin;
 import javafx.animation.FadeTransition;
@@ -77,8 +78,7 @@ public class PopOver extends PopupControl {
 
     private static final String DEFAULT_STYLE_CLASS = "popover"; //$NON-NLS-1$
 
-    private static final Duration DEFAULT_FADE_IN_DURATION = Duration
-            .seconds(.2);
+    private static final Duration DEFAULT_FADE_DURATION = Duration.seconds(.2);
 
     private double targetX;
 
@@ -89,7 +89,7 @@ public class PopOver extends PopupControl {
      */
     public PopOver() {
         super();
-
+        
         getStyleClass().add(DEFAULT_STYLE_CLASS);
 
         setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
@@ -104,6 +104,7 @@ public class PopOver extends PopupControl {
          * Create some initial content.
          */
         Label label = new Label("<No Content>"); //$NON-NLS-1$
+        label.setPrefSize(200, 200);
         label.setPadding(new Insets(4));
         setContentNode(label);
 
@@ -131,6 +132,8 @@ public class PopOver extends PopupControl {
      *            content shown by the pop over
      */
     public PopOver(Node content) {
+        this();
+
         setContentNode(content);
     }
 
@@ -188,7 +191,7 @@ public class PopOver extends PopupControl {
         @Override
         public void invalidated(Observable observable) {
             if (!isDetached()) {
-                hide();
+                hide(Duration.ZERO);
             }
         }
     };
@@ -221,6 +224,70 @@ public class PopOver extends PopupControl {
     private Window ownerWindow;
 
     /**
+     * Shows the pop over in a position relative to the edges of the given owner
+     * node. The position is dependent on the arrow location. If the arrow is
+     * pointing to the right then the pop over will be placed to the left of the
+     * given owner. If the arrow points up then the pop over will be placed
+     * below the given owner node. The arrow will slightly overlap with the
+     * owner node.
+     * 
+     * @param owner
+     *            the owner of the pop over
+     */
+    public final void show(Node owner) {
+        show(owner, 4);
+    }
+
+    /**
+     * Shows the pop over in a position relative to the edges of the given owner
+     * node. The position is dependent on the arrow location. If the arrow is
+     * pointing to the right then the pop over will be placed to the left of the
+     * given owner. If the arrow points up then the pop over will be placed
+     * below the given owner node.
+     * 
+     * @param owner
+     *            the owner of the pop over
+     * @param offset
+     *            if negative specifies the distance to the owner node or when
+     *            positive specifies the number of pixels that the arrow will
+     *            overlap with the owner node (positive values are recommended)
+     */
+    public final void show(Node owner, double offset) {
+        requireNonNull(owner);
+
+        Bounds bounds = owner.localToScreen(owner.getBoundsInLocal());
+
+        switch (getArrowLocation()) {
+        case BOTTOM_CENTER:
+        case BOTTOM_LEFT:
+        case BOTTOM_RIGHT:
+            show(owner, bounds.getMinX() + bounds.getWidth() / 2,
+                    bounds.getMinY() + offset);
+            break;
+        case LEFT_BOTTOM:
+        case LEFT_CENTER:
+        case LEFT_TOP:
+            show(owner, bounds.getMaxX() - offset,
+                    bounds.getMinY() + bounds.getHeight() / 2);
+            break;
+        case RIGHT_BOTTOM:
+        case RIGHT_CENTER:
+        case RIGHT_TOP:
+            show(owner, bounds.getMinX() + offset,
+                    bounds.getMinY() + bounds.getHeight() / 2);
+            break;
+        case TOP_CENTER:
+        case TOP_LEFT:
+        case TOP_RIGHT:
+            show(owner, bounds.getMinX() + bounds.getWidth() / 2,
+                    bounds.getMinY() + bounds.getHeight() - offset);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
      * Makes the pop over visible at the give location and associates it with
      * the given owner node. The x and y coordinate will be the target location
      * of the arrow of the pop over and not the location of the window.
@@ -234,7 +301,7 @@ public class PopOver extends PopupControl {
      */
     @Override
     public final void show(Node owner, double x, double y) {
-        show(owner, x, y, DEFAULT_FADE_IN_DURATION);
+        show(owner, x, y, DEFAULT_FADE_DURATION);
     }
 
     /**
@@ -254,28 +321,23 @@ public class PopOver extends PopupControl {
     public final void show(Node owner, double x, double y,
             Duration fadeInDuration) {
 
+        /*
+         * Calling show() a second time without first closing the
+         * pop over causes it to be placed at the wrong location.
+         */
+        if (ownerWindow != null && isShowing()) {
+            super.hide();
+        }
+        
         targetX = x;
         targetY = y;
-
-        setDetached(false);
 
         if (owner == null) {
             throw new IllegalArgumentException("owner can not be null"); //$NON-NLS-1$
         }
 
         if (fadeInDuration == null) {
-            fadeInDuration = DEFAULT_FADE_IN_DURATION;
-        }
-
-        if (!owner.equals(getOwnerNode())) {
-            if (getOwnerNode() != null) {
-                getOwnerNode().boundsInLocalProperty().removeListener(
-                        weakHideListener);
-                getOwnerNode().boundsInParentProperty().removeListener(
-                        weakHideListener);
-            }
-            owner.boundsInLocalProperty().addListener(weakHideListener);
-            owner.boundsInParentProperty().addListener(weakHideListener);
+            fadeInDuration = DEFAULT_FADE_DURATION;
         }
 
         /*
@@ -295,32 +357,28 @@ public class PopOver extends PopupControl {
         ownerWindow.widthProperty().addListener(weakHideListener);
         ownerWindow.heightProperty().addListener(weakHideListener);
 
-        setOnShown(new EventHandler<WindowEvent>() {
+        setOnShown(evt -> {
 
-            @Override
-            public void handle(WindowEvent evt) {
-                /*
-                 * The user clicked somewhere into the transparent background.
-                 * If this is the case the hide the window (when attached).
-                 */
-                getScene().addEventHandler(MOUSE_CLICKED,
-                        new EventHandler<MouseEvent>() {
-                            public void handle(MouseEvent evt) {
-                                if (evt.getTarget()
-                                        .equals(getScene().getRoot())) {
-                                    if (!isDetached()) {
-                                        hide();
-                                    }
+            /*
+             * The user clicked somewhere into the transparent background. If
+             * this is the case the hide the window (when attached).
+             */
+            getScene().addEventHandler(MOUSE_CLICKED,
+                    new EventHandler<MouseEvent>() {
+                        public void handle(MouseEvent evt) {
+                            if (evt.getTarget().equals(getScene().getRoot())) {
+                                if (!isDetached()) {
+                                    hide();
                                 }
-                            };
-                        });
+                            }
+                        };
+                    });
 
-                /*
-                 * Move the window so that the arrow will end up pointing at the
-                 * target coordinates.
-                 */
-                adjustWindowLocation();
-            }
+            /*
+             * Move the window so that the arrow will end up pointing at the
+             * target coordinates.
+             */
+            adjustWindowLocation();
         });
 
         super.show(owner, x, y);
@@ -333,6 +391,43 @@ public class PopOver extends PopupControl {
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
         fadeIn.play();
+    }
+
+    /**
+     * Hides the pop over by quickly changing its opacity to 0.
+     * 
+     * @see #hide(Duration)
+     */
+    @Override
+    public final void hide() {
+        hide(DEFAULT_FADE_DURATION);
+    }
+
+    /**
+     * Hides the pop over by quickly changing its opacity to 0.
+     * 
+     * @param fadeOutDuration
+     *            the duration of the fade transition that is being used to
+     *            change the opacity of the pop over
+     * @since 1.0
+     */
+    public final void hide(Duration fadeOutDuration) {
+        if (fadeOutDuration == null) {
+            fadeOutDuration = DEFAULT_FADE_DURATION;
+        }
+
+        if (isShowing()) {
+            // Fade Out
+            Node skinNode = getSkin().getNode();
+            skinNode.setOpacity(0);
+
+            FadeTransition fadeOut = new FadeTransition(fadeOutDuration,
+                    skinNode);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.setOnFinished(evt -> super.hide());
+            fadeOut.play();
+        }
     }
 
     private void adjustWindowLocation() {
@@ -384,21 +479,24 @@ public class PopOver extends PopupControl {
     }
 
     private double computeYOffset() {
+        double prefContentHeight = getContentNode().prefHeight(-1);
+
         switch (getArrowLocation()) {
         case LEFT_TOP:
         case RIGHT_TOP:
             return getCornerRadius() + getArrowIndent() + getArrowSize();
         case LEFT_CENTER:
         case RIGHT_CENTER:
-            return getContentNode().prefHeight(-1) / 2;
+            return Math.max(prefContentHeight, 2 * (getCornerRadius()
+                    + getArrowIndent() + getArrowSize())) / 2;
         case LEFT_BOTTOM:
         case RIGHT_BOTTOM:
-            return getContentNode().prefHeight(-1) - getCornerRadius()
-                    - getArrowIndent() - getArrowSize();
+            return Math.max(prefContentHeight - getCornerRadius()
+                    - getArrowIndent() - getArrowSize(), getCornerRadius()
+                    + getArrowIndent() + getArrowSize());
         default:
             return 0;
         }
-
     }
 
     /**

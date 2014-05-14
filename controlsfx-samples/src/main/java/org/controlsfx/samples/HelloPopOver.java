@@ -42,7 +42,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -63,7 +62,6 @@ import javafx.util.Duration;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
-import org.scenicview.ScenicView;
 
 public class HelloPopOver extends ControlsFXSample {
 

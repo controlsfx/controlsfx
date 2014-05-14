@@ -27,7 +27,7 @@
 package org.controlsfx.control;
 
 import static impl.org.controlsfx.tools.MathTools.isInInterval;
-import impl.org.controlsfx.skin.NodeRangeSelectorSkin;
+import impl.org.controlsfx.skin.SnapshotViewSkin;
 import impl.org.controlsfx.tools.rectangle.Rectangles2D;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -46,7 +46,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
- * A {@code NodeRangeSelector} is (in the colloquial not the inheritance sense) an
+ * A {@code SnapshotView} is (in the colloquial not the inheritance sense) an
  * {@link javafx.scene.image.ImageView ImageView} which allows the user to select an area of the image in the typical
  * manner used by picture editors:
  * <p>
@@ -60,18 +60,18 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Code Samples</h3>
  * 
- * {@code NodeRangeSelector} offers the same constructors as {@code ImageView}. All additional functionality regarding
+ * {@code SnapshotView} offers the same constructors as {@code ImageView}. All additional functionality regarding
  * the selection must be set using the typical accessor functions.
  * <p>
  * The following snippet creates a new instance with the ControlsFX logo loaded from the web, sets a selected area and
  * fixes its ratio:
  * 
  * <pre>
- * NodeRangeSelector nodeRangeSelector =
- *         new NodeRangeSelector(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
- * nodeRangeSelector.setSelection(33, 50, 100, 100);
- * nodeRangeSelector.setFixedSelectionRatio(1); // (this is actually the default value)
- * nodeRangeSelector.setSelectionRatioFixed(true);
+ SnapshotView snapshotView =
+         new SnapshotView(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
+ * snapshotView.setSelection(33, 50, 100, 100);
+ * snapshotView.setFixedSelectionRatio(1); // (this is actually the default value)
+ * snapshotView.setSelectionRatioFixed(true);
  * </pre>
  * 
  * <h3>Image</h3>
@@ -96,7 +96,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Selection</h3>
  * 
- * The selected area is represented by the {@link NodeRangeSelector#selectionProperty() selection} property. It
+ * The selected area is represented by the {@link SnapshotView#selectionProperty() selection} property. It
  * contains a {@link Rectangle2D}, which is immutable so the selection can only be changed by setting a new one. The
  * rectangle's coordinates are interpreted relative to the image.
  * <p>
@@ -109,7 +109,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h4>Active</h4>
  * 
- * The {@link NodeRangeSelector#selectionActiveProperty() selectionActive} property indicates whether the selection is
+ * The {@link SnapshotView#selectionActiveProperty() selectionActive} property indicates whether the selection is
  * currently active.
  * <p>
  * By default this property is managed by this control which means the selection is automatically activated when a new
@@ -121,7 +121,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h4>Changing</h4>
  * 
- * The selection can be changed by simply setting a new value in the {@link NodeRangeSelector#selectionProperty()
+ * The selection can be changed by simply setting a new value in the {@link SnapshotView#selectionProperty()
  * selection} property. But it can also change due to user interaction with the control. During the latter changes the
  * {@link #selectionChangingProperty() selectionChanging} property is set to {@code true}.
  * 
@@ -143,7 +143,7 @@ import javafx.scene.image.ImageView;
  * If a selection is explicitly set, its ratio <em>not</em> checked and hence not changed to match a possibly fixed
  * ratio!
  */
-public class NodeRangeSelector extends Control {
+public class SnapshotView extends Control {
 
     /* ************************************************************************
      *                                                                         *
@@ -154,7 +154,7 @@ public class NodeRangeSelector extends Control {
     // IMAGE VIEW
 
     /**
-     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
+     * The {@link Image} to be painted by this {@code SnapshotView}.
      */
     private final ObjectProperty<Node> node;
 
@@ -228,9 +228,9 @@ public class NodeRangeSelector extends Control {
      **************************************************************************/
 
     /**
-     * Creates a new NodeRangeSelector.
+     * Creates a new SnapshotView.
      */
-    public NodeRangeSelector() {
+    public SnapshotView() {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // IMAGE VIEW
@@ -296,23 +296,23 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * Creates a new NodeRangeSelector using the specified image.
+     * Creates a new SnapshotView using the specified image.
      * 
      * @param image
      *            the image to show after construction
      */
-    public NodeRangeSelector(Image image) {
+    public SnapshotView(Image image) {
         this();
         setNode(new ImageView(image));
     }
 
     /**
-     * Creates a new NodeRangeSelector using the image loaded from the specified URL.
+     * Creates a new SnapshotView using the image loaded from the specified URL.
      * 
      * @param url
      *            the string representing the URL from which to load the image
      */
-    public NodeRangeSelector(String url) {
+    public SnapshotView(String url) {
         this();
         Image image = new Image(url);
         setNode(new ImageView(image));
@@ -391,14 +391,14 @@ public class NodeRangeSelector extends Control {
     /**
      * The name of the style class used in CSS for instances of this class.
      */
-    private static final String DEFAULT_STYLE_CLASS = "node-range-selector";
+    private static final String DEFAULT_STYLE_CLASS = "snapshot-view";
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected String getUserAgentStylesheet() {
-        return getClass().getResource("node-range-selector.css").toExternalForm();
+        return getClass().getResource("snapshot-view.css").toExternalForm();
     }
 
     /**
@@ -406,7 +406,7 @@ public class NodeRangeSelector extends Control {
      */
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new NodeRangeSelectorSkin(this);
+        return new SnapshotViewSkin(this);
     }
 
     /* ************************************************************************
@@ -418,7 +418,7 @@ public class NodeRangeSelector extends Control {
     // IMAGE VIEW
 
     /**
-     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
+     * The {@link Image} to be painted by this {@code SnapshotView}.
      * 
      * @return the image as a property
      */
@@ -427,7 +427,7 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
+     * The {@link Image} to be painted by this {@code SnapshotView}.
      * 
      * @return the image
      */
@@ -436,7 +436,7 @@ public class NodeRangeSelector extends Control {
     }
 
     /**
-     * The {@link Image} to be painted by this {@code NodeRangeSelector}.
+     * The {@link Image} to be painted by this {@code SnapshotView}.
      * 
      * @param node the image to set
      */
@@ -581,7 +581,7 @@ public class NodeRangeSelector extends Control {
      */
     public BooleanProperty selectionChangingProperty() {
         // TODO It would be very nice if this could be a read only property
-        // but it is unclear how it could then be edited by 'NodeRangeSelectorBehavior'.
+        // but it is unclear how it could then be edited by 'SnapshotViewBehavior'.
         return selectionChanging;
     }
 

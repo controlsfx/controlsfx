@@ -26,7 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.behavior.NodeRangeSelectorBehavior;
+import impl.org.controlsfx.behavior.SnapshotViewBehavior;
 import impl.org.controlsfx.tools.MathTools;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -44,15 +44,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 
-import org.controlsfx.control.NodeRangeSelector;
+import org.controlsfx.control.SnapshotView;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
- * View for the {@link NodeRangeSelector}. It displays the image and the selection and manages their positioning.
- * MouseEvents are handed over to the {@link NodeRangeSelectorBehavior} which uses them to change the selection.
+ * View for the {@link SnapshotView}. It displays the image and the selection and manages their positioning.
+ * MouseEvents are handed over to the {@link SnapshotViewBehavior} which uses them to change the selection.
  */
-public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, NodeRangeSelectorBehavior> {
+public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotViewBehavior> {
 
     /*
      * IMAGE:
@@ -74,7 +74,7 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
      * 
      * MOUSE:
      * To capture mouse events an additional node is added on top of the image view and the selection areas (see
-     * below). These events are handed over to the 'NodeRangeSelectorBehavior' which uses them to determine a cursor
+     * below). These events are handed over to the 'SnapshotViewBehavior' which uses them to determine a cursor
      * and change the selection.
      * 
      * SELECTION:
@@ -138,13 +138,13 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
      **************************************************************************/
 
     /**
-     * Creates a new skin for the specified {@link NodeRangeSelector}.
+     * Creates a new skin for the specified {@link SnapshotView}.
      * 
-     * @param nodeRangeSelector
+     * @param snapshotView
      *            the control which this skin will display
      */
-    public NodeRangeSelectorSkin(NodeRangeSelector nodeRangeSelector) {
-        super(nodeRangeSelector, new NodeRangeSelectorBehavior(nodeRangeSelector));
+    public SnapshotViewSkin(SnapshotView snapshotView) {
+        super(snapshotView, new SnapshotViewBehavior(snapshotView));
 
         this.pane = createClippingPane();
         this.selectedArea = new Rectangle();
@@ -154,10 +154,10 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
         buildSceneGraph();
         initializeAreas();
         
-        registerChangeListener(nodeRangeSelector.nodeProperty(), "NODE");
-        registerChangeListener(nodeRangeSelector.selectionProperty(), "SELECTION");
-        registerChangeListener(nodeRangeSelector.widthProperty(), "WIDTH");
-        registerChangeListener(nodeRangeSelector.heightProperty(), "HEIGHT");
+        registerChangeListener(snapshotView.nodeProperty(), "NODE");
+        registerChangeListener(snapshotView.selectionProperty(), "SELECTION");
+        registerChangeListener(snapshotView.widthProperty(), "WIDTH");
+        registerChangeListener(snapshotView.heightProperty(), "HEIGHT");
     }
     
     @Override
@@ -250,7 +250,7 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
 
     /**
      * Initializes the {@link #selectedArea} and the {@link #unselectedArea}. This includes their style and their
-     * bindings to the {@link NodeRangeSelector#selectionProperty() selection} property.
+     * bindings to the {@link SnapshotView#selectionProperty() selection} property.
      */
     private void initializeAreas() {
         styleAreas();
@@ -292,8 +292,8 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
 
     /**
      * Binds the visibility of {@link #selectedArea} and {@link #unselectedArea unselected} to the
-     * {@link NodeRangeSelector}'s {@link NodeRangeSelector#selectionActiveProperty() selectionActive} and
-     * {@link NodeRangeSelector#selectionValidProperty() selectionValid} properties.
+     * {@link SnapshotView}'s {@link SnapshotView#selectionActiveProperty() selectionActive} and
+     * {@link SnapshotView#selectionValidProperty() selectionValid} properties.
      */
     private void bindAreaVisibilityToSelection() {
         ReadOnlyBooleanProperty selectionValid = getSkinnable().selectionValidProperty();
@@ -312,8 +312,8 @@ public class NodeRangeSelectorSkin extends BehaviorSkinBase<NodeRangeSelector, N
      **************************************************************************/
 
     /**
-     * Usability method. Returns the value contained in the {@link NodeRangeSelector}'s
-     * {@link NodeRangeSelector#selectionProperty() selection} property.
+     * Usability method. Returns the value contained in the {@link SnapshotView}'s
+     * {@link SnapshotView#selectionProperty() selection} property.
      * 
      * @return the image's selection
      */

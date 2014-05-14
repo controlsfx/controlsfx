@@ -35,12 +35,12 @@ import javafx.stage.Window;
 public class Utils {
 
     /**
-     * Will return a {@link Window} from an object if any can be found. null
+     * Will return a {@link Window} from an object if any can be found. {@code null}
      * value can be given, the program will then try to find the focused window
      * among those available.
      * 
-     * @param owner
-     * @return
+     * @param owner the object whose window is to be found.
+     * @return the window of the given object.
      */
     public static Window getWindow(Object owner) throws IllegalArgumentException {
         if (owner == null) {
@@ -73,7 +73,7 @@ public class Utils {
      * For example: 0 -> A 1 -> B 26 -> AA 32 -> AG 45 -> AT
      * 
      * 
-     * @param number
+     * @param number the number whose Excel Letter is to be found.
      * @return a letter (like) associated with the number.
      */
     public static final String getExcelLetterFromNumber(int number) {

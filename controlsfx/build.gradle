@@ -34,6 +34,15 @@ dependencies {
     }
 }
 
+task native2ascii(type: Copy) {
+    from"src/main/resources"
+    into "$buildDir/resources/main"
+    include '**/*.properties'
+    filter(EscapeUnicode)
+}
+
+jar.dependsOn(native2ascii)
+
 task generatei18nResources(type: Copy) {
     from "src/main/resources"
     into "$buildDir/resources/main"

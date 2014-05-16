@@ -64,7 +64,7 @@ import org.controlsfx.tools.Utils;
  * description to understand the fixing constraints.
  * 
  * <p>
- * If the column can be fixed, a{@link ContextMenu} will appear if the user right-clicks on it. 
+ * If the column can be fixed, a {@link ContextMenu} will appear if the user right-clicks on it. 
  * If not, nothing will appear and the user will not have the possibility to fix it.
  * 
  * <h3>Screenshot</h3>
@@ -74,7 +74,7 @@ import org.controlsfx.tools.Utils;
  * 
  * <br/>
  * <br/>
- * <center><img src="fixedColumn.png"></center>
+ * <center><img src="fixedColumn.png"/></center>
  * 
  * @see SpreadsheetView
  */

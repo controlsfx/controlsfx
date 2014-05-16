@@ -198,25 +198,6 @@ public abstract class SpreadsheetCellType<T> {
     }
 
     /**
-     * Creates a cell that hold a <T> at the specified position, with the
-     * specified row/column span.
-     * 
-     * @param row
-     *            row number
-     * @param column
-     *            column number
-     * @param rowSpan
-     *            rowSpan (1 is normal)
-     * @param columnSpan
-     *            ColumnSpan (1 is normal)
-     * @param value
-     *            the value to display
-     * @return a {@link SpreadsheetCell}
-     */
-    public abstract SpreadsheetCell createCell(final int row, final int column, final int rowSpan,
-            final int columnSpan, final T value);
-
-    /**
      * Creates an editor for this type of cells.
      * 
      * @param view
@@ -319,10 +300,25 @@ public abstract class SpreadsheetCellType<T> {
             return true;
         }
 
-        @Override
+        /**
+        * Creates a cell that hold an Object at the specified position, with the
+        * specified row/column span.
+        * 
+        * @param row
+        *            row number
+        * @param column
+        *            column number
+        * @param rowSpan
+        *            rowSpan (1 is normal)
+        * @param columnSpan
+        *            ColumnSpan (1 is normal)
+        * @param value
+        *            the value to display
+        * @return a {@link SpreadsheetCell}
+        */
         public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
                 final Object value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
+            SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -347,7 +343,7 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * The {@link SpreadsheetCell} {@link String} type instance.
      */
-    public static final SpreadsheetCellType<String> STRING = new StringType();
+    public static final StringType STRING = new StringType();
 
     /**
      * The {@link SpreadsheetCell} {@link String} type base class.
@@ -372,10 +368,25 @@ public abstract class SpreadsheetCellType<T> {
             return true;
         }
 
-        @Override
+        /**
+        * Creates a cell that hold a String at the specified position, with the
+        * specified row/column span.
+        * 
+        * @param row
+        *            row number
+        * @param column
+        *            column number
+        * @param rowSpan
+        *            rowSpan (1 is normal)
+        * @param columnSpan
+        *            ColumnSpan (1 is normal)
+        * @param value
+        *            the value to display
+        * @return a {@link SpreadsheetCell}
+        */
         public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
                 final String value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
+            SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -404,7 +415,7 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * The {@link SpreadsheetCell} {@link Double} type instance.
      */
-    public static final SpreadsheetCellType<Double> DOUBLE = new DoubleType();
+    public static final DoubleType DOUBLE = new DoubleType();
 
     /**
      * The {@link SpreadsheetCell} {@link Double} type base class.
@@ -452,10 +463,25 @@ public abstract class SpreadsheetCellType<T> {
             return "double"; //$NON-NLS-1$
         }
 
-        @Override
+        /**
+        * Creates a cell that hold a Double at the specified position, with the
+        * specified row/column span.
+        * 
+        * @param row
+        *            row number
+        * @param column
+        *            column number
+        * @param rowSpan
+        *            rowSpan (1 is normal)
+        * @param columnSpan
+        *            ColumnSpan (1 is normal)
+        * @param value
+        *            the value to display
+        * @return a {@link SpreadsheetCell}
+        */
         public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
                 final Double value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
+            SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -506,7 +532,7 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * The {@link SpreadsheetCell} {@link Integer} type instance.
      */
-    public static final SpreadsheetCellType<Integer> INTEGER = new IntegerType();
+    public static final IntegerType INTEGER = new IntegerType();
 
     /**
      * The {@link SpreadsheetCell} {@link Integer} type base class.
@@ -551,10 +577,25 @@ public abstract class SpreadsheetCellType<T> {
             return "Integer"; //$NON-NLS-1$
         }
 
-        @Override
+        /**
+        * Creates a cell that hold a Integer at the specified position, with the
+        * specified row/column span.
+        * 
+        * @param row
+        *            row number
+        * @param column
+        *            column number
+        * @param rowSpan
+        *            rowSpan (1 is normal)
+        * @param columnSpan
+        *            ColumnSpan (1 is normal)
+        * @param value
+        *            the value to display
+        * @return a {@link SpreadsheetCell}
+        */
         public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
                 final Integer value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
+            SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }
@@ -604,7 +645,7 @@ public abstract class SpreadsheetCellType<T> {
      *            the list items
      * @return the instance
      */
-    public static final SpreadsheetCellType<String> LIST(final List<String> items) {
+    public static final ListType LIST(final List<String> items) {
         return new ListType(items);
     }
 
@@ -634,13 +675,28 @@ public abstract class SpreadsheetCellType<T> {
             return "list"; //$NON-NLS-1$
         }
 
-        @Override
+        /**
+        * Creates a cell that hold a String at the specified position, with the
+        * specified row/column span.
+        * 
+        * @param row
+        *            row number
+        * @param column
+        *            column number
+        * @param rowSpan
+        *            rowSpan (1 is normal)
+        * @param columnSpan
+        *            ColumnSpan (1 is normal)
+        * @param value
+        *            the value to display
+        * @return a {@link SpreadsheetCell}
+        */
         public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
-                String item) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
+                String value) {
+            SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
             if (items != null && items.size() > 0) {
-                if (item != null && items.contains(item)) {
-                    cell.setItem(item);
+                if (value != null && items.contains(value)) {
+                    cell.setItem(value);
                 } else {
                     cell.setItem(items.get(0));
                 }
@@ -650,12 +706,12 @@ public abstract class SpreadsheetCellType<T> {
 
         @Override
         public SpreadsheetCellEditor createEditor(SpreadsheetView view) {
-            return new SpreadsheetCellEditor.ListEditor<String>(view, items);
+            return new SpreadsheetCellEditor.ListEditor<>(view, items);
         }
 
         @Override
         public boolean match(Object value) {
-            if (value instanceof String && items.contains(value))
+            if (value instanceof String && items.contains(value.toString()))
                 return true;
             else
                 return items.contains(value == null ? null : value.toString());
@@ -675,7 +731,7 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * The {@link SpreadsheetCell} {@link LocalDate} type instance.
      */
-    public static final SpreadsheetCellType<LocalDate> DATE = new DateType();
+    public static final DateType DATE = new DateType();
 
     /**
      * The {@link SpreadsheetCell} {@link LocalDate} type base class.
@@ -723,10 +779,25 @@ public abstract class SpreadsheetCellType<T> {
             return "date"; //$NON-NLS-1$
         }
 
-        @Override
+        /**
+        * Creates a cell that hold a LocalDate at the specified position, with the
+        * specified row/column span.
+        * 
+        * @param row
+        *            row number
+        * @param column
+        *            column number
+        * @param rowSpan
+        *            rowSpan (1 is normal)
+        * @param columnSpan
+        *            ColumnSpan (1 is normal)
+        * @param value
+        *            the value to display
+        * @return a {@link SpreadsheetCell}
+        */
         public SpreadsheetCell createCell(final int row, final int column, final int rowSpan, final int columnSpan,
                 final LocalDate value) {
-            SpreadsheetCell cell = new SpreadsheetCell(row, column, rowSpan, columnSpan, this);
+            SpreadsheetCell cell = new SpreadsheetCellBase(row, column, rowSpan, columnSpan, this);
             cell.setItem(value);
             return cell;
         }

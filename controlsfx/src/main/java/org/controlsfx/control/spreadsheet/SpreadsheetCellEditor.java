@@ -49,8 +49,7 @@ import javafx.util.StringConverter;
  * {@link SpreadsheetCell} in order to control how each value will be entered. <br/>
  * 
  * <h3>General behavior:</h3> Editors will be displayed if the user double-click
- * or press enter in an editable cell ( see
- * {@link SpreadsheetCell#setEditable(boolean)} ). <br/>
+ * in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ). <br/>
  * If the user does anything outside the editor, the editor <b> will be forced
  * </b> to try to commit the edition and close itself. If the value is not
  * valid, the editor will cancel the value and close itself. The editor is just

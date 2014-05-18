@@ -58,7 +58,7 @@ import javafx.event.ActionEvent;
  * </ol>
  * 
  * <p>The ability for ActionProxy to support glyph fonts is part of the ControlsFX
- * {@link org.controlsfx.glyphFont} API. For more information on how to specify
+ * {@link org.controlsfx.glyphfont} API. For more information on how to specify
  * images and glyph fonts, refer to the {@link ActionProxy#graphic()} method.
  * <br/><br/></li>
  * 

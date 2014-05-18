@@ -51,15 +51,15 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-import org.controlsfx.control.NodeRangeSelector;
+import org.controlsfx.control.SnapshotView;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 
 /**
- * The behavior for the {@link NodeRangeSelector}.
+ * The behavior for the {@link SnapshotView}.
  */
-public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
+public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
     /**
      * The percentage of the image's width/height used as a tolerance for determining whether the cursor is on an edge.
@@ -84,18 +84,18 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
      **************************************************************************/
 
     /**
-     * Creates a new behavior for the specified {@link NodeRangeSelector}.
+     * Creates a new behavior for the specified {@link SnapshotView}.
      * 
-     * @param selectableImageView
+     * @param snapshotView
      *            the control which this behavior will control
      */
-    public NodeRangeSelectorBehavior(NodeRangeSelector selectableImageView) {
-        super(selectableImageView, new ArrayList<KeyBinding>());
+    public SnapshotViewBehavior(SnapshotView snapshotView) {
+        super(snapshotView, new ArrayList<KeyBinding>());
     }
 
     /* ************************************************************************
      *                                                                         *
-     * Usability Access Functions to SelectableImageView Properties            *
+     * Usability Access Functions to SnapshotView Properties            *
      *                                                                         *
      **************************************************************************/
 
@@ -113,7 +113,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
     /**
      * The current selection.
      * 
-     * @return {@link NodeRangeSelector#getSelection()}
+     * @return {@link SnapshotView#getSelection()}
      */
     private Rectangle2D getSelection() {
         return getControl().getSelection();
@@ -122,7 +122,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
     /**
      * The image's width.
      * 
-     * @return {@link Image#getWidth() width} of {@link NodeRangeSelector#getImage()}
+     * @return {@link Image#getWidth() width} of {@link SnapshotView#getImage()}
      */
     private double getImageWidth() {
         return getControl().getNode().prefWidth(-1);
@@ -131,7 +131,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
     /**
      * The image's height.
      * 
-     * @return {@link Image#getHeight() height} of {@link NodeRangeSelector#getImage()}
+     * @return {@link Image#getHeight() height} of {@link SnapshotView#getImage()}
      */
     private double getImageHeight() {
         return getControl().getNode().prefHeight(-1);
@@ -140,7 +140,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
     /**
      * Indicates whether the current selection has a fixed ratio.
      * 
-     * @return {@link NodeRangeSelector#isSelectionRatioFixed()}
+     * @return {@link SnapshotView#isSelectionRatioFixed()}
      */
     private boolean isSelectionRatioFixed() {
         return getControl().isSelectionRatioFixed();
@@ -149,7 +149,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
     /**
      * The current selection's fixed ratio.
      * 
-     * @return {@link NodeRangeSelector#getFixedSelectionRatio()}
+     * @return {@link SnapshotView#getFixedSelectionRatio()}
      */
     private double getSelectionRatio() {
         return getControl().getFixedSelectionRatio();
@@ -382,8 +382,8 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
      **************************************************************************/
 
     /**
-     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link NodeRangeSelector}'s
-     * {@link NodeRangeSelector#selectionProperty() selection} property. This includes to check whether the mouse
+     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link SnapshotView}'s
+     * {@link SnapshotView#selectionProperty() selection} property. This includes to check whether the mouse
      * moved from the change's start to end and to possibly deactivate the selection if not.
      */
     private static class SelectionChange {
@@ -393,7 +393,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
         /**
          * The image view whose selection will be changed.
          */
-        private final NodeRangeSelector selectableImageView;
+        private final SnapshotView snapshotView;
 
         /**
          * The executed change strategy.
@@ -424,11 +424,11 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
         // Constructor
 
         /**
-         * Creates a new selection change for the specified {@link NodeRangeSelector} using the specified
+         * Creates a new selection change for the specified {@link SnapshotView} using the specified
          * {@link Rectangle2DChangeStrategy}.
          * 
-         * @param selectableImageView
-         *            the {@link NodeRangeSelector} whose selection will be changed
+         * @param snapshotView
+         *            the {@link SnapshotView} whose selection will be changed
          * @param selectionChangeStrategy
          *            the {@link Rectangle2DChangeStrategy} used to change the selection
          * @param cursor
@@ -436,10 +436,10 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
          * @param deactivateSelectionIfClick
          *            indicates whether the selection will be deactivated if the change is only a click
          */
-        public SelectionChange(NodeRangeSelector selectableImageView, Rectangle2DChangeStrategy selectionChangeStrategy,
+        public SelectionChange(SnapshotView snapshotView, Rectangle2DChangeStrategy selectionChangeStrategy,
                 Cursor cursor, boolean deactivateSelectionIfClick) {
             super();
-            this.selectableImageView = selectableImageView;
+            this.snapshotView = snapshotView;
             this.selectionChangeStrategy = selectionChangeStrategy;
             this.cursor = cursor;
             this.deactivateSelectionIfClick = deactivateSelectionIfClick;
@@ -455,10 +455,10 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
          */
         public void beginSelectionChange(Point2D point) {
             startingPoint = point;
-            selectableImageView.selectionChangingProperty().set(true);
+            snapshotView.selectionChangingProperty().set(true);
 
             Rectangle2D newSelection = selectionChangeStrategy.beginChange(point);
-            selectableImageView.setSelection(newSelection);
+            snapshotView.setSelection(newSelection);
         }
 
         /**
@@ -471,7 +471,7 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
             updateMouseMoved(point);
 
             Rectangle2D newSelection = selectionChangeStrategy.continueChange(point);
-            selectableImageView.setSelection(newSelection);
+            snapshotView.setSelection(newSelection);
         }
 
         /**
@@ -484,12 +484,12 @@ public class NodeRangeSelectorBehavior extends BehaviorBase<NodeRangeSelector> {
             updateMouseMoved(point);
 
             Rectangle2D newSelection = selectionChangeStrategy.endChange(point);
-            selectableImageView.setSelection(newSelection);
+            snapshotView.setSelection(newSelection);
 
             boolean deactivateSelection = deactivateSelectionIfClick && !mouseMoved;
             if (deactivateSelection)
-                selectableImageView.setSelection(null);
-            selectableImageView.selectionChangingProperty().set(false);
+                snapshotView.setSelection(null);
+            snapshotView.selectionChangingProperty().set(false);
         }
 
         /**

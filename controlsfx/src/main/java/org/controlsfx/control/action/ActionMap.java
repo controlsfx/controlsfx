@@ -136,7 +136,7 @@ public class ActionMap {
 
 	/**
 	 * Returns collection of actions by ids. Useful to create {@link ActionGroup}s.
-	 * Ids starting with "---" are converted to {@link ActionUtils.ACTION_SEPARATOR}
+	 * Ids starting with "---" are converted to {@link ActionUtils#ACTION_SEPARATOR}.
 	 * Incorrect ids are ignored. 
 	 * @param ids action ids
 	 * @return collection of actions

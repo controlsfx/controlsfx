@@ -175,9 +175,9 @@ import org.controlsfx.tools.Utils;
  *     int columnCount = 10;
  *     GridBase grid = new GridBase(rowCount, columnCount);
  *     
- *     ObservableList&lt;ObservableList&lt;SpreadsheetCell&lt;&lt; rows = FXCollections.observableArrayList();
+ *     ObservableList&lt;ObservableList&lt;SpreadsheetCell&gt;&gt; rows = FXCollections.observableArrayList();
  *     for (int row = 0; row &lt; grid.getRowCount(); ++row) {
- *         final ObservableList&lt;SpreadsheetCell&lt; list = FXCollections.observableArrayList();
+ *         final ObservableList&lt;SpreadsheetCell&gt; list = FXCollections.observableArrayList();
  *         for (int column = 0; column &lt; grid.getColumnCount(); ++column) {
  *             list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,"value"));
  *         }
@@ -191,7 +191,7 @@ import org.controlsfx.tools.Utils;
  * 
  * At that moment you can span some of the cells with the convenient method
  * provided by the grid. Then you just need to instantiate the SpreadsheetView. <br/>
- * <h3>Visual:</h3> <center><img src="spreadsheetView.png"></center>
+ * <h3>Visual:</h3> <center><img src="spreadsheetView.png"/></center>
  * 
  * @see SpreadsheetCell
  * @see SpreadsheetColumn
@@ -571,6 +571,11 @@ public class SpreadsheetView extends Control {
         return gridProperty.get();
     }
 
+    /**
+     * Return a {@link ReadOnlyObjectProperty} containing the current Grid
+     * used in the SpreadsheetView.
+     * @return a {@link ReadOnlyObjectProperty}.
+     */
     public final ReadOnlyObjectProperty<Grid> gridProperty() {
         return gridProperty;
     }

@@ -50,9 +50,17 @@ import com.sun.javafx.event.EventHandlerManager;
 /**
  * A base implementation of the {@link Grid} interface.
  * 
- * You can specify some row height in the constructor for some of your rows.
- * Just give a Map of Integer (the number of the concerned row) and Double (the
- * height, default is 24.0).
+ * <h3>Row Height</h3>
+ * 
+ * You can specify some row height for some of your rows at the beginning.
+ * You have to use the method {@link #setRowHeightCallback(javafx.util.Callback) }
+ * in order to specify a Callback that will give you the index of the row, and you 
+ * will give back the height of the row.
+ * <br/>
+ * If you just have a {@link Map} available, you can use the {@link MapBasedRowHeightFactory}
+ * that will construct the Callback for you.
+
+* The default height is 24.0.
  * 
  * <h3>Cell values</h3>
  * <p>
@@ -376,7 +384,7 @@ public class GridBase implements Grid, EventTarget {
      * specify a row index and its associated height).
      */
     public static class MapBasedRowHeightFactory implements Callback<Integer, Double> {
-        private Map<Integer, Double> rowHeightMap;
+        private final Map<Integer, Double> rowHeightMap;
 
         public MapBasedRowHeightFactory(Map<Integer, Double> rowHeightMap) {
             this.rowHeightMap = rowHeightMap;

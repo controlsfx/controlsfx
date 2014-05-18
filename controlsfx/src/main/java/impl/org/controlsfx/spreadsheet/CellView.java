@@ -221,22 +221,20 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         textProperty().bind(item.textProperty());
         setCellGraphic(item);
 
-        if (item.getItem() == null || item.getItem().equals("") //$NON-NLS-1$
-                || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
-            setTooltip(null);
-        } else {
-            /**
+        if(item.getTooltip().isPresent()){
+             /**
              * Ensure that modification of ToolTip are set on the JFX thread
-             * because an exception can be thrown otherwise. This should use
-             * Lambda expression but I cannot use 1.8 compliance..
+             * because an exception can be thrown otherwise. 
              */
             getValue(()->{
-                    Tooltip toolTip = new Tooltip(item.getItem().toString());
+                    Tooltip toolTip = new Tooltip(item.getTooltip().get());
                     toolTip.setWrapText(true);
                     toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
                     setTooltip(toolTip);
                 }
             );
+        }else{
+            setTooltip(null);
         }
         // We want the text to wrap onto another line
 //        setWrapText(true);

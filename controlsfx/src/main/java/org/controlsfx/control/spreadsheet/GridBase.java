@@ -46,6 +46,8 @@ import javafx.util.Callback;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 import com.sun.javafx.event.EventHandlerManager;
+import java.util.IdentityHashMap;
+import java.util.Optional;
 
 /**
  * A base implementation of the {@link Grid} interface.
@@ -108,6 +110,7 @@ public class GridBase implements Grid, EventTarget {
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
     private final ObservableList<String> rowsHeader;
     private final ObservableList<String> columnsHeader;
+    private final IdentityHashMap<SpreadsheetCell,String> tooltipMap;
 
     /***************************************************************************
      * 
@@ -134,7 +137,8 @@ public class GridBase implements Grid, EventTarget {
         rowsHeader = FXCollections.observableArrayList();
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
-        rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<Integer,Double>());
+        rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<>());
+        tooltipMap = new IdentityHashMap<>();
     }
 
     /***************************************************************************
@@ -317,6 +321,19 @@ public class GridBase implements Grid, EventTarget {
         setColumnCount(rowCount == 0 ? 0 : this.rows.get(0).size());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Optional<String> getTooltip(SpreadsheetCell cell){
+        return tooltipMap.containsKey(cell)?Optional.of(tooltipMap.get(cell)):
+                Optional.empty();
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setTooltip(SpreadsheetCell cell, String tooltip){
+        tooltipMap.put(cell, tooltip);
+    }
+    
     /** {@inheritDoc} */
     @Override
     public <E extends GridChange> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {

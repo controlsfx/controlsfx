@@ -162,7 +162,7 @@ public interface SpreadsheetCell {
      *
      * @return the {@link SpreadsheetCellType} of this particular cell.
      */
-    public SpreadsheetCellType<?> getCellType();
+    public SpreadsheetCellType getCellType();
 
     /**
      * Return the row of this cell.

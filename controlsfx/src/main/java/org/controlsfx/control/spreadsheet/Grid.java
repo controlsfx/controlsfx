@@ -27,11 +27,11 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.util.Collection;
+import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.util.Callback;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
@@ -165,6 +165,22 @@ public interface Grid {
      * @param rows
      */
     public void setRows(Collection<ObservableList<SpreadsheetCell>> rows);
+    
+    /**
+     * Return and {@link Optional} String representing the Tooltip of the given
+     * {@link SpreadsheetCell}.
+     * @param cell
+     * @return 
+     */
+    public Optional<String> getTooltip(SpreadsheetCell cell);
+    
+    /**
+     * Set a new Tooltip for the specified {@link SpreadsheetCell}. Replace
+     * any previous value.
+     * @param cell
+     * @param tooltip 
+     */
+    public void setTooltip(SpreadsheetCell cell, String tooltip);
     
     /**
      * Registers an event handler to this Grid. The Grid class allows 

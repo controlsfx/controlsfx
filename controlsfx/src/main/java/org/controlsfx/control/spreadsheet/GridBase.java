@@ -230,20 +230,14 @@ public class GridBase implements Grid, EventTarget {
         this.rowHeightFactory = rowHeight;
     }
 
-    /**
-     * Returns an ObservableList of string to display in the row headers.
-     * 
-     * @return an ObservableList of string to display in the row headers.
-     */
+    /** {@inheritDoc} */
+    @Override
     public ObservableList<String> getRowHeaders() {
         return rowsHeader;
     }
 
-    /**
-     * Returns an ObservableList of string to display in the column headers.
-     * 
-     * @return an ObservableList of string to display in the column headers.
-     */
+    /** {@inheritDoc} */
+    @Override
     public ObservableList<String> getColumnHeaders() {
         return columnsHeader;
     }
@@ -278,14 +272,8 @@ public class GridBase implements Grid, EventTarget {
         locked.setValue(lock);
     }
 
-    /**
-     * Span in row the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
-     */
+    /** {@inheritDoc} */
+    @Override
     public void spanRow(int count, int rowIndex, int colIndex) {
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = cell.getColumnSpan();
@@ -300,14 +288,8 @@ public class GridBase implements Grid, EventTarget {
         }
     }
 
-    /**
-     * Span in column the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
-     */
+    /** {@inheritDoc} */
+    @Override
     public void spanColumn(int count, int rowIndex, int colIndex) {
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = count;
@@ -322,9 +304,8 @@ public class GridBase implements Grid, EventTarget {
         }
     }
 
-    /**
-     * This method sets the rows used by the grid, and updates the rowCount.
-     */
+    /** {@inheritDoc} */
+    @Override
     public void setRows(Collection<ObservableList<SpreadsheetCell>> rows) {
         if (rows instanceof ObservableList) {
             this.rows = (ObservableList<ObservableList<SpreadsheetCell>>) rows;

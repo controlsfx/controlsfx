@@ -491,7 +491,7 @@ public class SpreadsheetView extends Control {
             for (int i = 0; i < columnCount; ++i) {
                 final int col = i;
 
-                String columnHeader = ((GridBase) grid).getColumnHeaders().size() > i ? ((GridBase) grid)
+                String columnHeader = grid.getColumnHeaders().size() > i ? grid
                         .getColumnHeaders().get(i) : Utils.getExcelLetterFromNumber(i);
                 final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
                         columnHeader);

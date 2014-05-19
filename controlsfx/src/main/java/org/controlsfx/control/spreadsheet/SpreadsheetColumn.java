@@ -116,10 +116,6 @@ public final class SpreadsheetColumn {
         };
         Platform.runLater(r);
 
-//        // Visual Confirmation
-//        if (isColumnFixable())
-//            column.setText(column.getText() + ".");
-
         // When changing FixedColumns, we set header in order to add "." or ":"
         spreadsheetView.getFixedColumns().addListener(updateTextListener);
 
@@ -127,10 +123,10 @@ public final class SpreadsheetColumn {
         spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
 
         // When ColumnsHeaders are changing, we update the text
-        ((GridBase) spreadsheetView.getGrid()).getColumnHeaders().addListener(new InvalidationListener() {
+        spreadsheetView.getGrid().getColumnHeaders().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable arg0) {
-                List<String> columnsHeader = ((GridBase) spreadsheetView.getGrid()).getColumnHeaders();
+                List<String> columnsHeader = spreadsheetView.getGrid().getColumnHeaders();
                 if (columnsHeader.size() <= indexColumn) {
                     setText(Utils.getExcelLetterFromNumber(indexColumn));
                 } else if (!columnsHeader.get(indexColumn).equals(getText())) {

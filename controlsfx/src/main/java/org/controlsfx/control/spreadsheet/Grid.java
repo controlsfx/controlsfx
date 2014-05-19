@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.Collection;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -123,6 +124,47 @@ public interface Grid {
      * @return the height of a row.
      */
     public double getRowHeight(int row);
+    
+    
+    /**
+     * Returns an ObservableList of string to display in the row headers.
+     * 
+     * @return an ObservableList of string to display in the row headers.
+     */
+    public ObservableList<String> getRowHeaders();
+    
+    /**
+     * Returns an ObservableList of string to display in the column headers.
+     * 
+     * @return an ObservableList of string to display in the column headers.
+     */
+    public ObservableList<String> getColumnHeaders();
+    
+    /**
+     * Span in row the cell situated at rowIndex and colIndex by the number
+     * count
+     * 
+     * @param count
+     * @param rowIndex
+     * @param colIndex
+     */
+    public void spanRow(int count, int rowIndex, int colIndex);
+    
+    /**
+     * Span in column the cell situated at rowIndex and colIndex by the number
+     * count
+     * 
+     * @param count
+     * @param rowIndex
+     * @param colIndex
+     */
+    public void spanColumn(int count, int rowIndex, int colIndex);
+    
+    /**
+     * This method sets the rows used by the grid, and updates the rowCount.
+     * @param rows
+     */
+    public void setRows(Collection<ObservableList<SpreadsheetCell>> rows);
     
     /**
      * Registers an event handler to this Grid. The Grid class allows 

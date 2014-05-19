@@ -26,7 +26,6 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -189,7 +188,7 @@ public interface SpreadsheetCell {
     /**
      * Sets how much this cell is spanning in row. See {@link SpreadsheetCell}
      * description for information. You should use
-     * {@link GridBase#spanRow(int, int, int)} instead of using this method
+     * {@link Grid#spanRow(int, int, int)} instead of using this method
      * directly.
      *
      * @param rowSpan
@@ -206,7 +205,7 @@ public interface SpreadsheetCell {
     /**
      * Sets how much this cell is spanning in column. See
      * {@link SpreadsheetCell} description for information. You should use
-     * {@link GridBase#spanColumn(int, int, int)} instead of using this method
+     * {@link Grid#spanColumn(int, int, int)} instead of using this method
      * directly.
      *
      * @param columnSpan
@@ -242,16 +241,4 @@ public interface SpreadsheetCell {
      * @return the graphic node associated with this cell.
      */
     public Node getGraphic();
-    
-    /**
-     * Return an {@link Optional} of String containing the Tooltip of this cell.
-     * @return 
-     */
-    public Optional<String> getTooltip();
-    
-    /**
-     * Set a new Tooltip for this cell.
-     * @param toolTip 
-     */
-    public void setTooltip(String toolTip);
 }

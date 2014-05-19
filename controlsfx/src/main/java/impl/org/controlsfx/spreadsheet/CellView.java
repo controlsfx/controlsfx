@@ -45,7 +45,6 @@ import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -221,21 +220,21 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         textProperty().bind(item.textProperty());
         setCellGraphic(item);
 
-        if(item.getTooltip().isPresent()){
-             /**
-             * Ensure that modification of ToolTip are set on the JFX thread
-             * because an exception can be thrown otherwise. 
-             */
-            getValue(()->{
-                    Tooltip toolTip = new Tooltip(item.getTooltip().get());
-                    toolTip.setWrapText(true);
-                    toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                    setTooltip(toolTip);
-                }
-            );
-        }else{
-            setTooltip(null);
-        }
+//        if(item.getTooltip().isPresent()){
+//             /**
+//             * Ensure that modification of ToolTip are set on the JFX thread
+//             * because an exception can be thrown otherwise. 
+//             */
+//            getValue(()->{
+//                    Tooltip toolTip = new Tooltip(item.getTooltip().get());
+//                    toolTip.setWrapText(true);
+//                    toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+//                    setTooltip(toolTip);
+//                }
+//            );
+//        }else{
+//            setTooltip(null);
+//        }
         // We want the text to wrap onto another line
 //        setWrapText(true);
         setEditable(item.isEditable());

@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -241,4 +242,10 @@ public interface SpreadsheetCell {
      * @return the graphic node associated with this cell.
      */
     public Node getGraphic();
+    
+    /**
+     * Return the tooltip associated with this SpreadsheetCell.
+     * @return 
+     */
+    public Optional<String> getTooltip();
 }

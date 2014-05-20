@@ -27,6 +27,7 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -211,6 +212,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
     private final StringProperty format;
     private final StringProperty text;
     private final ObjectProperty<Node> graphic;
+    private String tooltip;
 
     private ObservableSet<String> styleClass;
 
@@ -517,7 +519,20 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         result = prime * result + Objects.hashCode(getText());
         return result;
     }
-
+    
+    /** {@inheritDoc} */
+    @Override
+    public Optional<String> getTooltip() {
+        return Optional.ofNullable(tooltip);
+    }
+    
+    /**
+     * Set a new tooltip for this cell.
+     * @param tooltip 
+     */
+    public void setTooltip(String tooltip){
+        this.tooltip = tooltip;
+    }
     /***************************************************************************
      * 
      * Private Implementation

@@ -219,24 +219,23 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // We reset the settings
         textProperty().bind(cell.textProperty());
         setCellGraphic(cell);
-        Optional<String> tooltip = handle.getView().getGrid().getTooltip(cell);
         
-        /**
-             * Ensure that modification of ToolTip are set on the JFX thread
-             * because an exception can be thrown otherwise. 
-             */
+        Optional<String> tooltip = cell.getTooltip();
+        if(tooltip.isPresent()){
+            /**
+            * Ensure that modification of ToolTip are set on the JFX thread
+            * because an exception can be thrown otherwise. 
+            */
             getValue(()->{
-                    String tooltipString = tooltip.orElse(cell.getCellType().toString(cell.getItem()));
-                    if(tooltipString != null && !"".equals(tooltipString)){
-                        Tooltip toolTip = new Tooltip(tooltipString);
-                        toolTip.setWrapText(true);
-                        toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                        setTooltip(toolTip);
-                    }else{
-                        setTooltip(null);
-                    }
-                }
+                       Tooltip toolTip = new Tooltip(tooltip.get());
+                       toolTip.setWrapText(true);
+                       toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                       setTooltip(toolTip);
+               }
             );
+        }else{
+            setTooltip(null);
+        }
         // We want the text to wrap onto another line
 //        setWrapText(true);
         setEditable(cell.isEditable());

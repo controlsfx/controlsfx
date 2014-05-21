@@ -96,8 +96,8 @@ import org.controlsfx.tools.Utils;
  * <li>Rows can be resized just like columns with click & drag.</li>
  * <li>Both row and column header can be visible or invisible.</li>
  * <li>Selection of several cells can be made with a click and drag.</li>
- * <li>A copy/paste context menu is accessible with a right-click or the usual
- * shortcuts.</li>
+ * <li>A copy/paste context menu is accessible with a right-click. The usual
+ * shortcuts are also working.</li>
  * </ul>
  * 
  * <br/>
@@ -116,8 +116,10 @@ import org.controlsfx.tools.Utils;
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
  * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior
  * every move will ensure that no exception will be thrown.
- *
  * <br/>
+ * You have also the possibility to deactivate these possibilities. For example,
+ * you force some row/column to be fixed and then the user cannot change the 
+ * settings. 
  * <br/>
  * 
  * <h3>Headers</h3>
@@ -142,7 +144,9 @@ import org.controlsfx.tools.Utils;
  * {@link #setColumnPickerCallback(javafx.util.Callback) } in order to react when 
  * the user click on the picker. The Callback gives you the index of the picker.
  * <br/>
- * 
+ * The pickers will appear on the top of the column's header and on the left of 
+ * the row's header.
+ * <br/>
  * You can also override the default graphic of the picker by overriding its css,
  * example:
  * <br/>
@@ -154,18 +158,21 @@ import org.controlsfx.tools.Utils;
  * }
  * </pre>
  * 
- * <h3>Copy pasting</h3> You can copy every cell you want to paste it elsewhere.
+ * <h3>Copy pasting</h3> You can copy any cell you want and paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
  * type. Thus the value you're trying to paste must be compatible with the
  * {@link SpreadsheetCellType} of the receiving cell. Pasting a Double into a
- * String will work but the reverse operation will not. <br/>
+ * String will work but the reverse operation will not. 
+ * <br/>
+ * See {@link SpreadsheetCellType} <i>Value Verification</i> documentation for more 
+ * information.
+ * <br/>
  * A unique cell or a selection of several of them can be copied and pasted.
  * 
  * <br/>
  * <br/>
  * <h3>Code Samples</h3> Just like the {@link TableView}, you instantiate the
- * underlying model, a {@link Grid}. You will create some ObservableList<
- * {@link SpreadsheetCell}> filled with {@link SpreadsheetCell}.
+ * underlying model, a {@link Grid}. You will create some rows filled with {@link SpreadsheetCell}.
  * 
  * <br/>
  * <br/>
@@ -194,8 +201,10 @@ import org.controlsfx.tools.Utils;
  * <h3>Visual:</h3> <center><img src="spreadsheetView.png"/></center>
  * 
  * @see SpreadsheetCell
+ * @see SpreadsheetCellBase
  * @see SpreadsheetColumn
  * @see Grid
+ * @see GridBase
  */
 public class SpreadsheetView extends Control {
 

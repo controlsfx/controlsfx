@@ -31,6 +31,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
@@ -53,7 +54,7 @@ import javafx.scene.input.KeyCombination;
  * 
  * @see AbstractAction
  */
-public interface Action {
+public interface Action extends EventHandler<ActionEvent> {
 
     /**
      * The text to show to the user.
@@ -108,12 +109,4 @@ public interface Action {
      * by application developers
      */
     public ObservableMap<Object, Object> getProperties();
-    
-    /**
-     * This method is called when the user selects this action. 
-     * 
-     * @param ae The action context.
-     */
-    public void execute(ActionEvent ae);
-    
 }

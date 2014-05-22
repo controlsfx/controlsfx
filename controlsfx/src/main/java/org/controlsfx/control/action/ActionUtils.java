@@ -40,7 +40,6 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
@@ -379,7 +378,7 @@ public class ActionUtils {
             return null;
         }
 
-        @Override public void execute(ActionEvent ae) {
+        @Override public void handle(ActionEvent ae) {
         }
         
         public String toString() { 
@@ -585,13 +584,7 @@ public class ActionUtils {
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent ae) {
-                if ( !action.disabledProperty().get()) {
-                    action.execute(ae);
-                }
-            }
-        });
+        btn.setOnAction(action);
         
         return btn;
     }
@@ -626,13 +619,7 @@ public class ActionUtils {
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent ae) {
-                if ( !action.disabledProperty().get()) {
-                    action.execute(ae);
-                }
-            }
-        });
+        btn.setOnAction(action);
         
         return btn;
     }

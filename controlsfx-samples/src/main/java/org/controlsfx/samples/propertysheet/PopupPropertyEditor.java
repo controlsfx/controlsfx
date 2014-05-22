@@ -60,7 +60,7 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
                     ButtonBar.setType(this, ButtonBar.ButtonType.OK_DONE);
                 }
                 @Override
-                public void execute(ActionEvent ae) {
+                public void handle(ActionEvent ae) {
                     Dialog dlg = (Dialog) ae.getSource();
                     // real saving code here?
                     dlg.setResult(this);

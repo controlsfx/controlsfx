@@ -122,7 +122,7 @@ public class HelloGridView extends ControlsFXSample {
             this.grid = grid;
         }
 
-        @Override public void execute(ActionEvent ae) {
+        @Override public void handle(ActionEvent ae) {
             if ( myGrid != null ) {
                 root.getChildren().remove(myGrid);
             }

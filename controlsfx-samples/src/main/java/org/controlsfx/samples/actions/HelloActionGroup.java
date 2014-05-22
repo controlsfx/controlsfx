@@ -84,7 +84,7 @@ public class HelloActionGroup extends ControlsFXSample {
             super(name);
         }
 
-        @Override public void execute(javafx.event.ActionEvent ae) {
+        @Override public void handle(javafx.event.ActionEvent ae) {
             System.out.println( String.format("Action '%s' is executed", getText()));
         }
         
@@ -133,7 +133,7 @@ public class HelloActionGroup extends ControlsFXSample {
         
         Action toggleAction = new AbstractAction("Enable/Disable") {
 
-            @Override public void execute(ActionEvent ae) {
+            @Override public void handle(ActionEvent ae) {
                Action action = cbActions.getSelectionModel().getSelectedItem();
                if ( action != null ) {
                    BooleanProperty p = action.disabledProperty();

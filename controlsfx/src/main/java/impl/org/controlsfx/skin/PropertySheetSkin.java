@@ -259,7 +259,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             }
         }
 
-        @Override public void execute(ActionEvent ae) {
+        @Override public void handle(ActionEvent ae) {
             getSkinnable().modeProperty().set(mode);
         }
     }

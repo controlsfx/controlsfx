@@ -486,7 +486,7 @@ public class HelloDialog extends ControlsFXSample {
 				}
 
 				@Override
-				public void execute(ActionEvent ae) {
+				public void handle(ActionEvent ae) {
 					Dialog dlg = (Dialog) ae.getSource();
 					// real login code here
 					dlg.setResult(this);

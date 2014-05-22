@@ -586,7 +586,7 @@ public final class Dialogs {
         dlg.getActions().clear();
         
         Action openExceptionAction = new AbstractAction(localize(asKey("exception.button.label"))) {
-            @Override public void execute(ActionEvent ae) {
+            @Override public void handle(ActionEvent ae) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
@@ -735,7 +735,7 @@ public final class Dialogs {
             button.setDefaultButton(commandLink == defaultCommandLink);
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
-                   commandLink.execute( new ActionEvent(dlg, ae.getTarget()));
+                   commandLink.handle( new ActionEvent(dlg, ae.getTarget()));
                 }
             });
                     
@@ -994,7 +994,7 @@ public final class Dialogs {
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 			}
 			
-			@Override public void execute(ActionEvent ae) {
+			@Override public void handle(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {

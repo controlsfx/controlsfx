@@ -697,7 +697,7 @@ public class Dialog {
          * Implementation of default dialog action execution logic:
          * if action is enabled set it as dialog result.
          */
-        default public void execute(ActionEvent ae) {
+        default public void handle(ActionEvent ae) {
             if (! disabledProperty().get()) {
                 if (ae.getSource() instanceof Dialog ) {
                     ((Dialog) ae.getSource()).setResult(this);
@@ -833,8 +833,8 @@ public class Dialog {
          */
         private Actions(String title, ButtonType type, ActionTrait... traits) {
             this.action = new AbstractAction(title) {
-                @Override public void execute(ActionEvent ae) {
-                    Actions.this.execute(ae);
+                @Override public void handle(ActionEvent ae) {
+                    Actions.this.handle(ae);
                 }
             };
             this.traits = EnumSet.copyOf(Arrays.asList(traits));
@@ -876,8 +876,8 @@ public class Dialog {
         }
 
         /** {@inheritDoc} */
-        @Override public void execute(ActionEvent ae) {
-        	DialogAction.super.execute(ae);
+        @Override public void handle(ActionEvent ae) {
+        	DialogAction.super.handle(ae);
         }
         
         /** {@inheritDoc} */
@@ -1092,7 +1092,7 @@ public class Dialog {
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                action.execute(new ActionEvent(Dialog.this, ae.getTarget()));
+                action.handle(new ActionEvent(Dialog.this, ae.getTarget()));
                 result = action;
             }
         });

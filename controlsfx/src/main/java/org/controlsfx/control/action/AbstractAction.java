@@ -35,7 +35,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCombination;
@@ -235,7 +234,4 @@ public abstract class AbstractAction implements Action {
      * 
      **************************************************************************/
     
-    // --- execute
-    /** {@inheritDoc} */
-    @Override public abstract void execute(ActionEvent ae);
 }

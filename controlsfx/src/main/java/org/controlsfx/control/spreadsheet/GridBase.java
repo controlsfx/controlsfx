@@ -50,9 +50,17 @@ import com.sun.javafx.event.EventHandlerManager;
 /**
  * A base implementation of the {@link Grid} interface.
  * 
- * You can specify some row height in the constructor for some of your rows.
- * Just give a Map of Integer (the number of the concerned row) and Double (the
- * height, default is 24.0).
+ * <h3>Row Height</h3>
+ * 
+ * You can specify some row height for some of your rows at the beginning.
+ * You have to use the method {@link #setRowHeightCallback(javafx.util.Callback) }
+ * in order to specify a Callback that will give you the index of the row, and you 
+ * will give back the height of the row.
+ * <br/>
+ * If you just have a {@link Map} available, you can use the {@link MapBasedRowHeightFactory}
+ * that will construct the Callback for you.
+
+* The default height is 24.0.
  * 
  * <h3>Cell values</h3>
  * <p>
@@ -126,7 +134,7 @@ public class GridBase implements Grid, EventTarget {
         rowsHeader = FXCollections.observableArrayList();
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
-        rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<Integer,Double>());
+        rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<>());
     }
 
     /***************************************************************************
@@ -222,20 +230,14 @@ public class GridBase implements Grid, EventTarget {
         this.rowHeightFactory = rowHeight;
     }
 
-    /**
-     * Returns an ObservableList of string to display in the row headers.
-     * 
-     * @return an ObservableList of string to display in the row headers.
-     */
+    /** {@inheritDoc} */
+    @Override
     public ObservableList<String> getRowHeaders() {
         return rowsHeader;
     }
 
-    /**
-     * Returns an ObservableList of string to display in the column headers.
-     * 
-     * @return an ObservableList of string to display in the column headers.
-     */
+    /** {@inheritDoc} */
+    @Override
     public ObservableList<String> getColumnHeaders() {
         return columnsHeader;
     }
@@ -270,14 +272,8 @@ public class GridBase implements Grid, EventTarget {
         locked.setValue(lock);
     }
 
-    /**
-     * Span in row the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
-     */
+    /** {@inheritDoc} */
+    @Override
     public void spanRow(int count, int rowIndex, int colIndex) {
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = cell.getColumnSpan();
@@ -292,14 +288,8 @@ public class GridBase implements Grid, EventTarget {
         }
     }
 
-    /**
-     * Span in column the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
-     */
+    /** {@inheritDoc} */
+    @Override
     public void spanColumn(int count, int rowIndex, int colIndex) {
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = count;
@@ -314,9 +304,8 @@ public class GridBase implements Grid, EventTarget {
         }
     }
 
-    /**
-     * This method sets the rows used by the grid, and updates the rowCount.
-     */
+    /** {@inheritDoc} */
+    @Override
     public void setRows(Collection<ObservableList<SpreadsheetCell>> rows) {
         if (rows instanceof ObservableList) {
             this.rows = (ObservableList<ObservableList<SpreadsheetCell>>) rows;
@@ -376,7 +365,7 @@ public class GridBase implements Grid, EventTarget {
      * specify a row index and its associated height).
      */
     public static class MapBasedRowHeightFactory implements Callback<Integer, Double> {
-        private Map<Integer, Double> rowHeightMap;
+        private final Map<Integer, Double> rowHeightMap;
 
         public MapBasedRowHeightFactory(Map<Integer, Double> rowHeightMap) {
             this.rowHeightMap = rowHeightMap;

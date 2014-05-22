@@ -54,7 +54,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.Grid;
-import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -553,8 +552,8 @@ public class VerticalHeader extends StackPane {
      * @return
      */
     private String getRowHeader(int index) {
-        return ((GridBase) spreadsheetView.getGrid()).getRowHeaders().size() > index ? ((GridBase) spreadsheetView
-                .getGrid()).getRowHeaders().get(index) : String.valueOf(index + 1);
+        return spreadsheetView.getGrid().getRowHeaders().size() > index ? spreadsheetView
+                .getGrid().getRowHeaders().get(index) : String.valueOf(index + 1);
     }
 
     /**

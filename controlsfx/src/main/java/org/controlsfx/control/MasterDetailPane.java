@@ -139,10 +139,6 @@ public class MasterDetailPane extends Control {
     /**
      * Constructs a new pane with two placeholder nodes. The detail node will be
      * shown and to the right of the master node.
-     * 
-     * @param pos
-     *            the position where the details will be shown (top, bottom,
-     *            left, right)
      */
     public MasterDetailPane() {
         this(Side.RIGHT, new Placeholder(true), new Placeholder(false), true);

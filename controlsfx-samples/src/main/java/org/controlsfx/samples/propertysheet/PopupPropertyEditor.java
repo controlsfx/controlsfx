@@ -34,16 +34,16 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.DefaultDialogAction;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.DialogStyle;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.PropertyEditor;
@@ -54,32 +54,54 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private final PropertySheet.Item item;
     private final ObjectProperty<T> value = new SimpleObjectProperty<>();
 
+    final Action actionSave = new DefaultDialogAction("Save",
+            Dialog.ActionTrait.CLOSING, Dialog.ActionTrait.DEFAULT) {
+                {
+                    ButtonBar.setType(this, ButtonBar.ButtonType.OK_DONE);
+                }
+                @Override
+                public void execute(ActionEvent ae) {
+                    Dialog dlg = (Dialog) ae.getSource();
+                    // real saving code here?
+                    dlg.setResult(this);
+                }
+                @Override
+                public String toString() {
+                    return "SAVE";
+                }
+    };
+    
     public PopupPropertyEditor(PropertySheet.Item item) {
         this.item = item;
-
         if (item.getValue() != null) {
             btnEditor = new Button(item.getValue().toString());
             value.set((T) item.getValue());
         } else {
             btnEditor = new Button("<empty>");
         }
-
         btnEditor.setAlignment(Pos.CENTER_LEFT);
-
         btnEditor.setOnAction((ActionEvent event) -> {
             displayPopupEditor();
         });
-
     }
 
     private void displayPopupEditor() {
-        PopupPropertySheet sheet = new PopupPropertySheet(item, this);
-        Stage dialog = new Stage();
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("Popup Property Editor");
-        Scene scene = new Scene(sheet);
-        dialog.setScene(scene);
-        dialog.show();
+        PopupPropertySheet<T> sheet = new PopupPropertySheet<>(item, this);
+
+        Dialog dlg = new Dialog(null, "Popup Property Editor", false,
+                DialogStyle.CROSS_PLATFORM_DARK);
+
+        dlg.setResizable(false);
+        dlg.setIconifiable(false);
+        dlg.setContent(sheet);
+        dlg.getActions().addAll(actionSave, Dialog.Actions.CANCEL);
+        Action response = dlg.show();
+
+        if (actionSave.equals(response)) {
+            item.setValue(sheet.getBean());
+            btnEditor.setText(sheet.getBean().toString());
+        }
+
     }
 
     @Override
@@ -113,33 +135,15 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
             this.owner = owner;
             sheet = new PropertySheet();
             setCenter(sheet);
-            installButtons();
+//            installButtons();
             setMinHeight(500);
 
             initSheet();
 
         }
 
-        private void installButtons() {
-            FlowPane fp = new FlowPane(4, 4);
-            fp.setPadding(new Insets(4));
-            fp.setAlignment(Pos.CENTER_RIGHT);
-
-            Button btnSave = new Button("Save");
-            btnSave.setOnAction((ActionEvent e) -> {
-                item.setValue(bean);
-                owner.setValue(bean);
-                getScene().getWindow().hide();
-            });
-
-            Button btnCancel = new Button("Cancel");
-            btnCancel.setOnAction((ActionEvent e) -> {
-                getScene().getWindow().hide();
-            });
-
-            fp.getChildren().addAll(btnSave, btnCancel);
-            setBottom(fp);
-
+        public T getBean() {
+            return bean;
         }
 
         private void initSheet() {

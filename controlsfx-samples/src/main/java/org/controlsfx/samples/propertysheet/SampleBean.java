@@ -31,13 +31,9 @@ import java.util.UUID;
 public class SampleBean {
 
     private String id = UUID.randomUUID().toString();
-
     private String firstName;
-
     private String lastName;
-
     private Address address;
-
     private String hiddenValue;
 
     public SampleBean() {

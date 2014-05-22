@@ -92,7 +92,16 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             return;
         }
         control.setOpacity(1);
-//        checkState(true);
+        /**
+         * If we use "setGrid" on SpreadsheetView, we must be careful because we
+         * set our columns after (due to threading safety). So if, by mistake,
+         * we are in layout and the columns are set in SpreadsheetView, but not
+         * in TableView (yet). Then just return and wait for next calling.
+         */
+        if(spreadsheetView.getColumns().size() != gridView.getColumns().size()){
+            return;
+        }
+        checkState(true);
         if (cellsMap.isEmpty()) { return; }
 
         final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = getVisibleLeafColumns();
@@ -289,7 +298,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
      */
     private double getTableRowHeight(int i) {
         return handle.getCellsViewSkin().getRowHeight(i);
-	}
+    }
 
 	/**
      * Return true if the current cell is part of the sceneGraph.
@@ -302,9 +311,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
      * @return
      */
     private boolean isInvisible(double x, double width, double hbarValue,
-			double headerWidth, int columnSpan) {
-		return (x+width <hbarValue && columnSpan == 1) || (x> hbarValue+headerWidth);
-	}
+                    double headerWidth, int columnSpan) {
+        return (x+width <hbarValue && columnSpan == 1) || (x> hbarValue+headerWidth);
+    }
     /**
      * FIXME This is currently the exact copy of the method
      * in the SpreadsheetViewSelectionModel. But since it is a private implementation

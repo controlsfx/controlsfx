@@ -49,7 +49,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
@@ -214,33 +213,32 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     /**
      * Called in the gridRowSkinBase when doing layout This allow not to
      * override opacity in the row and let the cell handle itself
-     * @param item
+     * @param cell
      */
-    public void show(final SpreadsheetCell item) {
+    public void show(final SpreadsheetCell cell) {
         // We reset the settings
-        textProperty().bind(item.textProperty());
-        setCellGraphic(item);
-
-        if (item.getItem() == null || item.getItem().equals("") //$NON-NLS-1$
-                || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
-            setTooltip(null);
-        } else {
+        textProperty().bind(cell.textProperty());
+        setCellGraphic(cell);
+        
+        Optional<String> tooltip = cell.getTooltip();
+        if(tooltip.isPresent()){
             /**
-             * Ensure that modification of ToolTip are set on the JFX thread
-             * because an exception can be thrown otherwise. This should use
-             * Lambda expression but I cannot use 1.8 compliance..
-             */
+            * Ensure that modification of ToolTip are set on the JFX thread
+            * because an exception can be thrown otherwise. 
+            */
             getValue(()->{
-                    Tooltip toolTip = new Tooltip(item.getItem().toString());
-                    toolTip.setWrapText(true);
-                    toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                    setTooltip(toolTip);
-                }
+                       Tooltip toolTip = new Tooltip(tooltip.get());
+                       toolTip.setWrapText(true);
+                       toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                       setTooltip(toolTip);
+               }
             );
+        }else{
+            setTooltip(null);
         }
         // We want the text to wrap onto another line
 //        setWrapText(true);
-        setEditable(item.isEditable());
+        setEditable(cell.isEditable());
     }
 
     public void show() {

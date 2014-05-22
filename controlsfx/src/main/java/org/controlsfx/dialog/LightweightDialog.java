@@ -183,13 +183,20 @@ class LightweightDialog extends FXDialog {
                 EventType<? extends MouseEvent> type = event.getEventType();
                 
                 if (type == MouseEvent.MOUSE_PRESSED) {
-                    width = lightweightDialog.getWidth();
-                    height = lightweightDialog.getHeight();
-                    dragAnchor = new Point2D(event.getSceneX(), event.getSceneY());
+                    initAnchor(event);
                 } else if (type == MouseEvent.MOUSE_DRAGGED) {
+                    if (null == dragAnchor) {
+                        initAnchor(event);
+                    }
                     lightweightDialog.setPrefWidth(Math.max(lightweightDialog.minWidth(-1),   width  + (event.getSceneX() - dragAnchor.getX())));
                     lightweightDialog.setPrefHeight(Math.max(lightweightDialog.minHeight(-1), height + (event.getSceneY() - dragAnchor.getY())));
                 }
+            }
+
+            private void initAnchor(MouseEvent event) {
+                width = lightweightDialog.getWidth();
+                height = lightweightDialog.getHeight();
+                dragAnchor = new Point2D(event.getSceneX(), event.getSceneY());
             }
         };
         resizeCorner.setOnMousePressed(resizeHandler);

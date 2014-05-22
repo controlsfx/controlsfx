@@ -17,6 +17,7 @@ If you think you have a feature you can contribute, a bug you want to fix please
 |                                                                                                                 |
 |--------------------|--------------------------------------------------------------------------------------------|
 | ControlsFX         | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX)         |
+| ControlsFX 8u20    | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX 8u20)    |
 | ControlsFX Samples | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX Samples) |
 | FXSampler          | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=FXSampler)          |  
 

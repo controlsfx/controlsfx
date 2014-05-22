@@ -27,15 +27,17 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
+
 import java.util.Optional;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
+
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
 import org.controlsfx.property.editor.PropertyEditor;
@@ -75,7 +77,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see Item
  * @see Mode
  */
-public class PropertySheet extends Control {
+public class PropertySheet extends ControlsFXControl {
     
     
     /**************************************************************************

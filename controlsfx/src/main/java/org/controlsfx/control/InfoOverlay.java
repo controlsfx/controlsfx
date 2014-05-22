@@ -35,7 +35,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.ImageView;
 
@@ -53,7 +52,7 @@ import javafx.scene.image.ImageView;
  * <img src="infoOverlay.png"/>
  * </center>
  */
-public class InfoOverlay extends Control {
+public class InfoOverlay extends ControlsFXControl {
     
     /***************************************************************************
      *                                                                         *

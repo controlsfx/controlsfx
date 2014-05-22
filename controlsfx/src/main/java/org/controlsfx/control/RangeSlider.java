@@ -144,7 +144,7 @@ import com.sun.javafx.css.converters.SizeConverter;
  * 
  * @see Slider
  */
-public class RangeSlider extends Control {
+public class RangeSlider extends ControlsFXControl {
     
     /***************************************************************************
      *                                                                         *

@@ -38,7 +38,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Skin;
 
@@ -79,7 +78,7 @@ import javafx.scene.control.Skin;
  *
  * @param <T> The type of the data in the ComboBox.
  */
-public class CheckComboBox<T> extends Control {
+public class CheckComboBox<T> extends ControlsFXControl {
     
     /**************************************************************************
      * 

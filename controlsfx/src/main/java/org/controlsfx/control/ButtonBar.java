@@ -42,7 +42,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.HBox;
 
@@ -52,8 +51,8 @@ import org.controlsfx.tools.Platform;
 import com.sun.javafx.scene.traversal.Algorithm;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import com.sun.javafx.scene.traversal.TraversalContext;
-import com.sun.javafx.scene.traversal.TraversalEngine;
 import com.sun.javafx.scene.traversal.Direction;
+import com.sun.javafx.scene.traversal.TraversalEngine;
 import com.sun.javafx.scene.traversal.TraverseListener;
 
 /**
@@ -136,7 +135,7 @@ import com.sun.javafx.scene.traversal.TraverseListener;
  * buttonBar.setButtonOrder("+YN"); 
  * }</pre>
  */
-public final class ButtonBar extends Control {
+public final class ButtonBar extends ControlsFXControl {
     
     /**************************************************************************
      * 

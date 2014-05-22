@@ -39,7 +39,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 
@@ -65,7 +64,7 @@ import javafx.scene.control.Skin;
  * pane.setShowDetailNode(true);
  * }</pre>
  */
-public class MasterDetailPane extends Control {
+public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Constructs a new pane.

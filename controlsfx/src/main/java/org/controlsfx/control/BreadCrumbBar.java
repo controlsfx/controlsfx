@@ -38,7 +38,6 @@ import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
@@ -56,7 +55,7 @@ import com.sun.javafx.event.EventHandlerManager;
  * <img src="breadCrumbBar.png"/>
  * </center>
  */
-public class BreadCrumbBar<T> extends Control {
+public class BreadCrumbBar<T> extends ControlsFXControl {
 
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 

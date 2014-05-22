@@ -34,7 +34,6 @@ import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
-import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Skin;
 
@@ -89,7 +88,7 @@ import com.sun.javafx.event.EventHandlerManager;
  * @see Hyperlink
  * @see ActionEvent
  */
-public class HyperlinkLabel extends Control implements EventTarget {
+public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
     
     /***************************************************************************
      * 

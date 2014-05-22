@@ -40,7 +40,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -143,7 +142,7 @@ import javafx.scene.image.ImageView;
  * If a selection is explicitly set, its ratio <em>not</em> checked and hence not changed to match a possibly fixed
  * ratio!
  */
-public class SnapshotView extends Control {
+public class SnapshotView extends ControlsFXControl {
 
     /* ************************************************************************
      *                                                                         *

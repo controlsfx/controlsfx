@@ -62,7 +62,7 @@ import com.sun.javafx.css.converters.EnumConverter;
  * 
  * <center> <img src="plus-minus-slider.png"/> </center>
  */
-public class PlusMinusSlider extends Control {
+public class PlusMinusSlider extends ControlsFXControl {
 
 	private static final String DEFAULT_STYLE_CLASS = "plus-minus-slider"; //$NON-NLS-1$
 

@@ -33,7 +33,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 /**
@@ -59,7 +58,7 @@ import javafx.scene.control.Skin;
  * pane.setRight(new ListView());
  * </pre>
  */
-public class HiddenSidesPane extends Control {
+public class HiddenSidesPane extends ControlsFXControl {
 
     /**
      * Constructs a new pane with the given content node and the four side

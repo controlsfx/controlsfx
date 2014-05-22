@@ -29,7 +29,6 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.SegmentedButtonSkin;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -84,7 +83,7 @@ import javafx.scene.control.ToggleGroup;
  * @see ToggleButton
  * @see ToggleGroup
  */
-public class SegmentedButton extends Control {
+public class SegmentedButton extends ControlsFXControl {
     
     /**************************************************************************
      * 

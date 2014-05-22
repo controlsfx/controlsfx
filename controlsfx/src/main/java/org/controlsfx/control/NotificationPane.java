@@ -41,7 +41,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.web.WebView;
 
@@ -145,7 +144,7 @@ import org.controlsfx.control.action.Action;
  * @see Action
  * @see AbstractAction
  */
-public class NotificationPane extends Control {
+public class NotificationPane extends ControlsFXControl {
     
     /***************************************************************************
      * 

@@ -34,7 +34,6 @@ public class Version {
     private final boolean snapshot;
     
     public Version(String version) {
-        System.out.println("Version: " + version);
         snapshot = version.contains("SNAPSHOT");
         version = snapshot ? version.substring(0, version.indexOf("-SNAPSHOT")) : version;
         

@@ -3,6 +3,7 @@ import org.apache.tools.ant.filters.*
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'java'
+apply plugin: 'osgi'
 apply plugin: 'maven'
 
 apply from: 'mavenPublish.gradle'
@@ -81,8 +82,12 @@ jar {
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
 
-    manifest {
-        attributes 'Implementation-Title': 'ControlsFX', 'Implementation-Version': project.version
+    manifest { // the manifest of the default jar is of type OsgiManifest
+        attributes 'Implementation-Title': 'ControlsFX', 'Implementation-Version': project.version, 'Bundle-Name': 'ControlsFX'
+        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
+        instruction 'Export-Package',
+                '!impl.org.controlsfx.*',
+                'org.controlsfx.*'
     }
 }
 

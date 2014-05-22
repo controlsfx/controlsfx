@@ -133,7 +133,7 @@ public class TextFields {
      * 
      * @param textField The {@link TextField} to which auto-completion shall be added
      * @param suggestionProvider A suggestion-provider strategy to use
-     * @return
+     * @return The AutoCompletionBinding
      */
     public static <T> AutoCompletionBinding<T> bindAutoCompletion(TextField textField, 
     		Callback<ISuggestionRequest, Collection<T>> suggestionProvider){
@@ -146,7 +146,7 @@ public class TextFields {
      * 
      * @param textField The {@link TextField} to which auto-completion shall be added
      * @param possibleSuggestions Possible auto-complete suggestions
-     * @return
+     * @return The AutoCompletionBinding
      */
 	public static <T> AutoCompletionBinding<T> bindAutoCompletion(
 			TextField textField, T... possibleSuggestions) {

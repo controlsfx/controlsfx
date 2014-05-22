@@ -223,8 +223,7 @@ public interface SpreadsheetCell {
     public ObservableSet<String> getStyleClass();
 
     /**
-     * Return an ObjectProperty wrapping a Node for the graphic.
-     * @return 
+     * @return an ObjectProperty wrapping a Node for the graphic.
      */
     public ObjectProperty<Node> graphicProperty();
 
@@ -244,8 +243,7 @@ public interface SpreadsheetCell {
     public Node getGraphic();
     
     /**
-     * Return the tooltip associated with this SpreadsheetCell.
-     * @return 
+     * @return the tooltip associated with this SpreadsheetCell.
      */
     public Optional<String> getTooltip();
 }

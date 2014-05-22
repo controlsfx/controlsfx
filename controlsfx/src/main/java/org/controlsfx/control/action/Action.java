@@ -84,7 +84,7 @@ public interface Action {
     public StringProperty longTextProperty();
     
     /**
-     * This graphic that should be shown to the user in relation to this action.
+     * The graphic that should be shown to the user in relation to this action.
      * 
      * @return An observable {@link ObjectProperty} that represents the current
      *      graphic for this property, and which can be observed for changes.

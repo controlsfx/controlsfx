@@ -201,8 +201,8 @@ public class ValidationSupport {
     }
 
     /**
-     * Validation result property. Can be used to track validation result changes 
-     * @return
+     * Can be used to track validation result changes 
+     * @return The Validation result property.
      */
     public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
         return validationResultProperty.getReadOnlyProperty();
@@ -220,8 +220,7 @@ public class ValidationSupport {
     }
 
     /**
-     * Validation state property
-     * @return
+     * @return the Validation state property
      */
     public ReadOnlyObjectProperty<Boolean> invalidProperty() {
         return invalidProperty.getReadOnlyProperty();
@@ -237,8 +236,7 @@ public class ValidationSupport {
     };
 
     /**
-     * Return validation decorator property
-     * @return
+     * @return The Validation decorator property
      */
     public ObjectProperty<ValidationDecoration> validationDecoratorProperty() {
         return validationDecoratorProperty;

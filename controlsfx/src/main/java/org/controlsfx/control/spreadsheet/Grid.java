@@ -76,14 +76,12 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 public interface Grid {
     
     /**
-     * Return how many rows are inside the grid.
-     * @return 
+     * @return how many rows are inside the grid.
      */
     public int getRowCount();
     
     /**
-     * Return how many columns are inside the grid.
-     * @return 
+     * @return how many columns are inside the grid.
      */
     public int getColumnCount();
     

@@ -343,7 +343,7 @@ public class Dialog {
     /**
      * Returns this dialog's window. For lightweight dialogs,
      * this is the window in which this dialog is displayed. 
-     * @return
+     * @return This dialog's window.
      */
     public Window getWindow() {
         return dialog.getWindow();
@@ -438,13 +438,16 @@ public class Dialog {
      * The dialog graphic, presented either in the masthead, if one is showing,
      * or to the left of the {@link #contentProperty() content}.
      *  
-     * @return The currently set dialog graphic.
+     * @return An ObjectProperty wrapping the current graphic.
      */
     public ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
     
-    // auto-generated JavaDoc
+    /**
+     * @see #graphicProperty() 
+     * @return The currently set dialog graphic.
+     */
     public final Node getGraphic() {
         return graphicProperty.get();
     }

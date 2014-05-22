@@ -128,8 +128,7 @@ public class PopOver extends PopupControl {
     /**
      * Creates a pop over with the given node as the content node.
      * 
-     * @param the
-     *            content shown by the pop over
+     * @param content The content shown by the pop over
      */
     public PopOver(Node content) {
         this();
@@ -169,7 +168,7 @@ public class PopOver extends PopupControl {
      * 
      * @return the content node
      * 
-     * @see #contentProperty()
+     * @see #contentNodeProperty() 
      */
     public final Node getContentNode() {
         return contentNodeProperty().get();
@@ -181,7 +180,7 @@ public class PopOver extends PopupControl {
      * @param content
      *            the new content node value
      * 
-     * @see #contentProperty()
+     * @see #contentNodeProperty() 
      */
     public final void setContentNode(Node content) {
         contentNodeProperty().set(content);
@@ -565,7 +564,7 @@ public class PopOver extends PopupControl {
      *            if true the pop over will change its apperance to "detached"
      *            mode
      * 
-     * @see #detachedProperty();
+     * @see #detachedProperty()
      */
     public final void setDetached(boolean detached) {
         detachedProperty().set(detached);
@@ -576,7 +575,7 @@ public class PopOver extends PopupControl {
      * 
      * @return true if the pop over is currently detached.
      * 
-     * @see #detachedProperty();
+     * @see #detachedProperty()
      */
     public final boolean isDetached() {
         return detachedProperty().get();

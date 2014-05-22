@@ -75,11 +75,11 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Image</h3>
  * 
- * To display an image the control provides the {@link #imageProperty() image} and {@link #preserveImageRatioProperty()
+ * To display an image the control provides the {@link ImageView#imageProperty() image} and {@link ImageView#preserveRatioProperty() 
  * preserveImageRatio} properties. Both are used in the same way as in the {@link javafx.scene.image.ImageView
  * ImageView} class:
  * <ul>
- * <li> {@link javafx.scene.image.ImageView#imageProperty() ImageView.imageProperty()}</li>
+ * <li> {@link ImageView#imageProperty() }</li>
  * <li> {@link javafx.scene.image.ImageView#preserveRatioProperty() ImageView.preserveRatioProperty()}<br>
  * The name was slightly adapted by adding the word <i>Image</i> to discern this ratio from the selection ratio (see
  * below).</li>
@@ -87,7 +87,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Size & Alignment</h3>
  * 
- * The control will grow to fill all the available space and the value of the {@link #preserveImageRatioProperty()
+ * The control will grow to fill all the available space and the value of the {@link ImageView#preserveRatioProperty() 
  * preserveImageRatio} property defines how the displayed image will fill this control's space. If it is set to
  * {@code false}, the image will be resized to fill the whole control which will generally include skewing it. If it is
  * set to {@code true}, the image will be resized to the maximal size while preserving its ratio as well as fitting into
@@ -165,7 +165,7 @@ public class SnapshotView extends ControlsFXControl {
     private final ObjectProperty<Rectangle2D> selection;
 
     /**
-     * Indicates whether the current selection is valid. This is the case if the {@link #imageProperty() image} and
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty() image} and
      * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
      * of the image.
      * <p>
@@ -496,7 +496,7 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * Indicates whether the current selection is valid. This is the case if the {@link #imageProperty() image} and
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty()  image} and
      * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
      * of the image.
      * 
@@ -507,7 +507,7 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * Indicates whether the current selection is valid. This is the case if the {@link #imageProperty() image} and
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty()  image} and
      * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
      * of the image.
      * 

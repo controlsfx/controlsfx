@@ -395,7 +395,7 @@ public class ActionUtils {
      * {@link Action actions}.
      * 
      * @param actions The {@link Action actions} to place on the {@link ToolBar}.
-     * @param textBehavior defines {@link TextBahavior}
+     * @param textBehavior defines {@link ActionTextBehavior}
      * @return A {@link ToolBar} that contains {@link Node nodes} which are bound 
      *      to the state of the provided {@link Action}
      */

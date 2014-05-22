@@ -142,27 +142,42 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
     
     
     // --- text
+    private final StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
+    
     /**
-     * The text to display to the user, using the delimiter characters [ and ]
-     * to indicate where hyperlinks should be displayed.
+     * Return a {@link StringProperty} representing the text being displayed.
+     * @return a {@link StringProperty}.
      */
     public final StringProperty textProperty() { 
         return text; 
     }
-    private final StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
+    
+    /**
+     * Return the text currently displayed.
+     * @return the text currently displayed.
+     */
     public final String getText() {
         return text.get();
     }
+    
+    /**
+     * Set a new text to display to the user, using the delimiter characters [ and ]
+     * to indicate where hyperlinks should be displayed.
+     * @param value 
+     */
     public final void setText(String value) {
         text.set(value);
     }
     
     
     // --- onAction
+    private ObjectProperty<EventHandler<ActionEvent>> onAction;
+    
     /**
      * The action, which is invoked whenever a hyperlink is fired. This
      * may be due to the user clicking on the hyperlink with the mouse, or by
      * a touch event, or by a key press.
+     * @return an {@link ObjectProperty} representing the action.
      */
     public final ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
         if (onAction == null) {
@@ -174,12 +189,20 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
         }
         return onAction;
     }
-    private ObjectProperty<EventHandler<ActionEvent>> onAction;
 
+    /**
+     * Sets a new EventHandler which will be invoked whenever a hyperlink is 
+     * fired.
+     * @param value 
+     */
     public final void setOnAction(EventHandler<ActionEvent> value) {
         onActionProperty().set( value);
     }
 
+    /**
+     * 
+     * @return the action, which is invoked whenever a hyperlink is fired.
+     */
     public final EventHandler<ActionEvent> getOnAction() {
         return onAction == null ? null : onAction.get();
     }

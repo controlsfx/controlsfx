@@ -55,8 +55,7 @@ public enum Platform {
     }
     
     /**
-     * Returns current OS 
-     * @return
+     * @return the current OS.
      */
     public static Platform getCurrent() {
         return current;

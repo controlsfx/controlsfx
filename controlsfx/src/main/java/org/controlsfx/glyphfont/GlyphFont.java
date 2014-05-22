@@ -88,10 +88,10 @@ public abstract class GlyphFont {
 	}
 	
 	/**
-	 * Load glyph font from specified {@link URL} 
+	 * Load glyph font from specified URL. 
 	 * @param fontName glyph font name
 	 * @param defaultSize default font size
-	 * @param urlStr {@link URL} to load the font from
+	 * @param urlStr A URL to load the font from
 	 */
 	public GlyphFont( String fontName, int defaultSize, final String urlStr ) {
 		this.fontName = fontName;

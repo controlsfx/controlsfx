@@ -40,9 +40,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 
 /**
  * A {@code SnapshotView} is (in the colloquial not the inheritance sense) an
@@ -706,4 +708,18 @@ public class SnapshotView extends ControlsFXControl {
         selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
     }
 
+    
+    
+    /**
+     * Will return an image of the selection range.
+     */
+    public WritableImage createSnapshot() {
+        if (getNode() != null || getSelection() == null) {
+            SnapshotParameters params = new SnapshotParameters();
+            params.setViewport(getSelection());
+            return getNode().snapshot(params, null);
+        }
+
+        return null;
+    }
 }

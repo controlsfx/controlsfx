@@ -29,7 +29,6 @@ package org.controlsfx.control;
 import static impl.org.controlsfx.tools.MathTools.isInInterval;
 import impl.org.controlsfx.skin.SnapshotViewSkin;
 import impl.org.controlsfx.tools.rectangle.Rectangles2D;
-import javafx.animation.AnimationTimer;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -42,13 +41,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.SnapshotResult;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.util.Callback;
 
 /**
  * A {@code SnapshotView} is (in the colloquial not the inheritance sense) an
@@ -61,7 +57,7 @@ import javafx.util.Callback;
  * 
  * <h3>Screenshots</h3>
  * TODO Does this src-path work? It doesn't in my Eclipse instance.
- * <center><img src="node-range-selector-screenshot.png"></center>
+ * <center><img src="snapshotView.png"></center>
  * 
  * <h3>Code Samples</h3>
  * 

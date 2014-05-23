@@ -77,11 +77,6 @@ public class HelloSnapshotView extends ControlsFXSample {
     // STATIC
 
     /**
-     * The gap used between controls.
-     */
-    private static final double GAP = 5;
-
-    /**
      * The format used to display all numbers in the text fields.
      */
     private static final DecimalFormat zeroDpFormat = new DecimalFormat("0");
@@ -92,9 +87,8 @@ public class HelloSnapshotView extends ControlsFXSample {
      */
     private final String[] nodeNames = new String[] {
         "ControlsFX Logo",
-        "Java's Duke in 3D",
-        "Rotating Node",
-        "The Null Image",
+        "Java's Duke",
+        "Rotating Node"
     };
     
     /**
@@ -135,10 +129,9 @@ public class HelloSnapshotView extends ControlsFXSample {
         rotator.play();
         
         nodes = new Node[] {
-            new ImageView(new Image("http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png")),
-            new ImageView(new Image("http://upload.wikimedia.org/wikipedia/commons/4/45/Duke3D.png")),
-            rotatingRect,
-            null,
+            new ImageView(new Image(getClass().getResource("ControlsFX.png").toExternalForm())),
+            new ImageView(new Image(getClass().getResource("duke_wave.png").toExternalForm())),
+            rotatingRect
         };
         
         displayImageAndNameforIndex(imageIndex);
@@ -314,16 +307,7 @@ public class HelloSnapshotView extends ControlsFXSample {
     private Node createSnapshot() {
         AnimationTimer timer = new AnimationTimer() {
             @Override public void handle(long arg0) {
-                if (selector.getNode() != null || selector.getSelection() == null) {
-                    SnapshotParameters params = new SnapshotParameters();
-                    params.setViewport(selector.getSelection());
-                    selector.getNode().snapshot(new Callback<SnapshotResult, Void>() {
-                        @Override public Void call(SnapshotResult result) {
-                            snapshotImageView.setImage(result.getImage());
-                            return null;
-                        }
-                    }, params, null);
-                }
+                snapshotImageView.setImage(selector.createSnapshot());
             }
         };
         timer.start();

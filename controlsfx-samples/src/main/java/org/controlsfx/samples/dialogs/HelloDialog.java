@@ -29,6 +29,8 @@ package org.controlsfx.samples.dialogs;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
 import impl.org.controlsfx.i18n.Localization;
+import impl.org.controlsfx.i18n.Translation;
+import impl.org.controlsfx.i18n.Translations;
 
 import java.util.Arrays;
 import java.util.List;
@@ -578,19 +580,16 @@ public class HelloDialog extends ControlsFXSample {
 		int row = 0;
 
 		// locale
+		List<Locale> locales = Translations.getAllTranslationLocales();
 		grid.add(createLabel("Locale: ", "property"), 0, row);
 		final ComboBox<Locale> localeCombobox = new ComboBox<Locale>();
-		localeCombobox.getItems()
-				.addAll(Locale.ENGLISH,
-                        new Locale("ru", "RU"),
-                        Locale.FRENCH,
-                        new Locale("es","ES"),
-                        new Locale("pt","PT"),
-                        new Locale("gl","ES"));
+		localeCombobox.getItems().addAll(locales);
 		localeCombobox.valueProperty().addListener((ov, oldValue, newValue) -> Localization.setLocale(newValue));
-		localeCombobox.setValue(localeCombobox.getItems().get(0));
 		grid.add(localeCombobox, 1, row);
 		row++;
+		
+		// set the locale to english by default
+		Translations.getTranslation("en").ifPresent(t -> localeCombobox.setValue(t.getLocale()));
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);

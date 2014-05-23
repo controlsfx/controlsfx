@@ -199,7 +199,7 @@ public class VerticalHeader extends StackPane {
         if (resizing) {
             return;
         }
-        if ((spreadsheetView.isShowRowHeader() || !spreadsheetView.getColumnPickers().isEmpty()) && skin.getCellsSize() > 0) {
+        if ((spreadsheetView.isShowRowHeader() || !spreadsheetView.getRowPickers().isEmpty()) && skin.getCellsSize() > 0) {
 
             double x = snappedLeftInset();
             /**

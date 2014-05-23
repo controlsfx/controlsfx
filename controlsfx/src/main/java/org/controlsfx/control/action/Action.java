@@ -94,7 +94,7 @@ public interface Action extends EventHandler<ActionEvent> {
     
     /**
      * The accelerator {@link KeyCombination} that should be used for this action,
-     * if it is used in an applicable UI control (most notably {@link MenuItem}.
+     * if it is used in an applicable UI control (most notably {@link MenuItem}).
      * 
      * @return An observable {@link ObjectProperty} that represents the current
      *      accelerator for this property, and which can be observed for changes.

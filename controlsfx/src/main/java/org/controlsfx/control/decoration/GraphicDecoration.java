@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,18 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.image.ImageView;
 
+/**
+ * GraphicDecoration is a {@link Decoration} designed to show a graphic (be it
+ * an image loaded via an {@link ImageView} or an arbitrarily complex 
+ * scenegraph in its own right) on top of a given node. GraphicDecoration is
+ * applied as part of the ControlsFX {@link Decorator} API - refer to the 
+ * {@link Decorator} javadoc for more details.
+ * 
+ * @see Decoration
+ * @see Decorator
+ */
 public class GraphicDecoration extends Decoration {
 
     private final Node decorationNode;
@@ -42,14 +53,47 @@ public class GraphicDecoration extends Decoration {
     private final double xOffset;
     private final double yOffset;
 
-    public GraphicDecoration(Node decoration) {
-        this(decoration, Pos.TOP_LEFT);
+    /**
+     * Constructs a new GraphicDecoration with the given decoration node to be 
+     * applied to any node that has this decoration applied to it. By default
+     * the decoration node will be applied in the top-left corner of the node.
+     * 
+     * @param decorationNode The decoration node to apply to any node that has this 
+     *      decoration applied to it 
+     */
+    public GraphicDecoration(Node decorationNode) {
+        this(decorationNode, Pos.TOP_LEFT);
     }
     
+    /**
+     * Constructs a new GraphicDecoration with the given decoration node to be 
+     * applied to any node that has this decoration applied to it, in the location
+     * provided by the {@link Pos position} argument.
+     * 
+     * @param decorationNode The decoration node to apply to any node that has this 
+     *      decoration applied to it 
+     * @param position The location to position the decoration node relative to the 
+     *      node that is being decorated.
+     */
     public GraphicDecoration(Node decorationNode, Pos position) {
         this(decorationNode, position, 0, 0);
     }
     
+    /**
+     * Constructs a new GraphicDecoration with the given decoration node to be 
+     * applied to any node that has this decoration applied to it, in the location
+     * provided by the {@link Pos position} argument, with the given xOffset and
+     * yOffset values used to adjust the position.
+     * 
+     * @param decorationNode The decoration node to apply to any node that has this 
+     *      decoration applied to it 
+     * @param position The location to position the decoration node relative to the 
+     *      node that is being decorated.
+     * @param xOffset The amount of movement to apply to the decoration node in the
+     *      x direction (i.e. left and right).
+     * @param yOffset The amount of movement to apply to the decoration node in the
+     *      y direction (i.e. up and down). 
+     */
     public GraphicDecoration(Node decorationNode, Pos position, double xOffset, double yOffset) {
         this.decorationNode = decorationNode;
         this.decorationNode.setManaged(false);
@@ -58,6 +102,7 @@ public class GraphicDecoration extends Decoration {
         this.yOffset = yOffset;
     }
     
+    /** {@inheritDoc} */
     @Override public Node applyDecoration(Node targetNode) {
         List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
         updateGraphicPosition(targetNode);
@@ -67,6 +112,7 @@ public class GraphicDecoration extends Decoration {
         return null;
     }
     
+    /** {@inheritDoc} */
     @Override public void removeDecoration(Node targetNode) {
         List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
         

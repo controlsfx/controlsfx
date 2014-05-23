@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,9 @@ import javafx.scene.Node;
  * ships with pre-built decorations, including {@link GraphicDecoration} and
  * {@link StyleClassDecoration}.
  * 
+ * <p>To better understand how to use the ControlsFX decoration API in your 
+ * application, refer to the code samples and explanations in {@link Decorator}.
+ * 
  * @see Decorator
  * @see GraphicDecoration
  * @see StyleClassDecoration
@@ -44,6 +47,14 @@ import javafx.scene.Node;
 public abstract class Decoration {
     
     private volatile Map<String,Object> properties;
+    
+    /**
+     * Instantiates a default Decoration instance (obviously only callable by
+     * subclasses).
+     */
+    protected Decoration() {
+        // no-op
+    }
     
 	/**
      * This method decorates the given 

@@ -54,7 +54,6 @@ import javafx.scene.image.ImageView;
  * case the user's resizing will be limited such that the ratio is always upheld.
  * 
  * <h3>Screenshots</h3>
- * TODO Does this src-path work? It doesn't in my Eclipse instance.
  * <center><img src="snapshotView.png"></center>
  * 
  * <h3>Code Samples</h3>

@@ -891,36 +891,58 @@ public final class Dialogs {
         content.setWorker(worker);
     }
     
+    /**
+     * The UserInfo class is used in relation to the pre-built login dialog 
+     * available from {@link Dialogs#showLogin(UserInfo, Callback)}.
+     */
     public static class UserInfo {
     	
     	private String userName;
     	private String password;
     	
+    	/**
+    	 * Creates a UserInfo instance with the given username and password.
+    	 */
 		public UserInfo(String userName, String password) {
 			this.userName = userName == null? "": userName;
 			this.password = password == null? "": password;
 		}
 		
+		/**
+		 * Returns the currently set username.
+		 */
 		public String getUserName() {
 			return userName;
 		}
+		
+		/**
+		 * Sets the username to the given value.
+		 */
 		public void setUserName(String userName) {
 			this.userName = userName;
 		}
+		
+		/**
+         * Returns the currently set password.
+         */
 		public String getPassword() {
 			return password;
 		}
+		
+		/**
+         * Sets the password to the given value.
+         */
 		public void setPassword(String password) {
 			this.password = password;
 		}
 
-		@Override
-		public String toString() {
+		/** {@inheritDoc} */
+		@Override public String toString() {
 			return "UserInfo [userName=" + userName + "]";
 		}
 
-		@Override
-		public int hashCode() {
+		/** {@inheritDoc} */
+		@Override public int hashCode() {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result
@@ -930,8 +952,8 @@ public final class Dialogs {
 			return result;
 		}
 
-		@Override
-		public boolean equals(Object obj) {
+		/** {@inheritDoc} */
+		@Override public boolean equals(Object obj) {
 			if (this == obj)
 				return true;
 			if (obj == null)
@@ -951,10 +973,9 @@ public final class Dialogs {
 				return false;
 			return true;
 		}
-
-		
-		
     }
+    
+    
     
     /**
      * Creates a Login {@link Dialog} whith user name and password  fields

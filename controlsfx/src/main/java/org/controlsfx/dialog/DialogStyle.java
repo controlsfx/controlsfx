@@ -28,7 +28,11 @@
 package org.controlsfx.dialog;
 
 /**
- * This enum defines the possible styles for a dialog.
+ * This enum defines the possible styles for a dialog. Refer to the {@link Dialogs}
+ * class for screenshots of these options.
+ * 
+ * @see Dialogs
+ * @see Dialog
  */
 public enum DialogStyle {
     

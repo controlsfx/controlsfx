@@ -40,11 +40,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 
 /**
  * A {@code SnapshotView} is (in the colloquial not the inheritance sense) an
@@ -68,8 +66,8 @@ import javafx.scene.image.WritableImage;
  * fixes its ratio:
  * 
  * <pre>
- * SnapshotView snapshotView =
- *        new SnapshotView(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
+ SnapshotView snapshotView =
+         new SnapshotView(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
  * snapshotView.setSelection(33, 50, 100, 100);
  * snapshotView.setFixedSelectionRatio(1); // (this is actually the default value)
  * snapshotView.setSelectionRatioFixed(true);
@@ -146,7 +144,83 @@ import javafx.scene.image.WritableImage;
  */
 public class SnapshotView extends ControlsFXControl {
 
-    /***************************************************************************
+    /* ************************************************************************
+     *                                                                         *
+     * Attributes & Properties                                                 *
+     *                                                                         *
+     **************************************************************************/
+
+    // IMAGE VIEW
+
+    /**
+     * The {@link Image} to be painted by this {@code SnapshotView}.
+     */
+    private final ObjectProperty<Node> node;
+
+    // SELECTION
+
+    /**
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     */
+    private final ObjectProperty<Rectangle2D> selection;
+
+    /**
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty() image} and
+     * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
+     * of the image.
+     * <p>
+     * A selection will only be displayed if it is valid (and active).
+     */
+    private final BooleanProperty selectionValid;
+
+    /**
+     * Indicates whether an area is currently selected. A selection will only be displayed if it is active (and valid).
+     * <p>
+     * If {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} is set to
+     * {@code false} (which is the default) this control will update this property immediately after a new
+     * {@link #selectionProperty() selection} is set: if the new selection is {@code null}, it will be set to false;
+     * otherwise to {@code true}. <br>
+     * If {@code selectionActivityExplicitlyManaged} is {@code true} this control will never change this property's
+     * value. In this case it must be managed by the using code but it is possible to unidirectionally bind it to
+     * another property.
+     */
+    private final BooleanProperty selectionActive;
+
+    /**
+     * Indicates whether the {@link #selection} is currently changing due to GUI interaction. This will be set to
+     * {@code true} when changing the selection begins and set to {@code false} when it ends.
+     */
+    private final BooleanProperty selectionChanging;
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() selectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     */
+    private final BooleanProperty selectionRatioFixed;
+
+    /**
+     * The fixed ratio of the selection interpreted as {@code width / height}. If {@link #selectionRatioFixedProperty()
+     * selectionRatioFixed} is {@code true}, this ratio will be upheld by all changes made by GUI interaction. This
+     * explicitly excludes setting the {@link #selectionProperty() selection} property directly in which case the
+     * selection's ratio will not be checked!
+     * <p>
+     * Only strictly positive values are allowed as ratio, otherwise an {@link IllegalArgumentException} is thrown.
+     */
+    private final DoubleProperty fixedSelectionRatio;
+
+    // META
+
+    /**
+     * Indicates whether the {@link #selectionActiveProperty() selectionActive} property will be explicitly managed by
+     * the code using this control. This can be useful if the {@code selectionActive} property should be bound to
+     * another property.
+     */
+    private final BooleanProperty selectionActivityExplicitlyManaged;
+    
+    
+
+    /* ************************************************************************
      *                                                                         *
      * Constructors                                                            *
      *                                                                         *
@@ -242,258 +316,10 @@ public class SnapshotView extends ControlsFXControl {
         Image image = new Image(url);
         setNode(new ImageView(image));
     }
-    
-    
 
-    /***************************************************************************
+    /* ************************************************************************
      *                                                                         *
-     * Stylesheet & Skin Handling                                              *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * The name of the style class used in CSS for instances of this class.
-     */
-    private static final String DEFAULT_STYLE_CLASS = "snapshot-view";
-
-    /** {@inheritDoc} */
-    @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("snapshot-view.css").toExternalForm();
-    }
-
-    /** {@inheritDoc} */
-    @Override protected Skin<?> createDefaultSkin() {
-        return new SnapshotViewSkin(this);
-    }
-
-    
-    
-    /***************************************************************************
-     *                                                                         *
-     * Properties                                                              *
-     *                                                                         *
-     **************************************************************************/
-
-    // --- node
-    /**
-     * The {@link Image} to be painted by this {@code SnapshotView}.
-     */
-    private final ObjectProperty<Node> node;
-
-    public final ObjectProperty<Node> nodeProperty() {
-        return node;
-    }
-
-    public final Node getNode() {
-        return nodeProperty().get();
-    }
-
-    public final void setNode(Node node) {
-        nodeProperty().set(node);
-    }
-
-
-    // --- selection
-    /**
-     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
-     * <p>
-     * This property should not be unidirectionally bound to another one because new values will be set by this control
-     * when the user interacts with the selection.
-     */
-    private final ObjectProperty<Rectangle2D> selection;
-
-    public final ObjectProperty<Rectangle2D> selectionProperty() {
-        return selection;
-    }
-
-    public final Rectangle2D getSelection() {
-        return selectionProperty().get();
-    }
-
-    public final void setSelection(Rectangle2D selection) {
-        selectionProperty().set(selection);
-    }
-
-    /**
-     * Sets the selected area as the rectangle's upper left point's coordinates and the rectangle's width and height.
-     * The coordinates are interpreted relative to the currently shown image.
-     * 
-     * @param upperLeftX
-     *            the x coordinate of the selection's upper left point
-     * @param upperLeftY
-     *            the y coordinate of the selection's upper left point
-     * @param width
-     *            the selection's width
-     * @param height
-     *            the selection's height
-     * 
-     */
-    public final void setSelection(double upperLeftX, double upperLeftY, double width, double height) {
-        selectionProperty().set(new Rectangle2D(upperLeftX, upperLeftY, width, height));
-    }
-    
-    
-    // --- selectionValid
-    /**
-     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty() image} and
-     * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
-     * of the image.
-     * <p>
-     * A selection will only be displayed if it is valid (and active).
-     */
-    private final BooleanProperty selectionValid;
-
-    public final ReadOnlyBooleanProperty selectionValidProperty() {
-        return selectionValid;
-    }
-
-    public final boolean isSelectionValid() {
-        return selectionValidProperty().get();
-    }
-    
-    
-    // --- selectionActive
-    /**
-     * Indicates whether an area is currently selected. A selection will only be displayed if it is active (and valid).
-     * <p>
-     * If {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} is set to
-     * {@code false} (which is the default) this control will update this property immediately after a new
-     * {@link #selectionProperty() selection} is set: if the new selection is {@code null}, it will be set to false;
-     * otherwise to {@code true}. <br>
-     * If {@code selectionActivityExplicitlyManaged} is {@code true} this control will never change this property's
-     * value. In this case it must be managed by the using code but it is possible to unidirectionally bind it to
-     * another property.
-     */
-    private final BooleanProperty selectionActive;
-
-    public final BooleanProperty selectionActiveProperty() {
-        return selectionActive;
-    }
-
-    public final boolean isSelectionActive() {
-        return selectionActiveProperty().get();
-    }
-
-    public final void setSelectionActive(boolean selectionActive) {
-        selectionActiveProperty().set(selectionActive);
-    }
-    
-    
-    // --- selectionChanging
-    
-    /**
-     * Indicates whether the {@link #selection} is currently changing due to GUI interaction. This will be set to
-     * {@code true} when changing the selection begins and set to {@code false} when it ends.
-     * <p>
-     * This property should not be unidirectionally bound to another one because new values will be set by this control
-     * when the user interacts with the selection.
-     */
-    private final BooleanProperty selectionChanging;
-
-    public final BooleanProperty selectionChangingProperty() {
-        // TODO It would be very nice if this could be a read only property
-        // but it is unclear how it could then be edited by 'SnapshotViewBehavior'.
-        return selectionChanging;
-    }
-
-    public final boolean isSelectionChanging() {
-        return selectionChangingProperty().get();
-    }
-    
-    
-    // --- selectionRatioFixed
-    /**
-     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
-     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() selectionRatio}
-     * property will immediately be enforced so consider setting it first.
-     */
-    private final BooleanProperty selectionRatioFixed;
-
-    public final BooleanProperty selectionRatioFixedProperty() {
-        return selectionRatioFixed;
-    }
-
-    public final boolean isSelectionRatioFixed() {
-        return selectionRatioFixedProperty().get();
-    }
-
-    public final void setSelectionRatioFixed(boolean selectionRatioFixed) {
-        selectionRatioFixedProperty().set(selectionRatioFixed);
-    }
-
-    
-    // --- fixedSelectionRatio
-    /**
-     * The fixed ratio of the selection interpreted as {@code width / height}. If {@link #selectionRatioFixedProperty()
-     * selectionRatioFixed} is {@code true}, this ratio will be upheld by all changes made by GUI interaction. This
-     * explicitly excludes setting the {@link #selectionProperty() selection} property directly in which case the
-     * selection's ratio will not be checked!
-     * <p>
-     * Only strictly positive values are allowed as ratio, otherwise an {@link IllegalArgumentException} is thrown.
-     */
-    private final DoubleProperty fixedSelectionRatio;
-    
-    public final DoubleProperty fixedSelectionRatioProperty() {
-        return fixedSelectionRatio;
-    }
-
-    public final double getFixedSelectionRatio() {
-        return fixedSelectionRatioProperty().get();
-    }
-
-    public final void setFixedSelectionRatio(double fixedSelectionRatio) {
-        fixedSelectionRatioProperty().set(fixedSelectionRatio);
-    }
-
-
-    // --- selectionActivityExplicitlyManaged
-    
-    /**
-     * Indicates whether the {@link #selectionActiveProperty() selectionActive} property will be explicitly managed by
-     * the code using this control. This can be useful if the {@code selectionActive} property should be bound to
-     * another property.
-     */
-    private final BooleanProperty selectionActivityExplicitlyManaged;
-
-    public final BooleanProperty selectionActivityExplicitlyManagedProperty() {
-        return selectionActivityExplicitlyManaged;
-    }
-
-    public final boolean isSelectionActivityExplicitlyManaged() {
-        return selectionActivityExplicitlyManagedProperty().get();
-    }
-
-    public final void setSelectionActivityExplicitlyManaged(boolean selectionActivityExplicitlyManaged) {
-        selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
-    }
-
-    
-    
-    /***************************************************************************
-     *                                                                         *
-     * Public API                                                              *
-     *                                                                         *
-     **************************************************************************/
-    
-    /**
-     * Will return an image of the selection range.
-     */
-    public WritableImage createSnapshot() {
-        if (getNode() != null || getSelection() == null) {
-            SnapshotParameters params = new SnapshotParameters();
-            params.setViewport(getSelection());
-            return getNode().snapshot(params, null);
-        }
-        
-        return null;
-    }
-    
-    
-    
-    
-    /***************************************************************************
-     *                                                                         *
-     * Implementation                                                          *
+     * Model State                                                             *
      *                                                                         *
      **************************************************************************/
 
@@ -553,4 +379,332 @@ public class SnapshotView extends ControlsFXControl {
         final Node n = getNode();
         return n == null ? 0 : n.prefHeight(-1);
     }
+    
+
+    /* ************************************************************************
+     *                                                                         *
+     * Style Sheet & Skin Handling                                             *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * The name of the style class used in CSS for instances of this class.
+     */
+    private static final String DEFAULT_STYLE_CLASS = "snapshot-view";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getUserAgentStylesheet() {
+        return getClass().getResource("snapshot-view.css").toExternalForm();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new SnapshotViewSkin(this);
+    }
+
+    /* ************************************************************************
+     *                                                                         *
+     * Property Access                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+    // IMAGE VIEW
+
+    /**
+     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * 
+     * @return the image as a property
+     */
+    public final ObjectProperty<Node> nodeProperty() {
+        return node;
+    }
+
+    /**
+     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * 
+     * @return the image
+     */
+    public final Node getNode() {
+        return nodeProperty().get();
+    }
+
+    /**
+     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * 
+     * @param node the image to set
+     */
+    public void setNode(Node node) {
+        nodeProperty().set(node);
+    }
+
+
+    // SELECTION
+
+    /**
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * <p>
+     * This property should not be unidirectionally bound to another one because new values will be set by this control
+     * when the user interacts with the selection.
+     * 
+     * @return the selection as a property
+     */
+    public ObjectProperty<Rectangle2D> selectionProperty() {
+        return selection;
+    }
+
+    /**
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * 
+     * @return the selection
+     */
+    public Rectangle2D getSelection() {
+        return selectionProperty().get();
+    }
+
+    /**
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * 
+     * @param selection
+     *            the selection to set
+     */
+    public void setSelection(Rectangle2D selection) {
+        selectionProperty().set(selection);
+    }
+
+    /**
+     * Sets the selected area as the rectangle's upper left point's coordinates and the rectangle's width and height.
+     * The coordinates are interpreted relative to the currently shown image.
+     * 
+     * @param upperLeftX
+     *            the x coordinate of the selection's upper left point
+     * @param upperLeftY
+     *            the y coordinate of the selection's upper left point
+     * @param width
+     *            the selection's width
+     * @param height
+     *            the selection's height
+     * 
+     */
+    public void setSelection(double upperLeftX, double upperLeftY, double width, double height) {
+        selectionProperty().set(new Rectangle2D(upperLeftX, upperLeftY, width, height));
+    }
+
+    /**
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty()  image} and
+     * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
+     * of the image.
+     * 
+     * @return the selectionValid as a property
+     */
+    public ReadOnlyBooleanProperty selectionValidProperty() {
+        return selectionValid;
+    }
+
+    /**
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty()  image} and
+     * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
+     * of the image.
+     * 
+     * @return the selectionValid
+     */
+    public boolean isSelectionValid() {
+        return selectionValidProperty().get();
+    }
+
+    /**
+     * Indicates whether an area is currently selected. A selection will only be displayed if it is active (and valid).
+     * <p>
+     * If {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} is set to
+     * {@code false} (which is the default) this control will update this property immediately after a new
+     * {@link #selectionProperty() selection} is set: if the new selection is {@code null}, it will be set to false;
+     * otherwise to {@code true}. <br>
+     * If {@code selectionActivityExplicitlyManaged} is {@code true} this control will never change this property's
+     * value. In this case it must be managed by the using code but it is possible to unidirectionally bind it to
+     * another property.
+     * 
+     * @return the selectionActive as a property
+     */
+    public BooleanProperty selectionActiveProperty() {
+        return selectionActive;
+    }
+
+    /**
+     * Indicates whether an area is currently selected. A selection will only be displayed if it is active (and valid).
+     * <p>
+     * If {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} is set to
+     * {@code false} (which is the default) this control will update this property immediately after a new
+     * {@link #selectionProperty() selection} is set: if the new selection is {@code null}, it will be set to false;
+     * otherwise to {@code true}. <br>
+     * If {@code selectionActivityExplicitlyManaged} is {@code true} this control will never change this property's
+     * value. In this case it must be managed by the using code but it is possible to unidirectionally bind it to
+     * another property.
+     * 
+     * @return whether the selection is active
+     */
+    public boolean isSelectionActive() {
+        return selectionActiveProperty().get();
+    }
+
+    /**
+     * Indicates whether an area is currently selected. A selection will only be displayed if it is active (and valid).
+     * <p>
+     * If {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} is set to
+     * {@code false} (which is the default) this control will update this property immediately after a new
+     * {@link #selectionProperty() selection} is set: if the new selection is {@code null}, it will be set to false;
+     * otherwise to {@code true}. <br>
+     * If {@code selectionActivityExplicitlyManaged} is {@code true} this control will never change this property's
+     * value. In this case it must be managed by the using code, e.g. by unidirectionally binding it to another
+     * property.
+     * 
+     * @param selectionActive
+     *            the new selection active status
+     */
+    public void setSelectionActive(boolean selectionActive) {
+        selectionActiveProperty().set(selectionActive);
+    }
+
+    /**
+     * Indicates whether the {@link #selection} is currently changing due to GUI interaction. This will be set to
+     * {@code true} when changing the selection begins and set to {@code false} when it ends.
+     * <p>
+     * This property should not be unidirectionally bound to another one because new values will be set by this control
+     * when the user interacts with the selection.
+     * 
+     * @return the selectionChanging as a property
+     */
+    public BooleanProperty selectionChangingProperty() {
+        // TODO It would be very nice if this could be a read only property
+        // but it is unclear how it could then be edited by 'SnapshotViewBehavior'.
+        return selectionChanging;
+    }
+
+    /**
+     * Indicates whether the {@link #selection} is currently changing due to GUI interaction. This will be set to
+     * {@code true} when changing the selection begins and set to {@code false} when it ends.
+     * 
+     * @return the selectionChanging
+     */
+    public boolean isSelectionChanging() {
+        return selectionChangingProperty().get();
+    }
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() selectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     * 
+     * @return the selectionRatioFixed as a property
+     */
+    public BooleanProperty selectionRatioFixedProperty() {
+        return selectionRatioFixed;
+    }
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed.
+     * 
+     * @return the selectionRatioFixed
+     */
+    public boolean isSelectionRatioFixed() {
+        return selectionRatioFixedProperty().get();
+    }
+
+    /**
+     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
+     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}
+     * property will immediately be enforced so consider setting it first.
+     * 
+     * @param selectionRatioFixed
+     *            the selectionRatioFixed to set
+     */
+    public void setSelectionRatioFixed(boolean selectionRatioFixed) {
+        selectionRatioFixedProperty().set(selectionRatioFixed);
+    }
+
+    /**
+     * The fixed ratio of the selection interpreted as {@code width / height}. If {@link #selectionRatioFixedProperty()
+     * selectionRatioFixed} is {@code true}, this ratio will be upheld by all changes made by GUI interaction. This
+     * explicitly excludes setting the {@link #selectionProperty() selection} property directly in which case the
+     * selection's ratio will not be checked!
+     * <p>
+     * Only strictly positive values are allowed as ratio, otherwise an {@link IllegalArgumentException} is thrown.
+     * 
+     * @return the fixedSelectionRatio as a property
+     */
+    public DoubleProperty fixedSelectionRatioProperty() {
+        return fixedSelectionRatio;
+    }
+
+    /**
+     * The fixed ratio of the selection interpreted as {@code width / height}. If {@link #selectionRatioFixedProperty()
+     * selectionRatioFixed} is {@code true}, this ratio will be upheld by all changes made by GUI interaction. This
+     * explicitly excludes setting the {@link #selectionProperty() selection} property directly in which case the
+     * selection's ratio will not be checked!
+     * <p>
+     * This will only ever return strictly positive values.
+     * 
+     * @return the fixedSelectionRatio
+     */
+    public double getFixedSelectionRatio() {
+        return fixedSelectionRatioProperty().get();
+    }
+
+    /**
+     * The fixed ratio of the selection interpreted as {@code width / height}. If {@link #selectionRatioFixedProperty()
+     * selectionRatioFixed} is {@code true}, this ratio will be upheld by all changes made by GUI interaction. This
+     * explicitly excludes setting the {@link #selectionProperty() selection} property directly in which case the
+     * selection's ratio will not be checked!
+     * <p>
+     * Only strictly positive values are allowed as ratio, otherwise an {@link IllegalArgumentException} is thrown.
+     * 
+     * @param fixedSelectionRatio
+     *            the fixedSelectionRatio to set
+     * @throws IllegalArgumentException
+     *             if {@code fixedSelectionRatio} is not strictly positive
+     */
+    public void setFixedSelectionRatio(double fixedSelectionRatio) {
+        fixedSelectionRatioProperty().set(fixedSelectionRatio);
+    }
+
+    // META
+
+    /**
+     * Indicates whether the {@link #selectionActiveProperty() selectionActive} property will be explicitly managed by
+     * the code using this control. This can be useful if the {@code selectionActive} property should be bound to
+     * another property.
+     * 
+     * @return the selectionActivityExplicitlyManaged as a property
+     */
+    public BooleanProperty selectionActivityExplicitlyManagedProperty() {
+        return selectionActivityExplicitlyManaged;
+    }
+
+    /**
+     * Indicates whether the {@link #selectionActiveProperty() selectionActive} property will be explicitly managed by
+     * the code using this control. This can be useful if the {@code selectionActive} property should be bound to
+     * another property.
+     * 
+     * @return the selectionActivityExplicitlyManaged
+     */
+    public boolean isSelectionActivityExplicitlyManaged() {
+        return selectionActivityExplicitlyManagedProperty().get();
+    }
+
+    /**
+     * Indicates whether the {@link #selectionActiveProperty() selectionActive} property will be explicitly managed by
+     * the code using this control. This can be useful if the {@code selectionActive} property should be bound to
+     * another property.
+     * 
+     * @param selectionActivityExplicitlyManaged
+     *            the selectionActivityExplicitlyManaged to set
+     */
+    public void setSelectionActivityExplicitlyManaged(boolean selectionActivityExplicitlyManaged) {
+        selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
+    }
+
 }

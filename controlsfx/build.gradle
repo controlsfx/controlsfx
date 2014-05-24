@@ -56,7 +56,6 @@ processResources.dependsOn(generatei18nResources)
 javadoc {
     exclude 'impl/*'
     failOnError = true
-    failOnWarning = true
     classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
     
     options.windowTitle("ControlsFX Project ${version}")

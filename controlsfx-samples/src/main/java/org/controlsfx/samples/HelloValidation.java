@@ -162,7 +162,7 @@ public class HelloValidation extends ControlsFXSample {
         // date picker
         row++;
         DatePicker datePicker =  new DatePicker();
-        validationSupport.registerValidator(datePicker, (Control c, LocalDate newValue) -> 
+        validationSupport.registerValidator(datePicker, false, (Control c, LocalDate newValue) -> 
             ValidationResult.fromWarningIf( datePicker, "The date should be today", !LocalDate.now().equals(newValue)));
 
         root.add(new Label("Date Picker"), 0, row);

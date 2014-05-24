@@ -8,6 +8,7 @@ import javafx.scene.control.Control;
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.Decorator;
 import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.ValidationSupport;
 
 /**
  * Implements common functionality for validation decorators.
@@ -51,10 +52,7 @@ public abstract class AbstractValidationDecoration implements ValidationDecorati
 	 */
 	@Override
 	public void applyValidationDecoration(ValidationMessage message) {
-		for (Decoration d : createValidationDecorations(message)) {
-          setValidationDecoration(d); // mark for validation
-          Decorator.addDecoration(message.getTarget(), d);
-		}
+		createValidationDecorations(message).stream().forEach( d -> decorate( message.getTarget(), d ));
 	}
 
 	/*
@@ -63,10 +61,14 @@ public abstract class AbstractValidationDecoration implements ValidationDecorati
 	 */
 	@Override
 	public void applyRequiredDecoration(Control target) {
-		for (Decoration d : createRequiredDecorations(target)) {
-          setValidationDecoration(d); // mark for validation
-          Decorator.addDecoration(target, d);
+		if ( ValidationSupport.isRequired(target)) { 
+			createRequiredDecorations(target).stream().forEach( d -> decorate( target, d ));
 		}
+	}
+	
+	private void decorate( Control target, Decoration d ) {
+		setValidationDecoration(d); // mark as validation related decoration
+        Decorator.addDecoration(target, d);
 	}
 
 }

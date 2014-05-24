@@ -36,7 +36,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -234,10 +233,10 @@ public class SnapshotView extends ControlsFXControl {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // NODE
-        this.node = new SimpleObjectProperty<Node>(this, "node");
+        this.node = new SimpleObjectProperty<>(this, "node");
 
         // SELECTION
-        this.selection = new SimpleObjectProperty<Rectangle2D>(this, "selection");
+        this.selection = new SimpleObjectProperty<>(this, "selection");
         this.selectionValid = new SimpleBooleanProperty(this, "selectionValid", false);
         this.selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
         this.selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false);
@@ -262,36 +261,24 @@ public class SnapshotView extends ControlsFXControl {
      */
     private void addStateUpdatingListeners() {
         // valid & active
-        node.addListener(new ChangeListener<Node>() {
-            @Override
-            public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
-                updateSelectionValidity();
-            }
+        node.addListener((ObservableValue<? extends Node> observable, Node oldValue, Node newValue) -> {
+            updateSelectionValidity();
         });
-        selection.addListener(new ChangeListener<Rectangle2D>() {
-            @Override
-            public void changed(
-                    ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) {
-                updateSelectionValidity();
-                updateSelectionActiviteState();
-            }
+        
+        selection.addListener((ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) -> {
+            updateSelectionValidity();
+            updateSelectionActiviteState();
         });
 
         // ratio
-        selectionRatioFixed.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                boolean valueChangedToTrue = !oldValue && newValue;
-                if (valueChangedToTrue)
-                    fixSelectionRatio();
-            }
+        selectionRatioFixed.addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            boolean valueChangedToTrue = !oldValue && newValue;
+            if (valueChangedToTrue)
+                fixSelectionRatio();
         });
-        fixedSelectionRatio.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (isSelectionRatioFixed())
-                    fixSelectionRatio();
-            }
+        fixedSelectionRatio.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            if (isSelectionRatioFixed())
+                fixSelectionRatio();
         });
     }
 

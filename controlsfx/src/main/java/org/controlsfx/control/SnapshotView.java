@@ -702,6 +702,11 @@ public class SnapshotView extends ControlsFXControl {
     
     /**
      * Will return an image of the selection range.
+     * 
+     * @return the {@link WritableImage} that will be used to hold the rendered
+     * selection.
+     * 
+     * @see Node#snapshot
      */
     public WritableImage createSnapshot() {
         if (getNode() != null || getSelection() == null) {

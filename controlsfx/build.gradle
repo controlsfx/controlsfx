@@ -14,6 +14,11 @@ commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
 group = commons.controlsfx_group
 version = commons.controlsfx_version
 
+ext {
+    specification_version = commons.controlsfx_specification_version
+    specification_title = commons.controlsfx_specification_title
+    implementation_version = commons.controlsfx_version
+}
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -36,7 +41,7 @@ dependencies {
 }
 
 task native2ascii(type: Copy) {
-    from"src/main/resources"
+    from "src/main/resources"
     into "$buildDir/resources/main"
     include '**/*.properties'
     filter(EscapeUnicode)
@@ -84,7 +89,13 @@ jar {
     exclude '**/oxygen/svg/*'
 
     manifest { // the manifest of the default jar is of type OsgiManifest
-        attributes 'Implementation-Title': 'ControlsFX', 'Implementation-Version': project.version, 'Bundle-Name': 'ControlsFX'
+        attributes (\
+            'Specification-Title': specification_title,\
+            'Specification-Version': specification_version,\
+            'Implementation-Title': 'ControlsFX',\
+            'Implementation-Version': implementation_version,\
+            'Bundle-Name': 'ControlsFX'
+        )
         instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
         instruction 'Export-Package',
                 '!impl.org.controlsfx.*',
@@ -113,4 +124,3 @@ artifacts {
     archives sourceJar
     archives javadocJar
 }
-

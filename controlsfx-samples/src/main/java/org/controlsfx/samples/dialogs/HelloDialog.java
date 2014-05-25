@@ -29,7 +29,6 @@ package org.controlsfx.samples.dialogs;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
 import impl.org.controlsfx.i18n.Localization;
-import impl.org.controlsfx.i18n.Translation;
 import impl.org.controlsfx.i18n.Translations;
 
 import java.util.Arrays;
@@ -61,7 +60,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ButtonBar;

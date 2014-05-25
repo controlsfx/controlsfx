@@ -12,7 +12,12 @@ import org.controlsfx.validation.ValidationSupport;
 
 /**
  * Implements common functionality for validation decorators.
- * Inherit from this class to create custom validation decorator   
+ * This class intended as a base for custom validation decorators   
+ * Custom validation decorator should define only two things:
+ * how 'validation' and 'required' decorations should be created
+ * <br/>
+ * See {@link GraphicValidationDecoration} or {@link StyleClassValidationDecoration} for examples of such implementations.
+ * 
  */
 public abstract class AbstractValidationDecoration implements ValidationDecoration {
 	
@@ -67,7 +72,7 @@ public abstract class AbstractValidationDecoration implements ValidationDecorati
 	}
 	
 	private void decorate( Control target, Decoration d ) {
-		setValidationDecoration(d); // mark as validation related decoration
+		setValidationDecoration(d); // mark as validation specific decoration
         Decorator.addDecoration(target, d);
 	}
 

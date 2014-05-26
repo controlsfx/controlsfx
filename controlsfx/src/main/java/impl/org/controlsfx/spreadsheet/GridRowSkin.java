@@ -101,7 +101,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         if(spreadsheetView.getColumns().size() != gridView.getColumns().size()){
             return;
         }
-        checkState(true);
+        checkState();
         if (cellsMap.isEmpty()) { return; }
 
         final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = getVisibleLeafColumns();

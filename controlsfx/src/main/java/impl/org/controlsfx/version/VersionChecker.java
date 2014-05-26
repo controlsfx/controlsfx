@@ -69,7 +69,9 @@ public class VersionChecker {
         // and later versions.
         
         String[] splitSpecVersion = controlsFXSpecVersion.split("\\.");
-        String[] splitJavaVersion = javaFXVersion.split("\\.");
+        
+        // javaFXVersion may contain '-' like 8.0.20-ea so replace them with '.' before splitting.
+        String[] splitJavaVersion = javaFXVersion.replace('-', '.').split("\\.");
 
         for (int i=0; i < 3; i++) {
             if (Integer.parseInt(splitJavaVersion[i]) < Integer.parseInt(splitSpecVersion[i])) {

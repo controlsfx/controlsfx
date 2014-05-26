@@ -64,8 +64,9 @@ public class VersionChecker {
         // Fortunately, our system is simple at present: we use the
         // 'controlsFXSpec' value to represent what we require. In other
         // words, ControlsFX 8.0.0 has controlsFXSpecVersion of 8.0.0, so it will work on 
-        // JavaFX 8.0.0. Conversely, ControlsFX 8.0.6_20 has a controlsFXSpecVersion of
-        // 8.0.20 (controlsFXSpecTitle of Java 8u20), which means that ControlsFX will only work on JavaFX 8u20.
+        // JavaFX 8.0.0 and later versions. Conversely, ControlsFX 8.0.6_20 has a controlsFXSpecVersion of
+        // 8.0.20 (controlsFXSpecTitle of Java 8u20), which means that ControlsFX will only work on JavaFX 8u20
+        // and later versions.
         
         String[] splitSpecVersion = controlsFXSpecVersion.split("\\.");
         String[] splitJavaVersion = javaFXVersion.split("\\.");

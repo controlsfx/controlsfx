@@ -8,10 +8,16 @@ import javafx.scene.control.Control;
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.Decorator;
 import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.ValidationSupport;
 
 /**
  * Implements common functionality for validation decorators.
- * Inherit from this class to create custom validation decorator   
+ * This class intended as a base for custom validation decorators   
+ * Custom validation decorator should define only two things:
+ * how 'validation' and 'required' decorations should be created
+ * <br/>
+ * See {@link GraphicValidationDecoration} or {@link StyleClassValidationDecoration} for examples of such implementations.
+ * 
  */
 public abstract class AbstractValidationDecoration implements ValidationDecoration {
 	
@@ -51,10 +57,7 @@ public abstract class AbstractValidationDecoration implements ValidationDecorati
 	 */
 	@Override
 	public void applyValidationDecoration(ValidationMessage message) {
-		for (Decoration d : createValidationDecorations(message)) {
-          setValidationDecoration(d); // mark for validation
-          Decorator.addDecoration(message.getTarget(), d);
-		}
+		createValidationDecorations(message).stream().forEach( d -> decorate( message.getTarget(), d ));
 	}
 
 	/*
@@ -63,10 +66,14 @@ public abstract class AbstractValidationDecoration implements ValidationDecorati
 	 */
 	@Override
 	public void applyRequiredDecoration(Control target) {
-		for (Decoration d : createRequiredDecorations(target)) {
-          setValidationDecoration(d); // mark for validation
-          Decorator.addDecoration(target, d);
+		if ( ValidationSupport.isRequired(target)) { 
+			createRequiredDecorations(target).stream().forEach( d -> decorate( target, d ));
 		}
+	}
+	
+	private void decorate( Control target, Decoration d ) {
+		setValidationDecoration(d); // mark as validation specific decoration
+        Decorator.addDecoration(target, d);
 	}
 
 }

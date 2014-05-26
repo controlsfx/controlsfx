@@ -39,7 +39,10 @@ import org.controlsfx.validation.ValidationMessage;
 
 /**
  * Validation decorator to decorate component validation state using two
- * CSS classes for errors and warnings 
+ * CSS classes for errors and warnings.
+ * Here is example of such decoration 
+ * </br> </br>
+ * <img src="StyleClassValidationDecoration.png"/>  
  */
 public class StyleClassValidationDecoration extends AbstractValidationDecoration {
 

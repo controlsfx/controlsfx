@@ -27,6 +27,7 @@
 package impl.org.controlsfx.spreadsheet;
 
 import java.util.Optional;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
@@ -49,6 +50,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
@@ -69,6 +71,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor"; //$NON-NLS-1$
     private static final int TOOLTIP_MAX_WIDTH = 400;
     private static final int WRAP_HEIGHT = 35;
+    private static final Duration FADE_DURATION = Duration.millis(500);
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
@@ -137,6 +140,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     @Override
     public void commitEdit(SpreadsheetCell newValue) {
+        //When commiting, we bring the value smoothly.
+        FadeTransition fadeTransition = new FadeTransition(FADE_DURATION, this);
+        fadeTransition.setFromValue(0);
+        fadeTransition.setToValue(1);
+        fadeTransition.play();
+        
         if (!isEditing()) {
             return;
         }

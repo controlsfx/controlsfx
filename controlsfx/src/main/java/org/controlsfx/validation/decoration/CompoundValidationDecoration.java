@@ -38,7 +38,12 @@ import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.validation.ValidationMessage;
 
 /**
- * Validation decorator which combines several decorators into one 
+ * Validation decoration to combine several existing decorations into one.
+ * Here is example of combining {@link GraphicValidationDecoration} and  {@link StyleClassValidationDecoration} 
+ * </br> </br>
+ * <img src="CompoundValidationDecoration.png"/>  
+ *   
+ * 
  */
 public class CompoundValidationDecoration extends AbstractValidationDecoration {
 

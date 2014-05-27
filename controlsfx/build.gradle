@@ -137,10 +137,3 @@ artifacts {
     archives javadocJar
 }
 
-//def String getPropertyValue (String propertyName) {
-//    if (thhasProperty(propertyName)) {
-//        username = this.property("transifex.username")
-//        println username
-//        project.
-//    }
-//}

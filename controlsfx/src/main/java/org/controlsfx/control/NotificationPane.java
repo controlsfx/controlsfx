@@ -257,9 +257,20 @@ public class NotificationPane extends ControlsFXControl {
     public final ObjectProperty<Node> contentProperty() {
         return content;
     }
+    
+    /**
+     * Set the content to be shown in the scene, 
+     * <strong>that is not within</strong> the notification bar.
+     * @param value 
+     */
     public final void setContent(Node value) {
         this.content.set(value); 
     }
+    
+    /**
+     * 
+     * @return The content shown in the scene.
+     */
     public final Node getContent() {
         return content.get();
     }
@@ -278,9 +289,23 @@ public class NotificationPane extends ControlsFXControl {
     public final StringProperty textProperty() {
         return text;
     }
+    
+    /**
+     * Sets the text to show within the popup 
+     * notification bar that appears on top of the 
+     * {@link #contentProperty() content}.
+     * @param value 
+     */
     public final void setText(String value) {
         this.text.set(value); 
     }
+    
+    /**
+     * 
+     * @return the text showing within the popup 
+     * notification bar that appears on top of the 
+     * {@link #contentProperty() content}.
+     */
     public final String getText() {
         return text.get();
     }
@@ -301,9 +326,21 @@ public class NotificationPane extends ControlsFXControl {
     public final ObjectProperty<Node> graphicProperty() {
         return graphic;
     }
+    
+    /**
+     * Sets the {@link Node} to show within the popup 
+     * notification bar.
+     * @param value 
+     */
     public final void setGraphic(Node value) {
         this.graphic.set(value); 
     }
+    
+    /**
+     * 
+     * @return the {@link Node} to show within the popup 
+     * notification bar.
+     */
     public final Node getGraphic() {
         return graphic.get();
     }
@@ -317,7 +354,7 @@ public class NotificationPane extends ControlsFXControl {
      * should be showing to the user or not. To toggle visibility, use the
      * {@link #show()} and {@link #hide()} methods.
      * 
-     * @return A property representing whether the notifications bar is currently showing.
+     * @return A property representing whether the notification bar is currently showing.
      */
     public final ReadOnlyBooleanProperty showingProperty() {
         return showing.getReadOnlyProperty();
@@ -325,6 +362,10 @@ public class NotificationPane extends ControlsFXControl {
     private final void setShowing(boolean value) {
         this.showing.set(value); 
     }
+    /**
+     * 
+     * @return whether the notification bar is currently showing.
+     */
     public final boolean isShowing() {
         return showing.get();
     }
@@ -342,7 +383,7 @@ public class NotificationPane extends ControlsFXControl {
     
     /**
      * A property representing whether the notification bar should appear from the
-     * top  or the bottom of the NotificationPane area. By default it will appear 
+     * top or the bottom of the NotificationPane area. By default it will appear 
      * from the top, but this can be changed by setting this property to false.
      * 
      * @return A property representing where the notification bar should appear from.
@@ -350,9 +391,20 @@ public class NotificationPane extends ControlsFXControl {
     public final BooleanProperty showFromTopProperty() {
         return showFromTop;
     }
+    
+    /**
+     * Sets whether the notification bar should appear from the
+     * top or the bottom of the NotificationPane area.
+     * @param value 
+     */
     public final void setShowFromTop(boolean value) {
         this.showFromTop.set(value); 
     }
+    
+    /**
+     * @return whether the notification bar is appearing from the
+     * top or the bottom of the NotificationPane area.
+     */
     public final boolean isShowFromTop() {
         return showFromTop.get();
     }

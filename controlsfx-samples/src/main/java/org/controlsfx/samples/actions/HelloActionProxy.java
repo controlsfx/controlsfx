@@ -177,7 +177,7 @@ public class HelloActionProxy extends ControlsFXSample {
         
         Action toggleAction = new AbstractAction("Enable/Disable") {
 
-            @Override public void execute(ActionEvent ae) {
+            @Override public void handle(ActionEvent ae) {
                Action action = cbActions.getSelectionModel().getSelectedItem();
                if ( action != null ) {
                    BooleanProperty p = action.disabledProperty();

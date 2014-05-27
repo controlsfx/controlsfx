@@ -35,7 +35,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCombination;
@@ -96,12 +95,18 @@ public abstract class AbstractAction implements Action {
         return textProperty;
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * 
+     * @return the text of the Action.
+     */
     public final String getText() {
         return textProperty.get();
     }
 
-    //  javadoc auto-generated from property
+    /**
+     * Sets the text of the Action.
+     * @param value 
+     */
     public final void setText(String value) {
         textProperty.set(value);
     }
@@ -115,12 +120,20 @@ public abstract class AbstractAction implements Action {
         return disabledProperty;
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * 
+     * @return whether the action is available to the end user,
+     * or whether it should appeared 'grayed out'.
+     */
     public final boolean isDisabled() {
         return disabledProperty.get();
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * Sets whether the action should be available to the end user,
+     * or whether it should appeared 'grayed out'.
+     * @param value 
+     */
     public final void setDisabled(boolean value) {
         disabledProperty.set(value);
     }
@@ -134,12 +147,19 @@ public abstract class AbstractAction implements Action {
         return longTextProperty;
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * @see #longTextProperty() 
+     * @return The longer form of the text to show to the user
+     */
     public final String getLongText() {
         return Localization.localize(longTextProperty.get());
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * Sets the longer form of the text to show to the user
+     * @param value 
+     * @see #longTextProperty() 
+     */
     public final void setLongText(String value) {
         longTextProperty.set(value);
     }
@@ -153,12 +173,18 @@ public abstract class AbstractAction implements Action {
         return graphicProperty;
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * 
+     * @return The graphic that should be shown to the user in relation to this action.
+     */
     public final Node getGraphic() {
         return graphicProperty.get();
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * Sets the graphic that should be shown to the user in relation to this action.
+     * @param value 
+     */
     public final void setGraphic(Node value) {
         graphicProperty.set(value);
     }
@@ -172,12 +198,20 @@ public abstract class AbstractAction implements Action {
         return acceleratorProperty;
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * 
+     * @return The accelerator {@link KeyCombination} that should be used for this action,
+     * if it is used in an applicable UI control
+     */
     public final KeyCombination getAccelerator() {
         return acceleratorProperty.get();
     }
     
-    //  javadoc auto-generated from property
+    /**
+     * Sets the accelerator {@link KeyCombination} that should be used for this action,
+     * if it is used in an applicable UI control
+     * @param value 
+     */
     public final void setAccelerator(KeyCombination value) {
         acceleratorProperty.set(value);
     }
@@ -200,7 +234,4 @@ public abstract class AbstractAction implements Action {
      * 
      **************************************************************************/
     
-    // --- execute
-    /** {@inheritDoc} */
-    @Override public abstract void execute(ActionEvent ae);
 }

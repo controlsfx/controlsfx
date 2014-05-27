@@ -151,7 +151,7 @@ public class ActionGroup extends AbstractAction {
     /**
      * By default the execute method in an ActionGroup is a no-op.
      */
-    @Override public final void execute(ActionEvent ae) {
+    @Override public final void handle(ActionEvent ae) {
         // no-op
     }
 

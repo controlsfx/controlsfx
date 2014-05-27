@@ -226,7 +226,7 @@ public class PlusMinusSlider extends ControlsFXControl {
 	 * Returns the event handler that will be notified when the adjuster's value
 	 * changes.
 	 * 
-	 * @return
+	 * @return An EventHandler.
 	 */
 	public final EventHandler<PlusMinusEvent> getOnValueChanged() {
 		return onValueChangedProperty().get();

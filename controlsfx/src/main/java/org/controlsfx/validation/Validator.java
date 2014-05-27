@@ -56,7 +56,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
     /**
      * Factory method to create a validator, which checks if value exists. 
      * Error is created if not if value does not exist 
-     * @param text of a error to be created if value is invalid
+     * @param message of a error to be created if value is invalid
      * @return new validator
      */
     public static <T> Validator<T> createEmptyValidator(final String message) {
@@ -65,7 +65,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
 
     /**
      * Factory method to create a validator, which if value exists in the provided collection. 
-     * @param message text of a message to be created if value is not found
+     * @param values text of a message to be created if value is not found
      * @param severity severity of a message to be created if value is found
      * @return new validator
      */
@@ -77,6 +77,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * Factory method to create a validator, which checks if value exists in the provided collection. 
      * Error is created if not found 
      * @param message text of a error to be created if value is not found
+     * @param values
      * @return new validator
      */
     public static <T> Validator<T> createEqualsValidator(final String message, final Collection<T> values) {

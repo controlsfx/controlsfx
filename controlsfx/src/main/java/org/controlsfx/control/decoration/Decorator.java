@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,32 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 
 /**
  * The Decorator class is responsible for accessing decorations for a given node.
  * Through this class you may therefore add and remove decorations as desired.
+ * 
+ * <h3>Code Example</h3>
+ * <p>Say you have a {@link TextField} that you want to decorate. You would simply
+ * do the following:
+ * 
+ * <pre>
+ * {@code 
+ * TextField textfield = new TextField();
+ * Node decoration = ... // could be an ImageView or any Node!
+ * Decorator.addDecoration(textfield, new GraphicDecoration(decoration, Pos.CENTER_RIGHT));}
+ * </pre>
+ * 
+ * <p>Similarly, if we wanted to add a CSS style class (e.g. because we have some 
+ * css that knows to make the 'warning' style class turn the TextField a lovely
+ * shade of bright red, we would simply do the following:
+ * 
+ * <pre>
+ * {@code 
+ * TextField textfield = new TextField();
+ * Decorator.addDecoration(textfield, new StyleClassDecoration("warning");}
+ * </pre>
  * 
  * @see Decoration
  */
@@ -52,7 +74,7 @@ public class Decorator {
      *                                                                         *
      **************************************************************************/
 
-    public final static String DECORATIONS_PROPERTY_KEY = "$org.controlsfx.decorations$"; //$NON-NLS-1$
+    private final static String DECORATIONS_PROPERTY_KEY = "$org.controlsfx.decorations$"; //$NON-NLS-1$
 
     
     

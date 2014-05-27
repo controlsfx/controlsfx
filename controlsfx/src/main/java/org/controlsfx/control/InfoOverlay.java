@@ -72,7 +72,7 @@ public class InfoOverlay extends ControlsFXControl {
      * to load an image, and to place the given text string over top of it.
      * 
      * @param imageUrl The image file to attempt to load.
-     * @param info The text to display over top of the image.
+     * @param text The text to display over top of the image.
      */
     public InfoOverlay(String imageUrl, String text) {
         this(new ImageView(imageUrl), text);
@@ -83,8 +83,8 @@ public class InfoOverlay extends ControlsFXControl {
      * an arbitrarily complex node / scenegraph, or a simple ImageView, for example),
      * and places the given text string over top of it.
      * 
-     * @param Node The arbitrarily complex scenegraph over which the text will be displayed.
-     * @param info The text to display over top of the node.
+     * @param content The arbitrarily complex scenegraph over which the text will be displayed.
+     * @param text The text to display over top of the node.
      */
     public InfoOverlay(Node content, String text) {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
@@ -101,9 +101,7 @@ public class InfoOverlay extends ControlsFXControl {
      *                                                                         *
      **************************************************************************/
     
-    /**
-     * {@inheritDoc}
-     */    
+    /** {@inheritDoc} */   
     @Override protected Skin<?> createDefaultSkin() {
         return new InfoOverlaySkin(this);
     }
@@ -117,57 +115,90 @@ public class InfoOverlay extends ControlsFXControl {
      **************************************************************************/
 
     // --- content
+     private ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content"); //$NON-NLS-1$
+     
     /**
-     * Specifies the arbitrarily complex scenegraph over which the text will be 
-     * displayed.
+     * 
+     * @return an {@link ObjectProperty} containing the arbitrarily complex
+     * scenegraph over which the text will be displayed.
      */
     public final ObjectProperty<Node> contentProperty() {
         return content;
     }
-    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content"); //$NON-NLS-1$
 
+    /**
+     * Sets a new value for the {@link #contentProperty() }.
+     * @param content 
+     */
     public final void setContent(Node content) {
         contentProperty().set(content);
     }
 
+    /**
+     * 
+     * @return the arbitrarily complex scenegraph over which the text will be 
+     * displayed.
+     */
     public final Node getContent() {
         return contentProperty().get();
     }
 
     
     // --- text
+    
+    private StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
+    
     /**
-     * Specifies the text to display over top of the {@link #contentProperty() content}.
+     * @return A {@link StringProperty} representing the text displayed over top
+     * of the {@link #contentProperty() content}.
      */
     public final StringProperty textProperty() {
         return text;
     }
-    private StringProperty text = new SimpleStringProperty(this, "text"); //$NON-NLS-1$
 
+    /**
+     * 
+     * @return The text displayed over top of the {@link #contentProperty() content}.
+     */
     public final String getText() {
         return textProperty().get();
     }
 
+    /**
+     * Specifies the text to display over top of the {@link #contentProperty() content}.
+     * @param text 
+     */
     public final void setText(String text) {
         textProperty().set(text);
     }
     
     
     // --- showOnHover
+    private BooleanProperty showOnHover = new SimpleBooleanProperty(this, "showOnHover", true); //$NON-NLS-1$
+    
     /**
-     * Specifies whether to show the overlay on hover of the content node (and 
-     * to hide it again when the content is no longer being hovered). By default 
-     * this is true. 
+     * 
+     * @return A {@link BooleanProperty} representing whether the overlay on 
+     * hover of the content node is showing.
      */
     public final BooleanProperty showOnHoverProperty() {
         return showOnHover;
     }
-    private BooleanProperty showOnHover = new SimpleBooleanProperty(this, "showOnHover", true); //$NON-NLS-1$
 
+    /**
+     * 
+     * @return whether the overlay on hover of the content node is showing.
+     */
     public final boolean isShowOnHover() {
         return showOnHoverProperty().get();
     }
 
+    /**
+     * Specifies whether to show the overlay on hover of the content node (and 
+     * to hide it again when the content is no longer being hovered). By default 
+     * this is true. 
+     * @param value 
+     */
     public final void setShowOnHover(boolean value) {
         showOnHoverProperty().set(value);
     }

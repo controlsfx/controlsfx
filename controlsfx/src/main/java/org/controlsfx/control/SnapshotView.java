@@ -36,50 +36,50 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 
 /**
- * A {@code SnapshotView} is (in the colloquial not the inheritance sense) an
- * {@link javafx.scene.image.ImageView ImageView} which allows the user to select an area of the image in the typical
- * manner used by picture editors:
+ * A {@code SnapshotView} is a control which allows the user to select an area
+ * of a node in the typical manner used by picture editors.
  * <p>
- * While holding the left mouse key down, a rectangular selection can be drawn onto the image. This selection can be
+ * While holding the left mouse key down, a rectangular selection can be drawn onto a node. This selection can be
  * moved, resized in eight cardinal directions and removed. Additionally, the selection's ratio can be fixed in which
  * case the user's resizing will be limited such that the ratio is always upheld.
  * 
  * <h3>Screenshots</h3>
- * TODO Does this src-path work? It doesn't in my Eclipse instance.
- * <center><img src="node-range-selector-screenshot.png"></center>
+ * <center><img src="snapshotView.png"></center>
  * 
  * <h3>Code Samples</h3>
  * 
- * {@code SnapshotView} offers the same constructors as {@code ImageView}. All additional functionality regarding
- * the selection must be set using the typical accessor functions.
  * <p>
  * The following snippet creates a new instance with the ControlsFX logo loaded from the web, sets a selected area and
  * fixes its ratio:
  * 
  * <pre>
- SnapshotView snapshotView =
+ * SnapshotView snapshotView =
          new SnapshotView(&quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
  * snapshotView.setSelection(33, 50, 100, 100);
  * snapshotView.setFixedSelectionRatio(1); // (this is actually the default value)
  * snapshotView.setSelectionRatioFixed(true);
  * </pre>
  * 
+ * All additional functionality regarding the selection must be set using the
+ * typical accessor functions.
+ * 
  * <h3>Image</h3>
  * 
- * To display an image the control provides the {@link #imageProperty() image} and {@link #preserveImageRatioProperty()
+ * To display an image the control provides the {@link ImageView#imageProperty() image} and {@link ImageView#preserveRatioProperty() 
  * preserveImageRatio} properties. Both are used in the same way as in the {@link javafx.scene.image.ImageView
  * ImageView} class:
  * <ul>
- * <li> {@link javafx.scene.image.ImageView#imageProperty() ImageView.imageProperty()}</li>
+ * <li> {@link ImageView#imageProperty() }</li>
  * <li> {@link javafx.scene.image.ImageView#preserveRatioProperty() ImageView.preserveRatioProperty()}<br>
  * The name was slightly adapted by adding the word <i>Image</i> to discern this ratio from the selection ratio (see
  * below).</li>
@@ -87,7 +87,7 @@ import javafx.scene.image.ImageView;
  * 
  * <h3>Size & Alignment</h3>
  * 
- * The control will grow to fill all the available space and the value of the {@link #preserveImageRatioProperty()
+ * The control will grow to fill all the available space and the value of the {@link ImageView#preserveRatioProperty() 
  * preserveImageRatio} property defines how the displayed image will fill this control's space. If it is set to
  * {@code false}, the image will be resized to fill the whole control which will generally include skewing it. If it is
  * set to {@code true}, the image will be resized to the maximal size while preserving its ratio as well as fitting into
@@ -97,13 +97,13 @@ import javafx.scene.image.ImageView;
  * 
  * The selected area is represented by the {@link SnapshotView#selectionProperty() selection} property. It
  * contains a {@link Rectangle2D}, which is immutable so the selection can only be changed by setting a new one. The
- * rectangle's coordinates are interpreted relative to the image.
+ * rectangle's coordinates are interpreted relative to the node.
  * <p>
  * The selection is only displayed if it is valid and active (see below).
  * 
  * <h4>Valid</h4>
  * 
- * If a selection is not fully contained in the bounds of the current image, it is invalid. This will be indicated by
+ * If a selection is not fully contained in the bounds of the current node, it is invalid. This will be indicated by
  * the {@link #selectionValidProperty selectionValid} property.
  * 
  * <h4>Active</h4>
@@ -150,24 +150,24 @@ public class SnapshotView extends ControlsFXControl {
      *                                                                         *
      **************************************************************************/
 
-    // IMAGE VIEW
+    // NODE
 
     /**
-     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * The {@link Node} to be painted by this {@code SnapshotView}.
      */
     private final ObjectProperty<Node> node;
 
     // SELECTION
 
     /**
-     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown node.
      */
     private final ObjectProperty<Rectangle2D> selection;
 
     /**
-     * Indicates whether the current selection is valid. This is the case if the {@link #imageProperty() image} and
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty() image} and
      * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
-     * of the image.
+     * of the node.
      * <p>
      * A selection will only be displayed if it is valid (and active).
      */
@@ -232,11 +232,11 @@ public class SnapshotView extends ControlsFXControl {
     public SnapshotView() {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
-        // IMAGE VIEW
-        this.node = new SimpleObjectProperty<Node>(this, "node");
+        // NODE
+        this.node = new SimpleObjectProperty<>(this, "node");
 
         // SELECTION
-        this.selection = new SimpleObjectProperty<Rectangle2D>(this, "selection");
+        this.selection = new SimpleObjectProperty<>(this, "selection");
         this.selectionValid = new SimpleBooleanProperty(this, "selectionValid", false);
         this.selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
         this.selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false);
@@ -261,48 +261,36 @@ public class SnapshotView extends ControlsFXControl {
      */
     private void addStateUpdatingListeners() {
         // valid & active
-        node.addListener(new ChangeListener<Node>() {
-            @Override
-            public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
-                updateSelectionValidity();
-            }
+        node.addListener((ObservableValue<? extends Node> observable, Node oldValue, Node newValue) -> {
+            updateSelectionValidity();
         });
-        selection.addListener(new ChangeListener<Rectangle2D>() {
-            @Override
-            public void changed(
-                    ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) {
-                updateSelectionValidity();
-                updateSelectionActiviteState();
-            }
+        
+        selection.addListener((ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) -> {
+            updateSelectionValidity();
+            updateSelectionActiviteState();
         });
 
         // ratio
-        selectionRatioFixed.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                boolean valueChangedToTrue = !oldValue && newValue;
-                if (valueChangedToTrue)
-                    fixSelectionRatio();
-            }
+        selectionRatioFixed.addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            boolean valueChangedToTrue = !oldValue && newValue;
+            if (valueChangedToTrue)
+                fixSelectionRatio();
         });
-        fixedSelectionRatio.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (isSelectionRatioFixed())
-                    fixSelectionRatio();
-            }
+        fixedSelectionRatio.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            if (isSelectionRatioFixed())
+                fixSelectionRatio();
         });
     }
 
     /**
-     * Creates a new SnapshotView using the specified image.
+     * Creates a new SnapshotView using the specified node.
      * 
-     * @param image
-     *            the image to show after construction
+     * @param node
+     *            the node to show after construction
      */
-    public SnapshotView(Image image) {
+    public SnapshotView(Node node) {
         this();
-        setNode(new ImageView(image));
+        setNode(node);
     }
 
     /**
@@ -414,30 +402,30 @@ public class SnapshotView extends ControlsFXControl {
      *                                                                         *
      **************************************************************************/
 
-    // IMAGE VIEW
+    // NODE
 
     /**
-     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * The {@link Node} to be painted by this {@code SnapshotView}.
      * 
-     * @return the image as a property
+     * @return the node as a property
      */
     public final ObjectProperty<Node> nodeProperty() {
         return node;
     }
 
     /**
-     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * The {@link Node} to be painted by this {@code SnapshotView}.
      * 
-     * @return the image
+     * @return the node
      */
     public final Node getNode() {
         return nodeProperty().get();
     }
 
     /**
-     * The {@link Image} to be painted by this {@code SnapshotView}.
+     * The {@link Node} to be painted by this {@code SnapshotView}.
      * 
-     * @param node the image to set
+     * @param node the node to set
      */
     public void setNode(Node node) {
         nodeProperty().set(node);
@@ -447,7 +435,8 @@ public class SnapshotView extends ControlsFXControl {
     // SELECTION
 
     /**
-     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * The selected area as a rectangle.
+     * The coordinates are interpreted relative to the currently shown node.
      * <p>
      * This property should not be unidirectionally bound to another one because new values will be set by this control
      * when the user interacts with the selection.
@@ -459,7 +448,8 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * The selected area as a rectangle.
+     * The coordinates are interpreted relative to the currently shown node.
      * 
      * @return the selection
      */
@@ -468,7 +458,8 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * The selected area as a rectangle. The coordinates are interpreted relative to the currently shown image.
+     * The selected area as a rectangle.
+     * The coordinates are interpreted relative to the currently shown node.
      * 
      * @param selection
      *            the selection to set
@@ -479,7 +470,7 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * Sets the selected area as the rectangle's upper left point's coordinates and the rectangle's width and height.
-     * The coordinates are interpreted relative to the currently shown image.
+     * The coordinates are interpreted relative to the currently shown node.
      * 
      * @param upperLeftX
      *            the x coordinate of the selection's upper left point
@@ -496,9 +487,9 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * Indicates whether the current selection is valid. This is the case if the {@link #imageProperty() image} and
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty()  image} and
      * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
-     * of the image.
+     * of the node.
      * 
      * @return the selectionValid as a property
      */
@@ -507,9 +498,9 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * Indicates whether the current selection is valid. This is the case if the {@link #imageProperty() image} and
+     * Indicates whether the current selection is valid. This is the case if the {@link ImageView#imageProperty()  image} and
      * {@link #selectionProperty() selection} properties are not null and the selection rectangle lies within the bounds
-     * of the image.
+     * of the node.
      * 
      * @return the selectionValid
      */
@@ -707,4 +698,23 @@ public class SnapshotView extends ControlsFXControl {
         selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
     }
 
+    
+    
+    /**
+     * Will return an image of the selection range.
+     * 
+     * @return the {@link WritableImage} that will be used to hold the rendered
+     * selection.
+     * 
+     * @see Node#snapshot
+     */
+    public WritableImage createSnapshot() {
+        if (getNode() != null || getSelection() == null) {
+            SnapshotParameters params = new SnapshotParameters();
+            params.setViewport(getSelection());
+            return getNode().snapshot(params, null);
+        }
+
+        return null;
+    }
 }

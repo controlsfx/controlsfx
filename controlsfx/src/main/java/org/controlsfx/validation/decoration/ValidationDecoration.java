@@ -31,18 +31,21 @@ import javafx.scene.control.Control;
 import org.controlsfx.validation.ValidationMessage;
 
 /**
- * Contract for validation decorators
+ * Contract for validation decorators.
+ * Classes implementing this interface are used for decorating components with error/warning conditions, if such exists.
+ * They also used for marking 'required' components.
  */
 public interface ValidationDecoration {
 
     /**
-     * Removes all validation decorations from the target control
+     * Removes all validation specific decorations from the target control.
+     * Non-validation specific decorations are left untouched.
      * @param target
      */
     void removeDecorations(Control target);
 	
     /**
-     * Applies validation decoration for a given validation message
+     * Applies validation decoration based on a given validation message
      * @param message validation message
      */
     void applyValidationDecoration(ValidationMessage message);

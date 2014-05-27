@@ -218,6 +218,10 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+        * Constructor for the ObjectEditor..
+        * @param view The SpreadsheetView
+        */
         public ObjectEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -284,6 +288,10 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the StringEditor.
+         * @param view The SpreadsheetView
+         */
         public StringEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -355,7 +363,10 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
-        /** {@inheritDoc} */
+        /**
+         * Constructor for the DoubleEditor.
+         * @param view The SpreadsheetView.
+         */
         public DoubleEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -459,6 +470,10 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the IntegerEditor.
+         * @param view the SpreadsheetView
+         */
         public IntegerEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -561,6 +576,11 @@ public abstract class SpreadsheetCellEditor {
          * * Constructor * *
          **************************************************************************/
 
+        /**
+         * Constructor for the ListEditor.
+         * @param view The SpreadsheetView
+         * @param itemList The items to display in the editor.
+         */
         public ListEditor(SpreadsheetView view, final List<String> itemList) {
             super(view);
             this.itemList = itemList;
@@ -650,6 +670,11 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the DateEditor.
+         * @param view the SpreadsheetView
+         * @param converter A Converter for converting a date to a String.
+         */
         public DateEditor(SpreadsheetView view, StringConverter<LocalDate> converter) {
             super(view);
             datePicker = new DatePicker();

@@ -343,7 +343,7 @@ public class Dialog {
     /**
      * Returns this dialog's window. For lightweight dialogs,
      * this is the window in which this dialog is displayed. 
-     * @return
+     * @return This dialog's window.
      */
     public Window getWindow() {
         return dialog.getWindow();
@@ -438,13 +438,16 @@ public class Dialog {
      * The dialog graphic, presented either in the masthead, if one is showing,
      * or to the left of the {@link #contentProperty() content}.
      *  
-     * @return The currently set dialog graphic.
+     * @return An ObjectProperty wrapping the current graphic.
      */
     public ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
     
-    // auto-generated JavaDoc
+    /**
+     * @see #graphicProperty() 
+     * @return The currently set dialog graphic.
+     */
     public final Node getGraphic() {
         return graphicProperty.get();
     }
@@ -694,7 +697,7 @@ public class Dialog {
          * Implementation of default dialog action execution logic:
          * if action is enabled set it as dialog result.
          */
-        default public void execute(ActionEvent ae) {
+        default public void handle(ActionEvent ae) {
             if (! disabledProperty().get()) {
                 if (ae.getSource() instanceof Dialog ) {
                     ((Dialog) ae.getSource()).setResult(this);
@@ -830,8 +833,8 @@ public class Dialog {
          */
         private Actions(String title, ButtonType type, ActionTrait... traits) {
             this.action = new AbstractAction(title) {
-                @Override public void execute(ActionEvent ae) {
-                    Actions.this.execute(ae);
+                @Override public void handle(ActionEvent ae) {
+                    Actions.this.handle(ae);
                 }
             };
             this.traits = EnumSet.copyOf(Arrays.asList(traits));
@@ -873,8 +876,8 @@ public class Dialog {
         }
 
         /** {@inheritDoc} */
-        @Override public void execute(ActionEvent ae) {
-        	DialogAction.super.execute(ae);
+        @Override public void handle(ActionEvent ae) {
+        	DialogAction.super.handle(ae);
         }
         
         /** {@inheritDoc} */
@@ -1089,7 +1092,7 @@ public class Dialog {
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {
-                action.execute(new ActionEvent(Dialog.this, ae.getTarget()));
+                action.handle(new ActionEvent(Dialog.this, ae.getTarget()));
                 result = action;
             }
         });

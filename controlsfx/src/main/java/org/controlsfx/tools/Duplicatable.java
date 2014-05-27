@@ -26,6 +26,8 @@
  */
 package org.controlsfx.tools;
 
+import javafx.scene.Node;
+
 /**
  * An interface used in ControlsFX to represent something that can be duplicated,
  * as in the JavaFX scenegraph it is not possible to insert the same 

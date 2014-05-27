@@ -157,7 +157,7 @@ public class HelloPropertySheet extends ControlsFXSample {
         }
 
         @Override
-        public void execute(ActionEvent ae) {
+        public void handle(ActionEvent ae) {
 
             // retrieving bean properties may take some time
             // so we have to put it on separate thread to keep UI responsive
@@ -243,7 +243,7 @@ public class HelloPropertySheet extends ControlsFXSample {
         }
 
         @Override
-        public void execute(ActionEvent ae) {
+        public void handle(ActionEvent ae) {
             propertySheet.modeProperty().set(mode);
         }
 

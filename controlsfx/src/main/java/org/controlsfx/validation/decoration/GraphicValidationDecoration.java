@@ -44,7 +44,15 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 
 /**
- * Validation decorator to decorate validation state using images 
+ * Validation decorator to decorate validation state using images.
+ * <br/>
+ * Validation icons are shown in the bottom-left corner of the control as it is seems to be the most
+ * logical location for such information.
+ * Required components are marked at the top-left corner with small red triangle.
+ * Here is example of such decoration 
+ * </br> </br>
+ * <img src="GraphicValidationDecorationWithTooltip.png"/>  
+ * 
  */
 public class GraphicValidationDecoration extends AbstractValidationDecoration {
 

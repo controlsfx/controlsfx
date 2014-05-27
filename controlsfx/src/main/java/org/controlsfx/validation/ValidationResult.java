@@ -123,7 +123,7 @@ public class ValidationResult {
 
     /**
      * Factory method to create validation result out of several validation results
-     * @param validation results
+     * @param results results
      * @return New instance of validation result, combining all into one
      */
     public static final ValidationResult fromResults( ValidationResult... results ) {
@@ -132,7 +132,7 @@ public class ValidationResult {
 
     /**
      * Factory method to create validation result out of collection of validation results
-     * @param validation results
+     * @param results results
      * @return New instance of validation result, combining all into one
      */
     public static final ValidationResult fromResults( Collection<ValidationResult> results ) {

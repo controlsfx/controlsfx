@@ -79,8 +79,8 @@ public class DefaultDialogAction extends AbstractAction implements DialogAction 
 
     
     /** {@inheritDoc} */
-    @Override public void execute(ActionEvent ae) {
-    	DialogAction.super.execute(ae);
+    @Override public void handle(ActionEvent ae) {
+    	DialogAction.super.handle(ae);
     }
 
 }

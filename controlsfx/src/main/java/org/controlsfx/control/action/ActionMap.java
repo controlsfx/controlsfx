@@ -205,7 +205,7 @@ class AnnotatedAction extends AbstractAction {
 	}
 
 	@Override
-	public void execute(ActionEvent ae) {
+	public void handle(ActionEvent ae) {
 		try {
 			int paramCount =  method.getParameterCount(); 
 			if ( paramCount == 0 ) {

@@ -31,6 +31,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
@@ -53,7 +54,7 @@ import javafx.scene.input.KeyCombination;
  * 
  * @see AbstractAction
  */
-public interface Action {
+public interface Action extends EventHandler<ActionEvent> {
 
     /**
      * The text to show to the user.
@@ -84,7 +85,7 @@ public interface Action {
     public StringProperty longTextProperty();
     
     /**
-     * This graphic that should be shown to the user in relation to this action.
+     * The graphic that should be shown to the user in relation to this action.
      * 
      * @return An observable {@link ObjectProperty} that represents the current
      *      graphic for this property, and which can be observed for changes.
@@ -93,7 +94,7 @@ public interface Action {
     
     /**
      * The accelerator {@link KeyCombination} that should be used for this action,
-     * if it is used in an applicable UI control (most notably {@link MenuItem}.
+     * if it is used in an applicable UI control (most notably {@link MenuItem}).
      * 
      * @return An observable {@link ObjectProperty} that represents the current
      *      accelerator for this property, and which can be observed for changes.
@@ -108,12 +109,4 @@ public interface Action {
      * by application developers
      */
     public ObservableMap<Object, Object> getProperties();
-    
-    /**
-     * This method is called when the user selects this action. 
-     * 
-     * @param ae The action context.
-     */
-    public void execute(ActionEvent ae);
-    
 }

@@ -749,9 +749,7 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return an ObservableList of row indexes that display a picker.
-     * See {@link Axes} description.
-     * @return 
+     * @return An ObservableList of row indexes that display a picker.
      */
     public ObservableList<Integer> getRowPickers() {
         return rowPickers;
@@ -767,18 +765,14 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return the row Picker Callback.
-     * @return 
+     * @return the row Picker Callback.
      */
     public Callback<Integer, Void> getRowPickerCallback() {
         return rowPickerCallback;
     }
 
     /**
-     * Return an ObservableList of column indexes that display a picker.
-     * See {@link Axes} description.
-     * @
-     * @return 
+     * @return An ObservableList of column indexes that display a picker.
      */
     public ObservableList<Integer> getColumnPickers() {
         return columnPickers;
@@ -794,8 +788,7 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return the columnPicker Callback.
-     * @return 
+     * @return the columnPicker Callback.
      */
     public Callback<Integer, Void> getColumnPickerCallback() {
         return columnPickerCallback;
@@ -829,9 +822,8 @@ public class SpreadsheetView extends Control {
     }
     
     /**
-     * Return the height of a particular row of the SpreadsheetView. \n
      * @param row
-     * @return 
+     * @return the height of a particular row of the SpreadsheetView.
      */
     public double getRowHeight(int row) {
          return getCellsViewSkin().getRowHeight(row);
@@ -1076,7 +1068,7 @@ public class SpreadsheetView extends Control {
      * 
      * @param row
      * @param column
-     * @return
+     * @return The {@link SpanType} of a cell
      */
     public SpanType getSpanType(final int row, final int column) {
         if (getGrid() == null) {

@@ -24,51 +24,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package impl.org.controlsfx.version;
+package impl.org.controlsfx.i18n;
 
-public class Version {
-    private final int major;
-    private final int minor;
-    private final int increment;
-    private int javaBuildMin;
-    private final boolean snapshot;
+import java.nio.file.Path;
+import java.util.Locale;
+
+public class Translation implements Comparable<Translation> {
+
+    private final String localeString;
+    private final Locale locale;
+    private final Path path;
     
-    public Version(String version) {
-        System.out.println("Version: " + version);
-        snapshot = version.contains("SNAPSHOT");
-        version = snapshot ? version.substring(0, version.indexOf("-SNAPSHOT")) : version;
+    public Translation(String locale, Path path) {
+        this.localeString = locale;
+        this.path = path;
         
-        javaBuildMin = version.contains("_") ? Integer.valueOf(version.substring(version.indexOf("_") + 1)) : -1;
-        version = javaBuildMin != -1 ? version.substring(0, version.indexOf("_")) : version;
-        
-        String[] splitVersion = version.split("\\.");
-        if (splitVersion.length != 3) {
-            throw new RuntimeException("Unknown version string: " + version);
+        String[] split = localeString.split("_");
+        if (split.length == 1) {
+            this.locale = new Locale(localeString);
+        } else if (split.length == 2) {
+            this.locale = new Locale(split[0], split[1]);
+        } else if (split.length == 3) {
+            this.locale = new Locale(split[0], split[1], split[2]);
+        } else {
+            throw new IllegalArgumentException("Unknown locale string '" + locale + "'");
         }
-        major = Integer.valueOf(splitVersion[0]);
-        minor = Integer.valueOf(splitVersion[1]);
-        increment = Integer.valueOf(splitVersion[2]);
     }
     
-    public final int getMajor() {
-        return major;
+    public final String getLocaleString() {
+        return localeString;
     }
     
-    public final int getMinor() {
-        return minor;
+    public final Locale getLocale() {
+        return locale;
     }
     
-    public final int getIncrement() {
-        return increment;
-    }
-    
-    public final int getJavaBuildMin() {
-        return javaBuildMin;
+    public final Path getPath() {
+        return path;
     }
     
     @Override public String toString() {
-        return major + "." + minor + "." + increment + 
-                (javaBuildMin == -1 ? "" : "_" + javaBuildMin) + 
-                (snapshot ? "-SNAPSHOT" : "");
+        return localeString;
+    }
+    
+    @Override public int compareTo(Translation o) {
+        if (o == null) return 1;
+        return localeString.compareTo(o.localeString);
     }
 }

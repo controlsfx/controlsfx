@@ -29,6 +29,7 @@ package org.controlsfx.samples.dialogs;
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
 import impl.org.controlsfx.i18n.Localization;
+import impl.org.controlsfx.i18n.Translations;
 
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +51,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
@@ -76,10 +78,8 @@ import org.controlsfx.samples.Utils;
 
 public class HelloDialog extends ControlsFXSample {
 
-	private final CheckBox cbUseLightweightDialog = new CheckBox(
-			"Use Lightweight Dialogs");
-	private final CheckBox cbUseNativeTitleBar = new CheckBox(
-			"Use Native TitleBar");
+    private final ComboBox<DialogStyle> styleCombobox = new ComboBox<>();
+	private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
 	private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
 	private final CheckBox cbSetOwner = new CheckBox("Set Owner");
 
@@ -486,7 +486,7 @@ public class HelloDialog extends ControlsFXSample {
 				}
 
 				@Override
-				public void execute(ActionEvent ae) {
+				public void handle(ActionEvent ae) {
 					Dialog dlg = (Dialog) ae.getSource();
 					// real login code here
 					dlg.setResult(this);
@@ -506,8 +506,7 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent arg0) {
 				Dialog dlg = new Dialog(includeOwner() ? stage : null,
-						"Login Dialog", cbUseLightweightDialog.isSelected(),
-						cbUseNativeTitleBar.isSelected()?DialogStyle.NATIVE: DialogStyle.CROSS_PLATFORM_DARK);
+						"Login Dialog", cbUseLightweightDialog.isSelected(),getDialogStyle());
 				if (cbShowMasthead.isSelected()) {
 					dlg.setMasthead("Login to ControlsFX");
 				}
@@ -563,10 +562,8 @@ public class HelloDialog extends ControlsFXSample {
 		if (cbUseLightweightDialog.isSelected()) {
 			dialog.lightweight();
 		}
-
-		if (cbUseNativeTitleBar.isSelected()) {
-			dialog.style(DialogStyle.NATIVE);
-		}
+		
+		dialog.style(getDialogStyle());
 
 		return dialog;
 	}
@@ -580,26 +577,24 @@ public class HelloDialog extends ControlsFXSample {
 
 		int row = 0;
 
+		// locale
+		List<Locale> locales = Translations.getAllTranslationLocales();
 		grid.add(createLabel("Locale: ", "property"), 0, row);
 		final ComboBox<Locale> localeCombobox = new ComboBox<Locale>();
-		localeCombobox.getItems()
-				.addAll(Locale.ENGLISH,
-                                        new Locale("ru", "RU"),
-                                        Locale.FRENCH,
-                                        new Locale("es","ES"),
-                                        new Locale("pt","PT"),
-                                        new Locale("gl","ES"));
-		localeCombobox.valueProperty().addListener(
-				new ChangeListener<Locale>() {
-					@Override
-					public void changed(ObservableValue<? extends Locale> ov,
-							Locale oldValue, Locale newValue) {
-						Localization.setLocale(newValue);
-					}
-				});
-		localeCombobox.setValue(localeCombobox.getItems().get(0));
+		localeCombobox.getItems().addAll(locales);
+		localeCombobox.valueProperty().addListener((ov, oldValue, newValue) -> Localization.setLocale(newValue));
 		grid.add(localeCombobox, 1, row);
 		row++;
+		
+		// set the locale to english by default
+		Translations.getTranslation("en").ifPresent(t -> localeCombobox.setValue(t.getLocale()));
+		
+		// stage style
+		grid.add(createLabel("Style: ", "property"), 0, row);
+        styleCombobox.getItems().addAll(DialogStyle.values());
+        styleCombobox.setValue(styleCombobox.getItems().get(0));
+        grid.add(styleCombobox, 1, row);
+        row++;
 
 		// operating system button order
 		grid.add(createLabel("Operating system button order: ", "property"), 0,
@@ -618,11 +613,6 @@ public class HelloDialog extends ControlsFXSample {
 		grid.add(cbUseLightweightDialog, 1, row);
 		row++;
 
-		// use native titlebar
-		grid.add(createLabel("Native titlebar: ", "property"), 0, row);
-		grid.add(cbUseNativeTitleBar, 1, row);
-		row++;
-
 		// show masthead
 		grid.add(createLabel("Show masthead: ", "property"), 0, row);
 		grid.add(cbShowMasthead, 1, row);
@@ -634,6 +624,11 @@ public class HelloDialog extends ControlsFXSample {
 		row++;
 
 		return grid;
+	}
+	
+	private DialogStyle getDialogStyle() {
+	    SelectionModel<DialogStyle> sm = styleCombobox.getSelectionModel();
+	    return sm.getSelectedItem() == null ? DialogStyle.CROSS_PLATFORM_DARK : sm.getSelectedItem();
 	}
 
 	public static void main(String[] args) {

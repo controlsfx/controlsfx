@@ -28,7 +28,11 @@
 package org.controlsfx.dialog;
 
 /**
- * This enum defines the possible styles for a dialog.
+ * This enum defines the possible styles for a dialog. Refer to the {@link Dialogs}
+ * class for screenshots of these options.
+ * 
+ * @see Dialogs
+ * @see Dialog
  */
 public enum DialogStyle {
     
@@ -36,17 +40,27 @@ public enum DialogStyle {
      * Defines a cross-platform dialog style.
      * The dialogs rendered using this style will have a cross-platform title bar.
      */
-    CROSS_PLATFORM_DARK,
+    CROSS_PLATFORM_DARK("Cross-platform (dark)"),
 
     /**
      * Defines a native dialog style.
      * The dialogs rendered using this style will have a native title bar.
      */
-    NATIVE,
+    NATIVE("Native"),
 
     /**
      * Defines a dialog style with no decorations.
      * The dialogs rendered using this style will not have a title bar.
      */
-    UNDECORATED
+    UNDECORATED("Undecorated");
+    
+    private final String prettyName;
+    
+    DialogStyle(String prettyName) {
+        this.prettyName = prettyName;
+    }
+    
+    public String toString() {
+        return prettyName;
+    }
 }

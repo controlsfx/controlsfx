@@ -169,8 +169,17 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                             splitPane.getItems().remove(oldNode);
                         }
 
-                        if (newNode != null) {
-
+                        /**
+                        * If the detailNode is not showing, we do not force
+                        * it to show.
+                        */
+                        if (newNode != null && getSkinnable().isShowDetailNode()) {
+                            
+                            /**
+                             * Force the divider to take the value of the Pane,
+                             * and not compute his.
+                             */
+                            splitPane.setDividerPositions(getSkinnable().getDividerPosition());
                             updateMinAndMaxSizes();
 
                             SplitPane.setResizableWithParent(newNode, false);
@@ -367,6 +376,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                 break;
         }
 
+        updateMinAndMaxSizes();
         maybeAnimatePositionChange(getSkinnable().getDividerPosition(), true);
     }
 
@@ -417,6 +427,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                         unbindDividerPosition();
                         splitPane.getItems().remove(
                                 getSkinnable().getDetailNode());
+                        getSkinnable().getDetailNode().setOpacity(1);
                     }
                     changing = false;
                 }

@@ -40,7 +40,6 @@ public class VersionChecker {
     private static final String controlsFXSpecVersion;
     private static final String controlsFXImpVersion;
     
-    
     private static final Package controlsFX;
     
     static {
@@ -67,6 +66,12 @@ public class VersionChecker {
         // JavaFX 8.0.0 and later versions. Conversely, ControlsFX 8.0.6_20 has a controlsFXSpecVersion of
         // 8.0.20 (controlsFXSpecTitle of Java 8u20), which means that ControlsFX will only work on JavaFX 8u20
         // and later versions.
+        
+        if (controlsFXSpecVersion == null) {
+            // FIXME temporary fix to allow ControlsFX to work when run inside
+            // an IDE (i.e. for developers of ControlsFX).
+            return;
+        }
         
         String[] splitSpecVersion = controlsFXSpecVersion.split("\\.");
         

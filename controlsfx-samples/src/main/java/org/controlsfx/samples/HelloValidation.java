@@ -68,7 +68,7 @@ public class HelloValidation extends ControlsFXSample {
     }
 
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/validation/ValidationSupport.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/validation/ValidationSupport.html";
     }
 
     @Override public String getSampleDescription() {

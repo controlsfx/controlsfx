@@ -87,7 +87,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             "United States", "Germany", "Canada");
 
     private final List<String> logoList = Arrays.asList("", "ControlsFX.png", "apertureLogo.png",
-            "raptureLogo.png", "ammunationLogo.jpg", "nukaColaLogo.png", "paynsprayLogo.jpg", "umbrellacorporation.png");
+            "raptureLogo.png", "ammunationLogo.JPG", "nukaColaLogo.png", "paynsprayLogo.jpg", "umbrellacorporation.png");
 
     private final List<String> webSiteList = Arrays.asList("", "http://fxexperience.com/controlsfx/",
             "http://aperturescience.com/", "", "http://fr.gta.wikia.com/wiki/Ammu-Nation",

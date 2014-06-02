@@ -41,7 +41,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
@@ -420,32 +419,6 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
             styleClass = FXCollections.observableSet();
         }
         return styleClass;
-    }
-
-    // A map containing a set of properties for this cell
-    private ObservableMap<Object, Object> properties;
-
-    /**
-     * Returns an observable map of properties on this node for use primarily by
-     * application developers.
-     * 
-     * @return an observable map of properties on this node for use primarily by
-     *         application developers
-     */
-    public final ObservableMap<Object, Object> getProperties() {
-        if (properties == null) {
-            properties = FXCollections.observableHashMap();
-        }
-        return properties;
-    }
-
-    /**
-     * Tests if Node has properties.
-     * 
-     * @return true if node has properties.
-     */
-    public final boolean hasProperties() {
-        return properties != null && !properties.isEmpty();
     }
 
     /** {@inheritDoc} */

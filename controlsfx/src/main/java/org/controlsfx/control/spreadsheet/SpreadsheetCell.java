@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableSet;
@@ -43,6 +44,52 @@ import javafx.scene.Node;
  */
 public interface SpreadsheetCell {
 
+    /**
+     * This enum states the four different corner available for positioning 
+     * some elements in a cell.
+     */
+    public static enum CornerPosition {
+
+        TOP_LEFT {
+                    @Override
+                    int getBitNumber() {
+                        return 0;
+                    }
+                },
+        TOP_RIGHT {
+                    @Override
+                    int getBitNumber() {
+                        return 1;
+                    }
+                },
+        BOTTOM_RIGHT {
+                    @Override
+                    int getBitNumber() {
+                        return 2;
+                    }
+                },
+        BOTTOM_LEFT {
+                    @Override
+                    int getBitNumber() {
+                        return 3;
+                    }
+                };
+
+        abstract int getBitNumber();
+
+        public int setMask(int mask, boolean flag) {
+            if (flag) {
+                return mask | (1 << getBitNumber());
+            } else {
+                return mask & ~(1 << getBitNumber());
+            }
+        }
+
+        public boolean isSet(int mask) {
+            return (mask & (1 << getBitNumber())) != 0;
+        }
+    }
+    
     /**
      * Verify that the upcoming cell value can be set to the current cell. This
      * is currently used by the Copy/Paste.
@@ -99,26 +146,26 @@ public interface SpreadsheetCell {
     public BooleanProperty editableProperty();
 
     /**
-     * Return if this cell has a comment or not.
-     *
-     * @return true if this cell has a comment.
+     * This property allow you to track any change occuring on the corners.
+     * 
+     * @return a BooleanProperty related to the corners.
      */
-    public boolean isCommented();
+    public ReadOnlyIntegerProperty cornerProperty();
+    
+    /**
+     * This allow you to change the state of a specific corner.
+     * @param position
+     * @param activated 
+     */
+    public void setCorner(CornerPosition position, boolean activated);
 
     /**
-     * Change the commented state of this cell.
-     *
-     * @param flag
+     * 
+     * @param position
+     * @return the current state of a specific corner.
      */
-    public void setCommented(boolean flag);
-
-    /**
-     * The {@link BooleanProperty} linked with the commented state.
-     *
-     * @return The {@link BooleanProperty} linked with the commented state.
-     */
-    public BooleanProperty commentedProperty();
-
+    public boolean getCorner(CornerPosition position);
+    
     /**
      * The {@link StringProperty} linked with the format.
      *

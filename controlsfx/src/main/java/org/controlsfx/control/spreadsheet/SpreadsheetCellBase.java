@@ -28,11 +28,13 @@ package org.controlsfx.control.spreadsheet;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -213,6 +215,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
     private final StringProperty text;
     private final ObjectProperty<Node> graphic;
     private String tooltip;
+    private final IntegerProperty corner =new SimpleIntegerProperty(0);
 
     private ObservableSet<String> styleClass;
 
@@ -329,27 +332,6 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
             editable = new SimpleBooleanProperty(this, "editable", true); //$NON-NLS-1$
         }
         return editable;
-    }
-
-    // --- comment
-    private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false); //$NON-NLS-1$
-
-    /** {@inheritDoc} */
-    @Override
-    public final boolean isCommented() {
-        return commented == null ? true : commented.get();
-    }
-
-   /** {@inheritDoc} */
-    @Override
-    public final void setCommented(boolean flag) {
-        commentedProperty().set(flag);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final BooleanProperty commentedProperty() {
-        return commented;
     }
 
    /** {@inheritDoc} */
@@ -549,5 +531,23 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         } else {
             text.setValue(type.toString(getItem()));
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ReadOnlyIntegerProperty cornerProperty(){
+        return corner;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setCorner(CornerPosition position, boolean activated) {
+        corner.set(position.setMask(corner.get(), activated));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean getCorner(CornerPosition position) {
+        return position.isSet(corner.get());
     }
 }

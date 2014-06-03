@@ -35,6 +35,10 @@ dependencies {
     }
 }
 
+compileJava {  
+    options.encoding = "UTF-8"
+}
+
 javadoc {
     exclude 'impl/*'
     failOnError = false

@@ -19,6 +19,7 @@ ext {
     specification_title = commons.controlsfx_specification_title
     implementation_version = commons.controlsfx_version
 }
+
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -57,6 +58,10 @@ task generatei18nResources(type: Copy) {
 }
 
 processResources.dependsOn(generatei18nResources)
+
+compileJava {  
+    options.encoding = "UTF-8"
+}
 
 javadoc {
     exclude 'impl/*'

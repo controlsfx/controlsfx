@@ -75,6 +75,9 @@ private configurePOM(def pom) {
                 distribution 'repo'
             }
         }
+        properties {
+            project.build.sourceEncoding 'UTF-8'
+        }
     }
 }
 
@@ -102,3 +105,4 @@ ext.checkPasswords =  {
         }
     }
 }
+

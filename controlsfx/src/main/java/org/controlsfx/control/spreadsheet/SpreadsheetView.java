@@ -1035,7 +1035,6 @@ public class SpreadsheetView extends Control {
             }
         });
         
-        //FIXME Translate those strings properly
         final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment")));
         cornerMenu.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("comment.png"))));
@@ -1047,7 +1046,7 @@ public class SpreadsheetView extends Control {
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
                 SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
-                cell.setCorner(SpreadsheetCell.CornerPosition.TOP_LEFT, true);
+                cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
             }
         });
         final MenuItem topRightItem = new MenuItem("top-right");
@@ -1057,7 +1056,7 @@ public class SpreadsheetView extends Control {
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
                 SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
-                cell.setCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT, true);
+                cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
             }
         });
         final MenuItem bottomRightItem = new MenuItem("bottom-right");
@@ -1067,7 +1066,7 @@ public class SpreadsheetView extends Control {
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
                 SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
-                cell.setCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT, true);
+                cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
             }
         });
         final MenuItem bottomLeftItem = new MenuItem("bottom-left");
@@ -1077,7 +1076,7 @@ public class SpreadsheetView extends Control {
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
                 SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
-                cell.setCorner(SpreadsheetCell.CornerPosition.BOTTOM_LEFT, true);
+                cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_LEFT);
             }
         });
 

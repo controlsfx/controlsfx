@@ -90,23 +90,23 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 
-.comment:top-left{
-    -fx-background-color: green;
+.cell-corner{
+    -fx-background-color: red;
+}
+
+.cell-corner.top-left{
     -fx-shape : "M 0 0 L 1 0 L 0 1 z";
 }
 
-.comment:top-right{
-    -fx-background-color: red;
+.cell-corner.top-right{
     -fx-shape : "M 0 0 L -1 0 L 0 1 z";
 }
 
-.comment:bottom-right{
-    -fx-background-color: blue;
+.cell-corner.bottom-right{
     -fx-shape : "M 0 0 L -1 0 L 0 -1 z";
 }
 
-.comment:bottom-left{
-    -fx-background-color: violet;
+.cell-corner.bottom-left{
     -fx-shape : "M 0 0 L 1 0 L 0 -1 z";
 }
 

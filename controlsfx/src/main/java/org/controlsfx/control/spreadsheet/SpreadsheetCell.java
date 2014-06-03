@@ -29,7 +29,6 @@ package org.controlsfx.control.spreadsheet;
 import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableSet;
@@ -50,44 +49,10 @@ public interface SpreadsheetCell {
      */
     public static enum CornerPosition {
 
-        TOP_LEFT {
-                    @Override
-                    int getBitNumber() {
-                        return 0;
-                    }
-                },
-        TOP_RIGHT {
-                    @Override
-                    int getBitNumber() {
-                        return 1;
-                    }
-                },
-        BOTTOM_RIGHT {
-                    @Override
-                    int getBitNumber() {
-                        return 2;
-                    }
-                },
-        BOTTOM_LEFT {
-                    @Override
-                    int getBitNumber() {
-                        return 3;
-                    }
-                };
-
-        abstract int getBitNumber();
-
-        public int setMask(int mask, boolean flag) {
-            if (flag) {
-                return mask | (1 << getBitNumber());
-            } else {
-                return mask & ~(1 << getBitNumber());
-            }
-        }
-
-        public boolean isSet(int mask) {
-            return (mask & (1 << getBitNumber())) != 0;
-        }
+        TOP_LEFT ,
+        TOP_RIGHT ,
+        BOTTOM_RIGHT ,
+        BOTTOM_LEFT 
     }
     
     /**
@@ -146,25 +111,23 @@ public interface SpreadsheetCell {
     public BooleanProperty editableProperty();
 
     /**
-     * This property allow you to track any change occuring on the corners.
-     * 
-     * @return a BooleanProperty related to the corners.
+     * This activate the given cornerPosition.
+     * @param position
      */
-    public ReadOnlyIntegerProperty cornerProperty();
+    public void activateCorner(CornerPosition position);
     
     /**
-     * This allow you to change the state of a specific corner.
+     * This deactivate the given cornerPosition.
      * @param position
-     * @param activated 
      */
-    public void setCorner(CornerPosition position, boolean activated);
+    public void deactivateCorner(CornerPosition position);
 
     /**
      * 
      * @param position
      * @return the current state of a specific corner.
      */
-    public boolean getCorner(CornerPosition position);
+    public boolean isCornerActivated(CornerPosition position);
     
     /**
      * The {@link StringProperty} linked with the format.

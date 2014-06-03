@@ -33,7 +33,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -49,10 +48,10 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
  */
 public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
 
-    private final static PseudoClass TOP_LEFT_PSEUDO_CLASS = PseudoClass.getPseudoClass("top-left"); //$NON-NLS-1$
-    private final static PseudoClass TOP_RIGHT_PSEUDO_CLASS = PseudoClass.getPseudoClass("top-right"); //$NON-NLS-1$
-    private final static PseudoClass BOTTOM_RIGHT_PSEUDO_CLASS = PseudoClass.getPseudoClass("bottom-right"); //$NON-NLS-1$
-    private final static PseudoClass BOTTOM_LEFT_PSEUDO_CLASS = PseudoClass.getPseudoClass("bottom-left"); //$NON-NLS-1$
+    private final static String TOP_LEFT_CLASS = "top-left"; //$NON-NLS-1$
+    private final static String TOP_RIGHT_CLASS = "top-right"; //$NON-NLS-1$
+    private final static String BOTTOM_RIGHT_CLASS = "bottom-right"; //$NON-NLS-1$
+    private final static String BOTTOM_LEFT_CLASS = "bottom-left"; //$NON-NLS-1$
     /**
      * The size of the edge of the triangle FIXME Handling of static variable
      * will be changed.
@@ -69,9 +68,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
         super(tableCell);
         tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
-        if (tableCell.getItem() != null) {
-            tableCell.getItem().cornerProperty().addListener(triangleListener);
-        }
+//        if (tableCell.getItem() != null) {
+//            tableCell.getItem().cornerProperty().addListener(triangleListener);
+//        }
     }
 
     @Override
@@ -94,7 +93,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     }
 
     private void handleTopLeft(SpreadsheetCell cell) {
-        if (cell.getCorner(CornerPosition.TOP_LEFT)) {
+        if (cell.isCornerActivated(CornerPosition.TOP_LEFT)) {
             if (topLeftRegion == null) {
                 topLeftRegion = getRegion(CornerPosition.TOP_LEFT);
             }
@@ -109,7 +108,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     }
 
     private void handleTopRight(SpreadsheetCell cell) {
-        if (cell.getCorner(CornerPosition.TOP_RIGHT)) {
+        if (cell.isCornerActivated(CornerPosition.TOP_RIGHT)) {
             if (topRightRegion == null) {
                 topRightRegion = getRegion(CornerPosition.TOP_RIGHT);
             }
@@ -124,7 +123,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     }
 
     private void handleBottomRight(SpreadsheetCell cell) {
-        if (cell.getCorner(CornerPosition.BOTTOM_RIGHT)) {
+        if (cell.isCornerActivated(CornerPosition.BOTTOM_RIGHT)) {
             if (bottomRightRegion == null) {
                 bottomRightRegion = getRegion(CornerPosition.BOTTOM_RIGHT);
             }
@@ -138,7 +137,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         }
     }
     private void handleBottomLeft(SpreadsheetCell cell) {
-        if (cell.getCorner(CornerPosition.BOTTOM_LEFT)) {
+        if (cell.isCornerActivated(CornerPosition.BOTTOM_LEFT)) {
             if (bottomLeftRegion == null) {
                 bottomLeftRegion = getRegion(CornerPosition.BOTTOM_LEFT);
             }
@@ -155,19 +154,19 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     private static Region getRegion(CornerPosition position) {
         Region region = new Region();
         region.resize(TRIANGLE_SIZE, TRIANGLE_SIZE);
-        region.getStyleClass().add("comment"); //$NON-NLS-1$
+        region.getStyleClass().add("cell-corner"); //$NON-NLS-1$
         switch (position) {
             case TOP_LEFT:
-                region.pseudoClassStateChanged(TOP_LEFT_PSEUDO_CLASS, true);
+                region.getStyleClass().add(TOP_LEFT_CLASS);
                 break;
             case TOP_RIGHT:
-                region.pseudoClassStateChanged(TOP_RIGHT_PSEUDO_CLASS, true);
+                region.getStyleClass().add(TOP_RIGHT_CLASS);
                 break;
             case BOTTOM_RIGHT:
-                region.pseudoClassStateChanged(BOTTOM_RIGHT_PSEUDO_CLASS, true);
+                region.getStyleClass().add(BOTTOM_RIGHT_CLASS);
                 break;
             case BOTTOM_LEFT:
-                region.pseudoClassStateChanged(BOTTOM_LEFT_PSEUDO_CLASS, true);
+                region.getStyleClass().add(BOTTOM_LEFT_CLASS);
                 break;
 
         }
@@ -187,12 +186,12 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         @Override
         public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
                 SpreadsheetCell newCell) {
-            if (oldCell != null) {
-                oldCell.cornerProperty().removeListener(triangleListener);
-            }
-            if (newCell != null) {
-                newCell.cornerProperty().addListener(triangleListener);
-            }
+//            if (oldCell != null) {
+//                oldCell.cornerProperty().removeListener(triangleListener);
+//            }
+//            if (newCell != null) {
+//                newCell.cornerProperty().addListener(triangleListener);
+//            }
             if (getSkinnable().getItem() != null) {
                 layoutTriangle();
             }

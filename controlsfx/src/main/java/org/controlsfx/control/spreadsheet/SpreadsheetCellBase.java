@@ -31,7 +31,6 @@ import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -214,7 +213,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
     private final StringProperty text;
     private final ObjectProperty<Node> graphic;
     private String tooltip;
-    private final IntegerProperty corner =new SimpleIntegerProperty(0);
+    private final IntegerProperty corner = new SimpleIntegerProperty(0);
 
     private ObservableSet<String> styleClass;
 
@@ -261,6 +260,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
                 updateText();
             }
         });
+        
         getStyleClass().add("spreadsheet-cell"); //$NON-NLS-1$
     }
 
@@ -508,19 +508,48 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
 
     /** {@inheritDoc} */
     @Override
-    public ReadOnlyIntegerProperty cornerProperty(){
-        return corner;
+    public void activateCorner(CornerPosition position) {
+        corner.set(setMask(corner.get(), true, position));
     }
     
     /** {@inheritDoc} */
     @Override
-    public void setCorner(CornerPosition position, boolean activated) {
-        corner.set(position.setMask(corner.get(), activated));
+    public void deactivateCorner(CornerPosition position) {
+        corner.set(setMask(corner.get(), false, position));
     }
 
     /** {@inheritDoc} */
     @Override
-    public boolean getCorner(CornerPosition position) {
-        return position.isSet(corner.get());
+    public boolean isCornerActivated(CornerPosition position) {
+        return isSet(corner.get(), position);
+    }
+    
+    private int getBitNumber(CornerPosition position) {
+        switch (position) {
+            case TOP_LEFT:
+                return 0;
+
+            case TOP_RIGHT:
+                return 1;
+
+            case BOTTOM_RIGHT:
+                return 2;
+
+            case BOTTOM_LEFT:
+            default:
+                return 3;
+        }
+    }
+
+    private int setMask(int mask, boolean flag, CornerPosition position) {
+        if (flag) {
+            return mask | (1 << getBitNumber(position));
+        } else {
+            return mask & ~(1 << getBitNumber(position));
+        }
+    }
+
+    private boolean isSet(int mask, CornerPosition position) {
+        return (mask & (1 << getBitNumber(position))) != 0;
     }
 }

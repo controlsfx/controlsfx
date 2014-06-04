@@ -48,7 +48,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.BeanPropertyUtils;
@@ -139,7 +139,7 @@ public class HelloPropertySheet extends ControlsFXSample {
 
     }
 
-    class ActionShowInPropertySheet extends AbstractAction {
+    class ActionShowInPropertySheet extends Action {
 
         private Object bean;
 
@@ -233,7 +233,7 @@ public class HelloPropertySheet extends ControlsFXSample {
         return infoPane;
     }
 
-    class ActionModeChange extends AbstractAction {
+    class ActionModeChange extends Action {
 
         private Mode mode;
 

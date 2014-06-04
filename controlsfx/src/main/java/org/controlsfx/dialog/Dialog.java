@@ -29,8 +29,6 @@ package org.controlsfx.dialog;
 import impl.org.controlsfx.i18n.Localization;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 
 import javafx.beans.binding.DoubleBinding;
@@ -41,7 +39,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -55,7 +52,6 @@ import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Effect;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -68,7 +64,6 @@ import javafx.stage.Window;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 
@@ -684,30 +679,6 @@ public class Dialog {
     }
     
     /**
-     *  Interface for specialized dialog {@link Action}, which can have a set of traits {@link ActionTrait}
-     */
-    public interface DialogAction extends Action {
-        
-        /**
-         * Returns true if {@link Action} has given trait 
-         */
-        boolean hasTrait( ActionTrait trait);
-        
-        /**
-         * Implementation of default dialog action execution logic:
-         * if action is enabled set it as dialog result.
-         */
-        default public void handle(ActionEvent ae) {
-            if (! disabledProperty().get()) {
-                if (ae.getSource() instanceof Dialog ) {
-                    ((Dialog) ae.getSource()).setResult(this);
-                }
-            }
-        }
-        
-    }
-    
-    /**
      * Possible traits of {@link DialogAction}
      */
     public enum ActionTrait {
@@ -794,96 +765,44 @@ public class Dialog {
      * @see Dialog
      * @see Action
      */
-    public enum Actions implements DialogAction {
+    public static final class Actions {
 
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ), //$NON-NLS-1$
+        public static final Action CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        	public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( Localization.asKey("dlg.close.button"),  ButtonType.CANCEL_CLOSE ), //$NON-NLS-1$
+        public static final Action CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        	public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( Localization.asKey("dlg.no.button"),     ButtonType.NO ), //$NON-NLS-1$
+        public static final Action NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
+        	public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( Localization.asKey("dlg.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING), //$NON-NLS-1$
+        public static final Action OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING){ //$NON-NLS-1$
+        	public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( Localization.asKey("dlg.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ); //$NON-NLS-1$
+        public static final Action YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ){ //$NON-NLS-1$
+        	public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
+        }; 
+        
 
-        private final AbstractAction action;
-        private final EnumSet<ActionTrait> traits;
-
-        /**
-         * Creates common dialog action
-         * @param title action title
-         * @param isDefault true if it should be default action on the dialog. Only one can be, so the first us used.
-         * @param isCancel true if action produces the dialog cancellation. 
-         * @param isClosing true if action is closing the dialog
-         */
-        private Actions(String title, ButtonType type, ActionTrait... traits) {
-            this.action = new AbstractAction(title) {
-                @Override public void handle(ActionEvent ae) {
-                    Actions.this.handle(ae);
-                }
-            };
-            this.traits = EnumSet.copyOf(Arrays.asList(traits));
-            ButtonBar.setType(this, type);
-        }
-        
-        private Actions(String title, ButtonType type) {
-            this( title, type, ActionTrait.CANCEL, ActionTrait.CLOSING, ActionTrait.DEFAULT );
-        }
-
-        /** {@inheritDoc} */
-        @Override public StringProperty textProperty() {
-            return action.textProperty();
-        }
-
-        /** {@inheritDoc} */
-        @Override public BooleanProperty disabledProperty() {
-            return action.disabledProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public StringProperty longTextProperty() {
-            return action.longTextProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public ObjectProperty<Node> graphicProperty() {
-            return action.graphicProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
-            return action.acceleratorProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public ObservableMap<Object, Object> getProperties() {
-            return action.getProperties();
-        }
-
-        /** {@inheritDoc} */
-        @Override public void handle(ActionEvent ae) {
-        	DialogAction.super.handle(ae);
-        }
-        
-        /** {@inheritDoc} */
-        @Override public boolean hasTrait(ActionTrait trait) {
-            return traits.contains(trait);
-        }
     }
 
     

@@ -352,7 +352,7 @@ public class ActionUtils {
      * action tree serves as indication that separator has be created in its place.
      * See {@link ActionGroup} for example of action tree creation
      */
-    public static Action ACTION_SEPARATOR = new Action() {
+    public static Action ACTION_SEPARATOR = new Action(null) {
 
         @Override public StringProperty textProperty() {
             return null;

@@ -507,7 +507,7 @@ public class HelloDialog extends ControlsFXSample {
 			public void handle(ActionEvent arg0) {
 				Dialog dlg = new Dialog(includeOwner() ? stage : null,
 						"Login Dialog", cbUseLightweightDialog.isSelected());
-				dlg.getStyleClass().setAll(getDialogStyle());
+				dlg.getStyleClass().addAll(getDialogStyle());
 				
 				if (cbShowMasthead.isSelected()) {
 					dlg.setMasthead("Login to ControlsFX");

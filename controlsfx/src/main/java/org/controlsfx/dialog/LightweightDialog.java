@@ -351,7 +351,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scene root
-        ImplUtils.stripRootPane(scene, originalParent);
+        ImplUtils.stripRootPane(scene, originalParent, false);
     }
     
     private void hideInParent() {
@@ -369,7 +369,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scenegraph
-        ImplUtils.getChildren(owner.getParent()).setAll(owner);
+        ImplUtils.getChildren(owner.getParent(), false).setAll(owner);
         
         dialogStack = null;
     }
@@ -382,7 +382,7 @@ class LightweightDialog extends FXDialog {
         buildDialogStack(originalParent);
         
         lightweightDialog.setVisible(true);
-        ImplUtils.injectAsRootPane(scene, dialogStack);
+        ImplUtils.injectAsRootPane(scene, dialogStack, false);
         configureDialogStack(originalParent);
         lightweightDialog.requestFocus();
     }
@@ -391,7 +391,7 @@ class LightweightDialog extends FXDialog {
         installCSSInScene();
         
         buildDialogStack(owner);
-        ImplUtils.injectPane(owner, dialogStack);
+        ImplUtils.injectPane(owner, dialogStack, false);
         configureDialogStack(owner);
         lightweightDialog.setVisible(true);
         lightweightDialog.requestFocus();

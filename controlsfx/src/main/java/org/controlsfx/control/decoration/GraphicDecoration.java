@@ -104,7 +104,7 @@ public class GraphicDecoration extends Decoration {
     
     /** {@inheritDoc} */
     @Override public Node applyDecoration(Node targetNode) {
-        List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
+        List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode, true);
         updateGraphicPosition(targetNode);
         if (!targetNodeChildren.contains(decorationNode)) {
             targetNodeChildren.add(decorationNode);
@@ -114,7 +114,7 @@ public class GraphicDecoration extends Decoration {
     
     /** {@inheritDoc} */
     @Override public void removeDecoration(Node targetNode) {
-        List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode);
+        List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode, true);
         
         if (targetNodeChildren.contains(decorationNode)) {
             targetNodeChildren.remove(decorationNode);

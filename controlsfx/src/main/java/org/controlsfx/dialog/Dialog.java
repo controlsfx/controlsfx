@@ -342,15 +342,6 @@ public class Dialog {
     }
     
     /**
-     * Returns this dialog's window. For lightweight dialogs,
-     * this is the window in which this dialog is displayed. 
-     * @return This dialog's window.
-     */
-    public Window getWindow() {
-        return dialog.getWindow();
-    }
-
-    /**
      * Assigns the resulting action. If action is a {@link DialogAction} and has either CANCEL or CLOSING traits
      * the dialog will be closed.
      * @param result

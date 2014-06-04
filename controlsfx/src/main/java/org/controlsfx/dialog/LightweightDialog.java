@@ -217,6 +217,7 @@ class LightweightDialog extends FXDialog {
         // so we do not hide the titlebar
         dialogTitleBar.setVisible(true);
         dialogTitleBar.setManaged(true);
+        getStyleClass().add(Dialog.STYLE_CLASS_CROSS_PLATFORM);
     }
     
     

@@ -360,12 +360,14 @@ public class Dialog {
     /**
      * Return the StyleSheets associated with the scene used in the Dialog (see {@link Scene#getStylesheets()}
      * This allow you to specify custom CSS rules to be applied on your dialog's elements.
-     * @return and ObservableList of String. 
      */
     public ObservableList<String> getStylesheets(){
         return dialog.getStylesheets();
     }
     
+    /**
+     * Return the style classes specified on this dialog instance.
+     */
     public ObservableList<String> getStyleClass() {
         return dialog.getStyleClass();
     }

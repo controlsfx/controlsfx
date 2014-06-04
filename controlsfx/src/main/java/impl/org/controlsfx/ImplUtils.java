@@ -26,7 +26,6 @@
  */
 package impl.org.controlsfx;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javafx.collections.ObservableList;
@@ -106,7 +105,7 @@ public class ImplUtils {
         } else if (p instanceof Control) {
             Control c = (Control) p;
             Skin<?> s = c.getSkin();
-            children = s instanceof SkinBase<?> ? ((SkinBase<?>)s).getChildren() : null;
+            children = s instanceof SkinBase ? ((SkinBase<?>)s).getChildren() : null;
         } else if (useReflection) {
             // we really want to avoid using this!!!!
             try {
@@ -120,16 +119,8 @@ public class ImplUtils {
                 } else {
                     // uh oh, trouble
                 }
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            	throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
             }
         }
         

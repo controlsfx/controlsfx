@@ -767,10 +767,13 @@ public class Dialog {
      */
     public static final class Actions {
 
+    	
+    	
         /**
          * An action that, by default, will show 'Cancel'.
          */
         public static final Action CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        	{ lock();}
         	public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
         }; 
         
@@ -778,6 +781,7 @@ public class Dialog {
          * An action that, by default, will show 'Close'.
          */
         public static final Action CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        	{ lock();}
         	public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
         }; 
         
@@ -785,6 +789,7 @@ public class Dialog {
          * An action that, by default, will show 'No'.
          */
         public static final Action NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
+        	{ lock();}
         	public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
         }; 
         
@@ -792,6 +797,7 @@ public class Dialog {
          * An action that, by default, will show 'OK'.
          */
         public static final Action OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING){ //$NON-NLS-1$
+        	{ lock();}
         	public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
         }; 
         
@@ -799,6 +805,7 @@ public class Dialog {
          * An action that, by default, will show 'Yes'.
          */
         public static final Action YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ){ //$NON-NLS-1$
+        	{ lock();}
         	public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
         }; 
         

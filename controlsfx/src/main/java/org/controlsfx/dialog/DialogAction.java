@@ -80,7 +80,6 @@ public class DialogAction extends Action {
         this(text, ActionTrait.CLOSING, ActionTrait.DEFAULT);
     }
     
-    
     /**
      * Returns true if {@link Action} has given trait 
      */

@@ -32,13 +32,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -59,7 +55,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCombination;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.SegmentedButton;
@@ -353,30 +348,6 @@ public class ActionUtils {
      * See {@link ActionGroup} for example of action tree creation
      */
     public static Action ACTION_SEPARATOR = new Action(null) {
-
-        @Override public StringProperty textProperty() {
-            return null;
-        }
-
-        @Override public BooleanProperty disabledProperty() {
-            return null;
-        }
-
-        @Override public StringProperty longTextProperty() {
-            return null;
-        }
-
-        @Override public ObjectProperty<Node> graphicProperty() {
-            return null;
-        }
-        
-        @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
-            return null;
-        }
-
-        @Override public ObservableMap<Object, Object> getProperties() {
-            return null;
-        }
 
         @Override public void handle(ActionEvent ae) {
         }

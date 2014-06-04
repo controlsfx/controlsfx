@@ -63,7 +63,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * 
      **************************************************************************/
     
-    
+    private boolean locked = false;
     
     /**************************************************************************
      * 
@@ -82,7 +82,13 @@ public abstract class Action implements EventHandler<ActionEvent> {
         setText(text);
     }
     
+    public Action() {
+    	this("");
+    }
     
+    protected void lock() {
+    	locked = true;
+    }
     
     
     /**************************************************************************
@@ -92,7 +98,12 @@ public abstract class Action implements EventHandler<ActionEvent> {
      **************************************************************************/
     
     // --- text
-    private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"); //$NON-NLS-1$
+    private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"){ //$NON-NLS-1$
+    	public void set(String value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+    	}
+    };
     
     /**
      * The text to show to the user.
@@ -100,7 +111,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable {@link StringProperty} that represents the current
      *      text for this property, and which can be observed for changes.
      */
-    public StringProperty textProperty() {
+    public final StringProperty textProperty() {
         return textProperty;
     }
     
@@ -122,7 +133,12 @@ public abstract class Action implements EventHandler<ActionEvent> {
     
     
     // --- disabled
-    private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"); //$NON-NLS-1$
+    private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"){ //$NON-NLS-1$
+    	public void set(boolean value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+    	}
+    };
     
     /**
      * This represents whether the action should be available to the end user,
@@ -132,7 +148,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      *      disabled state for this property, and which can be observed for 
      *      changes.
      */
-    public BooleanProperty disabledProperty() {
+    public final BooleanProperty disabledProperty() {
         return disabledProperty;
     }
     
@@ -156,7 +172,13 @@ public abstract class Action implements EventHandler<ActionEvent> {
 
     
     // --- longText
-    private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"); //$NON-NLS-1$
+    private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"){ //$NON-NLS-1$
+    	public void set(String value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+
+    	};
+    };
     
     /**
      * The longer form of the text to show to the user (e.g. on a 
@@ -166,7 +188,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable {@link StringProperty} that represents the current
      *      long text for this property, and which can be observed for changes.
      */
-    public StringProperty longTextProperty() {
+    public final StringProperty longTextProperty() {
         return longTextProperty;
     }
     
@@ -189,7 +211,13 @@ public abstract class Action implements EventHandler<ActionEvent> {
     
     
     // --- graphic
-    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"); //$NON-NLS-1$
+    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"){ //$NON-NLS-1$
+    	public void set(Node value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+
+    	};
+    };
     
     /**
      * The graphic that should be shown to the user in relation to this action.
@@ -197,7 +225,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable {@link ObjectProperty} that represents the current
      *      graphic for this property, and which can be observed for changes.
      */
-    public ObjectProperty<Node> graphicProperty() {
+    public final ObjectProperty<Node> graphicProperty() {
         return graphicProperty;
     }
     
@@ -219,7 +247,13 @@ public abstract class Action implements EventHandler<ActionEvent> {
     
     
     // --- accelerator
-    private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"); //$NON-NLS-1$
+    private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"){ //$NON-NLS-1$
+    	public void set(KeyCombination value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+
+    	}
+    };
     
     /**
      * The accelerator {@link KeyCombination} that should be used for this action,
@@ -228,7 +262,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable {@link ObjectProperty} that represents the current
      *      accelerator for this property, and which can be observed for changes.
      */
-    public ObjectProperty<KeyCombination> acceleratorProperty() {
+    public final ObjectProperty<KeyCombination> acceleratorProperty() {
         return acceleratorProperty;
     }
     
@@ -266,7 +300,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable map of properties on this Action for use primarily
      * by application developers
      */
-    public ObservableMap<Object, Object> getProperties() {
+    public final ObservableMap<Object, Object> getProperties() {
     	return LazyProps.INSTANCE;
     }
 

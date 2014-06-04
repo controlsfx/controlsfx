@@ -61,7 +61,7 @@ public class HelloDecorator extends ControlsFXSample {
     }
     
     @Override public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE + "org/controlsfx/control/decorator/Decorator.html";
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/decoration/Decorator.html";
     }
     
     @Override public Node getPanel(final Stage stage) {

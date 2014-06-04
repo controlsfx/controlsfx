@@ -234,13 +234,15 @@ public class FXSampler extends Application {
            samplesTreeView.setRoot(root);
         }
         
-
         // and finally we sort the display a little
-        Collections.sort(root.getChildren(), new Comparator<TreeItem<Sample>>() {
-            @Override public int compare(TreeItem<Sample> o1, TreeItem<Sample> o2) {
-                return o1.getValue().getSampleName().compareTo(o2.getValue().getSampleName());
-            }
-        });
+        sort(root, (o1, o2) -> o1.getValue().getSampleName().compareTo(o2.getValue().getSampleName()));
+    }
+    
+    private void sort(TreeItem<Sample> node, Comparator<TreeItem<Sample>> comparator) {
+        node.getChildren().sort(comparator);
+        for (TreeItem<Sample> child : node.getChildren()) {
+            sort(child, comparator);
+        }
     }
     
     // true == keep, false == delete

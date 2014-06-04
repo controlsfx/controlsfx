@@ -41,7 +41,7 @@ import javafx.scene.layout.BorderPane;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.DefaultDialogAction;
+import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.DialogStyle;
 import org.controlsfx.property.BeanProperty;
@@ -54,7 +54,7 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private final PropertySheet.Item item;
     private final ObjectProperty<T> value = new SimpleObjectProperty<>();
 
-    final Action actionSave = new DefaultDialogAction("Save",
+    final Action actionSave = new DialogAction("Save",
             Dialog.ActionTrait.CLOSING, Dialog.ActionTrait.DEFAULT) {
                 {
                     ButtonBar.setType(this, ButtonBar.ButtonType.OK_DONE);

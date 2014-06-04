@@ -154,7 +154,7 @@ public class ActionMap {
 	
 }
 
-class AnnotatedAction extends AbstractAction {
+class AnnotatedAction extends Action {
 
 	private Method method;
 	private Object target;

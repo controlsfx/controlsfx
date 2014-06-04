@@ -47,7 +47,7 @@ import javafx.scene.control.ToolBar;
  * 
  * <h3>Code Examples</h3>
  * <p>Consider the following code example (note that DummyAction is a fake class
- * that extends from (and implements) {@link AbstractAction}):
+ * that extends from (and implements) {@link Action}):
  * 
  * <pre>
  * {@code
@@ -93,7 +93,7 @@ import javafx.scene.control.ToolBar;
  * @see Action
  * @see ActionUtils
  */
-public class ActionGroup extends AbstractAction {
+public class ActionGroup extends Action {
     
     /**
      * Creates an ActionGroup with the given text as the name of the {@link Action}, 

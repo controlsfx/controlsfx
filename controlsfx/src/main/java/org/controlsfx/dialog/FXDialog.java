@@ -139,7 +139,8 @@ abstract class FXDialog {
             @Override protected void layoutChildren() {
                 super.layoutChildren();
                 if (resizeCorner != null) {
-                    resizeCorner.relocate(getWidth() - 20, getHeight() - 20);
+                    resizeCorner.relocate(getWidth() - resizeCorner.getWidth(), 
+                                          getHeight() - resizeCorner.getHeight());
                 }
             }
         };
@@ -212,20 +213,9 @@ abstract class FXDialog {
         });
         
         resizableProperty().addListener(valueModel -> {
-            resizeCorner.setVisible(resizableProperty().get());
-            
-            if (maxButton != null) {
-                maxButton.setVisible(resizableProperty().get());
-   
-                if (resizableProperty().get()) {
-                    if (! windowBtns.getChildren().contains(maxButton)) {
-                        windowBtns.getChildren().add(1, maxButton);
-                    }
-                } else {
-                    windowBtns.getChildren().remove(maxButton);
-                }
-            }
+            updateResizable();
         });
+        updateResizable();
         
         focusedProperty().addListener(valueModel -> {                
             boolean active = ((ReadOnlyBooleanProperty)valueModel).get();
@@ -239,6 +229,24 @@ abstract class FXDialog {
         updateStageStyle(null, getStyleClass());
     }
     
+    private void updateResizable() {
+        resizeCorner.setVisible(resizableProperty().get());
+        
+        if (maxButton != null) {
+            maxButton.setVisible(resizableProperty().get());
+
+            if (resizableProperty().get()) {
+                if (! windowBtns.getChildren().contains(maxButton)) {
+                    windowBtns.getChildren().add(1, maxButton);
+                }
+            } else {
+                windowBtns.getChildren().remove(maxButton);
+            }
+        }        
+    }
+
+
+
     public void shake() {
         Timeline timeline = new Timeline();
         timeline.setCycleCount(2);
@@ -261,10 +269,6 @@ abstract class FXDialog {
     }
     
     public ObservableList<String> getStyleClass() {
-//        if (styleClass == null) {
-//            styleClass = FXCollections.observableArrayList();
-//        }
-//        return styleClass;
         return lightweightDialog.getStyleClass();
     }
     

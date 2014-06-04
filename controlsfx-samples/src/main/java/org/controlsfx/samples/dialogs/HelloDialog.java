@@ -54,10 +54,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -79,9 +82,11 @@ import org.controlsfx.samples.Utils;
 public class HelloDialog extends ControlsFXSample {
 
     private final ComboBox<String> styleCombobox = new ComboBox<>();
-	private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
-	private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
-	private final CheckBox cbSetOwner = new CheckBox("Set Owner");
+	private final CheckBox cbUseLightweightDialog = new CheckBox();
+	private final CheckBox cbShowMasthead = new CheckBox();
+	private final CheckBox cbSetOwner = new CheckBox();
+	private final CheckBox cbCustomGraphic = new CheckBox();
+	
 
 	@Override
 	public String getSampleName() {
@@ -565,6 +570,10 @@ public class HelloDialog extends ControlsFXSample {
 			dialog.lightweight();
 		}
 		
+		if (cbCustomGraphic.isSelected()) {
+		    dialog.graphic(new ImageView(new Image(getClass().getResource("../controlsfx-logo.png").toExternalForm())));
+		}
+		
 		dialog.styleClass(getDialogStyle());
 
 		return dialog;
@@ -624,6 +633,11 @@ public class HelloDialog extends ControlsFXSample {
 		grid.add(createLabel("Set dialog owner: ", "property"), 0, row);
 		grid.add(cbSetOwner, 1, row);
 		row++;
+		
+		// custom graphic
+        grid.add(createLabel("Use custom graphic: ", "property"), 0, row);
+        grid.add(cbCustomGraphic, 1, row);
+        row++;
 
 		return grid;
 	}

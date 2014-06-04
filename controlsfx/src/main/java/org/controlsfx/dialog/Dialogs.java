@@ -399,6 +399,7 @@ public final class Dialogs {
 
     private Object owner;
     private String title = USE_DEFAULT;
+    private Node graphic;
     private String message;
     private String masthead;
     private boolean lightweight;
@@ -438,7 +439,16 @@ public final class Dialogs {
         this.title = title;
         return this;
     }
-
+    
+    /**
+     * Assigns dialog's graphic
+     * @param title dialog graphic
+     * @return dialog instance.
+     */
+    public Dialogs graphic(final Node graphic) {
+        this.graphic = graphic;
+        return this;
+    }
     
     /**
      * Assigns dialog's instructions
@@ -1105,10 +1115,14 @@ public final class Dialogs {
         
         dlg.setResizable(false);
         dlg.setIconifiable(false);
-        Image image = dlgType.getImage();
-        if (image != null) {
-            dlg.setGraphic(new ImageView(image));
+        
+        // graphic
+        if (graphic != null) {
+            dlg.setGraphic(graphic);
+        } else if (dlgType.getImage() != null){
+            dlg.setGraphic(new ImageView(dlgType.getImage()));
         }
+        
         dlg.setMasthead(actualMasthead);
         dlg.getActions().addAll(dlgType.getActions());
         dlg.setBackgroundEffect(backgroundEffect);

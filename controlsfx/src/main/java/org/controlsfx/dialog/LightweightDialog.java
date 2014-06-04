@@ -144,18 +144,21 @@ class LightweightDialog extends FXDialog {
                 // remove the drop shadow out of the width calculations
                 final double DROP_SHADOW_SIZE = (lightweightDialog.getBoundsInParent().getWidth() - lightweightDialog.getLayoutBounds().getWidth()) / 2.0;
                 final Insets padding = lightweightDialog.getPadding();
-                final double rightPadding = padding.getRight();
-                final double bottomPadding = padding.getBottom();
+                
+                Insets ownerPadding = Insets.EMPTY;
+                if (owner instanceof Region) {
+                    ownerPadding = ((Region)owner).getPadding();
+                }
                 
                 double minX = 0;
                 double maxX = owner == null ? scene.getWidth() : owner.getLayoutBounds().getWidth();
                 double newX = event.getSceneX() + mouseDragDeltaX;
-                newX = Utils.clamp(minX, newX, maxX - w + DROP_SHADOW_SIZE + rightPadding + minX);
+                newX = Utils.clamp(minX, newX, maxX - w - DROP_SHADOW_SIZE - padding.getRight() - ownerPadding.getRight());
                 
                 double minY = 0;
                 double maxY = owner == null ? scene.getHeight() : owner.getLayoutBounds().getHeight();
                 double newY = event.getSceneY() + mouseDragDeltaY;
-                newY = Utils.clamp(0, newY, maxY - h + DROP_SHADOW_SIZE + bottomPadding + minY);
+                newY = Utils.clamp(minY, newY, maxY - h - DROP_SHADOW_SIZE - padding.getBottom() - ownerPadding.getBottom());
                 
                 lightweightDialog.setLayoutX(newX);
                 lightweightDialog.setLayoutY(newY);

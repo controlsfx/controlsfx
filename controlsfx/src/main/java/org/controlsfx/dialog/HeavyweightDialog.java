@@ -67,8 +67,6 @@ class HeavyweightDialog extends FXDialog {
     private final Stage stage;
     private final Window owner;
     
-    private boolean modal;
-    
     private static EnumSet<Platform> DECORATED_STAGE_PLATFORMS = EnumSet.of(OSX, UNIX);
 
     
@@ -79,33 +77,11 @@ class HeavyweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
-    HeavyweightDialog(String title, Window owner, boolean modal) {
-        this(title, owner, modal, DialogStyle.CROSS_PLATFORM_DARK);
-    }
-
-    HeavyweightDialog(String title, Window owner, boolean modal, DialogStyle dialogStyle) {
+    HeavyweightDialog(String title, Window owner) {
         super();
         this.owner = owner;
         
-        final StageStyle style;
-        
-        switch (dialogStyle) {
-            case CROSS_PLATFORM_DARK:
-                style = StageStyle.TRANSPARENT;
-                break;
-            case NATIVE:
-                style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
-                     StageStyle.DECORATED : StageStyle.UTILITY;
-                break;
-            case UNDECORATED:
-                style = StageStyle.UNDECORATED;
-                break;
-            default:
-                dialogStyle = DialogStyle.CROSS_PLATFORM_DARK;
-                style = StageStyle.TRANSPARENT;
-        }
-        
-        stage = new Stage(style) {
+        stage = new Stage() {
             @Override public void showAndWait() {
                 Window owner = getOwner();
                 if (owner != null) {
@@ -139,35 +115,36 @@ class HeavyweightDialog extends FXDialog {
         if (owner != null) {
             stage.initOwner(owner);
         }
-
-        setModal(modal);
         
-        boolean useCustomChrome = (dialogStyle == DialogStyle.CROSS_PLATFORM_DARK);
+        init(title);
+
+        boolean isCrossPlatformStyleSet = isCrossPlatformStyleClassSet();
 
         // *** The rest is for adding window decorations ***
-        init(title, dialogStyle);
+        setCrossPlatformStyleEnabled(isCrossPlatformStyleSet);
+        
         lightweightDialog.getStyleClass().add("heavyweight"); //$NON-NLS-1$
-        lightweightDialog.getStyleClass().add(useCustomChrome ? "custom-chrome" : "native-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
 
         Scene scene = new Scene(lightweightDialog);
         scene.getStylesheets().addAll(DIALOGS_CSS_URL.toExternalForm());
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
-
+    }
+    
+    @Override protected void setCrossPlatformStyleEnabled(boolean enabled) {
+        super.setCrossPlatformStyleEnabled(enabled);
         
-        if (useCustomChrome) {
+        if (enabled) {
+            stage.initStyle(StageStyle.TRANSPARENT);
+        
             // add window dragging
-            toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override public void handle(MouseEvent event) {
-                    mouseDragDeltaX = event.getSceneX();
-                    mouseDragDeltaY = event.getSceneY();
-                }
+            dialogTitleBar.setOnMousePressed(event -> {
+                mouseDragDeltaX = event.getSceneX();
+                mouseDragDeltaY = event.getSceneY();
             });
-            toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                @Override public void handle(MouseEvent event) {
-                    stage.setX(event.getScreenX() - mouseDragDeltaX);
-                    stage.setY(event.getScreenY() - mouseDragDeltaY);
-                }
+            dialogTitleBar.setOnMouseDragged(event -> {
+                stage.setX(event.getScreenX() - mouseDragDeltaX);
+                stage.setY(event.getScreenY() - mouseDragDeltaY);
             });
     
             // support maximising the dialog
@@ -226,8 +203,25 @@ class HeavyweightDialog extends FXDialog {
         }
     }
     
+    @Override protected void setNativeStyleEnabled(boolean enabled) {
+        super.setNativeStyleEnabled(enabled);
+        if (enabled) {
+            StageStyle style = DECORATED_STAGE_PLATFORMS.contains(Platform.getCurrent()) ? 
+                  StageStyle.DECORATED : StageStyle.UTILITY;
+            stage.initStyle(style);
+        }
+    }
     
+    @Override protected void setUndecoratedStyleEnabled(boolean enabled) {
+        super.setNativeStyleEnabled(enabled);
+        if (enabled) {
+            stage.initStyle(StageStyle.UNDECORATED);
+        }
+    }
     
+
+
+
     /**************************************************************************
      * 
      * Public API

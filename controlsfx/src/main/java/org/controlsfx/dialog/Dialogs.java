@@ -402,9 +402,9 @@ public final class Dialogs {
     private String message;
     private String masthead;
     private boolean lightweight;
-    private DialogStyle style;
     private Set<Action> actions = new LinkedHashSet<>();
     private Effect backgroundEffect;
+    private List<String> styleClasses;
 
     /**
      * Creates the initial dialog
@@ -511,15 +511,30 @@ public final class Dialogs {
     }
     
     /**
-     * Specifies that the dialog should use the given {@code DialogStyle}
-     * rather than the custom cross-platform rendering used by default.
-     * Refer to the Dialogs class JavaDoc for more information.
+     * Specifies that the dialog should use the given style class, which allows
+     * for custom styling via CSS. There are three built-in style classes that
+     * cover most use cases, these are:
      * 
-     * @param style The {@code DialogStyle} of the dialog.
+     * <ul>
+     *   <li>{@link Dialog#STYLE_CLASS_CROSS_PLATFORM}</li>
+     *   <li>{@link Dialog#STYLE_CLASS_NATIVE}</li>
+     *   <li>{@link Dialog#STYLE_CLASS_UNDECORATED}</li>
+     * </ul>
+     * 
+     * <p>By default, dialogs use the cross-platform style class, to give a
+     * consistent look across all operating systems.
+     * 
+     * <p>This method can be called multiple times, with each style class being
+     * added to the final dialog instance.
+     * 
+     * @param styleClass The style class to add to the dialog.
      * @return dialog instance.
      */
-    public Dialogs style(DialogStyle style) {
-        this.style = style;
+    public Dialogs styleClass(String styleClass) {
+        if (styleClasses == null) {
+            styleClasses = new ArrayList<String>();
+        }
+        styleClasses.add(styleClass);
         return this;
     }
     
@@ -590,7 +605,7 @@ public final class Dialogs {
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
                 String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails, style).show();
+                new ExceptionDialog((Window)owner, moreDetails).show();
             }
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
@@ -1082,7 +1097,12 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle, lightweight, style);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight);
+        
+        if (styleClasses != null) {
+            dlg.getStyleClass().addAll(styleClasses);
+        }
+        
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         Image image = dlgType.getImage();

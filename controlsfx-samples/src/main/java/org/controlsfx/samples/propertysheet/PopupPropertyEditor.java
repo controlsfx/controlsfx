@@ -43,7 +43,6 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.DialogStyle;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.PropertyEditor;
@@ -88,8 +87,7 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private void displayPopupEditor() {
         PopupPropertySheet<T> sheet = new PopupPropertySheet<>(item, this);
 
-        Dialog dlg = new Dialog(null, "Popup Property Editor", false,
-                DialogStyle.CROSS_PLATFORM_DARK);
+        Dialog dlg = new Dialog(null, "Popup Property Editor", false);
 
         dlg.setResizable(false);
         dlg.setIconifiable(false);

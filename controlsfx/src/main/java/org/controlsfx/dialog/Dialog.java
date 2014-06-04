@@ -66,6 +66,7 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.tools.Utils;
 
 /**
  * A lower-level API for creating standardized dialogs consisting of the following
@@ -209,11 +210,29 @@ public class Dialog {
      * 
      **************************************************************************/
     
+    /**
+     * Defines a native dialog style.
+     * The dialogs rendered using this style will have a native title bar.
+     */
+    public static final String STYLE_CLASS_NATIVE = "native";
+    
+    /**
+     * Defines a cross-platform dialog style.
+     * The dialogs rendered using this style will have a cross-platform title bar.
+     */
+    public static final String STYLE_CLASS_CROSS_PLATFORM = "cross-platform";
+    
+    /**
+     * Defines a dialog style with no decorations.
+     * The dialogs rendered using this style will not have a title bar.
+     */
+    public static final String STYLE_CLASS_UNDECORATED = "undecorated";
+    
     // enable to turn on grid lines, etc
     private static final boolean DEBUG = false;
     
     static int MIN_DIALOG_WIDTH = 426;
-
+    
     
     
     /**************************************************************************
@@ -268,26 +287,13 @@ public class Dialog {
      *      the difference between heavyweight and lightweight dialogs.
      */
     public Dialog(Object owner, String title, boolean lightweight) {
-        this(owner, title, lightweight, DialogStyle.CROSS_PLATFORM_DARK);
-    }
-    
-    /**
-     * Creates a dialog using specified owner, title and {@code DialogStyle}
-     * which may be rendered in either a heavyweight or lightweight fashion.
-     * 
-     * @param owner The dialog window owner - if specified the dialog will be
-     *      centered over the owner, otherwise the dialog will be shown in the 
-     *      middle of the screen.
-     * @param title The dialog title to be shown at the top of the dialog.
-     * @param lightweight If true this dialog will be rendered inside the given
-     *      owner, rather than in a separate window (as heavyweight dialogs are).
-     *      Refer to the {@link Dialogs} class documentation for more details on
-     *      the difference between heavyweight and lightweight dialogs.
-     * @param style The {@code DialogStyle} of the dialog. Refer to the 
-     *      {@link Dialogs} class javadoc for more information.
-     */
-    public Dialog(Object owner, String title, boolean lightweight, DialogStyle style) {
-        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, style);
+        if (lightweight) {
+            this.dialog = new LightweightDialog(title, owner);
+        } else {
+            Window window = Utils.getWindow(owner);
+            this.dialog = new HeavyweightDialog(title, window);
+            this.dialog.setModal(true);
+        }
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane"); //$NON-NLS-1$
@@ -303,7 +309,7 @@ public class Dialog {
      * Public API
      * 
      **************************************************************************/
-
+    
     /**
      * Shows the dialog and waits for the user response (in other words, brings 
      * up a modal dialog, with the returned value the users input).
@@ -350,16 +356,14 @@ public class Dialog {
      * @param result
      */
     public void setResult(Action result) {
-    
         this.result = result;
         
-        if ( result instanceof DialogAction ) {
+        if (result instanceof DialogAction) {
             DialogAction dlgAction = (DialogAction) result;
-            if ( dlgAction.hasTrait(ActionTrait.CANCEL) || dlgAction.hasTrait(ActionTrait.CLOSING) ) {
+            if (dlgAction.hasTrait(ActionTrait.CANCEL) || dlgAction.hasTrait(ActionTrait.CLOSING)) {
                 hide();
             }
         }
-
     }
     
     /**
@@ -370,6 +374,12 @@ public class Dialog {
     public ObservableList<String> getStylesheets(){
         return dialog.getStylesheets();
     }
+    
+    public ObservableList<String> getStyleClass() {
+        return dialog.getStyleClass();
+    }
+    
+    
     
     /**************************************************************************
      * 

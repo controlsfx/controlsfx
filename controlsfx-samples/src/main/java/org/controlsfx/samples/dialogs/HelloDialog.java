@@ -78,7 +78,7 @@ import org.controlsfx.samples.Utils;
 
 public class HelloDialog extends ControlsFXSample {
 
-    private final ComboBox<DialogStyle> styleCombobox = new ComboBox<>();
+    private final ComboBox<String> styleCombobox = new ComboBox<>();
 	private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
 	private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
 	private final CheckBox cbSetOwner = new CheckBox("Set Owner");
@@ -506,7 +506,9 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent arg0) {
 				Dialog dlg = new Dialog(includeOwner() ? stage : null,
-						"Login Dialog", cbUseLightweightDialog.isSelected(),getDialogStyle());
+						"Login Dialog", cbUseLightweightDialog.isSelected());
+				dlg.getStyleClass().setAll(getDialogStyle());
+				
 				if (cbShowMasthead.isSelected()) {
 					dlg.setMasthead("Login to ControlsFX");
 				}
@@ -563,7 +565,7 @@ public class HelloDialog extends ControlsFXSample {
 			dialog.lightweight();
 		}
 		
-		dialog.style(getDialogStyle());
+		dialog.styleClass(getDialogStyle());
 
 		return dialog;
 	}
@@ -591,7 +593,7 @@ public class HelloDialog extends ControlsFXSample {
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);
-        styleCombobox.getItems().addAll(DialogStyle.values());
+        styleCombobox.getItems().addAll("Cross-platform", "Native", "Undecorated");
         styleCombobox.setValue(styleCombobox.getItems().get(0));
         grid.add(styleCombobox, 1, row);
         row++;
@@ -626,9 +628,9 @@ public class HelloDialog extends ControlsFXSample {
 		return grid;
 	}
 	
-	private DialogStyle getDialogStyle() {
-	    SelectionModel<DialogStyle> sm = styleCombobox.getSelectionModel();
-	    return sm.getSelectedItem() == null ? DialogStyle.CROSS_PLATFORM_DARK : sm.getSelectedItem();
+	private String getDialogStyle() {
+	    SelectionModel<String> sm = styleCombobox.getSelectionModel();
+	    return sm.getSelectedItem() == null ? "cross-platform" : sm.getSelectedItem().toLowerCase();
 	}
 
 	public static void main(String[] args) {

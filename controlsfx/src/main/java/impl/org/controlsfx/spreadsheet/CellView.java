@@ -81,6 +81,17 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
 
+    static void setAnchor(Control table, TablePositionBase anchor) {
+        if (table != null && anchor == null) {
+            removeAnchor(table);
+        } else {
+            table.getProperties().put(ANCHOR_PROPERTY_KEY, anchor);
+        }
+    }
+    
+    static void removeAnchor(Control table) {
+        table.getProperties().remove(ANCHOR_PROPERTY_KEY);
+    }
     /***************************************************************************
      * * Constructor * *
      **************************************************************************/
@@ -192,6 +203,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             updateSelected(false);
         }
         if (empty && emptyRow) {
+            textProperty().unbind();
             setText(null);
             // do not nullify graphic here. Let the TableRow to control cell
             // dislay
@@ -489,10 +501,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             // clear selection, but maintain the anchor
             if (!e.isShortcutDown())
                 sm.clearSelection();
-
             if (minColumn != -1 && maxColumn != -1)
                 sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,
                         tableView.getColumns().get(maxColumn));
+            setAnchor(tableView, anchor);
         }
 
     }
@@ -519,6 +531,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private final EventHandler<MouseEvent> startFullDragEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent arg0) {
+            setAnchor(getTableView(), getTableView().getFocusModel().getFocusedCell());
             startFullDrag();
         }
     };

@@ -563,17 +563,17 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
      * JDK8u20
      */
-    @Override
-    protected void onSelectRightCell() {
-    }
+//    @Override
+//    protected void onSelectRightCell() {
+//    }
 
     /**
      * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
      * JDK8u20
      */
-    @Override
-    protected void onSelectLeftCell() {
-    }
+//    @Override
+//    protected void onSelectLeftCell() {
+//    }
 
     @Override
     protected void onSelectPreviousCell() {

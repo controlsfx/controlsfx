@@ -212,9 +212,7 @@ abstract class FXDialog {
             }
         });
         
-        resizableProperty().addListener(valueModel -> {
-            updateResizable();
-        });
+        resizableProperty().addListener(valueModel -> updateResizable());
         updateResizable();
         
         focusedProperty().addListener(valueModel -> {                

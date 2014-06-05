@@ -83,8 +83,19 @@ class HeavyweightDialog extends FXDialog {
         
         stage = new Stage() {
             @Override public void showAndWait() {
+                centerOnScreen();
+                super.showAndWait();
+            }
+            
+            @Override public void centerOnScreen() {
                 Window owner = getOwner();
                 if (owner != null) {
+                    Scene scene = owner.getScene();
+                    
+                    // scene.getY() seems to represent the y-offset from the top of the titlebar to the
+                    // start point of the scene, so it is the titlebar height
+                    final double titleBarHeight = scene.getY();
+                    
                     // because Stage does not seem to centre itself over its owner, we
                     // do it here.
                     double x, y;
@@ -99,16 +110,15 @@ class HeavyweightDialog extends FXDialog {
                         double maxH = screen.getVisualBounds().getHeight();
                         
                         x = maxW / 2.0 - dialogWidth / 2.0;
-                        y = maxH / 2.0 - dialogHeight / 2.0 - 50;
+                        y = maxH / 2.0 - dialogHeight / 2.0 + titleBarHeight;
                     } else {
-                        x = owner.getX() + (owner.getWidth() / 2.0) - (dialogWidth / 2.0);
-                        y = owner.getY() + (owner.getHeight() / 2.0) - dialogHeight / 2.0 - 50;
+                        x = owner.getX() + (scene.getWidth() / 2.0) - (dialogWidth / 2.0);
+                        y = owner.getY() +  titleBarHeight + (scene.getHeight() / 2.0) - (dialogHeight / 2.0);
                     }
                     
                     setX(x);
                     setY(y);
                 }
-                super.showAndWait();
             }
         };
 
@@ -268,7 +278,7 @@ class HeavyweightDialog extends FXDialog {
     }
     
     @Override public void show() {
-        stage.centerOnScreen();
+        root.heightProperty().addListener(o -> stage.centerOnScreen());
         stage.showAndWait();
     }
     

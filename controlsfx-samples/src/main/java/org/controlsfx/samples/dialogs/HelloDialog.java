@@ -61,18 +61,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
+import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
-import org.controlsfx.dialog.Dialogs.UserInfo;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
@@ -454,9 +454,9 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Optional<UserInfo> response = configureSampleDialog(Dialogs.create())
-						.showLogin(new UserInfo("user", "password"), info -> {
-							if ( !"controlsfx".equalsIgnoreCase(info.getUserName())) {
+				Optional<Pair<String,String>> response = configureSampleDialog(Dialogs.create())
+						.showLogin(new Pair<String,String>("user", "password"), info -> {
+							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
 								throw new RuntimeException("Service is not available... try again later!"); 
 							};
 							return null;

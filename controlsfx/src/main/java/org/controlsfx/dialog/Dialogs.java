@@ -92,6 +92,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
@@ -915,105 +916,19 @@ public final class Dialogs {
         content.setWorker(worker);
     }
     
-    /**
-     * The UserInfo class is used in relation to the pre-built login dialog 
-     * available from {@link Dialogs#showLogin(UserInfo, Callback)}.
-     */
-    public static class UserInfo {
-    	
-    	private String userName;
-    	private String password;
-    	
-    	/**
-    	 * Creates a UserInfo instance with the given username and password.
-    	 */
-		public UserInfo(String userName, String password) {
-			this.userName = userName == null? "": userName;
-			this.password = password == null? "": password;
-		}
-		
-		/**
-		 * Returns the currently set username.
-		 */
-		public String getUserName() {
-			return userName;
-		}
-		
-		/**
-		 * Sets the username to the given value.
-		 */
-		public void setUserName(String userName) {
-			this.userName = userName;
-		}
-		
-		/**
-         * Returns the currently set password.
-         */
-		public String getPassword() {
-			return password;
-		}
-		
-		/**
-         * Sets the password to the given value.
-         */
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		/** {@inheritDoc} */
-		@Override public String toString() {
-			return "UserInfo [userName=" + userName + "]";
-		}
-
-		/** {@inheritDoc} */
-		@Override public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((password == null) ? 0 : password.hashCode());
-			result = prime * result
-					+ ((userName == null) ? 0 : userName.hashCode());
-			return result;
-		}
-
-		/** {@inheritDoc} */
-		@Override public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			UserInfo other = (UserInfo) obj;
-			if (password == null) {
-				if (other.password != null)
-					return false;
-			} else if (!password.equals(other.password))
-				return false;
-			if (userName == null) {
-				if (other.userName != null)
-					return false;
-			} else if (!userName.equals(other.userName))
-				return false;
-			return true;
-		}
-    }
-    
-    
     
     /**
-     * Creates a Login {@link Dialog} whith user name and password  fields
+     * Creates a Login {@link Dialog} with user name and password fields. 
      * 
-     * @param initialUserInfo user information initially shown in the dialog
+     * @param initialUserInfo {@link Pair} of user name and password. User information initially shown in the dialog
      * @param authenticator callback represents actual authentication process. Exceptions coming from this callback are interpreted as
-     * authentication errors and will be shown as error message. In case of an exception the dialog will not closed to give the user 
+     * authentication errors and will be shown as error message. In case of an exception the dialog will not be closed to give the user 
      * an opportunity to correct their information and try again
      * 
-     * @return optional UserInfo. Optional.EMPTY returned in case of cancelled dialog otherwise Optional of UserInfo value with provided user name
-     * and password
-     *  
+     * @return optional {@link Pair} of user info. {@link Optional.EMPTY} returned in case of cancelled dialog, otherwise Optional of user info 
+     * with provided user name and password
      */
-    public Optional<UserInfo> showLogin( final UserInfo initialUserInfo, final Callback<UserInfo, Void> authenticator ) {
+    public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {
     	
     	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();// new CustomTextField();
     	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
@@ -1043,7 +958,7 @@ public final class Dialogs {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
+						authenticator.call( new Pair<String,String>(txUserName.getText(), txPassword.getText() ) );
 					}
 					lbMessage.setVisible(false);
 					lbMessage.setManaged(false);
@@ -1077,9 +992,9 @@ public final class Dialogs {
 		String userNameCation = getString("login.dlg.user.caption");
 		String passwordCaption = getString("login.dlg.pswd.caption");
 		txUserName.setPromptText(userNameCation);
-		txUserName.setText( initialUserInfo.getUserName());
+		txUserName.setText( initialUserInfo.getKey());
 		txPassword.setPromptText(passwordCaption);
-		txPassword.setText(new String(initialUserInfo.getPassword()));
+		txPassword.setText(new String(initialUserInfo.getValue()));
 
 		ValidationSupport validationSupport = new ValidationSupport();
 		Platform.runLater( () -> {
@@ -1092,7 +1007,7 @@ public final class Dialogs {
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
-    					new UserInfo(txUserName.getText(), txPassword.getText()): 
+    					new Pair<String,String>(txUserName.getText(), txPassword.getText()): 
     					null);
     }
     

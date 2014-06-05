@@ -27,11 +27,13 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.util.Optional;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableSet;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 
 /**
@@ -42,7 +44,30 @@ import javafx.scene.Node;
  * @see SpreadsheetCellBase
  */
 public interface SpreadsheetCell {
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
+     * when the editable state of a SpreadsheetCell is changed.
+     */
+    public static final EventType EDITABLE_EVENT_TYPE = new EventType("EditableEventType");
+    
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
+     * when a corner state of a SpreadsheetCell is changed.
+     */
+    public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType");
 
+    /**
+     * This enum states the four different corner available for positioning 
+     * some elements in a cell.
+     */
+    public static enum CornerPosition {
+
+        TOP_LEFT ,
+        TOP_RIGHT ,
+        BOTTOM_RIGHT ,
+        BOTTOM_LEFT 
+    }
+    
     /**
      * Verify that the upcoming cell value can be set to the current cell. This
      * is currently used by the Copy/Paste.
@@ -87,38 +112,29 @@ public interface SpreadsheetCell {
     /**
      * Change the editable state of this cell
      *
-     * @param readOnly
+     * @param editable
      */
-    public void setEditable(boolean readOnly);
+    public void setEditable(boolean editable);
 
     /**
-     * The {@link BooleanProperty} linked with the editable state.
-     *
-     * @return The {@link BooleanProperty} linked with the editable state.
+     * This activate the given cornerPosition.
+     * @param position
      */
-    public BooleanProperty editableProperty();
+    public void activateCorner(CornerPosition position);
+    
+    /**
+     * This deactivate the given cornerPosition.
+     * @param position
+     */
+    public void deactivateCorner(CornerPosition position);
 
     /**
-     * Return if this cell has a comment or not.
-     *
-     * @return true if this cell has a comment.
+     * 
+     * @param position
+     * @return the current state of a specific corner.
      */
-    public boolean isCommented();
-
-    /**
-     * Change the commented state of this cell.
-     *
-     * @param flag
-     */
-    public void setCommented(boolean flag);
-
-    /**
-     * The {@link BooleanProperty} linked with the commented state.
-     *
-     * @return The {@link BooleanProperty} linked with the commented state.
-     */
-    public BooleanProperty commentedProperty();
-
+    public boolean isCornerActivated(CornerPosition position);
+    
     /**
      * The {@link StringProperty} linked with the format.
      *
@@ -246,4 +262,20 @@ public interface SpreadsheetCell {
      * @return the tooltip associated with this SpreadsheetCell.
      */
     public Optional<String> getTooltip();
+    
+    /**
+     * Registers an event handler to this SpreadsheetCell. 
+     * @param eventType the type of the events to receive by the handler
+     * @param eventHandler the handler to register
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public void addEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
+    
+    /**
+     * Unregisters a previously registered event handler from this SpreadsheetCell. 
+     * @param eventType the event type from which to unregister
+     * @param eventHandler the handler to unregister
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public void removeEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
 }

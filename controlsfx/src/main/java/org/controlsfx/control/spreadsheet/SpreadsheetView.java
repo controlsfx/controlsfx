@@ -28,7 +28,6 @@ package org.controlsfx.control.spreadsheet;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
-
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
@@ -60,6 +59,7 @@ import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
@@ -1035,19 +1035,54 @@ public class SpreadsheetView extends Control {
             }
         });
         
-        final MenuItem commentedItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment")));
-        commentedItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
+        final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment")));
+        cornerMenu.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("comment.png"))));
-        commentedItem.setOnAction(new EventHandler<ActionEvent>() {
+
+        final MenuItem topLeftItem = new MenuItem("top-left");
+        topLeftItem.setOnAction(new EventHandler<ActionEvent>() {
+
             @Override
-            public void handle(ActionEvent e) {
+            public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell =  getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
-               cell.setCommented(!cell.isCommented());
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
             }
         });
+        final MenuItem topRightItem = new MenuItem("top-right");
+        topRightItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
+            }
+        });
+        final MenuItem bottomRightItem = new MenuItem("bottom-right");
+        bottomRightItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
+            }
+        });
+        final MenuItem bottomLeftItem = new MenuItem("bottom-left");
+        bottomLeftItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_LEFT);
+            }
+        });
+
+        cornerMenu.getItems().addAll(topLeftItem, topRightItem, bottomRightItem, bottomLeftItem);
         
-        contextMenu.getItems().addAll(copyItem, pasteItem, commentedItem);
+        contextMenu.getItems().addAll(copyItem, pasteItem, cornerMenu);
         return contextMenu;
     }
 

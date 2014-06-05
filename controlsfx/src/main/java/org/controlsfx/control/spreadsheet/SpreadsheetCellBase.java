@@ -26,21 +26,23 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import com.sun.javafx.event.EventHandlerManager;
 import java.util.Objects;
 import java.util.Optional;
-
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
+import javafx.event.Event;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 
@@ -195,7 +197,7 @@ import javafx.scene.image.ImageView;
  * @see SpreadsheetCellEditor
  * @see SpreadsheetCellType
  */
-public class SpreadsheetCellBase implements SpreadsheetCell{
+public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
     /***************************************************************************
      * 
@@ -203,7 +205,8 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
      * 
      **************************************************************************/
 
-    @SuppressWarnings("rawtypes")
+    //The Bit position for the editable Property.
+    private static final int EDITABLE_BIT_POSITION = 4;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -213,6 +216,13 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
     private final StringProperty text;
     private final ObjectProperty<Node> graphic;
     private String tooltip;
+    /**
+     * This variable handles all boolean values of this SpreadsheetCell inside
+     * its bits. Instead of using regular boolean, we use that int so that we 
+     * can reduce memory usage to the bare minimum.
+     */
+    private int propertyContainer = 0;
+    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     private ObservableSet<String> styleClass;
 
@@ -259,26 +269,22 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
                 updateText();
             }
         });
+        //Editable is true at the initialisation
+        setEditable(true);
         getStyleClass().add("spreadsheet-cell"); //$NON-NLS-1$
     }
 
     /***************************************************************************
      * 
-     * Abstract Methods
+     * Public Methods
      * 
      **************************************************************************/
-
+    
     /** {@inheritDoc} */
     @Override
     public boolean match(SpreadsheetCell cell) {
         return type.match(cell);
     }
-
-    /***************************************************************************
-     * 
-     * Properties
-     * 
-     ***************************************************************************/
 
     // --- item
     private final ObjectProperty<Object> item = new SimpleObjectProperty<Object>(this, "item") { //$NON-NLS-1$
@@ -307,49 +313,18 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         return item;
     }
 
-    // --- editable
-    private BooleanProperty editable;
-
-   /** {@inheritDoc} */
+    /** {@inheritDoc} */
     @Override
     public final boolean isEditable() {
-        return editable == null ? true : editable.get();
+        return isSet(EDITABLE_BIT_POSITION);
     }
 
-   /** {@inheritDoc} */
+    /** {@inheritDoc} */
     @Override
-    public final void setEditable(boolean readOnly) {
-        editableProperty().set(readOnly);
-    }
-
-   /** {@inheritDoc} */
-    @Override
-    public final BooleanProperty editableProperty() {
-        if (editable == null) {
-            editable = new SimpleBooleanProperty(this, "editable", true); //$NON-NLS-1$
+    public final void setEditable(boolean editable) {
+        if(setMask(editable, EDITABLE_BIT_POSITION)){
+            Event.fireEvent(this, new Event(EDITABLE_EVENT_TYPE));
         }
-        return editable;
-    }
-
-    // --- comment
-    private final BooleanProperty commented = new SimpleBooleanProperty(this, "commented", false); //$NON-NLS-1$
-
-    /** {@inheritDoc} */
-    @Override
-    public final boolean isCommented() {
-        return commented == null ? true : commented.get();
-    }
-
-   /** {@inheritDoc} */
-    @Override
-    public final void setCommented(boolean flag) {
-        commentedProperty().set(flag);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final BooleanProperty commentedProperty() {
-        return commented;
     }
 
    /** {@inheritDoc} */
@@ -370,12 +345,6 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         formatProperty().set(format);
         updateText();
     }
-
-    /***************************************************************************
-     * 
-     * Public Methods
-     * 
-     **************************************************************************/
 
     /** {@inheritDoc} */
     @Override
@@ -440,32 +409,6 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         return styleClass;
     }
 
-    // A map containing a set of properties for this cell
-    private ObservableMap<Object, Object> properties;
-
-    /**
-     * Returns an observable map of properties on this node for use primarily by
-     * application developers.
-     * 
-     * @return an observable map of properties on this node for use primarily by
-     *         application developers
-     */
-    public final ObservableMap<Object, Object> getProperties() {
-        if (properties == null) {
-            properties = FXCollections.observableHashMap();
-        }
-        return properties;
-    }
-
-    /**
-     * Tests if Node has properties.
-     * 
-     * @return true if node has properties.
-     */
-    public final boolean hasProperties() {
-        return properties != null && !properties.isEmpty();
-    }
-
     /** {@inheritDoc} */
     @Override
     public ObjectProperty<Node> graphicProperty() {
@@ -484,6 +427,48 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         return graphic.get();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Optional<String> getTooltip() {
+        return Optional.ofNullable(tooltip);
+    }
+    
+    /**
+     * Set a new tooltip for this cell.
+     * @param tooltip 
+     */
+    public void setTooltip(String tooltip){
+        this.tooltip = tooltip;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void activateCorner(CornerPosition position) {
+        if(setMask(true, getCornerBitNumber(position))){
+            Event.fireEvent(this, new Event(CORNER_EVENT_TYPE));
+        }
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void deactivateCorner(CornerPosition position) {
+        if(setMask(false, getCornerBitNumber(position))){
+             Event.fireEvent(this, new Event(EDITABLE_EVENT_TYPE));
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isCornerActivated(CornerPosition position) {
+        return isSet(getCornerBitNumber(position));
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
+        return tail.append(eventHandlerManager);
+    }
+    
     /***************************************************************************
      * 
      * Overridden Methods
@@ -520,19 +505,35 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         return result;
     }
     
-    /** {@inheritDoc} */
+    /**
+     * Registers an event handler to this SpreadsheetCell. The SpreadsheetCell class allows 
+     * registration of listeners which will be notified when a corner state of
+     * the editable state of this SpreadsheetCell have changed.
+     *
+     * @param eventType the type of the events to receive by the handler
+     * @param eventHandler the handler to register
+     * @throws NullPointerException if the event type or handler is null
+     */
     @Override
-    public Optional<String> getTooltip() {
-        return Optional.ofNullable(tooltip);
+    public void addEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler) {
+         eventHandlerManager.addEventHandler(eventType, eventHandler);
+    }
+
+    /**
+     * Unregisters a previously registered event handler from this SpreadsheetCell. One
+     * handler might have been registered for different event types, so the
+     * caller needs to specify the particular event type from which to
+     * unregister the handler.
+     *
+     * @param eventType the event type from which to unregister
+     * @param eventHandler the handler to unregister
+     * @throws NullPointerException if the event type or handler is null
+     */
+    @Override
+    public void removeEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler) {
+         eventHandlerManager.removeEventHandler(eventType, eventHandler);
     }
     
-    /**
-     * Set a new tooltip for this cell.
-     * @param tooltip 
-     */
-    public void setTooltip(String tooltip){
-        this.tooltip = tooltip;
-    }
     /***************************************************************************
      * 
      * Private Implementation
@@ -549,5 +550,52 @@ public class SpreadsheetCellBase implements SpreadsheetCell{
         } else {
             text.setValue(type.toString(getItem()));
         }
+    }
+
+    /**
+     * Return the Bit position for each corner.
+     * @param position
+     * @return 
+     */
+    private int getCornerBitNumber(CornerPosition position) {
+        switch (position) {
+            case TOP_LEFT:
+                return 0;
+
+            case TOP_RIGHT:
+                return 1;
+
+            case BOTTOM_RIGHT:
+                return 2;
+
+            case BOTTOM_LEFT:
+            default:
+                return 3;
+        }
+    }
+
+    /**
+     * Set the specified bit position at the value specified by flag.
+     * @param flag
+     * @param position
+     * @return whether a change has really occured.
+     */
+    private boolean setMask(boolean flag, int position) {
+        int oldCorner = propertyContainer;
+        if (flag) {
+            propertyContainer |= (1 << position);
+        } else {
+            propertyContainer &= ~(1 << position);
+        }
+        return propertyContainer != oldCorner;
+    }
+
+    /**
+     * @param mask
+     * @param position
+     * @return whether the specified bit position is true.
+     */
+    private boolean isSet(int position) {
+        return (propertyContainer & (1 << position)) != 0;
     }
 }

@@ -100,7 +100,6 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -973,7 +972,7 @@ public final class Dialogs {
 //		NotificationPane notificationPane = new NotificationPane(content);
 //		notificationPane.setShowFromTop(true);
 		
-		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 			}

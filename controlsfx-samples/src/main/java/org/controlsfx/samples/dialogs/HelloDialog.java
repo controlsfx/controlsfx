@@ -65,12 +65,10 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.DialogsAccessor;
@@ -480,12 +478,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new DialogAction("Login",
-					ActionTrait.CLOSING, ActionTrait.DEFAULT) {
-
-				{
-					ButtonBar.setType(this, ButtonType.OK_DONE);
-				}
+			final Action actionLogin = new DialogAction("Login", ButtonType.OK_DONE, false, true, true ){
 
 				@Override
 				public void handle(ActionEvent ae) {

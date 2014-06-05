@@ -363,7 +363,7 @@ public class Dialog {
         
         if (result instanceof DialogAction) {
             DialogAction dlgAction = (DialogAction) result;
-            if (dlgAction.hasTrait(ActionTrait.CANCEL) || dlgAction.hasTrait(ActionTrait.CLOSING)) {
+            if (dlgAction.isCancel() || dlgAction.isClosing()) {
                 hide();
             }
         }
@@ -694,26 +694,6 @@ public class Dialog {
     }
     
     /**
-     * Possible traits of {@link DialogAction}
-     */
-    public enum ActionTrait {
-        /**
-         * Action with this trait will close the dialog
-         */
-        CLOSING,
-        
-        /**
-         * Button related to an action with this will be set as default  
-         */
-        DEFAULT,
-        
-        /**
-         * Action with this trait will cancel the dialog
-         */
-        CANCEL
-    }
-    
-    /**
      * Return the titleProperty of the dialog.
      */
     public StringProperty titleProperty(){
@@ -811,7 +791,7 @@ public class Dialog {
         /**
          * An action that, by default, will show 'OK'.
          */
-        public static final Action OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING){ //$NON-NLS-1$
+        public static final Action OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  false, true, true){ //$NON-NLS-1$
         	{ lock();}
         	public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
         }; 
@@ -819,7 +799,7 @@ public class Dialog {
         /**
          * An action that, by default, will show 'Yes'.
          */
-        public static final Action YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ){ //$NON-NLS-1$
+        public static final Action YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES, false, true, true ){ //$NON-NLS-1$
         	{ lock();}
         	public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
         }; 
@@ -1028,8 +1008,8 @@ public class Dialog {
         
         if (action instanceof DialogAction) {
             DialogAction dlgAction = (DialogAction) action;
-            button.setDefaultButton(keepDefault && dlgAction.hasTrait(ActionTrait.DEFAULT));
-            button.setCancelButton(dlgAction.hasTrait(ActionTrait.CANCEL));
+            button.setDefaultButton(keepDefault && dlgAction.isDefault());
+            button.setCancelButton(dlgAction.isCancel());
         }
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent ae) {

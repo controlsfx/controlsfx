@@ -31,23 +31,20 @@ import java.util.EnumSet;
 
 import javafx.event.ActionEvent;
 
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.ButtonBar;
+import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog.ActionTrait;
-import org.controlsfx.dialog.Dialog.DialogAction;
 
 /**
- * A convenience class that implements the {@link Action} and {@link DialogAction} interfaces and provides
- * a simpler API. It is highly recommended to use this class rather than 
- * implement the {@link Action} or the {@link DialogAction} interfaces directly.
+ * A specialized dialog {@link Action}, which can have a set of traits {@link ActionTrait}
  * 
  * <p>To better understand how to use actions, and where they fit within the
  * JavaFX ecosystem, refer to the {@link Action} class documentation.
  * 
  * @see Action
- * @see DialogAction
  */
-public class DefaultDialogAction extends AbstractAction implements DialogAction {
+public class DialogAction extends Action {
     
     private final EnumSet<ActionTrait> traits;
 
@@ -56,31 +53,51 @@ public class DefaultDialogAction extends AbstractAction implements DialogAction 
      * @param text
      * @param traits
      */
-    public DefaultDialogAction(String text, ActionTrait... traits) {
+    public DialogAction(String text, ButtonType buttonType, ActionTrait... traits) {
         super(text);
         this.traits = (traits == null || traits.length == 0) ? 
                 EnumSet.noneOf(ActionTrait.class) : 
                 EnumSet.copyOf(Arrays.asList(traits));
+               
+        if ( buttonType != null ) {        
+        	ButtonBar.setType(this, buttonType);
+        }
+    }
+    
+    public DialogAction(String text, ActionTrait... traits) {
+    	this( text, null, traits);
+    }
+    
+    public DialogAction(String title, ButtonType buttonType) {
+        this( title, buttonType, ActionTrait.CANCEL, ActionTrait.CLOSING, ActionTrait.DEFAULT );
     }
 
     /**
      * Creates a dialog action with given text and common set of traits: CLOSING and DEFAULT
      * @param text
      */
-    public DefaultDialogAction(String text) {
+    public DialogAction(String text) {
         this(text, ActionTrait.CLOSING, ActionTrait.DEFAULT);
     }
     
-    
-    /** {@inheritDoc} */
-    @Override public boolean hasTrait(ActionTrait trait) {
+    /**
+     * Returns true if {@link Action} has given trait 
+     */
+    public boolean hasTrait(ActionTrait trait) {
         return traits.contains(trait);
     }
 
     
-    /** {@inheritDoc} */
+    /**
+     * Implementation of default dialog action execution logic:
+     * if action is enabled set it as dialog result.
+     */
     @Override public void handle(ActionEvent ae) {
-    	DialogAction.super.handle(ae);
+        if (! disabledProperty().get()) {
+            if (ae.getSource() instanceof Dialog ) {
+                ((Dialog) ae.getSource()).setResult(this);
+            }
+        }
     }
 
 }

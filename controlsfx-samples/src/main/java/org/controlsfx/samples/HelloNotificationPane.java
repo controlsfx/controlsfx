@@ -39,7 +39,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 
 public class HelloNotificationPane extends ControlsFXSample {
     
@@ -66,7 +66,7 @@ public class HelloNotificationPane extends ControlsFXSample {
         ImageView image = new ImageView(imagePath);
         notificationPane.setGraphic(image);
         
-        notificationPane.getActions().addAll(new AbstractAction("Sync") {
+        notificationPane.getActions().addAll(new Action("Sync") {
             @Override public void handle(ActionEvent ae) {
                 // do sync
                 

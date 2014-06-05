@@ -29,8 +29,6 @@ package org.controlsfx.dialog;
 import impl.org.controlsfx.i18n.Localization;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 
 import javafx.beans.binding.DoubleBinding;
@@ -41,7 +39,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -55,7 +52,6 @@ import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Effect;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -68,9 +64,9 @@ import javafx.stage.Window;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.tools.Utils;
 
 /**
  * A lower-level API for creating standardized dialogs consisting of the following
@@ -214,11 +210,29 @@ public class Dialog {
      * 
      **************************************************************************/
     
+    /**
+     * Defines a native dialog style.
+     * The dialogs rendered using this style will have a native title bar.
+     */
+    public static final String STYLE_CLASS_NATIVE = "native";
+    
+    /**
+     * Defines a cross-platform dialog style.
+     * The dialogs rendered using this style will have a cross-platform title bar.
+     */
+    public static final String STYLE_CLASS_CROSS_PLATFORM = "cross-platform";
+    
+    /**
+     * Defines a dialog style with no decorations.
+     * The dialogs rendered using this style will not have a title bar.
+     */
+    public static final String STYLE_CLASS_UNDECORATED = "undecorated";
+    
     // enable to turn on grid lines, etc
     private static final boolean DEBUG = false;
     
     static int MIN_DIALOG_WIDTH = 426;
-
+    
     
     
     /**************************************************************************
@@ -273,26 +287,25 @@ public class Dialog {
      *      the difference between heavyweight and lightweight dialogs.
      */
     public Dialog(Object owner, String title, boolean lightweight) {
-        this(owner, title, lightweight, DialogStyle.CROSS_PLATFORM_DARK);
-    }
-    
-    /**
-     * Creates a dialog using specified owner, title and {@code DialogStyle}
-     * which may be rendered in either a heavyweight or lightweight fashion.
-     * 
-     * @param owner The dialog window owner - if specified the dialog will be
-     *      centered over the owner, otherwise the dialog will be shown in the 
-     *      middle of the screen.
-     * @param title The dialog title to be shown at the top of the dialog.
-     * @param lightweight If true this dialog will be rendered inside the given
-     *      owner, rather than in a separate window (as heavyweight dialogs are).
-     *      Refer to the {@link Dialogs} class documentation for more details on
-     *      the difference between heavyweight and lightweight dialogs.
-     * @param style The {@code DialogStyle} of the dialog. Refer to the 
-     *      {@link Dialogs} class javadoc for more information.
-     */
-    public Dialog(Object owner, String title, boolean lightweight, DialogStyle style) {
-        this.dialog = DialogFactory.createDialog(lightweight, title, owner, true, style);
+        if (lightweight) {
+            this.dialog = new LightweightDialog(title, owner);
+        } else {
+            Window window = Utils.getWindow(owner);
+            this.dialog = new HeavyweightDialog(title, window);
+            this.dialog.setModal(true);
+        }
+        
+        // by default we show the cross platform style. If there is not one
+        // of the tree pre-defined styleclasses set, then we install the
+        // cross platform style.
+        // FIXME we need to of course consider the case where a custom, external
+        // styleclass is set, which we overwrite here and force in cross-platform.
+        List<String> styleClass = dialog.getStyleClass();
+        if (! styleClass.contains(STYLE_CLASS_CROSS_PLATFORM) ||
+            ! styleClass.contains(STYLE_CLASS_NATIVE) ||
+            ! styleClass.contains(STYLE_CLASS_UNDECORATED)) {
+            this.dialog.getStyleClass().add(STYLE_CLASS_CROSS_PLATFORM);
+        }
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane"); //$NON-NLS-1$
@@ -308,7 +321,7 @@ public class Dialog {
      * Public API
      * 
      **************************************************************************/
-
+    
     /**
      * Shows the dialog and waits for the user response (in other words, brings 
      * up a modal dialog, with the returned value the users input).
@@ -341,40 +354,37 @@ public class Dialog {
     }
     
     /**
-     * Returns this dialog's window. For lightweight dialogs,
-     * this is the window in which this dialog is displayed. 
-     * @return This dialog's window.
-     */
-    public Window getWindow() {
-        return dialog.getWindow();
-    }
-
-    /**
      * Assigns the resulting action. If action is a {@link DialogAction} and has either CANCEL or CLOSING traits
      * the dialog will be closed.
      * @param result
      */
     public void setResult(Action result) {
-    
         this.result = result;
         
-        if ( result instanceof DialogAction ) {
+        if (result instanceof DialogAction) {
             DialogAction dlgAction = (DialogAction) result;
-            if ( dlgAction.hasTrait(ActionTrait.CANCEL) || dlgAction.hasTrait(ActionTrait.CLOSING) ) {
+            if (dlgAction.hasTrait(ActionTrait.CANCEL) || dlgAction.hasTrait(ActionTrait.CLOSING)) {
                 hide();
             }
         }
-
     }
     
     /**
      * Return the StyleSheets associated with the scene used in the Dialog (see {@link Scene#getStylesheets()}
      * This allow you to specify custom CSS rules to be applied on your dialog's elements.
-     * @return and ObservableList of String. 
      */
     public ObservableList<String> getStylesheets(){
         return dialog.getStylesheets();
     }
+    
+    /**
+     * Return the style classes specified on this dialog instance.
+     */
+    public ObservableList<String> getStyleClass() {
+        return dialog.getStyleClass();
+    }
+    
+    
     
     /**************************************************************************
      * 
@@ -684,30 +694,6 @@ public class Dialog {
     }
     
     /**
-     *  Interface for specialized dialog {@link Action}, which can have a set of traits {@link ActionTrait}
-     */
-    public interface DialogAction extends Action {
-        
-        /**
-         * Returns true if {@link Action} has given trait 
-         */
-        boolean hasTrait( ActionTrait trait);
-        
-        /**
-         * Implementation of default dialog action execution logic:
-         * if action is enabled set it as dialog result.
-         */
-        default public void handle(ActionEvent ae) {
-            if (! disabledProperty().get()) {
-                if (ae.getSource() instanceof Dialog ) {
-                    ((Dialog) ae.getSource()).setResult(this);
-                }
-            }
-        }
-        
-    }
-    
-    /**
      * Possible traits of {@link DialogAction}
      */
     public enum ActionTrait {
@@ -794,96 +780,51 @@ public class Dialog {
      * @see Dialog
      * @see Action
      */
-    public enum Actions implements DialogAction {
+    public static final class Actions {
 
+    	
+    	
         /**
          * An action that, by default, will show 'Cancel'.
          */
-        CANCEL( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ), //$NON-NLS-1$
+        public static final Action CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        	{ lock();}
+        	public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'Close'.
          */
-        CLOSE ( Localization.asKey("dlg.close.button"),  ButtonType.CANCEL_CLOSE ), //$NON-NLS-1$
+        public static final Action CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        	{ lock();}
+        	public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'No'.
          */
-        NO    ( Localization.asKey("dlg.no.button"),     ButtonType.NO ), //$NON-NLS-1$
+        public static final Action NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
+        	{ lock();}
+        	public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'OK'.
          */
-        OK    ( Localization.asKey("dlg.ok.button"),     ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING), //$NON-NLS-1$
+        public static final Action OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  ActionTrait.DEFAULT, ActionTrait.CLOSING){ //$NON-NLS-1$
+        	{ lock();}
+        	public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
+        }; 
         
         /**
          * An action that, by default, will show 'Yes'.
          */
-        YES   ( Localization.asKey("dlg.yes.button"),    ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ); //$NON-NLS-1$
+        public static final Action YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES,  ActionTrait.DEFAULT, ActionTrait.CLOSING ){ //$NON-NLS-1$
+        	{ lock();}
+        	public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
+        }; 
+        
 
-        private final AbstractAction action;
-        private final EnumSet<ActionTrait> traits;
-
-        /**
-         * Creates common dialog action
-         * @param title action title
-         * @param isDefault true if it should be default action on the dialog. Only one can be, so the first us used.
-         * @param isCancel true if action produces the dialog cancellation. 
-         * @param isClosing true if action is closing the dialog
-         */
-        private Actions(String title, ButtonType type, ActionTrait... traits) {
-            this.action = new AbstractAction(title) {
-                @Override public void handle(ActionEvent ae) {
-                    Actions.this.handle(ae);
-                }
-            };
-            this.traits = EnumSet.copyOf(Arrays.asList(traits));
-            ButtonBar.setType(this, type);
-        }
-        
-        private Actions(String title, ButtonType type) {
-            this( title, type, ActionTrait.CANCEL, ActionTrait.CLOSING, ActionTrait.DEFAULT );
-        }
-
-        /** {@inheritDoc} */
-        @Override public StringProperty textProperty() {
-            return action.textProperty();
-        }
-
-        /** {@inheritDoc} */
-        @Override public BooleanProperty disabledProperty() {
-            return action.disabledProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public StringProperty longTextProperty() {
-            return action.longTextProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public ObjectProperty<Node> graphicProperty() {
-            return action.graphicProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
-            return action.acceleratorProperty();
-        }
-        
-        /** {@inheritDoc} */
-        @Override public ObservableMap<Object, Object> getProperties() {
-            return action.getProperties();
-        }
-
-        /** {@inheritDoc} */
-        @Override public void handle(ActionEvent ae) {
-        	DialogAction.super.handle(ae);
-        }
-        
-        /** {@inheritDoc} */
-        @Override public boolean hasTrait(ActionTrait trait) {
-            return traits.contains(trait);
-        }
     }
 
     

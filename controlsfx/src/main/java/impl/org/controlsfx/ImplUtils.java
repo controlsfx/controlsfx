@@ -26,13 +26,17 @@
  */
 package impl.org.controlsfx;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
+import javafx.scene.control.SkinBase;
+import javafx.scene.layout.Pane;
 
 public class ImplUtils {
 
@@ -40,12 +44,12 @@ public class ImplUtils {
         // no-op
     }
     
-    public static void injectAsRootPane(Scene scene, Parent injectedParent) {
+    public static void injectAsRootPane(Scene scene, Parent injectedParent, boolean useReflection) {
         Parent originalParent = scene.getRoot();
         scene.setRoot(injectedParent);
         
         if (originalParent != null) {
-            getChildren(injectedParent).add(0, originalParent);
+            getChildren(injectedParent, useReflection).add(0, originalParent);
             
             // copy in layout properties, etc, so that the dialogStack displays
             // properly in (hopefully) whatever layout the owner node is in
@@ -53,8 +57,15 @@ public class ImplUtils {
         }
     }
     
-    public static void injectPane(Parent parent, Parent injectedParent) {
-        ObservableList<Node> ownerParentChildren = getChildren(parent.getParent());
+    // parent is where we want to inject the injectedParent. We then need to
+    // set the child of the injectedParent to include parent.
+    // The end result is that we've forced in the injectedParent node above parent.
+    public static void injectPane(Parent parent, Parent injectedParent, boolean useReflection) {
+        if (parent == null) {
+            throw new IllegalArgumentException("parent can not be null");
+        }
+        
+        ObservableList<Node> ownerParentChildren = getChildren(parent.getParent(), useReflection);
         
         // we've got the children list, now we need to insert a temporary
         // layout container holding our dialogs and opaque layer / effect
@@ -64,47 +75,58 @@ public class ImplUtils {
         ownerParentChildren.remove(ownerPos);
         ownerParentChildren.add(ownerPos, injectedParent);
         
-        if (parent != null) {
-            getChildren(injectedParent).add(0, parent);
-            
-            // copy in layout properties, etc, so that the dialogStack displays
-            // properly in (hopefully) whatever layout the owner node is in
-            injectedParent.getProperties().putAll(parent.getProperties());
-        }
+        // now we install the parent as a child of the injectedParent
+        getChildren(injectedParent, useReflection).add(0, parent);
+        
+        // copy in layout properties, etc, so that the dialogStack displays
+        // properly in (hopefully) whatever layout the owner node is in
+        injectedParent.getProperties().putAll(parent.getProperties());
     }
     
-    public static void stripRootPane(Scene scene, Parent originalParent) {
+    public static void stripRootPane(Scene scene, Parent originalParent, boolean useReflection) {
         Parent oldParent = scene.getRoot();
-        getChildren(oldParent).remove(originalParent);
+        getChildren(oldParent, useReflection).remove(originalParent);
         originalParent.getStyleClass().remove("root"); //$NON-NLS-1$
         scene.setRoot(originalParent);        
     }
     
     @SuppressWarnings("unchecked")
-    public static ObservableList<Node> getChildren(Parent p) {
+    public static ObservableList<Node> getChildren(Parent p, boolean useReflection) {
         ObservableList<Node> children = null;
         
-        try {
-            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
-            
-            if (getChildrenMethod != null) {
-                if (! getChildrenMethod.isAccessible()) {
-                    getChildrenMethod.setAccessible(true);
+        // previously we used reflection immediately, now we try to avoid reflection
+        // by checking the type of the Parent. Still not great...
+        if (p instanceof Pane) {
+            // This should cover the majority of layout containers, including
+            // AnchorPane, FlowPane, GridPane, HBox, Pane, StackPane, TilePane, VBox
+            children = ((Pane)p).getChildren();
+        } else if (p instanceof Group) {
+            children = ((Group)p).getChildren();
+        } else if (p instanceof Control) {
+            Control c = (Control) p;
+            Skin<?> s = c.getSkin();
+            children = s instanceof SkinBase ? ((SkinBase<?>)s).getChildren() : null;
+        } else if (useReflection) {
+            // we really want to avoid using this!!!!
+            try {
+                Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
+                
+                if (getChildrenMethod != null) {
+                    if (! getChildrenMethod.isAccessible()) {
+                        getChildrenMethod.setAccessible(true);
+                    }
+                    children = (ObservableList<Node>) getChildrenMethod.invoke(p);
+                } else {
+                    // uh oh, trouble
                 }
-                children = (ObservableList<Node>) getChildrenMethod.invoke(p);
-            } else {
-                // uh oh, trouble
+            } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            	throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
             }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        }
+        
+        if (children == null) {
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() + 
+                                       ". useReflection is set to " + useReflection);
         }
         
         return children;

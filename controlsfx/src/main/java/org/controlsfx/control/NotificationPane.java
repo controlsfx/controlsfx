@@ -44,7 +44,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.web.WebView;
 
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.Action;
 
 /**
@@ -142,7 +142,7 @@ import org.controlsfx.control.action.Action;
  * }}</pre>
  * 
  * @see Action
- * @see AbstractAction
+ * @see Action
  */
 public class NotificationPane extends ControlsFXControl {
     

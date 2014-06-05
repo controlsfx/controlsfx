@@ -54,6 +54,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -66,10 +67,9 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.DefaultDialogAction;
+import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
-import org.controlsfx.dialog.DialogStyle;
 import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.Dialogs.UserInfo;
@@ -78,10 +78,12 @@ import org.controlsfx.samples.Utils;
 
 public class HelloDialog extends ControlsFXSample {
 
-    private final ComboBox<DialogStyle> styleCombobox = new ComboBox<>();
-	private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
-	private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
-	private final CheckBox cbSetOwner = new CheckBox("Set Owner");
+    private final ComboBox<String> styleCombobox = new ComboBox<>();
+	private final CheckBox cbUseLightweightDialog = new CheckBox();
+	private final CheckBox cbShowMasthead = new CheckBox();
+	private final CheckBox cbSetOwner = new CheckBox();
+	private final CheckBox cbCustomGraphic = new CheckBox();
+	
 
 	@Override
 	public String getSampleName() {
@@ -478,7 +480,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new DefaultDialogAction("Login",
+			final Action actionLogin = new DialogAction("Login",
 					ActionTrait.CLOSING, ActionTrait.DEFAULT) {
 
 				{
@@ -506,7 +508,9 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent arg0) {
 				Dialog dlg = new Dialog(includeOwner() ? stage : null,
-						"Login Dialog", cbUseLightweightDialog.isSelected(),getDialogStyle());
+						"Login Dialog", cbUseLightweightDialog.isSelected());
+				dlg.getStyleClass().addAll(getDialogStyle());
+				
 				if (cbShowMasthead.isSelected()) {
 					dlg.setMasthead("Login to ControlsFX");
 				}
@@ -563,7 +567,11 @@ public class HelloDialog extends ControlsFXSample {
 			dialog.lightweight();
 		}
 		
-		dialog.style(getDialogStyle());
+		if (cbCustomGraphic.isSelected()) {
+		    dialog.graphic(new ImageView(new Image(getClass().getResource("../controlsfx-logo.png").toExternalForm())));
+		}
+		
+		dialog.styleClass(getDialogStyle());
 
 		return dialog;
 	}
@@ -591,7 +599,7 @@ public class HelloDialog extends ControlsFXSample {
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);
-        styleCombobox.getItems().addAll(DialogStyle.values());
+        styleCombobox.getItems().addAll("Cross-platform", "Native", "Undecorated");
         styleCombobox.setValue(styleCombobox.getItems().get(0));
         grid.add(styleCombobox, 1, row);
         row++;
@@ -622,13 +630,18 @@ public class HelloDialog extends ControlsFXSample {
 		grid.add(createLabel("Set dialog owner: ", "property"), 0, row);
 		grid.add(cbSetOwner, 1, row);
 		row++;
+		
+		// custom graphic
+        grid.add(createLabel("Use custom graphic: ", "property"), 0, row);
+        grid.add(cbCustomGraphic, 1, row);
+        row++;
 
 		return grid;
 	}
 	
-	private DialogStyle getDialogStyle() {
-	    SelectionModel<DialogStyle> sm = styleCombobox.getSelectionModel();
-	    return sm.getSelectedItem() == null ? DialogStyle.CROSS_PLATFORM_DARK : sm.getSelectedItem();
+	private String getDialogStyle() {
+	    SelectionModel<String> sm = styleCombobox.getSelectionModel();
+	    return sm.getSelectedItem() == null ? "cross-platform" : sm.getSelectedItem().toLowerCase();
 	}
 
 	public static void main(String[] args) {

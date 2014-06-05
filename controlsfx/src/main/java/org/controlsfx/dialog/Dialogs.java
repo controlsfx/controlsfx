@@ -707,13 +707,13 @@ public final class Dialogs {
     }
 
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent 
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
      * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks(CommandLink defaultCommandLink, List<CommandLink> links) {
+    public Action showCommandLinks(DialogAction defaultCommandLink, List<DialogAction> links) {
         final Dialog dlg = buildDialog(Type.INFORMATION);
         dlg.setContent(message);
         
@@ -753,7 +753,7 @@ public final class Dialogs {
             content.add(message, 0, row++);
         }
         
-        for (final CommandLink commandLink : links) {
+        for (final DialogAction commandLink : links) {
             if (commandLink == null) continue; 
             
             final Button button = buildCommandLinkButton(commandLink);            
@@ -780,24 +780,48 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * Show a dialog filled with provided command links.Command links are just a {@link DialogAction}s and used instead of button bar and represent
      * a set of available 'radio' buttons
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */    
-    public Action showCommandLinks( List<CommandLink> links ) {
+    public Action showCommandLinks( List<DialogAction> links ) {
         return showCommandLinks( null, links);
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent
      * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
+    public Action showCommandLinks( DialogAction defaultCommandLink, DialogAction... links ) {
         return showCommandLinks( defaultCommandLink, Arrays.asList(links));
+    }
+    
+    /**
+     * Convenience method to quickly create a command link
+     * @param graphic command link graphic
+     * @param text command link main text
+     * @param comment command link comment text
+     * @return {@link DialogAction} representing a command link
+     */
+    public static final DialogAction buildCommandLink( Node graphic, String text, String comment ) {
+    	DialogAction action = new DialogAction(text);
+    	action.setLongText(comment);
+    	action.setGraphic(graphic);
+    	return action;
+    }
+    
+    /**
+     * Convenience method to quickly create a command link
+     * @param text command link main text
+     * @param comment command link comment text
+     * @return {@link DialogAction} representing a command link
+     */   
+    public static final DialogAction buildCommandLink( String text, String comment ) {
+    	return buildCommandLink(null, text, comment);
     }
     
     /**
@@ -1105,7 +1129,7 @@ public final class Dialogs {
         return root;
     }
     
-    private Button buildCommandLinkButton(CommandLink commandLink) {
+    private Button buildCommandLinkButton(DialogAction commandLink) {
         // put the content inside a button
         final Button button = new Button();
         button.getStyleClass().addAll("command-link-button");
@@ -1207,28 +1231,6 @@ public final class Dialogs {
             return actions;
         }
     }
-    
-    
-    /**
-     * Command Link class.
-     * Represents one command link in command links dialog. 
-     */
-    public static class CommandLink extends DialogAction {
-        
-        public CommandLink( Node graphic, String text, String longText ) {
-            super(text);
-            setLongText(longText);
-            setGraphic(graphic);
-        }
-        
-        public CommandLink( String message, String comment ) {
-            this(null, message, comment);
-        }
-
-        @Override public String toString() {
-            return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
-        }
-    } 
     
     /**
      * Font style as combination of font weight and font posture. 

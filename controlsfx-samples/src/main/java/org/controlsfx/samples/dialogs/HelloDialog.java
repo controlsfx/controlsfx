@@ -28,6 +28,7 @@ package org.controlsfx.samples.dialogs;
 
 import static org.controlsfx.dialog.Dialog.Actions.NO;
 import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialogs.buildCommandLink;
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.Translations;
 
@@ -72,7 +73,6 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.ActionTrait;
 import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialogs;
-import org.controlsfx.dialog.Dialogs.CommandLink;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
@@ -384,14 +384,14 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent e) {
 
-				List<CommandLink> links = Arrays
-						.asList(new CommandLink(
-								"Add a network that is in the range of this computer",
-								"This shows you a list of networks that are currently available and lets you connect to one."),
-								new CommandLink(
+				List<DialogAction> links = Arrays
+						.asList(buildCommandLink(
+										"Add a network that is in the range of this computer",
+										"This shows you a list of networks that are currently available and lets you connect to one."),
+								buildCommandLink(
 										"Manually create a network profile",
 										"This creates a new network profile or locates an existing one and saves it on your computer"),
-								new CommandLink("Create an ad hoc network",
+								buildCommandLink("Create an ad hoc network",
 										"This creates a temporary network for sharing files or and Internet connection"));
 
 				Action response = configureSampleDialog(

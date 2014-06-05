@@ -27,11 +27,13 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.util.Optional;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableSet;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 
 /**
@@ -42,6 +44,17 @@ import javafx.scene.Node;
  * @see SpreadsheetCellBase
  */
 public interface SpreadsheetCell {
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
+     * when the editable state of a SpreadsheetCell is changed.
+     */
+    public static final EventType EDITABLE_EVENT_TYPE = new EventType("EditableEventType");
+    
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
+     * when a corner state of a SpreadsheetCell is changed.
+     */
+    public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType");
 
     /**
      * This enum states the four different corner available for positioning 
@@ -99,16 +112,9 @@ public interface SpreadsheetCell {
     /**
      * Change the editable state of this cell
      *
-     * @param readOnly
+     * @param editable
      */
-    public void setEditable(boolean readOnly);
-
-    /**
-     * The {@link BooleanProperty} linked with the editable state.
-     *
-     * @return The {@link BooleanProperty} linked with the editable state.
-     */
-    public BooleanProperty editableProperty();
+    public void setEditable(boolean editable);
 
     /**
      * This activate the given cornerPosition.
@@ -256,4 +262,20 @@ public interface SpreadsheetCell {
      * @return the tooltip associated with this SpreadsheetCell.
      */
     public Optional<String> getTooltip();
+    
+    /**
+     * Registers an event handler to this SpreadsheetCell. 
+     * @param eventType the type of the events to receive by the handler
+     * @param eventHandler the handler to register
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public void addEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
+    
+    /**
+     * Unregisters a previously registered event handler from this SpreadsheetCell. 
+     * @param eventType the event type from which to unregister
+     * @param eventHandler the handler to unregister
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public void removeEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
 }

@@ -27,12 +27,12 @@
 package impl.org.controlsfx.spreadsheet;
 
 import com.sun.javafx.scene.control.skin.TableCellSkin;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -68,9 +68,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
         super(tableCell);
         tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
-//        if (tableCell.getItem() != null) {
-//            tableCell.getItem().cornerProperty().addListener(triangleListener);
-//        }
+        if (tableCell.getItem() != null) {
+            tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+        }
     }
 
     @Override
@@ -174,10 +174,10 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         return region;
     }
     
-    private final InvalidationListener triangleListener = new InvalidationListener() {
+    private final EventHandler<Event> triangleEventHandler = new EventHandler<Event>() {
 
         @Override
-        public void invalidated(Observable o) {
+        public void handle(Event event) {
             getSkinnable().requestLayout();
         }
     };
@@ -186,12 +186,12 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         @Override
         public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
                 SpreadsheetCell newCell) {
-//            if (oldCell != null) {
-//                oldCell.cornerProperty().removeListener(triangleListener);
-//            }
-//            if (newCell != null) {
-//                newCell.cornerProperty().addListener(triangleListener);
-//            }
+            if (oldCell != null) {
+                oldCell.removeEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+            }
+            if (newCell != null) {
+                newCell.addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+            }
             if (getSkinnable().getItem() != null) {
                 layoutTriangle();
             }

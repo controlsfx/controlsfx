@@ -67,7 +67,7 @@ class LightweightDialog extends FXDialog {
     private Parent owner;
     
     private Region opaqueLayer;
-    private Group dialogStack;
+    private Pane dialogStack;
     private Parent originalParent;
     
     private BooleanProperty focused;
@@ -104,7 +104,6 @@ class LightweightDialog extends FXDialog {
         } else if (_owner instanceof Tab) {
             // special case for people wanting to show a lightweight dialog inside
             // one tab whilst the rest of the TabPane remains responsive.
-            // we keep going up until the styleclass is "tab-content-area"
             owner = (Parent) ((Tab)_owner).getContent();
         } else if (_owner instanceof Node) {
             owner = getFirstParent((Node)_owner);
@@ -429,8 +428,12 @@ class LightweightDialog extends FXDialog {
     }
     
     private void buildDialogStack(final Node parent) {
-        dialogStack = new Group(lightweightDialog) {
+        dialogStack = new Pane() {
             private boolean isFirstRun = true;
+            
+            {
+                getChildren().add(lightweightDialog);
+            }
             
             protected void layoutChildren() {
                 final double w = getOverlayWidth();
@@ -465,6 +468,20 @@ class LightweightDialog extends FXDialog {
                     
                     lightweightDialog.relocate((int)(dialogX), (int)(dialogY));
                 }
+            }
+            
+            // These are the actual implementations in Region (the parent of Pane),
+            // but just for clarify I reproduce them here
+            @Override protected double computeMaxHeight(double width) {
+                return Double.MAX_VALUE;
+            }
+            
+            @Override protected double computeMaxWidth(double height) {
+                return Double.MAX_VALUE;
+            }
+            
+            @Override protected double computePrefWidth(double height) {
+                return Double.MAX_VALUE;
             }
         };
                 

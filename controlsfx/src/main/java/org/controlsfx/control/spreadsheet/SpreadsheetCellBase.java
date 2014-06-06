@@ -129,16 +129,15 @@ import javafx.scene.image.ImageView;
  * 
  * <center><img src="graphicNodeToCell.png"></center> <br>
  * In addition to that, you can also specify another graphic property to your
- * cell with {@link #commentedProperty()}. This allow you to specify whether
- * this cell has or not a unique property (here a comment). Therefore, you will
- * have a visual feedback for every cell that has that property set to true.
- * Right now it's a little red triangle but you can modify this in your CSS by
- * using the "<b>comment</b>" style class.
+ * cell with {@link #activateCorner(org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition) }.
+ * This allow you to activate or deactivate some graphics on the cell in every 
+ * corner. Right now it's a little red triangle but you can modify this in your CSS by
+ * using the "<b>cell-corner</b>" style class.
  * 
  * <pre>
- * .comment{
+ * .cell-corner.top-left{
  *     -fx-background-color: red;
- *     -fx-shape : "M 0 0 L -1 0 L 0 1 z";
+ *     -fx-shape : "M 0 0 L 1 0 L 0 1 z";
  * }
  * </pre>
  * 
@@ -360,7 +359,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
    /** {@inheritDoc} */
     @Override
-    public final SpreadsheetCellType<?> getCellType() {
+    public final SpreadsheetCellType getCellType() {
         return type;
     }
 

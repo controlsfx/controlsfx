@@ -246,7 +246,7 @@ public class GridBase implements Grid, EventTarget {
      * Return a BooleanProperty associated with the locked grid state. It means
      * that the Grid is in a read-only mode and that no SpreadsheetCell can be
      * modified, no regards for their own
-     * {@link SpreadsheetCell#editableProperty()}.
+     * {@link SpreadsheetCell#isEditable()} state.
      * 
      * @return a BooleanProperty associated with the locked grid state.
      */

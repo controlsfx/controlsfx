@@ -26,6 +26,11 @@ public abstract class ControlsFXSample extends SampleBase {
 	    return Utils.JAVADOC_BASE + "samples-src/" + getClass().getName().replace('.','/') + ".java";
 	}
 	
+	@Override
+	public String getControlStylesheetURL() {
+		return null;
+	}
+	
 	private static class ProjectInfo {
 		
 		private String version;

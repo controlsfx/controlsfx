@@ -88,6 +88,12 @@ public class HelloNotifications extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/Notifications.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/notificationpopup.css";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         this.stage = stage;
         

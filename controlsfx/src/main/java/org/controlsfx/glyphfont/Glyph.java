@@ -114,13 +114,13 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
         if (color == null) {
             css.append("-glyphs-color: -fx-text-background-color;"); //$NON-NLS-1$
         } else {
-            css.append("-glyphs-color: rgb("); //$NON-NLS-1$
-            css.append((int)(color.getRed()*255));
-            css.append(","); //$NON-NLS-1$
-            css.append((int)(color.getGreen()*255));
-            css.append(","); //$NON-NLS-1$
-            css.append((int)(color.getBlue())*255);
-            css.append(");"); //$NON-NLS-1$
+        	css.append(
+        	  String.format("-glyphs-color: rgba(%d,%d,%d,%f)",
+        			(int)(color.getRed()*255),
+        			(int)(color.getGreen()*255),
+        			(int)(color.getBlue()*255),
+        			color.getOpacity()
+        			));
         }
         setStyle(css.toString());
     }

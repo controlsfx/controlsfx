@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridViewSkin;
+import impl.org.controlsfx.version.VersionChecker;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +103,7 @@ import org.controlsfx.control.cell.ColorGridCell;
  * 
  * @see GridCell
  */
-public class GridView<T> extends Control {
+public class GridView<T> extends ControlsFXControl {
 
     /**************************************************************************
      * 

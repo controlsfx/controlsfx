@@ -144,7 +144,7 @@ import com.sun.javafx.css.converters.SizeConverter;
  * 
  * @see Slider
  */
-public class RangeSlider extends Control {
+public class RangeSlider extends ControlsFXControl {
     
     /***************************************************************************
      *                                                                         *
@@ -431,20 +431,29 @@ public class RangeSlider extends Control {
      *                                                                         *
      **************************************************************************/
     
+    private DoubleProperty max;
     
     /**
-     * The maximum value represented by this Slider. This must be a
-     * value greater than {@link #minProperty() min}.
+     * Sets the maximum value for this Slider.
+     * @param value 
      */
-    private DoubleProperty max;
     public final void setMax(double value) {
         maxProperty().set(value);
     }
 
+    /**
+     * @return The maximum value of this slider. 100 is returned if
+     * the maximum value has never been set.
+     */
     public final double getMax() {
         return max == null ? 100 : max.get();
     }
 
+    /**
+     * 
+     * @return A DoubleProperty representing the maximum value of this Slider. 
+     * This must be a value greater than {@link #minProperty() min}.
+     */
     public final DoubleProperty maxProperty() {
         if (max == null) {
             max = new DoublePropertyBase(100) {
@@ -466,19 +475,31 @@ public class RangeSlider extends Control {
         }
         return max;
     }
-    /**
-     * The minimum value represented by this Slider. This must be a
-     * value less than {@link #maxProperty() max}.
-     */
+
     private DoubleProperty min;
+    
+    /**
+     * Sets the minimum value for this Slider.
+     * @param value 
+     */
     public final void setMin(double value) {
         minProperty().set(value);
     }
 
+    /**
+     * 
+     * @return the minimum value for this Slider. 0 is returned if the minimum
+     * has never been set.
+     */
     public final double getMin() {
         return min == null ? 0 : min.get();
     }
 
+    /**
+     * 
+     * @return A DoubleProperty representing The minimum value of this Slider. 
+     * This must be a value less than {@link #maxProperty() max}.
+     */
     public final DoubleProperty minProperty() {
         if (min == null) {
             min = new DoublePropertyBase(0) {
@@ -502,19 +523,35 @@ public class RangeSlider extends Control {
     }
     
     /**
-     * Indicates whether the {@link #lowValueProperty()} value}/{@link #highValueProperty()} value} of the {@code Slider} should always
-     * be aligned with the tick marks. This is honored even if the tick marks
-     * are not shown.
+     * 
      */
     private BooleanProperty snapToTicks;
+    
+    /**
+     * Sets the value of SnapToTicks. 
+     * @see #snapToTicksProperty() 
+     * @param value 
+     */
     public final void setSnapToTicks(boolean value) {
         snapToTicksProperty().set(value);
     }
 
+    /**
+     * 
+     * @return the value of SnapToTicks.
+     * @see #snapToTicksProperty() 
+     */
     public final boolean isSnapToTicks() {
         return snapToTicks == null ? false : snapToTicks.get();
     }
 
+    /**
+     * Indicates whether the {@link #lowValueProperty()} value} / 
+     * {@link #highValueProperty()} value} of the {@code Slider} should always
+     * be aligned with the tick marks. This is honored even if the tick marks
+     * are not shown.
+     * @return A BooleanProperty.
+     */
     public final BooleanProperty snapToTicksProperty() {
         if (snapToTicks == null) {
             snapToTicks = new StyleableBooleanProperty(false) {
@@ -534,6 +571,31 @@ public class RangeSlider extends Control {
         return snapToTicks;
     }
     /**
+     * 
+     */
+    private DoubleProperty majorTickUnit;
+    
+    /**
+     * Sets the unit distance between major tick marks.
+     * @param value 
+     * @see #majorTickUnitProperty() 
+     */
+    public final void setMajorTickUnit(double value) {
+        if (value <= 0) {
+            throw new IllegalArgumentException("MajorTickUnit cannot be less than or equal to 0."); //$NON-NLS-1$
+        }
+        majorTickUnitProperty().set(value);
+    }
+
+    /**
+     * @see #majorTickUnitProperty() 
+     * @return The unit distance between major tick marks.
+     */
+    public final double getMajorTickUnit() {
+        return majorTickUnit == null ? 25 : majorTickUnit.get();
+    }
+
+    /**
      * The unit distance between major tick marks. For example, if
      * the {@link #minProperty() min} is 0 and the {@link #maxProperty() max} is 100 and the
      * {@link #majorTickUnitProperty() majorTickUnit} is 25, then there would be 5 tick marks: one at
@@ -543,19 +605,9 @@ public class RangeSlider extends Control {
      * This value should be positive and should be a value less than the
      * span. Out of range values are essentially the same as disabling
      * tick marks.
+     * 
+     * @return A DoubleProperty
      */
-    private DoubleProperty majorTickUnit;
-    public final void setMajorTickUnit(double value) {
-        if (value <= 0) {
-            throw new IllegalArgumentException("MajorTickUnit cannot be less than or equal to 0."); //$NON-NLS-1$
-        }
-        majorTickUnitProperty().set(value);
-    }
-
-    public final double getMajorTickUnit() {
-        return majorTickUnit == null ? 25 : majorTickUnit.get();
-    }
-
     public final DoubleProperty majorTickUnitProperty() {
         if (majorTickUnit == null) {
             majorTickUnit = new StyleableDoubleProperty(25) {
@@ -581,19 +633,33 @@ public class RangeSlider extends Control {
         return majorTickUnit;
     }
     /**
-     * The number of minor ticks to place between any two major ticks. This
-     * number should be positive or zero. Out of range values will disable
-     * disable minor ticks, as will a value of zero.
+     * 
      */
     private IntegerProperty minorTickCount;
+    
+    /**
+     * Sets the number of minor ticks to place between any two major ticks.
+     * @param value 
+     * @see #minorTickCountProperty() 
+     */
     public final void setMinorTickCount(int value) {
         minorTickCountProperty().set(value);
     }
 
+    /**
+     * @see #minorTickCountProperty() 
+     * @return The number of minor ticks to place between any two major ticks.
+     */
     public final int getMinorTickCount() {
         return minorTickCount == null ? 3 : minorTickCount.get();
     }
 
+    /**
+     * The number of minor ticks to place between any two major ticks. This
+     * number should be positive or zero. Out of range values will disable
+     * disable minor ticks, as will a value of zero.
+     * @return An InterProperty
+     */
     public final IntegerProperty minorTickCountProperty() {
         if (minorTickCount == null) {
             minorTickCount = new StyleableIntegerProperty(3) {
@@ -613,20 +679,36 @@ public class RangeSlider extends Control {
         return minorTickCount;
     }
     /**
-     * The amount by which to adjust the slider if the track of the slider is
-     * clicked. This is used when manipulating the slider position using keys. If
-     * {@link #snapToTicksProperty() snapToTicks} is true then the nearest tick mark to the adjusted
-     * value will be used.
+     *
      */
     private DoubleProperty blockIncrement;
+    
+    /**
+     * Sets the amount by which to adjust the slider if the track of the slider is
+     * clicked.
+     * @param value 
+     * @see #blockIncrementProperty() 
+     */
     public final void setBlockIncrement(double value) {
         blockIncrementProperty().set(value);
     }
 
+    /**
+     * @see #blockIncrementProperty() 
+     * @return The amount by which to adjust the slider if the track of the slider is
+     * clicked.
+     */
     public final double getBlockIncrement() {
         return blockIncrement == null ? 10 : blockIncrement.get();
     }
 
+    /**
+     *  The amount by which to adjust the slider if the track of the slider is
+     * clicked. This is used when manipulating the slider position using keys. If
+     * {@link #snapToTicksProperty() snapToTicks} is true then the nearest tick mark to the adjusted
+     * value will be used.
+     * @return A DoubleProperty
+     */
     public final DoubleProperty blockIncrementProperty() {
         if (blockIncrement == null) {
             blockIncrement = new StyleableDoubleProperty(10) {
@@ -647,18 +729,32 @@ public class RangeSlider extends Control {
     }
     
     /**
-     * The orientation of the {@code Slider} can either be horizontal
-     * or vertical.
+     * 
      */
     private ObjectProperty<Orientation> orientation;
+    
+    /**
+     * Sets the orientation of the Slider.
+     * @param value 
+     */
     public final void setOrientation(Orientation value) {
         orientationProperty().set(value);
     }
 
+    /**
+     * 
+     * @return The orientation of the Slider. {@link Orientation#HORIZONTAL} is 
+     * returned by default.
+     */
     public final Orientation getOrientation() {
         return orientation == null ? Orientation.HORIZONTAL : orientation.get();
     }
 
+    /**
+     * The orientation of the {@code Slider} can either be horizontal
+     * or vertical.
+     * @return An Objectproperty representing the orientation of the Slider.
+     */
     public final ObjectProperty<Orientation> orientationProperty() {
         if (orientation == null) {
             orientation = new StyleableObjectProperty<Orientation>(Orientation.HORIZONTAL) {
@@ -684,20 +780,29 @@ public class RangeSlider extends Control {
         return orientation;
     }
     
-    /**
-     * Indicates that the labels for tick marks should be shown. Typically a
-     * {@link Skin} implementation will only show labels if
-     * {@link #showTickMarksProperty() showTickMarks} is also true.
-     */
     private BooleanProperty showTickLabels;
+    
+    /**
+     * Sets whether labels of tick marks should be shown or not.
+     * @param value 
+     */
     public final void setShowTickLabels(boolean value) {
         showTickLabelsProperty().set(value);
     }
 
+    /**
+     * @return whether labels of tick marks are being shown.
+     */
     public final boolean isShowTickLabels() {
         return showTickLabels == null ? false : showTickLabels.get();
     }
 
+    /**
+     * Indicates that the labels for tick marks should be shown. Typically a
+     * {@link Skin} implementation will only show labels if
+     * {@link #showTickMarksProperty() showTickMarks} is also true.
+     * @return A BooleanProperty
+     */
     public final BooleanProperty showTickLabelsProperty() {
         if (showTickLabels == null) {
             showTickLabels = new StyleableBooleanProperty(false) {
@@ -717,17 +822,30 @@ public class RangeSlider extends Control {
         return showTickLabels;
     }
     /**
-     * Specifies whether the {@link Skin} implementation should show tick marks.
+     * 
      */
     private BooleanProperty showTickMarks;
+    
+    /**
+     * Specifies whether the {@link Skin} implementation should show tick marks.
+     * @param value 
+     */
     public final void setShowTickMarks(boolean value) {
         showTickMarksProperty().set(value);
     }
 
+    /**
+     * 
+     * @return whether the {@link Skin} implementation should show tick marks.
+     */
     public final boolean isShowTickMarks() {
         return showTickMarks == null ? false : showTickMarks.get();
     }
 
+    /**
+     * @return A BooleanProperty that specifies whether the {@link Skin} 
+     * implementation should show tick marks.
+     */
     public final BooleanProperty showTickMarksProperty() {
         if (showTickMarks == null) {
             showTickMarks = new StyleableBooleanProperty(false) {

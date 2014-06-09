@@ -32,15 +32,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
@@ -60,7 +55,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCombination;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.SegmentedButton;
@@ -353,33 +347,9 @@ public class ActionUtils {
      * action tree serves as indication that separator has be created in its place.
      * See {@link ActionGroup} for example of action tree creation
      */
-    public static Action ACTION_SEPARATOR = new Action() {
+    public static Action ACTION_SEPARATOR = new Action(null) {
 
-        @Override public StringProperty textProperty() {
-            return null;
-        }
-
-        @Override public BooleanProperty disabledProperty() {
-            return null;
-        }
-
-        @Override public StringProperty longTextProperty() {
-            return null;
-        }
-
-        @Override public ObjectProperty<Node> graphicProperty() {
-            return null;
-        }
-        
-        @Override public ObjectProperty<KeyCombination> acceleratorProperty() {
-            return null;
-        }
-
-        @Override public ObservableMap<Object, Object> getProperties() {
-            return null;
-        }
-
-        @Override public void execute(ActionEvent ae) {
+        @Override public void handle(ActionEvent ae) {
         }
         
         public String toString() { 
@@ -395,7 +365,7 @@ public class ActionUtils {
      * {@link Action actions}.
      * 
      * @param actions The {@link Action actions} to place on the {@link ToolBar}.
-     * @param textBehavior defines {@link TextBahavior}
+     * @param textBehavior defines {@link ActionTextBehavior}
      * @return A {@link ToolBar} that contains {@link Node nodes} which are bound 
      *      to the state of the provided {@link Action}
      */
@@ -585,13 +555,7 @@ public class ActionUtils {
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent ae) {
-                if ( !action.disabledProperty().get()) {
-                    action.execute(ae);
-                }
-            }
-        });
+        btn.setOnAction(action);
         
         return btn;
     }
@@ -626,13 +590,7 @@ public class ActionUtils {
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent ae) {
-                if ( !action.disabledProperty().get()) {
-                    action.execute(ae);
-                }
-            }
-        });
+        btn.setOnAction(action);
         
         return btn;
     }

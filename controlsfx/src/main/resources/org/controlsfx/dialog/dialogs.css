@@ -9,6 +9,13 @@
 .lightweight-dialog-background {
      -fx-background-color: #00000044;
  }
+ 
+/* Used to prevent the lightweight dialog from resizing its owner */
+.dialog.lightweight.cross-platform,
+.dialog.lightweight.cross-platform:active {
+    -fx-border-insets: 0;
+    -fx-effect: null;
+}
 
 /*******************************************************************************
  *                                                                             *
@@ -21,14 +28,14 @@
     -fx-border-insets: 0 10 10 0;
 }
 
-.dialog.custom-chrome {
+.dialog.cross-platform {
     -fx-border-width: 2;
     -fx-border-radius: 5 5 0 0;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 11, 0.0, 3, 3);
     -fx-border-color: #a3a3a3;
 }
 
-.dialog.heavyweight.custom-chrome {
+.dialog.heavyweight.cross-platform {
     /** 
      * This allows for the drop shadow which otherwise won't appear. We don't
      * want this in lightweight dialogs as it will overwrite the background.
@@ -36,7 +43,7 @@
     -fx-background-color: inherit;
 }
 
-.dialog.custom-chrome:active {
+.dialog.cross-platform:active {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 3, 3);
     -fx-border-color: #3e3e3e;
 }
@@ -135,6 +142,18 @@
 
 .dialog:masthead .masthead-panel .graphic-container {
     -fx-padding: 0 0 0 10;
+}
+
+.dialog .message-banner {
+    -fx-opacity:1; 
+    -fx-text-fill: A94442;
+    -fx-background-color: F2DEDE;
+    -fx-border-width: 1; 
+    -fx-border-color: EBCCD1; 
+    -fx-padding: 5 10 5 10;
+    -fx-font-weight:bold;
+    -fx-graphic-text-gap: 10;
+    /*-fx-graphic: url("../../../impl/org/controlsfx/dialog/resources/error_message.png");*/
 }
 
 

@@ -193,7 +193,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         final ButtonBar buttonBar = getSkinnable();
         double buttonMinWidth = buttonBar.getButtonMinWidth();
         final List<? extends ButtonBase> buttons = buttonBar.getButtons();
-        
+
         // determine the widest button
         double widest = buttonMinWidth;
         if (buttonBar.isButtonUniformSize()) {
@@ -208,10 +208,10 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
         for (ButtonBase button : buttons) {
             if (buttonBar.isButtonUniformSize()) {
                 if (!isButtonIndependent(button)) { 
-                    button.setMinWidth(widest);
+                    button.setPrefWidth(widest);
                 }
             } else if (buttonMinWidth > 0){
-                button.setMinWidth(buttonMinWidth);
+                button.setPrefWidth(buttonMinWidth);
             } else {
                 button.setMinWidth(0);
                 button.setPrefWidth(Region.USE_COMPUTED_SIZE);

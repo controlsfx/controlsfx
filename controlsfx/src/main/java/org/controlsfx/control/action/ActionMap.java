@@ -136,7 +136,7 @@ public class ActionMap {
 
 	/**
 	 * Returns collection of actions by ids. Useful to create {@link ActionGroup}s.
-	 * Ids starting with "---" are converted to {@link ActionUtils.ACTION_SEPARATOR}
+	 * Ids starting with "---" are converted to {@link ActionUtils#ACTION_SEPARATOR}.
 	 * Incorrect ids are ignored. 
 	 * @param ids action ids
 	 * @return collection of actions
@@ -154,7 +154,7 @@ public class ActionMap {
 	
 }
 
-class AnnotatedAction extends AbstractAction {
+class AnnotatedAction extends Action {
 
 	private Method method;
 	private Object target;
@@ -205,7 +205,7 @@ class AnnotatedAction extends AbstractAction {
 	}
 
 	@Override
-	public void execute(ActionEvent ae) {
+	public void handle(ActionEvent ae) {
 		try {
 			int paramCount =  method.getParameterCount(); 
 			if ( paramCount == 0 ) {

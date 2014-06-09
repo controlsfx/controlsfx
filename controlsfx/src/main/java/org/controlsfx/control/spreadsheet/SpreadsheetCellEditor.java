@@ -49,8 +49,7 @@ import javafx.util.StringConverter;
  * {@link SpreadsheetCell} in order to control how each value will be entered. <br/>
  * 
  * <h3>General behavior:</h3> Editors will be displayed if the user double-click
- * or press enter in an editable cell ( see
- * {@link SpreadsheetCell#setEditable(boolean)} ). <br/>
+ * in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ). <br/>
  * If the user does anything outside the editor, the editor <b> will be forced
  * </b> to try to commit the edition and close itself. If the value is not
  * valid, the editor will cancel the value and close itself. The editor is just
@@ -212,13 +211,17 @@ public abstract class SpreadsheetCellEditor {
     public static class ObjectEditor extends SpreadsheetCellEditor {
 
         /***************************************************************************
-         * * Protected Fields * *
+         * * Private Fields * *
          **************************************************************************/
-        protected final TextField tf;
+        private final TextField tf;
 
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+        * Constructor for the ObjectEditor..
+        * @param view The SpreadsheetView
+        */
         public ObjectEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -254,10 +257,10 @@ public abstract class SpreadsheetCellEditor {
         }
 
         /***************************************************************************
-         * * Protected Methods * *
+         * * Private Methods * *
          **************************************************************************/
 
-        protected void attachEnterEscapeEventHandler() {
+        private void attachEnterEscapeEventHandler() {
             tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
@@ -278,13 +281,17 @@ public abstract class SpreadsheetCellEditor {
      */
     public static class StringEditor extends SpreadsheetCellEditor {
         /***************************************************************************
-         * * Protected Fields * *
+         * * Private Fields * *
          **************************************************************************/
-        protected final TextField tf;
+        private final TextField tf;
 
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the StringEditor.
+         * @param view The SpreadsheetView
+         */
         public StringEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -321,10 +328,10 @@ public abstract class SpreadsheetCellEditor {
         }
 
         /***************************************************************************
-         * * Protected Methods * *
+         * * Private Methods * *
          **************************************************************************/
 
-        protected void attachEnterEscapeEventHandler() {
+        private void attachEnterEscapeEventHandler() {
             tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
@@ -349,13 +356,17 @@ public abstract class SpreadsheetCellEditor {
     public static class DoubleEditor extends SpreadsheetCellEditor {
 
         /***************************************************************************
-         * * Protected Fields * *
+         * * private Fields * *
          **************************************************************************/
-        protected final TextField tf;
+        private final TextField tf;
 
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the DoubleEditor.
+         * @param view The SpreadsheetView.
+         */
         public DoubleEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -364,6 +375,7 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Public Methods * *
          **************************************************************************/
+        /** {@inheritDoc} */
         @Override
         public void startEdit(Object value) {
             if (value instanceof Double) {
@@ -379,26 +391,29 @@ public abstract class SpreadsheetCellEditor {
             tf.end();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void end() {
             tf.setOnKeyPressed(null);
         }
 
+        /** {@inheritDoc} */
         @Override
         public TextField getEditor() {
             return tf;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String getControlValue() {
             return tf.getText();
         }
 
         /***************************************************************************
-         * * Protected Methods * *
+         * * Private Methods * *
          **************************************************************************/
 
-        protected void attachEnterEscapeEventHandler() {
+        private void attachEnterEscapeEventHandler() {
             tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
@@ -448,13 +463,17 @@ public abstract class SpreadsheetCellEditor {
     public static class IntegerEditor extends SpreadsheetCellEditor {
 
         /***************************************************************************
-         * * Protected Fields * *
+         * * Private Fields * *
          **************************************************************************/
-        protected final TextField tf;
+        private final TextField tf;
 
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the IntegerEditor.
+         * @param view the SpreadsheetView
+         */
         public IntegerEditor(SpreadsheetView view) {
             super(view);
             tf = new TextField();
@@ -463,6 +482,7 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Public Methods * *
          **************************************************************************/
+        /** {@inheritDoc} */
         @Override
         public void startEdit(Object value) {
             if (value instanceof Integer) {
@@ -478,26 +498,29 @@ public abstract class SpreadsheetCellEditor {
             tf.end();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void end() {
             tf.setOnKeyPressed(null);
         }
 
+        /** {@inheritDoc} */
         @Override
         public TextField getEditor() {
             return tf;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String getControlValue() {
             return tf.getText();
         }
 
         /***************************************************************************
-         * * Protected Methods * *
+         * * Private Methods * *
          **************************************************************************/
 
-        protected void attachEnterEscapeEventHandler() {
+        private void attachEnterEscapeEventHandler() {
             tf.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
@@ -543,16 +566,21 @@ public abstract class SpreadsheetCellEditor {
      */
     public static class ListEditor<R> extends SpreadsheetCellEditor {
         /***************************************************************************
-         * * Protected Fields * *
+         * * Private Fields * *
          **************************************************************************/
-        protected final List<String> itemList;
-        protected final ComboBox<String> cb;
+        private final List<String> itemList;
+        private final ComboBox<String> cb;
         private String originalValue;
 
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
 
+        /**
+         * Constructor for the ListEditor.
+         * @param view The SpreadsheetView
+         * @param itemList The items to display in the editor.
+         */
         public ListEditor(SpreadsheetView view, final List<String> itemList) {
             super(view);
             this.itemList = itemList;
@@ -564,6 +592,7 @@ public abstract class SpreadsheetCellEditor {
          * * Public Methods * *
          **************************************************************************/
 
+        /** {@inheritDoc} */
         @Override
         public void startEdit(Object value) {
             if (value instanceof String) {
@@ -580,26 +609,29 @@ public abstract class SpreadsheetCellEditor {
             cb.requestFocus();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void end() {
             cb.setOnKeyPressed(null);
         }
 
+        /** {@inheritDoc} */
         @Override
         public ComboBox<String> getEditor() {
             return cb;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String getControlValue() {
             return cb.getSelectionModel().getSelectedItem();
         }
 
         /***************************************************************************
-         * * Protected Methods * *
+         * * Private Methods * *
          **************************************************************************/
 
-        protected void attachEnterEscapeEventHandler() {
+        private void attachEnterEscapeEventHandler() {
 
             cb.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
@@ -623,7 +655,7 @@ public abstract class SpreadsheetCellEditor {
     public static class DateEditor extends SpreadsheetCellEditor {
 
         /***************************************************************************
-         * * Protected Fields * *
+         * * Private Fields * *
          **************************************************************************/
         private final DatePicker datePicker;
         private EventHandler<KeyEvent> eh;
@@ -638,6 +670,11 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Constructor * *
          **************************************************************************/
+        /**
+         * Constructor for the DateEditor.
+         * @param view the SpreadsheetView
+         * @param converter A Converter for converting a date to a String.
+         */
         public DateEditor(SpreadsheetView view, StringConverter<LocalDate> converter) {
             super(view);
             datePicker = new DatePicker();
@@ -647,6 +684,7 @@ public abstract class SpreadsheetCellEditor {
         /***************************************************************************
          * * Public Methods * *
          **************************************************************************/
+        /** {@inheritDoc} */
         @Override
         public void startEdit(Object value) {
             if (value instanceof LocalDate) {
@@ -657,6 +695,7 @@ public abstract class SpreadsheetCellEditor {
             datePicker.getEditor().requestFocus();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void end() {
             if (datePicker.isShowing()) {
@@ -666,21 +705,23 @@ public abstract class SpreadsheetCellEditor {
             datePicker.valueProperty().removeListener(cl);
         }
 
+        /** {@inheritDoc} */
         @Override
         public DatePicker getEditor() {
             return datePicker;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String getControlValue() {
             return datePicker.getEditor().getText();
         }
 
         /***************************************************************************
-         * * Protected Methods * *
+         * * Private Methods * *
          **************************************************************************/
 
-        protected void attachEnterEscapeEventHandler() {
+        private void attachEnterEscapeEventHandler() {
             /**
              * We need to add an EventFilter because otherwise the DatePicker
              * will block "escape" and "enter". But when "enter" is hit, we need

@@ -30,7 +30,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -84,9 +87,11 @@ public class FXSampler extends Application {
     private Tab sampleTab;
     private Tab javaDocTab;
     private Tab sourceTab;
+    private Tab cssTab;
 
     private WebView javaDocWebView;
     private WebView sourceWebView;
+    private WebView cssWebView;
 
 
     public static void main(String[] args) {
@@ -177,10 +182,14 @@ public class FXSampler extends Application {
         javaDocTab = new Tab("JavaDoc");
         javaDocWebView = new WebView();
         javaDocTab.setContent(javaDocWebView);
+
         sourceTab = new Tab("Source");
         sourceWebView = new WebView();
         sourceTab.setContent(sourceWebView);
 
+        cssTab = new Tab("Css");
+        cssWebView = new WebView();
+        cssTab.setContent(cssWebView);
 
         // by default we'll show the welcome message of first project in the tree
         // if no projects are available, we'll show the default page
@@ -234,13 +243,15 @@ public class FXSampler extends Application {
            samplesTreeView.setRoot(root);
         }
         
-
         // and finally we sort the display a little
-        Collections.sort(root.getChildren(), new Comparator<TreeItem<Sample>>() {
-            @Override public int compare(TreeItem<Sample> o1, TreeItem<Sample> o2) {
-                return o1.getValue().getSampleName().compareTo(o2.getValue().getSampleName());
-            }
-        });
+        sort(root, (o1, o2) -> o1.getValue().getSampleName().compareTo(o2.getValue().getSampleName()));
+    }
+    
+    private void sort(TreeItem<Sample> node, Comparator<TreeItem<Sample>> comparator) {
+        node.getChildren().sort(comparator);
+        for (TreeItem<Sample> child : node.getChildren()) {
+            sort(child, comparator);
+        }
     }
     
     // true == keep, false == delete
@@ -281,7 +292,7 @@ public class FXSampler extends Application {
         }
 
         if (tabPane.getTabs().contains(welcomeTab)) {
-            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab);
+            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab,cssTab);
         }
         
         updateTab();
@@ -298,6 +309,8 @@ public class FXSampler extends Application {
             javaDocWebView.getEngine().load(selectedSample.getJavaDocURL());
         } else if (selectedTab == sourceTab) {
             sourceWebView.getEngine().loadContent(formatSourceCode(selectedSample));
+        } else if (selectedTab == cssTab) {
+            cssWebView.getEngine().loadContent(formatCss(selectedSample));
         }  
     }
     
@@ -338,19 +351,40 @@ public class FXSampler extends Application {
     
     private String formatSourceCode(Sample sample) {
         String sourceURL = sample.getSampleSourceURL();
+        String src;
         if (sourceURL == null) {
-            return "No sample source available";
+            src = "No sample source available";
+        } else {
+	        src = "Sample Source not found";
+	        try {
+	           src = getSourceCode(sample);
+	        } catch(Throwable ex){
+	            ex.printStackTrace();
+	        }
         }
-        
         String template = getResource("/fxsampler/util/SourceCodeTemplate.html", null);
-        String src = "Sample Source not found";
-        try {
-           src = getSourceCode(sample);
-        } catch(Throwable ex){
-            ex.printStackTrace();
-        }
         return template.replace("<source/>", src);
     }
+    
+    
+    private String formatCss(Sample sample) {
+        String cssUrl = sample.getControlStylesheetURL();
+        String src;
+        if (cssUrl == null) {
+            src = "No CSS source available";
+        } else {
+	        src = "Css not found";
+	        try {
+	        	src = new String(
+					Files.readAllBytes( Paths.get(getClass().getResource(cssUrl).toURI()) )
+				);
+	        } catch(Throwable ex){
+	            ex.printStackTrace();
+	        }
+        }
+        String template = getResource("/fxsampler/util/CssTemplate.html", null);
+        return template.replace("<source/>", src);
+    }    
 
 
     private Node buildSampleTabContent(Sample sample) {

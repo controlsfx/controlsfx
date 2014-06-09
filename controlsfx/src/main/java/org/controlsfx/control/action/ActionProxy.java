@@ -32,6 +32,7 @@ import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
 import javafx.event.ActionEvent;
+import org.controlsfx.glyphfont.Glyph;
 
 /**
  * An annotation to allow conversion of class methods to {@link Action} instances.
@@ -58,7 +59,7 @@ import javafx.event.ActionEvent;
  * </ol>
  * 
  * <p>The ability for ActionProxy to support glyph fonts is part of the ControlsFX
- * {@link org.controlsfx.glyphFont} API. For more information on how to specify
+ * {@link Glyph} API. For more information on how to specify
  * images and glyph fonts, refer to the {@link ActionProxy#graphic()} method.
  * <br/><br/></li>
  * 

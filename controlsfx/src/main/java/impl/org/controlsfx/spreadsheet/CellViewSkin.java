@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014  ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,27 +26,32 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.skin.TableCellSkin;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.Region;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-
-import com.sun.javafx.scene.control.skin.TableCellSkin;
-import javafx.beans.value.WeakChangeListener;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
 
 /**
- * 
+ *
  * This is the skin for the {@link CellView}.
- * 
+ *
  * Its main goal is to draw an object (a triangle) on cells which have their
  * {@link SpreadsheetCell#commentedProperty()} set to true.
- * 
+ *
  */
 public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
 
+    private final static String TOP_LEFT_CLASS = "top-left"; //$NON-NLS-1$
+    private final static String TOP_RIGHT_CLASS = "top-right"; //$NON-NLS-1$
+    private final static String BOTTOM_RIGHT_CLASS = "bottom-right"; //$NON-NLS-1$
+    private final static String BOTTOM_LEFT_CLASS = "bottom-left"; //$NON-NLS-1$
     /**
      * The size of the edge of the triangle FIXME Handling of static variable
      * will be changed.
@@ -55,14 +60,16 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     /**
      * The region we will add on the cell when necessary.
      */
-    private Region commentTriangle = null;
+    private Region topLeftRegion = null;
+    private Region topRightRegion = null;
+    private Region bottomRightRegion = null;
+    private Region bottomLeftRegion = null;
 
     public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
         super(tableCell);
         tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
-
         if (tableCell.getItem() != null) {
-            tableCell.getItem().commentedProperty().addListener(new WeakChangeListener<>(triangleListener));
+            tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
         }
     }
 
@@ -70,45 +77,123 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     protected void layoutChildren(double x, final double y, final double w, final double h) {
         super.layoutChildren(x, y, w, h);
         if (getSkinnable().getItem() != null) {
-            layoutTriangle(getSkinnable().getItem().isCommented());
+            layoutTriangle();
         }
     }
 
-    private void layoutTriangle(boolean isCommented) {
-        if (isCommented) {
-            if (commentTriangle == null) {
-                commentTriangle = new Region();
-            }
-            if (!getChildren().contains(commentTriangle)) {
-                getChildren().add(commentTriangle);
-            }
-            commentTriangle.resize(TRIANGLE_SIZE, TRIANGLE_SIZE);
-            // Setting the style class is important for the shape.
-            commentTriangle.getStyleClass().add("comment"); //$NON-NLS-1$
-            commentTriangle.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, snappedTopInset() - 1);
-        } else if (commentTriangle != null) {
-            getChildren().remove(commentTriangle);
-            commentTriangle = null;
-        }
+    private void layoutTriangle() {
+        SpreadsheetCell cell = getSkinnable().getItem();
+        
+        handleTopLeft(cell);
+        handleTopRight(cell);
+        handleBottomLeft(cell);
+        handleBottomRight(cell);
+
         getSkinnable().requestLayout();
     }
 
-    private final ChangeListener<Boolean> triangleListener = new ChangeListener<Boolean>() {
+    private void handleTopLeft(SpreadsheetCell cell) {
+        if (cell.isCornerActivated(CornerPosition.TOP_LEFT)) {
+            if (topLeftRegion == null) {
+                topLeftRegion = getRegion(CornerPosition.TOP_LEFT);
+            }
+            if (!getChildren().contains(topLeftRegion)) {
+                getChildren().add(topLeftRegion);
+            }
+            topLeftRegion.relocate(0, snappedTopInset() - 1);
+        } else if (topLeftRegion != null) {
+            getChildren().remove(topLeftRegion);
+            topLeftRegion = null;
+        }
+    }
+
+    private void handleTopRight(SpreadsheetCell cell) {
+        if (cell.isCornerActivated(CornerPosition.TOP_RIGHT)) {
+            if (topRightRegion == null) {
+                topRightRegion = getRegion(CornerPosition.TOP_RIGHT);
+            }
+            if (!getChildren().contains(topRightRegion)) {
+                getChildren().add(topRightRegion);
+            }
+            topRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, snappedTopInset() - 1);
+        } else if (topRightRegion != null) {
+            getChildren().remove(topRightRegion);
+            topRightRegion = null;
+        }
+    }
+
+    private void handleBottomRight(SpreadsheetCell cell) {
+        if (cell.isCornerActivated(CornerPosition.BOTTOM_RIGHT)) {
+            if (bottomRightRegion == null) {
+                bottomRightRegion = getRegion(CornerPosition.BOTTOM_RIGHT);
+            }
+            if (!getChildren().contains(bottomRightRegion)) {
+                getChildren().add(bottomRightRegion);
+            }
+            bottomRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, getSkinnable().getHeight() - TRIANGLE_SIZE);
+        } else if (bottomRightRegion != null) {
+            getChildren().remove(bottomRightRegion);
+            bottomRightRegion = null;
+        }
+    }
+    private void handleBottomLeft(SpreadsheetCell cell) {
+        if (cell.isCornerActivated(CornerPosition.BOTTOM_LEFT)) {
+            if (bottomLeftRegion == null) {
+                bottomLeftRegion = getRegion(CornerPosition.BOTTOM_LEFT);
+            }
+            if (!getChildren().contains(bottomLeftRegion)) {
+                getChildren().add(bottomLeftRegion);
+            }
+            bottomLeftRegion.relocate(0, getSkinnable().getHeight() - TRIANGLE_SIZE);
+        } else if (bottomLeftRegion != null) {
+            getChildren().remove(bottomLeftRegion);
+            bottomLeftRegion = null;
+        }
+    }
+
+    private static Region getRegion(CornerPosition position) {
+        Region region = new Region();
+        region.resize(TRIANGLE_SIZE, TRIANGLE_SIZE);
+        region.getStyleClass().add("cell-corner"); //$NON-NLS-1$
+        switch (position) {
+            case TOP_LEFT:
+                region.getStyleClass().add(TOP_LEFT_CLASS);
+                break;
+            case TOP_RIGHT:
+                region.getStyleClass().add(TOP_RIGHT_CLASS);
+                break;
+            case BOTTOM_RIGHT:
+                region.getStyleClass().add(BOTTOM_RIGHT_CLASS);
+                break;
+            case BOTTOM_LEFT:
+                region.getStyleClass().add(BOTTOM_LEFT_CLASS);
+                break;
+
+        }
+
+        return region;
+    }
+    
+    private final EventHandler<Event> triangleEventHandler = new EventHandler<Event>() {
+
         @Override
-        public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+        public void handle(Event event) {
             getSkinnable().requestLayout();
         }
     };
-    
+
     private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
         @Override
         public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
                 SpreadsheetCell newCell) {
             if (oldCell != null) {
-                oldCell.commentedProperty().removeListener(triangleListener);
+                oldCell.removeEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
             }
             if (newCell != null) {
-                newCell.commentedProperty().addListener(new WeakChangeListener<>(triangleListener));
+                newCell.addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+            }
+            if (getSkinnable().getItem() != null) {
+                layoutTriangle();
             }
         }
     };

@@ -70,6 +70,12 @@ public interface Sample {
      */
     public String getJavaDocURL();
     
+    public String getControlStylesheetURL();
+    
+    /**
+     * A full URL to a sample source code, which is assumed to be in java.
+     * @return
+     */
     public String getSampleSourceURL();
     
     /**

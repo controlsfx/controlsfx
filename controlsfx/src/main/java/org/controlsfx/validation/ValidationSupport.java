@@ -26,8 +26,6 @@
  */
 package org.controlsfx.validation;
 
-import static org.controlsfx.control.decoration.Decorator.addDecoration;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +35,7 @@ import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -58,7 +57,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
-import org.controlsfx.control.decoration.Decorator;
+import org.controlsfx.validation.decoration.GraphicValidationDecoration;
+import org.controlsfx.validation.decoration.ValidationDecoration;
 
 /**
  * Provides validation support for UI components. The idea is create an instance of this class the component group, usually a panel.<br>
@@ -91,194 +91,235 @@ import org.controlsfx.control.decoration.Decorator;
  */
 public class ValidationSupport {
 	
-	private static class ObservableValueExtractor {
-		
-		public final Predicate<Control> applicability;
-		public final Callback<Control, ObservableValue<?>> extraction;
-		
-		public ObservableValueExtractor( Predicate<Control> applicability, Callback<Control, ObservableValue<?>> extraction ) {
-			this.applicability = Objects.requireNonNull(applicability);
-			this.extraction    = Objects.requireNonNull(extraction);
-		}
-		
-	}
+    private static class ObservableValueExtractor {
 
-	private static List<ObservableValueExtractor> extractors = FXCollections.observableArrayList(); 
-	
-	/**
-	 * Add "obervable value extractor" for custom controls.
-	 * @param test applicability test
-	 * @param extract extraction of observable value
-	 */
-	public static void addObservableValueExtractor( Predicate<Control> test, Callback<Control, ObservableValue<?>> extract ) {
-		extractors.add( new ObservableValueExtractor(test, extract));
-	}
-	
-	{
-		addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
-		addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
-		addObservableValueExtractor( c -> c instanceof ChoiceBox,        c -> ((ChoiceBox<?>)c).valueProperty());
-		addObservableValueExtractor( c -> c instanceof CheckBox,         c -> ((CheckBox)c).selectedProperty());
-		addObservableValueExtractor( c -> c instanceof Slider,           c -> ((Slider)c).valueProperty());
-		addObservableValueExtractor( c -> c instanceof ColorPicker,      c -> ((ColorPicker)c).valueProperty());
-		addObservableValueExtractor( c -> c instanceof DatePicker,       c -> ((DatePicker)c).valueProperty());
-		
-		addObservableValueExtractor( c -> c instanceof ListView,         c -> ((ListView<?>)c).itemsProperty());
-		addObservableValueExtractor( c -> c instanceof TableView,        c -> ((TableView<?>)c).itemsProperty());
-		
-		// FIXME: How to listen for TreeView changes???
-		//addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
-	}
-	
-	private static String CTRL_REQUIRED_FLAG = "controlsfx..validation.required";
-	
-	/**
-	 * Set control's required flag
-	 * @param c control
-	 * @param required flag
-	 */
-	public static void setRequired( Control c, boolean required ) {
-		c.getProperties().put(CTRL_REQUIRED_FLAG, required );
-	}
-	
-	/**
-	 * Check control's required flag
-	 * @param c control
-	 * @return true if required 
-	 */
-	public static boolean isRequired( Control c ) {
-		Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
-		return value instanceof Boolean? (Boolean)value: false;
-	}
-	
-	private ObservableSet<Control> controls = FXCollections.observableSet();
-	private ObservableMap<Control,ValidationResult> validationResults = 
-			FXCollections.observableMap(new WeakHashMap<>());
-	
-	/**
-	 * Creates validation support instance
-	 */
-	public ValidationSupport() {
-		
-		// notify validation result observers
-		validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
-			validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
-		);
-		
-		// validation decoration
-		validationResultProperty().addListener( (o, oldValue, validationResult) -> redecorate());
-	}
-	
-	// TODO needs optimizaion
-	public void redecorate() {
-		ValidationDecorator decorator = getValidationDecorator();
-		if ( decorator != null ) {
-        	for( Control target: getKnownControls()) {
-        		try {
-	        		Decorator.removeAllDecorations(target);
- 	        		getHighestMessage(target).ifPresent( msg -> 
- 	        			decorator.createDecorations(msg).stream().forEach( d -> addDecoration(target,d))
-	        		);
-        		} catch ( Throwable ex ) {
-        			// FIXME Decorator throws an exception on the first run
-        			ex.printStackTrace();
-        		}
-        	}
-    	}
-	}
-	
-	private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
-			new ReadOnlyObjectWrapper<ValidationResult>();
-	
-	
-	/**
-	 * Retrieves current validation result
-	 * @return validation result
-	 */
-	public ValidationResult getValidationResult() {
-		return validationResultProperty.get();
-	}
-	
-	/**
-	 * Validation result property. Can be used to track validation result changes 
-	 * @return
-	 */
-	public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
-		return validationResultProperty.getReadOnlyProperty();
-	}
-	
-	private ObjectProperty<ValidationDecorator> validationDecoratorProperty =
-			new SimpleObjectProperty<>(new StyleClassValidationDecorator());//new IconValidationDecorator());
-	
-	public ObjectProperty<ValidationDecorator> validationDecoratorProperty() {
-		return validationDecoratorProperty;
-	}
-	
-	public ValidationDecorator getValidationDecorator() {
-		return validationDecoratorProperty.get();
-	}
-	
-	public void setValidationDecorator( ValidationDecorator decorator ) {
-		if ( getValidationDecorator() != null && decorator == null ) {
-			for( Control target: getKnownControls()) {
-	           Decorator.removeAllDecorations(target);
-			}
-		}
-		if ( decorator != null )  redecorate();
-		validationDecoratorProperty.set(decorator);
-	}
-	
-	private Optional<ObservableValueExtractor> getExtractor(final Control c) {
-		for( ObservableValueExtractor e: extractors ) {
-			if ( e.applicability.test(c)) return Optional.of(e);
-		}
-		return Optional.empty();
-	}
+        public final Predicate<Control> applicability;
+        public final Callback<Control, ObservableValue<?>> extraction;
 
-	/**
-	 * Registers {@link Validator} for specified control with additional possiblity to mark control as required or not.
-	 * @param c control to validate
-	 * @param required true if controls should be required
-	 * @param validator {@link Validator} to be used
-	 * @return true if registration is successful
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
-		
-		return getExtractor(c).map( e -> {
-			
-			ObservableValue<T> observable = (ObservableValue<T>) e.extraction.call(c);
-			setRequired( c, required );
-			
-			Consumer<T> updateResults = value -> validationResults.put(c, validator.apply(c, value));
-			
-			controls.add(c);
-			observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
-			updateResults.accept(observable.getValue());
-			
-			return e;
-			
-		}).isPresent();
-	}
-	
-	public Set<Control> getKnownControls() {
-		return Collections.unmodifiableSet(controls);
-	}
-	
-	public Optional<ValidationMessage> getHighestMessage(Control target) {
-		return Optional.ofNullable(validationResults.get(target)).map( result -> 
-			result.getMessages().stream().max( ValidationMessage.COMPARATOR).orElse(null)
-		);
-	}
-	
-	/**
-	 * Registers {@link Validator} for specified control and makes control required
-	 * @param c control to validate
-	 * @param validator {@link Validator} to be used
-	 * @return true if registration is successful
-	 */
-	public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
-		return registerValidator(c, true, validator);
-	}
+        public ObservableValueExtractor( Predicate<Control> applicability, Callback<Control, ObservableValue<?>> extraction ) {
+            this.applicability = Objects.requireNonNull(applicability);
+            this.extraction    = Objects.requireNonNull(extraction);
+        }
 
+    }
+
+    private static List<ObservableValueExtractor> extractors = FXCollections.observableArrayList(); 
+
+    /**
+     * Add "obervable value extractor" for custom controls.
+     * @param test applicability test
+     * @param extract extraction of observable value
+     */
+    public static void addObservableValueExtractor( Predicate<Control> test, Callback<Control, ObservableValue<?>> extract ) {
+        extractors.add( new ObservableValueExtractor(test, extract));
+    }
+
+    {
+        addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
+        addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
+        addObservableValueExtractor( c -> c instanceof ChoiceBox,        c -> ((ChoiceBox<?>)c).valueProperty());
+        addObservableValueExtractor( c -> c instanceof CheckBox,         c -> ((CheckBox)c).selectedProperty());
+        addObservableValueExtractor( c -> c instanceof Slider,           c -> ((Slider)c).valueProperty());
+        addObservableValueExtractor( c -> c instanceof ColorPicker,      c -> ((ColorPicker)c).valueProperty());
+        addObservableValueExtractor( c -> c instanceof DatePicker,       c -> ((DatePicker)c).valueProperty());
+
+        addObservableValueExtractor( c -> c instanceof ListView,         c -> ((ListView<?>)c).itemsProperty());
+        addObservableValueExtractor( c -> c instanceof TableView,        c -> ((TableView<?>)c).itemsProperty());
+
+        // FIXME: How to listen for TreeView changes???
+        //addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
+    }
+
+    private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$";
+    
+    /**
+     * Set control's required flag
+     * @param c control
+     * @param required flag
+     */
+    public static void setRequired( Control c, boolean required ) {
+        c.getProperties().put(CTRL_REQUIRED_FLAG, required );
+    }
+
+    /**
+     * Check control's required flag
+     * @param c control
+     * @return true if required 
+     */
+    public static boolean isRequired( Control c ) {
+        Object value = c.getProperties().get(CTRL_REQUIRED_FLAG);
+        return value instanceof Boolean? (Boolean)value: false;
+    }
+
+    private ObservableSet<Control> controls = FXCollections.observableSet();
+    private ObservableMap<Control,ValidationResult> validationResults = 
+            FXCollections.observableMap(new WeakHashMap<>());
+
+    /**
+     * Creates validation support instance
+     */
+    public ValidationSupport() {
+
+        // notify validation result observers
+        validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
+        validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
+                );
+
+        // validation decoration
+        validationResultProperty().addListener( (o, oldValue, validationResult) -> {
+            invalidProperty.set(!validationResult.getErrors().isEmpty());
+            redecorate();
+        });
+    }
+
+    /**
+     * Redecorates all known components
+     * Only decorations related to validation are affected
+     */
+    // TODO needs optimization
+    public void redecorate() {
+        Optional<ValidationDecoration> odecorator = Optional.ofNullable(getValidationDecorator());
+        for (Control target : getRegisteredControls()) {
+            odecorator.ifPresent( decorator -> {
+            	decorator.removeDecorations(target);
+                decorator.applyRequiredDecoration(target);
+                getHighestMessage(target).ifPresent(msg -> decorator.applyValidationDecoration(msg));
+            });
+        }
+    }
+
+    private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
+            new ReadOnlyObjectWrapper<ValidationResult>();
+
+
+    /**
+     * Retrieves current validation result
+     * @return validation result
+     */
+    public ValidationResult getValidationResult() {
+        return validationResultProperty.get();
+    }
+
+    /**
+     * Can be used to track validation result changes 
+     * @return The Validation result property.
+     */
+    public ReadOnlyObjectProperty<ValidationResult> validationResultProperty() {
+        return validationResultProperty.getReadOnlyProperty();
+    }
+
+    private ReadOnlyObjectWrapper<Boolean> invalidProperty = new ReadOnlyObjectWrapper<Boolean>(); 
+
+
+    /**
+     * Returns current validation state. 
+     * @return true if there is at least one error
+     */
+    public Boolean isInvalid() {
+        return invalidProperty.get();
+    }
+
+    /**
+     * @return the Validation state property
+     */
+    public ReadOnlyObjectProperty<Boolean> invalidProperty() {
+        return invalidProperty.getReadOnlyProperty();
+    }
+
+
+    private ObjectProperty<ValidationDecoration> validationDecoratorProperty =
+            new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) {
+        protected void invalidated() {
+            // when the decorator changes, rerun the decoration to update the visuals immediately.
+            redecorate();
+        }
+    };
+
+    /**
+     * @return The Validation decorator property
+     */
+    public ObjectProperty<ValidationDecoration> validationDecoratorProperty() {
+        return validationDecoratorProperty;
+    }
+
+    /**
+     * Returns current validation decorator
+     * @return current validation decorator or null if none
+     */
+    public ValidationDecoration getValidationDecorator() {
+        return validationDecoratorProperty.get();
+    }
+
+    /**
+     * Sets new validation decorator
+     * @param decorator new validation decorator. Null value is valid - no decoration will occur
+     */
+    public void setValidationDecorator( ValidationDecoration decorator ) {
+        validationDecoratorProperty.set(decorator);
+    }
+
+    private Optional<ObservableValueExtractor> getExtractor(final Control c) {
+        for( ObservableValueExtractor e: extractors ) {
+            if ( e.applicability.test(c)) return Optional.of(e);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Registers {@link Validator} for specified control with additional possiblity to mark control as required or not.
+     * @param c control to validate
+     * @param required true if controls should be required
+     * @param validator {@link Validator} to be used
+     * @return true if registration is successful
+     */
+    @SuppressWarnings("unchecked")
+    public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
+
+        return getExtractor(c).map( e -> {
+
+            ObservableValue<T> observable = (ObservableValue<T>) e.extraction.call(c);
+            setRequired( c, required );
+
+            Consumer<T> updateResults = value -> { 
+                Platform.runLater(() -> validationResults.put(c, validator.apply(c, value)));
+            };
+
+            controls.add(c);
+
+            observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
+            updateResults.accept(observable.getValue());
+
+            return e;
+
+        }).isPresent();
+    }
+
+    /**
+     * Registers {@link Validator} for specified control and makes control required
+     * @param c control to validate
+     * @param validator {@link Validator} to be used
+     * @return true if registration is successful
+     */
+    public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
+        return registerValidator(c, true, validator);
+    }
+
+    /**
+     * Returns currently registered controls
+     * @return set of currently registered controls
+     */
+    public Set<Control> getRegisteredControls() {
+        return Collections.unmodifiableSet(controls);
+    }
+
+    /**
+     * Returns optional highest severity message for a control
+     * @param target control
+     * @return Optional highest severity message for a control
+     */
+    public Optional<ValidationMessage> getHighestMessage(Control target) {
+    	return Optional.ofNullable(validationResults.get(target)).flatMap( result ->
+    	   result.getMessages().stream().max(ValidationMessage.COMPARATOR)   
+    	);
+    }
 }

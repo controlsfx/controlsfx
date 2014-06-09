@@ -49,7 +49,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionUtils;
@@ -74,7 +73,7 @@ public class HelloActionGroup extends ControlsFXSample {
                                            new DummyAction("Action 4.2"))
     );
     
-    static class DummyAction extends AbstractAction {
+    static class DummyAction extends Action {
         public DummyAction(String name, Node image) {
             super(name);
             setGraphic(image);
@@ -84,7 +83,7 @@ public class HelloActionGroup extends ControlsFXSample {
             super(name);
         }
 
-        @Override public void execute(javafx.event.ActionEvent ae) {
+        @Override public void handle(javafx.event.ActionEvent ae) {
             System.out.println( String.format("Action '%s' is executed", getText()));
         }
         
@@ -131,9 +130,9 @@ public class HelloActionGroup extends ControlsFXSample {
         hbox.getChildren().add(new Label("Dynamically enable/disable action: "));
         hbox.getChildren().add(cbActions);
         
-        Action toggleAction = new AbstractAction("Enable/Disable") {
+        Action toggleAction = new Action("Enable/Disable") {
 
-            @Override public void execute(ActionEvent ae) {
+            @Override public void handle(ActionEvent ae) {
                Action action = cbActions.getSelectionModel().getSelectedItem();
                if ( action != null ) {
                    BooleanProperty p = action.disabledProperty();

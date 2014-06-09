@@ -39,62 +39,48 @@ import javafx.scene.control.Control;
  * @param <T> type of the controls value
  */
 public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
-	
-	/**
-	 * Factory method to create a validator, which checks if value exists. 
-	 * @param message text of a message to be created if value is invalid
-	 * @param severity severity of a message to be created if value is invalid
-	 * @return new validator
-	 */
-	static <T> Validator<T> createEmptyValidator(final String message, final Severity severity ) {
-		return new Validator<T>() {
 
-			@Override
-			public ValidationResult apply( Control c, T value) {
-				return ValidationResult
-				  .fromMessageIf(c, message, severity,
-				     value instanceof String? value.toString().trim().isEmpty(): value == null);
-			}
-			
-		};
-	}
-	
-	/**
-	 * Factory method to create a validator, which checks if value exists. 
-	 * Error is created if not if value does not exist 
-	 * @param text of a error to be created if value is invalid
-	 * @return new validator
-	 */
-	static <T> Validator<T> createEmptyValidator(final String message ) {
-		return createEmptyValidator(message, Severity.ERROR);
-	}
-	
-	/**
-	 * Factory method to create a validator, which if value exists in the provided collection. 
-	 * @param message text of a message to be created if value is not found
-	 * @param severity severity of a message to be created if value is found
-	 * @return new validator
-	 */
-	static <T> Validator<T> createEqualsValidator(final String message, final Severity severity, final Collection<T> values ) {
-		
-		return new Validator<T>() {
+    /**
+     * Factory method to create a validator, which checks if value exists. 
+     * @param message text of a message to be created if value is invalid
+     * @param severity severity of a message to be created if value is invalid
+     * @return new validator
+     */
+    public static <T> Validator<T> createEmptyValidator(final String message, final Severity severity) {
+        return (c, value) -> {
+            boolean condition = value instanceof String ? value.toString().trim().isEmpty() : value == null;
+            return ValidationResult.fromMessageIf(c, message, severity, condition);
+        };
+    }
 
-			@Override
-			public ValidationResult apply( Control c, T value) {
-				return ValidationResult.fromMessageIf(c,message,severity, !values.contains(value)); 
-			}
-			
-		};
-	}
-	
-	/**
-	 * Factory method to create a validator, which checks if value exists in the provided collection. 
-	 * Error is created if not found 
-	 * @param message text of a error to be created if value is not found
-	 * @return new validator
-	 */
-    static <T> Validator<T> createEqualsValidator(final String message, final Collection<T> values ) {
-		return createEqualsValidator(message, Severity.ERROR, values);
-	}
-	
+    /**
+     * Factory method to create a validator, which checks if value exists. 
+     * Error is created if not if value does not exist 
+     * @param message of a error to be created if value is invalid
+     * @return new validator
+     */
+    public static <T> Validator<T> createEmptyValidator(final String message) {
+        return createEmptyValidator(message, Severity.ERROR);
+    }
+
+    /**
+     * Factory method to create a validator, which if value exists in the provided collection. 
+     * @param values text of a message to be created if value is not found
+     * @param severity severity of a message to be created if value is found
+     * @return new validator
+     */
+    public static <T> Validator<T> createEqualsValidator(final String message, final Severity severity, final Collection<T> values) {
+        return (c, value) -> ValidationResult.fromMessageIf(c,message,severity, !values.contains(value));
+    }
+
+    /**
+     * Factory method to create a validator, which checks if value exists in the provided collection. 
+     * Error is created if not found 
+     * @param message text of a error to be created if value is not found
+     * @param values
+     * @return new validator
+     */
+    public static <T> Validator<T> createEqualsValidator(final String message, final Collection<T> values) {
+        return createEqualsValidator(message, Severity.ERROR, values);
+    }
 }

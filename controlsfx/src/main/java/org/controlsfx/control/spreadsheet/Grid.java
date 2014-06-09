@@ -26,11 +26,11 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.Collection;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.util.Callback;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
@@ -76,12 +76,12 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 public interface Grid {
     
     /**
-     * Return how many rows are inside the grid.
+     * @return how many rows are inside the grid.
      */
     public int getRowCount();
     
     /**
-     * Return how many columns are inside the grid.
+     * @return how many columns are inside the grid.
      */
     public int getColumnCount();
     
@@ -122,11 +122,53 @@ public interface Grid {
      */
     public double getRowHeight(int row);
     
+    
+    /**
+     * Returns an ObservableList of string to display in the row headers.
+     * 
+     * @return an ObservableList of string to display in the row headers.
+     */
+    public ObservableList<String> getRowHeaders();
+    
+    /**
+     * Returns an ObservableList of string to display in the column headers.
+     * 
+     * @return an ObservableList of string to display in the column headers.
+     */
+    public ObservableList<String> getColumnHeaders();
+    
+    /**
+     * Span in row the cell situated at rowIndex and colIndex by the number
+     * count
+     * 
+     * @param count
+     * @param rowIndex
+     * @param colIndex
+     */
+    public void spanRow(int count, int rowIndex, int colIndex);
+    
+    /**
+     * Span in column the cell situated at rowIndex and colIndex by the number
+     * count
+     * 
+     * @param count
+     * @param rowIndex
+     * @param colIndex
+     */
+    public void spanColumn(int count, int rowIndex, int colIndex);
+    
+    /**
+     * This method sets the rows used by the grid, and updates the rowCount.
+     * @param rows
+     */
+    public void setRows(Collection<ObservableList<SpreadsheetCell>> rows);
+    
     /**
      * Registers an event handler to this Grid. The Grid class allows 
      * registration of listeners which will be notified as a {@link SpreadsheetCell}'s value 
      * will change.
      *
+     * @param <E>
      * @param eventType the type of the events to receive by the handler
      * @param eventHandler the handler to register
      * @throws NullPointerException if the event type or handler is null
@@ -139,6 +181,7 @@ public interface Grid {
      * caller needs to specify the particular event type from which to
      * unregister the handler.
      *
+     * @param <E>
      * @param eventType the event type from which to unregister
      * @param eventHandler the handler to unregister
      * @throws NullPointerException if the event type or handler is null

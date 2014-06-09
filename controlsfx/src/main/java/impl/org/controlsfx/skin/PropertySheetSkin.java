@@ -26,6 +26,9 @@
  */
 package impl.org.controlsfx.skin;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +59,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
@@ -111,7 +114,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         toolbar.getItems().add(modeButton);
         
         // property sheet search
-        searchField.setPromptText("Search");
+        searchField.setPromptText( localize(asKey("property.sheet.search.field.prompt")));
         searchField.setMinWidth(0);
         HBox.setHgrow(searchField, Priority.SOMETIMES);
         searchField.managedProperty().bind(searchField.visibleProperty());
@@ -227,9 +230,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         
     }
 
-    private String capitalize( String s ) {
-        return s.substring(0,1).toUpperCase() + s.substring(1).toLowerCase();
-    }
     
     /**************************************************************************
      * 
@@ -237,7 +237,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
-    private class ActionChangeMode extends AbstractAction {
+    private class ActionChangeMode extends Action {
         
     	private final Image CATEGORY_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png");
     	private final Image NAME_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png");
@@ -248,20 +248,18 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             super("");
             this.mode = mode;
             
-            final String text = "By " + capitalize(mode.toString());
-            
             if (mode == Mode.CATEGORY) {
                 setGraphic( new ImageView(CATEGORY_IMAGE));
-                setLongText(text);
+                setLongText(localize(asKey("property.sheet.group.mode.bycategory")));
             } else if (mode == Mode.NAME) {
                 setGraphic(new ImageView(NAME_IMAGE));
-                setLongText(text);
+                setLongText(localize(asKey("property.sheet.group.mode.byname")));
             } else {
-                setText(text);
+                setText("???");
             }
         }
 
-        @Override public void execute(ActionEvent ae) {
+        @Override public void handle(ActionEvent ae) {
             getSkinnable().modeProperty().set(mode);
         }
     }

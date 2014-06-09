@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Tab;
@@ -93,13 +92,17 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog.ActionTrait;
+import org.controlsfx.control.textfield.CustomPasswordField;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.Dialog.Actions;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 
 /**
@@ -210,42 +213,63 @@ import org.controlsfx.dialog.Dialog.Actions;
  * </table>
  * 
  * 
- * <h3>Native and Cross-Platform Dialogs</h3>
+ * <h3>Styled Dialogs</h3>
  * 
  * <p>The ControlsFX dialogs API supports displaying dialogs with either a
  * consistent cross-platform titlebar area, or by using the titlebar of the users
- * operating system. All of the screenshots above are taken using the cross-platform
- * style, whereas the screenshots below are the same dialog code being rendered
- * using the users native platform titlebar. To enable this in the Dialogs
- * fluent API, simply call {@link #nativeTitleBar()} when creating the dialog.
- * If you're using the {@link Dialog} class, you can specify that you want to
- * use the native titlebar as part of the 
- * {@link Dialog#Dialog(Object, String, boolean, boolean)} constructor (where the
- * fourth parameter is used to represent whether to use the native titlebar or not).
+ * operating system, or without a titlebar. All of the screenshots above are taken
+ * using the cross-platform style, whereas the screenshots below are the
+ * same dialog code being rendered using different dialog styles.</p>
  * 
- * <p>Here are the screenshots of dialogs with their native title bars:
+ * <p>
+ * A dialog has one of the following styles:
+ * <ul>
+ * <li>{@link DialogStyle#CROSS_PLATFORM_DARK} - a dialog with a cross-platform title bar.</li>
+ * <li>{@link DialogStyle#NATIVE} - a dialog with a native title bar.</li>
+ * <li>{@link DialogStyle#UNDECORATED} - a dialog without a title bar.</li>
+ * </ul>
+ * </p>
+ * <p>If no style is specified, the dialogs will be rendered using the default
+ * {@link DialogStyle#CROSS_PLATFORM_DARK} style.</p>
+ * 
+ * To enable this in the Dialogs fluent API, simply call {@link #style(DialogStyle)}
+ * when creating the dialog. If you're using the {@link Dialog} class,
+ * you can specify the {@code DialogStyle} you want to use as part of the 
+ * {@link Dialog#Dialog(Object, String, boolean, DialogStyle)} constructor.
+ * 
+ * <p>Here are the screenshots of dialogs using different dialog styles:
  * 
  * <br/>
  * <table style="border: 1px solid gray;">
  *   <tr>
  *     <th><center><h3>Platform</h3></center></th>
+ *     <th><center><h3>DialogStyle</h3></center></th>
  *     <th><center><h3>Screenshot</h3></center></th>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Cross-Platform (default)</strong></td>
- *     <td><center><img src="native-titlebar/cross-platform.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Cross-Platform (default)</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.CROSS_PLATFORM_DARK}</strong></td>
+ *     <td><center><img src="dialog-style/cross-platform.png"></center></td>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Mac OS X</strong></td>
- *     <td><center><img src="native-titlebar/mac-native-titlebar.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Mac OS X</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.NATIVE}</strong></td>
+ *     <td><center><img src="dialog-style/mac-native-titlebar.png"></center></td>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Windows 8</strong></td>
- *     <td><center><img src="native-titlebar/windows-8-native-titlebar.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Windows 8</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.NATIVE}</strong></td>
+ *     <td><center><img src="dialog-style/windows-8-native-titlebar.png"></center></td>
  *   </tr>
  *   <tr>
- *     <td valign="center" style="text-align:right;"><strong>Linux (Ubuntu)</strong></td>
- *     <td><center><img src="native-titlebar/linux-native-titlebar.png"></center></td>
+ *     <td valign="center" style="text-align:center;"><strong>Linux (Ubuntu)</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.NATIVE}</strong></td>
+ *     <td><center><img src="dialog-style/linux-native-titlebar.png"></center></td>
+ *   </tr>
+ *   <tr>
+ *     <td valign="center" style="text-align:center;"><strong>Linux (Ubuntu)</strong></td>
+ *     <td valign="center" style="text-align:right;"><strong>{@code DialogStyle.UNDECORATED}</strong></td>
+ *     <td><center><img src="dialog-style/linux-undecorated-dialog.png"></center></td>
  *   </tr>
  * </table>
  * 
@@ -272,10 +296,10 @@ import org.controlsfx.dialog.Dialog.Actions;
  * 
  * <p>One limitation of lightweight dialogs is that it is not possible to use
  * the native titlebar feature. If you call both {@link #lightweight()} and
- * {@link #nativeTitleBar()}, the call to enable lightweight takes precedence
- * over the use of the native titlebar, so you will end up seeing what is shown
- * in the screenshot below (that is, a cross-platform-looking dialog that is 
- * lightweight).
+ * {@link #style(DialogStyle)} with {@link DialogStyle#NATIVE} option,
+ * the call to enable lightweight takes precedence over the use of the
+ * {@code DialogStyle}, so you will end up seeing what is shown in the screenshot
+ * below (that is, a cross-platform-looking dialog that is lightweight).
  * 
  * <p>To make a dialog lightweight, you simply call {@link #lightweight()} when
  * constructing the dialog using this Dialogs API. If you are using the 
@@ -283,13 +307,18 @@ import org.controlsfx.dialog.Dialog.Actions;
  * lightweight dialogs must be made in the
  * {@link Dialog#Dialog(Object, String, boolean)} constructor.
  * 
- * <p>Shown below is a screenshot of a lightweight dialog whose owner is the
+ * <p>Shown below are screenshots of a lightweight dialog whose owner is the
  * Tab. This means that whilst the first tab is blocked for input until the
  * dialog is dismissed by the user, the rest of the UI (including going to other
  * tabs) remains interactive):
  * 
+ * <h4>Lightweight dialog whose style is {@link DialogStyle#CROSS_PLATFORM_DARK}</h4>
  * <br>
- * <center><img src="lightweight.png"></center>
+ * <center><img src="dialog-style/windows-8-lightweight-cross-platform.png"></center>
+ * 
+ * <h4>Lightweight dialog whose style is {@link DialogStyle#UNDECORATED}</h4>
+ * <br>
+ * <center><img src="dialog-style/windows-8-lightweight-undecorated.png"></center>
  * 
  * <h3>Java 8 API elements</h3>
  * 
@@ -301,7 +330,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  *   optional.isPresent(value->{...}) //perform an operation only if there is a value 
  *   optional.orElse(default)         //get the value of optional with default if it does not exists
  *   optional.map( value -> {...} ).orElse(default) //convert to other type with default
- * </pre>
+ * }</pre>
  * and many more - check {@link Optional} API.<br>
  * {@link Optional} can be thought of as a stream collection of one or none elements, allowing for functional approach - 
  * chaining methods without keeping state. This especially beneficial in concurrent environments.  
@@ -356,7 +385,7 @@ import org.controlsfx.dialog.Dialog.Actions;
  * @see Dialog
  * @see Action
  * @see Actions
- * @see AbstractAction
+ * @see Action
  * @see Optional
  */
 public final class Dialogs {
@@ -370,12 +399,13 @@ public final class Dialogs {
 
     private Object owner;
     private String title = USE_DEFAULT;
+    private Node graphic;
     private String message;
-    private String masthead = USE_DEFAULT;
+    private String masthead;
     private boolean lightweight;
-    private boolean nativeTitleBar;
     private Set<Action> actions = new LinkedHashSet<>();
     private Effect backgroundEffect;
+    private List<String> styleClasses;
 
     /**
      * Creates the initial dialog
@@ -409,7 +439,16 @@ public final class Dialogs {
         this.title = title;
         return this;
     }
-
+    
+    /**
+     * Assigns dialog's graphic
+     * @param title dialog graphic
+     * @return dialog instance.
+     */
+    public Dialogs graphic(final Node graphic) {
+        this.graphic = graphic;
+        return this;
+    }
     
     /**
      * Assigns dialog's instructions
@@ -482,14 +521,30 @@ public final class Dialogs {
     }
     
     /**
-     * Specifies that the dialog should use the native title bar of the users 
-     * operating system rather than the custom cross-platform rendering used by 
-     * default. Refer to the Dialogs class JavaDoc for more information.
+     * Specifies that the dialog should use the given style class, which allows
+     * for custom styling via CSS. There are three built-in style classes that
+     * cover most use cases, these are:
      * 
+     * <ul>
+     *   <li>{@link Dialog#STYLE_CLASS_CROSS_PLATFORM}</li>
+     *   <li>{@link Dialog#STYLE_CLASS_NATIVE}</li>
+     *   <li>{@link Dialog#STYLE_CLASS_UNDECORATED}</li>
+     * </ul>
+     * 
+     * <p>By default, dialogs use the cross-platform style class, to give a
+     * consistent look across all operating systems.
+     * 
+     * <p>This method can be called multiple times, with each style class being
+     * added to the final dialog instance.
+     * 
+     * @param styleClass The style class to add to the dialog.
      * @return dialog instance.
      */
-    public Dialogs nativeTitleBar() {
-        this.nativeTitleBar = true;
+    public Dialogs styleClass(String styleClass) {
+        if (styleClasses == null) {
+            styleClasses = new ArrayList<String>();
+        }
+        styleClasses.add(styleClass);
         return this;
     }
     
@@ -554,13 +609,13 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new AbstractAction("Open Exception") {
-            @Override public void execute(ActionEvent ae) {
+        Action openExceptionAction = new Action(localize(asKey("exception.button.label"))) {
+            @Override public void handle(ActionEvent ae) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 exception.printStackTrace(pw);
                 String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails, nativeTitleBar).show();
+                new ExceptionDialog((Window)owner, moreDetails).show();
             }
         };
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
@@ -651,13 +706,13 @@ public final class Dialogs {
     }
 
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent 
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
      * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks(CommandLink defaultCommandLink, List<CommandLink> links) {
+    public Action showCommandLinks(DialogAction defaultCommandLink, List<DialogAction> links) {
         final Dialog dlg = buildDialog(Type.INFORMATION);
         dlg.setContent(message);
         
@@ -697,14 +752,14 @@ public final class Dialogs {
             content.add(message, 0, row++);
         }
         
-        for (final CommandLink commandLink : links) {
+        for (final DialogAction commandLink : links) {
             if (commandLink == null) continue; 
             
             final Button button = buildCommandLinkButton(commandLink);            
             button.setDefaultButton(commandLink == defaultCommandLink);
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
-                   commandLink.execute( new ActionEvent(dlg, ae.getTarget()));
+                   commandLink.handle( new ActionEvent(dlg, ae.getTarget()));
                 }
             });
                     
@@ -724,24 +779,48 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * Show a dialog filled with provided command links.Command links are just a {@link DialogAction}s and used instead of button bar and represent
      * a set of available 'radio' buttons
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */    
-    public Action showCommandLinks( List<CommandLink> links ) {
+    public Action showCommandLinks( List<DialogAction> links ) {
         return showCommandLinks( null, links);
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent
      * a set of available 'radio' buttons
      * @param defaultCommandLink command is set to be default. Null means no default
      * @param links command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
+    public Action showCommandLinks( DialogAction defaultCommandLink, DialogAction... links ) {
         return showCommandLinks( defaultCommandLink, Arrays.asList(links));
+    }
+    
+    /**
+     * Convenience method to quickly create a command link
+     * @param graphic command link graphic
+     * @param text command link main text
+     * @param comment command link comment text
+     * @return {@link DialogAction} representing a command link
+     */
+    public static final DialogAction buildCommandLink( Node graphic, String text, String comment ) {
+    	DialogAction action = new DialogAction(text);
+    	action.setLongText(comment);
+    	action.setGraphic(graphic);
+    	return action;
+    }
+    
+    /**
+     * Convenience method to quickly create a command link
+     * @param text command link main text
+     * @param comment command link comment text
+     * @return {@link DialogAction} representing a command link
+     */   
+    public static final DialogAction buildCommandLink( String text, String comment ) {
+    	return buildCommandLink(null, text, comment);
     }
     
     /**
@@ -860,148 +939,69 @@ public final class Dialogs {
         content.setWorker(worker);
     }
     
-    public static class UserInfo {
-    	
-    	private String userName;
-    	private String password;
-    	
-		public UserInfo(String userName, String password) {
-			this.userName = userName == null? "": userName;
-			this.password = password == null? "": password;
-		}
-		
-		public String getUserName() {
-			return userName;
-		}
-		public void setUserName(String userName) {
-			this.userName = userName;
-		}
-		public String getPassword() {
-			return password;
-		}
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		@Override
-		public String toString() {
-			return "UserInfo [userName=" + userName + "]";
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((password == null) ? 0 : password.hashCode());
-			result = prime * result
-					+ ((userName == null) ? 0 : userName.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			UserInfo other = (UserInfo) obj;
-			if (password == null) {
-				if (other.password != null)
-					return false;
-			} else if (!password.equals(other.password))
-				return false;
-			if (userName == null) {
-				if (other.userName != null)
-					return false;
-			} else if (!userName.equals(other.userName))
-				return false;
-			return true;
-		}
-
-		
-		
-    }
     
     /**
-     * Creates a Login {@link Dialog} whith user name and password  fields
+     * Creates a Login {@link Dialog} with user name and password fields. 
      * 
-     * @param initialUserInfo user information initially shown in the dialog
-     * @param authenticator callback to execute actual authentication process. Exceptions coming from this callback are interpreted as
-     * authentication errors and will be shown as error message. In case of an exception the dialog will not close to give the user 
+     * @param initialUserInfo {@link Pair} of user name and password. User information initially shown in the dialog
+     * @param authenticator callback represents actual authentication process. Exceptions coming from this callback are interpreted as
+     * authentication errors and will be shown as error message. In case of an exception the dialog will not be closed to give the user 
      * an opportunity to correct their information and try again
      * 
-     * @return optional of UserInfo. Optional.EMPTY returned in case of cancelled dialog otherwise Optional of UserInfo value with provided user name
-     * and password
-     *  
+     * @return optional {@link Pair} of user info. {@link Optional.EMPTY} returned in case of cancelled dialog, otherwise Optional of user info 
+     * with provided user name and password
      */
-    public Optional<UserInfo> showLogin( final UserInfo initialUserInfo, final Callback<UserInfo, Void> authenticator ) {
+    public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {
     	
-    	TextField txUserName     = new TextField();
-		PasswordField txPassword = new PasswordField();
-		Label lbMessage          = new Label(""); 
-		lbMessage.setStyle("-fx-text-fill: red;");
+    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();// new CustomTextField();
+    	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
+    	
+    	CustomPasswordField txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
+    	txPassword.setLeft(new ImageView( DialogResources.getImage("login.password.icon")));
 		
+		Label lbMessage= new Label(""); 
+		lbMessage.getStyleClass().addAll("message-banner");
 		lbMessage.setVisible(false);
-		final GridPane content = new GridPane();
-		content.setHgap(10);
-		content.setVgap(10);
-		content.add(lbMessage, 0, 0, 2, 1);
-		GridPane.setHgrow(lbMessage, Priority.ALWAYS);
-		content.addRow(1, new Label( getString("login.dlg.user.caption")),txUserName);
-		GridPane.setHgrow(txUserName, Priority.ALWAYS);
-		content.addRow(2,new Label(getString("login.dlg.pswd.caption")), txPassword);
-		GridPane.setHgrow(txPassword, Priority.ALWAYS);
+		lbMessage.setManaged(false);
+		
+		final VBox content = new VBox(10);
+		content.getChildren().add(lbMessage);
+		content.getChildren().add(txUserName);
+		content.getChildren().add(txPassword);
 		
 //		NotificationPane notificationPane = new NotificationPane(content);
 //		notificationPane.setShowFromTop(true);
 		
-		Action actionLogin = new AbstractDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
-
+		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 			}
 			
-			
-			@Override
-			public void execute(ActionEvent ae) {
+			@Override public void handle(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
+						authenticator.call( new Pair<String,String>(txUserName.getText(), txPassword.getText() ) );
 					}
 					lbMessage.setVisible(false);
+					lbMessage.setManaged(false);
 					dlg.hide();
 					dlg.setResult(this);
 				} catch( Throwable ex ) {
 					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
 					lbMessage.setVisible(true);
+					lbMessage.setManaged(true);
 					lbMessage.setText(ex.getMessage());
+					dlg.sizeToScene();
+					dlg.shake();
 					ex.printStackTrace();
 				}
-				
 			}
 
 			public String toString() {
 				return "LOGIN";
 			};
 		};
-
-		ChangeListener<String> fieldChangeListener = new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> observable,
-					String oldValue, String newValue) {
-				actionLogin.disabledProperty().set(
-						txUserName.getText().trim().isEmpty()
-					 || txPassword.getText().trim().isEmpty());
-			}
-		};
-
-		txUserName.textProperty().addListener(fieldChangeListener);
-		txPassword.textProperty().addListener(fieldChangeListener);		
 		
 		final Dialog dlg = buildDialog(Type.LOGIN);
         dlg.setContent(content);
@@ -1012,14 +1012,25 @@ public final class Dialogs {
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
 		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
-		txUserName.setText( initialUserInfo.getUserName());
-		txPassword.setText(new String(initialUserInfo.getPassword()));
+		String userNameCation = getString("login.dlg.user.caption");
+		String passwordCaption = getString("login.dlg.pswd.caption");
+		txUserName.setPromptText(userNameCation);
+		txUserName.setText( initialUserInfo.getKey());
+		txPassword.setPromptText(passwordCaption);
+		txPassword.setText(new String(initialUserInfo.getValue()));
 
-		Platform.runLater( () -> txUserName.requestFocus() );
+		ValidationSupport validationSupport = new ValidationSupport();
+		Platform.runLater( () -> {
+			String requiredFormat = "'%s' is required";
+			validationSupport.registerValidator(txUserName, Validator.createEmptyValidator( String.format( requiredFormat, userNameCation )));
+			validationSupport.registerValidator(txPassword, Validator.createEmptyValidator(String.format( requiredFormat, passwordCaption )));
+			actionLogin.disabledProperty().bind(validationSupport.invalidProperty());
+			txUserName.requestFocus();
+	    } );
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
-    					new UserInfo(txUserName.getText(), txPassword.getText()): 
+    					new Pair<String,String>(txUserName.getText(), txPassword.getText()): 
     					null);
     }
     
@@ -1034,13 +1045,22 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle, lightweight, nativeTitleBar);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight);
+        
+        if (styleClasses != null) {
+            dlg.getStyleClass().addAll(styleClasses);
+        }
+        
         dlg.setResizable(false);
         dlg.setIconifiable(false);
-        Image image = dlgType.getImage();
-        if (image != null) {
-            dlg.setGraphic(new ImageView(image));
+        
+        // graphic
+        if (graphic != null) {
+            dlg.setGraphic(graphic);
+        } else if (dlgType.getImage() != null){
+            dlg.setGraphic(new ImageView(dlgType.getImage()));
         }
+        
         dlg.setMasthead(actualMasthead);
         dlg.getActions().addAll(dlgType.getActions());
         dlg.setBackgroundEffect(backgroundEffect);
@@ -1108,7 +1128,7 @@ public final class Dialogs {
         return root;
     }
     
-    private Button buildCommandLinkButton(CommandLink commandLink) {
+    private Button buildCommandLinkButton(DialogAction commandLink) {
         // put the content inside a button
         final Button button = new Button();
         button.getStyleClass().addAll("command-link-button");
@@ -1210,33 +1230,6 @@ public final class Dialogs {
             return actions;
         }
     }
-    
-    
-    /**
-     * Command Link class.
-     * Represents one command link in command links dialog. 
-     */
-    public static class CommandLink extends AbstractDialogAction {
-        
-        public CommandLink( Node graphic, String text, String longText ) {
-            super(text);
-            setLongText(longText);
-            setGraphic(graphic);
-        }
-        
-        public CommandLink( String message, String comment ) {
-            this(null, message, comment);
-        }
-
-        @Override public final void execute(ActionEvent ae) {
-            Dialog dlg = (Dialog)ae.getSource();
-            dlg.setResult(this);
-        }
-
-        @Override public String toString() {
-            return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
-        }
-    } 
     
     /**
      * Font style as combination of font weight and font posture. 
@@ -1366,7 +1359,7 @@ public final class Dialogs {
         private final ListView<String> fontListView = new ListView<String>(filteredFontList);
         private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
         private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
-        private final Text sample = new Text("Sample");
+        private final Text sample = new Text(localize(asKey("font.dlg.sample.text")));
         
         public FontPanel() {
             setHgap(HGAP);
@@ -1426,7 +1419,7 @@ public final class Dialogs {
 //            });
             
             // layout dialog
-            add( new Label("Font"), 0, 0);
+            add( new Label(localize(asKey("font.dlg.font.label"))), 0, 0);
 //            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( fontSearch, 0, 1);
             add(fontListView, 0, 1);
@@ -1462,13 +1455,13 @@ public final class Dialogs {
                     refreshSample();
                 }});
 
-            add( new Label("Style"), 1, 0);
+            add( new Label(localize(asKey("font.dlg.style.label"))), 1, 0);
 //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( postureSearch, 1, 1);
             add(styleListView, 1, 1);
             styleListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
             
-            add( new Label("Size"), 2, 0);
+            add( new Label(localize(asKey("font.dlg.size.label"))), 2, 0);
 //            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( sizeSearch, 2, 1);
             add(sizeListView, 2, 1);

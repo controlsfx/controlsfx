@@ -83,15 +83,26 @@ public class CustomPasswordField extends PasswordField {
     /**
      * Property representing the {@link Node} that is placed on the left of
      * the password field.
+     * @return An ObjectProperty.
      */
     public final ObjectProperty<Node> leftProperty() {
         return left;
     }
     
+    /**
+     * 
+     * @return The {@link Node} that is placed on the left of
+     * the password field.
+     */
     public final Node getLeft() {
         return left.get();
     }
     
+    /**
+     * Sets the {@link Node} that is placed on the left of
+     * the password field.
+     * @param value 
+     */
     public final void setLeft(Node value) {
         left.set(value);
     }
@@ -103,15 +114,26 @@ public class CustomPasswordField extends PasswordField {
     /**
      * Property representing the {@link Node} that is placed on the right of
      * the password field.
+     * @return An ObjectProperty.
      */
     public final ObjectProperty<Node> rightProperty() {
         return right;
     }
     
+    /**
+     * 
+     * @return The {@link Node} that is placed on the right of
+     * the password field.
+     */
     public final Node getRight() {
         return right.get();
     }
     
+    /**
+     * Sets the {@link Node} that is placed on the right of
+     * the password field.
+     * @param value 
+     */
     public final void setRight(Node value) {
         right.set(value);
     }

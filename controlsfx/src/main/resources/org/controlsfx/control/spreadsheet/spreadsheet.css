@@ -2,92 +2,11 @@
     -fx-background-color: transparent;
 }
 
-.spreadsheet-cell {
-    -fx-background-color: green;
-     -fx-padding: 0 0 0 0.2em;
-}
-
-.tooltip {
-    -fx-background-radius: 0px;
-    -fx-background-color:
-        linear-gradient(#cec340, #a59c31),
-        linear-gradient(#fefefc, #e6dd71),
-        linear-gradient(#fef592, #e5d848);
-    -fx-background-insets: 0,1,2;
-    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em; /* 4 8 4 8 */
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
-    -fx-text-fill:black;
-}
-
-/* ROW HEADER CELL */
-.spreadsheet-cell.row_header:filled:selected ,
-.spreadsheet-cell.row_header:filled:focused:selected,
-.spreadsheet-cell.row_header:filled:focused:selected:hover {
-    -fx-background-color: #26ADE4;
-    /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
-    -fx-text-fill: -fx-selection-bar-text;
-}
-.spreadsheet-cell.row_header:hover,
-.spreadsheet-cell.row_header:filled:focused {
-    -fx-background-color: #97bea9;
-    -fx-text-fill: -fx-text-inner-color;
-    -fx-background-insets: 0, 0 0 1 0;
-}
-
-.spreadsheet-cell.row_header{
-    -fx-background-color:-fx-table-cell-border-color,#b4d4ad ;
-    -fx-background-insets: 0, 0 1 1 0;
-    -fx-alignment: center;
-}
-
-/* CELL COLUMN HEADER */
-.spreadsheet-cell.col_header:filled:selected ,
-.spreadsheet-cell.col_header:filled:focused:selected,
-.spreadsheet-cell.col_header:filled:focused:selected:hover {
-    -fx-background-color: #26ADE4;
-    /*-fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
-    -fx-text-fill: -fx-selection-bar-text;
-}
-.spreadsheet-cell.col_header:hover,
-.spreadsheet-cell.col_header:filled:focused {
-    -fx-background-color: #b07297;
-    -fx-text-fill: -fx-text-inner-color;
-    -fx-background-insets: 0, 0 0 1 0;
-}
-
-.spreadsheet-cell.col_header{
-    -fx-background-color: -fx-table-cell-border-color, #e18cb3;
-    -fx-background-insets: 0, 0 1 1 0;
-    -fx-alignment: center;
-}
-
-/* CELL EVERY 5 ROW */
-.spreadsheet-cell.five_rows:filled:selected ,
-.spreadsheet-cell.five_rows:filled:focused:selected,
-.spreadsheet-cell.five_rows:filled:focused:selected:hover {
-    -fx-background-color: #26ADE4 ;
-    /*-fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
-    -fx-text-fill: -fx-selection-bar-text;
-}
-.spreadsheet-cell.five_rows:hover,
-.spreadsheet-cell.five_rows:filled:focused {
-    -fx-background-color: #a9f0b4;
-    -fx-text-fill: -fx-text-inner-color;
-    -fx-background-insets: 0, 0 0 1 0;
-}
-
-.spreadsheet-cell.five_rows{
-    -fx-background-color: -fx-table-cell-border-color, #ccffff;
-    -fx-background-insets: 0, 0 1 1 0;
-    -fx-alignment: center;
-}
-
 /* NORMAL CELL */
 .spreadsheet-cell:filled:selected,
 .spreadsheet-cell:filled:focused:selected,
 .spreadsheet-cell:filled:focused:selected:hover {
-    -fx-background-color: #26ADE4;
-    /* -fx-background-insets: 0 1 0 0, 1 2 1 1, 2 3 2 2;*/
+    -fx-background-color: #FFDA8C;
     -fx-border-color: #a9a9a9;
     -fx-border-width : 0.5px;
     -fx-text-fill: -fx-selection-bar-text;
@@ -101,12 +20,23 @@
 }
 
 .spreadsheet-cell{
-    -fx-background-color: -fx-table-cell-border-color, #d9d6dd;
-    -fx-background-insets: 0, 0 1 1 0;
+    -fx-padding: 0 0 0 0.2em;
+    -fx-border-color: black;
+    -fx-border-width : 0.3px;
+    -fx-background-color: -fx-table-cell-border-color,white;
 }
-/*.spreadsheet-cell.modified{
-        -fx-background-radius : 0 15 0 0;
-}*/
+
+.tooltip {
+    -fx-background-radius: 0px;
+    -fx-background-color:
+        linear-gradient(#cec340, #a59c31),
+        linear-gradient(#fefefc, #e6dd71),
+        linear-gradient(#fef592, #e5d848);
+    -fx-background-insets: 0,1,2;
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em; /* 4 8 4 8 */
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
+    -fx-text-fill:black;
+}
 
 /* FIXED HEADERS  */
 VerticalHeader > Label.fixed{
@@ -160,9 +90,24 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 
-.comment{
+.cell-corner{
     -fx-background-color: red;
+}
+
+.cell-corner.top-left{
+    -fx-shape : "M 0 0 L 1 0 L 0 1 z";
+}
+
+.cell-corner.top-right{
     -fx-shape : "M 0 0 L -1 0 L 0 1 z";
+}
+
+.cell-corner.bottom-right{
+    -fx-shape : "M 0 0 L -1 0 L 0 -1 z";
+}
+
+.cell-corner.bottom-left{
+    -fx-shape : "M 0 0 L 1 0 L 0 -1 z";
 }
 
 /* TextField must squeeze tight, so no padding
@@ -173,4 +118,17 @@ on top and bottom */
 
 .indicationLabel{
     -fx-font-style : italic;
+}
+
+/* PICKERS */
+.picker-label{
+    -fx-graphic: url("picker.png"); 
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+    -fx-alignment: center;
+}
+
+.picker-label:hover{
+    -fx-effect:dropshadow(gaussian, black, 10, 0.1, 0, 0);
+    -fx-cursor:hand;
 }

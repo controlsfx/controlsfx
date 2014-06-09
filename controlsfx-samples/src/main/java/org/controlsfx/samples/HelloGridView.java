@@ -43,7 +43,7 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.cell.ColorGridCell;
 import org.controlsfx.control.cell.ImageGridCell;
@@ -63,6 +63,12 @@ public class HelloGridView extends ControlsFXSample {
     
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/GridView.html";
+    }
+    
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/gridview.css";
     }
     
     private GridView<?> getColorGrid() {
@@ -113,7 +119,7 @@ public class HelloGridView extends ControlsFXSample {
         return root;
     }
     
-    class ActionShowGrid extends AbstractAction {
+    class ActionShowGrid extends Action {
 
         GridView<?> grid;
         
@@ -122,7 +128,7 @@ public class HelloGridView extends ControlsFXSample {
             this.grid = grid;
         }
 
-        @Override public void execute(ActionEvent ae) {
+        @Override public void handle(ActionEvent ae) {
             if ( myGrid != null ) {
                 root.getChildren().remove(myGrid);
             }

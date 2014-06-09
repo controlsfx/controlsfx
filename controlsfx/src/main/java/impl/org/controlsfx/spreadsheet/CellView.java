@@ -27,6 +27,7 @@
 package impl.org.controlsfx.spreadsheet;
 
 import java.util.Optional;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
@@ -49,7 +50,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-
+import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
@@ -70,6 +71,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor"; //$NON-NLS-1$
     private static final int TOOLTIP_MAX_WIDTH = 400;
     private static final int WRAP_HEIGHT = 35;
+    private static final Duration FADE_DURATION = Duration.millis(500);
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
@@ -138,6 +140,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     @Override
     public void commitEdit(SpreadsheetCell newValue) {
+        //When commiting, we bring the value smoothly.
+        FadeTransition fadeTransition = new FadeTransition(FADE_DURATION, this);
+        fadeTransition.setFromValue(0);
+        fadeTransition.setToValue(1);
+        fadeTransition.play();
+        
         if (!isEditing()) {
             return;
         }
@@ -214,33 +222,32 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     /**
      * Called in the gridRowSkinBase when doing layout This allow not to
      * override opacity in the row and let the cell handle itself
-     * @param item
+     * @param cell
      */
-    public void show(final SpreadsheetCell item) {
+    public void show(final SpreadsheetCell cell) {
         // We reset the settings
-        textProperty().bind(item.textProperty());
-        setCellGraphic(item);
-
-        if (item.getItem() == null || item.getItem().equals("") //$NON-NLS-1$
-                || (item.getItem() instanceof Double && Double.isNaN((double) item.getItem()))) {
-            setTooltip(null);
-        } else {
+        textProperty().bind(cell.textProperty());
+        setCellGraphic(cell);
+        
+        Optional<String> tooltip = cell.getTooltip();
+        if(tooltip.isPresent()){
             /**
-             * Ensure that modification of ToolTip are set on the JFX thread
-             * because an exception can be thrown otherwise. This should use
-             * Lambda expression but I cannot use 1.8 compliance..
-             */
+            * Ensure that modification of ToolTip are set on the JFX thread
+            * because an exception can be thrown otherwise. 
+            */
             getValue(()->{
-                    Tooltip toolTip = new Tooltip(item.getItem().toString());
-                    toolTip.setWrapText(true);
-                    toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                    setTooltip(toolTip);
-                }
+                       Tooltip toolTip = new Tooltip(tooltip.get());
+                       toolTip.setWrapText(true);
+                       toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                       setTooltip(toolTip);
+               }
             );
+        }else{
+            setTooltip(null);
         }
         // We want the text to wrap onto another line
 //        setWrapText(true);
-        setEditable(item.isEditable());
+        setEditable(cell.isEditable());
     }
 
     public void show() {

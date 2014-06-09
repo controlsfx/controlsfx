@@ -26,6 +26,11 @@ public abstract class ControlsFXSample extends SampleBase {
 	    return Utils.JAVADOC_BASE + "samples-src/" + getClass().getName().replace('.','/') + ".java";
 	}
 	
+	@Override
+	public String getControlStylesheetURL() {
+		return null;
+	}
+	
 	private static class ProjectInfo {
 		
 		private String version;
@@ -34,7 +39,7 @@ public abstract class ControlsFXSample extends SampleBase {
 		public ProjectInfo() {
 			
 			InputStream s = getClass().getClassLoader().getResourceAsStream(
-					"META-INF/manifest.mf");
+					"META-INF/MANIFEST.MF");
 			
 			try {
 				Manifest manifest = new Manifest(s);

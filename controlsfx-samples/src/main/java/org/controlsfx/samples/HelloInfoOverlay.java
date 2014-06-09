@@ -56,6 +56,12 @@ public class HelloInfoOverlay extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/InfoOverlay.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/info-overlay.css";
+    }
+    
     @Override public String getSampleDescription() {
         return "A simple UI control that allows for an information popup to be "
                 + "displayed over a node to describe it in further detail. In "

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,27 +26,56 @@
  */
 package org.controlsfx.control.decoration;
 
+import java.util.List;
+
 import javafx.scene.Node;
 
-public class StyleClassDecoration implements Decoration {
+/**
+ * StyleClassDecoration is a {@link Decoration} designed to add a CSS style class
+ * to a node (for example, to show a warning style when the field is incorrectly 
+ * set). StyleClassDecoration is applied as part of the ControlsFX {@link Decorator} 
+ * API - refer to the {@link Decorator} javadoc for more details.
+ * 
+ * @see Decoration
+ * @see Decorator
+ */
+public class StyleClassDecoration extends Decoration {
 
-    private final String styleClass;
+    private final String[] styleClasses;
 
-    public StyleClassDecoration(String styleClass) {
-        this.styleClass = styleClass;
+    /**
+     * Constructs a new StyleClassDecoration with the given var-args array of 
+     * style classes set to be applied to any node that has this decoration 
+     * applied to it.
+     * 
+     * @param styleClass A var-args array of style classes to apply to any node.
+     * @throws IllegalArgumentException if the styleClass varargs array is null or empty.
+     */
+    public StyleClassDecoration(String... styleClass) {
+        if (styleClass == null || styleClass.length == 0) {
+            throw new IllegalArgumentException("var-arg style class array must not be null or empty");
+        }
+        this.styleClasses = styleClass;
     }
 
-    @Override public Node run(Node targetNode, boolean add) {
-        if (add) {
-            if (targetNode.getStyleClass().contains(styleClass)) return null;
-
-            targetNode.getStyleClass().add(styleClass);
-
-            // no decoration node, so return null
-            return null;
-        } else {
-            targetNode.getStyleClass().remove(styleClass);
-            return null;
+    /** {@inheritDoc} */
+    @Override public Node applyDecoration(Node targetNode) {
+        final List<String> styleClassList = targetNode.getStyleClass();
+        
+        for (String styleClass : styleClasses) {
+            if (styleClassList.contains(styleClass)) {
+                continue;
+            }
+    
+            styleClassList.add(styleClass);
         }
+            
+        // no decoration node, so return null
+        return null;
+    }
+    
+    /** {@inheritDoc} */
+    @Override public void removeDecoration(Node targetNode) {
+        targetNode.getStyleClass().removeAll(styleClasses);
     }
 }

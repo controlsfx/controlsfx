@@ -35,12 +35,12 @@ import javafx.stage.Window;
 public class Utils {
 
     /**
-     * Will return a {@link Window} from an object if any can be found. null
+     * Will return a {@link Window} from an object if any can be found. {@code null}
      * value can be given, the program will then try to find the focused window
      * among those available.
      * 
-     * @param owner
-     * @return
+     * @param owner the object whose window is to be found.
+     * @return the window of the given object.
      */
     public static Window getWindow(Object owner) throws IllegalArgumentException {
         if (owner == null) {
@@ -62,5 +62,30 @@ public class Utils {
         } else {
             throw new IllegalArgumentException("Unknown owner: " + owner.getClass()); //$NON-NLS-1$
         }
+    }
+    
+    /**
+     * Return a letter (just like Excel) associated with the number. When the
+     * number is under 26, a simple letter is returned. When the number is
+     * superior, concatenated letters are returned.
+     * 
+     * 
+     * For example: 0 -> A 1 -> B 26 -> AA 32 -> AG 45 -> AT
+     * 
+     * 
+     * @param number the number whose Excel Letter is to be found.
+     * @return a letter (like) associated with the number.
+     */
+    public static final String getExcelLetterFromNumber(int number) {
+        String letter = "";
+        // Repeatedly divide the number by 26 and convert the
+        // remainder into the appropriate letter.
+        while (number >= 0) {
+            final int remainder = number % 26;
+            letter = (char) (remainder + 'A') + letter;
+            number = number / 26 - 1;
+        }
+
+        return letter;
     }
 }

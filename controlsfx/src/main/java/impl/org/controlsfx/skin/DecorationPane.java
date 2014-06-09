@@ -73,7 +73,7 @@ public class DecorationPane extends StackPane {
     }
 
     private void showDecoration(Node targetNode, Decoration decoration) {
-        Node decorationNode = decoration.run(targetNode, true);
+        Node decorationNode = decoration.applyDecoration(targetNode);
         if (decorationNode != null) {
             List<Node> decorationNodes = nodeDecorationMap.get(targetNode);
             if (decorationNodes == null) {
@@ -111,7 +111,7 @@ public class DecorationPane extends StackPane {
         
         // 2) Tell the decoration to remove itself from the target node (if necessary)
         for (Decoration decoration : decorations) {
-            decoration.run(targetNode, false);
+            decoration.removeDecoration(targetNode);
         }
     }
     

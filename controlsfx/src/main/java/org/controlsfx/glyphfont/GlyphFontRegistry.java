@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import javafx.scene.Node;
+import org.controlsfx.control.action.ActionProxy;
 
 /**
  * The glyph font registry automatically registers available fonts using a 

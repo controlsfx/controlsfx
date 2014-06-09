@@ -104,7 +104,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
     /**
      * Gets the target node for auto completion
-     * @return
+     * @return the target node for auto completion
      */
     public Node getCompletionTarget(){
         return completionTarget;
@@ -206,13 +206,13 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     public static interface ISuggestionRequest {
         /**
          * Is this request canceled?
-         * @return
+         * @return {@code true} if the request is canceled, otherwise {@code false}
          */
         public boolean isCancelled();
 
         /**
          * Get the user text to which suggestions shall be found
-         * @return
+         * @return {@link String} containing the user text
          */
         public String getUserText();
     }

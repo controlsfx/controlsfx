@@ -27,9 +27,15 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.RatingSkin;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 /**
@@ -109,7 +115,7 @@ import javafx.scene.control.Skin;
  * automatically follow the users mouse as they move it along the Rating scale.
  * To enable this, just set both properties to true.
  */
-public class Rating extends Control {
+public class Rating extends ControlsFXControl {
     
     /***************************************************************************
      * 

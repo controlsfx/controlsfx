@@ -38,7 +38,6 @@ import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
@@ -56,7 +55,7 @@ import com.sun.javafx.event.EventHandlerManager;
  * <img src="breadCrumbBar.png"/>
  * </center>
  */
-public class BreadCrumbBar<T> extends Control {
+public class BreadCrumbBar<T> extends ControlsFXControl {
 
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
@@ -209,6 +208,10 @@ public class BreadCrumbBar<T> extends Control {
         return selectedCrumb.get();
     }
 
+    /**
+     * Select one node in the BreadCrumbBar for being the bottom-most path node.
+     * @param selectedCrumb 
+     */
     public final void setSelectedCrumb(TreeItem<T> selectedCrumb){
         this.selectedCrumb.set(selectedCrumb);
     }
@@ -218,17 +221,28 @@ public class BreadCrumbBar<T> extends Control {
     /**
      * Enable or disable auto navigation (default is enabled).
      * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
+     * @return a {@link BooleanProperty}
      */
     public final BooleanProperty autoNavigationEnabledProperty() {
         return autoNavigation;
     }
+    
     private final BooleanProperty autoNavigation = 
             new SimpleBooleanProperty(this, "autoNavigationEnabled", true); //$NON-NLS-1$
     
+    /**
+     * Return whether auto-navigation is enabled.
+     * @return whether auto-navigation is enabled.
+     */
     public final boolean isAutoNavigationEnabled() {
         return autoNavigation.get();
     }
     
+    /**
+     * Enable or disable auto navigation (default is enabled).
+     * If auto navigation is enabled, it will automatically navigate to the crumb which was clicked by the user.
+     * @param enabled 
+     */
     public final void setAutoNavigationEnabled(boolean enabled) {
         autoNavigation.set(enabled);
     }
@@ -237,8 +251,8 @@ public class BreadCrumbBar<T> extends Control {
     
     // --- crumbFactory
     /**
-     * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
-     * <code>null</code> is not allowed and will result in a fall back to the default factory.
+     * Return an ObjectProperty of the CrumbFactory.
+     * @return an ObjectProperty of the CrumbFactory.
      */
     public final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactoryProperty() {
         return crumbFactory;
@@ -247,6 +261,11 @@ public class BreadCrumbBar<T> extends Control {
     private final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactory = 
             new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory"); //$NON-NLS-1$
 
+    /**
+     * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.
+     * <code>null</code> is not allowed and will result in a fall back to the default factory.
+     * @param value 
+     */
     public final void setCrumbFactory(Callback<TreeItem<T>, Button> value) {
         if(value == null){
             value = defaultCrumbNodeFactory;
@@ -265,17 +284,28 @@ public class BreadCrumbBar<T> extends Control {
     
     // --- onCrumbAction
     /**
-     * Callback property for when a user selects a crumb.
+     * @return an ObjectProperty representing the crumbAction EventHandler being used.
      */
     public final ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbActionProperty() { 
         return onCrumbAction; 
     }
+    
+    /**
+     * Set a new EventHandler for when a user selects a crumb.
+     * @param value 
+     */
     public final void setOnCrumbAction(EventHandler<BreadCrumbActionEvent<T>> value) {
         onCrumbActionProperty().set(value); 
     }
+    
+    /**
+     * Return the EventHandler currently used when a user selects a crumb.
+     * @return the EventHandler currently used when a user selects a crumb.
+     */
     public final EventHandler<BreadCrumbActionEvent<T>> getOnCrumbAction() { 
         return onCrumbActionProperty().get(); 
     }
+    
     private ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
         @SuppressWarnings("rawtypes")
         @Override protected void invalidated() {

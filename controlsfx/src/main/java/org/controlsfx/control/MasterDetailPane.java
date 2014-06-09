@@ -39,7 +39,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 
@@ -65,7 +64,7 @@ import javafx.scene.control.Skin;
  * pane.setShowDetailNode(true);
  * }</pre>
  */
-public class MasterDetailPane extends Control {
+public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Constructs a new pane.
@@ -139,10 +138,6 @@ public class MasterDetailPane extends Control {
     /**
      * Constructs a new pane with two placeholder nodes. The detail node will be
      * shown and to the right of the master node.
-     * 
-     * @param pos
-     *            the position where the details will be shown (top, bottom,
-     *            left, right)
      */
     public MasterDetailPane() {
         this(Side.RIGHT, new Placeholder(true), new Placeholder(false), true);

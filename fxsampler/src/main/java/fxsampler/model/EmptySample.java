@@ -48,4 +48,9 @@ public class EmptySample implements Sample {
         return null;
     }
 
+	@Override
+	public String getControlStylesheetURL() {
+		return null;
+	}
+
 }

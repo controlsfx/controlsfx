@@ -27,17 +27,20 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
+
 import java.util.Optional;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
+
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
+import org.controlsfx.property.editor.Editors;
 import org.controlsfx.property.editor.PropertyEditor;
 
 /**
@@ -57,7 +60,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * {@link PropertyEditor} that allows the end user the means to manipulate the
  * property. In the screenshot you can see CheckEditor, 
  * ChoiceEditor, TextEditor and FontEditor, among the
- * many editors that are available in the {@link org.controlsfx.property.editor}
+ * many editors that are available in the {@link Editors}
  * package.
  * 
  * <p>To create a PropertySheet is simple: you firstly instantiate an instance
@@ -75,7 +78,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see Item
  * @see Mode
  */
-public class PropertySheet extends Control {
+public class PropertySheet extends ControlsFXControl {
     
     
     /**************************************************************************
@@ -210,7 +213,7 @@ public class PropertySheet extends Control {
     
     /**
      * Creates a PropertySheet instance prepopulated with the items provided
-     * in the items {@link ObservabelList}.
+     * in the items {@link ObservableList}.
      * 
      * @param items The items that should appear within the PropertySheet.
      */
@@ -229,7 +232,8 @@ public class PropertySheet extends Control {
      **************************************************************************/
     
     /**
-     * A list of properties that will be displayed to the user to allow for them
+     * 
+     * @return An ObservableList of properties that will be displayed to the user to allow for them
      * to be edited. 
      */
     public ObservableList<Item> getItems() {
@@ -263,20 +267,29 @@ public class PropertySheet extends Control {
             new SimpleObjectProperty<>(this, "mode", Mode.NAME); //$NON-NLS-1$
     
     /**
-     * A property used to represent how the properties should be laid out in
+     * Used to represent how the properties should be laid out in
      * the PropertySheet. Refer to the {@link Mode} enumeration to better 
      * understand the available options.
+     * @return A SimpleObjectproperty. 
      */
     public final SimpleObjectProperty<Mode> modeProperty() {
     	return modeProperty;
     }
 
-    // -- JavaDoc auto-generated
+    /**
+     * @see Mode
+     * @return how the properties should be laid out in
+     * the PropertySheet.
+     */
     public final Mode getMode() {
         return modeProperty.get();
     }
 
-    // -- JavaDoc auto-generated
+    /**
+     * Set how the properties should be laid out in
+     * the PropertySheet.
+     * @param mode 
+     */
     public final void setMode(Mode mode) {
         modeProperty.set(mode);
     }
@@ -292,17 +305,27 @@ public class PropertySheet extends Control {
      * {@link DefaultPropertyEditorFactory} is used, but this may be replaced
      * or extended by developers wishing to add in (or substitute) their own
      * property editors.
+     * 
+     * @return A SimpleObjectproperty.
      */
     public final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory() {
         return propertyEditorFactory;
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * 
+     * @return The editor factory used by the PropertySheet to determine which
+     * {@link PropertyEditor} to use for a given {@link Item}.
+     */
     public final Callback<Item, PropertyEditor<?>> getPropertyEditorFactory() {
         return propertyEditorFactory.get();
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * Sets a new editor factory used by the PropertySheet to determine which
+     * {@link PropertyEditor} to use for a given {@link Item}.
+     * @param factory 
+     */
     public final void setPropertyEditorFactory( Callback<Item, PropertyEditor<?>> factory ) {
         propertyEditorFactory.set( factory == null? new DefaultPropertyEditorFactory(): factory );
     }
@@ -316,17 +339,26 @@ public class PropertySheet extends Control {
      * This property represents whether a visual option should be presented to
      * users to switch between the various {@link Mode modes} available. By
      * default this is true, so setting it to false will hide these buttons.
+     * @return A SimpleBooleanproperty.
      */
     public final SimpleBooleanProperty modeSwitcherVisibleProperty() {
         return modeSwitcherVisible;
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * 
+     * @return whether a visual option is presented to
+     * users to switch between the various {@link Mode modes} available.
+     */
     public final boolean isModeSwitcherVisible() {
         return modeSwitcherVisible.get();
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * Set whether a visual option should be presented to
+     * users to switch between the various {@link Mode modes} available.
+     * @param visible 
+     */
     public final void setModeSwitcherVisible( boolean visible ) {
         modeSwitcherVisible.set(visible);
     }
@@ -337,21 +369,35 @@ public class PropertySheet extends Control {
             new SimpleBooleanProperty(this, "searchBoxVisible", true); //$NON-NLS-1$
     
     /**
+     * 
+     */
+    /**
      * This property represents whether a text field should be presented to
      * users to allow for them to filter the properties in the property sheet to
      * only show ones matching the typed input. By default this is true, so 
      * setting it to false will hide this search field.
+     * @return A SimpleBooleanProperty.
      */
     public final SimpleBooleanProperty searchBoxVisibleProperty() {
         return searchBoxVisible;
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * 
+     * @return whether a text field should be presented to
+     * users to allow for them to filter the properties in the property sheet to
+     * only show ones matching the typed input.
+     */
     public final boolean isSearchBoxVisible() {
         return searchBoxVisible.get();
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * Sets whether a text field should be presented to
+     * users to allow for them to filter the properties in the property sheet to
+     * only show ones matching the typed input.
+     * @param visible 
+     */
     public final void setSearchBoxVisible( boolean visible ) {
         searchBoxVisible.set(visible);
     }   
@@ -366,17 +412,25 @@ public class PropertySheet extends Control {
      * is visible or not, it is possible to filter the options shown on screen
      * using this title filter property. If the search box is visible, it will
      * manipulate this property to contain whatever the user types.
+     * @return A SimpleStringProperty.
      */
     public final SimpleStringProperty titleFilter() {
         return titleFilterProperty;
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * @see #titleFilter() 
+     * @return the filter for filtering the options shown on screen
+     */
     public final String getTitleFilter() {
         return titleFilterProperty.get();
     }
     
-    // -- JavaDoc auto-generated
+    /**
+     * Sets the filter for filtering the options shown on screen.
+     * @param filter 
+     * @see #titleFilter() 
+     */
     public final void setTitleFilter( String filter ) {
         titleFilterProperty.set(filter);
     }

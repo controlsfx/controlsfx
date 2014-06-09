@@ -89,17 +89,28 @@ public class CustomTextField extends TextField {
     private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this, "left"); //$NON-NLS-1$
     
     /**
-     * Property representing the {@link Node} that is placed on the left of
-     * the text field.
+     * 
+     * @return An ObjectProperty wrapping the {@link Node} that is placed 
+     * on the left ofthe text field.
      */
     public final ObjectProperty<Node> leftProperty() {
         return left;
     }
     
+    /**
+     * 
+     * @return the {@link Node} that is placed on the left of
+     * the text field.
+     */
     public final Node getLeft() {
         return left.get();
     }
     
+    /**
+     * Sets the {@link Node} that is placed on the left of
+     * the text field.
+     * @param value 
+     */
     public final void setLeft(Node value) {
         left.set(value);
     }
@@ -111,15 +122,26 @@ public class CustomTextField extends TextField {
     /**
      * Property representing the {@link Node} that is placed on the right of
      * the text field.
+     * @return An ObjectProperty.
      */
     public final ObjectProperty<Node> rightProperty() {
         return right;
     }
     
+    /**
+     * 
+     * @return The {@link Node} that is placed on the right of
+     * the text field.
+     */
     public final Node getRight() {
         return right.get();
     }
     
+    /**
+     * Sets the {@link Node} that is placed on the right of
+     * the text field.
+     * @param value 
+     */
     public final void setRight(Node value) {
         right.set(value);
     }

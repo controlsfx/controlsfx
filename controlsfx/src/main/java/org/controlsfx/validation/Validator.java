@@ -93,9 +93,9 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param severity severity of a message to be created if value is invalid
      * @return new validator
      */
-    public static <T> Validator<T> createRegexValidator(final String message, final String regex, final Severity severity) {
+    public static Validator<String> createRegexValidator(final String message, final String regex, final Severity severity) {
         return (c, value) -> {
-            boolean condition = value instanceof String ? !Pattern.matches(regex, (String) value) : value == null;
+            boolean condition = value == null ? true : !Pattern.matches(regex, value);
             return ValidationResult.fromMessageIf(c, message, severity, condition);
         };
     }
@@ -108,9 +108,9 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param severity severity of a message to be created if value is invalid
      * @return new validator
      */
-    public static <T> Validator<T> createRegexValidator(final String message, final Pattern regex, final Severity severity) {
+    public static Validator<String> createRegexValidator(final String message, final Pattern regex, final Severity severity) {
         return (c, value) -> {
-            boolean condition = value instanceof String ? !regex.matcher((String) value).matches() : value == null;
+            boolean condition = value == null ? true : !regex.matcher(value).matches();
             return ValidationResult.fromMessageIf(c, message, severity, condition);
         };
     }

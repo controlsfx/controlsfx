@@ -42,10 +42,12 @@ import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -258,6 +260,10 @@ public class SpreadsheetView extends Control {
         BOTH_INVISIBLE;
     }
 
+    /**
+     * Default width of the VerticalHeader.
+     */
+    private static final double DEFAULT_ROW_HEADER_WIDTH = 30.0;
     /***************************************************************************
      * * Private Fields * *
      **************************************************************************/
@@ -287,6 +293,11 @@ public class SpreadsheetView extends Control {
     // is the VirtualFlow)
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
+    
+    /**
+     * The vertical header width, just for the Label, not the Pickers.
+     */
+    private final DoubleProperty rowHeaderWidth = new SimpleDoubleProperty(DEFAULT_ROW_HEADER_WIDTH);
 
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
@@ -748,6 +759,33 @@ public class SpreadsheetView extends Control {
         return showRowHeader;
     }
 
+    /**
+     * This DoubleProperty represents the with of the rowHeader. This is just
+     * representing the width of the Labels, not the pickers.
+     *
+     * @return A DoubleProperty.
+     */
+    public final DoubleProperty rowHeaderWidthProperty(){
+        return rowHeaderWidth;
+    }
+    
+    /**
+     * Specify a new width for the row header.
+     *
+     * @param value
+     */
+    public final void setRowHeaderWidth(double value){
+        rowHeaderWidth.setValue(value);
+    }
+    
+    /**
+     *
+     * @return the current width of the row header.
+     */
+    public final double getRowHeaderWidth(){
+        return rowHeaderWidth.get();
+    }
+    
     /**
      * @return An ObservableList of row indexes that display a picker.
      */

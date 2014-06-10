@@ -26,6 +26,10 @@
  */
 package org.controlsfx.samples;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 
 import javafx.application.Application;
@@ -338,5 +342,10 @@ public class HelloPopOver extends ControlsFXSample {
         return "An implementation of a pop over control as used by Apple for its iCal application. A pop over allows"
                 + " the user to see and edit an objects properties. The pop over gets displayed in its own popup window and"
                 + " can be torn off in order to create several instances of it.";
+    }
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/popover.css";
     }
 }

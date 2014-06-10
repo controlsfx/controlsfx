@@ -65,6 +65,12 @@ public class HelloGridView extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/GridView.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/gridview.css";
+    }
+    
     private GridView<?> getColorGrid() {
         final ObservableList<Color> list = FXCollections.<Color>observableArrayList();
         

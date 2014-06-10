@@ -59,6 +59,12 @@ public class HelloNotificationPane extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/NotificationPane.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/notificationpane.css";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         notificationPane = new NotificationPane();
         

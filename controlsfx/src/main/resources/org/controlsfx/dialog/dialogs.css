@@ -9,6 +9,13 @@
 .lightweight-dialog-background {
      -fx-background-color: #00000044;
  }
+ 
+/* Used to prevent the lightweight dialog from resizing its owner */
+.dialog.lightweight.custom-chrome,
+.dialog.lightweight.custom-chrome:active {
+    -fx-border-insets: 0;
+    -fx-effect: null;
+}
 
 /*******************************************************************************
  *                                                                             *

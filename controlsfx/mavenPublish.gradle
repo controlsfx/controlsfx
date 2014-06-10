@@ -76,7 +76,7 @@ private configurePOM(def pom) {
             }
         }
         properties {
-            project.build.sourceEncoding 'UTF-8'
+            project.build.sourceEncoding='UTF-8'
         }
     }
 }

@@ -59,7 +59,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
@@ -237,7 +237,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
-    private class ActionChangeMode extends AbstractAction {
+    private class ActionChangeMode extends Action {
         
     	private final Image CATEGORY_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png");
     	private final Image NAME_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png");

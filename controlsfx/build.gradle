@@ -50,6 +50,30 @@ task native2ascii(type: Copy) {
 
 jar.dependsOn(native2ascii)
 
+task transifex {
+    String username = ""
+    String password = ""
+    if (project.hasProperty("transifex.username")) {
+        username = project.property("transifex.username")
+    }
+    
+    if (project.hasProperty("transifex.password")) {
+        password = project.getProperty("transifex.password")
+    }
+    
+    if (username.equals("") || password.equals("")) {
+        logger.warn "----------------------------------------------------------"
+        logger.warn "Cannot determine Transifex Username/Password."
+        logger.warn "If you want to build ControlsFX with its translations then"
+        logger.warn "you need to create a Transifex account and set"
+        logger.warn "transifex.username & transifex.password properties in your" 
+        logger.warn "gradle.properties file." 
+        logger.warn "----------------------------------------------------------"
+    }
+}
+
+processResources.dependsOn(transifex)
+
 task generatei18nResources(type: Copy) {
     from "src/main/resources"
     into "$buildDir/resources/main"

@@ -95,7 +95,6 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -386,7 +385,7 @@ import org.controlsfx.validation.Validator;
  * @see Dialog
  * @see Action
  * @see Actions
- * @see AbstractAction
+ * @see Action
  * @see Optional
  */
 public final class Dialogs {
@@ -585,7 +584,7 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new AbstractAction(localize(asKey("exception.button.label"))) {
+        Action openExceptionAction = new Action(localize(asKey("exception.button.label"))) {
             @Override public void handle(ActionEvent ae) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
@@ -1010,7 +1009,7 @@ public final class Dialogs {
 //		NotificationPane notificationPane = new NotificationPane(content);
 //		notificationPane.setShowFromTop(true);
 		
-		Action actionLogin = new DefaultDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 			}
@@ -1265,7 +1264,7 @@ public final class Dialogs {
      * Command Link class.
      * Represents one command link in command links dialog. 
      */
-    public static class CommandLink extends DefaultDialogAction {
+    public static class CommandLink extends DialogAction {
         
         public CommandLink( Node graphic, String text, String longText ) {
             super(text);

@@ -26,15 +26,11 @@
  */
 package org.controlsfx.dialog;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-
 import javafx.event.ActionEvent;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog.ActionTrait;
 
 /**
  * A specialized dialog {@link Action}, which can have a set of traits {@link ActionTrait}
@@ -45,31 +41,32 @@ import org.controlsfx.dialog.Dialog.ActionTrait;
  * @see Action
  */
 public class DialogAction extends Action {
+
+	private final boolean _cancel;
+	private final boolean _closing;
+	private final boolean _default;
     
-    private final EnumSet<ActionTrait> traits;
 
     /**
      * Creates a dialog action with given text and traits
      * @param text
      * @param traits
      */
-    public DialogAction(String text, ButtonType buttonType, ActionTrait... traits) {
+    public DialogAction(String text, ButtonType buttonType, boolean cancelAction, boolean closingAction, boolean defaultAction) {
         super(text);
-        this.traits = (traits == null || traits.length == 0) ? 
-                EnumSet.noneOf(ActionTrait.class) : 
-                EnumSet.copyOf(Arrays.asList(traits));
-               
+
+        _cancel = cancelAction;
+        _closing = closingAction;
+        _default = defaultAction;
+        
         if ( buttonType != null ) {        
         	ButtonBar.setType(this, buttonType);
         }
     }
     
-    public DialogAction(String text, ActionTrait... traits) {
-    	this( text, null, traits);
-    }
     
     public DialogAction(String title, ButtonType buttonType) {
-        this( title, buttonType, ActionTrait.CANCEL, ActionTrait.CLOSING, ActionTrait.DEFAULT );
+        this( title, buttonType, true, true, true );
     }
 
     /**
@@ -77,16 +74,26 @@ public class DialogAction extends Action {
      * @param text
      */
     public DialogAction(String text) {
-        this(text, ActionTrait.CLOSING, ActionTrait.DEFAULT);
+        this(text, null, false, true, true );
     }
     
     /**
-     * Returns true if {@link Action} has given trait 
+     * Is dialog cancel action
+     * @return true if action should cancel the dialog
      */
-    public boolean hasTrait(ActionTrait trait) {
-        return traits.contains(trait);
-    }
+    public boolean isCancel() { return _cancel; }
 
+    /**
+     * Is dialog closing action 
+     * @return true if action should close the dialog
+     */
+    public boolean isClosing() { return _closing; }
+
+    /**
+     * Is dialog default action 
+     * @return true if action is default in the dialog
+     */
+    public boolean isDefault() { return _default; }
     
     /**
      * Implementation of default dialog action execution logic:

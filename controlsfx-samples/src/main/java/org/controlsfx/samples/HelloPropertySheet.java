@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -43,6 +44,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
@@ -93,6 +95,12 @@ public class HelloPropertySheet extends ControlsFXSample {
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/PropertySheet.html";
+    }
+    
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/propertysheet.css";
     }
 
     class CustomPropertyItem implements Item {

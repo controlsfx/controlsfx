@@ -52,6 +52,12 @@ public class HelloRangeSlider extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/RangeSlider.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/rangeslider.css";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(15);
         

@@ -57,6 +57,12 @@ public class HelloRating extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/Rating.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/rating.css";
+    }
+    
     @Override public String getSampleDescription() {
         return "TODO";
     }

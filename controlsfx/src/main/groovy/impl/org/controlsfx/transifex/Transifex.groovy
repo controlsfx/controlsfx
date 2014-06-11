@@ -28,6 +28,7 @@ package impl.org.controlsfx.transifex
 
 import groovyx.net.http.RESTClient
 import groovyx.net.http.HttpResponseDecorator
+import groovyx.net.http.HttpResponseException
 import groovyx.net.http.ContentType
 
 import java.net.UnknownHostException
@@ -71,5 +72,9 @@ try {
     System.err.println "Unable to download translation resources."
     System.err.println ex
     System.err.println "Are you connected to the Internet ?"
+} catch (HttpResponseException ex) {
+    System.err.println "Unable to download translation resources."
+    System.err.println ex
+    System.err.println "Incorrect Username/Password !!"
 }
 

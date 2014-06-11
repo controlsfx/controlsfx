@@ -29,6 +29,8 @@ package impl.org.controlsfx.transifex
 import groovyx.net.http.RESTClient
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.ContentType
+
+import java.net.UnknownHostException
     
 RESTClient client
 HttpResponseDecorator resp
@@ -44,24 +46,30 @@ client.uri = "https://www.transifex.com/api/2/"
 client.headers['Authorization'] = "Basic "+(username+":"+password).bytes.encodeBase64()
 client.auth.basic(username, password)
 
-resp = client.get(
-    path : "project/controlsfx/resource/controlsfx-core/",
-    query : [details : ""]
-)
+try {
+    resp = client.get(
+        path : "project/controlsfx/resource/controlsfx-core/",
+        query : [details : ""]
+    )
 
-resp.data.available_languages.code.each {
-    String file = "controlsfx_${it}.properties"
-    
-    print "Downloading $file..."
-    
-    new File("build/resources/main/$file").withWriter("iso-8859-1") { writer ->
-        writer << client.get(
-            path : "project/controlsfx/resource/controlsfx-core/translation/$it/",
-            query : [file : ""],
-            contentType : ContentType.BINARY
-        ).data.getText("iso-8859-1")
+    resp.data.available_languages.code.each {
+        String file = "controlsfx_${it}.properties"
+        
+        print "Downloading $file..."
+        
+        new File("build/resources/main/$file").withWriter("iso-8859-1") { writer ->
+            writer << client.get(
+                path : "project/controlsfx/resource/controlsfx-core/translation/$it/",
+                query : [file : ""],
+                contentType : ContentType.BINARY
+            ).data.getText("iso-8859-1")
+        }
+         
+        println "Done."
     }
-     
-    println "Done."
+} catch (UnknownHostException ex) {
+    System.err.println "Unable to download translation resources."
+    System.err.println ex
+    System.err.println "Are you connected to the Internet ?"
 }
 

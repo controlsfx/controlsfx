@@ -592,7 +592,7 @@ public class HelloDialog extends ControlsFXSample {
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);
-        styleCombobox.getItems().addAll("Cross-platform", "Native", "Undecorated");
+        styleCombobox.getItems().setAll("Cross-platform", "Native", "Undecorated");
         styleCombobox.setValue(styleCombobox.getItems().get(0));
         grid.add(styleCombobox, 1, row);
         row++;

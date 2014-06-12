@@ -1047,10 +1047,7 @@ public final class Dialogs {
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         Dialog dlg = new Dialog(owner, actualTitle, lightweight);
         
-        if (styleClasses != null) {
-            dlg.getStyleClass().addAll(styleClasses);
-        }
-        
+        dlg.updateStyleClasses(styleClasses, true);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         

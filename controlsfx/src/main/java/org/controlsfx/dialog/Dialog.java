@@ -295,23 +295,24 @@ public class Dialog {
             this.dialog.setModal(true);
         }
         
-        // by default we show the cross platform style. If there is not one
-        // of the tree pre-defined styleclasses set, then we install the
-        // cross platform style.
-        // FIXME we need to of course consider the case where a custom, external
-        // styleclass is set, which we overwrite here and force in cross-platform.
-        List<String> styleClass = dialog.getStyleClass();
-        if (! styleClass.contains(STYLE_CLASS_CROSS_PLATFORM) ||
-            ! styleClass.contains(STYLE_CLASS_NATIVE) ||
-            ! styleClass.contains(STYLE_CLASS_UNDECORATED)) {
-            this.dialog.getStyleClass().add(STYLE_CLASS_CROSS_PLATFORM);
-        }
+        updateStyleClasses(dialog.getStyleClass(), false);
         
         this.contentPane = new GridPane();
         this.contentPane.getStyleClass().add("content-pane"); //$NON-NLS-1$
         this.contentPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         
         this.dialog.setContentPane(contentPane);
+    }
+    
+    void updateStyleClasses(List<String> styleClasses, boolean addUnique) {
+        // let's check to see what styleclasses have been set. If any have been
+        // set outside the 'common' set, we will not set the default cross-platform
+        // style class, otherwise we will
+        for (String styleClass : styleClasses) {
+            if (addUnique && ! dialog.getStyleClass().contains(styleClass)) {
+                dialog.getStyleClass().add(styleClass);
+            }
+        }
     }
     
     

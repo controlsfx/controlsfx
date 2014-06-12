@@ -28,6 +28,7 @@ package org.controlsfx.dialog;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.animation.Interpolator;
@@ -42,6 +43,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -76,6 +78,13 @@ abstract class FXDialog {
     
     protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css"); //$NON-NLS-1$
     protected static final int HEADER_HEIGHT = 28;
+    
+    public static final List<String> COMMON_STYLE_CLASSES;
+    static {
+        COMMON_STYLE_CLASSES = Collections.unmodifiableList(
+            FXCollections.observableArrayList(
+                    "root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight"));
+    }
     
     
     
@@ -400,17 +409,14 @@ abstract class FXDialog {
             for (String newStyle : addedStyles) {
                 switch (newStyle) {
                     case "cross-platform": {
-                        styleClasses.removeAll(STYLE_CLASS_NATIVE, STYLE_CLASS_UNDECORATED);
                         setCrossPlatformStyleEnabled(true);
                         break;
                     }
                     case "native": {
-                        styleClasses.removeAll(STYLE_CLASS_CROSS_PLATFORM, STYLE_CLASS_UNDECORATED);
                         setNativeStyleEnabled(true);
                         break;
                     }
                     case "undecorated": {
-                        styleClasses.removeAll(STYLE_CLASS_CROSS_PLATFORM, STYLE_CLASS_NATIVE);
                         setUndecoratedStyleEnabled(true);
                         break;
                     }

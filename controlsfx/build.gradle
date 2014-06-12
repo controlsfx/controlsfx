@@ -1,12 +1,23 @@
-import org.apache.tools.ant.filters.*
-
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'java'
+apply plugin: 'groovy'
 apply plugin: 'osgi'
 apply plugin: 'maven'
 
 apply from: 'mavenPublish.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile localGroovy()
+    compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        exclude group: 'org.codehaus.groovy', module: 'groovy'
+    }
+}
 
 Properties commons = new Properties()
 commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
@@ -18,6 +29,8 @@ ext {
     specification_version = commons.controlsfx_specification_version
     specification_title = commons.controlsfx_specification_title
     implementation_version = commons.controlsfx_version
+    transifex_username = ""
+    transifex_password = ""
 }
 
 sourceCompatibility = '1.8'
@@ -25,6 +38,13 @@ targetCompatibility = '1.8'
 
 configurations {
     jdk
+    
+    if (project.hasProperty("transifex.username")) {
+        transifex_username = project.property("transifex.username")
+    }
+    if (project.hasProperty("transifex.password")) {
+        transifex_password = project.getProperty("transifex.password")
+    }
 }
 
 sourceSets {
@@ -41,23 +61,28 @@ dependencies {
     }
 }
 
-task native2ascii(type: Copy) {
-    from "src/main/resources"
-    into "$buildDir/resources/main"
-    include '**/*.properties'
-    filter(EscapeUnicode)
+task downloadTranslations << {
+    description = "Download translations from Transifex"
+    
+    if (transifex_username.equals("") || transifex_password.equals("")) {
+        logger.warn "----------------------------------------------------------"
+        logger.warn "Cannot determine Transifex Username/Password."
+        logger.warn "If you want to build ControlsFX with its translations then"
+        logger.warn "you need to create a Transifex account and set"
+        logger.warn "transifex.username & transifex.password properties in your" 
+        logger.warn "gradle.properties file." 
+        logger.warn "----------------------------------------------------------"
+    } else {
+        javaexec {
+            main = 'impl.org.controlsfx.transifex.Transifex'
+            classpath = sourceSets.main.runtimeClasspath
+            systemProperty 'transifex.username', transifex_username
+            systemProperty 'transifex.password', transifex_password
+        }
+    }
 }
 
-jar.dependsOn(native2ascii)
-
-task generatei18nResources(type: Copy) {
-    from "src/main/resources"
-    into "$buildDir/resources/main"
-    include "controlsfx.properties"
-    rename{ String fileName -> fileName.replace("fx.prop", "fx_en.prop") }
-}
-
-processResources.dependsOn(generatei18nResources)
+processResources.finalizedBy(downloadTranslations)
 
 compileJava {  
     options.encoding = "UTF-8"
@@ -128,3 +153,4 @@ artifacts {
     archives sourceJar
     archives javadocJar
 }
+

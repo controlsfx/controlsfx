@@ -452,12 +452,15 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Optional<Pair<String,String>> response = configureSampleDialog(Dialogs.create())
-						.showLogin(new Pair<String,String>("user", "password"), info -> {
-							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
-								throw new RuntimeException("Service is not available... try again later!"); 
-							};
-							return null;
+				Optional<Pair<String,String>> response = 
+				        configureSampleDialog(
+				        Dialogs.create()
+				            .masthead(isMastheadVisible() ? "Login to ControlsFX" : null))
+				            .showLogin(new Pair<String,String>("user", "password"), info -> {
+    							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
+    								throw new RuntimeException("Service is not available... try again later!"); 
+    							};
+    							return null;
 							}
 						 );
 

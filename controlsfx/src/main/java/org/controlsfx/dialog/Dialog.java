@@ -228,6 +228,51 @@ public class Dialog {
      */
     public static final String STYLE_CLASS_UNDECORATED = "undecorated";
     
+    
+    
+    /**
+     * An action that, by default, will show 'Cancel'.
+     */
+    public static final Action ACTION_CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        { lock();}
+        public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
+    }; 
+    
+    /**
+     * An action that, by default, will show 'Close'.
+     */
+    public static final Action ACTION_CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+        { lock();}
+        public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
+    }; 
+    
+    /**
+     * An action that, by default, will show 'No'.
+     */
+    public static final Action ACTION_NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
+        { lock();}
+        public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
+    }; 
+    
+    /**
+     * An action that, by default, will show 'OK'.
+     */
+    public static final Action ACTION_OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  false, true, true){ //$NON-NLS-1$
+        { lock();}
+        public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
+    }; 
+    
+    /**
+     * An action that, by default, will show 'Yes'.
+     */
+    public static final Action ACTION_YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES, false, true, true ){ //$NON-NLS-1$
+        { lock();}
+        public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
+    }; 
+    
+    
+    
+    
     // enable to turn on grid lines, etc
     private static final boolean DEBUG = false;
     
@@ -244,7 +289,7 @@ public class Dialog {
     private final FXDialog dialog;
 
     // Dialog result, package-protected for Dialogs
-    Action result = Actions.CANCEL;
+    Action result = ACTION_CANCEL;
 
     private final GridPane contentPane;
     
@@ -308,6 +353,8 @@ public class Dialog {
         // let's check to see what styleclasses have been set. If any have been
         // set outside the 'common' set, we will not set the default cross-platform
         // style class, otherwise we will
+        if (styleClasses == null) return;
+        
         for (String styleClass : styleClasses) {
             if (addUnique && ! dialog.getStyleClass().contains(styleClass)) {
                 dialog.getStyleClass().add(styleClass);
@@ -336,7 +383,7 @@ public class Dialog {
             return result;
         } catch (Throwable e) {
             e.printStackTrace();
-            return Actions.CANCEL;
+            return ACTION_CANCEL;
         }
     }
 
@@ -752,61 +799,6 @@ public class Dialog {
      * 
      **************************************************************************/
 
-    /**
-     * An enumeration of common dialog actions, ideal for use in dialogs if 
-     * the common behavior of presenting options to a user and listening to their
-     * response is all that is necessary. Refer to the {@link Dialog} class
-     * documentation for examples on how to use this enumeration.
-     * 
-     * @see Dialog
-     * @see Action
-     */
-    public static final class Actions {
-
-    	
-    	
-        /**
-         * An action that, by default, will show 'Cancel'.
-         */
-        public static final Action CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
-        	{ lock();}
-        	public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
-        }; 
-        
-        /**
-         * An action that, by default, will show 'Close'.
-         */
-        public static final Action CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
-        	{ lock();}
-        	public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
-        }; 
-        
-        /**
-         * An action that, by default, will show 'No'.
-         */
-        public static final Action NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
-        	{ lock();}
-        	public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
-        }; 
-        
-        /**
-         * An action that, by default, will show 'OK'.
-         */
-        public static final Action OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  false, true, true){ //$NON-NLS-1$
-        	{ lock();}
-        	public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
-        }; 
-        
-        /**
-         * An action that, by default, will show 'Yes'.
-         */
-        public static final Action YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES, false, true, true ){ //$NON-NLS-1$
-        	{ lock();}
-        	public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
-        }; 
-        
-
-    }
 
     
     

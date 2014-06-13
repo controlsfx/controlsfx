@@ -26,14 +26,19 @@
  */
 package org.controlsfx.dialog;
 
+import javafx.beans.NamedArg;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.action.Action;
 
 /**
- * A specialized dialog {@link Action}, which can have a set of traits {@link ActionTrait}
+ * A specialized dialog {@link Action} that knows how to properly return the
+ * result back to the owner {@link Dialog} such that it can be returned via
+ * {@link Dialog#show()). To be even more useful, DialogAction instances can
+ * be 
  * 
  * <p>To better understand how to use actions, and where they fit within the
  * JavaFX ecosystem, refer to the {@link Action} class documentation.
@@ -48,11 +53,20 @@ public class DialogAction extends Action {
     
 
     /**
-     * Creates a dialog action with given text and traits
-     * @param text
-     * @param traits
+     * Creates a dialog action with the given text and zero or more of the 
+     * cancel / closing / default built-in actions enabled.
+     * 
+     * @param text The string to display in the text property of controls such
+     *      as {@link Button#textProperty() Button}.
+     * @param cancelAction
+     * @param closingAction
+     * @param defaultAction
      */
-    public DialogAction(String text, ButtonType buttonType, boolean cancelAction, boolean closingAction, boolean defaultAction) {
+    public DialogAction(@NamedArg("text") String text, 
+                        @NamedArg("buttonType") ButtonType buttonType, 
+                        @NamedArg("cancelAction") boolean cancelAction, 
+                        @NamedArg("closingAction") boolean closingAction, 
+                        @NamedArg("defaultAction") boolean defaultAction) {
         super(text);
 
         _cancel = cancelAction;
@@ -65,16 +79,17 @@ public class DialogAction extends Action {
     }
     
     
-    public DialogAction(String title, ButtonType buttonType) {
-        this( title, buttonType, true, true, true );
+    public DialogAction(@NamedArg("title") String title, 
+                        @NamedArg("buttonType") ButtonType buttonType) {
+        this(title, buttonType, true, true, true);
     }
 
     /**
      * Creates a dialog action with given text and common set of traits: CLOSING and DEFAULT
      * @param text
      */
-    public DialogAction(String text) {
-        this(text, null, false, true, true );
+    public DialogAction(@NamedArg("text") String text) {
+        this(text, null, false, true, true);
     }
     
     /**

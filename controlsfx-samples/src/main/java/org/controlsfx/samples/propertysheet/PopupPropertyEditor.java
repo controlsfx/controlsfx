@@ -90,7 +90,7 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         dlg.setContent(sheet);
-        dlg.getActions().addAll(actionSave, Dialog.Actions.CANCEL);
+        dlg.getActions().addAll(actionSave, Dialog.ACTION_CANCEL);
         Action response = dlg.show();
 
         if (actionSave.equals(response)) {

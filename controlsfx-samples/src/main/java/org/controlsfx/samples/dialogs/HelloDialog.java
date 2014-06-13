@@ -26,8 +26,9 @@
  */
 package org.controlsfx.samples.dialogs;
 
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
 import static org.controlsfx.dialog.Dialogs.buildCommandLink;
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.Translations;
@@ -188,7 +189,7 @@ public class HelloDialog extends ControlsFXSample {
 										"I was a bit worried that you might not want them, so I wanted to double check."))
 						.actions(
 								!cbShowCancel.isSelected() ? new Action[] {
-										YES, NO } : new Action[0])
+								    ACTION_YES, ACTION_NO } : new Action[0])
 						.showConfirm();
 
 				System.out.println("response: " + response);
@@ -539,7 +540,7 @@ public class HelloDialog extends ControlsFXSample {
 				dlg.setGraphic(new ImageView(HelloDialog.class.getResource(
 						"login.png").toString()));
 				dlg.setContent(content);
-				dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
+				dlg.getActions().addAll(actionLogin, ACTION_CANCEL);
 				validate();
 
 				Platform.runLater( () -> txUserName.requestFocus() );

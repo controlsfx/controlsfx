@@ -29,10 +29,10 @@ package org.controlsfx.dialog;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.getString;
 import static impl.org.controlsfx.i18n.Localization.localize;
-import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.OK;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_OK;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -100,7 +100,6 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
@@ -638,7 +637,7 @@ public final class Dialogs {
         final TextField textField = new TextField(defaultValue);
         dlg.setContent(buildInputContent(textField));
         
-        return Optional.ofNullable( dlg.show() == OK ? textField.getText() : null );
+        return Optional.ofNullable( dlg.show() == ACTION_OK ? textField.getText() : null );
     }
 
     /**
@@ -683,7 +682,7 @@ public final class Dialogs {
             selectionModel.select(defaultChoice);
         }
 
-        return Optional.ofNullable( dlg.show() == OK ? selectionModel.getSelectedItem() : null);
+        return Optional.ofNullable( dlg.show() == ACTION_OK ? selectionModel.getSelectedItem() : null);
 
     }
 
@@ -836,7 +835,7 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.FONT);
         dlg.setIconifiable(false);
         dlg.setContent(fontPanel);
-        return Optional.ofNullable( Dialog.Actions.OK == dlg.show() ? fontPanel.getFont(): null );
+        return Optional.ofNullable(ACTION_OK == dlg.show() ? fontPanel.getFont(): null);
     }
     
     /**
@@ -953,7 +952,7 @@ public final class Dialogs {
      */
     public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {
     	
-    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();// new CustomTextField();
+    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();
     	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
     	
     	CustomPasswordField txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
@@ -969,9 +968,6 @@ public final class Dialogs {
 		content.getChildren().add(txUserName);
 		content.getChildren().add(txPassword);
 		
-//		NotificationPane notificationPane = new NotificationPane(content);
-//		notificationPane.setShowFromTop(true);
-		
 		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
@@ -981,14 +977,13 @@ public final class Dialogs {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call( new Pair<String,String>(txUserName.getText(), txPassword.getText() ) );
+						authenticator.call(new Pair<String,String>(txUserName.getText(), txPassword.getText()));
 					}
 					lbMessage.setVisible(false);
 					lbMessage.setManaged(false);
 					dlg.hide();
 					dlg.setResult(this);
 				} catch( Throwable ex ) {
-					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
 					lbMessage.setVisible(true);
 					lbMessage.setManaged(true);
 					lbMessage.setText(ex.getMessage());
@@ -1011,7 +1006,7 @@ public final class Dialogs {
 		if ( dlg.getGraphic() == null ) { 
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
-		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
+		dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
 		String userNameCation = getString("login.dlg.user.caption");
 		String passwordCaption = getString("login.dlg.pswd.caption");
 		txUserName.setPromptText(userNameCation);
@@ -1186,14 +1181,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), OK),
-        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), OK),
-        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
-        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),
-        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), OK, CANCEL),
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), ACTION_OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), ACTION_OK),
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), ACTION_OK),
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
         PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), OK, CANCEL);
+        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), ACTION_OK, ACTION_CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;

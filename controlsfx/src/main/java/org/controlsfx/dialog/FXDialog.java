@@ -28,6 +28,7 @@ package org.controlsfx.dialog;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,8 +83,7 @@ abstract class FXDialog {
     public static final List<String> COMMON_STYLE_CLASSES;
     static {
         COMMON_STYLE_CLASSES = Collections.unmodifiableList(
-            FXCollections.observableArrayList(
-                    "root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight"));
+            Arrays.asList("root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight"));
     }
     
     

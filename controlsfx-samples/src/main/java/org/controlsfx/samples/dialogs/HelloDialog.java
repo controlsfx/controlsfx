@@ -26,8 +26,9 @@
  */
 package org.controlsfx.samples.dialogs;
 
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
 import static org.controlsfx.dialog.Dialogs.buildCommandLink;
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.Translations;
@@ -188,7 +189,7 @@ public class HelloDialog extends ControlsFXSample {
 										"I was a bit worried that you might not want them, so I wanted to double check."))
 						.actions(
 								!cbShowCancel.isSelected() ? new Action[] {
-										YES, NO } : new Action[0])
+								    ACTION_YES, ACTION_NO } : new Action[0])
 						.showConfirm();
 
 				System.out.println("response: " + response);
@@ -452,12 +453,15 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Optional<Pair<String,String>> response = configureSampleDialog(Dialogs.create())
-						.showLogin(new Pair<String,String>("user", "password"), info -> {
-							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
-								throw new RuntimeException("Service is not available... try again later!"); 
-							};
-							return null;
+				Optional<Pair<String,String>> response = 
+				        configureSampleDialog(
+				        Dialogs.create()
+				            .masthead(isMastheadVisible() ? "Login to ControlsFX" : null))
+				            .showLogin(new Pair<String,String>("user", "password"), info -> {
+    							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
+    								throw new RuntimeException("Service is not available... try again later!"); 
+    							};
+    							return null;
 							}
 						 );
 
@@ -536,7 +540,7 @@ public class HelloDialog extends ControlsFXSample {
 				dlg.setGraphic(new ImageView(HelloDialog.class.getResource(
 						"login.png").toString()));
 				dlg.setContent(content);
-				dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
+				dlg.getActions().addAll(actionLogin, ACTION_CANCEL);
 				validate();
 
 				Platform.runLater( () -> txUserName.requestFocus() );
@@ -592,7 +596,7 @@ public class HelloDialog extends ControlsFXSample {
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);
-        styleCombobox.getItems().addAll("Cross-platform", "Native", "Undecorated");
+        styleCombobox.getItems().setAll("Cross-platform", "Native", "Undecorated");
         styleCombobox.setValue(styleCombobox.getItems().get(0));
         grid.add(styleCombobox, 1, row);
         row++;

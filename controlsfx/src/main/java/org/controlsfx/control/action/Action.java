@@ -28,6 +28,7 @@ package org.controlsfx.control.action;
 
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.SimpleLocalizedStringProperty;
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -78,7 +79,7 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @param text The string to display in the text property of controls such
      *      as {@link Button#textProperty() Button}.
      */
-    public Action(String text) {
+    public Action(@NamedArg("text") String text) {
         setText(text);
     }
     

@@ -706,12 +706,12 @@ public final class Dialogs {
 
     /**
      * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
-     * a set of available 'radio' buttons
-     * @param defaultCommandLink command is set to be default. Null means no default
+     * a set of available 'radio' buttons. "Command link" action uses content of its 'text' property as a title of a command link and content of 'long text'
+     * property as a description of the command link.
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks(DialogAction defaultCommandLink, List<DialogAction> links) {
+    public Action showCommandLinks(List<DialogAction> links) {
         final Dialog dlg = buildDialog(Type.INFORMATION);
         dlg.setContent(message);
         
@@ -755,7 +755,8 @@ public final class Dialogs {
             if (commandLink == null) continue; 
             
             final Button button = buildCommandLinkButton(commandLink);            
-            button.setDefaultButton(commandLink == defaultCommandLink);
+            
+            button.setDefaultButton(commandLink.isDefault());
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
                    commandLink.handle( new ActionEvent(dlg, ae.getTarget()));
@@ -778,48 +779,14 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links.Command links are just a {@link DialogAction}s and used instead of button bar and represent
-     * a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
+     * a set of available 'radio' buttons. "Command link" action uses content of its 'text' property as a title of a command link and content of 'long text'
+     * property as a description of the command link.
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
-     */    
-    public Action showCommandLinks( List<DialogAction> links ) {
-        return showCommandLinks( null, links);
-    }
-    
-    /**
-     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent
-     * a set of available 'radio' buttons
-     * @param defaultCommandLink command is set to be default. Null means no default
-     * @param links command links presented in specified sequence
-     * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks( DialogAction defaultCommandLink, DialogAction... links ) {
-        return showCommandLinks( defaultCommandLink, Arrays.asList(links));
-    }
-    
-    /**
-     * Convenience method to quickly create a command link
-     * @param graphic command link graphic
-     * @param text command link main text
-     * @param comment command link comment text
-     * @return {@link DialogAction} representing a command link
-     */
-    public static final DialogAction buildCommandLink( Node graphic, String text, String comment ) {
-    	DialogAction action = new DialogAction(text);
-    	action.setLongText(comment);
-    	action.setGraphic(graphic);
-    	return action;
-    }
-    
-    /**
-     * Convenience method to quickly create a command link
-     * @param text command link main text
-     * @param comment command link comment text
-     * @return {@link DialogAction} representing a command link
-     */   
-    public static final DialogAction buildCommandLink( String text, String comment ) {
-    	return buildCommandLink(null, text, comment);
+    public Action showCommandLinks(DialogAction... links) {
+    	return showCommandLinks( Arrays.asList(links));
     }
     
     /**

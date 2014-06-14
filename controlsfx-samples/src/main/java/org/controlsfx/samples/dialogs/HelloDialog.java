@@ -29,7 +29,6 @@ package org.controlsfx.samples.dialogs;
 import static org.controlsfx.dialog.Dialog.ACTION_NO;
 import static org.controlsfx.dialog.Dialog.ACTION_YES;
 import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
-import static org.controlsfx.dialog.Dialogs.buildCommandLink;
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.Translations;
 
@@ -389,7 +388,8 @@ public class HelloDialog extends ControlsFXSample {
 										"This shows you a list of networks that are currently available and lets you connect to one."),
 								buildCommandLink(
 										"Manually create a network profile",
-										"This creates a new network profile or locates an existing one and saves it on your computer"),
+										"This creates a new network profile or locates an existing one and saves it on your computer",
+										 true /*default*/),
 								buildCommandLink("Create an ad hoc network",
 										"This creates a temporary network for sharing files or and Internet connection"));
 
@@ -400,7 +400,7 @@ public class HelloDialog extends ControlsFXSample {
 										isMastheadVisible() ? "Manually connect to wireless network"
 												: null)
 								.message("How do you want to add a network?"))
-						.showCommandLinks(links.get(1), links);
+						.showCommandLinks(links);
 
 				System.out.println("response: " + response);
 			}
@@ -635,6 +635,17 @@ public class HelloDialog extends ControlsFXSample {
 
 		return grid;
 	}
+	
+	 private DialogAction buildCommandLink( String text, String comment, boolean isDefault ) {
+	 	DialogAction action = new DialogAction(text, null, false, true, isDefault);
+	 	action.setLongText(comment);
+	 	return action;
+	 }
+	 
+	 public  DialogAction buildCommandLink( String text, String comment ) {
+	 	return buildCommandLink(text, comment, false);
+	 }
+	
 	
 	private String getDialogStyle() {
 	    SelectionModel<String> sm = styleCombobox.getSelectionModel();

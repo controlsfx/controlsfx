@@ -104,11 +104,11 @@ import com.sun.javafx.scene.traversal.TraverseListener;
  * <table border="0">
  *   <tr>
  *     <td width="75"><strong>Windows:</strong></td>
- *     <td>L_E+U+FBI_YNOCAH_R</td>
+ *     <td>L_E+U+FBIX_YNOCAH_R</td>
  *   </tr>
  *   <tr>
  *     <td><strong>Mac OS:</strong></td>
- *     <td>L_HE+U+FBI_NCYOA_R</td>
+ *     <td>L_HE+U+FBIX_NCYOA_R</td>
  *   </tr>
  *   <tr>
  *     <td><strong>Linux:</strong></td>
@@ -142,12 +142,12 @@ public final class ButtonBar extends ControlsFXControl {
     /**
      * The default button ordering on Windows.
      */
-    public static final String BUTTON_ORDER_WINDOWS = "L_E+U+FBI_YNOCAH_R"; //$NON-NLS-1$
+    public static final String BUTTON_ORDER_WINDOWS = "L_E+U+FBIX_YNOCAH_R"; //$NON-NLS-1$
     
     /**
      * The default button ordering on Mac OS.
      */
-    public static final String BUTTON_ORDER_MAC_OS  = "L_HE+U+FBI_NCYOA_R"; //$NON-NLS-1$
+    public static final String BUTTON_ORDER_MAC_OS  = "L_HE+U+FBIX_NCYOA_R"; //$NON-NLS-1$
     
     /**
      * The default button ordering on Linux (specifically, GNOME).

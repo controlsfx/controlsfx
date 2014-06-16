@@ -285,15 +285,10 @@ public abstract class Action implements EventHandler<ActionEvent> {
         acceleratorProperty.set(value);
     }
     
-    /**
-     * Using 'Initialization on Demand Holder' idiom to enable a safe, 
-     * highly concurrent lazy initialization with good performance
-     */
-    private static class LazyProps {
-        private static final ObservableMap<Object, Object> INSTANCE = FXCollections.observableHashMap();
-    }
     
     // --- properties
+    private ObservableMap<Object, Object> props;
+    
     /**
      * Returns an observable map of properties on this Action for use primarily
      * by application developers.
@@ -301,8 +296,9 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable map of properties on this Action for use primarily
      * by application developers
      */
-    public final ObservableMap<Object, Object> getProperties() {
-    	return LazyProps.INSTANCE;
+    public final synchronized ObservableMap<Object, Object> getProperties() {
+    	if ( props == null ) props = FXCollections.observableHashMap();
+    	return props;
     }
 
     

@@ -116,6 +116,7 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
+    exclude 'impl/org/controlsfx/transifex/**'
 
     manifest { // the manifest of the default jar is of type OsgiManifest
         attributes (\
@@ -131,7 +132,6 @@ jar {
                 'org.controlsfx.*'
     }
 }
-
 
 task sourceJar(type: Jar) {
     from sourceSets.main.java

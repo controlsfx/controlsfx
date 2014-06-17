@@ -38,6 +38,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -341,6 +342,13 @@ public class Dialog {
         }
         
         updateStyleClasses(dialog.getStyleClass(), false);
+        
+        // if the actions change, we dynamically update the dialog
+        getActions().addListener((ListChangeListener<Action>) c -> {
+            if (dialog.getWindow().isShowing()) {
+                updateDialogContent();
+            }
+        });
     }
     
     void updateStyleClasses(List<String> styleClasses, boolean addUnique) {

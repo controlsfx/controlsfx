@@ -126,9 +126,10 @@ public class HelloGridView extends ControlsFXSample {
         public ActionShowGrid(String text, GridView<?> grid) {
             super(text);
             this.grid = grid;
+            setEventHandler(this::handleAction);
         }
 
-        @Override public void handle(ActionEvent ae) {
+        private void handleAction(ActionEvent ae) {
             if ( myGrid != null ) {
                 root.getChildren().remove(myGrid);
             }

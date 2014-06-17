@@ -482,14 +482,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new DialogAction("Login", ButtonType.OK_DONE, false, true, true ){
-
-				@Override
-				public void handle(ActionEvent ae) {
-					Dialog dlg = (Dialog) ae.getSource();
-					// real login code here
-					dlg.setResult(this);
-				}
+			final Action actionLogin = new DialogAction("Login", ButtonType.OK_DONE, false, true, true, ae -> {/* real login code here*/} ){
 
 				public String toString() {
 					return "LOGIN";

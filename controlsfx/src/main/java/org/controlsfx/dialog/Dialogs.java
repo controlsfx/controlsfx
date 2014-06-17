@@ -936,9 +936,10 @@ public final class Dialogs {
 		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
+				setEventHandler(this::handleAction);
 			}
 			
-			@Override public void handle(ActionEvent ae) {
+			protected void handleAction(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {

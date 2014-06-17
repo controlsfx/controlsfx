@@ -162,6 +162,7 @@ class AnnotatedAction extends Action {
 	public AnnotatedAction(ActionProxy annotation, Method method, Object target) {
 	    // set text
 		super(annotation.text());
+		setEventHandler(this::handleAction);
 		
 		// set graphic
 		Node graphic = resolveGraphic(annotation);
@@ -204,8 +205,7 @@ class AnnotatedAction extends Action {
 		return target;
 	}
 
-	@Override
-	public void handle(ActionEvent ae) {
+	private void handleAction(ActionEvent ae) {
 		try {
 			int paramCount =  method.getParameterCount(); 
 			if ( paramCount == 0 ) {

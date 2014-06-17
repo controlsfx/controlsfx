@@ -26,6 +26,8 @@
  */
 package org.controlsfx.dialog;
 
+import java.util.function.Consumer;
+
 import javafx.beans.NamedArg;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -51,23 +53,33 @@ public class DialogAction extends Action {
 	private final boolean _closing;
 	private final boolean _default;
     
-
     /**
-     * Creates a dialog action with the given text and zero or more of the 
-     * cancel / closing / default built-in actions enabled.
+     * Creates a dialog action with the given text and several required attributes.
      * 
      * @param text The string to display in the text property of controls such
      *      as {@link Button#textProperty() Button}.
      * @param cancelAction
      * @param closingAction
      * @param defaultAction
+     * @param userEventHandler custom action event handler
      */
     public DialogAction(@NamedArg("text") String text, 
                         @NamedArg("buttonType") ButtonType buttonType, 
                         @NamedArg("cancelAction") boolean cancelAction, 
                         @NamedArg("closingAction") boolean closingAction, 
-                        @NamedArg("defaultAction") boolean defaultAction) {
+                        @NamedArg("defaultAction") boolean defaultAction,
+                        @NamedArg("eventHandler") Consumer<ActionEvent> userEventHandler) {
         super(text);
+        setEventHandler( ae -> {
+        	
+        	if ( userEventHandler != null ) userEventHandler.accept(ae);
+
+        	// continue with dialog related operations
+        	if (ae.getSource() instanceof Dialog ) {
+                ((Dialog) ae.getSource()).setResult(this);
+            }
+        	
+        });
 
         _cancel = cancelAction;
         _closing = closingAction;
@@ -78,18 +90,58 @@ public class DialogAction extends Action {
         }
     }
     
+    /**
+     * Creates a dialog action with the given text and several required attributes.
+     * 
+     * @param text The string to display in the text property of controls such
+     *      as {@link Button#textProperty() Button}.
+     * @param cancelAction
+     * @param closingAction
+     * @param defaultAction
+     */
+    public DialogAction(@NamedArg("text") String text, 
+            @NamedArg("buttonType") ButtonType buttonType, 
+            @NamedArg("cancelAction") boolean cancelAction, 
+            @NamedArg("closingAction") boolean closingAction, 
+            @NamedArg("defaultAction") boolean defaultAction ) {
+    	this( text, buttonType, cancelAction, closingAction, defaultAction, null);
+    }
     
-    public DialogAction(@NamedArg("title") String title, 
+    /**
+     * Creates a dialog action with the given text 
+     * @param text The string to display in the text property of controls such
+     *      as {@link Button#textProperty() Button}
+     * @param buttonType type assigned to a related dialog button 
+     * @param userEventHandler custom action event handler
+     */
+    public DialogAction(@NamedArg("text") String text, 
+                        @NamedArg("buttonType") ButtonType buttonType, 
+                        @NamedArg("eventHandler") Consumer<ActionEvent> userEventHandler) {
+        this(text, buttonType, true, true, true, userEventHandler);
+    }
+    
+    public DialogAction(@NamedArg("text") String text, 
                         @NamedArg("buttonType") ButtonType buttonType) {
-        this(title, buttonType, true, true, true);
+    	this( text, buttonType, null);
     }
 
     /**
-     * Creates a dialog action with given text and common set of traits: CLOSING and DEFAULT
+     * Creates a dialog action with given text and common set of attributes: Closing and Default
      * @param text
+     * @param userEventHandler custom action event handler
      */
+    public DialogAction(@NamedArg("text") String text,
+    		            @NamedArg("eventHandler") Consumer<ActionEvent> userEventHandler) {
+        this(text, null, false, true, true, userEventHandler);
+    }
+
+
+    /**
+     * Creates a dialog action with given text and common set of attributes: Closing and Default
+     * @param text
+     */    
     public DialogAction(@NamedArg("text") String text) {
-        this(text, null, false, true, true);
+    	this(text, (Consumer<ActionEvent>)null);
     }
     
     /**
@@ -109,17 +161,5 @@ public class DialogAction extends Action {
      * @return true if action is default in the dialog
      */
     public boolean isDefault() { return _default; }
-    
-    /**
-     * Implementation of default dialog action execution logic:
-     * if action is enabled set it as dialog result.
-     */
-    @Override public void handle(ActionEvent ae) {
-        if (! disabledProperty().get()) {
-            if (ae.getSource() instanceof Dialog ) {
-                ((Dialog) ae.getSource()).setResult(this);
-            }
-        }
-    }
 
 }

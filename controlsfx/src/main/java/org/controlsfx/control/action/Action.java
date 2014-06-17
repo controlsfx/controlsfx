@@ -26,10 +26,11 @@
  */
 package org.controlsfx.control.action;
 
-import java.util.function.Consumer;
-
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.SimpleLocalizedStringProperty;
+
+import java.util.function.Consumer;
+
 import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -42,7 +43,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCombination;
@@ -69,7 +69,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     private boolean locked = false;
     
-    private final Consumer<ActionEvent> eventHandler;
+    private Consumer<ActionEvent> eventHandler;
     
     
     /**************************************************************************
@@ -97,7 +97,7 @@ public class Action implements EventHandler<ActionEvent> {
      */
     public Action(@NamedArg("text") String text, Consumer<ActionEvent> eventHandler) {
         setText(text);
-        this.eventHandler = eventHandler;
+        setEventHandler(eventHandler);
     }
     
     protected void lock() {
@@ -313,8 +313,14 @@ public class Action implements EventHandler<ActionEvent> {
     	if ( props == null ) props = FXCollections.observableHashMap();
     	return props;
     }
-
     
+    protected Consumer<ActionEvent> getEventHandler() {
+		return eventHandler;
+	}
+    
+    protected void setEventHandler(Consumer<ActionEvent> eventHandler) {
+		this.eventHandler = eventHandler;
+	}
     
     /**************************************************************************
      * 
@@ -325,8 +331,8 @@ public class Action implements EventHandler<ActionEvent> {
     /** 
      * Defers to the Consumer<ActionEvent> passed in to the Action constructor.
      */
-    @Override public void handle(ActionEvent event) {
-        if (eventHandler != null) {
+    @Override public final void handle(ActionEvent event) {
+        if (eventHandler != null && !isDisabled()) {
             eventHandler.accept(event);
         }
     }

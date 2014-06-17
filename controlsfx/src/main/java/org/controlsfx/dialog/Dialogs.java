@@ -608,15 +608,13 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new Action(localize(asKey("exception.button.label"))) {
-            @Override public void handle(ActionEvent ae) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                exception.printStackTrace(pw);
-                String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails).show();
-            }
-        };
+        Action openExceptionAction = new Action(localize(asKey("exception.button.label")), ae -> {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);
+            String moreDetails = sw.toString();
+            new ExceptionDialog((Window)owner, moreDetails).show();
+        });
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
         

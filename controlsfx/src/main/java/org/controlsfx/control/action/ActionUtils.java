@@ -140,10 +140,10 @@ public class ActionUtils {
      * within custom Button subclasses.
      * 
      * @param action The {@link Action} that the {@link Button} should bind to.
-     * @param button The {@link Button} that the {@link Action} should be bound to.
-     * @return The {@link Button} that was bound to the {@link Action}.
+     * @param button The {@link ButtonBase} that the {@link Action} should be bound to.
+     * @return The {@link ButtonBase} that was bound to the {@link Action}.
      */
-	public static Button configureButton(final Action action, Button button) {
+	public static ButtonBase configureButton(final Action action, ButtonBase button) {
         return configure(button, action, ActionTextBehavior.SHOW);
     }
 	    
@@ -297,6 +297,10 @@ public class ActionUtils {
         return configure(new MenuItem(), action);
     }
     
+    public static MenuItem configureMenuItem(final Action action, MenuItem menuItem) {
+        return configure(menuItem, action);
+    }
+    
     /**
      * Takes the provided {@link Action} and returns a {@link Menu} instance
      * with all relevant properties bound to the properties of the Action.
@@ -347,15 +351,10 @@ public class ActionUtils {
      * action tree serves as indication that separator has be created in its place.
      * See {@link ActionGroup} for example of action tree creation
      */
-    public static Action ACTION_SEPARATOR = new Action(null) {
-
-        @Override public void handle(ActionEvent ae) {
-        }
-        
-        public String toString() { 
+    public static Action ACTION_SEPARATOR = new Action(null, null) {
+        @Override public String toString() { 
             return "Separator";  //$NON-NLS-1$
         };
-        
     };    
     
     /**
@@ -506,8 +505,7 @@ public class ActionUtils {
     	}
     }
     
-    private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBahavior ) {
-        
+    private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBahavior) {
         if (action == null) {
             throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
         }
@@ -560,18 +558,17 @@ public class ActionUtils {
         return btn;
     }
     
-    private static <T extends MenuItem> T configure(final T btn, final Action action) {
-        
+    private static <T extends MenuItem> T configure(final T menuItem, final Action action) {
         if (action == null) {
             throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
         }
         
         // button bind to action properties
-        btn.textProperty().bind(action.textProperty());
-        btn.disableProperty().bind(action.disabledProperty());
-        btn.acceleratorProperty().bind(action.acceleratorProperty());
+        menuItem.textProperty().bind(action.textProperty());
+        menuItem.disableProperty().bind(action.disabledProperty());
+        menuItem.acceleratorProperty().bind(action.acceleratorProperty());
         
-        btn.graphicProperty().bind(new ObjectBinding<Node>() {
+        menuItem.graphicProperty().bind(new ObjectBinding<Node>() {
             { bind(action.graphicProperty()); }
 
             @Override protected Node computeValue() {
@@ -582,17 +579,17 @@ public class ActionUtils {
         
         // add all the properties of the action into the button, and set up
         // a listener so they are always copied across
-        btn.getProperties().putAll(action.getProperties());
-        action.getProperties().addListener(new MenuItemPropertiesMapChangeListener<>(btn, action));
+        menuItem.getProperties().putAll(action.getProperties());
+        action.getProperties().addListener(new MenuItemPropertiesMapChangeListener<>(menuItem, action));
         
         // TODO handle the selected state of the menu item if it is a 
         // CheckMenuItem or RadioMenuItem
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button
-        btn.setOnAction(action);
+        menuItem.setOnAction(action);
         
-        return btn;
+        return menuItem;
     }
 
     private static class ButtonPropertiesMapChangeListener<T extends ButtonBase> implements MapChangeListener<Object, Object> {

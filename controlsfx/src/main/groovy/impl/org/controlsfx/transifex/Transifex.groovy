@@ -54,19 +54,25 @@ try {
     )
 
     resp.data.available_languages.code.each {
-        String file = "controlsfx_${it}.properties"
+        def lang_stats = client.get(
+            path : "project/controlsfx/resource/controlsfx-core/stats/$it/",
+        ).data
         
-        print "Downloading $file..."
-        
-        new File("build/resources/main/$file").withWriter("iso-8859-1") { writer ->
-            writer << client.get(
-                path : "project/controlsfx/resource/controlsfx-core/translation/$it/",
-                query : [file : ""],
-                contentType : ContentType.BINARY
-            ).data.getText("iso-8859-1")
+        if(lang_stats.completed == "100%" && lang_stats.reviewed_percentage == "100%") {
+            String file = "controlsfx_${it}.properties"
+            
+            print "Downloading $file..."
+            
+            new File("build/resources/main/$file").withWriter("iso-8859-1") { writer ->
+                writer << client.get(
+                    path : "project/controlsfx/resource/controlsfx-core/translation/$it/",
+                    query : [file : ""],
+                    contentType : ContentType.BINARY
+                ).data.getText("iso-8859-1")
+            }
+      
+            println "Done."
         }
-         
-        println "Done."
     }
 } catch (UnknownHostException ex) {
     System.err.println "Unable to download translation resources."

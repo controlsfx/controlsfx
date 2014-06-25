@@ -28,6 +28,10 @@ package org.controlsfx.control.action;
 
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.SimpleLocalizedStringProperty;
+
+import java.util.function.Consumer;
+
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -55,7 +59,7 @@ import javafx.scene.input.KeyCombination;
  * buttons, menu items, etc. The state that an action can handle includes text, 
  * graphic, long text (i.e. tooltip text), and disabled.
  */
-public abstract class Action implements EventHandler<ActionEvent> {
+public class Action implements EventHandler<ActionEvent> {
     
     /**************************************************************************
      * 
@@ -65,25 +69,35 @@ public abstract class Action implements EventHandler<ActionEvent> {
     
     private boolean locked = false;
     
+    private Consumer<ActionEvent> eventHandler;
+    
+    
     /**************************************************************************
      * 
      * Constructors
      * 
      **************************************************************************/
     
+    public Action(@NamedArg("text") String text) {
+        this(text, null);
+    }
+    
+    public Action(Consumer<ActionEvent> eventHandler) {
+        this("", eventHandler);
+    }
+   
     /**
      * Creates a new AbstractAction instance with the given String set as the 
-     * {@link #textProperty() text} value.
+     * {@link #textProperty() text} value, as well as the Consumer<ActionEvent>
+     * set to be called when the action event is fired.
      *  
      * @param text The string to display in the text property of controls such
      *      as {@link Button#textProperty() Button}.
+     * @param eventHandler This will be called when the ActionEvent is fired.
      */
-    public Action(String text) {
+    public Action(@NamedArg("text") String text, Consumer<ActionEvent> eventHandler) {
         setText(text);
-    }
-    
-    public Action() {
-    	this("");
+        setEventHandler(eventHandler);
     }
     
     protected void lock() {
@@ -284,15 +298,10 @@ public abstract class Action implements EventHandler<ActionEvent> {
         acceleratorProperty.set(value);
     }
     
-    /**
-     * Using 'Initialization on Demand Holder' idiom to enable a safe, 
-     * highly concurrent lazy initialization with good performance
-     */
-    private static class LazyProps {
-        private static final ObservableMap<Object, Object> INSTANCE = FXCollections.observableHashMap();
-    }
     
     // --- properties
+    private ObservableMap<Object, Object> props;
+    
     /**
      * Returns an observable map of properties on this Action for use primarily
      * by application developers.
@@ -300,11 +309,18 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * @return An observable map of properties on this Action for use primarily
      * by application developers
      */
-    public final ObservableMap<Object, Object> getProperties() {
-    	return LazyProps.INSTANCE;
+    public final synchronized ObservableMap<Object, Object> getProperties() {
+    	if ( props == null ) props = FXCollections.observableHashMap();
+    	return props;
     }
-
     
+    protected Consumer<ActionEvent> getEventHandler() {
+		return eventHandler;
+	}
+    
+    protected void setEventHandler(Consumer<ActionEvent> eventHandler) {
+		this.eventHandler = eventHandler;
+	}
     
     /**************************************************************************
      * 
@@ -312,4 +328,20 @@ public abstract class Action implements EventHandler<ActionEvent> {
      * 
      **************************************************************************/
     
+    /** 
+     * Defers to the Consumer<ActionEvent> passed in to the Action constructor.
+     */
+    @Override public final void handle(ActionEvent event) {
+        if (eventHandler != null && !isDisabled()) {
+            eventHandler.accept(event);
+        }
+    }
+    
+//    public void bind(ButtonBase button) {
+//        ActionUtils.configureButton(this, button);
+//    }
+//    
+//    public void bind(MenuItem menuItem) {
+//        ActionUtils.configureMenuItem(this, menuItem);
+//    }
 }

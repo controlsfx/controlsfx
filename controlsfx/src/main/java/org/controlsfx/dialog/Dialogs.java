@@ -29,10 +29,10 @@ package org.controlsfx.dialog;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.getString;
 import static impl.org.controlsfx.i18n.Localization.localize;
-import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.OK;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_OK;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -100,7 +100,6 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
@@ -609,15 +608,13 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new Action(localize(asKey("exception.button.label"))) {
-            @Override public void handle(ActionEvent ae) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                exception.printStackTrace(pw);
-                String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails).show();
-            }
-        };
+        Action openExceptionAction = new Action(localize(asKey("exception.button.label")), ae -> {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);
+            String moreDetails = sw.toString();
+            new ExceptionDialog((Window)owner, moreDetails).show();
+        });
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
         
@@ -638,7 +635,7 @@ public final class Dialogs {
         final TextField textField = new TextField(defaultValue);
         dlg.setContent(buildInputContent(textField));
         
-        return Optional.ofNullable( dlg.show() == OK ? textField.getText() : null );
+        return Optional.ofNullable( dlg.show() == ACTION_OK ? textField.getText() : null );
     }
 
     /**
@@ -683,7 +680,7 @@ public final class Dialogs {
             selectionModel.select(defaultChoice);
         }
 
-        return Optional.ofNullable( dlg.show() == OK ? selectionModel.getSelectedItem() : null);
+        return Optional.ofNullable( dlg.show() == ACTION_OK ? selectionModel.getSelectedItem() : null);
 
     }
 
@@ -707,12 +704,12 @@ public final class Dialogs {
 
     /**
      * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
-     * a set of available 'radio' buttons
-     * @param defaultCommandLink command is set to be default. Null means no default
+     * a set of available 'radio' buttons. "Command link" action uses content of its 'text' property as a title of a command link and content of 'long text'
+     * property as a description of the command link.
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks(DialogAction defaultCommandLink, List<DialogAction> links) {
+    public Action showCommandLinks(List<DialogAction> links) {
         final Dialog dlg = buildDialog(Type.INFORMATION);
         dlg.setContent(message);
         
@@ -756,7 +753,8 @@ public final class Dialogs {
             if (commandLink == null) continue; 
             
             final Button button = buildCommandLinkButton(commandLink);            
-            button.setDefaultButton(commandLink == defaultCommandLink);
+            
+            button.setDefaultButton(commandLink.isDefault());
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
                    commandLink.handle( new ActionEvent(dlg, ae.getTarget()));
@@ -779,48 +777,14 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links.Command links are just a {@link DialogAction}s and used instead of button bar and represent
-     * a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
+     * a set of available 'radio' buttons. "Command link" action uses content of its 'text' property as a title of a command link and content of 'long text'
+     * property as a description of the command link.
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
-     */    
-    public Action showCommandLinks( List<DialogAction> links ) {
-        return showCommandLinks( null, links);
-    }
-    
-    /**
-     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent
-     * a set of available 'radio' buttons
-     * @param defaultCommandLink command is set to be default. Null means no default
-     * @param links command links presented in specified sequence
-     * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks( DialogAction defaultCommandLink, DialogAction... links ) {
-        return showCommandLinks( defaultCommandLink, Arrays.asList(links));
-    }
-    
-    /**
-     * Convenience method to quickly create a command link
-     * @param graphic command link graphic
-     * @param text command link main text
-     * @param comment command link comment text
-     * @return {@link DialogAction} representing a command link
-     */
-    public static final DialogAction buildCommandLink( Node graphic, String text, String comment ) {
-    	DialogAction action = new DialogAction(text);
-    	action.setLongText(comment);
-    	action.setGraphic(graphic);
-    	return action;
-    }
-    
-    /**
-     * Convenience method to quickly create a command link
-     * @param text command link main text
-     * @param comment command link comment text
-     * @return {@link DialogAction} representing a command link
-     */   
-    public static final DialogAction buildCommandLink( String text, String comment ) {
-    	return buildCommandLink(null, text, comment);
+    public Action showCommandLinks(DialogAction... links) {
+    	return showCommandLinks( Arrays.asList(links));
     }
     
     /**
@@ -836,7 +800,7 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.FONT);
         dlg.setIconifiable(false);
         dlg.setContent(fontPanel);
-        return Optional.ofNullable( Dialog.Actions.OK == dlg.show() ? fontPanel.getFont(): null );
+        return Optional.ofNullable(ACTION_OK == dlg.show() ? fontPanel.getFont(): null);
     }
     
     /**
@@ -953,7 +917,7 @@ public final class Dialogs {
      */
     public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {
     	
-    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();// new CustomTextField();
+    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();
     	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
     	
     	CustomPasswordField txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
@@ -969,26 +933,23 @@ public final class Dialogs {
 		content.getChildren().add(txUserName);
 		content.getChildren().add(txPassword);
 		
-//		NotificationPane notificationPane = new NotificationPane(content);
-//		notificationPane.setShowFromTop(true);
-		
 		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
+				setEventHandler(this::handleAction);
 			}
 			
-			@Override public void handle(ActionEvent ae) {
+			protected void handleAction(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call( new Pair<String,String>(txUserName.getText(), txPassword.getText() ) );
+						authenticator.call(new Pair<String,String>(txUserName.getText(), txPassword.getText()));
 					}
 					lbMessage.setVisible(false);
 					lbMessage.setManaged(false);
 					dlg.hide();
 					dlg.setResult(this);
 				} catch( Throwable ex ) {
-					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
 					lbMessage.setVisible(true);
 					lbMessage.setManaged(true);
 					lbMessage.setText(ex.getMessage());
@@ -1011,7 +972,7 @@ public final class Dialogs {
 		if ( dlg.getGraphic() == null ) { 
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
-		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
+		dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
 		String userNameCation = getString("login.dlg.user.caption");
 		String passwordCaption = getString("login.dlg.pswd.caption");
 		txUserName.setPromptText(userNameCation);
@@ -1047,10 +1008,7 @@ public final class Dialogs {
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
         Dialog dlg = new Dialog(owner, actualTitle, lightweight);
         
-        if (styleClasses != null) {
-            dlg.getStyleClass().addAll(styleClasses);
-        }
-        
+        dlg.updateStyleClasses(styleClasses, true);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         
@@ -1189,14 +1147,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), OK),
-        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), OK),
-        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
-        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),
-        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), OK, CANCEL),
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), ACTION_OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), ACTION_OK),
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), ACTION_OK),
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
         PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), OK, CANCEL);
+        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), ACTION_OK, ACTION_CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;

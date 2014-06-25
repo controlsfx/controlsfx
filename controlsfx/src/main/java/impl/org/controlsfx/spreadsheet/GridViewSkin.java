@@ -483,8 +483,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         double horizontalPickerHeight = spreadsheetView.getColumnPickers().isEmpty() ? 0: VerticalHeader.PICKER_SIZE;
         
         if (spreadsheetView.isShowRowHeader() || !spreadsheetView.getRowPickers().isEmpty()) {
-            x += verticalHeaderWidth;//verticalHeader.getVerticalHeaderWidth();
-            w -=  verticalHeaderWidth;//verticalHeader.getVerticalHeaderWidth();
+            x += verticalHeaderWidth;
+            w -=  verticalHeaderWidth;
         }
 
         

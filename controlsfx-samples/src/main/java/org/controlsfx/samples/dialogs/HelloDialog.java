@@ -26,9 +26,9 @@
  */
 package org.controlsfx.samples.dialogs;
 
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
-import static org.controlsfx.dialog.Dialogs.buildCommandLink;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.Translations;
 
@@ -188,7 +188,7 @@ public class HelloDialog extends ControlsFXSample {
 										"I was a bit worried that you might not want them, so I wanted to double check."))
 						.actions(
 								!cbShowCancel.isSelected() ? new Action[] {
-										YES, NO } : new Action[0])
+								    ACTION_YES, ACTION_NO } : new Action[0])
 						.showConfirm();
 
 				System.out.println("response: " + response);
@@ -388,7 +388,8 @@ public class HelloDialog extends ControlsFXSample {
 										"This shows you a list of networks that are currently available and lets you connect to one."),
 								buildCommandLink(
 										"Manually create a network profile",
-										"This creates a new network profile or locates an existing one and saves it on your computer"),
+										"This creates a new network profile or locates an existing one and saves it on your computer",
+										 true /*default*/),
 								buildCommandLink("Create an ad hoc network",
 										"This creates a temporary network for sharing files or and Internet connection"));
 
@@ -399,7 +400,7 @@ public class HelloDialog extends ControlsFXSample {
 										isMastheadVisible() ? "Manually connect to wireless network"
 												: null)
 								.message("How do you want to add a network?"))
-						.showCommandLinks(links.get(1), links);
+						.showCommandLinks(links);
 
 				System.out.println("response: " + response);
 			}
@@ -452,12 +453,15 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Optional<Pair<String,String>> response = configureSampleDialog(Dialogs.create())
-						.showLogin(new Pair<String,String>("user", "password"), info -> {
-							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
-								throw new RuntimeException("Service is not available... try again later!"); 
-							};
-							return null;
+				Optional<Pair<String,String>> response = 
+				        configureSampleDialog(
+				        Dialogs.create()
+				            .masthead(isMastheadVisible() ? "Login to ControlsFX" : null))
+				            .showLogin(new Pair<String,String>("user", "password"), info -> {
+    							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
+    								throw new RuntimeException("Service is not available... try again later!"); 
+    							};
+    							return null;
 							}
 						 );
 
@@ -478,14 +482,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new DialogAction("Login", ButtonType.OK_DONE, false, true, true ){
-
-				@Override
-				public void handle(ActionEvent ae) {
-					Dialog dlg = (Dialog) ae.getSource();
-					// real login code here
-					dlg.setResult(this);
-				}
+			final Action actionLogin = new DialogAction("Login", ButtonType.OK_DONE, false, true, true, ae -> {/* real login code here*/} ){
 
 				public String toString() {
 					return "LOGIN";
@@ -536,7 +533,7 @@ public class HelloDialog extends ControlsFXSample {
 				dlg.setGraphic(new ImageView(HelloDialog.class.getResource(
 						"login.png").toString()));
 				dlg.setContent(content);
-				dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
+				dlg.getActions().addAll(actionLogin, ACTION_CANCEL);
 				validate();
 
 				Platform.runLater( () -> txUserName.requestFocus() );
@@ -592,7 +589,7 @@ public class HelloDialog extends ControlsFXSample {
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);
-        styleCombobox.getItems().addAll("Cross-platform", "Native", "Undecorated");
+        styleCombobox.getItems().setAll("Cross-platform", "Native", "Undecorated");
         styleCombobox.setValue(styleCombobox.getItems().get(0));
         grid.add(styleCombobox, 1, row);
         row++;
@@ -631,6 +628,17 @@ public class HelloDialog extends ControlsFXSample {
 
 		return grid;
 	}
+	
+	 private DialogAction buildCommandLink( String text, String comment, boolean isDefault ) {
+	 	DialogAction action = new DialogAction(text, null, false, true, isDefault);
+	 	action.setLongText(comment);
+	 	return action;
+	 }
+	 
+	 public  DialogAction buildCommandLink( String text, String comment ) {
+	 	return buildCommandLink(text, comment, false);
+	 }
+	
 	
 	private String getDialogStyle() {
 	    SelectionModel<String> sm = styleCombobox.getSelectionModel();

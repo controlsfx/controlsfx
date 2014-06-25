@@ -37,7 +37,6 @@ import java.util.TreeMap;
 
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
@@ -242,11 +241,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     	private final Image CATEGORY_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png");
     	private final Image NAME_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png");
     	
-        private PropertySheet.Mode mode;
-        
         public ActionChangeMode(PropertySheet.Mode mode) {
             super("");
-            this.mode = mode;
+            setEventHandler(ae -> getSkinnable().modeProperty().set(mode));
             
             if (mode == Mode.CATEGORY) {
                 setGraphic( new ImageView(CATEGORY_IMAGE));
@@ -259,9 +256,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             }
         }
 
-        @Override public void handle(ActionEvent ae) {
-            getSkinnable().modeProperty().set(mode);
-        }
     }
     
     

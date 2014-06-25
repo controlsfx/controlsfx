@@ -72,14 +72,12 @@ public class HelloNotificationPane extends ControlsFXSample {
         ImageView image = new ImageView(imagePath);
         notificationPane.setGraphic(image);
         
-        notificationPane.getActions().addAll(new Action("Sync") {
-            @Override public void handle(ActionEvent ae) {
+        notificationPane.getActions().addAll(new Action("Sync", ae -> {
                 // do sync
                 
                 // then hide...
                 notificationPane.hide();
-            }
-        });
+        }));
         
         Button showBtn = new Button("Show / Hide");
         showBtn.setOnAction(new EventHandler<ActionEvent>() {

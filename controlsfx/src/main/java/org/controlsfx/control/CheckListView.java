@@ -115,16 +115,14 @@ public class CheckListView<T> extends ListView<T> {
      */
     public CheckListView(ObservableList<T> items) {
         super(items);
-        
+        this.itemBooleanMap = new HashMap<>();
+        itemsProperty().addListener(ov -> {
+            setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
+        });
         if (items == null) {
             items = FXCollections.observableArrayList();
             setItems(items);
         }
-        
-        final int initialSize = items.size();
-        this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
-        
-        setCheckModel(new CheckListViewBitSetCheckModel<T>(items, itemBooleanMap));
         setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             public ListCell<T> call(ListView<T> listView) {
                 return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {

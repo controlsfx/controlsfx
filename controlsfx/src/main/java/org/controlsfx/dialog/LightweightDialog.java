@@ -27,6 +27,7 @@
 package org.controlsfx.dialog;
 
 import impl.org.controlsfx.ImplUtils;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -472,16 +473,28 @@ class LightweightDialog extends FXDialog {
             
             // These are the actual implementations in Region (the parent of Pane),
             // but just for clarify I reproduce them here
-            @Override protected double computeMaxHeight(double width) {
-                return Double.MAX_VALUE;
+            @Override protected double computeMinHeight(double width) {
+                return parent.minHeight(width);
             }
             
-            @Override protected double computeMaxWidth(double height) {
-                return Double.MAX_VALUE;
+            @Override protected double computeMinWidth(double height) {
+                return parent.minWidth(height);
+            }
+            
+            @Override protected double computePrefHeight(double width) {
+                return parent.prefHeight(width);
             }
             
             @Override protected double computePrefWidth(double height) {
-                return Double.MAX_VALUE;
+                return parent.prefWidth(height);
+            }
+            
+            @Override protected double computeMaxHeight(double width) {
+                return parent.maxHeight(width);
+            }
+            
+            @Override protected double computeMaxWidth(double height) {
+                return parent.maxWidth(height);
             }
         };
                 

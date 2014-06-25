@@ -70,11 +70,6 @@ public class VerticalHeader extends StackPane {
     private static final String TABLE_LABEL_KEY = "Label";
 
     /**
-     * Default width of the VerticalHeader.
-     */
-    public static final double DEFAULT_VERTICAL_HEADER_WIDTH = 30.0;
-
-    /**
      * *************************************************************************
      * * Private Fields * *
      * ************************************************************************
@@ -83,9 +78,13 @@ public class VerticalHeader extends StackPane {
     private final SpreadsheetView spreadsheetView;
     private double horizontalHeaderHeight;
     /**
-     * The vertical header width, just for the Label, not the Pickers.
+     * This represents the VerticalHeader width. It's the total amount of space
+     * used by the VerticalHeader. It's composed of the sum of the
+     * SpreadsheetView {@link SpreadsheetView#getRowHeaderWidth() } and the size
+     * of the pickers (which is fixed right now).
+     *
      */
-    private final DoubleProperty verticalHeaderWidth = new SimpleDoubleProperty(DEFAULT_VERTICAL_HEADER_WIDTH);
+    private final DoubleProperty innerVerticalHeaderWidth = new SimpleDoubleProperty();
     private Rectangle clip; // Ensure that children do not go out of bounds
     private ContextMenu blankContextMenu;
 
@@ -152,7 +151,7 @@ public class VerticalHeader extends StackPane {
         clip.relocate(snappedTopInset(), snappedLeftInset());
         clip.setSmooth(false);
         clip.heightProperty().bind(skin.getSkinnable().heightProperty());
-        clip.widthProperty().bind(verticalHeaderWidth);
+        clip.widthProperty().bind(innerVerticalHeaderWidth);
         VerticalHeader.this.setClip(clip);
 
         // We desactivate and activate the verticalHeader upon request
@@ -168,6 +167,7 @@ public class VerticalHeader extends StackPane {
         spreadsheetView.showColumnHeaderProperty().addListener(layout);
         spreadsheetView.getFixedRows().addListener(layout);
         spreadsheetView.fixingRowsAllowedProperty().addListener(layout);
+        spreadsheetView.rowHeaderWidthProperty().addListener(layout);
 
         // In case we resize the view in any manners
         spreadsheetView.heightProperty().addListener(layout);
@@ -180,7 +180,7 @@ public class VerticalHeader extends StackPane {
     }
 
     public double getVerticalHeaderWidth() {
-        return verticalHeaderWidth.get();
+        return innerVerticalHeaderWidth.get();
     }
 
     public double computeHeaderWidth() {
@@ -189,7 +189,7 @@ public class VerticalHeader extends StackPane {
             width += PICKER_SIZE;
         }
         if (spreadsheetView.isShowRowHeader()) {
-            width += DEFAULT_VERTICAL_HEADER_WIDTH;
+            width += spreadsheetView.getRowHeaderWidth();
         }
         return width;
     }
@@ -208,13 +208,13 @@ public class VerticalHeader extends StackPane {
             pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
             pickerUsed.clear();
             if (!spreadsheetView.getRowPickers().isEmpty()) {
-                verticalHeaderWidth.setValue(PICKER_SIZE);
+                innerVerticalHeaderWidth.setValue(PICKER_SIZE);
                 x += PICKER_SIZE;
             }else{
-                verticalHeaderWidth.setValue(0);
+                innerVerticalHeaderWidth.setValue(0);
             }
             if (spreadsheetView.isShowRowHeader()) {
-                verticalHeaderWidth.setValue(getVerticalHeaderWidth() + DEFAULT_VERTICAL_HEADER_WIDTH);
+                innerVerticalHeaderWidth.setValue(getVerticalHeaderWidth() + spreadsheetView.getRowHeaderWidth());
             }
 
             getChildren().clear();
@@ -341,7 +341,7 @@ public class VerticalHeader extends StackPane {
                 label = getLabel(rowCount++);
 
                 label.setText(getRowHeader(rowIndex));
-                label.resize(DEFAULT_VERTICAL_HEADER_WIDTH, row.getHeight());
+                label.resize(spreadsheetView.getRowHeaderWidth(), row.getHeight());
                 label.setLayoutX(x);
                 label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 label.setContextMenu(getRowContextMenu(rowIndex));
@@ -412,7 +412,7 @@ public class VerticalHeader extends StackPane {
         // FIXME Can gridRow be null?
         Double newHeight = gridRow.getHeight() + delta;
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
-        label.resize(getVerticalHeaderWidth(), newHeight);
+        label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
 

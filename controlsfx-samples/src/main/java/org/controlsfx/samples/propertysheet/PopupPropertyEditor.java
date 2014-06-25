@@ -54,14 +54,8 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private final PropertySheet.Item item;
     private final ObjectProperty<T> value = new SimpleObjectProperty<>();
 
-    final Action actionSave = new DialogAction("Save", ButtonBar.ButtonType.OK_DONE, false, true, true ) {
+    final Action actionSave = new DialogAction("Save", ButtonBar.ButtonType.OK_DONE, false, true, true, ae -> { /* real saving code here */ } ) {
             
-                @Override
-                public void handle(ActionEvent ae) {
-                    Dialog dlg = (Dialog) ae.getSource();
-                    // real saving code here?
-                    dlg.setResult(this);
-                }
                 @Override
                 public String toString() {
                     return "SAVE";
@@ -90,7 +84,7 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         dlg.setContent(sheet);
-        dlg.getActions().addAll(actionSave, Dialog.Actions.CANCEL);
+        dlg.getActions().addAll(actionSave, Dialog.ACTION_CANCEL);
         Action response = dlg.show();
 
         if (actionSave.equals(response)) {

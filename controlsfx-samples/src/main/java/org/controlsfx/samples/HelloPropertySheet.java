@@ -153,6 +153,7 @@ public class HelloPropertySheet extends ControlsFXSample {
 
         public ActionShowInPropertySheet(String title, Object bean) {
             super(title);
+            setEventHandler(this::handleAction);
             this.bean = bean;
         }
 
@@ -164,8 +165,7 @@ public class HelloPropertySheet extends ControlsFXSample {
             return list;
         }
 
-        @Override
-        public void handle(ActionEvent ae) {
+        private void handleAction(ActionEvent ae) {
 
             // retrieving bean properties may take some time
             // so we have to put it on separate thread to keep UI responsive
@@ -243,16 +243,9 @@ public class HelloPropertySheet extends ControlsFXSample {
 
     class ActionModeChange extends Action {
 
-        private Mode mode;
-
         public ActionModeChange(String title, Mode mode) {
             super(title);
-            this.mode = mode;
-        }
-
-        @Override
-        public void handle(ActionEvent ae) {
-            propertySheet.modeProperty().set(mode);
+            setEventHandler(ae -> propertySheet.modeProperty().set(mode));
         }
 
     }

@@ -28,6 +28,7 @@ package org.controlsfx.validation;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
 import javafx.scene.control.Control;
 
@@ -82,5 +83,35 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      */
     public static <T> Validator<T> createEqualsValidator(final String message, final Collection<T> values) {
         return createEqualsValidator(message, Severity.ERROR, values);
+    }
+    
+    /**
+     * Factory method to create a validator, which checks the value against a given regular expression.
+     * Error is created if the value is <code>null</code> or the value does not match the pattern.
+     * @param message text of a message to be created if value is invalid
+     * @param regex the regular expression the value has to match
+     * @param severity severity of a message to be created if value is invalid
+     * @return new validator
+     */
+    public static Validator<String> createRegexValidator(final String message, final String regex, final Severity severity) {
+        return (c, value) -> {
+            boolean condition = value == null ? true : !Pattern.matches(regex, value);
+            return ValidationResult.fromMessageIf(c, message, severity, condition);
+        };
+    }
+    
+    /**
+     * Factory method to create a validator, which checks the value against a given regular expression.
+     * Error is created if the value is <code>null</code> or the value does not match the pattern.
+     * @param message text of a message to be created if value is invalid
+     * @param regex the regular expression the value has to match
+     * @param severity severity of a message to be created if value is invalid
+     * @return new validator
+     */
+    public static Validator<String> createRegexValidator(final String message, final Pattern regex, final Severity severity) {
+        return (c, value) -> {
+            boolean condition = value == null ? true : !regex.matcher(value).matches();
+            return ValidationResult.fromMessageIf(c, message, severity, condition);
+        };
     }
 }

@@ -36,7 +36,6 @@ import java.util.Collection;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -171,16 +170,15 @@ public class HelloActionProxy extends ControlsFXSample {
         hbox.getChildren().add(new Label("Dynamically enable/disable action: "));
         hbox.getChildren().add(cbActions);
         
-        Action toggleAction = new Action("Enable/Disable") {
+        Action toggleAction = new Action("Enable/Disable", ae -> {
 
-            @Override public void handle(ActionEvent ae) {
                Action action = cbActions.getSelectionModel().getSelectedItem();
                if ( action != null ) {
                    BooleanProperty p = action.disabledProperty();
                    p.set(!p.get());
                }
-            }
-        };
+            
+        });
         
         hbox.getChildren().add(ActionUtils.createButton(toggleAction));
         

@@ -287,7 +287,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
         if (item.getGraphic() != null) {
             if (item.getGraphic() instanceof ImageView) {
-                ImageView image = new ImageView(((ImageView) item.getGraphic()).getImage());
+                ImageView image = (ImageView) item.getGraphic();
                 image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
@@ -299,7 +299,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                                 image.getImage().getWidth()).otherwise(widthProperty()));
                 setGraphic(image);
             } else if (item.getGraphic() instanceof Node) {
-                setGraphic((Node) item.getGraphic());
+                setGraphic(item.getGraphic());
+            }
+            /**
+             * In case of a resize of the column, we have new cells that steal
+             * the image from the original TableCell. So we check here if we are
+             * not in that case so that the Graphic of the SpreadsheetCell will
+             * always be on the latest tableView and therefore fully visible.
+             */
+            if (!getChildren().contains(item.getGraphic())) {
+                getChildren().add(item.getGraphic());
             }
         } else {
             setGraphic(null);

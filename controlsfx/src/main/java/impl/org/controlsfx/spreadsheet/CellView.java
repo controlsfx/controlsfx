@@ -286,22 +286,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             return;
         }
         if (item.getGraphic() != null) {
-            /**
-             * FIXME To be removed in JDK8u20. This workaround is added for the
-             * first row containing a graphic because for an unknown reason, the
-             * graphic is translated to a negative value so it's not fully
-             * visible. So we add those listener that watch those changes, and
-             * try to get the previous value (the right one) if the new value
-             * goes out of bounds.
-             */
-            if (item.getRow() == 0) {
-                item.getGraphic().layoutXProperty().removeListener(firstRowLayoutXListener);
-                item.getGraphic().layoutXProperty().addListener(firstRowLayoutXListener);
-
-                item.getGraphic().layoutYProperty().removeListener(firstRowLayoutYListener);
-                item.getGraphic().layoutYProperty().addListener(firstRowLayoutYListener);
-            }
-            
             if (item.getGraphic() instanceof ImageView) {
                 ImageView image = (ImageView) item.getGraphic();
                 image.setCache(true);
@@ -331,24 +315,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    private final ChangeListener<Number> firstRowLayoutXListener = new ChangeListener<Number>() {
-        @Override
-        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-            if (getItem() != null && t1.doubleValue() < 0 && t != null) {
-                getItem().getGraphic().setLayoutX(t.doubleValue());
-            }
-        }
-    };
-    
-    private final ChangeListener<Number> firstRowLayoutYListener = new ChangeListener<Number>() {
-        @Override
-        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-            if (getItem() != null && t1.doubleValue() < 0 && t != null) {
-                getItem().getGraphic().setLayoutY(t.doubleValue());
-            }
-        }
-    };
-    
     /**
      * Set this SpreadsheetCell hoverProperty
      * 
@@ -361,7 +327,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // Otherwise it's will not be visible
         ((GridRow) this.getTableRow()).setHoverPublic(hover);
     }
-    
+
     /**
      * Return an instance of Editor specific to the Cell type We are not using
      * the build-in editor-Cell because we cannot know in advance which editor

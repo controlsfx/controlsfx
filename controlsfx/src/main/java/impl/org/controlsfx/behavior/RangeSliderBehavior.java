@@ -293,6 +293,11 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
         slider.setHighValueChanging(true);
         slider.setLowValue(newLowValue);
         slider.setHighValue(newHighValue);        
+    }
+    
+      public void confirmRange() {
+        RangeSlider slider = (RangeSlider) getControl();
+         
         slider.setLowValueChanging(false);
         slider.setHighValueChanging(false);
     }

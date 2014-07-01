@@ -64,12 +64,20 @@ public interface Sample {
      * the sample.
      */
     public Node getControlPanel();
+    
+    /**
+     * Returns divider position to use for split between main panel and control panel 
+     */
+    public double getControlPanelDividerPosition();
 
     /**
      * A full URL to the javadoc for the API being demonstrated in this sample.
      */
     public String getJavaDocURL();
     
+    /**
+     * Returns URL for control's stylsheet 
+     */
     public String getControlStylesheetURL();
     
     /**

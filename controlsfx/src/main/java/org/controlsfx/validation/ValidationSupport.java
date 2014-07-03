@@ -36,9 +36,12 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -208,8 +211,7 @@ public class ValidationSupport {
         return validationResultProperty.getReadOnlyProperty();
     }
 
-    private ReadOnlyObjectWrapper<Boolean> invalidProperty = new ReadOnlyObjectWrapper<Boolean>(); 
-
+    private BooleanProperty invalidProperty = new SimpleBooleanProperty();
 
     /**
      * Returns current validation state. 
@@ -220,10 +222,11 @@ public class ValidationSupport {
     }
 
     /**
-     * @return the Validation state property
+     * Validation state property 
+     * @return validation state property
      */
-    public ReadOnlyObjectProperty<Boolean> invalidProperty() {
-        return invalidProperty.getReadOnlyProperty();
+    public ReadOnlyBooleanProperty invalidProperty() {
+        return invalidProperty;
     }
 
 

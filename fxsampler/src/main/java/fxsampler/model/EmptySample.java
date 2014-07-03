@@ -47,6 +47,10 @@ public class EmptySample implements Sample {
     @Override public Node getControlPanel() {
         return null;
     }
+    
+    public double getControlPanelDividerPosition() {
+    	return 0.6;
+    }
 
 	@Override
 	public String getControlStylesheetURL() {

@@ -70,7 +70,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                 // already on the cell and we wanted to go below.
                 if (!spreadsheetView.isPressed() && oldPosition.getColumn() == newPosition.getColumn() && oldPosition.getRow() == newPosition.getRow() - 1) {
                     Platform.runLater(() -> {
-                        tfm.focus(getTableRowSpan(oldPosition, cellsView), oldPosition.getTableColumn());
+                        tfm.focus(getNextRowNumber(oldPosition, cellsView), oldPosition.getTableColumn());
                     });
 
                 } else {
@@ -128,10 +128,10 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * the RowSpan to be on a visible Cell)
      *
      * @param t
-     * @param spreadsheetView
+     * @param cellsView
      * @return
      */
-    static int getTableRowSpan(final TablePosition<?, ?> t, SpreadsheetGridView cellsView) {
+    public static int getNextRowNumber(final TablePosition<?, ?> t, SpreadsheetGridView cellsView) {
         return cellsView.getItems().get(t.getRow()).get(t.getColumn()).getRowSpan()
                 + cellsView.getItems().get(t.getRow()).get(t.getColumn()).getRow();
     }

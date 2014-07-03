@@ -29,7 +29,6 @@ package org.controlsfx.control.spreadsheet;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -38,6 +37,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -62,6 +62,11 @@ import javafx.util.StringConverter;
  * happens and the editor keeps editing. <br/>
  * You can abandon a current modification by pressing "esc" key. <br/>
  * 
+ * You can specify a maximum height to your spreadsheetCellEditor with {@link #getMaxHeight()
+ * }. This can be used in order to control the display of your editor. If they
+ * should grow or not in a big cell. (for example a {@link TextAreaEditor} want
+ * to grow with the cell in order to take full space for display.
+ * <br/>
  * <h3>Specific behavior:</h3> This class offers some static classes in order to
  * create a {@link SpreadsheetCellEditor}. Here are their properties: <br/>
  * 
@@ -133,6 +138,8 @@ import javafx.util.StringConverter;
  * @see SpreadsheetCellType
  */
 public abstract class SpreadsheetCellEditor {
+    private static final double MAX_EDITOR_HEIGHT = 50.0;
+    
     public static final DecimalFormat decimalFormat=new DecimalFormat("#.##########");
     SpreadsheetView view;
 
@@ -203,6 +210,14 @@ public abstract class SpreadsheetCellEditor {
      */
     public abstract void end();
 
+    /**
+     * Return the maximum height of the editor. 
+     * @return 50 by default.
+     */
+    public double getMaxHeight(){
+        return MAX_EDITOR_HEIGHT;
+    }
+    
     /**
      * A {@link SpreadsheetCellEditor} for
      * {@link SpreadsheetCellType.ObjectType} typed cells. It displays a
@@ -345,6 +360,94 @@ public abstract class SpreadsheetCellEditor {
         }
     }
 
+    
+    /**
+     * A {@link SpreadsheetCellEditor} for
+     * {@link SpreadsheetCellType.StringType} typed cells. It displays a
+     * {@link TextField} where the user can type different values.
+     */
+    public static class TextAreaEditor extends SpreadsheetCellEditor {
+
+        /**
+         * *************************************************************************
+         * * Private Fields * *
+         * ************************************************************************
+         */
+        private final TextArea textArea;
+
+        /**
+         * *************************************************************************
+         * * Constructor * *
+         * ************************************************************************
+         */
+        /**
+         * Constructor for the StringEditor.
+         *
+         * @param view The SpreadsheetView
+         */
+        public TextAreaEditor(SpreadsheetView view) {
+            super(view);
+            textArea = new TextArea();
+        }
+
+        /**
+         * *************************************************************************
+         * * Public Methods * *
+         * ************************************************************************
+         */
+        @Override
+        public void startEdit(Object value) {
+            if (value instanceof String || value == null) {
+                textArea.setText((String) value);
+            }
+            attachEnterEscapeEventHandler();
+
+            textArea.requestFocus();
+            textArea.end();
+        }
+
+        @Override
+        public String getControlValue() {
+            return textArea.getText();
+        }
+
+        @Override
+        public void end() {
+            textArea.setOnKeyPressed(null);
+        }
+
+        @Override
+        public TextArea getEditor() {
+            return textArea;
+        }
+
+        @Override
+        public double getMaxHeight() {
+            return 500;
+        }
+        /**
+         * *************************************************************************
+         * * Private Methods * *
+         * ************************************************************************
+         */
+        private void attachEnterEscapeEventHandler() {
+            textArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent keyEvent) {
+                    if (keyEvent.getCode() == KeyCode.ENTER) {
+                        if (keyEvent.isShortcutDown()) {
+                            //if shortcut is down, we insert a new line.
+                            textArea.replaceSelection("\n");
+                        } else {
+                            endEdit(true);
+                        }
+                    } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                        endEdit(false);
+                    }
+                }
+            });
+        }
+    }
     /**
      * A {@link SpreadsheetCellEditor} for
      * {@link SpreadsheetCellType.DoubleType} typed cells. It displays a

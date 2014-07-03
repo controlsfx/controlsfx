@@ -404,12 +404,12 @@ public class SpreadsheetView extends Control {
                 else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
                     pasteClipboard();
                 // Go to the next row
-                else if (keyEvent.getCode() == KeyCode.ENTER) {
+                else if (!keyEvent.isShortcutDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
                     if (position != null) {
-                        cellsView.getSelectionModel().clearAndSelect(position.getRow() + 1, position.getTableColumn());
+                        cellsView.getSelectionModel().clearAndSelect(FocusModelListener.getNextRowNumber(position, getCellsView()), position.getTableColumn());
                     }
                    /* // Go to next cell
                 } else if (keyEvent.getCode().compareTo(KeyCode.TAB) == 0) {

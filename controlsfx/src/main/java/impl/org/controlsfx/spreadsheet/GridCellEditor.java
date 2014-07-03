@@ -61,7 +61,6 @@ public class GridCellEditor {
     
     //The last key pressed in order to select cell below if it was "enter"
     private KeyCode lastKeyPressed;
-    private static final double MAX_EDITOR_HEIGHT = 50.0;
 
     /***************************************************************************
      * * Constructor * *
@@ -145,7 +144,8 @@ public class GridCellEditor {
                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
                             getFocusModel().getFocusedCell();
                     if (position != null) {
-                        handle.getGridView().getSelectionModel().clearAndSelect(position.getRow() + 1, position.getTableColumn());
+                        
+                        handle.getGridView().getSelectionModel().clearAndSelect(FocusModelListener.getNextRowNumber(position,handle.getGridView()), position.getTableColumn());
                     }
                 }
             }
@@ -187,7 +187,7 @@ public class GridCellEditor {
 
         // Then we call the user editor in order for it to be ready
         Object value = modelCell.getItem();
-        Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), MAX_EDITOR_HEIGHT);
+        Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), spreadsheetCellEditor.getMaxHeight());
         spreadsheetCellEditor.getEditor().setMaxHeight(maxHeight);
         spreadsheetCellEditor.getEditor().setPrefWidth(viewCell.getWidth());
         
@@ -258,9 +258,18 @@ public class GridCellEditor {
         private boolean addCell(CellView cell) {
             GridRow lastRow = handle.getCellsViewSkin().getRow(getCellCount() - 1);
 
-            // If the row returned is the extra one at the bottom (see RT-31503)
+            /**
+             * When we scroll to the very bottom, we may have several null/blank
+             * cell beyond the rowCount. So we must iterate over the cell
+             * backward till we found the last one suiting our needs.
+             * (see RT-31503)
+             */
             if (lastRow.getIndex() >= handle.getView().getGrid().getRowCount()) {
-                lastRow = handle.getCellsViewSkin().getRow(handle.getView().getGrid().getRowCount() - 1);
+                lastRow = null;
+                int i = handle.getView().getGrid().getRowCount()-1;
+                while(i> 0 && (lastRow == null || lastRow.getIndex() >= handle.getView().getGrid().getRowCount())){
+                    lastRow = handle.getCellsViewSkin().getRow(i--);
+                }
             }
 
             if (lastRow != null) {

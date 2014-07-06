@@ -230,7 +230,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setCellGraphic(cell);
         
         Optional<String> tooltip = cell.getTooltip();
-        if(tooltip.isPresent()){
+        if(tooltip.isPresent() && !tooltip.get().trim().equals("")){
             /**
             * Ensure that modification of ToolTip are set on the JFX thread
             * because an exception can be thrown otherwise. 
@@ -286,17 +286,35 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             return;
         }
         if (item.getGraphic() != null) {
+            /**
+             * FIXME To be removed in JDK8u20. This workaround is added for the
+             * first row containing a graphic because for an unknown reason, the
+             * graphic is translated to a negative value so it's not fully
+             * visible. So we add those listener that watch those changes, and
+             * try to get the previous value (the right one) if the new value
+             * goes out of bounds.
+             */
+            if (item.getRow() == 0) {
+                item.getGraphic().layoutXProperty().removeListener(firstRowLayoutXListener);
+                item.getGraphic().layoutXProperty().addListener(firstRowLayoutXListener);
+
+                item.getGraphic().layoutYProperty().removeListener(firstRowLayoutYListener);
+                item.getGraphic().layoutYProperty().addListener(firstRowLayoutYListener);
+            }
+            
             if (item.getGraphic() instanceof ImageView) {
                 ImageView image = (ImageView) item.getGraphic();
                 image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
+                if(image.getImage() != null){
                 image.fitHeightProperty().bind(
                         new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
                                 image.getImage().getHeight()).otherwise(heightProperty()));
                 image.fitWidthProperty().bind(
                         new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
                                 image.getImage().getWidth()).otherwise(widthProperty()));
+                }
                 setGraphic(image);
             } else if (item.getGraphic() instanceof Node) {
                 setGraphic(item.getGraphic());
@@ -315,6 +333,24 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
+    private final ChangeListener<Number> firstRowLayoutXListener = new ChangeListener<Number>() {
+        @Override
+        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+            if (getItem() != null && t1.doubleValue() < 0 && t != null) {
+                getItem().getGraphic().setLayoutX(t.doubleValue());
+            }
+        }
+    };
+    
+    private final ChangeListener<Number> firstRowLayoutYListener = new ChangeListener<Number>() {
+        @Override
+        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+            if (getItem() != null && t1.doubleValue() < 0 && t != null) {
+                getItem().getGraphic().setLayoutY(t.doubleValue());
+            }
+        }
+    };
+    
     /**
      * Set this SpreadsheetCell hoverProperty
      * 

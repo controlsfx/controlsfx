@@ -118,9 +118,9 @@ public class GridBase implements Grid, EventTarget {
     /**
      * Creates grid with 'unlimited' rows and columns
      */
-    public GridBase() {
-        this(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    }
+//    public GridBase() {
+//        this(Integer.MAX_VALUE, Integer.MAX_VALUE);
+//    }
 
     /**
      * Creates a grid with a fixed number of rows and columns.

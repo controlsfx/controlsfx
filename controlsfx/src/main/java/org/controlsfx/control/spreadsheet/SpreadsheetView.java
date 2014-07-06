@@ -339,9 +339,9 @@ public class SpreadsheetView extends Control {
      * Creates a default SpreadsheetView control with no content and a Grid set
      * to null.
      */
-    public SpreadsheetView() {
-        this(null);
-    }
+//    public SpreadsheetView() {
+//        this(null);
+//    }
 
     /**
      * Creates a SpreadsheetView control with the {@link Grid} specified.

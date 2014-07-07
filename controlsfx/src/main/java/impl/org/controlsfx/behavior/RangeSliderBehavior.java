@@ -278,17 +278,17 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     }
     
     public void moveRange(double position) {
-//        System.out.println("delta: " + delta);
         RangeSlider slider = (RangeSlider) getControl();
         final double min = slider.getMin();
         final double max = slider.getMax();
         final double lowValue = slider.getLowValue();
-        final double newLowValue = Utils.clamp(min, lowValue + position *(max-min) / slider.getWidth(), max);
+        final double newLowValue = Utils.clamp(min, lowValue + position *(max-min) / 
+                (slider.getOrientation() == Orientation.HORIZONTAL? slider.getWidth(): slider.getHeight()), max);
         final double highValue = slider.getHighValue();
-        final double newHighValue = Utils.clamp(min, highValue + position*(max-min) / slider.getWidth(), max);
+        final double newHighValue = Utils.clamp(min, highValue + position*(max-min) / 
+                (slider.getOrientation() == Orientation.HORIZONTAL? slider.getWidth(): slider.getHeight()), max);
         
         if (newLowValue <= min || newHighValue >= max) return;
-        
         slider.setLowValueChanging(true);
         slider.setHighValueChanging(true);
         slider.setLowValue(newLowValue);

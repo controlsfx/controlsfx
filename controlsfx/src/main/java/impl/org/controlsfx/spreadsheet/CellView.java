@@ -295,8 +295,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * goes out of bounds.
              */
             if (item.getRow() == 0) {
-                item.getGraphic().layoutXProperty().removeListener(firstRowLayoutXListener);
-                item.getGraphic().layoutXProperty().addListener(firstRowLayoutXListener);
+                item.getGraphic().layoutXProperty().removeListener(new WeakChangeListener<>(firstRowLayoutXListener));
+                item.getGraphic().layoutXProperty().addListener(new WeakChangeListener<>(firstRowLayoutXListener));
 
                 item.getGraphic().layoutYProperty().removeListener(firstRowLayoutYListener);
                 item.getGraphic().layoutYProperty().addListener(firstRowLayoutYListener);
@@ -335,18 +335,18 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     private final ChangeListener<Number> firstRowLayoutXListener = new ChangeListener<Number>() {
         @Override
-        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-            if (getItem() != null && t1.doubleValue() < 0 && t != null) {
-                getItem().getGraphic().setLayoutX(t.doubleValue());
+        public void changed(ObservableValue<? extends Number> ov, Number oldLayoutX, Number newLayoutX) {
+            if (getItem() != null && getItem().getGraphic() != null && newLayoutX.doubleValue() < 0 && oldLayoutX != null) {
+                getItem().getGraphic().setLayoutX(oldLayoutX.doubleValue());
             }
         }
     };
     
     private final ChangeListener<Number> firstRowLayoutYListener = new ChangeListener<Number>() {
         @Override
-        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-            if (getItem() != null && t1.doubleValue() < 0 && t != null) {
-                getItem().getGraphic().setLayoutY(t.doubleValue());
+        public void changed(ObservableValue<? extends Number> ov, Number oldLayoutY, Number newLayoutY) {
+            if (getItem() != null && getItem().getGraphic() != null && newLayoutY.doubleValue() < 0 && oldLayoutY != null) {
+                getItem().getGraphic().setLayoutY(oldLayoutY.doubleValue());
             }
         }
     };

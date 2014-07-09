@@ -1,7 +1,7 @@
 apply plugin: 'signing'
 
 configurations {
-    samples { extendsFrom mainRuntime}
+    samples { extendsFrom runtime}
     jdk
     maven { extendsFrom archives }
     published { extendsFrom archives, signatures}

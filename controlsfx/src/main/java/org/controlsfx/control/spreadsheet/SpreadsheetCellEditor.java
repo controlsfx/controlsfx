@@ -435,7 +435,7 @@ public abstract class SpreadsheetCellEditor {
                 @Override
                 public void handle(KeyEvent keyEvent) {
                     if (keyEvent.getCode() == KeyCode.ENTER) {
-                        if (keyEvent.isShortcutDown()) {
+                        if (keyEvent.isShiftDown()) {
                             //if shortcut is down, we insert a new line.
                             textArea.replaceSelection("\n");
                         } else {

@@ -404,7 +404,7 @@ public class SpreadsheetView extends Control {
                 else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
                     pasteClipboard();
                 // Go to the next row
-                else if (!keyEvent.isShortcutDown() && keyEvent.getCode() == KeyCode.ENTER) {
+                else if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
@@ -864,7 +864,12 @@ public class SpreadsheetView extends Control {
      * @return the height of a particular row of the SpreadsheetView.
      */
     public double getRowHeight(int row) {
-         return getCellsViewSkin().getRowHeight(row);
+        //Sometime, the skin is not initialised yet..
+        if (getCellsViewSkin() == null) {
+            return getGrid().getRowHeight(row);
+        } else {
+            return getCellsViewSkin().getRowHeight(row);
+        }
     }
     
     /**

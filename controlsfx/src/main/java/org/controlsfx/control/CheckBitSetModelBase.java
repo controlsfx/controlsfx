@@ -303,13 +303,9 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
                     final int changeIndex = selectedIndicesList.indexOf(index);
                     
                     if (booleanProperty.get()) {
-//                        selectedIndices.set(index);
-//                        selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));                            
                         select(index);
                     } else {
                         clearSelection(index);
-//                        selectedIndices.clear(index);
-//                        selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
                     }
                 }
             });

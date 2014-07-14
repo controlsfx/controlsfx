@@ -228,6 +228,8 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
         for( int index = 0; index < selectedIndices.length(); index++) {
             clearSelection(index);
         }
+        setSelectedIndex(-1);
+        setSelectedItem(null);
     }
 
     /** {@inheritDoc} */
@@ -253,7 +255,8 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     @Override public void select(int index) {
         if (index < 0 || index >= getItemCount()) return;
         selectedIndices.set(index);
-        
+        setSelectedIndex(index);
+        setSelectedItem(getItem(index));
         final int changeIndex = selectedIndicesList.indexOf(index);
         selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));
     }
@@ -300,11 +303,9 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
                     final int changeIndex = selectedIndicesList.indexOf(index);
                     
                     if (booleanProperty.get()) {
-                        selectedIndices.set(index);
-                        selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));                            
+                        select(index);
                     } else {
-                        selectedIndices.clear(index);
-                        selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
+                        clearSelection(index);
                     }
                 }
             });

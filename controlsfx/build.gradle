@@ -84,6 +84,22 @@ task downloadTranslations << {
 
 processResources.finalizedBy(downloadTranslations)
 
+task compileCSS << {
+    ant.delete (includeEmptyDirs: 'true') { 
+        fileset(dir: file("build/resources/main"), includes: "**/*.bss") 
+    }
+    javaexec {
+        main = "com.sun.javafx.tools.packager.Main"
+        classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
+        args = [ "-createbss",
+            "-srcdir", "src/main/resources",
+            "-outdir", "build/resources/main"
+        ]
+    }
+}
+
+processResources.finalizedBy(compileCSS)
+
 compileJava {  
     options.encoding = "UTF-8"
 }

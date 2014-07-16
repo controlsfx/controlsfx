@@ -75,7 +75,7 @@ task downloadTranslations << {
     } else {
         javaexec {
             main = 'impl.org.controlsfx.transifex.Transifex'
-            classpath = sourceSets.main.runtimeClasspath
+            classpath = sourceSets.main.runtimeClasspath + files('build/classes/groovy')
             systemProperty 'transifex.username', transifex_username
             systemProperty 'transifex.password', transifex_password
         }
@@ -100,7 +100,11 @@ task compileCSS << {
 
 processResources.finalizedBy(compileCSS)
 
-compileJava {  
+compileGroovy {
+    destinationDir = file('build/classes/groovy')
+}
+
+compileJava {
     options.encoding = "UTF-8"
 }
 
@@ -132,7 +136,6 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
-    exclude 'impl/org/controlsfx/transifex/**'
 
     manifest { // the manifest of the default jar is of type OsgiManifest
         attributes (\

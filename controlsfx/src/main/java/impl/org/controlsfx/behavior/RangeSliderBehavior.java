@@ -297,9 +297,16 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     
       public void confirmRange() {
         RangeSlider slider = (RangeSlider) getControl();
-         
+
         slider.setLowValueChanging(false);
+        if (slider.isSnapToTicks()) {
+            slider.setLowValue(snapValueToTicks(slider.getLowValue()));
+        }
         slider.setHighValueChanging(false);
+        if (slider.isSnapToTicks()) {
+            slider.setHighValue(snapValueToTicks(slider.getHighValue()));
+        }
+
     }
     
     public static class RangeSliderKeyBinding extends OrientedKeyBinding {

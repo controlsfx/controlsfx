@@ -230,7 +230,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setCellGraphic(cell);
         
         Optional<String> tooltip = cell.getTooltip();
-        if(tooltip.isPresent() && !tooltip.get().trim().equals("")){
+        if(tooltip.isPresent() && !tooltip.get().trim().isEmpty()){
             /**
             * Ensure that modification of ToolTip are set on the JFX thread
             * because an exception can be thrown otherwise. 

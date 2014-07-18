@@ -76,6 +76,8 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -398,13 +400,13 @@ public class SpreadsheetView extends Control {
             @Override
             public void handle(KeyEvent keyEvent) {
                 // Copy
-                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
-                    copyClipboard();
-                // Paste
-                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
-                    pasteClipboard();
+//                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
+//                    copyClipboard();
+//                // Paste
+//                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
+//                    pasteClipboard();
                 // Go to the next row
-                else if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
+                if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
@@ -1061,6 +1063,7 @@ public class SpreadsheetView extends Control {
         final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy")));
         copyItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("copySpreadsheetView.png"))));
+        copyItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         copyItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -1071,6 +1074,7 @@ public class SpreadsheetView extends Control {
         final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste")));
         pasteItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("pasteSpreadsheetView.png"))));
+        pasteItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
         pasteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {

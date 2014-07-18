@@ -128,7 +128,8 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
 }
 
 /* We do not want to show the textfield, we want an Excel visual */
-CellView > .text-input.text-field{
+CellView > .text-input.text-field,
+CellView > .text-input.text-area{
     -fx-padding : 0 0 0 -0.2em;
     -fx-background-color: transparent;
 }

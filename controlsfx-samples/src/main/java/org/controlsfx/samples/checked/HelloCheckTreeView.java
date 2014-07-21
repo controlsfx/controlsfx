@@ -36,22 +36,28 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
+import org.controlsfx.control.CheckModel;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.samples.Utils;
 
 public class HelloCheckTreeView extends ControlsFXSample {
     
-    private Label checkedItemsLabel;
-    private Label selectedItemsLabel;
+    private final Label checkedItemsLabel = new Label();
+    private final Label selectedItemsLabel = new Label();
     
     private CheckTreeView<String> checkTreeView;
+    
+    private CheckBoxTreeItem<String> treeItem_Jonathan = new CheckBoxTreeItem<>("Jonathan");
+    private CheckBoxTreeItem<String> treeItem_Eugene = new CheckBoxTreeItem<>("Eugene");
+    private CheckBoxTreeItem<String> treeItem_Henry = new CheckBoxTreeItem<>("Henry");
+    private CheckBoxTreeItem<String> treeItem_Samir = new CheckBoxTreeItem<>("Samir");
 
     @Override public String getSampleName() {
         return "CheckTreeView";
@@ -74,10 +80,13 @@ public class HelloCheckTreeView extends ControlsFXSample {
         CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>("Root");
         root.setExpanded(true);
         root.getChildren().addAll(
-                new CheckBoxTreeItem<String>("Jonathan"),
-                new CheckBoxTreeItem<String>("Eugene"),
-                new CheckBoxTreeItem<String>("Henri"),
-                new CheckBoxTreeItem<String>("Samir"));
+                treeItem_Jonathan,
+                treeItem_Eugene,
+                treeItem_Henry,
+                treeItem_Samir);
+        
+        // lets check Eugene to make sure that it shows up in the tree
+        treeItem_Eugene.setSelected(true);
         
         // CheckListView
         checkTreeView = new CheckTreeView<>(root);
@@ -87,9 +96,21 @@ public class HelloCheckTreeView extends ControlsFXSample {
                 updateText(selectedItemsLabel, c.getList());
             }
         });
-        checkTreeView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
-                updateText(checkedItemsLabel, c.getList());
+        
+        checkTreeView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<TreeItem<String>>() {
+            @Override public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> change) {
+                updateText(checkedItemsLabel, change.getList());
+                
+                while (change.next()) {
+                    System.out.println("============================================");
+                    System.out.println("Change: " + change);
+                    System.out.println("Added sublist " + change.getAddedSubList());
+                    System.out.println("Removed sublist " + change.getRemoved());
+                    System.out.println("List " + change.getList());
+                    System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
+                            + change.wasReplaced() + " Updated " + change.wasUpdated());
+                    System.out.println("============================================");
+                }
             }
         });
         
@@ -109,31 +130,20 @@ public class HelloCheckTreeView extends ControlsFXSample {
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
         grid.add(label1, 0, row);
-        checkedItemsLabel = new Label();
         grid.add(checkedItemsLabel, 1, row++);
-        updateText(checkedItemsLabel, null);
+        updateText(checkedItemsLabel, checkTreeView.getCheckModel().getCheckedItems());
         
         Label label2 = new Label("Selected items: ");
         label2.getStyleClass().add("property");
         grid.add(label2, 0, row);
-        selectedItemsLabel = new Label();
         grid.add(selectedItemsLabel, 1, row++);
-        updateText(selectedItemsLabel, null);
+        updateText(selectedItemsLabel, checkTreeView.getSelectionModel().getSelectedItems());
         
         Label checkItem2Label = new Label("Check 'Jonathan': ");
         checkItem2Label.getStyleClass().add("property");
         grid.add(checkItem2Label, 0, row);
         final CheckBox checkItem2Btn = new CheckBox();
-        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                SelectionModel<TreeItem<String>> cm = checkTreeView.getCheckModel();
-                if (cm.isSelected(1)) {
-                    cm.clearSelection(1);
-                } else {
-                    cm.select(1);
-                }
-            }
-        });
+        checkItem2Btn.selectedProperty().bindBidirectional(treeItem_Jonathan.selectedProperty());
         grid.add(checkItem2Btn, 1, row++);
         
         return grid;

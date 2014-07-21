@@ -44,6 +44,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckListView;
+import org.controlsfx.control.CheckModel;
 import org.controlsfx.samples.Utils;
 
 public class HelloCheckListView extends ControlsFXSample {
@@ -83,9 +84,20 @@ public class HelloCheckListView extends ControlsFXSample {
                 updateText(selectedItemsLabel, c.getList());
             }
         });
-        checkListView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
-                updateText(checkedItemsLabel, c.getList());
+        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
+            @Override public void onChanged(ListChangeListener.Change<? extends String> change) {
+                updateText(checkedItemsLabel, change.getList());
+                
+                while (change.next()) {
+                    System.out.println("============================================");
+                    System.out.println("Change: " + change);
+                    System.out.println("Added sublist " + change.getAddedSubList());
+                    System.out.println("Removed sublist " + change.getRemoved());
+                    System.out.println("List " + change.getList());
+                    System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
+                            + change.wasReplaced() + " Updated " + change.wasUpdated());
+                    System.out.println("============================================");
+                }
             }
         });
         
@@ -123,11 +135,11 @@ public class HelloCheckListView extends ControlsFXSample {
         final CheckBox checkItem2Btn = new CheckBox();
         checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                SelectionModel<String> cm = checkListView.getCheckModel();
-                if (cm.isSelected(2)) {
-                    cm.clearSelection(2);
+                CheckModel<String> cm = checkListView.getCheckModel();
+                if (cm.isChecked(2)) {
+                    cm.clearCheck(2);
                 } else {
-                    cm.select(2);
+                    cm.check(2);
                 }
             }
         });

@@ -143,7 +143,7 @@ public class CheckTreeView<T> extends TreeView<T> {
      **************************************************************************/
 
     // --- Check Model
-    private ObjectProperty<MultipleSelectionModel<TreeItem<T>>> checkModel = 
+    private ObjectProperty<CheckModel<TreeItem<T>>> checkModel = 
             new SimpleObjectProperty<>(this, "checkModel"); //$NON-NLS-1$
     
     /**
@@ -154,14 +154,14 @@ public class CheckTreeView<T> extends TreeView<T> {
      * selection model concept, which is used in the TreeView control to 
      * represent the selection state of each row).. 
      */
-    public final void setCheckModel(MultipleSelectionModel<TreeItem<T>> value) {
+    public final void setCheckModel(CheckModel<TreeItem<T>> value) {
         checkModelProperty().set(value);
     }
 
     /**
      * Returns the currently installed check model.
      */
-    public final MultipleSelectionModel<TreeItem<T>> getCheckModel() {
+    public final CheckModel<TreeItem<T>> getCheckModel() {
         return checkModel == null ? null : checkModel.get();
     }
 
@@ -171,7 +171,7 @@ public class CheckTreeView<T> extends TreeView<T> {
      * which items have been checked by the user. Note that it has a generic
      * type that must match the type of the CheckTreeView itself.
      */
-    public final ObjectProperty<MultipleSelectionModel<TreeItem<T>>> checkModelProperty() {
+    public final ObjectProperty<CheckModel<TreeItem<T>>> checkModelProperty() {
         return checkModel;
     }
     
@@ -222,12 +222,22 @@ public class CheckTreeView<T> extends TreeView<T> {
                     
                     final int index = getItemIndex(treeItem);
                     if (treeItem.isSelected() && ! treeItem.isIndeterminate()) {
-                        select(index);
+                        check(index);
                     } else { 
-                        clearSelection(index);
+                        clearCheck(index);
                     }
                 }
             });
+            
+            // we should reset the check model and then update the checked items
+            // based on the currently checked items in the tree view
+            clearChecks();
+            for (int i = 0; i < treeView.getExpandedItemCount(); i++) {
+                CheckBoxTreeItem<T> treeItem = (CheckBoxTreeItem<T>) treeView.getTreeItem(i);
+                if (treeItem.isSelected() && ! treeItem.isIndeterminate()) {
+                    check(i);
+                }
+            }
         }
         
         

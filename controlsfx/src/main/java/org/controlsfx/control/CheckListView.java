@@ -167,7 +167,7 @@ public class CheckListView<T> extends ListView<T> {
      **************************************************************************/
 
     // --- Check Model
-    private ObjectProperty<CheckModel<T>> checkModel = 
+    private ObjectProperty<IndexedCheckModel<T>> checkModel = 
             new SimpleObjectProperty<>(this, "checkModel"); //$NON-NLS-1$
     
     /**
@@ -178,14 +178,14 @@ public class CheckListView<T> extends ListView<T> {
      * selection model concept, which is used in the ListView control to 
      * represent the selection state of each row).. 
      */
-    public final void setCheckModel(CheckModel<T> value) {
+    public final void setCheckModel(IndexedCheckModel<T> value) {
         checkModelProperty().set(value);
     }
 
     /**
      * Returns the currently installed check model.
      */
-    public final CheckModel<T> getCheckModel() {
+    public final IndexedCheckModel<T> getCheckModel() {
         return checkModel == null ? null : checkModel.get();
     }
 
@@ -195,7 +195,7 @@ public class CheckListView<T> extends ListView<T> {
      * which items have been checked by the user. Note that it has a generic
      * type that must match the type of the CheckListView itself.
      */
-    public final ObjectProperty<CheckModel<T>> checkModelProperty() {
+    public final ObjectProperty<IndexedCheckModel<T>> checkModelProperty() {
         return checkModel;
     }
     

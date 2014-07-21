@@ -26,9 +26,15 @@
  */
 package org.controlsfx.control;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
@@ -113,7 +119,7 @@ public class CheckTreeView<T> extends TreeView<T> {
     public CheckTreeView(final CheckBoxTreeItem<T> root) {
         super(root);
         
-        setCheckModel(new CheckTreeViewBitSetCheckModel<T>(this));
+        setCheckModel(new CheckTreeViewCheckModel<T>(this));
         setCellFactory(CheckBoxTreeCell.<T>forTreeView());
     }
     
@@ -192,7 +198,7 @@ public class CheckTreeView<T> extends TreeView<T> {
      * 
      **************************************************************************/
     
-    private static class CheckTreeViewBitSetCheckModel<T> extends CheckBitSetModelBase<TreeItem<T>> {
+    private static class CheckTreeViewCheckModel<T> implements CheckModel<TreeItem<T>> {// extends CheckBitSetModelBase<TreeItem<T>> {
         
         /***********************************************************************
          *                                                                     *
@@ -203,6 +209,8 @@ public class CheckTreeView<T> extends TreeView<T> {
         private final CheckTreeView<T> treeView;
         private final TreeItem<T> root;
         
+        private ObservableList<TreeItem<T>> checkedItems = FXCollections.observableArrayList();
+        
         
         
         /***********************************************************************
@@ -211,20 +219,17 @@ public class CheckTreeView<T> extends TreeView<T> {
          *                                                                     *
          **********************************************************************/
         
-        CheckTreeViewBitSetCheckModel(final CheckTreeView<T> treeView) {
-            super(null);
-            
+        CheckTreeViewCheckModel(final CheckTreeView<T> treeView) {
             this.treeView = treeView;
             this.root = treeView.getRoot();
             this.root.addEventHandler(CheckBoxTreeItem.<T>checkBoxSelectionChangedEvent(), new EventHandler<TreeModificationEvent<T>>() {
                 public void handle(TreeModificationEvent<T> e) {
                     CheckBoxTreeItem<T> treeItem = e.getTreeItem();
                     
-                    final int index = getItemIndex(treeItem);
-                    if (treeItem.isSelected() && ! treeItem.isIndeterminate()) {
-                        check(index);
+                    if (treeItem.isSelected()) { // && ! treeItem.isIndeterminate()) {
+                        check(treeItem);
                     } else { 
-                        clearCheck(index);
+                        clearCheck(treeItem);
                     }
                 }
             });
@@ -235,7 +240,7 @@ public class CheckTreeView<T> extends TreeView<T> {
             for (int i = 0; i < treeView.getExpandedItemCount(); i++) {
                 CheckBoxTreeItem<T> treeItem = (CheckBoxTreeItem<T>) treeView.getTreeItem(i);
                 if (treeItem.isSelected() && ! treeItem.isIndeterminate()) {
-                    check(i);
+                    check(treeItem);
                 }
             }
         }
@@ -248,33 +253,71 @@ public class CheckTreeView<T> extends TreeView<T> {
          *                                                                     *
          **********************************************************************/
 
-        @Override public TreeItem<T> getItem(int index) {
-            return treeView.getTreeItem(index);
-        }
-        
         @Override public int getItemCount() {
             return treeView.getExpandedItemCount();
         }
-        
-        @Override public int getItemIndex(TreeItem<T> item) {
-            return treeView.getRow(item);
+
+
+        // TODO make read-only
+        @Override public ObservableList<TreeItem<T>> getCheckedItems() {
+            return checkedItems;
         }
-        
-        @Override BooleanProperty getItemBooleanProperty(TreeItem<T> item) {
-            if (item == null) return null;
-            return ((CheckBoxTreeItem<T>)item).selectedProperty();
+
+        @Override public void checkAll() {
+            iterateOverTree(this::check);
+        }
+
+        @Override public void clearCheck(TreeItem<T> item) {
+            if (item instanceof CheckBoxTreeItem) {
+                ((CheckBoxTreeItem<T>)item).setSelected(false);
+            }
+            checkedItems.remove(item);
+        }
+
+        @Override public void clearChecks() {
+            checkedItems.stream().forEach(this::clearCheck);
+        }
+
+        @Override public boolean isEmpty() {
+            return checkedItems.isEmpty();
+        }
+
+        @Override public boolean isChecked(TreeItem<T> item) {
+            return checkedItems.contains(item);
+        }
+
+        @Override public void check(TreeItem<T> item) {
+            if (item instanceof CheckBoxTreeItem) {
+                ((CheckBoxTreeItem<T>)item).setSelected(true);
+            }
+            if (!checkedItems.contains(item)) {
+                checkedItems.add(item);
+            }
         }
         
         
         
         /***********************************************************************
          *                                                                     *
-         * Overriding public API                                               *
+         * Private Implementation                                              *
          *                                                                     *
          **********************************************************************/
         
-        @Override protected void updateMap() {
-            // no-op
+        private void iterateOverTree(Consumer<TreeItem<T>> consumer) {
+            processNode(consumer, root);
+        }
+        
+        private void processNode(Consumer<TreeItem<T>> consumer, TreeItem<T> node) {
+            if (node == null) return;
+            consumer.accept(node);
+            processChildren(consumer, node.getChildren());
+        }
+        
+        private void processChildren(Consumer<TreeItem<T>> consumer, List<TreeItem<T>> children) {
+            if (children == null) return;
+            for (TreeItem<T> child : children) {
+                processNode(consumer, child);
+            }
         }
     }
 }

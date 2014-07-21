@@ -43,6 +43,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckModel;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.samples.Utils;
 
@@ -52,6 +53,11 @@ public class HelloCheckTreeView extends ControlsFXSample {
     private final Label selectedItemsLabel = new Label();
     
     private CheckTreeView<String> checkTreeView;
+    
+    private CheckBoxTreeItem<String> treeItem_Jonathan = new CheckBoxTreeItem<>("Jonathan");
+    private CheckBoxTreeItem<String> treeItem_Eugene = new CheckBoxTreeItem<>("Eugene");
+    private CheckBoxTreeItem<String> treeItem_Henry = new CheckBoxTreeItem<>("Henry");
+    private CheckBoxTreeItem<String> treeItem_Samir = new CheckBoxTreeItem<>("Samir");
 
     @Override public String getSampleName() {
         return "CheckTreeView";
@@ -74,13 +80,13 @@ public class HelloCheckTreeView extends ControlsFXSample {
         CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>("Root");
         root.setExpanded(true);
         root.getChildren().addAll(
-                new CheckBoxTreeItem<String>("Jonathan"),
-                new CheckBoxTreeItem<String>("Eugene"),
-                new CheckBoxTreeItem<String>("Henri"),
-                new CheckBoxTreeItem<String>("Samir"));
+                treeItem_Jonathan,
+                treeItem_Eugene,
+                treeItem_Henry,
+                treeItem_Samir);
         
         // lets check Eugene to make sure that it shows up in the tree
-        ((CheckBoxTreeItem<String>)root.getChildren().get(1)).setSelected(true);
+        treeItem_Eugene.setSelected(true);
         
         // CheckListView
         checkTreeView = new CheckTreeView<>(root);
@@ -137,16 +143,7 @@ public class HelloCheckTreeView extends ControlsFXSample {
         checkItem2Label.getStyleClass().add("property");
         grid.add(checkItem2Label, 0, row);
         final CheckBox checkItem2Btn = new CheckBox();
-        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                CheckModel<TreeItem<String>> cm = checkTreeView.getCheckModel();
-                if (cm.isChecked(1)) {
-                    cm.clearCheck(1);
-                } else {
-                    cm.check(1);
-                }
-            }
-        });
+        checkItem2Btn.selectedProperty().bindBidirectional(treeItem_Jonathan.selectedProperty());
         grid.add(checkItem2Btn, 1, row++);
         
         return grid;

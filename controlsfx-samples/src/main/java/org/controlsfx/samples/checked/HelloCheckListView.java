@@ -44,7 +44,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckListView;
-import org.controlsfx.control.CheckModel;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.samples.Utils;
 
 public class HelloCheckListView extends ControlsFXSample {
@@ -133,7 +133,7 @@ public class HelloCheckListView extends ControlsFXSample {
         final CheckBox checkItem2Btn = new CheckBox();
         checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                CheckModel<String> cm = checkListView.getCheckModel();
+                IndexedCheckModel<String> cm = checkListView.getCheckModel();
                 if (cm.isChecked(2)) {
                     cm.clearCheck(2);
                 } else {

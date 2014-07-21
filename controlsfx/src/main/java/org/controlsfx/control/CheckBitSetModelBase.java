@@ -41,7 +41,7 @@ import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 
 // not public API
-abstract class CheckBitSetModelBase<T> implements CheckModel<T> { // extends MultipleSelectionModel<T> {
+abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> { 
     
     /***********************************************************************
      *                                                                     *
@@ -211,6 +211,12 @@ abstract class CheckBitSetModelBase<T> implements CheckModel<T> { // extends Mul
             check(indices[i]);
         }
     }
+    
+    /** {@inheritDoc} */
+    @Override public void clearCheck(T item) {
+        int index = getItemIndex(item);
+        clearCheck(index);        
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -236,6 +242,12 @@ abstract class CheckBitSetModelBase<T> implements CheckModel<T> { // extends Mul
     @Override
     public boolean isEmpty() {
         return checkedIndices.isEmpty();
+    }
+    
+    /** {@inheritDoc} */
+    @Override public boolean isChecked(T item) {
+        int index = getItemIndex(item);
+        return isChecked(index);
     }
 
     /** {@inheritDoc} */

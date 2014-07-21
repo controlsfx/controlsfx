@@ -41,7 +41,7 @@ import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckComboBox;
-import org.controlsfx.control.CheckModel;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.samples.Utils;
 
 public class HelloCheckComboBox extends ControlsFXSample {
@@ -126,7 +126,7 @@ public class HelloCheckComboBox extends ControlsFXSample {
         final CheckBox checkItem2Btn = new CheckBox();
         checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                CheckModel<String> cm = checkComboBox.getCheckModel();
+                IndexedCheckModel<String> cm = checkComboBox.getCheckModel();
                 if (cm.isChecked(2)) {
                     cm.clearCheck(2);
                 } else {

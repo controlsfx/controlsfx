@@ -126,6 +126,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      */
     protected void showPopup(){
         autoCompletionPopup.show(completionTarget);
+        autoCompletionPopup.selectFirstSuggestion();
     }
 
     /**

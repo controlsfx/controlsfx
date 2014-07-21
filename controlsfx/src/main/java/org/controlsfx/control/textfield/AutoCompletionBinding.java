@@ -1,24 +1,17 @@
 package org.controlsfx.control.textfield;
 
-import impl.org.controlsfx.skin.AutoCompletePopup;
-import impl.org.controlsfx.skin.AutoCompletePopup.SuggestionEvent;
-
-import java.util.Collection;
 import com.sun.javafx.event.EventHandlerManager;
-
+import impl.org.controlsfx.skin.AutoCompletePopup;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventDispatchChain;
-import javafx.event.EventHandler;
-import javafx.event.EventTarget;
-import javafx.event.EventType;
+import javafx.event.*;
 import javafx.scene.Node;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+
+import java.util.Collection;
 
 /**
  * The AutoCompletionBinding is the abstract base class of all auto-completion bindings.
@@ -69,18 +62,15 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         this.autoCompletionPopup = new AutoCompletePopup<T>();
         this.autoCompletionPopup.setConverter(converter);
 
-        autoCompletionPopup.setOnSuggestion(new EventHandler<AutoCompletePopup
-                .SuggestionEvent<T>>() {
-            @Override public void handle(SuggestionEvent<T> sce) {
-                try{
-                    setIgnoreInputChanges(true);
-                    completeUserInput(sce.getSuggestion());
-                    fireAutoCompletion(sce.getSuggestion());
-                    hidePopup();
-                }finally{
-                    // Ensure that ignore is always set back to false
-                    setIgnoreInputChanges(false);
-                }
+        autoCompletionPopup.setOnSuggestion(sce -> {
+            try{
+                setIgnoreInputChanges(true);
+                completeUserInput(sce.getSuggestion());
+                fireAutoCompletion(sce.getSuggestion());
+                hidePopup();
+            }finally{
+                // Ensure that ignore is always set back to false
+                setIgnoreInputChanges(false);
             }
         });
     }
@@ -237,16 +227,13 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
             if(provider != null){
                 final Collection<T> fetchedSuggestions = provider.call(this);
                 if(!isCancelled()){
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
-                                autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
-                                showPopup();
-                            }else{
-                                // No suggestions found, so hide the popup
-                                hidePopup();
-                            }
+                    Platform.runLater(() -> {
+                        if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
+                            autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
+                            showPopup();
+                        }else{
+                            // No suggestions found, so hide the popup
+                            hidePopup();
                         }
                     });
                 }

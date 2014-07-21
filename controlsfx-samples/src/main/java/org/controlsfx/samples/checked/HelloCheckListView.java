@@ -49,8 +49,8 @@ import org.controlsfx.samples.Utils;
 
 public class HelloCheckListView extends ControlsFXSample {
     
-    private Label checkedItemsLabel;
-    private Label selectedItemsLabel;
+    private final Label checkedItemsLabel = new Label();
+    private final Label selectedItemsLabel = new Label();
     
     private CheckListView<String> checkListView;
     
@@ -117,14 +117,12 @@ public class HelloCheckListView extends ControlsFXSample {
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
         grid.add(label1, 0, 0);
-        checkedItemsLabel = new Label();
         grid.add(checkedItemsLabel, 1, row++);
         updateText(checkedItemsLabel, null);
         
         Label label2 = new Label("Selected items: ");
         label2.getStyleClass().add("property");
         grid.add(label2, 0, 1);
-        selectedItemsLabel = new Label();
         grid.add(selectedItemsLabel, 1, row++);
         updateText(selectedItemsLabel, null);
         

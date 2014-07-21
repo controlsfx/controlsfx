@@ -48,8 +48,8 @@ import org.controlsfx.samples.Utils;
 
 public class HelloCheckTreeView extends ControlsFXSample {
     
-    private Label checkedItemsLabel = new Label();
-    private Label selectedItemsLabel = new Label();
+    private final Label checkedItemsLabel = new Label();
+    private final Label selectedItemsLabel = new Label();
     
     private CheckTreeView<String> checkTreeView;
 

@@ -46,7 +46,7 @@ import org.controlsfx.samples.Utils;
 
 public class HelloCheckComboBox extends ControlsFXSample {
     
-    private Label checkedItemsLabel;
+    private final Label checkedItemsLabel = new Label();
     private CheckComboBox<String> checkComboBox;
     
     @Override public String getSampleName() {
@@ -117,7 +117,6 @@ public class HelloCheckComboBox extends ControlsFXSample {
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
         grid.add(label1, 0, 0);
-        checkedItemsLabel = new Label();
         grid.add(checkedItemsLabel, 1, row++);
         updateText(checkedItemsLabel, null);
         

@@ -144,7 +144,7 @@ public class AutoCompletePopup<T> extends PopupControl{
         if(skin instanceof AutoCompletePopupSkin){
             AutoCompletePopupSkin au = (AutoCompletePopupSkin)skin;
             ListView li = (ListView)au.getNode();
-            if(!li.getSelectionModel().isEmpty()){
+            if(li.getItems() != null && !li.getItems().isEmpty()){
                 li.getSelectionModel().select(0);
             }
         }

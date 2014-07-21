@@ -114,13 +114,13 @@ public class CheckListView<T> extends ListView<T> {
      * @param items The items to display within the CheckListView.
      */
     public CheckListView(ObservableList<T> items) {
+        super(items);
         this.itemBooleanMap = new HashMap<>();
         
         setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
         itemsProperty().addListener(ov -> {
             setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
         });
-        
         
         setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             public ListCell<T> call(ListView<T> listView) {

@@ -224,8 +224,6 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         for( int index = 0; index < checkedIndices.length(); index++) {
             clearCheck(index);
         }
-        setSelectedIndex(-1);
-        setSelectedItem(null);
     }
 
     /** {@inheritDoc} */
@@ -261,7 +259,6 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
     public void check(int index) {
         if (index < 0 || index >= getItemCount()) return;
         checkedIndices.set(index);
-        setSelectedIndex(index);
         final int changeIndex = checkedIndicesList.indexOf(index);
         checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, checkedIndicesList));
     }

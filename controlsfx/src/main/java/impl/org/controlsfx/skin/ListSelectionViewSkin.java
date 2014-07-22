@@ -27,7 +27,6 @@
 package impl.org.controlsfx.skin;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -60,13 +59,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
 
         getChildren().add(gridPane);
 
-        InvalidationListener updateListener = new InvalidationListener() {
-
-            @Override
-            public void invalidated(Observable observable) {
-                updateView();
-            }
-        };
+        InvalidationListener updateListener = o -> updateView();
 
         view.sourceHeaderProperty().addListener(updateListener);
         view.sourceFooterProperty().addListener(updateListener);

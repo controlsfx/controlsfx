@@ -54,10 +54,14 @@ import javafx.scene.layout.HBox;
  * "move" buttons between the two lists. Each list can be decorated with a
  * header and a footer node. The default header nodes are simply two labels
  * ("Available", "Selected"). The two footer nodes are displaying two buttons
- * each for easy selection / deselection of all items. <h2>Code Example</h2>
+ * each for easy selection / deselection of all items. 
+ *
+ * <h3>Screenshot</h3> 
+ * <center><img src="list-selection-view.png" /></center>
  * 
+ * <h3>Code Example</h3>
  * <pre>
- * DualListView&lt;String&gt; view = new DualListView&lt;&gt;();
+ * ListSelectionView&lt;String&gt; view = new ListSelectionView&lt;&gt;();
  * view.getSourceListView().getItems().add(&quot;One&quot;, &quot;Two&quot;, &quot;Three&quot;);
  * view.getTargetListView().getItems().add(&quot;Four&quot;, &quot;Five&quot;);
  * </pre>
@@ -66,9 +70,8 @@ import javafx.scene.layout.HBox;
  *            the type of the list items
  */
 public class ListSelectionView<T> extends Control {
-    // TODO: add an image to the javadocs
 
-    private static final String DEFAULT_STYLECLASS = "dual-list-view";
+    private static final String DEFAULT_STYLECLASS = "list-selection-view";
 
     private ListView<T> sourceListView;
 

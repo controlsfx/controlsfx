@@ -44,6 +44,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.controlsfx.control.ListSelectionView;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.GlyphFont;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private GridPane gridPane;
@@ -52,9 +55,12 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private Button moveToTargetAll;
     private Button moveToSourceAll;
     private Button moveToSource;
+    private GlyphFont fontAwesome;
 
     public ListSelectionViewSkin(ListSelectionView<T> view) {
         super(view);
+
+        this.fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
         gridPane = createGridPane();
         buttonBox = createButtonBox();
@@ -122,11 +128,12 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         VBox box = new VBox(5);
         box.setFillWidth(true);
 
-        // TODO: use controlsfx glyps for button graphics
-        moveToTarget = new Button(">");
-        moveToTargetAll = new Button(">>");
-        moveToSource = new Button("<");
-        moveToSourceAll = new Button("<<");
+        moveToTarget = new Button("", FontAwesome.Glyph.ANGLE_LEFT.create());
+        moveToTargetAll = new Button("",
+                FontAwesome.Glyph.DOUBLE_ANGLE_LEFT.create());
+        moveToSource = new Button("", FontAwesome.Glyph.ANGLE_RIGHT.create());
+        moveToSourceAll = new Button("",
+                FontAwesome.Glyph.DOUBLE_ANGLE_RIGHT.create());
 
         moveToTarget.getStyleClass().add("move-to-target-button");
         moveToTargetAll.getStyleClass().add("move-to-target-all-button");

@@ -369,7 +369,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * if the hidden sides can be made visible by moving the mouse to the
      * corresponding side of the pane into the trigger distance.
      * 
-     * @return mouse trigger enabled property
+     * @return mouse enabled property
      */
     public final BooleanProperty mouseEnabledProperty() {
         return mouseEnabled;
@@ -378,7 +378,7 @@ public class HiddenSidesPane extends ControlsFXControl {
     /**
      * Returns the value of the mouse enabled property
      * 
-     * @return if the mouse trigger is enabled
+     * @return if the mouse is enabled
      */
     public final boolean isMouseEnabled() {
         return mouseEnabled.get();
@@ -387,11 +387,11 @@ public class HiddenSidesPane extends ControlsFXControl {
     /**
      * Set the value of mouse enabled property
      * 
-     * @param pMouseTriggerEnabled
-     *            enable or disable the mouse trigger
+     * @param pEnabled
+     *            enable or disable the mouse
      */
-    public final void setMouseEnabled(boolean pMouseTriggerEnabled) {
-        mouseEnabled.set(pMouseTriggerEnabled);
+    public final void setMouseEnabled(boolean pEnabled) {
+        mouseEnabled.set(pEnabled);
     }
 
     // fade in animation delay
@@ -400,9 +400,8 @@ public class HiddenSidesPane extends ControlsFXControl {
             this, "delay", Duration.millis(300));
 
     /**
-     * Returns the fade in animation delay property. The value of this property
-     * determines the delay before the hidden side fade in animation starts to
-     * play.
+     * Returns the delay property. The value of this property determines the
+     * delay before the hidden side fade in animation starts to play.
      * 
      * @return animation delay property
      */
@@ -411,7 +410,7 @@ public class HiddenSidesPane extends ControlsFXControl {
     }
 
     /**
-     * Returns the fade in animation delay
+     * Returns the slide in animation delay
      * 
      * @return animation delay
      */
@@ -420,13 +419,13 @@ public class HiddenSidesPane extends ControlsFXControl {
     }
 
     /**
-     * Set the fade in animation delay
+     * Set the slide in animation delay
      * 
-     * @param pAnimationDelay
+     * @param pDelay
      *            animation delay
      */
-    public final void setDelay(Duration pAnimationDelay) {
-        delay.set(pAnimationDelay);
+    public final void setDelay(Duration pDelay) {
+        delay.set(pDelay);
     }
 
     // fade in / fade out duration
@@ -456,10 +455,10 @@ public class HiddenSidesPane extends ControlsFXControl {
     /**
      * Set the animation delay
      * 
-     * @param pAnimationDelay
-     *            animation delay
+     * @param pAnimationDuration
+     *            animation duration
      */
-    public final void setAnimationDuration(Duration pAnimationDelay) {
-        animationDuration.set(pAnimationDelay);
+    public final void setAnimationDuration(Duration pAnimationDuration) {
+        animationDuration.set(pAnimationDuration);
     }
 }

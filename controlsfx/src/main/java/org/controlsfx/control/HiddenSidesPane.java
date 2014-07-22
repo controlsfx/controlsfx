@@ -387,14 +387,14 @@ public class HiddenSidesPane extends ControlsFXControl {
     /**
      * Set the value of mouse enabled property
      * 
-     * @param pEnabled
+     * @param enabled
      *            enable or disable the mouse
      */
-    public final void setMouseEnabled(boolean pEnabled) {
-        mouseEnabled.set(pEnabled);
+    public final void setMouseEnabled(boolean enabled) {
+        mouseEnabled.set(enabled);
     }
 
-    // fade in animation delay
+    // slide in animation delay
 
     private final ObjectProperty<Duration> delay = new SimpleObjectProperty<Duration>(
             this, "delay", Duration.millis(300));
@@ -421,14 +421,14 @@ public class HiddenSidesPane extends ControlsFXControl {
     /**
      * Set the slide in animation delay
      * 
-     * @param pDelay
+     * @param duration
      *            animation delay
      */
-    public final void setDelay(Duration pDelay) {
-        delay.set(pDelay);
+    public final void setDelay(Duration duration) {
+        delay.set(duration);
     }
 
-    // fade in / fade out duration
+    // slide in / slide out duration
 
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<Duration>(
             this, "animationDuration", Duration.millis(200));
@@ -455,10 +455,10 @@ public class HiddenSidesPane extends ControlsFXControl {
     /**
      * Set the animation delay
      * 
-     * @param pAnimationDuration
+     * @param duration
      *            animation duration
      */
-    public final void setAnimationDuration(Duration pAnimationDuration) {
-        animationDuration.set(pAnimationDuration);
+    public final void setAnimationDuration(Duration duration) {
+        animationDuration.set(duration);
     }
 }

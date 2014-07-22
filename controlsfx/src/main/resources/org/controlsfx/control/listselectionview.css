@@ -1,0 +1,13 @@
+.dual-list-view {
+	-fx-padding: 10px;	
+}
+
+.dual-list-view > .grid-pane {
+	-fx-vgap: 10px;
+	-fx-hgap: 10px;
+}
+
+.dual-list-view > .grid-pane > .list-header-label {
+	-fx-font-size: 1.0em;
+	-fx-font-weight: bold;
+}

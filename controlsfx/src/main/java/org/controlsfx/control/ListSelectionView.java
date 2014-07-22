@@ -28,6 +28,8 @@ package org.controlsfx.control;
 
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
+import static javafx.scene.input.MouseButton.PRIMARY;
+import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
 
 import java.util.ArrayList;
@@ -35,16 +37,12 @@ import java.util.List;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 /**
@@ -54,12 +52,14 @@ import javafx.scene.layout.HBox;
  * "move" buttons between the two lists. Each list can be decorated with a
  * header and a footer node. The default header nodes are simply two labels
  * ("Available", "Selected"). The two footer nodes are displaying two buttons
- * each for easy selection / deselection of all items. 
+ * each for easy selection / deselection of all items.
  *
- * <h3>Screenshot</h3> 
+ * <h3>Screenshot</h3>
+ * 
  * <center><img src="list-selection-view.png" /></center>
  * 
  * <h3>Code Example</h3>
+ * 
  * <pre>
  * ListSelectionView&lt;String&gt; view = new ListSelectionView&lt;&gt;();
  * view.getSourceListView().getItems().add(&quot;One&quot;, &quot;Two&quot;, &quot;Three&quot;);
@@ -104,25 +104,17 @@ public class ListSelectionView<T> extends Control {
         setSourceFooter(createFooterControl(sourceListView));
         setTargetFooter(createFooterControl(targetListView));
 
-        sourceListView.addEventHandler(MouseEvent.MOUSE_CLICKED,
-                new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent event) {
-                        if (event.getButton() == MouseButton.PRIMARY
-                                && event.getClickCount() == 2) {
-                            moveToTarget();
-                        }
-                    };
-                });
+        sourceListView.addEventHandler(MOUSE_CLICKED, event -> {
+            if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
+                moveToTarget();
+            }
+        });
 
-        targetListView.addEventHandler(MouseEvent.MOUSE_CLICKED,
-                new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent event) {
-                        if (event.getButton() == MouseButton.PRIMARY
-                                && event.getClickCount() == 2) {
-                            moveToSource();
-                        }
-                    };
-                });
+        targetListView.addEventHandler(MOUSE_CLICKED, event -> {
+            if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
+                moveToSource();
+            }
+        });
     }
 
     protected Skin<ListSelectionView<T>> createDefaultSkin() {
@@ -184,23 +176,12 @@ public class ListSelectionView<T> extends Control {
     private Node createFooterControl(final ListView<T> view) {
         Button selectAll = new Button("Select All");
         selectAll.getStyleClass().add("select-all-button");
-        selectAll.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                view.getSelectionModel().selectAll();
-            }
-        });
+        selectAll.setOnAction(evt -> view.getSelectionModel().selectAll());
 
         Button deselectAll = new Button("Deselect All");
         deselectAll.getStyleClass().add("deselect-all-button");
-        deselectAll.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                view.getSelectionModel().clearSelection();
-            }
-        });
+        deselectAll.setOnAction(evt -> view.getSelectionModel()
+                .clearSelection());
 
         HBox box = new HBox(10);
         box.getChildren().addAll(selectAll, deselectAll);

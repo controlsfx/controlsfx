@@ -29,8 +29,6 @@ package impl.org.controlsfx.skin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -45,8 +43,6 @@ import javafx.scene.layout.VBox;
 
 import org.controlsfx.control.ListSelectionView;
 import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
 
 public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private GridPane gridPane;
@@ -55,12 +51,9 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private Button moveToTargetAll;
     private Button moveToSourceAll;
     private Button moveToSource;
-    private GlyphFont fontAwesome;
 
     public ListSelectionViewSkin(ListSelectionView<T> view) {
         super(view);
-
-        this.fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
         gridPane = createGridPane();
         buttonBox = createButtonBox();
@@ -147,75 +140,27 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         moveToSourceAll.setMaxWidth(Double.MAX_VALUE);
 
         getSkinnable().getSourceListView().itemsProperty()
-                .addListener(new InvalidationListener() {
-
-                    @Override
-                    public void invalidated(Observable observable) {
-                        bindMoveAllButtonsToDataModel();
-                    }
-                });
+                .addListener(it -> bindMoveAllButtonsToDataModel());
 
         getSkinnable().getTargetListView().itemsProperty()
-                .addListener(new InvalidationListener() {
-
-                    @Override
-                    public void invalidated(Observable observable) {
-                        bindMoveAllButtonsToDataModel();
-                    }
-                });
+                .addListener(it -> bindMoveAllButtonsToDataModel());
 
         getSkinnable().getSourceListView().selectionModelProperty()
-                .addListener(new InvalidationListener() {
-
-                    @Override
-                    public void invalidated(Observable observable) {
-                        bindMoveButtonsToSelectionModel();
-                    }
-                });
+                .addListener(it -> bindMoveButtonsToSelectionModel());
 
         getSkinnable().getTargetListView().selectionModelProperty()
-                .addListener(new InvalidationListener() {
-
-                    @Override
-                    public void invalidated(Observable observable) {
-                        bindMoveButtonsToSelectionModel();
-                    }
-                });
+                .addListener(it -> bindMoveButtonsToSelectionModel());
 
         bindMoveButtonsToSelectionModel();
         bindMoveAllButtonsToDataModel();
 
-        moveToTarget.setOnAction(new EventHandler<ActionEvent>() {
+        moveToTarget.setOnAction(evt -> getSkinnable().moveToTarget());
 
-            @Override
-            public void handle(ActionEvent event) {
-                getSkinnable().moveToTarget();
-            }
-        });
+        moveToTargetAll.setOnAction(evt -> getSkinnable().moveToTargetAll());
 
-        moveToTargetAll.setOnAction(new EventHandler<ActionEvent>() {
+        moveToSource.setOnAction(evt -> getSkinnable().moveToSource());
 
-            @Override
-            public void handle(ActionEvent event) {
-                getSkinnable().moveToTargetAll();
-            }
-        });
-
-        moveToSource.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                getSkinnable().moveToSource();
-            }
-        });
-
-        moveToSourceAll.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                getSkinnable().moveToSourceAll();
-            }
-        });
+        moveToSourceAll.setOnAction(evt -> getSkinnable().moveToSourceAll());
 
         box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource,
                 moveToSourceAll);

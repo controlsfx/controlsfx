@@ -47,305 +47,318 @@ import org.controlsfx.control.HiddenSidesPane;
 
 public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
 
-    private StackPane stackPane;
+	private StackPane stackPane;
 
-    private EventHandler<MouseEvent> exitedHandler;
+	private EventHandler<MouseEvent> exitedHandler;
 
-    private boolean mousePressed;
+	private boolean mousePressed;
 
-    public HiddenSidesPaneSkin(HiddenSidesPane pane) {
-        super(pane);
+	public HiddenSidesPaneSkin(HiddenSidesPane pane) {
+		super(pane);
 
-        exitedHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (getSkinnable().getPinnedSide() == null && !mousePressed) {
-                    hide();
-                }
-            }
-        };
+		exitedHandler = new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (getSkinnable().isMouseTriggerEnabled()
+						&& getSkinnable().getPinnedSide() == null
+						&& !mousePressed) {
+					hide();
+				}
+			}
+		};
 
-        stackPane = new StackPane();
-        getChildren().add(stackPane);
-        updateStackPane();
+		stackPane = new StackPane();
+		getChildren().add(stackPane);
+		updateStackPane();
 
-        InvalidationListener rebuildListener = new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                updateStackPane();
-            }
-        };
-        pane.contentProperty().addListener(rebuildListener);
-        pane.topProperty().addListener(rebuildListener);
-        pane.rightProperty().addListener(rebuildListener);
-        pane.bottomProperty().addListener(rebuildListener);
-        pane.leftProperty().addListener(rebuildListener);
+		InvalidationListener rebuildListener = new InvalidationListener() {
+			@Override
+			public void invalidated(Observable observable) {
+				updateStackPane();
+			}
+		};
+		pane.contentProperty().addListener(rebuildListener);
+		pane.topProperty().addListener(rebuildListener);
+		pane.rightProperty().addListener(rebuildListener);
+		pane.bottomProperty().addListener(rebuildListener);
+		pane.leftProperty().addListener(rebuildListener);
 
-        pane.addEventFilter(MouseEvent.MOUSE_MOVED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if (getSkinnable().getPinnedSide() == null) {
-                            Side side = getSide(event);
-                            if (side != null) {
-                                show(side);
-                            } else if (isOutsideSides(event)) {
-                                hide();
-                            }
-                        }
-                    }
+		pane.addEventFilter(MouseEvent.MOUSE_MOVED,
+				new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						if (getSkinnable().isMouseTriggerEnabled()
+								&& getSkinnable().getPinnedSide() == null) {
+							Side side = getSide(event);
+							if (side != null) {
+								show(side);
+							} else if (isOutsideSides(event)) {
+								hide();
+							}
+						}
+					}
 
-                    private boolean isOutsideSides(MouseEvent event) {
-                        if (getSkinnable().getLeft() != null
-                                && getSkinnable().getLeft().getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
+					private boolean isOutsideSides(MouseEvent event) {
+						if (getSkinnable().getLeft() != null
+								&& getSkinnable().getLeft().getBoundsInParent()
+										.contains(event.getX(), event.getY())) {
+							return false;
+						}
 
-                        if (getSkinnable().getTop() != null
-                                && getSkinnable().getTop().getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
+						if (getSkinnable().getTop() != null
+								&& getSkinnable().getTop().getBoundsInParent()
+										.contains(event.getX(), event.getY())) {
+							return false;
+						}
 
-                        if (getSkinnable().getRight() != null
-                                && getSkinnable().getRight()
-                                        .getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
+						if (getSkinnable().getRight() != null
+								&& getSkinnable().getRight()
+										.getBoundsInParent()
+										.contains(event.getX(), event.getY())) {
+							return false;
+						}
 
-                        if (getSkinnable().getBottom() != null
-                                && getSkinnable().getBottom()
-                                        .getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
+						if (getSkinnable().getBottom() != null
+								&& getSkinnable().getBottom()
+										.getBoundsInParent()
+										.contains(event.getX(), event.getY())) {
+							return false;
+						}
 
-                        return true;
-                    }
-                });
+						return true;
+					}
+				});
 
-        pane.addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
+		pane.addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
 
-        pane.addEventFilter(MouseEvent.MOUSE_PRESSED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        mousePressed = true;
-                    }
-                });
+		pane.addEventFilter(MouseEvent.MOUSE_PRESSED,
+				new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						mousePressed = true;
+					}
+				});
 
-        pane.addEventFilter(MouseEvent.MOUSE_RELEASED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        mousePressed = false;
+		pane.addEventFilter(MouseEvent.MOUSE_RELEASED,
+				new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						mousePressed = false;
 
-                        if (getSkinnable().getPinnedSide() == null) {
-                            Side side = getSide(event);
-                            if (side != null) {
-                                show(side);
-                            } else {
-                                hide();
-                            }
-                        }
-                    }
-                });
+						if (getSkinnable().isMouseTriggerEnabled()
+								&& getSkinnable().getPinnedSide() == null) {
+							Side side = getSide(event);
+							if (side != null) {
+								show(side);
+							} else {
+								hide();
+							}
+						}
+					}
+				});
 
-        for (Side side : Side.values()) {
-            visibility[side.ordinal()] = new SimpleDoubleProperty(0);
-            visibility[side.ordinal()].addListener(new InvalidationListener() {
+		for (Side side : Side.values()) {
+			visibility[side.ordinal()] = new SimpleDoubleProperty(0);
+			visibility[side.ordinal()].addListener(new InvalidationListener() {
 
-                @Override
-                public void invalidated(Observable observable) {
-                    getSkinnable().requestLayout();
-                }
-            });
-        }
+				@Override
+				public void invalidated(Observable observable) {
+					getSkinnable().requestLayout();
+				}
+			});
+		}
 
-        pane.pinnedSideProperty().addListener(new InvalidationListener() {
+		pane.pinnedSideProperty().addListener(new InvalidationListener() {
 
-            @Override
-            public void invalidated(Observable observable) {
-                show(getSkinnable().getPinnedSide());
-            }
-        });
+			@Override
+			public void invalidated(Observable observable) {
+				show(getSkinnable().getPinnedSide());
+			}
+		});
 
-        Rectangle clip = new Rectangle();
-        clip.setX(0);
-        clip.setY(0);
-        clip.widthProperty().bind(getSkinnable().widthProperty());
-        clip.heightProperty().bind(getSkinnable().heightProperty());
+		Rectangle clip = new Rectangle();
+		clip.setX(0);
+		clip.setY(0);
+		clip.widthProperty().bind(getSkinnable().widthProperty());
+		clip.heightProperty().bind(getSkinnable().heightProperty());
 
-        getSkinnable().setClip(clip);
-    }
+		getSkinnable().setClip(clip);
+	}
 
-    private Side getSide(MouseEvent evt) {
-        if (stackPane.getBoundsInLocal().contains(evt.getX(), evt.getY())) {
-            double trigger = getSkinnable().getTriggerDistance();
-            if (evt.getX() <= trigger) {
-                return Side.LEFT;
-            } else if (evt.getX() > getSkinnable().getWidth() - trigger) {
-                return Side.RIGHT;
-            } else if (evt.getY() <= trigger) {
-                return Side.TOP;
-            } else if (evt.getY() > getSkinnable().getHeight() - trigger) {
-                return Side.BOTTOM;
-            }
-        }
+	private Side getSide(MouseEvent evt) {
+		if (stackPane.getBoundsInLocal().contains(evt.getX(), evt.getY())) {
+			double trigger = getSkinnable().getTriggerDistance();
+			if (evt.getX() <= trigger) {
+				return Side.LEFT;
+			} else if (evt.getX() > getSkinnable().getWidth() - trigger) {
+				return Side.RIGHT;
+			} else if (evt.getY() <= trigger) {
+				return Side.TOP;
+			} else if (evt.getY() > getSkinnable().getHeight() - trigger) {
+				return Side.BOTTOM;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private DoubleProperty[] visibility = new SimpleDoubleProperty[Side
-            .values().length];
+	private DoubleProperty[] visibility = new SimpleDoubleProperty[Side
+			.values().length];
 
-    private Timeline showTimeline;
+	private Timeline showTimeline;
 
-    private void show(Side side) {
-        if (hideTimeline != null) {
-            hideTimeline.stop();
-        }
+	private void show(Side side) {
+		if (hideTimeline != null) {
+			hideTimeline.stop();
+		}
 
-        if (showTimeline != null && showTimeline.getStatus() == Status.RUNNING) {
-            return;
-        }
+		if (showTimeline != null && showTimeline.getStatus() == Status.RUNNING) {
+			return;
+		}
 
-        KeyValue[] keyValues = new KeyValue[Side.values().length];
-        for (Side s : Side.values()) {
-            keyValues[s.ordinal()] = new KeyValue(visibility[s.ordinal()],
-                    s.equals(side) ? 1 : 0);
-        }
+		KeyValue[] keyValues = new KeyValue[Side.values().length];
+		for (Side s : Side.values()) {
+			keyValues[s.ordinal()] = new KeyValue(visibility[s.ordinal()],
+					s.equals(side) ? 1 : 0);
+		}
 
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(200), keyValues);
-        showTimeline = new Timeline(keyFrame);
-        showTimeline.setDelay(Duration.millis(300));
-        showTimeline.play();
-    }
+		Duration delay = getSkinnable().getFadeInDelay() != null ? getSkinnable()
+				.getFadeInDelay() : Duration.millis(300);
 
-    private Timeline hideTimeline;
+		Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
+				.getAnimationDuration() : Duration.millis(200);
 
-    private void hide() {
-        if (showTimeline != null) {
-            showTimeline.stop();
-        }
+		KeyFrame keyFrame = new KeyFrame(duration, keyValues);
+		showTimeline = new Timeline(keyFrame);
+		showTimeline.setDelay(delay);
+		showTimeline.play();
+	}
 
-        if (hideTimeline != null && hideTimeline.getStatus() == Status.RUNNING) {
-            return;
-        }
+	private Timeline hideTimeline;
 
-        boolean sideVisible = false;
-        for (Side side : Side.values()) {
-            if (visibility[side.ordinal()].get() > 0) {
-                sideVisible = true;
-                break;
-            }
-        }
+	private void hide() {
+		if (showTimeline != null) {
+			showTimeline.stop();
+		}
 
-        // nothing to do here
-        if (!sideVisible) {
-            return;
-        }
+		if (hideTimeline != null && hideTimeline.getStatus() == Status.RUNNING) {
+			return;
+		}
 
-        KeyValue[] keyValues = new KeyValue[Side.values().length];
-        for (Side side : Side.values()) {
-            keyValues[side.ordinal()] = new KeyValue(
-                    visibility[side.ordinal()], 0);
-        }
+		boolean sideVisible = false;
+		for (Side side : Side.values()) {
+			if (visibility[side.ordinal()].get() > 0) {
+				sideVisible = true;
+				break;
+			}
+		}
 
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(200), keyValues);
-        hideTimeline = new Timeline(keyFrame);
-        hideTimeline.play();
-    }
+		// nothing to do here
+		if (!sideVisible) {
+			return;
+		}
 
-    private void updateStackPane() {
-        stackPane.getChildren().clear();
+		KeyValue[] keyValues = new KeyValue[Side.values().length];
+		for (Side side : Side.values()) {
+			keyValues[side.ordinal()] = new KeyValue(
+					visibility[side.ordinal()], 0);
+		}
 
-        if (getSkinnable().getContent() != null) {
-            stackPane.getChildren().add(getSkinnable().getContent());
-        }
-        if (getSkinnable().getTop() != null) {
-            stackPane.getChildren().add(getSkinnable().getTop());
-            getSkinnable().getTop().setManaged(false);
-            getSkinnable().getTop().removeEventFilter(MouseEvent.MOUSE_EXITED,
-                    exitedHandler);
-            getSkinnable().getTop().addEventFilter(MouseEvent.MOUSE_EXITED,
-                    exitedHandler);
-        }
-        if (getSkinnable().getRight() != null) {
-            stackPane.getChildren().add(getSkinnable().getRight());
-            getSkinnable().getRight().setManaged(false);
-            getSkinnable().getRight().removeEventFilter(
-                    MouseEvent.MOUSE_EXITED, exitedHandler);
-            getSkinnable().getRight().addEventFilter(MouseEvent.MOUSE_EXITED,
-                    exitedHandler);
-        }
-        if (getSkinnable().getBottom() != null) {
-            stackPane.getChildren().add(getSkinnable().getBottom());
-            getSkinnable().getBottom().setManaged(false);
-            getSkinnable().getBottom().removeEventFilter(
-                    MouseEvent.MOUSE_EXITED, exitedHandler);
-            getSkinnable().getBottom().addEventFilter(MouseEvent.MOUSE_EXITED,
-                    exitedHandler);
-        }
-        if (getSkinnable().getLeft() != null) {
-            stackPane.getChildren().add(getSkinnable().getLeft());
-            getSkinnable().getLeft().setManaged(false);
-            getSkinnable().getLeft().removeEventFilter(MouseEvent.MOUSE_EXITED,
-                    exitedHandler);
-            getSkinnable().getLeft().addEventFilter(MouseEvent.MOUSE_EXITED,
-                    exitedHandler);
-        }
-    }
+		Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
+				.getAnimationDuration() : Duration.millis(200);
 
-    @Override
-    protected void layoutChildren(double contentX, double contentY,
-            double contentWidth, double contentHeight) {
+		KeyFrame keyFrame = new KeyFrame(duration, keyValues);
+		hideTimeline = new Timeline(keyFrame);
+		hideTimeline.play();
+	}
 
-        /*
-         * Layout the stackpane in a normal way (equals
-         * "lay out the content node", the only managed node)
-         */
-        super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
+	private void updateStackPane() {
+		stackPane.getChildren().clear();
 
-        // layout the unmanaged side nodes
+		if (getSkinnable().getContent() != null) {
+			stackPane.getChildren().add(getSkinnable().getContent());
+		}
+		if (getSkinnable().getTop() != null) {
+			stackPane.getChildren().add(getSkinnable().getTop());
+			getSkinnable().getTop().setManaged(false);
+			getSkinnable().getTop().removeEventFilter(MouseEvent.MOUSE_EXITED,
+					exitedHandler);
+			getSkinnable().getTop().addEventFilter(MouseEvent.MOUSE_EXITED,
+					exitedHandler);
+		}
+		if (getSkinnable().getRight() != null) {
+			stackPane.getChildren().add(getSkinnable().getRight());
+			getSkinnable().getRight().setManaged(false);
+			getSkinnable().getRight().removeEventFilter(
+					MouseEvent.MOUSE_EXITED, exitedHandler);
+			getSkinnable().getRight().addEventFilter(MouseEvent.MOUSE_EXITED,
+					exitedHandler);
+		}
+		if (getSkinnable().getBottom() != null) {
+			stackPane.getChildren().add(getSkinnable().getBottom());
+			getSkinnable().getBottom().setManaged(false);
+			getSkinnable().getBottom().removeEventFilter(
+					MouseEvent.MOUSE_EXITED, exitedHandler);
+			getSkinnable().getBottom().addEventFilter(MouseEvent.MOUSE_EXITED,
+					exitedHandler);
+		}
+		if (getSkinnable().getLeft() != null) {
+			stackPane.getChildren().add(getSkinnable().getLeft());
+			getSkinnable().getLeft().setManaged(false);
+			getSkinnable().getLeft().removeEventFilter(MouseEvent.MOUSE_EXITED,
+					exitedHandler);
+			getSkinnable().getLeft().addEventFilter(MouseEvent.MOUSE_EXITED,
+					exitedHandler);
+		}
+	}
 
-        Node bottom = getSkinnable().getBottom();
-        if (bottom != null) {
-            double prefHeight = bottom.prefHeight(-1);
-            double offset = prefHeight
-                    * visibility[Side.BOTTOM.ordinal()].get();
-            bottom.resizeRelocate(contentX, contentY + contentHeight - offset,
-                    contentWidth, prefHeight);
-            bottom.setVisible(visibility[Side.BOTTOM.ordinal()].get() > 0);
-        }
+	@Override
+	protected void layoutChildren(double contentX, double contentY,
+			double contentWidth, double contentHeight) {
 
-        Node left = getSkinnable().getLeft();
-        if (left != null) {
-            double prefWidth = left.prefWidth(-1);
-            double offset = prefWidth * visibility[Side.LEFT.ordinal()].get();
-            left.resizeRelocate(contentX - (prefWidth - offset), contentY,
-                    prefWidth, contentHeight);
-            left.setVisible(visibility[Side.LEFT.ordinal()].get() > 0);
-        }
+		/*
+		 * Layout the stackpane in a normal way (equals
+		 * "lay out the content node", the only managed node)
+		 */
+		super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
 
-        Node right = getSkinnable().getRight();
-        if (right != null) {
-            double prefWidth = right.prefWidth(-1);
-            double offset = prefWidth * visibility[Side.RIGHT.ordinal()].get();
-            right.resizeRelocate(contentX + contentWidth - offset, contentY,
-                    prefWidth, contentHeight);
-            right.setVisible(visibility[Side.RIGHT.ordinal()].get() > 0);
-        }
+		// layout the unmanaged side nodes
 
-        Node top = getSkinnable().getTop();
-        if (top != null) {
-            double prefHeight = top.prefHeight(-1);
-            double offset = prefHeight * visibility[Side.TOP.ordinal()].get();
-            top.resizeRelocate(contentX, contentY - (prefHeight - offset),
-                    contentWidth, prefHeight);
-            top.setVisible(visibility[Side.TOP.ordinal()].get() > 0);
-        }
-    }
+		Node bottom = getSkinnable().getBottom();
+		if (bottom != null) {
+			double prefHeight = bottom.prefHeight(-1);
+			double offset = prefHeight
+					* visibility[Side.BOTTOM.ordinal()].get();
+			bottom.resizeRelocate(contentX, contentY + contentHeight - offset,
+					contentWidth, prefHeight);
+			bottom.setVisible(visibility[Side.BOTTOM.ordinal()].get() > 0);
+		}
+
+		Node left = getSkinnable().getLeft();
+		if (left != null) {
+			double prefWidth = left.prefWidth(-1);
+			double offset = prefWidth * visibility[Side.LEFT.ordinal()].get();
+			left.resizeRelocate(contentX - (prefWidth - offset), contentY,
+					prefWidth, contentHeight);
+			left.setVisible(visibility[Side.LEFT.ordinal()].get() > 0);
+		}
+
+		Node right = getSkinnable().getRight();
+		if (right != null) {
+			double prefWidth = right.prefWidth(-1);
+			double offset = prefWidth * visibility[Side.RIGHT.ordinal()].get();
+			right.resizeRelocate(contentX + contentWidth - offset, contentY,
+					prefWidth, contentHeight);
+			right.setVisible(visibility[Side.RIGHT.ordinal()].get() > 0);
+		}
+
+		Node top = getSkinnable().getTop();
+		if (top != null) {
+			double prefHeight = top.prefHeight(-1);
+			double offset = prefHeight * visibility[Side.TOP.ordinal()].get();
+			top.resizeRelocate(contentX, contentY - (prefHeight - offset),
+					contentWidth, prefHeight);
+			top.setVisible(visibility[Side.TOP.ordinal()].get() > 0);
+		}
+	}
 }

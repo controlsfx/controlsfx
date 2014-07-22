@@ -43,8 +43,7 @@ import javafx.scene.control.Skin;
  * done by either double clicking on the list items or by using one of the
  * "move" buttons between the two lists. Each list can be decorated with a
  * header and a footer node. The default header nodes are simply two labels
- * ("Available", "Selected"). The two footer nodes are displaying two buttons
- * each for easy selection / deselection of all items.
+ * ("Available", "Selected").
  *
  * <h3>Screenshot</h3>
  *

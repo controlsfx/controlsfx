@@ -2,12 +2,15 @@ package org.controlsfx.control.textfield;
 
 import com.sun.javafx.event.EventHandlerManager;
 import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.concurrent.Task;
 import javafx.event.*;
 import javafx.scene.Node;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Skin;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -126,7 +129,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      */
     protected void showPopup(){
         autoCompletionPopup.show(completionTarget);
-        autoCompletionPopup.selectFirstSuggestion();
+        selectFirstSuggestion(autoCompletionPopup);
     }
 
     /**
@@ -146,6 +149,21 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * Private methods                                                         *
      *                                                                         *
      **************************************************************************/
+
+    /**
+     * Selects the first suggestion (if any), so the user can choose it
+     * by pressing enter immediately.
+     */
+    private void selectFirstSuggestion(AutoCompletePopup<?> autoCompletionPopup){
+        Skin<?> skin = autoCompletionPopup.getSkin();
+        if(skin instanceof AutoCompletePopupSkin){
+            AutoCompletePopupSkin au = (AutoCompletePopupSkin)skin;
+            ListView li = (ListView)au.getNode();
+            if(li.getItems() != null && !li.getItems().isEmpty()){
+                li.getSelectionModel().select(0);
+            }
+        }
+    }
 
     /**
      * Occurs when the user text has changed and the suggestions require an update

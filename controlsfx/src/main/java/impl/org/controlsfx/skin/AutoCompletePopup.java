@@ -11,7 +11,6 @@ import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
-import javafx.scene.control.ListView;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.stage.Window;
@@ -135,21 +134,6 @@ public class AutoCompletePopup<T> extends PopupControl{
 		return converter;
 	}
 
-    /**
-     * Selects the first suggestion (if any), so the user can choose it
-     * by pressing enter immediately.
-     */
-    public void selectFirstSuggestion(){
-        Skin<?> skin = this.getSkin();
-        if(skin instanceof AutoCompletePopupSkin){
-            AutoCompletePopupSkin au = (AutoCompletePopupSkin)skin;
-            ListView li = (ListView)au.getNode();
-            if(li.getItems() != null && !li.getItems().isEmpty()){
-                li.getSelectionModel().select(0);
-            }
-        }
-    }
-    
 
     /***************************************************************************
      *                                                                         *

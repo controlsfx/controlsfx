@@ -26,7 +26,9 @@
  */
 package org.controlsfx.samples;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
@@ -44,7 +46,21 @@ public class HelloListSelectionView extends ControlsFXSample {
         ListSelectionView<String> view = new ListSelectionView<>();
         view.getSourceListView().getItems()
                 .addAll("Katja", "Dirk", "Philip", "Jule", "Armin");
-        return view;
+
+        GridPane pane = new GridPane();
+        pane.add(view, 0, 0);
+        pane.setAlignment(Pos.CENTER);
+
+        return pane;
+    }
+
+    @Override
+    public String getSampleDescription() {
+        return "A control used to let the user select multiple values from a "
+                + "list of available values. Selected values are moved into a "
+                + "second list that is showing the current selection. Items can "
+                + "be moved by double clicking on them or by first selecting "
+                + "them and then pressing one of the buttons in the center.";
     }
 
     @Override

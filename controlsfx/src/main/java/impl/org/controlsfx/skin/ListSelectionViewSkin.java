@@ -128,12 +128,13 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         VBox box = new VBox(5);
         box.setFillWidth(true);
 
-        moveToTarget = new Button("", FontAwesome.Glyph.ANGLE_LEFT.create());
+        moveToTarget = new Button("", FontAwesome.Glyph.ANGLE_RIGHT.create());
         moveToTargetAll = new Button("",
-                FontAwesome.Glyph.DOUBLE_ANGLE_LEFT.create());
-        moveToSource = new Button("", FontAwesome.Glyph.ANGLE_RIGHT.create());
-        moveToSourceAll = new Button("",
                 FontAwesome.Glyph.DOUBLE_ANGLE_RIGHT.create());
+
+        moveToSource = new Button("", FontAwesome.Glyph.ANGLE_LEFT.create());
+        moveToSourceAll = new Button("",
+                FontAwesome.Glyph.DOUBLE_ANGLE_LEFT.create());
 
         moveToTarget.getStyleClass().add("move-to-target-button");
         moveToTargetAll.getStyleClass().add("move-to-target-all-button");

@@ -28,22 +28,14 @@ package org.controlsfx.control;
 
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
-import static javafx.scene.input.MouseButton.PRIMARY;
-import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
-import javafx.scene.layout.HBox;
 
 /**
  * A control used to perform a multi-selection via the help of two list views.
@@ -55,17 +47,17 @@ import javafx.scene.layout.HBox;
  * each for easy selection / deselection of all items.
  *
  * <h3>Screenshot</h3>
- * 
+ *
  * <center><img src="list-selection-view.png" /></center>
- * 
+ *
  * <h3>Code Example</h3>
- * 
+ *
  * <pre>
  * ListSelectionView&lt;String&gt; view = new ListSelectionView&lt;&gt;();
  * view.getSourceListView().getItems().add(&quot;One&quot;, &quot;Two&quot;, &quot;Three&quot;);
  * view.getTargetListView().getItems().add(&quot;Four&quot;, &quot;Five&quot;);
  * </pre>
- * 
+ *
  * @param <T>
  *            the type of the list items
  */
@@ -100,23 +92,9 @@ public class ListSelectionView<T> extends Control {
         targetHeader.getStyleClass().add("list-header-label");
         targetHeader.setId("target-header-label");
         setTargetHeader(targetHeader);
-
-        setSourceFooter(createFooterControl(sourceListView));
-        setTargetFooter(createFooterControl(targetListView));
-
-        sourceListView.addEventHandler(MOUSE_CLICKED, event -> {
-            if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
-                moveToTarget();
-            }
-        });
-
-        targetListView.addEventHandler(MOUSE_CLICKED, event -> {
-            if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
-                moveToSource();
-            }
-        });
     }
 
+    @Override
     protected Skin<ListSelectionView<T>> createDefaultSkin() {
         return new ListSelectionViewSkin<T>(this);
     }
@@ -129,7 +107,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Returns the source list view (shown on the left-hand side).
-     * 
+     *
      * @return the source list view
      */
     public final ListView<T> getSourceListView() {
@@ -138,7 +116,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Returns the target list view (shown on the right-hand side).
-     * 
+     *
      * @return the target list view
      */
     public final ListView<T> getTargetListView() {
@@ -149,7 +127,7 @@ public class ListSelectionView<T> extends Control {
      * Creates the {@link ListView} instance used on the left-hand side as the
      * source list. This method can be overridden to provide a customized list
      * view control.
-     * 
+     *
      * @return the source list view
      */
     protected ListView<T> createSourceListView() {
@@ -160,7 +138,7 @@ public class ListSelectionView<T> extends Control {
      * Creates the {@link ListView} instance used on the right-hand side as the
      * target list. This method can be overridden to provide a customized list
      * view control.
-     * 
+     *
      * @return the target list view
      */
     protected ListView<T> createTargetListView() {
@@ -173,22 +151,6 @@ public class ListSelectionView<T> extends Control {
         return view;
     }
 
-    private Node createFooterControl(final ListView<T> view) {
-        Button selectAll = new Button("Select All");
-        selectAll.getStyleClass().add("select-all-button");
-        selectAll.setOnAction(evt -> view.getSelectionModel().selectAll());
-
-        Button deselectAll = new Button("Deselect All");
-        deselectAll.getStyleClass().add("deselect-all-button");
-        deselectAll.setOnAction(evt -> view.getSelectionModel()
-                .clearSelection());
-
-        HBox box = new HBox(10);
-        box.getChildren().addAll(selectAll, deselectAll);
-
-        return box;
-    }
-
     private final ObjectProperty<Node> sourceHeader = new SimpleObjectProperty<>(
             this, "sourceHeader");
 
@@ -196,7 +158,7 @@ public class ListSelectionView<T> extends Control {
      * A property used to store a reference to a node that will be displayed
      * above the source list view. The default node is a {@link Label}
      * displaying the text "Available".
-     * 
+     *
      * @return the property used to store the source header node
      */
     public final ObjectProperty<Node> sourceHeaderProperty() {
@@ -205,7 +167,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Returns the value of {@link #sourceHeaderProperty()}.
-     * 
+     *
      * @return the source header node
      */
     public final Node getSourceHeader() {
@@ -214,7 +176,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Sets the value of {@link #sourceHeaderProperty()}.
-     * 
+     *
      * @param node
      *            the new header node to use for the source list
      */
@@ -229,7 +191,7 @@ public class ListSelectionView<T> extends Control {
      * A property used to store a reference to a node that will be displayed
      * below the source list view. The default node is a node with two buttons
      * for easily selecting / deselecting all elements in the list view.
-     * 
+     *
      * @return the property used to store the source footer node
      */
     public final ObjectProperty<Node> sourceFooterProperty() {
@@ -238,7 +200,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Returns the value of {@link #sourceFooterProperty()}.
-     * 
+     *
      * @return the source footer node
      */
     public final Node getSourceFooter() {
@@ -247,7 +209,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Sets the value of {@link #sourceFooterProperty()}.
-     * 
+     *
      * @param node
      *            the new node shown below the source list
      */
@@ -262,7 +224,7 @@ public class ListSelectionView<T> extends Control {
      * A property used to store a reference to a node that will be displayed
      * above the target list view. The default node is a {@link Label}
      * displaying the text "Selected".
-     * 
+     *
      * @return the property used to store the target header node
      */
     public final ObjectProperty<Node> targetHeaderProperty() {
@@ -271,7 +233,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Returns the value of {@link #targetHeaderProperty()}.
-     * 
+     *
      * @return the source header node
      */
     public final Node getTargetHeader() {
@@ -280,7 +242,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Sets the value of {@link #targetHeaderProperty()}.
-     * 
+     *
      * @param node
      *            the new node shown above the target list
      */
@@ -295,7 +257,7 @@ public class ListSelectionView<T> extends Control {
      * A property used to store a reference to a node that will be displayed
      * below the target list view. The default node is a node with two buttons
      * for easily selecting / deselecting all elements in the list view.
-     * 
+     *
      * @return the property used to store the source footer node
      */
     public final ObjectProperty<Node> targetFooterProperty() {
@@ -304,7 +266,7 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Returns the value of {@link #targetFooterProperty()}.
-     * 
+     *
      * @return the source header node
      */
     public final Node getTargetFooter() {
@@ -313,60 +275,11 @@ public class ListSelectionView<T> extends Control {
 
     /**
      * Sets the value of {@link #targetFooterProperty()}.
-     * 
+     *
      * @param node
      *            the new node shown below the target list
      */
     public final void setTargetFooter(Node node) {
         targetFooter.set(node);
-    }
-
-    /**
-     * Moves the currently selected items from the source list to the target
-     * list.
-     */
-    public final void moveToTarget() {
-        move(sourceListView, targetListView);
-        sourceListView.getSelectionModel().clearSelection();
-    }
-
-    /**
-     * Moves all items from the source list to the target list.
-     */
-    public final void moveToTargetAll() {
-        move(sourceListView, targetListView,
-                new ArrayList<>(sourceListView.getItems()));
-        sourceListView.getSelectionModel().clearSelection();
-    }
-
-    /**
-     * Moves the currently selected items from the target list to the source
-     * list.
-     */
-    public final void moveToSource() {
-        move(targetListView, sourceListView);
-        targetListView.getSelectionModel().clearSelection();
-    }
-
-    /**
-     * Moves all items from the target list to the source list.
-     */
-    public final void moveToSourceAll() {
-        move(targetListView, sourceListView,
-                new ArrayList<>(targetListView.getItems()));
-        targetListView.getSelectionModel().clearSelection();
-    }
-
-    private void move(ListView<T> viewA, ListView<T> viewB) {
-        List<T> selectedItems = new ArrayList<T>(viewA.getSelectionModel()
-                .getSelectedItems());
-        move(viewA, viewB, selectedItems);
-    }
-
-    private void move(ListView<T> viewA, ListView<T> viewB, List<T> items) {
-        for (T item : items) {
-            viewA.getItems().remove(item);
-            viewB.getItems().add(item);
-        }
     }
 }

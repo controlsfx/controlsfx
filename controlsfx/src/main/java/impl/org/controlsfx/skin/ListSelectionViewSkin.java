@@ -26,6 +26,12 @@
  */
 package impl.org.controlsfx.skin;
 
+import static javafx.scene.input.MouseButton.PRIMARY;
+import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -67,6 +73,24 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         view.targetFooterProperty().addListener(updateListener);
 
         updateView();
+
+        getSkinnable().getSourceListView().addEventHandler(
+                MOUSE_CLICKED,
+                event -> {
+                    if (event.getButton() == PRIMARY
+                            && event.getClickCount() == 2) {
+                        moveToTarget();
+                    }
+                });
+
+        getSkinnable().getTargetListView().addEventHandler(
+                MOUSE_CLICKED,
+                event -> {
+                    if (event.getButton() == PRIMARY
+                            && event.getClickCount() == 2) {
+                        moveToSource();
+                    }
+                });
     }
 
     private GridPane createGridPane() {
@@ -147,13 +171,13 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         bindMoveButtonsToSelectionModel();
         bindMoveAllButtonsToDataModel();
 
-        moveToTarget.setOnAction(evt -> getSkinnable().moveToTarget());
+        moveToTarget.setOnAction(evt -> moveToTarget());
 
-        moveToTargetAll.setOnAction(evt -> getSkinnable().moveToTargetAll());
+        moveToTargetAll.setOnAction(evt -> moveToTargetAll());
 
-        moveToSource.setOnAction(evt -> getSkinnable().moveToSource());
+        moveToSource.setOnAction(evt -> moveToSource());
 
-        moveToSourceAll.setOnAction(evt -> getSkinnable().moveToSourceAll());
+        moveToSourceAll.setOnAction(evt -> moveToSourceAll());
 
         box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource,
                 moveToSourceAll);
@@ -221,5 +245,44 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         stackPane.getChildren().add(buttonBox);
 
         gridPane.add(stackPane, 1, 1);
+    }
+
+    private void moveToTarget() {
+        move(getSkinnable().getSourceListView(), getSkinnable()
+                .getTargetListView());
+        getSkinnable().getSourceListView().getSelectionModel().clearSelection();
+    }
+
+    private void moveToTargetAll() {
+        move(getSkinnable().getSourceListView(), getSkinnable()
+                .getTargetListView(), new ArrayList<>(getSkinnable()
+                .getSourceListView().getItems()));
+        getSkinnable().getSourceListView().getSelectionModel().clearSelection();
+    }
+
+    private void moveToSource() {
+        move(getSkinnable().getTargetListView(), getSkinnable()
+                .getSourceListView());
+        getSkinnable().getTargetListView().getSelectionModel().clearSelection();
+    }
+
+    private void moveToSourceAll() {
+        move(getSkinnable().getTargetListView(), getSkinnable()
+                .getSourceListView(), new ArrayList<>(getSkinnable()
+                .getTargetListView().getItems()));
+        getSkinnable().getTargetListView().getSelectionModel().clearSelection();
+    }
+
+    private void move(ListView<T> viewA, ListView<T> viewB) {
+        List<T> selectedItems = new ArrayList<T>(viewA.getSelectionModel()
+                .getSelectedItems());
+        move(viewA, viewB, selectedItems);
+    }
+
+    private void move(ListView<T> viewA, ListView<T> viewB, List<T> items) {
+        for (T item : items) {
+            viewA.getItems().remove(item);
+            viewB.getItems().add(item);
+        }
     }
 }

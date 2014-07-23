@@ -27,10 +27,8 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.HiddenSidesPaneSkin;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Side;
@@ -105,7 +103,10 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     /**
      * The property that stores the distance to the pane's edges that will
-     * trigger the apperance of the hidden side nodes.
+     * trigger the appearance of the hidden side nodes.<br>
+     * Setting the property to zero or a negative value will disable this
+     * functionality, so a hidden side can only be made visible with
+     * {@link #setPinnedSide(Side)}.
      * 
      * @return the trigger distance property
      */
@@ -123,20 +124,15 @@ public class HiddenSidesPane extends ControlsFXControl {
     }
 
     /**
-     * Set the value of the trigger distance property. The value must be larger
-     * than zero.
+     * Set the value of the trigger distance property. <br>
+     * Setting the property to zero or a negative value will disable this
+     * functionality, so a hidden side can only be made visible with
+     * {@link #setPinnedSide(Side)}.
      * 
-     * @throws IllegalArgumentException
-     *             if distance is smaller than zero.
      * @param distance
      *            the new value for the trigger distance property
      */
     public final void setTriggerDistance(double distance) {
-        if (distance <= 0) {
-            throw new IllegalArgumentException(
-                    "trigger distance must be larger than 0 but was " //$NON-NLS-1$
-                            + distance);
-        }
         triggerDistance.set(distance);
     }
 
@@ -359,73 +355,39 @@ public class HiddenSidesPane extends ControlsFXControl {
         pinnedSideProperty().set(side);
     }
 
-    // show / hide the hidden sides with mouse interaction?
-
-    private final BooleanProperty mouseEnabled = new SimpleBooleanProperty(
-            this, "mouseEnabled", true);
-
-    /**
-     * Returns the mouse enabled property. The value of this property determines
-     * if the hidden sides can be made visible by moving the mouse to the
-     * corresponding side of the pane into the trigger distance.
-     * 
-     * @return mouse enabled property
-     */
-    public final BooleanProperty mouseEnabledProperty() {
-        return mouseEnabled;
-    }
-
-    /**
-     * Returns the value of the mouse enabled property
-     * 
-     * @return if the mouse is enabled
-     */
-    public final boolean isMouseEnabled() {
-        return mouseEnabled.get();
-    }
-
-    /**
-     * Set the value of mouse enabled property
-     * 
-     * @param enabled
-     *            enable or disable the mouse
-     */
-    public final void setMouseEnabled(boolean enabled) {
-        mouseEnabled.set(enabled);
-    }
-
     // slide in animation delay
 
-    private final ObjectProperty<Duration> delay = new SimpleObjectProperty<Duration>(
-            this, "delay", Duration.millis(300));
+    private final ObjectProperty<Duration> slideInDelay = new SimpleObjectProperty<Duration>(
+            this, "slideInDelay", Duration.millis(300));
 
     /**
-     * Returns the delay property. The value of this property determines the
-     * delay before the hidden side fade in animation starts to play.
+     * Returns the slide in delay property. The value of this property
+     * determines the delay before the hidden side fade in animation starts to
+     * play.
      * 
      * @return animation delay property
      */
-    public final ObjectProperty<Duration> delayProperty() {
-        return delay;
+    public final ObjectProperty<Duration> slideInDelayProperty() {
+        return slideInDelay;
     }
 
     /**
      * Returns the slide in animation delay
      * 
-     * @return animation delay
+     * @return slide in animation delay
      */
-    public final Duration getDelay() {
-        return delay.get();
+    public final Duration getSlideInDelay() {
+        return slideInDelay.get();
     }
 
     /**
      * Set the slide in animation delay
      * 
      * @param duration
-     *            animation delay
+     *            slide in animation delay
      */
-    public final void setDelay(Duration duration) {
-        delay.set(duration);
+    public final void setSlideInDelay(Duration duration) {
+        slideInDelay.set(duration);
     }
 
     // slide in / slide out duration

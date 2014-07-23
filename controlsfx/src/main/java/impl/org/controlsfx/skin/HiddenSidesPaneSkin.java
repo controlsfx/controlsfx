@@ -54,8 +54,8 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
         super(pane);
 
         exitedHandler = event -> {
-            if (getSkinnable().isMouseEnabled()
-                    && getSkinnable().getPinnedSide() == null && !mousePressed) {
+            if (isMouseEnabled() && getSkinnable().getPinnedSide() == null
+                    && !mousePressed) {
                 hide();
             }
         };
@@ -72,8 +72,7 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
         pane.leftProperty().addListener(rebuildListener);
 
         pane.addEventFilter(MouseEvent.MOUSE_MOVED, event -> {
-            if (getSkinnable().isMouseEnabled()
-                    && getSkinnable().getPinnedSide() == null) {
+            if (isMouseEnabled() && getSkinnable().getPinnedSide() == null) {
                 Side side = getSide(event);
                 if (side != null) {
                     show(side);
@@ -91,8 +90,7 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
         pane.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
             mousePressed = false;
 
-            if (getSkinnable().isMouseEnabled()
-                    && getSkinnable().getPinnedSide() == null) {
+            if (isMouseEnabled() && getSkinnable().getPinnedSide() == null) {
                 Side side = getSide(event);
                 if (side != null) {
                     show(side);
@@ -148,6 +146,10 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
         return true;
     }
 
+    private boolean isMouseEnabled() {
+        return getSkinnable().getTriggerDistance() > 0;
+    }
+
     private Side getSide(MouseEvent evt) {
         if (stackPane.getBoundsInLocal().contains(evt.getX(), evt.getY())) {
             double trigger = getSkinnable().getTriggerDistance();
@@ -185,9 +187,8 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
                     s.equals(side) ? 1 : 0);
         }
 
-        Duration delay = getSkinnable().getDelay() != null ? getSkinnable()
-                .getDelay() : Duration.millis(300);
-
+        Duration delay = getSkinnable().getSlideInDelay() != null ? getSkinnable()
+                .getSlideInDelay() : Duration.millis(300);
         Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
                 .getAnimationDuration() : Duration.millis(200);
 

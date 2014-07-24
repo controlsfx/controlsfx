@@ -131,25 +131,4 @@ public final class GlyphFontRegistry {
         font.ensureFontIsLoaded();
         return font;
     }
-
-    /**
-     * Retrieve one glyph by font name and glyph name
-     * @param fontName font name
-     * @param glyphName glyph name
-     * @return glyph as a Node
-     */
-    public static Node glyph( String fontName, String glyphName ) {
-        GlyphFont font = font(fontName);
-        return font.create(glyphName);
-    }
-
-    /**
-     * Retrieve glyph by font name and glyph name using one string where font name an glyph name are separated by pipe
-     * @param fontAndGlyph font and glyph
-     * @return glyph as Node
-     */
-    public static Node glyph( String fontAndGlyph ) {
-        String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
-        return glyph( args[0], args[1]);
-    }
 }

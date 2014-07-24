@@ -45,6 +45,25 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /***************************************************************************
      *                                                                         *
+     * Static creators                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Retrieve glyph by font name and glyph name using one string
+     * where font name an glyph name are separated by pipe.
+     *
+     * @param fontAndGlyph The font and glyph separated by a pipe. Example: "FontAwesome|STAR"
+     * @return A instance of a Glyph node
+     */
+    public static Glyph create(String fontAndGlyph) {
+        String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
+        return new Glyph(args[0], args[1]);
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
      * Private fields                                                          *
      *                                                                         *
      **************************************************************************/

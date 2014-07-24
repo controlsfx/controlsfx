@@ -39,21 +39,17 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
-import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
-
-import java.util.Map;
 
 public class HelloGlyphFont extends ControlsFXSample {
 
+    static {
+        // Register a custom default font
+        GlyphFontRegistry.register("icomoon", HelloGlyphFont.class.getResourceAsStream("icomoon.ttf") , 16);
+    }
+
+
 	private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-
-	private GlyphFont icoMoon = new GlyphFont("icomoon", 16, getClass()
-			.getResourceAsStream("icomoon.ttf")){
-
-				@Override
-				public Map<String, Character> getGlyphs() {
-					return null;
-				}};
+	private GlyphFont icoMoon = GlyphFontRegistry.font("icomoon");
 
 //	private static char FAW_TRASH = '\uf014';
 	private static char FAW_GEAR  = '\uf013';
@@ -62,6 +58,8 @@ public class HelloGlyphFont extends ControlsFXSample {
 	private static char IM_BOLD        = '\ue027';
 	private static char IM_UNDERSCORED = '\ue02b';
 	private static char IM_ITALIC      = '\ue13e';
+
+
 
 	@Override
 	public String getSampleName() {
@@ -83,10 +81,14 @@ public class HelloGlyphFont extends ControlsFXSample {
 		Label title = new Label("Using FontAwesome(CDN)");
 		root.getChildren().add(title);
 		ToolBar toolbar = new ToolBar(
-				new Button("", glyph("FontAwesome|TRASH")), 
-				new Button("", glyph("FontAwesome|STAR")),
-				new Button("", FontAwesome.Glyph.ANCHOR.create()),
-				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)) 
+
+                // There are many ways how you can define a Glyph:
+
+                new Button("", new Glyph("FontAwesome", "TRASH")),                  // Use the Glyph-class with a icon name
+				new Button("", new Glyph("FontAwesome", FontAwesome.Glyph.STAR)),   // Use the Glyph-class with a known enum value
+                new Button("", fontAwesome.create("SMILE")),                        // Use the font-instance with a name
+                new Button("", fontAwesome.create(FontAwesome.Glyph.ANCHOR)),       // Use the font-instance with a enum
+				new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED))       // Use the font-instance with a unicode char
         );
 		root.getChildren().add(toolbar);
 		title = new Label("Using IcoMoon (Local)");
@@ -103,9 +105,13 @@ public class HelloGlyphFont extends ControlsFXSample {
                 .useGradientEffect().useHoverEffect();
 
 		toolbar = new ToolBar(
-				new Button("", icoMoon.fontSize(16).create(IM_BOLD)),
-				new Button("", icoMoon.fontColor(Color.GREEN).fontSize(32).create(IM_UNDERSCORED)), 
-				new Button("", icoMoon.fontSize(48).create(IM_ITALIC)),
+
+                // Since we have a custom font without named characters,
+                // we have to use unicode character codes for the icons:
+
+				new Button("", icoMoon.create(IM_BOLD).size(16)),
+				new Button("", icoMoon.create(IM_UNDERSCORED).color(Color.GREEN).size(32)),
+				new Button("", icoMoon.create(IM_ITALIC).size(48)),
                 new Button("", effectGlyph),
                 new Button("", effectGlyph2));
 		root.getChildren().add(toolbar);
@@ -114,6 +120,6 @@ public class HelloGlyphFont extends ControlsFXSample {
 	}
 
 	public static void main(String[] args) {
-		launch(args);
+        launch(args);
 	}
 }

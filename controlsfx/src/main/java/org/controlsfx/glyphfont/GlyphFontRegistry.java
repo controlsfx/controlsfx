@@ -27,12 +27,13 @@
 package org.controlsfx.glyphfont;
 
 
+import javafx.scene.Node;
+import org.controlsfx.control.action.ActionProxy;
+
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-
-import javafx.scene.Node;
-import org.controlsfx.control.action.ActionProxy;
 
 /**
  * The glyph font registry automatically registers available fonts using a 
@@ -54,45 +55,81 @@ import org.controlsfx.control.action.ActionProxy;
  * prefix should be used. For more information see {@link ActionProxy}.  
  */
 public final class GlyphFontRegistry {
+
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 	
 	private static Map<String, GlyphFont> fontMap = new HashMap<>();
-	
-	private static boolean isInited = false;
-	
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
+    static {
+        // find all classes that implement GlyphFont and register them now
+        ServiceLoader<GlyphFont> loader = ServiceLoader.load(GlyphFont.class);
+        for (GlyphFont font : loader) {
+            GlyphFontRegistry.register(font);
+        }
+    }
+
+    /**
+     * Private constructor since static class
+     */
 	private GlyphFontRegistry() {
 		// no-op
 	}
-	
-	private static void init() {
-	    if (isInited) return;
-	    isInited = true;
-	    
-	    // find all classes that implement GlyphFont and register them now
-	    ServiceLoader<GlyphFont> loader = ServiceLoader.load(GlyphFont.class);
-        for (GlyphFont font : loader) {
-        	GlyphFontRegistry.register(font);
-        }
-	}
-	
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Registers the specified font as default GlyphFont
+     * @param familyName The name of this font.
+     * @param uri The location where it can be loaded from.
+     * @param defaultSize The default font size
+     */
+    public static void register(String familyName, String uri, int defaultSize){
+        register(new GlyphFont(familyName, defaultSize, uri));
+    }
+
+    /**
+     * Registers the specified font as default GlyphFont
+     * @param familyName The name of this font.
+     * @param in Inputstream of the font data
+     * @param defaultSize The default font size
+     */
+    public static void register(String familyName, InputStream in, int defaultSize){
+        register(new GlyphFont(familyName, defaultSize, in));
+    }
+
 	/**
-	 * Registers specified font
+	 * Registers the specified font
 	 * @param font
 	 */
 	public static void register( GlyphFont font ) {
-	    init();
 		if (font != null ) {
 			fontMap.put( font.getName(), font );
 		}
 	}
 	
 	/**
-	 * Retrieve font by font
-	 * @param fontName font name
+	 * Retrieve font by its family name
+	 * @param familyName family name of the font
 	 * @return font or null if not found
 	 */
-	public static GlyphFont font( String fontName ) {
-	    init();
-		return fontMap.get(fontName);
+	public static GlyphFont font( String familyName ) {
+        GlyphFont font = fontMap.get(familyName);
+        font.ensureFontIsLoaded();
+        return font;
 	}
 	
 	/**
@@ -102,7 +139,6 @@ public final class GlyphFontRegistry {
 	 * @return glyph as a Node
 	 */
 	public static Node glyph( String fontName, String glyphName ) {
-	    init();
 		GlyphFont font = font(fontName);
 		return font.create(glyphName);
 	}
@@ -113,7 +149,6 @@ public final class GlyphFontRegistry {
 	 * @return glyph as Node
 	 */
 	public static Node glyph( String fontAndGlyph ) {
-	    init();
 		String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
 		return glyph( args[0], args[1]);
 	}

@@ -26,11 +26,7 @@
  */
 package org.controlsfx.glyphfont;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javafx.scene.Node;
+import java.util.Arrays;
 
 
 /**
@@ -73,12 +69,11 @@ public class FontAwesome extends GlyphFont {
 
 	private static String fontName = "FontAwesome"; //$NON-NLS-1$
 	
-	private Map<String, Character> glyphs;
-	
+
 	/**
 	 * The individual glyphs offered by the FontAwesome font.
 	 */
-	public static enum Glyph {
+	public static enum Glyph implements INamedCharacter {
 
 		GLASS('\uf000'),
 		MUSIC('\uf001'),
@@ -459,42 +454,29 @@ public class FontAwesome extends GlyphFont {
 		WEIBO('\uf18A'),
 		RENREN('\uf18B');
 		
-		private final Character ch;
-		
-		Glyph( Character ch ) {
+		private final char ch;
+
+        /**
+         * Creates a named Glyph mapped to the given character
+         * @param ch
+         */
+		Glyph( char ch ) {
 			this.ch = ch;
 		}
-		
-		public Character getChar() {
+
+        @Override
+		public char getChar() {
 			return ch;
-		}
-		
-		public Node create() {
-		    return GlyphFontRegistry.glyph(fontName, name());
 		}
 	};
 	
 	/**
 	 * Do not call this constructor directly - instead access the 
-	 * {@link FontAwesome.Glyph} public static enumeration (and call the 
-	 * {@link FontAwesome.Glyph#create()} method to create the glyph nodes), or
+	 * {@link FontAwesome.Glyph} public static enumeration method to create the glyph nodes), or
 	 * use the {@link GlyphFontRegistry} class to get access.
 	 */
 	public FontAwesome() {
-		
-		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf" );  //$NON-NLS-1$
-		
-		Map<String, Character> map = new HashMap<>();
-		for (Glyph e:  Glyph.values()) {
-			map.put(e.name(), e.getChar());
-		}
-		glyphs = Collections.unmodifiableMap(map);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override public Map<String, Character> getGlyphs() {
-		return glyphs;
+		super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf", true );  //$NON-NLS-1$
+        registerAll(Arrays.asList(Glyph.values()));
 	}
 }

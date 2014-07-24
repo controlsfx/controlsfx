@@ -26,9 +26,12 @@
  */
 package org.controlsfx.glyphfont;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.*;
+import javafx.scene.text.Font;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.tools.Duplicatable;
 
@@ -40,53 +43,89 @@ import org.controlsfx.tools.Duplicatable;
  */
 public class Glyph extends Label implements Duplicatable<Glyph> {
 
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
 
-    public final static String STYLE_GRADIENT = "gradient";
-    public final static String STYLE_HOVER_EFFECT = "hover-effect";
+    public final static String DEFAULT_CSS_CLASS = "glyph-font";    //$NON-NLS-1$
+    public final static String STYLE_GRADIENT = "gradient";         //$NON-NLS-1$
+    public final static String STYLE_HOVER_EFFECT = "hover-effect"; //$NON-NLS-1$
 
-    private final String fontFamily;
-    private final Character character;
-    private double size;
-    private Color color;
+    private final ObjectProperty<Object> icon = new SimpleObjectProperty<>();
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
 
     /**
-     * Creates the glyph
-     * @param fontFamily font the glyph should be based on
-     * @param character character representing the icon in the icon font
-     * @param size glyph size in pixels
-     * @param color glyph color
+     * Empty Constructor (used by FXML)
      */
-    public Glyph(String fontFamily, Character character, double size, Color color) {
-        super(character.toString());
+    public Glyph(){
+        getStyleClass().add(DEFAULT_CSS_CLASS);
 
-        this.fontFamily = fontFamily;
-        this.character = character;
-        this.size = size;
-        this.color = color;
-
-        getStyleClass().add("glyph-font"); //$NON-NLS-1$
-        updateStyle();
+        icon.addListener(x -> updateIcon());
+        fontProperty().addListener(x -> updateIcon());
     }
-    
+
     /**
-     * Sets glyph size in pixels
+     * Creates a new Glyph
+     * @param fontFamily
+     * @param unicode
+     */
+    public Glyph(String fontFamily, char unicode) {
+        this();
+        setFontFamily(fontFamily);
+        setTextUnicode(unicode);
+    }
+
+    /**
+     * Creates a new Glyph
+     * @param fontFamily
+     * @param icon
+     */
+    public Glyph(String fontFamily, Object icon) {
+        this();
+        setFontFamily(fontFamily);
+        setIcon(icon);
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Sets the glyph icon font family
+     * @param fontFamily A font family name
+     * @return Returns this instance for fluent API
+     */
+    public Glyph fontFamily(String fontFamily){
+        setFontFamily(fontFamily);
+        return this;
+    }
+
+    /**
+     * Sets the glyph color
+     * @param color
+     * @return Returns this instance for fluent API
+     */
+    public Glyph color(Color color){
+        setColor(color);
+        return this;
+    }
+
+    /**
+     * Sets glyph size
      * @param size
      * @return Returns this instance for fluent API
      */
     public Glyph size(double size) {
-        this.size = size;
-        updateStyle();
-        return this;
-    }
-    
-    /**
-     * Sets glyph color
-     * @param color
-     * @return Returns this instance for fluent API
-     */
-    public Glyph color(Color color) {
-        this.color = color;
-        updateStyle();
+        setFontSize(size);
         return this;
     }
 
@@ -95,7 +134,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * @return Returns this instance for fluent API
      */
     public Glyph useHoverEffect(){
-        this.getStyleClass().addAll(Glyph.STYLE_HOVER_EFFECT);
+        this.getStyleClass().add(Glyph.STYLE_HOVER_EFFECT);
         return this;
     }
 
@@ -104,32 +143,151 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * @return Returns this instance for fluent API
      */
     public Glyph useGradientEffect(){
-        this.getStyleClass().addAll(Glyph.STYLE_GRADIENT);
+
+        if(getTextFill() instanceof Color){
+            Color currentColor = (Color)getTextFill();
+
+            /*
+             TODO
+             Do this in code:
+            -fx-text-fill: linear-gradient(to bottom, derive(-fx-text-fill,20%) 10%, derive(-fx-text-fill,-40%) 80%);
+             */
+            Stop[] stops = new Stop[] { new Stop(0, Color.BLACK), new Stop(1, currentColor)};
+            LinearGradient lg1 = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
+            setTextFill(lg1);
+        }
+
+        this.getStyleClass().add(Glyph.STYLE_GRADIENT);
         return this;
     }
-    
-    //TODO: Need to be able to use external styles
-    private void updateStyle() {
-        StringBuilder css = new StringBuilder( String.format("-fx-font-family: %s; -fx-font-size: %fpx;", fontFamily, size)); //$NON-NLS-1$
-        if (color == null) {
-            css.append("-glyphs-color: -fx-text-background-color;"); //$NON-NLS-1$
-        } else {
-        	css.append(
-        	  String.format("-glyphs-color: rgba(%d,%d,%d,%f)",
-        			(int)(color.getRed()*255),
-        			(int)(color.getGreen()*255),
-        			(int)(color.getBlue()*255),
-        			color.getOpacity()
-        			));
+
+
+    /**
+     * Allows glyph duplication. Since in the JavaFX scenegraph it is not possible to insert the same
+     * {@link Node} in multiple locations at the same time, this method allows for glyph reuse in several places
+     */
+    @Override public Glyph duplicate() {
+        Paint color = getTextFill();
+        return new Glyph(){{
+            setTextFill(color);
+        }}
+                .fontFamily(getFontFamily())
+                .size(getFontSize());
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Sets the font family of this glyph
+     * @param family
+     */
+    public void setFontFamily(String family){
+        if(family != getFont().getFamily()){
+            Font newFont = Font.font(family, getFont().getSize());
+            setFont(newFont);
         }
-        setStyle(css.toString());
     }
 
     /**
-     * Allows glyph duplication. Since in the JavaFX scenegraph it is not possible to insert the same 
-     * {@link Node} in multiple locations at the same time, this method allows for glyph reuse in several places  
+     * Gets the font family of this glyph
+     * @return
      */
-	@Override public Glyph duplicate() {
-		return new Glyph(fontFamily, character, size, color);
-	}
+    public String getFontFamily(){
+        return getFont().getFamily();
+    }
+
+    /**
+     * Sets the font size of this glyph
+     * @param size
+     */
+    public void setFontSize(double size){
+        Font newFont = Font.font(getFont().getFamily(), size);
+        setFont(newFont);
+    }
+
+    /**
+     * Gets the font size of this glyph
+     * @return
+     */
+    public double getFontSize(){
+        return getFont().getSize();
+    }
+
+    /**
+     * Set the Color of this Glyph
+     * @param color
+     */
+    public void setColor(Color color){
+        setTextFill(color);
+    }
+
+    /**
+     * The icon name property.
+     *
+     * This must either be a Glyph-Name (either string or enum value) known by the GlyphFontRegistry.
+     * Alternatively, you can directly submit a unicode character here.
+     *
+     * @return
+     */
+    public Object iconProperty(){
+        return icon;
+    }
+
+    /**
+     * Set the icon to display.
+     * @param iconValue This can either be the Glyph-Name, Glyph-Enum Value or a unicode character representing the sign.
+     */
+    public void setIcon(Object iconValue){
+        icon.set(iconValue);
+    }
+
+    public Object getIcon(){
+        return icon.get();
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Private methods                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+
+    /**
+     * This updates the text with the correct unicode value
+     * so that the desired icon is displayed.
+     */
+    private void updateIcon(){
+
+        Object iconValue = getIcon();
+
+        if(iconValue != null) {
+            if(iconValue instanceof Character){
+                setTextUnicode((Character)iconValue);
+            }else {
+                GlyphFont gylphFont = GlyphFontRegistry.font(getFontFamily());
+                if (gylphFont != null) {
+                    String name = iconValue.toString();
+                    Character unicode = gylphFont.getCharacter(name);
+                    if (unicode != null) {
+                        setTextUnicode(unicode);
+                    } else {
+                        // Could not find a icon with this name
+                        setText(name);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the given char as text
+     * @param unicode
+     */
+    private void setTextUnicode(char unicode){
+        setText(String.valueOf(unicode));
+    }
 }

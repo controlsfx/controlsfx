@@ -26,13 +26,12 @@
  */
 package org.controlsfx.glyphfont;
 
-import java.io.InputStream;
-import java.util.Map;
-
 import com.sun.javafx.css.StyleManager;
-
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Represents a glyph font, which can be loaded locally or from a specified URL.
@@ -43,7 +42,7 @@ import javafx.scene.text.Font;
  *  <p>To simplify glyph customization, methods can be chained, for example:
  *   
  *  <pre>
- *  Glyph glyph = fontAwesome.fontSize(28).fontColor(Color.RED).create('&#92;uf013'); //GEAR
+ *  Glyph glyph = fontAwesome.create('&#92;uf013').size(28).color(Color.RED); //GEAR
  *  </pre>
  *  
  *  <p>Here's a screenshot of two font packs being used to render images into 
@@ -52,58 +51,109 @@ import javafx.scene.text.Font;
  * <br>
  * <center><img src="glyphFont.png"></center>
  */
-public abstract class GlyphFont {
+public class GlyphFont {
     
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
                 GlyphFont.class.getResource("glyphfont.css").toExternalForm()); //$NON-NLS-1$
     }
 
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
+
+    private final Map<String, Character> namedGlyphs = new HashMap<>();
+    private final Runnable fontLoader;
 	private final String fontName;
-	
 	private final double defaultSize;
-	private double size;
-	private Color color;
-	
+
 	private boolean  fontLoaded = false;
-	private Runnable fontLoader = null;
-	
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Loads glyph font from specified {@link InputStream}
+     * @param fontName glyph font name
+     * @param defaultSize default font size
+     * @param in input stream to load the font from
+     */
+    public GlyphFont( String fontName, int defaultSize, final InputStream in) {
+        this(fontName, defaultSize, in, false);
+    }
+
+    /**
+     * Load glyph font from specified URL.
+     * Example for a local file:
+     * "file:///C:/Users/Bob/Fonts/icomoon.ttf"
+     * "file:///Users/Bob/Fonts/icomoon.ttf"
+     *
+     * @param fontName glyph font name
+     * @param defaultSize default font size
+     * @param urlStr A URL to load the font from
+     */
+    public GlyphFont( String fontName, int defaultSize, final String urlStr) {
+        this(fontName, defaultSize, urlStr, false);
+    }
 
 	/**
 	 * Loads glyph font from specified {@link InputStream}
 	 * @param fontName glyph font name
 	 * @param defaultSize default font size
 	 * @param in input stream to load the font from
+     * @param lazyLoad If true, the font will only be loaded when accessed
 	 */
-	public GlyphFont( String fontName, int defaultSize, final InputStream in ) {
-		this.fontName = fontName;
-		this.defaultSize = defaultSize;
-		this.size = defaultSize;
-		fontLoader = new Runnable() {
-			public void run() {
-				Font.loadFont(in, -1);
-				fontLoaded = true;
-			}
-		};
+	public GlyphFont( String fontName, int defaultSize, final InputStream in, boolean lazyLoad) {
+        this(fontName, defaultSize, () -> {
+            Font.loadFont(in, -1);
+        }, lazyLoad);
 	}
 	
 	/**
-	 * Load glyph font from specified URL. 
+	 * Load glyph font from specified URL.
+     * Example for a local file:
+     * "file:///C:/Users/Bob/Fonts/icomoon.ttf"
+     * "file:///Users/Bob/Fonts/icomoon.ttf"
+     *
 	 * @param fontName glyph font name
 	 * @param defaultSize default font size
 	 * @param urlStr A URL to load the font from
+     * @param lazyLoad If true, the font will only be loaded when accessed
 	 */
-	public GlyphFont( String fontName, int defaultSize, final String urlStr ) {
-		this.fontName = fontName;
-		this.defaultSize = defaultSize;
-		this.size = defaultSize;
-		fontLoader = new Runnable() {
-			public void run() {
-				Font.loadFont(urlStr, -1);
-				fontLoaded = true;
-			}
-		};
+	public GlyphFont( String fontName, int defaultSize, final String urlStr, boolean lazyLoad) {
+        this(fontName, defaultSize, () -> {
+            Font.loadFont(urlStr, -1);
+        }, lazyLoad);
 	}
+
+    /**
+     * Creates a GlyphFont
+     * @param fontName
+     * @param defaultSize
+     * @param fontLoader
+     * @param lazyLoad
+     */
+    private GlyphFont(String fontName, int defaultSize, Runnable fontLoader, boolean lazyLoad){
+        this.fontName = fontName;
+        this.defaultSize = defaultSize;
+        this.fontLoader = fontLoader;
+
+        if(!lazyLoad){
+            ensureFontIsLoaded();
+        }
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
 	
 	/**
 	 * Returns font name
@@ -120,26 +170,7 @@ public abstract class GlyphFont {
 	public double getDefaultSize() {
 		return defaultSize;
 	}
-	
-	/**
-	 * Sets font size
-	 * @param size
-	 * @return font instance so the calls can be chained
-	 */
-	public GlyphFont fontSize(double size) {
-	    this.size = size;
-	    return this;
-	}
-	
-	/**
-	 * Sets font color
-	 * @param color
-	 * @return font instance so the calls can be chained
-	 */
-	public GlyphFont fontColor(Color color) {
-	    this.color = color;
-	    return this;
-	}
+
 	
 	/**
 	 * Creates an instance of {@link Glyph} using specified font character
@@ -147,23 +178,70 @@ public abstract class GlyphFont {
 	 * @return instance of {@link Glyph}
 	 */
 	public Glyph create(char character) {
-		if ( !fontLoaded ) fontLoader.run();
-	    return new Glyph(fontName, character, size, color);
+	    return new Glyph(fontName, character);
 	}
 	
 	/**
-	 * Creates and instance of {@link Glyph} using glyph name
+	 * Creates an instance of {@link Glyph} using glyph name
 	 * @param glyphName glyph name
 	 * @return glyph by its name or null if name is not found
 	 */
 	public Glyph create(String glyphName) {
-		Character ch = getGlyphs().get(glyphName);
-		return ch==null?null:create(ch);
+        return new Glyph(fontName, glyphName);
 	}
-	
-	/**
-	 * Returns glyph dictionary
-	 * @return {@link Map} of glyph name to character
-	 */
-	public abstract Map<String, Character> getGlyphs();
+
+    /**
+     *  Creates an instance of {@link Glyph} using a known Glyph enum value
+     * @param glyph
+     * @return
+     */
+    public Glyph create(Enum glyph) {
+        return new Glyph(fontName, glyph);
+    }
+
+    /**
+     * Returns the character code which is mapped to this Name.
+     * If no match is found, NULL is returned.
+     * @param glyphName
+     * @return
+     */
+    public Character getCharacter(String glyphName){
+        return namedGlyphs.get(glyphName.toUpperCase());
+    }
+
+
+    /**
+     * Registers all given characters with their name.
+     * @param namedCharacters
+     */
+    public void registerAll(Iterable<? extends INamedCharacter> namedCharacters){
+        for (INamedCharacter e:  namedCharacters) {
+            register(e.name(), e.getChar());
+        }
+    }
+
+    /**
+     * Registers the given name-character mapping
+     * @param name
+     * @param character
+     */
+    public void register(String name, Character character){
+        namedGlyphs.put(name.toUpperCase(), character);
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Internal methods                                                        *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Ensures that the font is loaded
+     */
+    synchronized void ensureFontIsLoaded(){
+        if ( !fontLoaded ) {
+            fontLoader.run();
+            fontLoaded = true;
+        }
+    }
 }

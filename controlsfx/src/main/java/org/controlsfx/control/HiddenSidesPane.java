@@ -357,37 +357,37 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // slide in animation delay
 
-    private final ObjectProperty<Duration> slideInDelay = new SimpleObjectProperty<Duration>(
-            this, "slideInDelay", Duration.millis(300));
+    private final ObjectProperty<Duration> animationDelay = new SimpleObjectProperty<Duration>(
+            this, "animationDelay", Duration.millis(300));
 
     /**
-     * Returns the slide in delay property. The value of this property
-     * determines the delay before the hidden side fade in animation starts to
-     * play.
+     * Returns the animation delay property. The value of this property
+     * determines the delay before the hidden side slide in / slide out
+     * animation starts to play.
      * 
      * @return animation delay property
      */
-    public final ObjectProperty<Duration> slideInDelayProperty() {
-        return slideInDelay;
+    public final ObjectProperty<Duration> animationDelayProperty() {
+        return animationDelay;
     }
 
     /**
-     * Returns the slide in animation delay
+     * Returns the animation delay
      * 
-     * @return slide in animation delay
+     * @return animation delay
      */
-    public final Duration getSlideInDelay() {
-        return slideInDelay.get();
+    public final Duration getAnimationDelay() {
+        return animationDelay.get();
     }
 
     /**
-     * Set the slide in animation delay
+     * Set the animation delay
      * 
      * @param duration
      *            slide in animation delay
      */
-    public final void setSlideInDelay(Duration duration) {
-        slideInDelay.set(duration);
+    public final void setAnimationDelay(Duration duration) {
+        animationDelay.set(duration);
     }
 
     // slide in / slide out duration

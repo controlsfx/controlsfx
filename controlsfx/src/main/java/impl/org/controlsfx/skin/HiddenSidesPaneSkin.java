@@ -187,8 +187,8 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
                     s.equals(side) ? 1 : 0);
         }
 
-        Duration delay = getSkinnable().getSlideInDelay() != null ? getSkinnable()
-                .getSlideInDelay() : Duration.millis(300);
+        Duration delay = getSkinnable().getAnimationDelay() != null ? getSkinnable()
+                .getAnimationDelay() : Duration.millis(300);
         Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
                 .getAnimationDuration() : Duration.millis(200);
 
@@ -228,11 +228,14 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
                     visibility[side.ordinal()], 0);
         }
 
+        Duration delay = getSkinnable().getAnimationDelay() != null ? getSkinnable()
+                .getAnimationDelay() : Duration.millis(300);
         Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
                 .getAnimationDuration() : Duration.millis(200);
 
         KeyFrame keyFrame = new KeyFrame(duration, keyValues);
         hideTimeline = new Timeline(keyFrame);
+        hideTimeline.setDelay(delay);
         hideTimeline.play();
     }
 

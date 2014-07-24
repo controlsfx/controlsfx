@@ -36,23 +36,23 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
- * The glyph font registry automatically registers available fonts using a 
- * {@link ServiceLoader} facility, however it is also possible to register 
- * glyph fonts manually using the provided 
- * {@link GlyphFontRegistry#register(GlyphFont)} method. 
- * 
+ * The glyph font registry automatically registers available fonts using a
+ * {@link ServiceLoader} facility, however it is also possible to register
+ * glyph fonts manually using the provided
+ * {@link GlyphFontRegistry#register(GlyphFont)} method.
+ *
  * <p>Once registered, fonts and their glyphs can be requested by name using the
  * {@link GlyphFontRegistry#glyph(String)} and
  * {@link GlyphFontRegistry#glyph(String, String)} methods. For example:
- * 
+ *
  * <pre>{@code
- * import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph; 
- * new Button("", glyph("FontAwesome|TRASH")) 
+ * import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
+ * new Button("", glyph("FontAwesome|TRASH"))
  * }</pre>
- * 
- * <p>An ability to retrieve glyph node by combination of font name and glyph name 
- * extends to the {@link ActionProxy} graphic attribute, where the "font>" 
- * prefix should be used. For more information see {@link ActionProxy}.  
+ *
+ * <p>An ability to retrieve glyph node by combination of font name and glyph name
+ * extends to the {@link ActionProxy} graphic attribute, where the "font>"
+ * prefix should be used. For more information see {@link ActionProxy}.
  */
 public final class GlyphFontRegistry {
 
@@ -61,8 +61,8 @@ public final class GlyphFontRegistry {
      * Private fields                                                          *
      *                                                                         *
      **************************************************************************/
-	
-	private static Map<String, GlyphFont> fontMap = new HashMap<>();
+
+    private static Map<String, GlyphFont> fontMap = new HashMap<>();
 
     /***************************************************************************
      *                                                                         *
@@ -81,9 +81,9 @@ public final class GlyphFontRegistry {
     /**
      * Private constructor since static class
      */
-	private GlyphFontRegistry() {
-		// no-op
-	}
+    private GlyphFontRegistry() {
+        // no-op
+    }
 
     /***************************************************************************
      *                                                                         *
@@ -111,45 +111,45 @@ public final class GlyphFontRegistry {
         register(new GlyphFont(familyName, defaultSize, in));
     }
 
-	/**
-	 * Registers the specified font
-	 * @param font
-	 */
-	public static void register( GlyphFont font ) {
-		if (font != null ) {
-			fontMap.put( font.getName(), font );
-		}
-	}
-	
-	/**
-	 * Retrieve font by its family name
-	 * @param familyName family name of the font
-	 * @return font or null if not found
-	 */
-	public static GlyphFont font( String familyName ) {
+    /**
+     * Registers the specified font
+     * @param font
+     */
+    public static void register( GlyphFont font ) {
+        if (font != null ) {
+            fontMap.put( font.getName(), font );
+        }
+    }
+
+    /**
+     * Retrieve font by its family name
+     * @param familyName family name of the font
+     * @return font or null if not found
+     */
+    public static GlyphFont font( String familyName ) {
         GlyphFont font = fontMap.get(familyName);
         font.ensureFontIsLoaded();
         return font;
-	}
-	
-	/**
-	 * Retrieve one glyph by font name and glyph name
-	 * @param fontName font name
-	 * @param glyphName glyph name
-	 * @return glyph as a Node
-	 */
-	public static Node glyph( String fontName, String glyphName ) {
-		GlyphFont font = font(fontName);
-		return font.create(glyphName);
-	}
-	
-	/**
-	 * Retrieve glyph by font name and glyph name using one string where font name an glyph name are separated by pipe
-	 * @param fontAndGlyph font and glyph
-	 * @return glyph as Node
-	 */
-	public static Node glyph( String fontAndGlyph ) {
-		String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
-		return glyph( args[0], args[1]);
-	}
+    }
+
+    /**
+     * Retrieve one glyph by font name and glyph name
+     * @param fontName font name
+     * @param glyphName glyph name
+     * @return glyph as a Node
+     */
+    public static Node glyph( String fontName, String glyphName ) {
+        GlyphFont font = font(fontName);
+        return font.create(glyphName);
+    }
+
+    /**
+     * Retrieve glyph by font name and glyph name using one string where font name an glyph name are separated by pipe
+     * @param fontAndGlyph font and glyph
+     * @return glyph as Node
+     */
+    public static Node glyph( String fontAndGlyph ) {
+        String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
+        return glyph( args[0], args[1]);
+    }
 }

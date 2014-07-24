@@ -48,51 +48,51 @@ public class HelloGlyphFont extends ControlsFXSample {
     }
 
 
-	private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-	private GlyphFont icoMoon = GlyphFontRegistry.font("icomoon");
+    private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
+    private GlyphFont icoMoon = GlyphFontRegistry.font("icomoon");
 
-//	private static char FAW_TRASH = '\uf014';
-	private static char FAW_GEAR  = '\uf013';
+    //	private static char FAW_TRASH = '\uf014';
+    private static char FAW_GEAR  = '\uf013';
 //	private static char FAW_STAR  = '\uf005';
 
-	private static char IM_BOLD        = '\ue027';
-	private static char IM_UNDERSCORED = '\ue02b';
-	private static char IM_ITALIC      = '\ue13e';
+    private static char IM_BOLD        = '\ue027';
+    private static char IM_UNDERSCORED = '\ue02b';
+    private static char IM_ITALIC      = '\ue13e';
 
 
 
-	@Override
-	public String getSampleName() {
-		return "Glyph Font";
-	}
+    @Override
+    public String getSampleName() {
+        return "Glyph Font";
+    }
 
-	@Override
-	public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE + "org/controlsfx/glyphfont/GlyphFont.html";
-	}
+    @Override
+    public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/glyphfont/GlyphFont.html";
+    }
 
-	@Override
-	public Node getPanel(final Stage stage) {
+    @Override
+    public Node getPanel(final Stage stage) {
 
-		VBox root = new VBox(10);
-		
-		root.setPadding(new Insets(10, 10, 10, 10));
-		root.setMaxHeight(Double.MAX_VALUE);
-		Label title = new Label("Using FontAwesome(CDN)");
-		root.getChildren().add(title);
-		ToolBar toolbar = new ToolBar(
+        VBox root = new VBox(10);
+
+        root.setPadding(new Insets(10, 10, 10, 10));
+        root.setMaxHeight(Double.MAX_VALUE);
+        Label title = new Label("Using FontAwesome(CDN)");
+        root.getChildren().add(title);
+        ToolBar toolbar = new ToolBar(
 
                 // There are many ways how you can define a Glyph:
 
                 new Button("", new Glyph("FontAwesome", "TRASH")),                  // Use the Glyph-class with a icon name
-				new Button("", new Glyph("FontAwesome", FontAwesome.Glyph.STAR)),   // Use the Glyph-class with a known enum value
+                new Button("", new Glyph("FontAwesome", FontAwesome.Glyph.STAR)),   // Use the Glyph-class with a known enum value
                 new Button("", fontAwesome.create("SMILE")),                        // Use the font-instance with a name
                 new Button("", fontAwesome.create(FontAwesome.Glyph.ANCHOR)),       // Use the font-instance with a enum
-				new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED))       // Use the font-instance with a unicode char
+                new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED))       // Use the font-instance with a unicode char
         );
-		root.getChildren().add(toolbar);
-		title = new Label("Using IcoMoon (Local)");
-		root.getChildren().add(title);
+        root.getChildren().add(toolbar);
+        title = new Label("Using IcoMoon (Local)");
+        root.getChildren().add(title);
 
         Glyph effectGlyph = icoMoon.create(IM_UNDERSCORED)
                 .color(Color.BLUE)
@@ -104,22 +104,22 @@ public class HelloGlyphFont extends ControlsFXSample {
                 .size(48)
                 .useGradientEffect().useHoverEffect();
 
-		toolbar = new ToolBar(
+        toolbar = new ToolBar(
 
                 // Since we have a custom font without named characters,
                 // we have to use unicode character codes for the icons:
 
-				new Button("", icoMoon.create(IM_BOLD).size(16)),
-				new Button("", icoMoon.create(IM_UNDERSCORED).color(Color.GREEN).size(32)),
-				new Button("", icoMoon.create(IM_ITALIC).size(48)),
+                new Button("", icoMoon.create(IM_BOLD).size(16)),
+                new Button("", icoMoon.create(IM_UNDERSCORED).color(Color.GREEN).size(32)),
+                new Button("", icoMoon.create(IM_ITALIC).size(48)),
                 new Button("", effectGlyph),
                 new Button("", effectGlyph2));
-		root.getChildren().add(toolbar);
-		return root;
+        root.getChildren().add(toolbar);
+        return root;
 
-	}
+    }
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         launch(args);
-	}
+    }
 }

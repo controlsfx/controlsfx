@@ -38,21 +38,21 @@ import java.util.Map;
  *  {@link Glyph}s can be created easily using specified character defined in the
  *  font. For example, &#92;uf013 in FontAwesome is used to represent
  *  a gear icon.
- *  
+ *
  *  <p>To simplify glyph customization, methods can be chained, for example:
- *   
+ *
  *  <pre>
  *  Glyph glyph = fontAwesome.create('&#92;uf013').size(28).color(Color.RED); //GEAR
  *  </pre>
- *  
- *  <p>Here's a screenshot of two font packs being used to render images into 
+ *
+ *  <p>Here's a screenshot of two font packs being used to render images into
  *  JavaFX Button controls:
- *  
+ *
  * <br>
  * <center><img src="glyphFont.png"></center>
  */
 public class GlyphFont {
-    
+
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
                 GlyphFont.class.getResource("glyphfont.css").toExternalForm()); //$NON-NLS-1$
@@ -66,10 +66,10 @@ public class GlyphFont {
 
     private final Map<String, Character> namedGlyphs = new HashMap<>();
     private final Runnable fontLoader;
-	private final String fontName;
-	private final double defaultSize;
+    private final String fontName;
+    private final double defaultSize;
 
-	private boolean  fontLoaded = false;
+    private boolean  fontLoaded = false;
 
 
     /***************************************************************************
@@ -102,35 +102,35 @@ public class GlyphFont {
         this(fontName, defaultSize, urlStr, false);
     }
 
-	/**
-	 * Loads glyph font from specified {@link InputStream}
-	 * @param fontName glyph font name
-	 * @param defaultSize default font size
-	 * @param in input stream to load the font from
+    /**
+     * Loads glyph font from specified {@link InputStream}
+     * @param fontName glyph font name
+     * @param defaultSize default font size
+     * @param in input stream to load the font from
      * @param lazyLoad If true, the font will only be loaded when accessed
-	 */
-	public GlyphFont( String fontName, int defaultSize, final InputStream in, boolean lazyLoad) {
+     */
+    public GlyphFont( String fontName, int defaultSize, final InputStream in, boolean lazyLoad) {
         this(fontName, defaultSize, () -> {
             Font.loadFont(in, -1);
         }, lazyLoad);
-	}
-	
-	/**
-	 * Load glyph font from specified URL.
+    }
+
+    /**
+     * Load glyph font from specified URL.
      * Example for a local file:
      * "file:///C:/Users/Bob/Fonts/icomoon.ttf"
      * "file:///Users/Bob/Fonts/icomoon.ttf"
      *
-	 * @param fontName glyph font name
-	 * @param defaultSize default font size
-	 * @param urlStr A URL to load the font from
+     * @param fontName glyph font name
+     * @param defaultSize default font size
+     * @param urlStr A URL to load the font from
      * @param lazyLoad If true, the font will only be loaded when accessed
-	 */
-	public GlyphFont( String fontName, int defaultSize, final String urlStr, boolean lazyLoad) {
+     */
+    public GlyphFont( String fontName, int defaultSize, final String urlStr, boolean lazyLoad) {
         this(fontName, defaultSize, () -> {
             Font.loadFont(urlStr, -1);
         }, lazyLoad);
-	}
+    }
 
     /**
      * Creates a GlyphFont
@@ -154,41 +154,41 @@ public class GlyphFont {
      * Public API                                                              *
      *                                                                         *
      **************************************************************************/
-	
-	/**
-	 * Returns font name
-	 * @return font name
-	 */
-	public String getName() {
-		return fontName;
-	}
-	
-	/**
-	 * Returns the default font size
-	 * @return default font size
-	 */
-	public double getDefaultSize() {
-		return defaultSize;
-	}
 
-	
-	/**
-	 * Creates an instance of {@link Glyph} using specified font character
-	 * @param character font character
-	 * @return instance of {@link Glyph}
-	 */
-	public Glyph create(char character) {
-	    return new Glyph(fontName, character);
-	}
-	
-	/**
-	 * Creates an instance of {@link Glyph} using glyph name
-	 * @param glyphName glyph name
-	 * @return glyph by its name or null if name is not found
-	 */
-	public Glyph create(String glyphName) {
+    /**
+     * Returns font name
+     * @return font name
+     */
+    public String getName() {
+        return fontName;
+    }
+
+    /**
+     * Returns the default font size
+     * @return default font size
+     */
+    public double getDefaultSize() {
+        return defaultSize;
+    }
+
+
+    /**
+     * Creates an instance of {@link Glyph} using specified font character
+     * @param character font character
+     * @return instance of {@link Glyph}
+     */
+    public Glyph create(char character) {
+        return new Glyph(fontName, character);
+    }
+
+    /**
+     * Creates an instance of {@link Glyph} using glyph name
+     * @param glyphName glyph name
+     * @return glyph by its name or null if name is not found
+     */
+    public Glyph create(String glyphName) {
         return new Glyph(fontName, glyphName);
-	}
+    }
 
     /**
      *  Creates an instance of {@link Glyph} using a known Glyph enum value

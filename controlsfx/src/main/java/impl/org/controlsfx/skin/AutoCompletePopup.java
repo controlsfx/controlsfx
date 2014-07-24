@@ -1,6 +1,7 @@
 package impl.org.controlsfx.skin;
 
 
+import com.sun.javafx.event.EventHandlerManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.collections.FXCollections;
@@ -14,8 +15,6 @@ import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
-
-import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * The auto-complete-popup provides an list of available suggestions in order
@@ -122,17 +121,19 @@ public class AutoCompletePopup<T> extends PopupControl{
     }
 
     /**
+     * Set the string converter used to turn a generic suggestion into a string
      */
     public void setConverter(StringConverter<T> converter) {
 		this.converter = converter;
 	}
     
     /**
+     * Get the string converter used to turn a generic suggestion into a string
      */
 	public StringConverter<T> getConverter() {
 		return converter;
 	}
-    
+
 
     /***************************************************************************
      *                                                                         *

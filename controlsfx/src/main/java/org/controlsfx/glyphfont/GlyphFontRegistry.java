@@ -27,9 +27,6 @@
 package org.controlsfx.glyphfont;
 
 
-import javafx.scene.Node;
-import org.controlsfx.control.action.ActionProxy;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,18 +38,12 @@ import java.util.ServiceLoader;
  * glyph fonts manually using the provided
  * {@link GlyphFontRegistry#register(GlyphFont)} method.
  *
- * <p>Once registered, fonts and their glyphs can be requested by name using the
- * {@link GlyphFontRegistry#glyph(String)} and
- * {@link GlyphFontRegistry#glyph(String, String)} methods. For example:
+ * <p>Once registered, fonts can be requested by name using the
+ * {@link GlyphFontRegistry#font(String)} method.
  *
- * <pre>{@code
- * import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
- * new Button("", glyph("FontAwesome|TRASH"))
- * }</pre>
+ * Please refer to the {@link GlyphFont} documentation
+ * to learn how to use a font.
  *
- * <p>An ability to retrieve glyph node by combination of font name and glyph name
- * extends to the {@link ActionProxy} graphic attribute, where the "font>"
- * prefix should be used. For more information see {@link ActionProxy}.
  */
 public final class GlyphFontRegistry {
 

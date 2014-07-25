@@ -40,6 +40,14 @@ import org.controlsfx.tools.Duplicatable;
  * The glyph is actually a label showing one character from the specified font. It can be used as 'graphic' on any UI
  * control or {@link Action}
  *
+ * <pre>{@code
+ * new Button("", new Glyph("FontAwesome", "TRASH"))
+ * }</pre>
+ *
+ * <p>An ability to retrieve glyph node by combination of font name and glyph name
+ * extends to the {@link org.controlsfx.control.action.ActionProxy} graphic attribute, where the "font>"
+ * prefix should be used. For more information see {@link org.controlsfx.control.action.ActionProxy}.
+ *
  */
 public class Glyph extends Label implements Duplicatable<Glyph> {
 
@@ -287,10 +295,10 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
             if(iconValue instanceof Character){
                 setTextUnicode((Character)iconValue);
             }else {
-                GlyphFont gylphFont = GlyphFontRegistry.font(getFontFamily());
-                if (gylphFont != null) {
+                GlyphFont glyphFont = GlyphFontRegistry.font(getFontFamily());
+                if (glyphFont != null) {
                     String name = iconValue.toString();
-                    Character unicode = gylphFont.getCharacter(name);
+                    Character unicode = glyphFont.getCharacter(name);
                     if (unicode != null) {
                         setTextUnicode(unicode);
                     } else {

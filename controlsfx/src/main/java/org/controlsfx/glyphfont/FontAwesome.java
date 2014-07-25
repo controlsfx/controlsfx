@@ -26,6 +26,7 @@
  */
 package org.controlsfx.glyphfont;
 
+import java.io.InputStream;
 import java.util.Arrays;
 
 
@@ -475,8 +476,26 @@ public class FontAwesome extends GlyphFont {
      * {@link FontAwesome.Glyph} public static enumeration method to create the glyph nodes), or
      * use the {@link GlyphFontRegistry} class to get access.
      */
-    public FontAwesome() {
-        super(fontName, 14, "http://netdna.bootstrapcdn.com/font-awesome/3.2.1/font/fontawesome-webfont.ttf", true );  //$NON-NLS-1$
+    FontAwesome() {
+        this("http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/fonts/fontawesome-webfont.ttf"); //$NON-NLS-1$
+    }
+
+    /**
+     * Creates a new FontAwesome instance which uses the provided font source.
+     * @param url
+     */
+    public FontAwesome(String url){
+        super(fontName, 14, url, true);
         registerAll(Arrays.asList(Glyph.values()));
     }
+
+    /**
+     * Creates a new FontAwesome instance which uses the provided font source.
+     * @param is
+     */
+    public FontAwesome(InputStream is){
+        super(fontName, 14, is, true);
+        registerAll(Arrays.asList(Glyph.values()));
+    }
+
 }

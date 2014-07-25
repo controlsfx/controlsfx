@@ -475,8 +475,10 @@ public class FontAwesome extends GlyphFont {
      * Do not call this constructor directly - instead access the
      * {@link FontAwesome.Glyph} public static enumeration method to create the glyph nodes), or
      * use the {@link GlyphFontRegistry} class to get access.
+     *
+     * Note: Do not remove this public constructor since it is used by the service loader!
      */
-    FontAwesome() {
+    public FontAwesome() {
         this("http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/fonts/fontawesome-webfont.ttf"); //$NON-NLS-1$
     }
 

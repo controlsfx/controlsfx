@@ -84,11 +84,11 @@ public class HelloGlyphFont extends ControlsFXSample {
 
                 // There are many ways how you can define a Glyph:
 
-                new Button("", new Glyph("FontAwesome", "TRASH")),                  // Use the Glyph-class with a icon name
+                new Button("", new Glyph("FontAwesome", "TRASH_ALT")),              // Use the Glyph-class with a icon name
                 new Button("", new Glyph("FontAwesome", FontAwesome.Glyph.STAR)),   // Use the Glyph-class with a known enum value
                 new Button("", Glyph.create("FontAwesome|BUG")),                    // Use the static Glyph-class create protocol
-                new Button("", fontAwesome.create("SMILE")),                        // Use the font-instance with a name
-                new Button("", fontAwesome.create(FontAwesome.Glyph.ANCHOR)),       // Use the font-instance with a enum
+                new Button("", fontAwesome.create("REBEL")),                        // Use the font-instance with a name
+                new Button("", fontAwesome.create(FontAwesome.Glyph.SMILE_ALT)),    // Use the font-instance with a enum
                 new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED))       // Use the font-instance with a unicode char
         );
         root.getChildren().add(toolbar);

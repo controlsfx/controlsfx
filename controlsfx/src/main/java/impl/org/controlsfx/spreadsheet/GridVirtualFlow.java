@@ -26,11 +26,12 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -40,21 +41,30 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 import javafx.scene.layout.Region;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import com.sun.javafx.scene.control.skin.VirtualScrollBar;
-
 final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     
+    /**
+     * With that comparator we can lay out our rows in the reverse order. That
+     * is to say from the bottom to the very top. In that manner we are sure
+     * that our spanning cells will COVER the cell below so we don't have any
+     * problems with missing hovering, the editor jammed etc.
+     * <br/>
+     *
+     * The only problem is for the fixed column but the {@link #getTopRow(int) }
+     * now returns the very first row and allow us to put some priviledge
+     * TableCell in it if they feel the need to be on top in term of z-order.
+     *
+     * FIXME The best would be to put a TreeList of something like that in order
+     * not to sort the rows everytime, need investigation..
+     */
     private static final Comparator<GridRow> ROWCMP = new Comparator<GridRow>() {
         @Override
-        public int compare(GridRow o1, GridRow o2) {
-            final int lhs = o1.getIndex();
-            final int rhs = o2.getIndex();
-            return lhs < rhs ? -1 : +1;
+        public int compare(GridRow firstRow, GridRow secondRow) {
+            //o1.getIndex() < o2.getIndex() ? -1 : +1;
+            return secondRow.getIndex() - firstRow.getIndex();
         }
     };
 
@@ -68,7 +78,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * That is to say, when the VirtualFlow has not already placed one.
      */
     private final ArrayList<T> myFixedCells = new ArrayList<>();
-    private final List<Node> sheetChildren;
+    public final List<Node> sheetChildren;
     
     /***************************************************************************
      * * Constructor * *
@@ -87,32 +97,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         widthProperty().addListener(hBarValueChangeListener);
         
 
-        // FIXME Until RT-31777 is resolved
+        // FIXME Until https://javafx-jira.kenai.com/browse/RT-31777 is resolved
         getHbar().setUnitIncrement(10);
         
         sheetChildren = findSheetChildren();
     }
 
-    /**
-     * WARNING : This is bad but no other options right now.
-     * This will find the sheetChildren of the VirtualFlow, 
-     * aka where the cells are kept and clipped. See layoutFixedRows() for use.
-     * 
-     * @return
-     */
-    private List<Node> findSheetChildren(){
-        if(!getChildren().isEmpty()){
-            if(getChildren().get(0) instanceof Region){
-                Region region = (Region) getChildren().get(0);
-                if(!region.getChildrenUnmodifiable().isEmpty()){
-                    if(region.getChildrenUnmodifiable().get(0) instanceof Group){
-                        return ((Group)region.getChildrenUnmodifiable().get(0)).getChildren();
-                    }
-                }
-            }
-        }
-        return new ArrayList<>();
-    }
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
@@ -130,6 +120,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 								if(cell.getIndex() == i){
 									cell.setManaged(false);
 									cell.setVisible(false);
+//                                                                        sheetChildren.remove(cell);
 									myFixedCells.remove(cell);
 									break;
 								}
@@ -174,11 +165,25 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
         return returnValue;
     }
-
+    
     /***************************************************************************
      * * Protected Methods * *
      **************************************************************************/
 
+    /**
+     * We need to return here the very top row in term of "z-order". Because we
+     * will add in this row the TableCell that are in fixedColumn and which
+     * needs to be drawn on top of all others.
+     *
+     * @return
+     */
+    GridRow getTopRow() {
+        if (!sheetChildren.isEmpty()) {
+            return (GridRow) sheetChildren.get(sheetChildren.size() - 1);
+        }
+        return null;
+    }
+    
     @Override
     protected void layoutChildren() {
         // We don't want to layout everything in case we're editing 
@@ -199,6 +204,16 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     protected void layoutTotal() {
         sortRows();
         
+        /**
+         * When we layout, we also remove the cell that have been deported into
+         * other rows in order not to have some TableCell hanging out.
+         */
+        for(GridRow row : gridViewSkin.deportedCells.keySet()){
+            for(CellView cell: gridViewSkin.deportedCells.get(row)){
+                row.removeCell(cell);
+            }
+        }
+        gridViewSkin.deportedCells.clear();
         // When scrolling fast with fixed Rows, cells is empty and not recreated..
         if (getCells().isEmpty()) {
             reconfigureCells();
@@ -228,6 +243,27 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      **************************************************************************/
 
     /**
+     * WARNING : This is bad but no other options right now. This will find the
+     * sheetChildren of the VirtualFlow, aka where the cells are kept and
+     * clipped. See layoutFixedRows() or getTopRow() for use.
+     *
+     * @return
+     */
+    private List<Node> findSheetChildren(){
+        if(!getChildren().isEmpty()){
+            if(getChildren().get(0) instanceof Region){
+                Region region = (Region) getChildren().get(0);
+                if(!region.getChildrenUnmodifiable().isEmpty()){
+                    if(region.getChildrenUnmodifiable().get(0) instanceof Group){
+                        return ((Group)region.getChildrenUnmodifiable().get(0)).getChildren();
+                    }
+                }
+            }
+        }
+        return new ArrayList<>();
+    }
+    
+    /**
      * Layout the fixed rows to position them correctly
      */
     private void layoutFixedRows() {
@@ -244,7 +280,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
              * handle. But if the row is missing, then I must show mine in order
              * to have the fixed row.
              */
-            T cell = null;
+            T row = null;
             Integer fixedRowIndex;
             
             rows:
@@ -253,41 +289,52 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 T lastCell = getLastVisibleCellWithinViewPort();
                 //If the fixed row is out of bounds
                 if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {
-                    if (cell != null) {
-                        cell.setVisible(false);
-                        cell.setManaged(false);
+                    if (row != null) {
+                        row.setVisible(false);
+                        row.setManaged(false);
+                        sheetChildren.remove(row);
                     }
                     continue;
                 }
 
                 //We see if the row is laid out by the VirtualFlow
                 for (T virtualFlowCells : getCells()) {
-                	if (virtualFlowCells.getIndex() > fixedRowIndex) {
+                    if (virtualFlowCells.getIndex() > fixedRowIndex) {
                         break;
-                    }else if (virtualFlowCells.getIndex() == fixedRowIndex) {
-                        cell = containsRows(fixedRowIndex);
-                        if (cell != null) {
-                            cell.setVisible(false);
-                            cell.setManaged(false);
+                    } else if (virtualFlowCells.getIndex() == fixedRowIndex) {
+                        row = containsRows(fixedRowIndex);
+                        if (row != null) {
+                            row.setVisible(false);
+                            row.setManaged(false);
+                            sheetChildren.remove(row);
                         }
+                        /**
+                         * OLD COMMENT : We must push to Front only if the row
+                         * is at the very top and has a risk to be recovered.
+                         * This is happening only if this row is translated.
+                         *
+                         * NEW COMMENT: I'm not sure about this.. Since the
+                         * fixedColumn are not in the special top row, we don't
+                         * care if the row is pushed to front.. need
+                         * investigation
+                         */
                         virtualFlowCells.toFront();
                         continue rows;
                     }
                 }
                 
-                cell = containsRows(fixedRowIndex);
-                if (cell == null) {
+                row = containsRows(fixedRowIndex);
+                if (row == null) {
                     /**
                      * getAvailableCell is not added our cell to the ViewPort in some cases.
                      * So we need to instantiate it ourselves.
                      */
-                    cell = getCreateCell().call(this);
-                    cell.getProperties().put("newcell", null); //$NON-NLS-1$
-//                	cell = getAvailableCell(fixedRowIndex);
+                    row = getCreateCell().call(this);
+                    row.getProperties().put("newcell", null); //$NON-NLS-1$
                 	 
-                    setCellIndex(cell, fixedRowIndex);
-                    resizeCellSize(cell);
-                    myFixedCells.add(cell);
+                    setCellIndex(row, fixedRowIndex);
+                    resizeCellSize(row);
+                    myFixedCells.add(row);
                 }
                 
                 /**
@@ -295,14 +342,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                  * we can end up with some rows not being added to the ViewPort.
                  * So we must be sure it's in and add it ourself otherwise.
                  */
-                if(!sheetChildren.contains(cell)){
-                    sheetChildren.add(cell);
+                if(!sheetChildren.contains(row)){
+                    sheetChildren.add(row);
                 }
                
-                cell.setManaged(true);
-                cell.setVisible(true);
-                cell.toFront();
-                cell.requestLayout();
+                row.setManaged(true);
+                row.setVisible(true);
+                row.toFront();
+                row.requestLayout();
             }
         }
     }

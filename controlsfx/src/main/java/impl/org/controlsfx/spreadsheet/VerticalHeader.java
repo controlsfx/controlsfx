@@ -227,7 +227,7 @@ public class VerticalHeader extends StackPane {
             rowCount = addVisibleRows(rowCount, x, cellSize);
 
             if (spreadsheetView.isShowRowHeader()) {
-                rowCount = addFixedRows(rowCount, x, cellSize);
+                rowCount = addFixedRows(rowCount, cellSize);
             }
             // First one blank and on top (z-order) of the others
             if (spreadsheetView.showColumnHeaderProperty().get()) {
@@ -260,7 +260,7 @@ public class VerticalHeader extends StackPane {
         }
     }
 
-    private int addFixedRows(int rowCount, double x, int cellSize) {
+    private int addFixedRows(int rowCount, int cellSize) {
         double spaceUsedByFixedRows = 0;
         int rowIndex;
         Label label;

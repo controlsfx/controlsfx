@@ -86,7 +86,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     public CellView(SpreadsheetHandle handle) {
         this.handle = handle;
-        hoverProperty().addListener(hoverChangeListener);
         // When we detect a drag, we start the Full Drag so that other event
         // will be fired
         this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
@@ -192,6 +191,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             updateSelected(false);
         }
         if (empty && emptyRow) {
+            textProperty().unbind();
             setText(null);
             // do not nullify graphic here. Let the TableRow to control cell
             // dislay
@@ -395,55 +395,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-    /**
-     * A SpreadsheetCell is being hovered and we need to re-route the signal.
-     * 
-     * @param cell
-     *            The DataCell needed to be hovered.
-     * @param hover
-     */
-    private void hoverGridCell(SpreadsheetCell cell) {
-        CellView gridCell;
-
-        final GridViewSkin sps = handle.getCellsViewSkin();
-        final GridRow row = sps.getRow(0);// spv.getFixedRows().size());
-
-        if (sps.getCellsSize() != 0 && row.getIndex() <= cell.getRow()) {
-            // We want to get the top of the spanned cell, so we need
-            // to access the difference between where we want to go and the
-            // first visibleRow
-            final GridRow rightRow = sps.getRow(cell.getRow() - row.getIndex());
-
-            if (rightRow != null) {// Sometime when scrolling fast it's null
-                                   // so..
-                gridCell = rightRow.getGridCell(cell.getColumn());
-            } else {
-                gridCell = row.getGridCell(cell.getColumn());
-            }
-        } else { // If it's not, then it's the firstkey
-            gridCell = row.getGridCell(cell.getColumn());
-        }
-
-        if (gridCell != null) {
-            gridCell.setHoverPublic(true);
-            GridCellEditor editor = sps.getSpreadsheetCellEditorImpl();
-            editor.setLastHover(gridCell);
-        }
-    }
-
-    /**
-     * Set Hover to false to the previous Cell we force to be hovered
-     */
-    private void unHoverGridCell() {
-        // If the top of the spanned cell is visible, then no problem
-        final GridViewSkin sps = handle.getCellsViewSkin();
-        GridCellEditor editor = sps.getSpreadsheetCellEditorImpl();
-        CellView lastHover = editor.getLastHover();
-        if (editor.getLastHover() != null) {
-            lastHover.setHoverPublic(false);
-        }
-    }
-
     private final ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
         @Override
         public void changed(ObservableValue<? extends Node> arg0, Node arg1, Node newGraphic) {
@@ -548,7 +499,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * 
      * @param runnable
      */
-    static void getValue(final Runnable runnable) {
+    public static void getValue(final Runnable runnable) {
         if (Platform.isFxApplicationThread()) {
             runnable.run();
         } else {
@@ -575,24 +526,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     };
     
-    private final ChangeListener<Boolean> hoverChangeListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
-            final int row = getIndex();
-            if (getItem() == null) {
-                getTableRow().requestLayout();
-                // We only need to re-route if the rowSpan is large because
-                // it's the only case where it's not handled correctly.
-            } else if (getItem().getRowSpan() > 1) {
-                // If we are not at the top of the Spanned Cell
-                if (t1 && row != getItem().getRow()) {
-                    hoverGridCell(getItem());
-                } else if (!t1 && row != getItem().getRow()) {
-                    unHoverGridCell();
-                }
-            }
-        }
-    };
     private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
 
         @Override

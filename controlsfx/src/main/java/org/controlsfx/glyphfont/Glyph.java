@@ -38,11 +38,21 @@ import org.controlsfx.tools.Duplicatable;
 /**
  * Represents one glyph from the font.
  * The glyph is actually a label showing one character from the specified font. It can be used as 'graphic' on any UI
- * control or {@link Action}
+ * control or {@link Action}. It can also directly be used in FXML.
+ *
+ * Examples:
  *
  * <pre>{@code
- * new Button("", new Glyph("FontAwesome", "TRASH"))
+ * new Button("", new Glyph("FontAwesome", "BEER"))
  * }</pre>
+ *
+ * <pre>{@code
+ * new Button("", new Glyph("FontAwesome", FontAwesome.Glyph.BEER))
+ * }</pre>
+ *
+ * Thy Glyph-Class also offers a fluent API to customize the look of the Glyph.
+ * For example, you can set the color {@link #color(javafx.scene.paint.Color)} or
+ * also add effects such as {@link #useHoverEffect()}
  *
  * <p>An ability to retrieve glyph node by combination of font name and glyph name
  * extends to the {@link org.controlsfx.control.action.ActionProxy} graphic attribute, where the "font>"
@@ -100,8 +110,8 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Creates a new Glyph
-     * @param fontFamily
-     * @param unicode
+     * @param fontFamily The family name of the font. Example: "FontAwesome"
+     * @param unicode The Unicode character of the glyph
      */
     public Glyph(String fontFamily, char unicode) {
         this();
@@ -111,8 +121,9 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Creates a new Glyph
-     * @param fontFamily
-     * @param icon
+     * @param fontFamily The family name of the font. Example: "FontAwesome"
+     * @param icon The icon - which can be the name (String) or Enum value.
+     *             Example: FontAwesome.Glyph.BEER
      */
     public Glyph(String fontFamily, Object icon) {
         this();

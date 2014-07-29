@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013,2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ import java.util.Arrays;
  * Defines a {@link GlyphFont} for the FontAwesome font set (see
  * <a href="http://fortawesome.github.io/Font-Awesome/">the FontAwesome website</a>
  * for more details). Note that at present the FontAwesome font is not distributed
- * with ControlsFX, and is instead loaded from Bootstrap CDN at runtime.
+ * with ControlsFX, and is, by default, instead loaded from a CDN at runtime.
  *
  * <p>To use FontAwesome (or indeed any glyph font) in your JavaFX application,
  * you firstly have to get access to the FontAwesome glyph font. You do this by
@@ -49,18 +49,23 @@ import java.util.Arrays;
  * <p>Once the font set has been loaded, you can simply start creating
  * {@link Glyph} nodes and place them in your user interface. For example:
  *
- * <pre>new Button("", fontAwesome.fontColor(Color.RED).create(&#92;uf013));</pre>
+ * <pre>new Button("", fontAwesome.create(&#92;uf013).fontColor(Color.RED));</pre>
  *
  * <p>Of course, this requires you to know that <code>&#92;uf013</code> maps to
  * a 'gear' icon, which is not always intuitive (especially when you re-read the
  * code in the future). A simpler approach is to do the following:
  *
- * <pre>new Button("", FontAwesome.Glyph.GEAR.create());</pre>
+ * <pre>new Button("", fontAwesome.create(FontAwesome.Glyph.GEAR));</pre>
+ * or
+ * <pre>new Button("", fontAwesome.create("GEAR"));</pre>
  *
  * It is possible to achieve the same result without creating a reference to icon font by simply using
- * {@link GlyphFontRegistry} methods
+ * {@link org.controlsfx.glyphfont.Glyph} constructor
  *
- * <pre>new Button("", GlyphFontRegistry.glyph("FontAwesome|GEAR");</pre>
+ * <pre>new Button("", new Glyph("FontAwesome","GEAR");</pre>
+ *
+ * You can use the above Glyph class also in FXML and set the
+ * fontFamily and icon property there.
  *
  * @see GlyphFont
  * @see GlyphFontRegistry

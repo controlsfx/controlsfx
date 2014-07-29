@@ -119,7 +119,9 @@ public final class GlyphFontRegistry {
      */
     public static GlyphFont font( String familyName ) {
         GlyphFont font = fontMap.get(familyName);
-        font.ensureFontIsLoaded();
+        if(font != null) {
+            font.ensureFontIsLoaded();
+        }
         return font;
     }
 }

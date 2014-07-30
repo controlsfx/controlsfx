@@ -27,6 +27,8 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.SegmentedButtonSkin;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Skin;
@@ -67,6 +69,16 @@ import javafx.scene.control.ToggleGroup;
  * 
  * <pre>{@code SegmentedButton segmentedButton = new SegmentedButton(b1, b2, b3, b4);}</pre>
  * 
+ * <h3>Custom ToggleGroup</h3>
+ * <p>It is possible to configure the ToggleGroup, which is used internally.
+ * By setting the ToggleGroup to null, the control will allow multiple selections.
+ * 
+ * <pre>
+ * {@code 
+ * SegmentedButton segmentedButton = new SegmentedButton();
+ * segmentedButton.setGroup(null);
+ * }</pre>
+ *  
  * <h3>Alternative Styling</h3>
  * <p>As is visible in the screenshot at the top of this class documentation, 
  * there are two different styles supported by the SegmentedButton control.
@@ -114,6 +126,7 @@ public class SegmentedButton extends ControlsFXControl {
      *************************************************************************/
     
     private final ObservableList<ToggleButton> buttons;
+    private final ObjectProperty<ToggleGroup> group = new SimpleObjectProperty<ToggleGroup>(new ToggleGroup());
     
     /**************************************************************************
      * 
@@ -180,6 +193,27 @@ public class SegmentedButton extends ControlsFXControl {
         return buttons;
     }
     
+    /**
+     * @return Property of the ToggleGroup used internally 
+     */
+    public ObjectProperty<ToggleGroup> groupProperty() {
+        return this.group;
+    }
+
+    /**
+     * @return ToggleGroup used internally 
+     */
+    public ToggleGroup getGroup() {
+        return this.groupProperty().getValue();
+    }
+
+    /**
+     * @param group ToggleGroup to be used internally 
+     */
+    public void setGroup(final ToggleGroup group) {
+        this.groupProperty().setValue(group);
+    }
+    
     
     /**************************************************************************
      * 
@@ -193,4 +227,5 @@ public class SegmentedButton extends ControlsFXControl {
     @Override protected String getUserAgentStylesheet() {
         return SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm(); //$NON-NLS-1$
     }
+
 }

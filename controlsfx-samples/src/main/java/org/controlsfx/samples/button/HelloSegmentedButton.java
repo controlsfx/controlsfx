@@ -100,6 +100,19 @@ public class HelloSegmentedButton extends ControlsFXSample {
         segmentedButton_dark.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         grid.add(segmentedButton_dark, 1, 2);
         
+        
+        // without toggle group
+        grid.add(new Label("Without ToggleGroup (multiple selection): "), 0, 3);
+        
+        ToggleButton nogrp_b1 = new ToggleButton("day");
+        ToggleButton nogrp_b2 = new ToggleButton("week");
+        ToggleButton nogrp_b3 = new ToggleButton("month");
+        ToggleButton nogrp_b4 = new ToggleButton("year");
+        
+        SegmentedButton segmentedButton_nogrp = new SegmentedButton(nogrp_b1, nogrp_b2, nogrp_b3, nogrp_b4);
+        segmentedButton_nogrp.setGroup(null);
+        grid.add(segmentedButton_nogrp, 1, 3);
+        
 
         return grid;
     }

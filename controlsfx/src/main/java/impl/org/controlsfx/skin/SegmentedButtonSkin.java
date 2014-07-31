@@ -64,7 +64,7 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
             }
         });
         
-        control.groupProperty().addListener((observable, oldValue, newValue) -> {
+        control.toggleGroupProperty().addListener((observable, oldValue, newValue) -> {
             getButtons().forEach((button) -> {
                 button.setToggleGroup(newValue);
             });
@@ -77,7 +77,7 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
     
     private void updateButtons() {
         ObservableList<ToggleButton> buttons = getButtons();
-        ToggleGroup group = getSkinnable().getGroup();
+        ToggleGroup group = getSkinnable().getToggleGroup();
         
         container.getChildren().clear();
         

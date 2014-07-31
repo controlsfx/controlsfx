@@ -76,7 +76,7 @@ import javafx.scene.control.ToggleGroup;
  * <pre>
  * {@code 
  * SegmentedButton segmentedButton = new SegmentedButton();
- * segmentedButton.setGroup(null);
+ * segmentedButton.setToggleGroup(null);
  * }</pre>
  *  
  * <h3>Alternative Styling</h3>
@@ -126,7 +126,7 @@ public class SegmentedButton extends ControlsFXControl {
      *************************************************************************/
     
     private final ObservableList<ToggleButton> buttons;
-    private final ObjectProperty<ToggleGroup> group = new SimpleObjectProperty<ToggleGroup>(new ToggleGroup());
+    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<ToggleGroup>(new ToggleGroup());
     
     /**************************************************************************
      * 
@@ -196,22 +196,22 @@ public class SegmentedButton extends ControlsFXControl {
     /**
      * @return Property of the ToggleGroup used internally 
      */
-    public ObjectProperty<ToggleGroup> groupProperty() {
-        return this.group;
+    public ObjectProperty<ToggleGroup> toggleGroupProperty() {
+        return this.toggleGroup;
     }
 
     /**
      * @return ToggleGroup used internally 
      */
-    public ToggleGroup getGroup() {
-        return this.groupProperty().getValue();
+    public ToggleGroup getToggleGroup() {
+        return this.toggleGroupProperty().getValue();
     }
 
     /**
-     * @param group ToggleGroup to be used internally 
+     * @param toggleGroup ToggleGroup to be used internally 
      */
-    public void setGroup(final ToggleGroup group) {
-        this.groupProperty().setValue(group);
+    public void setToggleGroup(final ToggleGroup toggleGroup) {
+        this.toggleGroupProperty().setValue(toggleGroup);
     }
     
     

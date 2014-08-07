@@ -358,6 +358,19 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     
     public void resizeRowsToDefault() {
         rowHeightMap.clear();
+        
+        /**
+         * Wen resizing to default, we need to go through the visible rows in
+         * order to update them directly. Because if the rowHeightMap is empty,
+         * the rows will not detect that maybe the height has changed.
+         */
+        for (GridRow row : (List<GridRow>) getFlow().getCells()) {
+            double newHeight = row.computePrefHeight(-1);
+            if(row.getPrefHeight() != newHeight){
+                row.setPrefHeight(newHeight);
+                row.requestLayout();
+            }
+        }
     }
     /**
      * We want to have extra space when displaying LocalDate because they will

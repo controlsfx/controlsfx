@@ -222,7 +222,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     /**
-     * Compute the height of a deportedCells row.
+     * Compute the height of a particular row.
      * 
      * @param row
      * @return

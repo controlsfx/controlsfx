@@ -88,4 +88,21 @@ public class Utils {
 
         return letter;
     }
+    
+    /**
+     * The equals method which integrate the null value.
+     *
+     * @param a
+     * @param b
+     * @return
+     */
+    public static boolean equalsWithNull(Object a, Object b) {
+        if (a == b) {
+            return true;
+        }
+        if ((a == null) || (b == null)) {
+            return false;
+        }
+        return a.equals(b);
+    }
 }

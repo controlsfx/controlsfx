@@ -46,7 +46,6 @@ import javafx.util.Callback;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 import com.sun.javafx.event.EventHandlerManager;
-import org.controlsfx.tools.Utils;
 
 /**
  * A base implementation of the {@link Grid} interface.
@@ -158,7 +157,7 @@ public class GridBase implements Grid, EventTarget {
             Object previousItem = cell.getItem();
             Object convertedValue = cell.getCellType().convertValue(value);
             cell.setItem(convertedValue);
-            if (!Utils.equalsWithNull(previousItem, cell.getItem())) {
+            if (!java.util.Objects.equals(previousItem, cell.getItem())) {
                 GridChange cellChange = new GridChange(row, column, previousItem, convertedValue);
                 Event.fireEvent(this, cellChange);
             }

@@ -360,7 +360,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         rowHeightMap.clear();
         
         /**
-         * Wen resizing to default, we need to go through the visible rows in
+         * When resizing to default, we need to go through the visible rows in
          * order to update them directly. Because if the rowHeightMap is empty,
          * the rows will not detect that maybe the height has changed.
          */

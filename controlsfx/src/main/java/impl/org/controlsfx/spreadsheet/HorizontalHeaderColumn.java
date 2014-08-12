@@ -48,13 +48,14 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
     @Override
     protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
+        TableViewSkinBase<?,?,?,?,?,TableColumnBase<?,?>> tableViewSkin = getTableViewSkin();
         if (col.getColumns().isEmpty()) {
-            final TableColumnHeader columnHeader = new TableColumnHeader(getTableViewSkin(), col);
+            final TableColumnHeader columnHeader = new TableColumnHeader(tableViewSkin, col);
             columnHeader.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent arg0) {
                     if (arg0.getClickCount() == 2 && arg0.isPrimaryButtonDown()) {
-                        ((GridViewSkin) getTableViewSkin()).resize(col);
+                        ((GridViewSkin) (Object) tableViewSkin).resize(col);
                     }
                 }
             });
@@ -75,7 +76,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
      *
      */
     public void layoutFixedColumns() {
-        SpreadsheetHandle handle = ((GridViewSkin) getTableViewSkin()).handle;
+        SpreadsheetHandle handle = ((GridViewSkin) (Object) getTableViewSkin()).handle;
         final SpreadsheetView spreadsheetView = handle.getView();
         if (handle.getCellsViewSkin() == null) {
             return;

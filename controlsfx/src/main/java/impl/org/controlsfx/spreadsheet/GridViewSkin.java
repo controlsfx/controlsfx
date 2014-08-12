@@ -49,7 +49,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -57,12 +56,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
-import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.util.Callback;
@@ -485,28 +480,28 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
          * JDK8u20
          */
-        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.LEFT) {
-                    if (keyEvent.isShortcutDown()) {
-                        getFocusModel().focusLeftCell();
-                    } else {
-                        selectLeft();
-                    }
-                    keyEvent.consume();
-                    scrollHorizontally();
-                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
-                    if (keyEvent.isShortcutDown()) {
-                        getFocusModel().focusRightCell();
-                    } else {
-                        selectRight();
-                    }
-                    keyEvent.consume();
-                    scrollHorizontally();
-                }
-            }
-        });
+//        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+//            @Override
+//            public void handle(KeyEvent keyEvent) {
+//                if (keyEvent.getCode() == KeyCode.LEFT) {
+//                    if (keyEvent.isShortcutDown()) {
+//                        getFocusModel().focusLeftCell();
+//                    } else {
+//                        selectLeft();
+//                    }
+//                    keyEvent.consume();
+//                    scrollHorizontally();
+//                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
+//                    if (keyEvent.isShortcutDown()) {
+//                        getFocusModel().focusRightCell();
+//                    } else {
+//                        selectRight();
+//                    }
+//                    keyEvent.consume();
+//                    scrollHorizontally();
+//                }
+//            }
+//        });
     }
 
     protected final ObservableSet<Integer> getCurrentlyFixedRow() {
@@ -617,17 +612,17 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
      * JDK8u20
      */
-    @Override
-    protected void onSelectRightCell() {
-    }
+//    @Override
+//    protected void onSelectRightCell() {
+//    }
 
     /**
      * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
      * JDK8u20
      */
-    @Override
-    protected void onSelectLeftCell() {
-    }
+//    @Override
+//    protected void onSelectLeftCell() {
+//    }
 
     @Override
     protected void onSelectPreviousCell() {
@@ -716,50 +711,50 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     /**
      * Select the Right cell.
      */
-    private void selectRight() {
-        TableSelectionModel sm = getSelectionModel();
-        if (sm == null)
-            return;
-
-        TableFocusModel fm = getFocusModel();
-        if (fm == null)
-            return;
-
-        TablePosition focusedCell = getFocusedCell();
-        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-        if (currentColumn == getVisibleLeafColumns().size() - 1)
-            return;
-
-        TableColumnBase tc = focusedCell.getTableColumn();
-        tc = getVisibleLeafColumn(currentColumn + 1);
-
-        int row = focusedCell.getRow();
-        sm.clearAndSelect(row, tc);
-    }
-
-    /**
-     * Select the left cell.
-     */
-    private void selectLeft() {
-        TableSelectionModel sm = getSelectionModel();
-        if (sm == null)
-            return;
-
-        TableFocusModel fm = getFocusModel();
-        if (fm == null)
-            return;
-
-        TablePosition focusedCell = getFocusedCell();
-        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-        if (currentColumn == 0)
-            return;
-
-        TableColumnBase tc = focusedCell.getTableColumn();
-        tc = getVisibleLeafColumn(currentColumn - 1);
-
-        int row = focusedCell.getRow();
-        sm.clearAndSelect(row, tc);
-    }
+//    private void selectRight() {
+//        TableSelectionModel sm = getSelectionModel();
+//        if (sm == null)
+//            return;
+//
+//        TableFocusModel fm = getFocusModel();
+//        if (fm == null)
+//            return;
+//
+//        TablePosition focusedCell = getFocusedCell();
+//        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+//        if (currentColumn == getVisibleLeafColumns().size() - 1)
+//            return;
+//
+//        TableColumnBase tc = focusedCell.getTableColumn();
+//        tc = getVisibleLeafColumn(currentColumn + 1);
+//
+//        int row = focusedCell.getRow();
+//        sm.clearAndSelect(row, tc);
+//    }
+//
+//    /**
+//     * Select the left cell.
+//     */
+//    private void selectLeft() {
+//        TableSelectionModel sm = getSelectionModel();
+//        if (sm == null)
+//            return;
+//
+//        TableFocusModel fm = getFocusModel();
+//        if (fm == null)
+//            return;
+//
+//        TablePosition focusedCell = getFocusedCell();
+//        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+//        if (currentColumn == 0)
+//            return;
+//
+//        TableColumnBase tc = focusedCell.getTableColumn();
+//        tc = getVisibleLeafColumn(currentColumn - 1);
+//
+//        int row = focusedCell.getRow();
+//        sm.clearAndSelect(row, tc);
+//    }
 
     /**
      * Return a BitSet of the rows that needs layout all the time. This

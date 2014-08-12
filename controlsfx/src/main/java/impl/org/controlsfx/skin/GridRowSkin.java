@@ -33,14 +33,14 @@ import javafx.scene.Node;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
-import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
+import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.CellSkinBase;
 
-public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, CellBehaviorBase<GridRow<T>>> {
+public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, BehaviorBase<GridRow<T>>> {
 
     public GridRowSkin(GridRow<T> control) {
-        super(control, new CellBehaviorBase<GridRow<T>>(control, Collections.<KeyBinding> emptyList()));
+        super(control, new BehaviorBase<GridRow<T>>(control, Collections.<KeyBinding> emptyList()));
 
         // Remove any children before creating cells (by default a LabeledText exist and we don't need it)
         getChildren().clear();

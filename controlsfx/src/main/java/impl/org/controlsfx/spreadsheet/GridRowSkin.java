@@ -100,7 +100,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         }
         
         final List<SpreadsheetCell> row = grid.getRows().get(index);
-         
         /**
          * If we use "setGrid" on SpreadsheetView, we must be careful because we
          * set our columns after (due to threading safety). So if, by mistake,
@@ -110,6 +109,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         if (spreadsheetView.getColumns().size() != gridView.getColumns().size()) {
             return;
         }
+        checkState(true);
         
         // layout the individual column cells
         double width;

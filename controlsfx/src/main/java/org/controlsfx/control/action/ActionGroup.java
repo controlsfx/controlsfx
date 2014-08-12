@@ -31,7 +31,6 @@ import java.util.Collection;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
@@ -47,7 +46,7 @@ import javafx.scene.control.ToolBar;
  * 
  * <h3>Code Examples</h3>
  * <p>Consider the following code example (note that DummyAction is a fake class
- * that extends from (and implements) {@link AbstractAction}):
+ * that extends from (and implements) {@link Action}):
  * 
  * <pre>
  * {@code
@@ -93,7 +92,7 @@ import javafx.scene.control.ToolBar;
  * @see Action
  * @see ActionUtils
  */
-public class ActionGroup extends AbstractAction {
+public class ActionGroup extends Action {
     
     /**
      * Creates an ActionGroup with the given text as the name of the {@link Action}, 
@@ -146,13 +145,6 @@ public class ActionGroup extends AbstractAction {
         super(text);
         setGraphic(icon);
         getActions().addAll(actions);
-    }
-
-    /**
-     * By default the execute method in an ActionGroup is a no-op.
-     */
-    @Override public final void handle(ActionEvent ae) {
-        // no-op
     }
 
     // --- actions

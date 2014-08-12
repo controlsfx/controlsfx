@@ -38,12 +38,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.DefaultDialogAction;
 import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.DialogStyle;
+import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.PropertyEditor;
@@ -54,17 +54,8 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private final PropertySheet.Item item;
     private final ObjectProperty<T> value = new SimpleObjectProperty<>();
 
-    final Action actionSave = new DefaultDialogAction("Save",
-            Dialog.ActionTrait.CLOSING, Dialog.ActionTrait.DEFAULT) {
-                {
-                    ButtonBar.setType(this, ButtonBar.ButtonType.OK_DONE);
-                }
-                @Override
-                public void handle(ActionEvent ae) {
-                    Dialog dlg = (Dialog) ae.getSource();
-                    // real saving code here?
-                    dlg.setResult(this);
-                }
+    final Action actionSave = new DialogAction("Save", ButtonBar.ButtonType.OK_DONE, false, true, true, ae -> { /* real saving code here */ } ) {
+            
                 @Override
                 public String toString() {
                     return "SAVE";
@@ -88,13 +79,12 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private void displayPopupEditor() {
         PopupPropertySheet<T> sheet = new PopupPropertySheet<>(item, this);
 
-        Dialog dlg = new Dialog(null, "Popup Property Editor", false,
-                DialogStyle.CROSS_PLATFORM_DARK);
+        Dialog dlg = new Dialog(null, "Popup Property Editor", false);
 
         dlg.setResizable(false);
         dlg.setIconifiable(false);
         dlg.setContent(sheet);
-        dlg.getActions().addAll(actionSave, Dialog.Actions.CANCEL);
+        dlg.getActions().addAll(actionSave, Dialog.ACTION_CANCEL);
         Action response = dlg.show();
 
         if (actionSave.equals(response)) {

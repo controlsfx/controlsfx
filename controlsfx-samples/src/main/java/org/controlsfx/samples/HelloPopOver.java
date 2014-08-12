@@ -339,4 +339,9 @@ public class HelloPopOver extends ControlsFXSample {
                 + " the user to see and edit an objects properties. The pop over gets displayed in its own popup window and"
                 + " can be torn off in order to create several instances of it.";
     }
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/popover.css";
+    }
 }

@@ -47,6 +47,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -87,7 +88,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             "United States", "Germany", "Canada");
 
     private final List<String> logoList = Arrays.asList("", "ControlsFX.png", "apertureLogo.png",
-            "raptureLogo.png", "ammunationLogo.jpg", "nukaColaLogo.png", "paynsprayLogo.jpg", "umbrellacorporation.png");
+            "raptureLogo.png", "ammunationLogo.JPG", "nukaColaLogo.png", "paynsprayLogo.jpg", "umbrellacorporation.png");
 
     private final List<String> webSiteList = Arrays.asList("", "http://fxexperience.com/controlsfx/",
             "http://aperturescience.com/", "", "http://fr.gta.wikia.com/wiki/Ammu-Nation",
@@ -672,6 +673,15 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.setEditable(true);
         grid.add(editable, 1, row++);
         spreadSheetView.editableProperty().bind(editable.selectedProperty());
+        
+        //Row Header width
+        Label rowHeaderWidth = new Label("Row header width: ");
+        rowHeaderWidth.getStyleClass().add("property");
+        grid.add(rowHeaderWidth, 0, row);
+        Slider slider = new Slider(15, 100, 30);
+        spreadSheetView.rowHeaderWidthProperty().bind(slider.valueProperty());
+        grid.add(slider, 1, row++);
+        
         return grid;
     }
 }

@@ -24,11 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- package org.controlsfx.control.action;
+package org.controlsfx.control.action;
 
+import impl.org.controlsfx.i18n.Localization;
+import impl.org.controlsfx.i18n.SimpleLocalizedStringProperty;
+
+import java.util.function.Consumer;
+
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -39,9 +48,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCombination;
 
 /**
- * Common interface for dialog actions, where Actions are converted into buttons 
- * in the dialogs button bar. It is highly recommended that rather than 
- * implement this interface that developers instead use {@link AbstractAction}.
+ * A base class for Action API. 
  * 
  * <h3>What is an Action?</h3>
  * An action in JavaFX can be used to separate functionality and state from a 
@@ -51,18 +58,101 @@ import javafx.scene.input.KeyCombination;
  * centralized handling of the state of action-event-firing components such as 
  * buttons, menu items, etc. The state that an action can handle includes text, 
  * graphic, long text (i.e. tooltip text), and disabled.
- * 
- * @see AbstractAction
  */
-public interface Action extends EventHandler<ActionEvent> {
-
+public class Action implements EventHandler<ActionEvent> {
+    
+    /**************************************************************************
+     * 
+     * Private fields
+     * 
+     **************************************************************************/
+    
+    private boolean locked = false;
+    
+    private Consumer<ActionEvent> eventHandler;
+    
+    
+    /**************************************************************************
+     * 
+     * Constructors
+     * 
+     **************************************************************************/
+    
+    public Action(@NamedArg("text") String text) {
+        this(text, null);
+    }
+    
+    public Action(Consumer<ActionEvent> eventHandler) {
+        this("", eventHandler);
+    }
+   
+    /**
+     * Creates a new AbstractAction instance with the given String set as the 
+     * {@link #textProperty() text} value, as well as the Consumer<ActionEvent>
+     * set to be called when the action event is fired.
+     *  
+     * @param text The string to display in the text property of controls such
+     *      as {@link Button#textProperty() Button}.
+     * @param eventHandler This will be called when the ActionEvent is fired.
+     */
+    public Action(@NamedArg("text") String text, Consumer<ActionEvent> eventHandler) {
+        setText(text);
+        setEventHandler(eventHandler);
+    }
+    
+    protected void lock() {
+    	locked = true;
+    }
+    
+    
+    /**************************************************************************
+     * 
+     * Properties
+     * 
+     **************************************************************************/
+    
+    // --- text
+    private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"){ //$NON-NLS-1$
+    	public void set(String value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+    	}
+    };
+    
     /**
      * The text to show to the user.
      * 
      * @return An observable {@link StringProperty} that represents the current
      *      text for this property, and which can be observed for changes.
      */
-    public StringProperty textProperty();
+    public final StringProperty textProperty() {
+        return textProperty;
+    }
+    
+    /**
+     * 
+     * @return the text of the Action.
+     */
+    public final String getText() {
+        return textProperty.get();
+    }
+
+    /**
+     * Sets the text of the Action.
+     * @param value 
+     */
+    public final void setText(String value) {
+        textProperty.set(value);
+    }
+    
+    
+    // --- disabled
+    private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"){ //$NON-NLS-1$
+    	public void set(boolean value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+    	}
+    };
     
     /**
      * This represents whether the action should be available to the end user,
@@ -72,8 +162,38 @@ public interface Action extends EventHandler<ActionEvent> {
      *      disabled state for this property, and which can be observed for 
      *      changes.
      */
-    public BooleanProperty disabledProperty();
+    public final BooleanProperty disabledProperty() {
+        return disabledProperty;
+    }
+    
+    /**
+     * 
+     * @return whether the action is available to the end user,
+     * or whether it should appeared 'grayed out'.
+     */
+    public final boolean isDisabled() {
+        return disabledProperty.get();
+    }
+    
+    /**
+     * Sets whether the action should be available to the end user,
+     * or whether it should appeared 'grayed out'.
+     * @param value 
+     */
+    public final void setDisabled(boolean value) {
+        disabledProperty.set(value);
+    }
 
+    
+    // --- longText
+    private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"){ //$NON-NLS-1$
+    	public void set(String value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+
+    	};
+    };
+    
     /**
      * The longer form of the text to show to the user (e.g. on a 
      * {@link Button}, it is usually a tooltip that should be shown to the user 
@@ -82,7 +202,36 @@ public interface Action extends EventHandler<ActionEvent> {
      * @return An observable {@link StringProperty} that represents the current
      *      long text for this property, and which can be observed for changes.
      */
-    public StringProperty longTextProperty();
+    public final StringProperty longTextProperty() {
+        return longTextProperty;
+    }
+    
+    /**
+     * @see #longTextProperty() 
+     * @return The longer form of the text to show to the user
+     */
+    public final String getLongText() {
+        return Localization.localize(longTextProperty.get());
+    }
+    
+    /**
+     * Sets the longer form of the text to show to the user
+     * @param value 
+     * @see #longTextProperty() 
+     */
+    public final void setLongText(String value) {
+        longTextProperty.set(value);
+    }
+    
+    
+    // --- graphic
+    private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"){ //$NON-NLS-1$
+    	public void set(Node value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+
+    	};
+    };
     
     /**
      * The graphic that should be shown to the user in relation to this action.
@@ -90,7 +239,35 @@ public interface Action extends EventHandler<ActionEvent> {
      * @return An observable {@link ObjectProperty} that represents the current
      *      graphic for this property, and which can be observed for changes.
      */
-    public ObjectProperty<Node> graphicProperty();
+    public final ObjectProperty<Node> graphicProperty() {
+        return graphicProperty;
+    }
+    
+    /**
+     * 
+     * @return The graphic that should be shown to the user in relation to this action.
+     */
+    public final Node getGraphic() {
+        return graphicProperty.get();
+    }
+    
+    /**
+     * Sets the graphic that should be shown to the user in relation to this action.
+     * @param value 
+     */
+    public final void setGraphic(Node value) {
+        graphicProperty.set(value);
+    }
+    
+    
+    // --- accelerator
+    private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"){ //$NON-NLS-1$
+    	public void set(KeyCombination value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    		super.set(value);
+
+    	}
+    };
     
     /**
      * The accelerator {@link KeyCombination} that should be used for this action,
@@ -99,7 +276,31 @@ public interface Action extends EventHandler<ActionEvent> {
      * @return An observable {@link ObjectProperty} that represents the current
      *      accelerator for this property, and which can be observed for changes.
      */
-    public ObjectProperty<KeyCombination> acceleratorProperty();
+    public final ObjectProperty<KeyCombination> acceleratorProperty() {
+        return acceleratorProperty;
+    }
+    
+    /**
+     * 
+     * @return The accelerator {@link KeyCombination} that should be used for this action,
+     * if it is used in an applicable UI control
+     */
+    public final KeyCombination getAccelerator() {
+        return acceleratorProperty.get();
+    }
+    
+    /**
+     * Sets the accelerator {@link KeyCombination} that should be used for this action,
+     * if it is used in an applicable UI control
+     * @param value 
+     */
+    public final void setAccelerator(KeyCombination value) {
+        acceleratorProperty.set(value);
+    }
+    
+    
+    // --- properties
+    private ObservableMap<Object, Object> props;
     
     /**
      * Returns an observable map of properties on this Action for use primarily
@@ -108,5 +309,39 @@ public interface Action extends EventHandler<ActionEvent> {
      * @return An observable map of properties on this Action for use primarily
      * by application developers
      */
-    public ObservableMap<Object, Object> getProperties();
+    public final synchronized ObservableMap<Object, Object> getProperties() {
+    	if ( props == null ) props = FXCollections.observableHashMap();
+    	return props;
+    }
+    
+    protected Consumer<ActionEvent> getEventHandler() {
+		return eventHandler;
+	}
+    
+    protected void setEventHandler(Consumer<ActionEvent> eventHandler) {
+		this.eventHandler = eventHandler;
+	}
+    
+    /**************************************************************************
+     * 
+     * Public API
+     * 
+     **************************************************************************/
+    
+    /** 
+     * Defers to the Consumer<ActionEvent> passed in to the Action constructor.
+     */
+    @Override public final void handle(ActionEvent event) {
+        if (eventHandler != null && !isDisabled()) {
+            eventHandler.accept(event);
+        }
+    }
+    
+//    public void bind(ButtonBase button) {
+//        ActionUtils.configureButton(this, button);
+//    }
+//    
+//    public void bind(MenuItem menuItem) {
+//        ActionUtils.configureMenuItem(this, menuItem);
+//    }
 }

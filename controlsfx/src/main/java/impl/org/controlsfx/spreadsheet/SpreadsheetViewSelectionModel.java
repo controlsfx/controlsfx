@@ -36,6 +36,7 @@ import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.NamedArg;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
@@ -174,7 +175,7 @@ public class SpreadsheetViewSelectionModel extends
      * @param spreadsheetView
      * @param cellsView 
      */
-    public SpreadsheetViewSelectionModel(SpreadsheetView spreadsheetView, SpreadsheetGridView cellsView) {
+    public SpreadsheetViewSelectionModel(@NamedArg("spreadsheetView") SpreadsheetView spreadsheetView,@NamedArg("cellsView") SpreadsheetGridView cellsView) {
         super(cellsView);
         this.cellsView = cellsView;
         this.spreadsheetView = spreadsheetView;
@@ -234,9 +235,11 @@ public class SpreadsheetViewSelectionModel extends
         // Variable we need for algorithm
         TablePosition<ObservableList<SpreadsheetCell>, ?> posFinal = new TablePosition<>(getTableView(), row,
                 column);
-
+        
         final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(row, posFinal.getColumn());
 
+        //For some reasons (see below), we don't want to go in edition.
+        boolean edition=true;
         /**
          * We check if we are on covered cell. If so we have the algorithm of
          * the focus model to give the selection to the right cell.
@@ -244,21 +247,32 @@ public class SpreadsheetViewSelectionModel extends
          */
         switch (spanType) {
             case ROW_SPAN_INVISIBLE:
-                // If we notice that the new selected cell is the previous one,
-                // then it means that we were
-                // already on the cell and we wanted to go below.
-                // We make sure that old is not null, and that the move is
-                // initiated by keyboard.
-                // Because if it's a click, then we just want to go on the
-                // clicked cell (not below)
+                /**
+                 * If we notice that the new selected cell is the previous one,
+                 * then it means that we were already on the cell and we wanted
+                 * to go below. We make sure that old is not null, and that the
+                 * move is initiated by keyboard. Because if it's a click, then
+                 * we just want to go on the clicked cell (not below)
+                 */
                 if (old != null && key && !shift && old.getColumn() == posFinal.getColumn()
                         && old.getRow() == posFinal.getRow() - 1) {
-                    posFinal = getVisibleCell(FocusModelListener.getTableRowSpan(old, cellsView), old.getTableColumn(), old.getColumn());
-                } else {
-                    // If the current selected cell if hidden by row span, we go
-                    // above
-                    posFinal = getVisibleCell(row, column, posFinal.getColumn());
+                    int visibleRow = FocusModelListener.getNextRowNumber(old, cellsView);
+                    /**
+                     * If the visibleRow we're targeting is out of bounds, we do
+                     * not want to get a visibleCell, so we step out. But we
+                     * need to set edition to false because we will be going
+                     * back to the old cell and we could go to edition.
+                     */
+                    if (visibleRow < getItemCount()) {
+                        posFinal = getVisibleCell(visibleRow, old.getTableColumn(), old.getColumn());
+                        break;
+                    }else{
+                        edition = false;
+                    }
                 }
+                // If the current selected cell if hidden by row span, we go
+                // above
+                posFinal = getVisibleCell(row, column, posFinal.getColumn());
                 break;
             case BOTH_INVISIBLE:
                 // If the current selected cell if hidden by a both (row and
@@ -282,7 +296,7 @@ public class SpreadsheetViewSelectionModel extends
         }
 
         // This is to handle edition
-        if (posFinal.equals(old) && !ctrl && !shift && !drag) {
+        if (edition && posFinal.equals(old) && !ctrl && !shift && !drag) {
             // If we are on an Invisible row or both (in diagonal), we need
             // to force the edition
             if (spanType == SpreadsheetView.SpanType.ROW_SPAN_INVISIBLE

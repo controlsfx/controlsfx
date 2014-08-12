@@ -154,7 +154,7 @@ public class ActionMap {
 	
 }
 
-class AnnotatedAction extends AbstractAction {
+class AnnotatedAction extends Action {
 
 	private Method method;
 	private Object target;
@@ -162,6 +162,7 @@ class AnnotatedAction extends AbstractAction {
 	public AnnotatedAction(ActionProxy annotation, Method method, Object target) {
 	    // set text
 		super(annotation.text());
+		setEventHandler(this::handleAction);
 		
 		// set graphic
 		Node graphic = resolveGraphic(annotation);
@@ -204,8 +205,7 @@ class AnnotatedAction extends AbstractAction {
 		return target;
 	}
 
-	@Override
-	public void handle(ActionEvent ae) {
+	private void handleAction(ActionEvent ae) {
 		try {
 			int paramCount =  method.getParameterCount(); 
 			if ( paramCount == 0 ) {

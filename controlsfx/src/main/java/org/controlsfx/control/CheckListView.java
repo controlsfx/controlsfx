@@ -115,16 +115,13 @@ public class CheckListView<T> extends ListView<T> {
      */
     public CheckListView(ObservableList<T> items) {
         super(items);
+        this.itemBooleanMap = new HashMap<>();
         
-        if (items == null) {
-            items = FXCollections.observableArrayList();
-            setItems(items);
-        }
+        setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
+        itemsProperty().addListener(ov -> {
+            setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
+        });
         
-        final int initialSize = items.size();
-        this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
-        
-        setCheckModel(new CheckListViewBitSetCheckModel<T>(items, itemBooleanMap));
         setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             public ListCell<T> call(ListView<T> listView) {
                 return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
@@ -170,8 +167,8 @@ public class CheckListView<T> extends ListView<T> {
      **************************************************************************/
 
     // --- Check Model
-    private ObjectProperty<MultipleSelectionModel<T>> checkModel = 
-            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel"); //$NON-NLS-1$
+    private ObjectProperty<IndexedCheckModel<T>> checkModel = 
+            new SimpleObjectProperty<>(this, "checkModel"); //$NON-NLS-1$
     
     /**
      * Sets the 'check model' to be used in the CheckListView - this is the
@@ -181,14 +178,14 @@ public class CheckListView<T> extends ListView<T> {
      * selection model concept, which is used in the ListView control to 
      * represent the selection state of each row).. 
      */
-    public final void setCheckModel(MultipleSelectionModel<T> value) {
+    public final void setCheckModel(IndexedCheckModel<T> value) {
         checkModelProperty().set(value);
     }
 
     /**
      * Returns the currently installed check model.
      */
-    public final MultipleSelectionModel<T> getCheckModel() {
+    public final IndexedCheckModel<T> getCheckModel() {
         return checkModel == null ? null : checkModel.get();
     }
 
@@ -198,7 +195,7 @@ public class CheckListView<T> extends ListView<T> {
      * which items have been checked by the user. Note that it has a generic
      * type that must match the type of the CheckListView itself.
      */
-    public final ObjectProperty<MultipleSelectionModel<T>> checkModelProperty() {
+    public final ObjectProperty<IndexedCheckModel<T>> checkModelProperty() {
         return checkModel;
     }
     

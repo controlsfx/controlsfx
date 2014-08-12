@@ -165,8 +165,8 @@ public class CheckComboBox<T> extends ControlsFXControl {
      **************************************************************************/
 
     // --- Check Model
-    private ObjectProperty<MultipleSelectionModel<T>> checkModel = 
-            new SimpleObjectProperty<MultipleSelectionModel<T>>(this, "checkModel"); //$NON-NLS-1$
+    private ObjectProperty<IndexedCheckModel<T>> checkModel = 
+            new SimpleObjectProperty<>(this, "checkModel"); //$NON-NLS-1$
     
     /**
      * Sets the 'check model' to be used in the CheckComboBox - this is the
@@ -176,14 +176,14 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * selection model concept, which is used in the ComboBox control to 
      * represent the selection state of each row).. 
      */
-    public final void setCheckModel(MultipleSelectionModel<T> value) {
+    public final void setCheckModel(IndexedCheckModel<T> value) {
         checkModelProperty().set(value);
     }
 
     /**
      * Returns the currently installed check model.
      */
-    public final MultipleSelectionModel<T> getCheckModel() {
+    public final IndexedCheckModel<T> getCheckModel() {
         return checkModel == null ? null : checkModel.get();
     }
 
@@ -193,7 +193,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * which items have been checked by the user. Note that it has a generic
      * type that must match the type of the CheckComboBox itself.
      */
-    public final ObjectProperty<MultipleSelectionModel<T>> checkModelProperty() {
+    public final ObjectProperty<IndexedCheckModel<T>> checkModelProperty() {
         return checkModel;
     }
     

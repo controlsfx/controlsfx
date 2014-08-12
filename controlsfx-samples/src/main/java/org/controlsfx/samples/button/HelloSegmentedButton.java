@@ -49,6 +49,12 @@ public class HelloSegmentedButton extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/SegmentedButton.html";
     }
     
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/segmentedbutton.css";
+    }
+    
     @Override public Node getPanel(Stage stage) {
         GridPane grid = new GridPane();
         grid.setVgap(10);

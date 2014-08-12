@@ -28,20 +28,10 @@ package org.controlsfx.samples;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.PropertySheet;
-import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.tools.Borders;
 
 public class HelloBorders extends ControlsFXSample {
@@ -158,67 +148,67 @@ public class HelloBorders extends ControlsFXSample {
 //        return stackPane;
     }
 
-    private Tab buildLineBorderTab() {
-        PropertySheet lineBorderPropertySheet = new PropertySheet();
-        lineBorderPropertySheet.setModeSwitcherVisible(false);
-        lineBorderPropertySheet.setSearchBoxVisible(false);
-        lineBorderPropertySheet.setMaxHeight(Double.MAX_VALUE);
-        
-        Item titleProperty = new BorderItem("Title");
-        lineBorderPropertySheet.getItems().add(titleProperty);
-        
-        Item colorProperty = new BorderItem("Color", Color.class);
-        lineBorderPropertySheet.getItems().add(colorProperty);
-        
-        Item radiusProperty = new BorderItem("Radius", Number.class);
-        lineBorderPropertySheet.getItems().add(radiusProperty);
-        
-        Item thicknessProperty = new BorderItem("Thickness", Number.class);
-        lineBorderPropertySheet.getItems().add(thicknessProperty);
-        
-        Tab tab = new Tab("Line");
-        tab.setContent(lineBorderPropertySheet);
-        return tab;
-    }
+//    private Tab buildLineBorderTab() {
+//        PropertySheet lineBorderPropertySheet = new PropertySheet();
+//        lineBorderPropertySheet.setModeSwitcherVisible(false);
+//        lineBorderPropertySheet.setSearchBoxVisible(false);
+//        lineBorderPropertySheet.setMaxHeight(Double.MAX_VALUE);
+//        
+//        Item titleProperty = new BorderItem("Title");
+//        lineBorderPropertySheet.getItems().add(titleProperty);
+//        
+//        Item colorProperty = new BorderItem("Color", Color.class);
+//        lineBorderPropertySheet.getItems().add(colorProperty);
+//        
+//        Item radiusProperty = new BorderItem("Radius", Number.class);
+//        lineBorderPropertySheet.getItems().add(radiusProperty);
+//        
+//        Item thicknessProperty = new BorderItem("Thickness", Number.class);
+//        lineBorderPropertySheet.getItems().add(thicknessProperty);
+//        
+//        Tab tab = new Tab("Line");
+//        tab.setContent(lineBorderPropertySheet);
+//        return tab;
+//    }
     
-    private static class BorderItem implements Item {
-        private final String displayText;
-        private final Class<?> type;
-        
-        public BorderItem(String displayText) {
-            this(displayText, null);
-        }
-        
-        public BorderItem(String displayText, Class<?> type) {
-            this.displayText = displayText;
-            this.type = type == null ? String.class : type;
-        }
-
-        @Override public Class<?> getType() {
-            return type;
-        }
-
-        @Override public String getCategory() {
-            return null;
-        }
-
-        @Override public String getName() {
-            return displayText;
-        }
-
-        @Override public String getDescription() {
-            return null;
-        }
-
-        @Override public Object getValue() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override public void setValue(Object value) {
-            // TODO Auto-generated method stub
-            
-        }
-        
-    }
+//    private static class BorderItem implements Item {
+//        private final String displayText;
+//        private final Class<?> type;
+//        
+//        public BorderItem(String displayText) {
+//            this(displayText, null);
+//        }
+//        
+//        public BorderItem(String displayText, Class<?> type) {
+//            this.displayText = displayText;
+//            this.type = type == null ? String.class : type;
+//        }
+//
+//        @Override public Class<?> getType() {
+//            return type;
+//        }
+//
+//        @Override public String getCategory() {
+//            return null;
+//        }
+//
+//        @Override public String getName() {
+//            return displayText;
+//        }
+//
+//        @Override public String getDescription() {
+//            return null;
+//        }
+//
+//        @Override public Object getValue() {
+//            // TODO Auto-generated method stub
+//            return null;
+//        }
+//
+//        @Override public void setValue(Object value) {
+//            // TODO Auto-generated method stub
+//            
+//        }
+//        
+//    }
 }

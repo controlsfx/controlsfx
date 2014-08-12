@@ -27,7 +27,7 @@
 package org.controlsfx.dialog;
 
 import impl.org.controlsfx.ImplUtils;
-
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -68,7 +68,7 @@ class LightweightDialog extends FXDialog {
     private Parent owner;
     
     private Region opaqueLayer;
-    private Group dialogStack;
+    private Pane dialogStack;
     private Parent originalParent;
     
     private BooleanProperty focused;
@@ -78,7 +78,6 @@ class LightweightDialog extends FXDialog {
     private Effect effect;
     private Effect tempEffect;
     
-    private boolean modal = true;
     
     
     
@@ -88,7 +87,7 @@ class LightweightDialog extends FXDialog {
      * 
      **************************************************************************/
     
-    LightweightDialog(final String title, final Object incomingOwner, final DialogStyle style) {
+    LightweightDialog(final String title, final Object incomingOwner) {
         super();
         
         Object _owner = incomingOwner;
@@ -106,7 +105,6 @@ class LightweightDialog extends FXDialog {
         } else if (_owner instanceof Tab) {
             // special case for people wanting to show a lightweight dialog inside
             // one tab whilst the rest of the TabPane remains responsive.
-            // we keep going up until the styleclass is "tab-content-area"
             owner = (Parent) ((Tab)_owner).getContent();
         } else if (_owner instanceof Node) {
             owner = getFirstParent((Node)_owner);
@@ -118,25 +116,33 @@ class LightweightDialog extends FXDialog {
             this.scene = owner.getScene();
         }
         
+
         // Don't add window decorations if style is undecorated
-        if (style == DialogStyle.UNDECORATED) {
-            init(title, style);
-            return;
-        }
+        init(title);
         
         // *** The rest is for adding window decorations ***
-        init(title, DialogStyle.CROSS_PLATFORM_DARK);
-        lightweightDialog.getStyleClass().addAll("lightweight", "custom-chrome"); //$NON-NLS-1$ //$NON-NLS-2$
+        boolean isUndecorated = isUndecoratedStyleClassSet();
+        setCrossPlatformStyleEnabled(! isUndecorated);
+        
+        lightweightDialog.getStyleClass().add("lightweight"); //$NON-NLS-1$
+        
+        // make focused by default
+        lightweightDialog.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        lightweightDialog.pseudoClassStateChanged(ACTIVE_PSEUDO_CLASS, true);
+    }
+    
+    @Override protected void setCrossPlatformStyleEnabled(boolean enabled) {
+        super.setCrossPlatformStyleEnabled(enabled);
         
         // add window dragging
-        toolBar.setOnMousePressed(new EventHandler<MouseEvent>() {
+        dialogTitleBar.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
                 mouseDragDeltaX = lightweightDialog.getLayoutX() - event.getSceneX();
                 mouseDragDeltaY = lightweightDialog.getLayoutY() - event.getSceneY();
                 lightweightDialog.setCache(true);
             }
         });
-        toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
+        dialogTitleBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
                 final double w = lightweightDialog.getWidth();
                 final double h = lightweightDialog.getHeight();
@@ -144,24 +150,27 @@ class LightweightDialog extends FXDialog {
                 // remove the drop shadow out of the width calculations
                 final double DROP_SHADOW_SIZE = (lightweightDialog.getBoundsInParent().getWidth() - lightweightDialog.getLayoutBounds().getWidth()) / 2.0;
                 final Insets padding = lightweightDialog.getPadding();
-                final double rightPadding = padding.getRight();
-                final double bottomPadding = padding.getBottom();
+                
+                Insets ownerPadding = Insets.EMPTY;
+                if (owner instanceof Region) {
+                    ownerPadding = ((Region)owner).getPadding();
+                }
                 
                 double minX = 0;
                 double maxX = owner == null ? scene.getWidth() : owner.getLayoutBounds().getWidth();
                 double newX = event.getSceneX() + mouseDragDeltaX;
-                newX = Utils.clamp(minX, newX, maxX - w + DROP_SHADOW_SIZE + rightPadding + minX);
+                newX = Utils.clamp(minX, newX, maxX - w - DROP_SHADOW_SIZE - padding.getRight() - ownerPadding.getRight());
                 
                 double minY = 0;
                 double maxY = owner == null ? scene.getHeight() : owner.getLayoutBounds().getHeight();
                 double newY = event.getSceneY() + mouseDragDeltaY;
-                newY = Utils.clamp(0, newY, maxY - h + DROP_SHADOW_SIZE + bottomPadding + minY);
+                newY = Utils.clamp(minY, newY, maxY - h - DROP_SHADOW_SIZE - padding.getBottom() - ownerPadding.getBottom());
                 
                 lightweightDialog.setLayoutX(newX);
                 lightweightDialog.setLayoutY(newY);
             }
         });
-        toolBar.setOnMouseReleased(new EventHandler<MouseEvent>() {
+        dialogTitleBar.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
                 lightweightDialog.setCache(false);
             }
@@ -201,10 +210,14 @@ class LightweightDialog extends FXDialog {
         };
         resizeCorner.setOnMousePressed(resizeHandler);
         resizeCorner.setOnMouseDragged(resizeHandler);
-       
-        // make focused by default
-        lightweightDialog.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        lightweightDialog.pseudoClassStateChanged(ACTIVE_PSEUDO_CLASS, true);
+    }
+    
+    @Override protected void setNativeStyleEnabled(boolean enabled) {
+        // there are no native styles available in the lightweight approach,
+        // so we do not hide the titlebar
+        dialogTitleBar.setVisible(true);
+        dialogTitleBar.setManaged(true);
+        getStyleClass().add(Dialog.STYLE_CLASS_CROSS_PLATFORM);
     }
     
     
@@ -351,7 +364,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scene root
-        ImplUtils.stripRootPane(scene, originalParent);
+        ImplUtils.stripRootPane(scene, originalParent, false);
     }
     
     private void hideInParent() {
@@ -369,7 +382,7 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scenegraph
-        ImplUtils.getChildren(owner.getParent()).setAll(owner);
+        ImplUtils.getChildren(owner.getParent(), false).setAll(owner);
         
         dialogStack = null;
     }
@@ -382,7 +395,7 @@ class LightweightDialog extends FXDialog {
         buildDialogStack(originalParent);
         
         lightweightDialog.setVisible(true);
-        ImplUtils.injectAsRootPane(scene, dialogStack);
+        ImplUtils.injectAsRootPane(scene, dialogStack, false);
         configureDialogStack(originalParent);
         lightweightDialog.requestFocus();
     }
@@ -391,7 +404,7 @@ class LightweightDialog extends FXDialog {
         installCSSInScene();
         
         buildDialogStack(owner);
-        ImplUtils.injectPane(owner, dialogStack);
+        ImplUtils.injectPane(owner, dialogStack, false);
         configureDialogStack(owner);
         lightweightDialog.setVisible(true);
         lightweightDialog.requestFocus();
@@ -416,8 +429,12 @@ class LightweightDialog extends FXDialog {
     }
     
     private void buildDialogStack(final Node parent) {
-        dialogStack = new Group(lightweightDialog) {
+        dialogStack = new Pane() {
             private boolean isFirstRun = true;
+            
+            {
+                getChildren().add(lightweightDialog);
+            }
             
             protected void layoutChildren() {
                 final double w = getOverlayWidth();
@@ -452,6 +469,32 @@ class LightweightDialog extends FXDialog {
                     
                     lightweightDialog.relocate((int)(dialogX), (int)(dialogY));
                 }
+            }
+            
+            // These are the actual implementations in Region (the parent of Pane),
+            // but just for clarify I reproduce them here
+            @Override protected double computeMinHeight(double width) {
+                return parent.minHeight(width);
+            }
+            
+            @Override protected double computeMinWidth(double height) {
+                return parent.minWidth(height);
+            }
+            
+            @Override protected double computePrefHeight(double width) {
+                return parent.prefHeight(width);
+            }
+            
+            @Override protected double computePrefWidth(double height) {
+                return parent.prefWidth(height);
+            }
+            
+            @Override protected double computeMaxHeight(double width) {
+                return parent.maxHeight(width);
+            }
+            
+            @Override protected double computeMaxWidth(double height) {
+                return parent.maxWidth(height);
             }
         };
                 

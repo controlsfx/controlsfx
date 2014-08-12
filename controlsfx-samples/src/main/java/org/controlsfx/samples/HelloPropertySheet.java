@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -43,12 +44,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.BeanPropertyUtils;
@@ -93,6 +95,12 @@ public class HelloPropertySheet extends ControlsFXSample {
     @Override
     public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/PropertySheet.html";
+    }
+    
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/propertysheet.css";
     }
 
     class CustomPropertyItem implements Item {
@@ -139,12 +147,13 @@ public class HelloPropertySheet extends ControlsFXSample {
 
     }
 
-    class ActionShowInPropertySheet extends AbstractAction {
+    class ActionShowInPropertySheet extends Action {
 
         private Object bean;
 
         public ActionShowInPropertySheet(String title, Object bean) {
             super(title);
+            setEventHandler(this::handleAction);
             this.bean = bean;
         }
 
@@ -156,8 +165,7 @@ public class HelloPropertySheet extends ControlsFXSample {
             return list;
         }
 
-        @Override
-        public void handle(ActionEvent ae) {
+        private void handleAction(ActionEvent ae) {
 
             // retrieving bean properties may take some time
             // so we have to put it on separate thread to keep UI responsive
@@ -233,18 +241,11 @@ public class HelloPropertySheet extends ControlsFXSample {
         return infoPane;
     }
 
-    class ActionModeChange extends AbstractAction {
-
-        private Mode mode;
+    class ActionModeChange extends Action {
 
         public ActionModeChange(String title, Mode mode) {
             super(title);
-            this.mode = mode;
-        }
-
-        @Override
-        public void handle(ActionEvent ae) {
-            propertySheet.modeProperty().set(mode);
+            setEventHandler(ae -> propertySheet.modeProperty().set(mode));
         }
 
     }

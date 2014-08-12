@@ -36,11 +36,8 @@ import java.util.Collection;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -50,11 +47,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionMap;
@@ -175,16 +170,15 @@ public class HelloActionProxy extends ControlsFXSample {
         hbox.getChildren().add(new Label("Dynamically enable/disable action: "));
         hbox.getChildren().add(cbActions);
         
-        Action toggleAction = new AbstractAction("Enable/Disable") {
+        Action toggleAction = new Action("Enable/Disable", ae -> {
 
-            @Override public void handle(ActionEvent ae) {
                Action action = cbActions.getSelectionModel().getSelectedItem();
                if ( action != null ) {
                    BooleanProperty p = action.disabledProperty();
                    p.set(!p.get());
                }
-            }
-        };
+            
+        });
         
         hbox.getChildren().add(ActionUtils.createButton(toggleAction));
         

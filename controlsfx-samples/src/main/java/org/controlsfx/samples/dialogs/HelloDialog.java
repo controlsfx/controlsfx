@@ -26,8 +26,9 @@
  */
 package org.controlsfx.samples.dialogs;
 
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
 import impl.org.controlsfx.i18n.Localization;
 import impl.org.controlsfx.i18n.Translations;
 
@@ -54,34 +55,33 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.DefaultDialogAction;
 import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialog.ActionTrait;
-import org.controlsfx.dialog.DialogStyle;
+import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.dialog.Dialogs;
-import org.controlsfx.dialog.Dialogs.CommandLink;
-import org.controlsfx.dialog.Dialogs.UserInfo;
 import org.controlsfx.dialog.DialogsAccessor;
 import org.controlsfx.samples.Utils;
 
 public class HelloDialog extends ControlsFXSample {
 
-    private final ComboBox<DialogStyle> styleCombobox = new ComboBox<>();
-	private final CheckBox cbUseLightweightDialog = new CheckBox("Use Lightweight Dialogs");
-	private final CheckBox cbShowMasthead = new CheckBox("Show Masthead");
-	private final CheckBox cbSetOwner = new CheckBox("Set Owner");
+    private final ComboBox<String> styleCombobox = new ComboBox<>();
+	private final CheckBox cbUseLightweightDialog = new CheckBox();
+	private final CheckBox cbShowMasthead = new CheckBox();
+	private final CheckBox cbSetOwner = new CheckBox();
+	private final CheckBox cbCustomGraphic = new CheckBox();
+	
 
 	@Override
 	public String getSampleName() {
@@ -188,7 +188,7 @@ public class HelloDialog extends ControlsFXSample {
 										"I was a bit worried that you might not want them, so I wanted to double check."))
 						.actions(
 								!cbShowCancel.isSelected() ? new Action[] {
-										YES, NO } : new Action[0])
+								    ACTION_YES, ACTION_NO } : new Action[0])
 						.showConfirm();
 
 				System.out.println("response: " + response);
@@ -382,14 +382,15 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent e) {
 
-				List<CommandLink> links = Arrays
-						.asList(new CommandLink(
-								"Add a network that is in the range of this computer",
-								"This shows you a list of networks that are currently available and lets you connect to one."),
-								new CommandLink(
+				List<DialogAction> links = Arrays
+						.asList(buildCommandLink(
+										"Add a network that is in the range of this computer",
+										"This shows you a list of networks that are currently available and lets you connect to one."),
+								buildCommandLink(
 										"Manually create a network profile",
-										"This creates a new network profile or locates an existing one and saves it on your computer"),
-								new CommandLink("Create an ad hoc network",
+										"This creates a new network profile or locates an existing one and saves it on your computer",
+										 true /*default*/),
+								buildCommandLink("Create an ad hoc network",
 										"This creates a temporary network for sharing files or and Internet connection"));
 
 				Action response = configureSampleDialog(
@@ -399,7 +400,7 @@ public class HelloDialog extends ControlsFXSample {
 										isMastheadVisible() ? "Manually connect to wireless network"
 												: null)
 								.message("How do you want to add a network?"))
-						.showCommandLinks(links.get(1), links);
+						.showCommandLinks(links);
 
 				System.out.println("response: " + response);
 			}
@@ -452,12 +453,15 @@ public class HelloDialog extends ControlsFXSample {
 		Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Optional<UserInfo> response = configureSampleDialog(Dialogs.create())
-						.showLogin(new UserInfo("user", "password"), info -> {
-							if ( !"controlsfx".equalsIgnoreCase(info.getUserName())) {
-								throw new RuntimeException("Service is not available... try again later!"); 
-							};
-							return null;
+				Optional<Pair<String,String>> response = 
+				        configureSampleDialog(
+				        Dialogs.create()
+				            .masthead(isMastheadVisible() ? "Login to ControlsFX" : null))
+				            .showLogin(new Pair<String,String>("user", "password"), info -> {
+    							if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
+    								throw new RuntimeException("Service is not available... try again later!"); 
+    							};
+    							return null;
 							}
 						 );
 
@@ -478,19 +482,7 @@ public class HelloDialog extends ControlsFXSample {
 
 			final TextField txUserName = new TextField();
 			final PasswordField txPassword = new PasswordField();
-			final Action actionLogin = new DefaultDialogAction("Login",
-					ActionTrait.CLOSING, ActionTrait.DEFAULT) {
-
-				{
-					ButtonBar.setType(this, ButtonType.OK_DONE);
-				}
-
-				@Override
-				public void handle(ActionEvent ae) {
-					Dialog dlg = (Dialog) ae.getSource();
-					// real login code here
-					dlg.setResult(this);
-				}
+			final Action actionLogin = new DialogAction("Login", ButtonType.OK_DONE, false, true, true, ae -> {/* real login code here*/} ){
 
 				public String toString() {
 					return "LOGIN";
@@ -506,7 +498,9 @@ public class HelloDialog extends ControlsFXSample {
 			@Override
 			public void handle(ActionEvent arg0) {
 				Dialog dlg = new Dialog(includeOwner() ? stage : null,
-						"Login Dialog", cbUseLightweightDialog.isSelected(),getDialogStyle());
+						"Login Dialog", cbUseLightweightDialog.isSelected());
+				dlg.getStyleClass().addAll(getDialogStyle());
+				
 				if (cbShowMasthead.isSelected()) {
 					dlg.setMasthead("Login to ControlsFX");
 				}
@@ -539,7 +533,7 @@ public class HelloDialog extends ControlsFXSample {
 				dlg.setGraphic(new ImageView(HelloDialog.class.getResource(
 						"login.png").toString()));
 				dlg.setContent(content);
-				dlg.getActions().addAll(actionLogin, Dialog.Actions.CANCEL);
+				dlg.getActions().addAll(actionLogin, ACTION_CANCEL);
 				validate();
 
 				Platform.runLater( () -> txUserName.requestFocus() );
@@ -563,7 +557,11 @@ public class HelloDialog extends ControlsFXSample {
 			dialog.lightweight();
 		}
 		
-		dialog.style(getDialogStyle());
+		if (cbCustomGraphic.isSelected()) {
+		    dialog.graphic(new ImageView(new Image(getClass().getResource("../controlsfx-logo.png").toExternalForm())));
+		}
+		
+		dialog.styleClass(getDialogStyle());
 
 		return dialog;
 	}
@@ -591,7 +589,7 @@ public class HelloDialog extends ControlsFXSample {
 		
 		// stage style
 		grid.add(createLabel("Style: ", "property"), 0, row);
-        styleCombobox.getItems().addAll(DialogStyle.values());
+        styleCombobox.getItems().setAll("Cross-platform", "Native", "Undecorated");
         styleCombobox.setValue(styleCombobox.getItems().get(0));
         grid.add(styleCombobox, 1, row);
         row++;
@@ -622,13 +620,29 @@ public class HelloDialog extends ControlsFXSample {
 		grid.add(createLabel("Set dialog owner: ", "property"), 0, row);
 		grid.add(cbSetOwner, 1, row);
 		row++;
+		
+		// custom graphic
+        grid.add(createLabel("Use custom graphic: ", "property"), 0, row);
+        grid.add(cbCustomGraphic, 1, row);
+        row++;
 
 		return grid;
 	}
 	
-	private DialogStyle getDialogStyle() {
-	    SelectionModel<DialogStyle> sm = styleCombobox.getSelectionModel();
-	    return sm.getSelectedItem() == null ? DialogStyle.CROSS_PLATFORM_DARK : sm.getSelectedItem();
+	 private DialogAction buildCommandLink( String text, String comment, boolean isDefault ) {
+	 	DialogAction action = new DialogAction(text, null, false, true, isDefault);
+	 	action.setLongText(comment);
+	 	return action;
+	 }
+	 
+	 public  DialogAction buildCommandLink( String text, String comment ) {
+	 	return buildCommandLink(text, comment, false);
+	 }
+	
+	
+	private String getDialogStyle() {
+	    SelectionModel<String> sm = styleCombobox.getSelectionModel();
+	    return sm.getSelectedItem() == null ? "cross-platform" : sm.getSelectedItem().toLowerCase();
 	}
 
 	public static void main(String[] args) {

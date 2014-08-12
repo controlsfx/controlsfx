@@ -35,14 +35,13 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.control.MultipleSelectionModel;
 
 import com.sun.javafx.collections.MappingChange;
 import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 
 // not public API
-abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
+abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> { 
     
     /***********************************************************************
      *                                                                     *
@@ -52,9 +51,9 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
 
     private final Map<T, BooleanProperty> itemBooleanMap;
     
-    private final BitSet selectedIndices;
-    private final ReadOnlyUnbackedObservableList<Integer> selectedIndicesList;
-    private final ReadOnlyUnbackedObservableList<T> selectedItemsList;
+    private final BitSet checkedIndices;
+    private final ReadOnlyUnbackedObservableList<Integer> checkedIndicesList;
+    private final ReadOnlyUnbackedObservableList<T> checkedItemsList;
     
     
 
@@ -67,15 +66,15 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
     CheckBitSetModelBase(final Map<T, BooleanProperty> itemBooleanMap) {
         this.itemBooleanMap = itemBooleanMap;
         
-        this.selectedIndices = new BitSet();
+        this.checkedIndices = new BitSet();
         
-        this.selectedIndicesList = new ReadOnlyUnbackedObservableList<Integer>() {
+        this.checkedIndicesList = new ReadOnlyUnbackedObservableList<Integer>() {
             @Override public Integer get(int index) {
                 if (index < 0 || index >= getItemCount()) return -1;
 
-                for (int pos = 0, val = selectedIndices.nextSetBit(0);
+                for (int pos = 0, val = checkedIndices.nextSetBit(0);
                     val >= 0 || pos == index;
-                    pos++, val = selectedIndices.nextSetBit(val+1)) {
+                    pos++, val = checkedIndices.nextSetBit(val+1)) {
                         if (pos == index) return val;
                 }
 
@@ -83,7 +82,7 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
             }
 
             @Override public int size() {
-                return selectedIndices.cardinality();
+                return checkedIndices.cardinality();
             }
 
             @Override public boolean contains(Object o) {
@@ -91,23 +90,23 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
                     Number n = (Number) o;
                     int index = n.intValue();
 
-                    return index >= 0 && index < selectedIndices.length() &&
-                            selectedIndices.get(index);
+                    return index >= 0 && index < checkedIndices.length() &&
+                            checkedIndices.get(index);
                 }
 
                 return false;
             }
         };
         
-        this.selectedItemsList = new ReadOnlyUnbackedObservableList<T>() {
+        this.checkedItemsList = new ReadOnlyUnbackedObservableList<T>() {
             @Override public T get(int i) {
-                int pos = selectedIndicesList.get(i);
+                int pos = checkedIndicesList.get(i);
                 if (pos < 0 || pos >= getItemCount()) return null;
                 return getItem(pos);
             }
 
             @Override public int size() {
-                return selectedIndices.cardinality();
+                return checkedIndices.cardinality();
             }
         };
         
@@ -116,11 +115,11 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
                 return getItem(f);
             }
         };
-        selectedIndicesList.addListener(new ListChangeListener<Integer>() {
+        checkedIndicesList.addListener(new ListChangeListener<Integer>() {
             @Override public void onChanged(final Change<? extends Integer> c) {
                 // when the selectedIndices ObservableList changes, we manually call
                 // the observers of the selectedItems ObservableList.
-                selectedItemsList.callObservers(new MappingChange<Integer,T>(c, map, selectedItemsList));
+                checkedItemsList.callObservers(new MappingChange<Integer,T>(c, map, checkedItemsList));
                 c.reset();
             }
         });
@@ -128,7 +127,7 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
         // this code is to handle the situation where a developer is manually
         // toggling the check model, and expecting the UI to update (without
         // this it won't happen!).
-        getSelectedItems().addListener(new ListChangeListener<T>() {
+        getCheckedItems().addListener(new ListChangeListener<T>() {
             @Override public void onChanged(ListChangeListener.Change<? extends T> c) {
                 while (c.next()) {
                     if (c.wasAdded()) {
@@ -161,10 +160,13 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
      *                                                                     *
      **********************************************************************/
 
+    @Override
     public abstract T getItem(int index);
     
+    @Override
     public abstract int getItemCount();
     
+    @Override
     public abstract int getItemIndex(T item);
     
     BooleanProperty getItemBooleanProperty(T item) {
@@ -179,100 +181,95 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
      **********************************************************************/
     
     /**
-     * Returns a read-only list of the currently selected indices in the CheckBox.
+     * Returns a read-only list of the currently checked indices in the CheckBox.
      */
-    @Override public ObservableList<Integer> getSelectedIndices() {
-        return selectedIndicesList;
+    @Override
+    public ObservableList<Integer> getCheckedIndices() {
+        return checkedIndicesList;
     }
     
     /**
-     * Returns a read-only list of the currently selected items in the CheckBox.
+     * Returns a read-only list of the currently checked items in the CheckBox.
      */
-    @Override public ObservableList<T> getSelectedItems() {
-        return selectedItemsList;
+    @Override
+    public ObservableList<T> getCheckedItems() {
+        return checkedItemsList;
     }
 
     /** {@inheritDoc} */
-    @Override public void selectAll() {
+    @Override
+    public void checkAll() {
         for (int i = 0; i < getItemCount(); i++) {
-            select(i);
+            check(i);
         }
     }
 
     /** {@inheritDoc} */
-    @Override public void selectFirst() {
-        select(0);
-    }
-
-    /** {@inheritDoc} */
-    @Override public void selectIndices(int index, int... indices) {
-        select(index);
+    @Override
+    public void checkIndices(int... indices) {
         for (int i = 0; i < indices.length; i++) {
-            select(indices[i]);
+            check(indices[i]);
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override public void selectLast() {
-        select(getItemCount() - 1);
-    }
-
-    /** {@inheritDoc} */
-    @Override public void clearAndSelect(int index) {
-        clearSelection();
-        select(index);
-    }
-
-    /** {@inheritDoc} */
-    @Override public void clearSelection() {
-        for( int index = 0; index < selectedIndices.length(); index++) {
-            clearSelection(index);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override public void clearSelection(int index) {
-        if (index < 0 || index >= getItemCount()) return;
-        selectedIndices.clear(index);
-        
-        final int changeIndex = selectedIndicesList.indexOf(index);
-        selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
     }
     
     /** {@inheritDoc} */
-    @Override public boolean isEmpty() {
-        return selectedIndices.isEmpty();
-    }
-
-    /** {@inheritDoc} */
-    @Override public boolean isSelected(int index) {
-        return selectedIndices.get(index);
-    }
-
-    /** {@inheritDoc} */
-    @Override public void select(int index) {
-        if (index < 0 || index >= getItemCount()) return;
-        selectedIndices.set(index);
-        
-        final int changeIndex = selectedIndicesList.indexOf(index);
-        selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));
-    }
-
-    /** {@inheritDoc} */
-    @Override public void select(T item) {
+    @Override public void clearCheck(T item) {
         int index = getItemIndex(item);
-        select(index);
+        clearCheck(index);        
     }
 
     /** {@inheritDoc} */
-    @Override public void selectNext() {
-        // no-op
+    @Override
+    public void clearChecks() {
+        for( int index = 0; index < checkedIndices.length(); index++) {
+            clearCheck(index);
+        }
     }
 
     /** {@inheritDoc} */
-    @Override public void selectPrevious() {
-        // no-op
+    @Override
+    public void clearCheck(int index) {
+        if (index < 0 || index >= getItemCount()) return;
+        checkedIndices.clear(index);
+        
+        final int changeIndex = checkedIndicesList.indexOf(index);
+        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, checkedIndicesList));
     }
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean isEmpty() {
+        return checkedIndices.isEmpty();
+    }
+    
+    /** {@inheritDoc} */
+    @Override public boolean isChecked(T item) {
+        int index = getItemIndex(item);
+        return isChecked(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isChecked(int index) {
+        return checkedIndices.get(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void check(int index) {
+        if (index < 0 || index >= getItemCount()) return;
+        checkedIndices.set(index);
+        final int changeIndex = checkedIndicesList.indexOf(index);
+        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, checkedIndicesList));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void check(T item) {
+        int index = getItemIndex(item);
+        check(index);
+    }
+
     
     
     
@@ -297,14 +294,14 @@ abstract class CheckBitSetModelBase<T> extends MultipleSelectionModel<T> {
             // the selected items list) when the checkbox is toggled
             booleanProperty.addListener(new InvalidationListener() {
                 @Override public void invalidated(Observable o) {
-                    final int changeIndex = selectedIndicesList.indexOf(index);
-                    
                     if (booleanProperty.get()) {
-                        selectedIndices.set(index);
-                        selectedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, selectedIndicesList));                            
+                        checkedIndices.set(index);
+                        final int changeIndex = checkedIndicesList.indexOf(index);
+                        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, checkedIndicesList));                            
                     } else {
-                        selectedIndices.clear(index);
-                        selectedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, selectedIndicesList));
+                        final int changeIndex = checkedIndicesList.indexOf(index);
+                        checkedIndices.clear(index);
+                        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, checkedIndicesList));
                     }
                 }
             });

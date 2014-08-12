@@ -90,15 +90,24 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 
-.comment{
+.cell-corner{
     -fx-background-color: red;
+}
+
+.cell-corner.top-left{
+    -fx-shape : "M 0 0 L 1 0 L 0 1 z";
+}
+
+.cell-corner.top-right{
     -fx-shape : "M 0 0 L -1 0 L 0 1 z";
 }
 
-/* TextField must squeeze tight, so no padding
-on top and bottom */
-.spreadsheet-cell TextField{
-    -fx-padding : 0 7 0 7 ;
+.cell-corner.bottom-right{
+    -fx-shape : "M 0 0 L -1 0 L 0 -1 z";
+}
+
+.cell-corner.bottom-left{
+    -fx-shape : "M 0 0 L 1 0 L 0 -1 z";
 }
 
 .indicationLabel{
@@ -116,4 +125,11 @@ on top and bottom */
 .picker-label:hover{
     -fx-effect:dropshadow(gaussian, black, 10, 0.1, 0, 0);
     -fx-cursor:hand;
+}
+
+/* We do not want to show the textfield, we want an Excel visual */
+CellView > .text-input.text-field,
+CellView > .text-input.text-area{
+    -fx-padding : 0 0 0 -0.2em;
+    -fx-background-color: transparent;
 }

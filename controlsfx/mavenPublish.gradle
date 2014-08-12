@@ -1,7 +1,7 @@
 apply plugin: 'signing'
 
 configurations {
-    samples { extendsFrom mainRuntime}
+    samples { extendsFrom runtime}
     jdk
     maven { extendsFrom archives }
     published { extendsFrom archives, signatures}
@@ -75,6 +75,9 @@ private configurePOM(def pom) {
                 distribution 'repo'
             }
         }
+        properties {
+            project.build.sourceEncoding='UTF-8'
+        }
     }
 }
 
@@ -102,3 +105,4 @@ ext.checkPasswords =  {
         }
     }
 }
+

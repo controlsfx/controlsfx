@@ -29,10 +29,10 @@ package org.controlsfx.dialog;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.getString;
 import static impl.org.controlsfx.i18n.Localization.localize;
-import static org.controlsfx.dialog.Dialog.Actions.CANCEL;
-import static org.controlsfx.dialog.Dialog.Actions.NO;
-import static org.controlsfx.dialog.Dialog.Actions.OK;
-import static org.controlsfx.dialog.Dialog.Actions.YES;
+import static org.controlsfx.dialog.Dialog.ACTION_CANCEL;
+import static org.controlsfx.dialog.Dialog.ACTION_NO;
+import static org.controlsfx.dialog.Dialog.ACTION_OK;
+import static org.controlsfx.dialog.Dialog.ACTION_YES;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -92,16 +92,14 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
-import org.controlsfx.control.action.AbstractAction;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.Dialog.ActionTrait;
-import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
@@ -386,7 +384,7 @@ import org.controlsfx.validation.Validator;
  * @see Dialog
  * @see Action
  * @see Actions
- * @see AbstractAction
+ * @see Action
  * @see Optional
  */
 public final class Dialogs {
@@ -400,12 +398,13 @@ public final class Dialogs {
 
     private Object owner;
     private String title = USE_DEFAULT;
+    private Node graphic;
     private String message;
     private String masthead;
     private boolean lightweight;
-    private DialogStyle style;
     private Set<Action> actions = new LinkedHashSet<>();
     private Effect backgroundEffect;
+    private List<String> styleClasses;
 
     /**
      * Creates the initial dialog
@@ -439,7 +438,16 @@ public final class Dialogs {
         this.title = title;
         return this;
     }
-
+    
+    /**
+     * Assigns dialog's graphic
+     * @param title dialog graphic
+     * @return dialog instance.
+     */
+    public Dialogs graphic(final Node graphic) {
+        this.graphic = graphic;
+        return this;
+    }
     
     /**
      * Assigns dialog's instructions
@@ -512,15 +520,30 @@ public final class Dialogs {
     }
     
     /**
-     * Specifies that the dialog should use the given {@code DialogStyle}
-     * rather than the custom cross-platform rendering used by default.
-     * Refer to the Dialogs class JavaDoc for more information.
+     * Specifies that the dialog should use the given style class, which allows
+     * for custom styling via CSS. There are three built-in style classes that
+     * cover most use cases, these are:
      * 
-     * @param style The {@code DialogStyle} of the dialog.
+     * <ul>
+     *   <li>{@link Dialog#STYLE_CLASS_CROSS_PLATFORM}</li>
+     *   <li>{@link Dialog#STYLE_CLASS_NATIVE}</li>
+     *   <li>{@link Dialog#STYLE_CLASS_UNDECORATED}</li>
+     * </ul>
+     * 
+     * <p>By default, dialogs use the cross-platform style class, to give a
+     * consistent look across all operating systems.
+     * 
+     * <p>This method can be called multiple times, with each style class being
+     * added to the final dialog instance.
+     * 
+     * @param styleClass The style class to add to the dialog.
      * @return dialog instance.
      */
-    public Dialogs style(DialogStyle style) {
-        this.style = style;
+    public Dialogs styleClass(String styleClass) {
+        if (styleClasses == null) {
+            styleClasses = new ArrayList<String>();
+        }
+        styleClasses.add(styleClass);
         return this;
     }
     
@@ -585,15 +608,13 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new AbstractAction(localize(asKey("exception.button.label"))) {
-            @Override public void handle(ActionEvent ae) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                exception.printStackTrace(pw);
-                String moreDetails = sw.toString();
-                new ExceptionDialog((Window)owner, moreDetails, style).show();
-            }
-        };
+        Action openExceptionAction = new Action(localize(asKey("exception.button.label")), ae -> {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);
+            String moreDetails = sw.toString();
+            new ExceptionDialog((Window)owner, moreDetails).show();
+        });
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
         
@@ -614,7 +635,7 @@ public final class Dialogs {
         final TextField textField = new TextField(defaultValue);
         dlg.setContent(buildInputContent(textField));
         
-        return Optional.ofNullable( dlg.show() == OK ? textField.getText() : null );
+        return Optional.ofNullable( dlg.show() == ACTION_OK ? textField.getText() : null );
     }
 
     /**
@@ -659,7 +680,7 @@ public final class Dialogs {
             selectionModel.select(defaultChoice);
         }
 
-        return Optional.ofNullable( dlg.show() == OK ? selectionModel.getSelectedItem() : null);
+        return Optional.ofNullable( dlg.show() == ACTION_OK ? selectionModel.getSelectedItem() : null);
 
     }
 
@@ -682,13 +703,13 @@ public final class Dialogs {
     }
 
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent 
-     * a set of available 'radio' buttons
-     * @param defaultCommandLink command is set to be default. Null means no default
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
+     * a set of available 'radio' buttons. "Command link" action uses content of its 'text' property as a title of a command link and content of 'long text'
+     * property as a description of the command link.
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks(CommandLink defaultCommandLink, List<CommandLink> links) {
+    public Action showCommandLinks(List<DialogAction> links) {
         final Dialog dlg = buildDialog(Type.INFORMATION);
         dlg.setContent(message);
         
@@ -728,11 +749,12 @@ public final class Dialogs {
             content.add(message, 0, row++);
         }
         
-        for (final CommandLink commandLink : links) {
+        for (final DialogAction commandLink : links) {
             if (commandLink == null) continue; 
             
             final Button button = buildCommandLinkButton(commandLink);            
-            button.setDefaultButton(commandLink == defaultCommandLink);
+            
+            button.setDefaultButton(commandLink.isDefault());
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent ae) {
                    commandLink.handle( new ActionEvent(dlg, ae.getTarget()));
@@ -755,24 +777,14 @@ public final class Dialogs {
     }
     
     /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
-     * a set of available 'radio' buttons
+     * Show a dialog filled with provided command links. Command links are just a {@link DialogAction}s and used instead of button bar and represent 
+     * a set of available 'radio' buttons. "Command link" action uses content of its 'text' property as a title of a command link and content of 'long text'
+     * property as a description of the command link.
      * @param links list of command links presented in specified sequence
      * @return action used to close dialog (it is either one of command links or CANCEL) 
-     */    
-    public Action showCommandLinks( List<CommandLink> links ) {
-        return showCommandLinks( null, links);
-    }
-    
-    /**
-     * Show a dialog filled with provided command links. Command links are used instead of button bar and represent
-     * a set of available 'radio' buttons
-     * @param defaultCommandLink command is set to be default. Null means no default
-     * @param links command links presented in specified sequence
-     * @return action used to close dialog (it is either one of command links or CANCEL) 
      */
-    public Action showCommandLinks( CommandLink defaultCommandLink, CommandLink... links ) {
-        return showCommandLinks( defaultCommandLink, Arrays.asList(links));
+    public Action showCommandLinks(DialogAction... links) {
+    	return showCommandLinks( Arrays.asList(links));
     }
     
     /**
@@ -788,7 +800,7 @@ public final class Dialogs {
         Dialog dlg = buildDialog(Type.FONT);
         dlg.setIconifiable(false);
         dlg.setContent(fontPanel);
-        return Optional.ofNullable( Dialog.Actions.OK == dlg.show() ? fontPanel.getFont(): null );
+        return Optional.ofNullable(ACTION_OK == dlg.show() ? fontPanel.getFont(): null);
     }
     
     /**
@@ -891,107 +903,21 @@ public final class Dialogs {
         content.setWorker(worker);
     }
     
-    /**
-     * The UserInfo class is used in relation to the pre-built login dialog 
-     * available from {@link Dialogs#showLogin(UserInfo, Callback)}.
-     */
-    public static class UserInfo {
-    	
-    	private String userName;
-    	private String password;
-    	
-    	/**
-    	 * Creates a UserInfo instance with the given username and password.
-    	 */
-		public UserInfo(String userName, String password) {
-			this.userName = userName == null? "": userName;
-			this.password = password == null? "": password;
-		}
-		
-		/**
-		 * Returns the currently set username.
-		 */
-		public String getUserName() {
-			return userName;
-		}
-		
-		/**
-		 * Sets the username to the given value.
-		 */
-		public void setUserName(String userName) {
-			this.userName = userName;
-		}
-		
-		/**
-         * Returns the currently set password.
-         */
-		public String getPassword() {
-			return password;
-		}
-		
-		/**
-         * Sets the password to the given value.
-         */
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		/** {@inheritDoc} */
-		@Override public String toString() {
-			return "UserInfo [userName=" + userName + "]";
-		}
-
-		/** {@inheritDoc} */
-		@Override public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((password == null) ? 0 : password.hashCode());
-			result = prime * result
-					+ ((userName == null) ? 0 : userName.hashCode());
-			return result;
-		}
-
-		/** {@inheritDoc} */
-		@Override public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			UserInfo other = (UserInfo) obj;
-			if (password == null) {
-				if (other.password != null)
-					return false;
-			} else if (!password.equals(other.password))
-				return false;
-			if (userName == null) {
-				if (other.userName != null)
-					return false;
-			} else if (!userName.equals(other.userName))
-				return false;
-			return true;
-		}
-    }
-    
-    
     
     /**
-     * Creates a Login {@link Dialog} whith user name and password  fields
+     * Creates a Login {@link Dialog} with user name and password fields. 
      * 
-     * @param initialUserInfo user information initially shown in the dialog
+     * @param initialUserInfo {@link Pair} of user name and password. User information initially shown in the dialog
      * @param authenticator callback represents actual authentication process. Exceptions coming from this callback are interpreted as
-     * authentication errors and will be shown as error message. In case of an exception the dialog will not closed to give the user 
+     * authentication errors and will be shown as error message. In case of an exception the dialog will not be closed to give the user 
      * an opportunity to correct their information and try again
      * 
-     * @return optional UserInfo. Optional.EMPTY returned in case of cancelled dialog otherwise Optional of UserInfo value with provided user name
-     * and password
-     *  
+     * @return optional {@link Pair} of user info. {@link Optional.EMPTY} returned in case of cancelled dialog, otherwise Optional of user info 
+     * with provided user name and password
      */
-    public Optional<UserInfo> showLogin( final UserInfo initialUserInfo, final Callback<UserInfo, Void> authenticator ) {
+    public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {
     	
-    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();// new CustomTextField();
+    	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();
     	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
     	
     	CustomPasswordField txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
@@ -1007,26 +933,23 @@ public final class Dialogs {
 		content.getChildren().add(txUserName);
 		content.getChildren().add(txPassword);
 		
-//		NotificationPane notificationPane = new NotificationPane(content);
-//		notificationPane.setShowFromTop(true);
-		
-		Action actionLogin = new DefaultDialogAction(getString("login.dlg.login.button"), ActionTrait.DEFAULT) {
+		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
+				setEventHandler(this::handleAction);
 			}
 			
-			@Override public void handle(ActionEvent ae) {
+			protected void handleAction(ActionEvent ae) {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call( new UserInfo(txUserName.getText(), txPassword.getText() ) );
+						authenticator.call(new Pair<String,String>(txUserName.getText(), txPassword.getText()));
 					}
 					lbMessage.setVisible(false);
 					lbMessage.setManaged(false);
 					dlg.hide();
 					dlg.setResult(this);
 				} catch( Throwable ex ) {
-					//Platform.runLater( () -> notificationPane.show(ex.getMessage()) );
 					lbMessage.setVisible(true);
 					lbMessage.setManaged(true);
 					lbMessage.setText(ex.getMessage());
@@ -1049,13 +972,13 @@ public final class Dialogs {
 		if ( dlg.getGraphic() == null ) { 
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
-		dlg.getActions().setAll(actionLogin, Dialog.Actions.CANCEL);
+		dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
 		String userNameCation = getString("login.dlg.user.caption");
 		String passwordCaption = getString("login.dlg.pswd.caption");
 		txUserName.setPromptText(userNameCation);
-		txUserName.setText( initialUserInfo.getUserName());
+		txUserName.setText( initialUserInfo.getKey());
 		txPassword.setPromptText(passwordCaption);
-		txPassword.setText(new String(initialUserInfo.getPassword()));
+		txPassword.setText(new String(initialUserInfo.getValue()));
 
 		ValidationSupport validationSupport = new ValidationSupport();
 		Platform.runLater( () -> {
@@ -1068,7 +991,7 @@ public final class Dialogs {
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
-    					new UserInfo(txUserName.getText(), txPassword.getText()): 
+    					new Pair<String,String>(txUserName.getText(), txPassword.getText()): 
     					null);
     }
     
@@ -1083,13 +1006,19 @@ public final class Dialogs {
     private Dialog buildDialog(final Type dlgType) {
         String actualTitle = title == null ? null : USE_DEFAULT.equals(title) ? dlgType.getDefaultTitle() : title;
         String actualMasthead = masthead == null ? null : (USE_DEFAULT.equals(masthead) ? dlgType.getDefaultMasthead() : masthead);
-        Dialog dlg = new Dialog(owner, actualTitle, lightweight, style);
+        Dialog dlg = new Dialog(owner, actualTitle, lightweight);
+        
+        dlg.updateStyleClasses(styleClasses, true);
         dlg.setResizable(false);
         dlg.setIconifiable(false);
-        Image image = dlgType.getImage();
-        if (image != null) {
-            dlg.setGraphic(new ImageView(image));
+        
+        // graphic
+        if (graphic != null) {
+            dlg.setGraphic(graphic);
+        } else if (dlgType.getImage() != null){
+            dlg.setGraphic(new ImageView(dlgType.getImage()));
         }
+        
         dlg.setMasthead(actualMasthead);
         dlg.getActions().addAll(dlgType.getActions());
         dlg.setBackgroundEffect(backgroundEffect);
@@ -1157,7 +1086,7 @@ public final class Dialogs {
         return root;
     }
     
-    private Button buildCommandLinkButton(CommandLink commandLink) {
+    private Button buildCommandLinkButton(DialogAction commandLink) {
         // put the content inside a button
         final Button button = new Button();
         button.getStyleClass().addAll("command-link-button");
@@ -1218,14 +1147,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), OK),
-        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), OK),
-        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), YES, NO, CANCEL),
-        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), OK, CANCEL),
-        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), OK, CANCEL),
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), ACTION_OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), ACTION_OK),
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), ACTION_OK),
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
         PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), OK, CANCEL);
+        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), ACTION_OK, ACTION_CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;
@@ -1259,28 +1188,6 @@ public final class Dialogs {
             return actions;
         }
     }
-    
-    
-    /**
-     * Command Link class.
-     * Represents one command link in command links dialog. 
-     */
-    public static class CommandLink extends DefaultDialogAction {
-        
-        public CommandLink( Node graphic, String text, String longText ) {
-            super(text);
-            setLongText(longText);
-            setGraphic(graphic);
-        }
-        
-        public CommandLink( String message, String comment ) {
-            this(null, message, comment);
-        }
-
-        @Override public String toString() {
-            return "CommandLink [text=" + getText() + ", longText=" + getLongText() + "]";
-        }
-    } 
     
     /**
      * Font style as combination of font weight and font posture. 

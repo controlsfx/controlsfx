@@ -41,6 +41,12 @@ public abstract class SampleBase extends Application implements Sample {
     }
     
     /** {@inheritDoc} */
+    @Override
+    public double getControlPanelDividerPosition() {
+    	return 0.6;
+    }
+    
+    /** {@inheritDoc} */
     @Override public String getSampleDescription() {
         return "";
     }
@@ -55,11 +61,12 @@ public abstract class SampleBase extends Application implements Sample {
      */
     public static Node buildSample(Sample sample, Stage stage) {
         SplitPane splitPane = new SplitPane();
-        splitPane.setDividerPosition(0, 0.6);
+        
         
         // we guarantee that the build order is panel then control panel.
         final Node samplePanel = sample.getPanel(stage);
         final Node controlPanel = sample.getControlPanel();
+        splitPane.setDividerPosition(0, sample.getControlPanelDividerPosition());
         
         if (samplePanel != null) {
             splitPane.getItems().add(samplePanel);
@@ -119,6 +126,7 @@ public abstract class SampleBase extends Application implements Sample {
             scrollPane.setMaxHeight(Double.MAX_VALUE);
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(true);
+            SplitPane.setResizableWithParent(scrollPane, false);
             splitPane.getItems().add(scrollPane);
         }
         

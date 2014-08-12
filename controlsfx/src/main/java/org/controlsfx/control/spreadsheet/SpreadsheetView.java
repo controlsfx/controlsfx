@@ -28,7 +28,6 @@ package org.controlsfx.control.spreadsheet;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
-
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
@@ -43,10 +42,12 @@ import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -60,6 +61,7 @@ import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
@@ -74,6 +76,8 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -258,6 +262,10 @@ public class SpreadsheetView extends Control {
         BOTH_INVISIBLE;
     }
 
+    /**
+     * Default width of the VerticalHeader.
+     */
+    private static final double DEFAULT_ROW_HEADER_WIDTH = 30.0;
     /***************************************************************************
      * * Private Fields * *
      **************************************************************************/
@@ -287,6 +295,11 @@ public class SpreadsheetView extends Control {
     // is the VirtualFlow)
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
+    
+    /**
+     * The vertical header width, just for the Label, not the Pickers.
+     */
+    private final DoubleProperty rowHeaderWidth = new SimpleDoubleProperty(DEFAULT_ROW_HEADER_WIDTH);
 
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
@@ -328,9 +341,9 @@ public class SpreadsheetView extends Control {
      * Creates a default SpreadsheetView control with no content and a Grid set
      * to null.
      */
-    public SpreadsheetView() {
-        this(null);
-    }
+//    public SpreadsheetView() {
+//        this(null);
+//    }
 
     /**
      * Creates a SpreadsheetView control with the {@link Grid} specified.
@@ -387,18 +400,18 @@ public class SpreadsheetView extends Control {
             @Override
             public void handle(KeyEvent keyEvent) {
                 // Copy
-                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
-                    copyClipboard();
-                // Paste
-                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
-                    pasteClipboard();
+//                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
+//                    copyClipboard();
+//                // Paste
+//                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
+//                    pasteClipboard();
                 // Go to the next row
-                else if (keyEvent.getCode() == KeyCode.ENTER) {
+                if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
                     if (position != null) {
-                        cellsView.getSelectionModel().clearAndSelect(position.getRow() + 1, position.getTableColumn());
+                        cellsView.getSelectionModel().clearAndSelect(FocusModelListener.getNextRowNumber(position, getCellsView()), position.getTableColumn());
                     }
                    /* // Go to next cell
                 } else if (keyEvent.getCode().compareTo(KeyCode.TAB) == 0) {
@@ -749,6 +762,33 @@ public class SpreadsheetView extends Control {
     }
 
     /**
+     * This DoubleProperty represents the with of the rowHeader. This is just
+     * representing the width of the Labels, not the pickers.
+     *
+     * @return A DoubleProperty.
+     */
+    public final DoubleProperty rowHeaderWidthProperty(){
+        return rowHeaderWidth;
+    }
+    
+    /**
+     * Specify a new width for the row header.
+     *
+     * @param value
+     */
+    public final void setRowHeaderWidth(double value){
+        rowHeaderWidth.setValue(value);
+    }
+    
+    /**
+     *
+     * @return the current width of the row header.
+     */
+    public final double getRowHeaderWidth(){
+        return rowHeaderWidth.get();
+    }
+    
+    /**
      * @return An ObservableList of row indexes that display a picker.
      */
     public ObservableList<Integer> getRowPickers() {
@@ -826,7 +866,12 @@ public class SpreadsheetView extends Control {
      * @return the height of a particular row of the SpreadsheetView.
      */
     public double getRowHeight(int row) {
-         return getCellsViewSkin().getRowHeight(row);
+        //Sometime, the skin is not initialised yet..
+        if (getCellsViewSkin() == null) {
+            return getGrid().getRowHeight(row);
+        } else {
+            return getCellsViewSkin().getRowHeight(row);
+        }
     }
     
     /**
@@ -1018,6 +1063,7 @@ public class SpreadsheetView extends Control {
         final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy")));
         copyItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("copySpreadsheetView.png"))));
+        copyItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         copyItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -1028,6 +1074,7 @@ public class SpreadsheetView extends Control {
         final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste")));
         pasteItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("pasteSpreadsheetView.png"))));
+        pasteItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
         pasteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -1035,19 +1082,54 @@ public class SpreadsheetView extends Control {
             }
         });
         
-        final MenuItem commentedItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment")));
-        commentedItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
+        final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment")));
+        cornerMenu.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("comment.png"))));
-        commentedItem.setOnAction(new EventHandler<ActionEvent>() {
+
+        final MenuItem topLeftItem = new MenuItem("top-left");
+        topLeftItem.setOnAction(new EventHandler<ActionEvent>() {
+
             @Override
-            public void handle(ActionEvent e) {
+            public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell =  getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
-               cell.setCommented(!cell.isCommented());
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
             }
         });
+        final MenuItem topRightItem = new MenuItem("top-right");
+        topRightItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
+            }
+        });
+        final MenuItem bottomRightItem = new MenuItem("bottom-right");
+        bottomRightItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
+            }
+        });
+        final MenuItem bottomLeftItem = new MenuItem("bottom-left");
+        bottomLeftItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
+                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_LEFT);
+            }
+        });
+
+        cornerMenu.getItems().addAll(topLeftItem, topRightItem, bottomRightItem, bottomLeftItem);
         
-        contextMenu.getItems().addAll(copyItem, pasteItem, commentedItem);
+        contextMenu.getItems().addAll(copyItem, pasteItem, cornerMenu);
         return contextMenu;
     }
 

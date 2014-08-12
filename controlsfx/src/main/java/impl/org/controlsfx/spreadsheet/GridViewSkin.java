@@ -212,7 +212,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * @return
      */
     public double getRowHeight(int row) {
-        Double rowHeight = handle.getCellsViewSkin().rowHeightMap.get(row);
+        Double rowHeight = rowHeightMap.get(row);
         return rowHeight == null ? handle.getView().getGrid().getRowHeight(row) : rowHeight;
     }
 
@@ -352,18 +352,24 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     public void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
         List<?> items = itemsProperty().get();
-        if (items == null || items.isEmpty())
+        if (items == null || items.isEmpty()) {
             return;
+        }
 
-        Callback/* <TableColumn<T, ?>, TableCell<T,?>> */cellFactory = col.getCellFactory();
-        if (cellFactory == null)
+        Callback/* <TableColumn<T, ?>, TableCell<T,?>> */ cellFactory = col.getCellFactory();
+        if (cellFactory == null) {
             return;
+        }
 
         TableCell<ObservableList<SpreadsheetCell>, ?> cell = (TableCell<ObservableList<SpreadsheetCell>, ?>) cellFactory
                 .call(col);
-        if (cell == null)
+        if (cell == null) {
             return;
+        }
 
+        //The current index of that column
+        int indexColumn = handle.getGridView().getColumns().indexOf(tc);
+        
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
@@ -376,6 +382,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             padding = r.snappedLeftInset() + r.snappedRightInset();
         }
 
+        ObservableList<ObservableList<SpreadsheetCell>> gridRows = spreadsheetView.getGrid().getRows();//.get(row)
+        
         int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows);
         double maxWidth = 0;
         boolean datePresent = false;
@@ -383,7 +391,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             cell.updateTableColumn(col);
             cell.updateTableView(handle.getGridView());
             cell.updateIndex(row);
-
+            
             if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
                 getChildren().add(cell);
 
@@ -391,7 +399,22 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                     datePresent = true;
                 }
                 cell.impl_processCSS(false);
-                maxWidth = Math.max(maxWidth, cell.prefWidth(-1));
+                double width = cell.prefWidth(-1);
+                
+                /**
+                 * If the cell is spanning in column, we need to take the other
+                 * columns into account in the calculation of the with. So we
+                 * compute the width needed by the cell and we substract the
+                 * remaining columns width in order not to have a huge width for
+                 * the considered column.
+                 */
+                SpreadsheetCell spc = gridRows.get(row).get(indexColumn);
+                if (spc.getColumnSpan() > 1 && spc.getColumn() == indexColumn) {
+                    for (int i = 1; i < spc.getColumnSpan(); ++i) {
+                        width -= spreadsheetView.getColumns().get(indexColumn + i).getWidth();
+                    }
+                }
+                maxWidth = Math.max(maxWidth, width);
                 getChildren().remove(cell);
             }
         }
@@ -408,8 +431,10 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         if (datePresent && widthMax < DATE_CELL_MIN_WIDTH) {
             widthMax = DATE_CELL_MIN_WIDTH;
         }
-        col.impl_setWidth(widthMax);
-        col.setPrefWidth(widthMax);
+        if(col.isResizable()){
+//        col.setPrefWidth(widthMax);
+            col.setPrefWidth(widthMax);
+        }
     }
 
     /***************************************************************************
@@ -461,7 +486,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     /**
      * Used in the HorizontalColumnHeader when we need to resize in double
-     * click. Keep in mind that resize is broken RT-31653
+     * click.
      * 
      * @param tc
      */
@@ -478,8 +503,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         double horizontalPickerHeight = spreadsheetView.getColumnPickers().isEmpty() ? 0: VerticalHeader.PICKER_SIZE;
         
         if (spreadsheetView.isShowRowHeader() || !spreadsheetView.getRowPickers().isEmpty()) {
-            x += verticalHeaderWidth;//verticalHeader.getVerticalHeaderWidth();
-            w -=  verticalHeaderWidth;//verticalHeader.getVerticalHeaderWidth();
+            x += verticalHeaderWidth;
+            w -=  verticalHeaderWidth;
         }
 
         

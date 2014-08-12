@@ -100,6 +100,12 @@ public class HelloPlusMinusSlider extends ControlsFXSample {
         return Utils.JAVADOC_BASE
                 + "org/controlsfx/control/PlusMinusSlider.html";
     }
+    
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/plusminusslider.css";
+    }
 
     @Override
     public String getSampleDescription() {

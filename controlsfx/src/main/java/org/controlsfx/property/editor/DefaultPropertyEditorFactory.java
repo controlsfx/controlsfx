@@ -5,9 +5,12 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
+
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 
@@ -50,7 +53,7 @@ public class DefaultPropertyEditorFactory implements Callback<Item, PropertyEdit
             return Editors.createDateEditor(item);
         }
         
-        if (/*type != null &&*/type == Color.class) {
+        if (/*type != null &&*/type == Color.class || type == Paint.class) {
             return Editors.createColorEditor(item);
         }
 

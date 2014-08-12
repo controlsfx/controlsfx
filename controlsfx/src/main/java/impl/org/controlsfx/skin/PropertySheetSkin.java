@@ -37,7 +37,6 @@ import java.util.TreeMap;
 
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
@@ -59,7 +58,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.control.PropertySheet.Mode;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.control.action.AbstractAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
@@ -237,16 +236,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
-    private class ActionChangeMode extends AbstractAction {
+    private class ActionChangeMode extends Action {
         
     	private final Image CATEGORY_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png");
     	private final Image NAME_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png");
     	
-        private PropertySheet.Mode mode;
-        
         public ActionChangeMode(PropertySheet.Mode mode) {
             super("");
-            this.mode = mode;
+            setEventHandler(ae -> getSkinnable().modeProperty().set(mode));
             
             if (mode == Mode.CATEGORY) {
                 setGraphic( new ImageView(CATEGORY_IMAGE));
@@ -259,9 +256,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             }
         }
 
-        @Override public void handle(ActionEvent ae) {
-            getSkinnable().modeProperty().set(mode);
-        }
     }
     
     

@@ -36,17 +36,17 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.SelectionModel;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.samples.Utils;
 
 public class HelloCheckComboBox extends ControlsFXSample {
     
-    private Label checkedItemsLabel;
+    private final Label checkedItemsLabel = new Label();
     private CheckComboBox<String> checkComboBox;
     
     @Override public String getSampleName() {
@@ -84,9 +84,20 @@ public class HelloCheckComboBox extends ControlsFXSample {
         
         // CheckComboBox
         checkComboBox = new CheckComboBox<String>(strings);
-        checkComboBox.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
-                updateText(checkedItemsLabel, c.getList());
+        checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
+            @Override public void onChanged(ListChangeListener.Change<? extends String> change) {
+                updateText(checkedItemsLabel, change.getList());
+                
+                while (change.next()) {
+                    System.out.println("============================================");
+                    System.out.println("Change: " + change);
+                    System.out.println("Added sublist " + change.getAddedSubList());
+                    System.out.println("Removed sublist " + change.getRemoved());
+                    System.out.println("List " + change.getList());
+                    System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
+                            + change.wasReplaced() + " Updated " + change.wasUpdated());
+                    System.out.println("============================================");
+                }
             }
         });
         grid.add(new Label("CheckComboBox: "), 0, row);
@@ -106,7 +117,6 @@ public class HelloCheckComboBox extends ControlsFXSample {
         Label label1 = new Label("Checked items: ");
         label1.getStyleClass().add("property");
         grid.add(label1, 0, 0);
-        checkedItemsLabel = new Label();
         grid.add(checkedItemsLabel, 1, row++);
         updateText(checkedItemsLabel, null);
         
@@ -116,11 +126,11 @@ public class HelloCheckComboBox extends ControlsFXSample {
         final CheckBox checkItem2Btn = new CheckBox();
         checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                SelectionModel<String> cm = checkComboBox.getCheckModel();
-                if (cm.isSelected(2)) {
-                    cm.clearSelection(2);
+                IndexedCheckModel<String> cm = checkComboBox.getCheckModel();
+                if (cm.isChecked(2)) {
+                    cm.clearCheck(2);
                 } else {
-                    cm.select(2);
+                    cm.check(2);
                 }
             }
         });

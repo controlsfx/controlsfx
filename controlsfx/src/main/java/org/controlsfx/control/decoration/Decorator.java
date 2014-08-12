@@ -185,7 +185,7 @@ public class Decorator {
             }
             p = new DecorationPane();
             Node oldRoot = scene.getRoot();
-            ImplUtils.injectAsRootPane(scene, p);
+            ImplUtils.injectAsRootPane(scene, p, true);
             ((DecorationPane)p).setRoot(oldRoot);
         }
         

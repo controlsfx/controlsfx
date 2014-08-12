@@ -283,6 +283,12 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             }
         });
         
+         rangeBar.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent e) {
+                ((RangeSliderBehavior) getBehavior()).confirmRange();
+            }
+        });
+        
         getChildren().add(rangeBar);
     }
 

@@ -338,6 +338,12 @@ public class HelloSnapshotView extends ControlsFXSample {
                 + "org/controlsfx/control/SnapshotView.html";
     }
 
+    
+    @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/control/snapshot-view.css";
+    }
+    
     @Override
     public String getSampleDescription() {
         return "A tool which allows the user to select a rectangular area of the displayed node. " +

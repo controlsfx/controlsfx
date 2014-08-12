@@ -72,7 +72,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     @Override
     protected void layoutChildren(double x, final double y, final double w,
             final double h) {
-        checkState(true);
+        checkState();
         if (cellsMap.isEmpty()) return;
         
         
@@ -109,7 +109,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         if (spreadsheetView.getColumns().size() != gridView.getColumns().size()) {
             return;
         }
-        checkState(true);
+        checkState();
         
         // layout the individual column cells
         double width;

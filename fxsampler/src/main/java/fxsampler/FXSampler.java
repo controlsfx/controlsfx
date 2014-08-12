@@ -360,6 +360,10 @@ public class FXSampler extends Application {
 	            ex.printStackTrace();
 	        }
         }
+        
+        // Escape '<' by "&lt;" to ensure correct rendering by SyntaxHighlighter
+        src = src.replace("<", "&lt;");
+        
         String template = getResource("/fxsampler/util/SourceCodeTemplate.html", null);
         return template.replace("<source/>", src);
     }
@@ -380,6 +384,10 @@ public class FXSampler extends Application {
 	            ex.printStackTrace();
 	        }
         }
+        
+        // Escape '<' by "&lt;" to ensure correct rendering by SyntaxHighlighter
+        src = src.replace("<", "&lt;");
+        
         String template = getResource("/fxsampler/util/CssTemplate.html", null);
         return template.replace("<source/>", src);
     }    
@@ -413,3 +421,4 @@ public class FXSampler extends Application {
         return wPage;
     }
 }
+

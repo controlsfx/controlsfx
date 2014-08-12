@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -238,8 +237,6 @@ public class SpreadsheetViewSelectionModel extends
         
         final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(row, posFinal.getColumn());
 
-        //For some reasons (see below), we don't want to go in edition.
-        boolean edition=true;
         /**
          * We check if we are on covered cell. If so we have the algorithm of
          * the focus model to give the selection to the right cell.
@@ -254,7 +251,7 @@ public class SpreadsheetViewSelectionModel extends
                  * move is initiated by keyboard. Because if it's a click, then
                  * we just want to go on the clicked cell (not below)
                  */
-                if (old != null && key && !shift && old.getColumn() == posFinal.getColumn()
+                if (old != null && !shift && old.getColumn() == posFinal.getColumn()
                         && old.getRow() == posFinal.getRow() - 1) {
                     int visibleRow = FocusModelListener.getNextRowNumber(old, cellsView);
                     /**
@@ -266,8 +263,6 @@ public class SpreadsheetViewSelectionModel extends
                     if (visibleRow < getItemCount()) {
                         posFinal = getVisibleCell(visibleRow, old.getTableColumn(), old.getColumn());
                         break;
-                    }else{
-                        edition = false;
                     }
                 }
                 // If the current selected cell if hidden by row span, we go
@@ -283,7 +278,7 @@ public class SpreadsheetViewSelectionModel extends
                 // If we notice that the new selected cell is the previous one,
                 // then it means that we were
                 // already on the cell and we wanted to go right.
-                if (old != null && key && !shift && old.getColumn() == posFinal.getColumn() - 1
+                if (old != null && !shift && old.getColumn() == posFinal.getColumn() - 1
                         && old.getRow() == posFinal.getRow()) {
                     posFinal = getVisibleCell(old.getRow(), FocusModelListener.getTableColumnSpan(old, cellsView), getTableColumnSpanInt(old));
                 } else {
@@ -295,23 +290,6 @@ public class SpreadsheetViewSelectionModel extends
                 break;
         }
 
-        // This is to handle edition
-        if (edition && posFinal.equals(old) && !ctrl && !shift && !drag) {
-            // If we are on an Invisible row or both (in diagonal), we need
-            // to force the edition
-            if (spanType == SpreadsheetView.SpanType.ROW_SPAN_INVISIBLE
-                    || spanType == SpreadsheetView.SpanType.BOTH_INVISIBLE) {
-                final TablePosition<ObservableList<SpreadsheetCell>, ?> FinalPos = new TablePosition<>(cellsView,
-                        posFinal.getRow(), posFinal.getTableColumn());
-                final Runnable r = new Runnable() {
-                    @Override
-                    public void run() {
-                        cellsView.edit(FinalPos.getRow(), FinalPos.getTableColumn());
-                    }
-                };
-                Platform.runLater(r);
-            }
-        }
         old = posFinal;
 
         selectedCellsMap.add(posFinal);

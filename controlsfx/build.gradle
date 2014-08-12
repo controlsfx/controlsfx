@@ -17,6 +17,14 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         exclude group: 'org.codehaus.groovy', module: 'groovy'
     }
+    testCompile 'junit:junit:[4,)'
+}
+
+test {
+    testLogging {
+        // Show that tests are run in the command-line output
+        events 'started', 'passed'
+    }
 }
 
 Properties commons = new Properties()

@@ -31,7 +31,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
@@ -47,21 +46,17 @@ import org.controlsfx.control.HiddenSidesPane;
 
 public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
 
-    private StackPane stackPane;
-
-    private EventHandler<MouseEvent> exitedHandler;
-
+    private final StackPane stackPane;
+    private final EventHandler<MouseEvent> exitedHandler;
     private boolean mousePressed;
 
     public HiddenSidesPaneSkin(HiddenSidesPane pane) {
         super(pane);
 
-        exitedHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (getSkinnable().getPinnedSide() == null && !mousePressed) {
-                    hide();
-                }
+        exitedHandler = event -> {
+            if (isMouseEnabled() && getSkinnable().getPinnedSide() == null
+                    && !mousePressed) {
+                hide();
             }
         };
 
@@ -69,108 +64,50 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
         getChildren().add(stackPane);
         updateStackPane();
 
-        InvalidationListener rebuildListener = new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                updateStackPane();
-            }
-        };
+        InvalidationListener rebuildListener = observable -> updateStackPane();
         pane.contentProperty().addListener(rebuildListener);
         pane.topProperty().addListener(rebuildListener);
         pane.rightProperty().addListener(rebuildListener);
         pane.bottomProperty().addListener(rebuildListener);
         pane.leftProperty().addListener(rebuildListener);
 
-        pane.addEventFilter(MouseEvent.MOUSE_MOVED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if (getSkinnable().getPinnedSide() == null) {
-                            Side side = getSide(event);
-                            if (side != null) {
-                                show(side);
-                            } else if (isOutsideSides(event)) {
-                                hide();
-                            }
-                        }
-                    }
-
-                    private boolean isOutsideSides(MouseEvent event) {
-                        if (getSkinnable().getLeft() != null
-                                && getSkinnable().getLeft().getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
-
-                        if (getSkinnable().getTop() != null
-                                && getSkinnable().getTop().getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
-
-                        if (getSkinnable().getRight() != null
-                                && getSkinnable().getRight()
-                                        .getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
-
-                        if (getSkinnable().getBottom() != null
-                                && getSkinnable().getBottom()
-                                        .getBoundsInParent()
-                                        .contains(event.getX(), event.getY())) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                });
+        pane.addEventFilter(MouseEvent.MOUSE_MOVED, event -> {
+            if (isMouseEnabled() && getSkinnable().getPinnedSide() == null) {
+                Side side = getSide(event);
+                if (side != null) {
+                    show(side);
+                } else if (isMouseMovedOutsideSides(event)) {
+                    hide();
+                }
+            }
+        });
 
         pane.addEventFilter(MouseEvent.MOUSE_EXITED, exitedHandler);
 
         pane.addEventFilter(MouseEvent.MOUSE_PRESSED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        mousePressed = true;
-                    }
-                });
+                event -> mousePressed = true);
 
-        pane.addEventFilter(MouseEvent.MOUSE_RELEASED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        mousePressed = false;
+        pane.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            mousePressed = false;
 
-                        if (getSkinnable().getPinnedSide() == null) {
-                            Side side = getSide(event);
-                            if (side != null) {
-                                show(side);
-                            } else {
-                                hide();
-                            }
-                        }
-                    }
-                });
+            if (isMouseEnabled() && getSkinnable().getPinnedSide() == null) {
+                Side side = getSide(event);
+                if (side != null) {
+                    show(side);
+                } else {
+                    hide();
+                }
+            }
+        });
 
         for (Side side : Side.values()) {
             visibility[side.ordinal()] = new SimpleDoubleProperty(0);
-            visibility[side.ordinal()].addListener(new InvalidationListener() {
-
-                @Override
-                public void invalidated(Observable observable) {
-                    getSkinnable().requestLayout();
-                }
-            });
+            visibility[side.ordinal()].addListener(observable -> getSkinnable()
+                    .requestLayout());
         }
 
-        pane.pinnedSideProperty().addListener(new InvalidationListener() {
-
-            @Override
-            public void invalidated(Observable observable) {
-                show(getSkinnable().getPinnedSide());
-            }
-        });
+        pane.pinnedSideProperty().addListener(
+                observable -> show(getSkinnable().getPinnedSide()));
 
         Rectangle clip = new Rectangle();
         clip.setX(0);
@@ -179,6 +116,38 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
         clip.heightProperty().bind(getSkinnable().heightProperty());
 
         getSkinnable().setClip(clip);
+    }
+
+    private boolean isMouseMovedOutsideSides(MouseEvent event) {
+        if (getSkinnable().getLeft() != null
+                && getSkinnable().getLeft().getBoundsInParent()
+                        .contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        if (getSkinnable().getTop() != null
+                && getSkinnable().getTop().getBoundsInParent()
+                        .contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        if (getSkinnable().getRight() != null
+                && getSkinnable().getRight().getBoundsInParent()
+                        .contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        if (getSkinnable().getBottom() != null
+                && getSkinnable().getBottom().getBoundsInParent()
+                        .contains(event.getX(), event.getY())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isMouseEnabled() {
+        return getSkinnable().getTriggerDistance() > 0;
     }
 
     private Side getSide(MouseEvent evt) {
@@ -218,9 +187,14 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
                     s.equals(side) ? 1 : 0);
         }
 
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(200), keyValues);
+        Duration delay = getSkinnable().getAnimationDelay() != null ? getSkinnable()
+                .getAnimationDelay() : Duration.millis(300);
+        Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
+                .getAnimationDuration() : Duration.millis(200);
+
+        KeyFrame keyFrame = new KeyFrame(duration, keyValues);
         showTimeline = new Timeline(keyFrame);
-        showTimeline.setDelay(Duration.millis(300));
+        showTimeline.setDelay(delay);
         showTimeline.play();
     }
 
@@ -254,8 +228,14 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
                     visibility[side.ordinal()], 0);
         }
 
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(200), keyValues);
+        Duration delay = getSkinnable().getAnimationDelay() != null ? getSkinnable()
+                .getAnimationDelay() : Duration.millis(300);
+        Duration duration = getSkinnable().getAnimationDuration() != null ? getSkinnable()
+                .getAnimationDuration() : Duration.millis(200);
+
+        KeyFrame keyFrame = new KeyFrame(duration, keyValues);
         hideTimeline = new Timeline(keyFrame);
+        hideTimeline.setDelay(delay);
         hideTimeline.play();
     }
 

@@ -28,10 +28,10 @@ package org.controlsfx.control.spreadsheet;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
+import impl.org.controlsfx.spreadsheet.CellView;
 
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
@@ -108,13 +108,9 @@ public final class SpreadsheetColumn {
         canFix = initCanFix();
 
         // The contextMenu creation must be on the JFX thread
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                column.setContextMenu(getColumnContextMenu());
-            }
-        };
-        Platform.runLater(r);
+        CellView.getValue(() -> {
+            column.setContextMenu(getColumnContextMenu());
+        });
 
         // When changing FixedColumns, we set header in order to add "." or ":"
         spreadsheetView.getFixedColumns().addListener(updateTextListener);
@@ -223,18 +219,11 @@ public final class SpreadsheetColumn {
      * * Private Methods * *
      **************************************************************************/
     private void setText(String text) {
-//        if (!isColumnFixable()) {
-            column.setText(text);
-//        } else if (spreadsheetView.getFixedColumns().contains(this)) {
-//            column.setText(text + ":");
-//        } else {
-//            column.setText(text + ".");
-//        }
-
+        column.setText(text);
     }
 
     private String getText() {
-        return column.getText();//.replace(".", "").replace(":", "");
+        return column.getText();
     }
 
     /**
@@ -269,20 +258,16 @@ public final class SpreadsheetColumn {
     }
 
     /**
-     * Verify that you can fix this column. Right now, only a column without any
-     * cell spanning can be fixed.
+     * Verify that you can fix this column. 
      * 
      * @return if it's fixable.
      */
     private boolean initCanFix() {
         for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
             int columnSpan = row.get(indexColumn).getColumnSpan();
-            if (columnSpan > 1 || row.get(indexColumn).getRowSpan() > 1)
+            if (columnSpan > 1) {
                 return false;
-            // }else if(columnSpan>1){
-            // columnSpanConstraint =
-            // columnSpanConstraint>columnSpan?columnSpanConstraint:columnSpan;
-            // }
+            }
         }
         return true;
     }
@@ -297,5 +282,4 @@ public final class SpreadsheetColumn {
             setText(getText());
         }
     };
-
 }

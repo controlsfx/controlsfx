@@ -110,15 +110,21 @@ import org.controlsfx.tools.Utils;
  * <br/>
  * You can fix some rows and some columns by right-clicking on their header. A
  * context menu will appear if it's possible to fix them. The label will then be
- * in italic and the background will turn to dark grey. Keep in mind that only
- * columns without any spanning cells can be fixed.
+ * in italic and the background will turn to dark grey. 
  * <br/>
- * And that and only rows without row-spanning cells can be fixed. <br/>
  * You have also the possibility to fix them manually by adding and removing
  * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
  * are strongly advised to check if it's possible to do so with
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
- * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior
+ * {@link #isRowFixable(int)} for the fixed rows. 
+ * <br/>
+ * 
+ * If you want to fix several rows together, and they have a row span inside,
+ * you can call {@link #areRowsFixable(java.util.List) } to verify if you can
+ * fix them. Be sure to add them all in once otherwise the system will detect
+ * that a span is going out of bounds and will throw an exception.
+ *
+ * Calling those methods prior
  * every move will ensure that no exception will be thrown.
  * <br/>
  * You have also the possibility to deactivate these possibilities. For example,
@@ -338,14 +344,6 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     /**
-     * Creates a default SpreadsheetView control with no content and a Grid set
-     * to null.
-     */
-//    public SpreadsheetView() {
-//        this(null);
-//    }
-
-    /**
      * Creates a SpreadsheetView control with the {@link Grid} specified.
      * 
      * @param grid
@@ -441,7 +439,7 @@ public class SpreadsheetView extends Control {
          */
         this.contextMenuProperty().addListener(new WeakChangeListener<>(contextMenuChangeListener));
         // The contextMenu creation must be on the JFX thread
-        Platform.runLater(()->{
+        CellView.getValue(() -> {
             setContextMenu(getSpreadsheetViewContextMenu());
         });
 
@@ -557,9 +555,9 @@ public class SpreadsheetView extends Control {
          * We need to set the columns of the TableView in the JFX thread. Since
          * this method can be called from another thread, we execute the code here.
          */
-        Platform.runLater(()->{
+        CellView.getValue(() -> {
             cellsView.getColumns().clear();
-            for(SpreadsheetColumn spreadsheetColumn:columns){
+            for (SpreadsheetColumn spreadsheetColumn : columns) {
                 cellsView.getColumns().add(spreadsheetColumn.column);
             }
         });
@@ -622,6 +620,40 @@ public class SpreadsheetView extends Control {
      */
     public boolean isRowFixable(int row) {
         return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
+    }
+    
+    /**
+     * Indicates whether a List of rows can be fixed or not.
+     * @param list
+     * @return true if the List of row can be fixed together.
+     */
+    public boolean areRowsFixable(List<? extends Integer> list) {
+        for (Integer row : list) {
+            //If this row is not fixable, we need to identify the maximum span
+            if (!isRowFixable(row)) {
+
+                int maxSpan = 1;
+                List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
+                for (SpreadsheetCell cell : gridRow) {
+                    //If the original row is not within this range, there is not need to look deeper.
+                    if (!list.contains(cell.getRow())) {
+                        return false;
+                    }
+                    //We only want to consider the original cell.
+                    if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
+                        maxSpan = cell.getRowSpan();
+                    }
+                }
+                //Then we need to verify that all rows within that span are fixed.
+                int count = row + maxSpan - 1;
+                for (int index = row + 1; index < count; ++index) {
+                    if (!list.contains(index)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -875,7 +907,7 @@ public class SpreadsheetView extends Control {
     }
     
     /**
-     * Return the selectionModel used by the SpreadsheetView.
+     * Return the selectionModel used by the SpreadsheetView. 
      * 
      * @return {@link TableViewSelectionModel}
      */
@@ -1235,30 +1267,51 @@ public class SpreadsheetView extends Control {
         @Override
         public void onChanged(ListChangeListener.Change<? extends Integer> c) {
             while (c.next()) {
-                if (c.wasAdded() || c.wasRemoved()) {
+                if (c.wasAdded()) {
                     List<? extends Integer> newRows = c.getAddedSubList();
-                    for (int row : newRows) {
-                        if (!isRowFixable(row)) {
-                            throw new IllegalArgumentException(computeReason(row));
-                        }
+                    if(!areRowsFixable(newRows)){
+                        throw new IllegalArgumentException(computeReason(newRows));
                     }
                     FXCollections.sort(fixedRows);
                 }
-            }
-        }
-
-        private String computeReason(Integer element) {
-            String reason = "\n This row cannot be fixed.";
-            for (SpreadsheetCell cell : getGrid().getRows().get(element)) {
-                if (cell.getRowSpan() > 1) {
-                    reason += "The cell situated at line " + cell.getRow() + " and column " + cell.getColumn()
-                            + "\n has a rowSpan of " + cell.getRowSpan() + ", it must be 1.";
-                    return reason;
+                
+                if(c.wasRemoved()){
+                    //Handle this case.
                 }
             }
-            return reason;
         }
     };
+
+        private String computeReason(List<? extends Integer> list) {
+        String reason = "\n A row cannot be fixed. \n";
+
+        for (Integer row : list) {
+            //If this row is not fixable, we need to identify the maximum span
+            if (!isRowFixable(row)) {
+
+                int maxSpan = 1;
+                List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
+                for (SpreadsheetCell cell : gridRow) {
+                    if(!list.contains(cell.getRow())){
+                        reason += "The row " + row + " is inside a row span and the starting row " + cell.getRow() + " is not fixed.\n";
+                    }
+                    //We only want to consider the original cell.
+                    if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
+                        maxSpan = cell.getRowSpan();
+                    }
+                }
+                //Then we need to verify that all rows within that span are fixed.
+                int count = row + maxSpan - 1;
+                for (int index = row + 1; index < count; ++index) {
+                    if (!list.contains(index)) {
+                        reason += "One cell on the row " + row + " has a row span of " + maxSpan + ". "
+                                + "But the row " + index + " contained within that span is not fixed.\n";
+                    }
+                }
+            }
+        }
+        return reason;
+    }
 
     private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
         @Override
@@ -1281,7 +1334,7 @@ public class SpreadsheetView extends Control {
             String reason = "\n This column cannot be fixed.";
             for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
                 int columnSpan = row.get(indexColumn).getColumnSpan();
-                if (columnSpan > 1 || row.get(indexColumn).getRowSpan() > 1) {
+                if (columnSpan > 1 /*|| row.get(indexColumn).getRowSpan() > 1*/) {
                     reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column "
                             + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1.";
                     return reason;

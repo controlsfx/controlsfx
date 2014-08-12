@@ -26,18 +26,13 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -85,58 +80,18 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
             }
         });
     }
-    private final InvalidationListener setPrefHeightListener = new InvalidationListener() {
-
-        @Override
-        public void invalidated(Observable o) {
-            setPrefHeight(computePrefHeight(-1));
-        }
-    };
-    /***************************************************************************
-     * * Public Methods * *
-     **************************************************************************/
-
-    /**
-     * When unfixing some Columns, we need to put the previously FixedColumns
-     * back if we want the hover to be dealt correctly
-     * 
-     */
-    public void putFixedColumnToBack() {
-        final List<Node> tset = new ArrayList<>(getChildren());
-        tset.sort(new Comparator<Node>() {
-            @Override
-            public int compare(Node o1, Node o2) {
-                // In case it's null (some rows are initiated after rowCount)
-                if (((CellView) o1).getItem() == null || ((CellView) o2).getItem() == null) {
-                    return -1;
-                }
-                final int lhs = getTableView().getColumns().indexOf(((CellView) o1).getTableColumn());
-                final int rhs = getTableView().getColumns().indexOf(((CellView) o2).getTableColumn());
-                if (lhs < rhs) {
-                    return -1;
-                }
-                if (lhs > rhs) {
-                    return +1;
-                }
-                return 0;
-
-            }
-        });
-        getChildren().setAll(tset);
-    }
-
-    public void addCell(CellView cell) {
-        getChildren().add(cell);
-    }
-
-    public void removeCell(CellView gc) {
-        getChildren().remove(gc);
-    }
-
     /***************************************************************************
      * * Protected Methods * *
      **************************************************************************/
 
+    void addCell(CellView cell) {
+        getChildren().add(cell);
+    }
+
+    void removeCell(CellView gc) {
+        getChildren().remove(gc);
+    }
+    
     SpreadsheetView getSpreadsheetView() {
         return handle.getView();
     }
@@ -179,5 +134,12 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     protected Skin<?> createDefaultSkin() {
         return new GridRowSkin(handle, this);
     }
+    
+    private final InvalidationListener setPrefHeightListener = new InvalidationListener() {
 
+        @Override
+        public void invalidated(Observable o) {
+            setPrefHeight(computePrefHeight(-1));
+        }
+    };
 }

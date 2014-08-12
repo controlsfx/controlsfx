@@ -357,7 +357,7 @@ import org.controlsfx.validation.Validator;
  * 
  * <pre>
  * {@code 
- * if (response == Dialog.Actions.OK) {
+ * if (response == Dialog.Actions.YES) {
  *     // ... submit user input
  * } else {
  *     // ... user cancelled, reset form to default

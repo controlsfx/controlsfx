@@ -2,15 +2,11 @@ package impl.org.controlsfx.skin;
 
 import javafx.beans.binding.Bindings;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 
@@ -37,27 +33,21 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
     }
 
     private void registerEventListener(){
-        suggestionList.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-                if (me.getButton() == MouseButton.PRIMARY){
-                    onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
-                }
+        suggestionList.setOnMouseClicked(me -> {
+            if (me.getButton() == MouseButton.PRIMARY){
+                onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
             }
         });
 
 
-        suggestionList.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent ke) {
-                switch (ke.getCode()) {
-                case ENTER:
-                    onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
-                    break;
+        suggestionList.setOnKeyPressed(ke -> {
+            switch (ke.getCode()) {
+            case ENTER:
+                onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
+                break;
 
-                default:
-                    break;
-                }
+            default:
+                break;
             }
         });
     }

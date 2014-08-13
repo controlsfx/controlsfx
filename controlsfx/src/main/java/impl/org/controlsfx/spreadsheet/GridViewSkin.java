@@ -456,7 +456,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             widthMax = DATE_CELL_MIN_WIDTH;
         }
         if(col.isResizable()){
-//        col.setPrefWidth(widthMax);
             col.setPrefWidth(widthMax);
         }
     }
@@ -475,33 +474,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         horizontalPickers = new HorizontalPicker((HorizontalHeader) getTableHeaderRow(), spreadsheetView);
         getChildren().add(horizontalPickers);
         getFlow().init(spreadsheetView);
-
-        /**
-         * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-         * JDK8u20
-         */
-//        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-//            @Override
-//            public void handle(KeyEvent keyEvent) {
-//                if (keyEvent.getCode() == KeyCode.LEFT) {
-//                    if (keyEvent.isShortcutDown()) {
-//                        getFocusModel().focusLeftCell();
-//                    } else {
-//                        selectLeft();
-//                    }
-//                    keyEvent.consume();
-//                    scrollHorizontally();
-//                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
-//                    if (keyEvent.isShortcutDown()) {
-//                        getFocusModel().focusRightCell();
-//                    } else {
-//                        selectRight();
-//                    }
-//                    keyEvent.consume();
-//                    scrollHorizontally();
-//                }
-//            }
-//        });
     }
 
     protected final ObservableSet<Integer> getCurrentlyFixedRow() {
@@ -608,22 +580,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          *****************************************************************/
     }
 
-    /**
-     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-     * JDK8u20
-     */
-//    @Override
-//    protected void onSelectRightCell() {
-//    }
-
-    /**
-     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-     * JDK8u20
-     */
-//    @Override
-//    protected void onSelectLeftCell() {
-//    }
-
     @Override
     protected void onSelectPreviousCell() {
         super.onSelectPreviousCell();
@@ -707,54 +663,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     GridVirtualFlow<?> getFlow() {
         return (GridVirtualFlow<?>) flow;
     }
-
-    /**
-     * Select the Right cell.
-     */
-//    private void selectRight() {
-//        TableSelectionModel sm = getSelectionModel();
-//        if (sm == null)
-//            return;
-//
-//        TableFocusModel fm = getFocusModel();
-//        if (fm == null)
-//            return;
-//
-//        TablePosition focusedCell = getFocusedCell();
-//        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-//        if (currentColumn == getVisibleLeafColumns().size() - 1)
-//            return;
-//
-//        TableColumnBase tc = focusedCell.getTableColumn();
-//        tc = getVisibleLeafColumn(currentColumn + 1);
-//
-//        int row = focusedCell.getRow();
-//        sm.clearAndSelect(row, tc);
-//    }
-//
-//    /**
-//     * Select the left cell.
-//     */
-//    private void selectLeft() {
-//        TableSelectionModel sm = getSelectionModel();
-//        if (sm == null)
-//            return;
-//
-//        TableFocusModel fm = getFocusModel();
-//        if (fm == null)
-//            return;
-//
-//        TablePosition focusedCell = getFocusedCell();
-//        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-//        if (currentColumn == 0)
-//            return;
-//
-//        TableColumnBase tc = focusedCell.getTableColumn();
-//        tc = getVisibleLeafColumn(currentColumn - 1);
-//
-//        int row = focusedCell.getRow();
-//        sm.clearAndSelect(row, tc);
-//    }
 
     /**
      * Return a BitSet of the rows that needs layout all the time. This

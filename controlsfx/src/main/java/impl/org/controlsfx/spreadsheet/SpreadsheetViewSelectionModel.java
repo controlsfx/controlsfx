@@ -60,7 +60,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 public class SpreadsheetViewSelectionModel extends
         TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
 
-    private boolean ctrl = false; // Register state of 'ctrl' key
+//    private boolean ctrl = false; // Register state of 'ctrl' key
     private boolean shift = false; // Register state of 'shift' key
     private boolean key = false; // Register if we last touch the keyboard
     // or the mouse
@@ -126,7 +126,7 @@ public class SpreadsheetViewSelectionModel extends
         @Override
         public void handle(KeyEvent keyEvent) {
             key = true;
-            ctrl = keyEvent.isControlDown();
+//            ctrl = keyEvent.isControlDown();
             shift = keyEvent.isShiftDown();
         }
     };
@@ -134,7 +134,7 @@ public class SpreadsheetViewSelectionModel extends
         @Override
         public void handle(MouseEvent mouseEvent) {
             key = false;
-            ctrl = mouseEvent.isControlDown();
+//            ctrl = mouseEvent.isControlDown();
             shift = mouseEvent.isShiftDown();
         }
     };
@@ -204,12 +204,12 @@ public class SpreadsheetViewSelectionModel extends
 
     private void handleSelectedCellsListChangeEvent(
             ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
-        if (makeAtomic) {
-            return;
-        }
+            if (makeAtomic) {
+                return;
+            }
 
-        selectedCellsSeq.callObservers(new MappingChange<>(c, MappingChange.NOOP_MAP, selectedCellsSeq));
-        c.reset();
+            selectedCellsSeq.callObservers(new MappingChange<>(c, MappingChange.NOOP_MAP, selectedCellsSeq));
+            c.reset();
     }
 
     /**

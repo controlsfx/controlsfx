@@ -402,6 +402,7 @@ public class VerticalHeader extends StackPane {
     };
 
     private void rowResizing(GridRow gridRow, Label label, MouseEvent me) {
+        //FIXME Must block when resizing is below 0 (impact row spanning cell)
         double draggedY = me.getSceneY() - dragAnchorY;
         if (gridRow.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
             draggedY = -draggedY;

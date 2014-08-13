@@ -188,7 +188,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     @Override
     public void updateItem(final SpreadsheetCell item, boolean empty) {
         final boolean emptyRow = getTableView().getItems().size() < getIndex() + 1;
-
         /**
          * don't call super.updateItem() because it will trigger cancelEdit() if
          * the cell is being edited. It causes calling commitEdit() ALWAYS call
@@ -212,13 +211,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             show(item);
             if (item.getGraphic() == null) {
                 setGraphic(null);
-            }
-
-            // Sometimes the hoverProperty is not called on exit. So the cell is
-            // affected to a new Item but
-            // the hover is still activated. So we fix it now.
-            if (isHover()) {
-                setHoverPublic(false);
             }
         }
     }
@@ -363,19 +355,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     };
     
     /**
-     * Set this SpreadsheetCell hoverProperty
-     * 
-     * @param hover
-     */
-    private void setHoverPublic(boolean hover) {
-        this.setHover(hover);
-        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in
-        // to be in Hover
-        // Otherwise it's will not be visible
-        ((GridRow) this.getTableRow()).setHoverPublic(hover);
-    }
-
-    /**
      * Return an instance of Editor specific to the Cell type We are not using
      * the build-in editor-Cell because we cannot know in advance which editor
      * we will need. Furthermore, we want to control the behavior very closely
@@ -435,7 +414,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @param e
      */
     private void dragSelect(MouseEvent e) {
-
         // If the mouse event is not contained within this tableCell, then
         // we don't want to react to it.
         if (!this.contains(e.getX(), e.getY())) {

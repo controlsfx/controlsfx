@@ -75,7 +75,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         checkState();
         if (cellsMap.isEmpty()) return;
         
-        
         final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = getVisibleLeafColumns();
         if (visibleLeafColumns.isEmpty()) {
             super.layoutChildren(x, y, w, h);
@@ -109,7 +108,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         if (spreadsheetView.getColumns().size() != gridView.getColumns().size()) {
             return;
         }
-        checkState();
         
         // layout the individual column cells
         double width;
@@ -169,7 +167,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             
 //            GridRow row = handle.getCellsViewSkin().getFlow().getTopRow();
 //            row.removeCell(tableCell);
-            getChildren().remove(tableCell);
+            //FIXME THIS IS CAUSING PROBLEM IN 8u20
+//            getChildren().remove(tableCell);
 
             if (isVisible) {
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
@@ -177,13 +176,13 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                 switch (spanType) {
                     case ROW_SPAN_INVISIBLE:
                     case BOTH_INVISIBLE:
-                        tableCell.setManaged(false);
                         fixedCells.remove(tableCell);
+                        getChildren().remove(tableCell);
                         x += width;
                         continue; // we don't want to fall through
                     case COLUMN_SPAN_INVISIBLE:
-                        tableCell.setManaged(false);
                         fixedCells.remove(tableCell);
+                        getChildren().remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
                         final SpreadsheetViewSelectionModel sm = (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel();
@@ -215,7 +214,10 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                          * So the cell we're currently adding must not recover
                          * them.
                          */
-                        getChildren().add(0, tableCell);
+                        //FIXME THIS IS CAUSING PROBLEM IN 8u20
+                        if(tableCell.getParent() == null){
+                            getChildren().add(0, tableCell);
+                        }
                 }
 
                 if (spreadsheetCell.getColumnSpan() > 1) {
@@ -255,13 +257,12 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         - spaceBetweenTopAndMe + tableCellY);
 
                 // Request layout is here as (partial) fix for RT-28684
-                // tableCell.requestLayout();
+//                 tableCell.requestLayout();
             }
             x += width;
         }
         
         handleFixedCell(fixedCells, index);
-        
     }
 
     /**

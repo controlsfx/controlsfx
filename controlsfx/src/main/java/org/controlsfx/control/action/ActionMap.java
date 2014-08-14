@@ -26,22 +26,17 @@
  */
 package org.controlsfx.control.action;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
+import org.controlsfx.glyphfont.Glyph;
 
-import org.controlsfx.glyphfont.GlyphFontRegistry;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Action Map provides an ability to create an action map of any object.
@@ -193,7 +188,7 @@ class AnnotatedAction extends Action {
 			String[] def = graphicDef.split("\\>");  // cannot use ':' because it used in urls //$NON-NLS-1$
 			if ( def.length == 1 ) return new ImageView(new Image(def[0]));
 			switch (def[0]) {
-			   case "font"    : return GlyphFontRegistry.glyph(def[1]);   //$NON-NLS-1$
+			   case "font"    : return Glyph.create(def[1]);   //$NON-NLS-1$
 			   case "image"   : return new ImageView(new Image(def[1])); //$NON-NLS-1$
 			   default: throw new IllegalArgumentException( String.format("Unknown ActionProxy graphic protocol: %s", def[0])); //$NON-NLS-1$
 			}

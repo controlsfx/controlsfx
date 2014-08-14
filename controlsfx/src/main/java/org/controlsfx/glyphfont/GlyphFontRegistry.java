@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013,2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,94 +27,101 @@
 package org.controlsfx.glyphfont;
 
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import javafx.scene.Node;
-import org.controlsfx.control.action.ActionProxy;
-
 /**
- * The glyph font registry automatically registers available fonts using a 
- * {@link ServiceLoader} facility, however it is also possible to register 
- * glyph fonts manually using the provided 
- * {@link GlyphFontRegistry#register(GlyphFont)} method. 
- * 
- * <p>Once registered, fonts and their glyphs can be requested by name using the
- * {@link GlyphFontRegistry#glyph(String)} and
- * {@link GlyphFontRegistry#glyph(String, String)} methods. For example:
- * 
- * <pre>{@code
- * import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph; 
- * new Button("", glyph("FontAwesome|TRASH")) 
- * }</pre>
- * 
- * <p>An ability to retrieve glyph node by combination of font name and glyph name 
- * extends to the {@link ActionProxy} graphic attribute, where the "font>" 
- * prefix should be used. For more information see {@link ActionProxy}.  
+ * The glyph font registry automatically registers available fonts using a
+ * {@link ServiceLoader} facility, however it is also possible to register
+ * glyph fonts manually using the provided
+ * {@link GlyphFontRegistry#register(GlyphFont)} method.
+ *
+ * <p>Once registered, fonts can be requested by name using the
+ * {@link GlyphFontRegistry#font(String)} method.
+ *
+ * Please refer to the {@link GlyphFont} documentation
+ * to learn how to use a font.
+ *
  */
 public final class GlyphFontRegistry {
-	
-	private static Map<String, GlyphFont> fontMap = new HashMap<>();
-	
-	private static boolean isInited = false;
-	
-	private GlyphFontRegistry() {
-		// no-op
-	}
-	
-	private static void init() {
-	    if (isInited) return;
-	    isInited = true;
-	    
-	    // find all classes that implement GlyphFont and register them now
-	    ServiceLoader<GlyphFont> loader = ServiceLoader.load(GlyphFont.class);
+
+    /***************************************************************************
+     *                                                                         *
+     * Private fields                                                          *
+     *                                                                         *
+     **************************************************************************/
+
+    private static Map<String, GlyphFont> fontMap = new HashMap<>();
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
+    static {
+        // find all classes that implement GlyphFont and register them now
+        ServiceLoader<GlyphFont> loader = ServiceLoader.load(GlyphFont.class);
         for (GlyphFont font : loader) {
-        	GlyphFontRegistry.register(font);
+            GlyphFontRegistry.register(font);
         }
-	}
-	
-	/**
-	 * Registers specified font
-	 * @param font
-	 */
-	public static void register( GlyphFont font ) {
-	    init();
-		if (font != null ) {
-			fontMap.put( font.getName(), font );
-		}
-	}
-	
-	/**
-	 * Retrieve font by font
-	 * @param fontName font name
-	 * @return font or null if not found
-	 */
-	public static GlyphFont font( String fontName ) {
-	    init();
-		return fontMap.get(fontName);
-	}
-	
-	/**
-	 * Retrieve one glyph by font name and glyph name
-	 * @param fontName font name
-	 * @param glyphName glyph name
-	 * @return glyph as a Node
-	 */
-	public static Node glyph( String fontName, String glyphName ) {
-	    init();
-		GlyphFont font = font(fontName);
-		return font.create(glyphName);
-	}
-	
-	/**
-	 * Retrieve glyph by font name and glyph name using one string where font name an glyph name are separated by pipe
-	 * @param fontAndGlyph font and glyph
-	 * @return glyph as Node
-	 */
-	public static Node glyph( String fontAndGlyph ) {
-	    init();
-		String[] args = fontAndGlyph.split("\\|"); //$NON-NLS-1$
-		return glyph( args[0], args[1]);
-	}
+    }
+
+    /**
+     * Private constructor since static class
+     */
+    private GlyphFontRegistry() {
+        // no-op
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Registers the specified font as default GlyphFont
+     * @param familyName The name of this font.
+     * @param uri The location where it can be loaded from.
+     * @param defaultSize The default font size
+     */
+    public static void register(String familyName, String uri, int defaultSize){
+        register(new GlyphFont(familyName, defaultSize, uri));
+    }
+
+    /**
+     * Registers the specified font as default GlyphFont
+     * @param familyName The name of this font.
+     * @param in Inputstream of the font data
+     * @param defaultSize The default font size
+     */
+    public static void register(String familyName, InputStream in, int defaultSize){
+        register(new GlyphFont(familyName, defaultSize, in));
+    }
+
+    /**
+     * Registers the specified font
+     * @param font
+     */
+    public static void register( GlyphFont font ) {
+        if (font != null ) {
+            fontMap.put( font.getName(), font );
+        }
+    }
+
+    /**
+     * Retrieve font by its family name
+     * @param familyName family name of the font
+     * @return font or null if not found
+     */
+    public static GlyphFont font( String familyName ) {
+        GlyphFont font = fontMap.get(familyName);
+        if(font != null) {
+            font.ensureFontIsLoaded();
+        }
+        return font;
+    }
 }

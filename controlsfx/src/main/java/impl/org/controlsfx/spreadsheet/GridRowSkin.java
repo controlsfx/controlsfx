@@ -42,7 +42,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     
     private final SpreadsheetHandle handle;
-    private SpreadsheetView spreadsheetView;
+    private final SpreadsheetView spreadsheetView;
     public GridRowSkin(SpreadsheetHandle handle, GridRow gridRow) {
         super(gridRow);
         this.handle = handle;
@@ -53,21 +53,23 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
      * FIXME Look into and understand the deep cause of that
      * We need to override this since B105 because it's messing up our
      * fixedRows and also our rows CSS.. (kind of flicker)
+     * EDIT: This seems not to mess up anymore in 8u20.
      */
-    @Override protected void handleControlPropertyChanged(String p) {
-        if ("ITEM".equals(p)) { //$NON-NLS-1$
-            updateCells = true;
-            getSkinnable().requestLayout();
-        } else if ("INDEX".equals(p)){ //$NON-NLS-1$
-           /* // update the index of all children cells (RT-29849)
-            final int newIndex = getSkinnable().getIndex();
-            for (int i = 0, max = cells.size(); i < max; i++) {
-                cells.get(i).updateIndex(newIndex);
-            }*/
-        } else  {
-            super.handleControlPropertyChanged(p);
-        }
-    }
+//    @Override protected void handleControlPropertyChanged(String p) {
+//        if ("ITEM".equals(p)) { //$NON-NLS-1$
+//            updateCells = true;
+//            getSkinnable().requestLayout();
+//        } else if ("INDEX".equals(p)){ //$NON-NLS-1$
+//            System.out.println("ici");
+//            // update the index of all children cells (RT-29849)
+//            final int newIndex = getSkinnable().getIndex();
+//            for (int i = 0, max = cells.size(); i < max; i++) {
+//                cells.get(i).updateIndex(newIndex);
+//            }
+//        } else  {
+//            super.handleControlPropertyChanged(p);
+//        }
+//    }
     
     @Override
     protected void layoutChildren(double x, final double y, final double w,
@@ -90,9 +92,9 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         // that extra row at the bottom layouting.
         if (index < 0 || index >= gridView.getItems().size()) {
             /**
-             * Investigate if the row at the bottom could be still present, because
-             * this opacity is doing trouble when doing:
-             * right, scroll down, left, unfix first, go up.
+             * Investigate if the row at the bottom could be still present,
+             * because this opacity is doing trouble when doing: right, scroll
+             * down, left, unfix first, go up.
              */
 //            control.setOpacity(0);
             return;
@@ -165,11 +167,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                 }
             }
             
-//            GridRow row = handle.getCellsViewSkin().getFlow().getTopRow();
-//            row.removeCell(tableCell);
-            //FIXME THIS IS CAUSING PROBLEM IN 8u20
-//            getChildren().remove(tableCell);
-
             if (isVisible) {
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
 
@@ -214,7 +211,6 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                          * So the cell we're currently adding must not recover
                          * them.
                          */
-                        //FIXME THIS IS CAUSING PROBLEM IN 8u20
                         if(tableCell.getParent() == null){
                             getChildren().add(0, tableCell);
                         }
@@ -258,6 +254,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
 
                 // Request layout is here as (partial) fix for RT-28684
 //                 tableCell.requestLayout();
+            }else{
+                getChildren().remove(tableCell);
             }
             x += width;
         }

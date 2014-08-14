@@ -104,7 +104,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
         itemProperty().addListener(itemChangeListener);
-        heightProperty().addListener(wrapHeightChangeListener);
+        setWrapText(true);
     }
 
     /***************************************************************************
@@ -124,10 +124,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         final SpreadsheetView spv = handle.getView();
         final Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
+        //FIXME with the reverse algorithm in virtualFlow, is this still necessary?
         if (type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
 
             /**
-             * We may come to the situation where this methods is called two
+             * We may come to the situation where this method is called two
              * times. One time by the row inside the VirtualFlow. And another by
              * the row inside myFixedCells used by our GridVirtualFlow.
              * 
@@ -215,13 +216,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-//    @Override
-//    public String toString() {
-//        //FIXME
-//        return getItem().getRow() + "/" + getItem().getColumn(); //$NON-NLS-1$
-//
-//    }
-
     /**
      * Called in the gridRowSkinBase when doing layout This allow not to
      * override opacity in the row and let the cell handle itself
@@ -263,26 +257,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * * Private Methods * *
      **************************************************************************/
 
-    /**
-     * FIXME
-     * We got a problem right now with wrapping values because if the height of the row is
-     * too small for the text, it is not rendered. And this bug is not happening when we set
-     * the wrap property to false.
-     * 
-     * So this is a work-around in order to set the wrap property only if this has a bit of sense,
-     * aka, the height could allow a second line.
-     */
-     private final ChangeListener<Number> wrapHeightChangeListener = new ChangeListener<Number>() {
-
-        @Override
-        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-            if (t1.doubleValue() > WRAP_HEIGHT) {
-                setWrapText(true);
-            } else {
-                setWrapText(false);
-            }
-        }
-    };
     private void setCellGraphic(SpreadsheetCell item) {
 
         if (isEditing()) {
@@ -290,12 +264,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
         if (item.getGraphic() != null) {
             /**
-             * FIXME To be removed in JDK8u20. This workaround is added for the
-             * first row containing a graphic because for an unknown reason, the
-             * graphic is translated to a negative value so it's not fully
-             * visible. So we add those listener that watch those changes, and
-             * try to get the previous value (the right one) if the new value
-             * goes out of bounds.
+             * This workaround is added for the first row containing a graphic
+             * because for an unknown reason, the graphic is translated to a
+             * negative value so it's not fully visible. So we add those
+             * listener that watch those changes, and try to get the previous
+             * value (the right one) if the new value goes out of bounds.
              */
             if (item.getRow() == 0) {
                 item.getGraphic().layoutXProperty().removeListener(new WeakChangeListener<>(firstRowLayoutXListener));

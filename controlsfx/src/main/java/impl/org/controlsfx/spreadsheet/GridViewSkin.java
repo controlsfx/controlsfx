@@ -183,14 +183,13 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         gridCellEditor = new GridCellEditor(handle);
         TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
 
-        // Do nothing basically but give access to the Hover Property.
-        tableView
-                .setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
-                    @Override
-                    public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
-                        return new GridRow(handle);
-                    }
-                });
+        //Set a new row factory, useful when handling row height.
+        tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
+            @Override
+            public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
+                return new GridRow(handle);
+            }
+        });
 
         tableView.getStyleClass().add("cell-spreadsheet"); //$NON-NLS-1$
 
@@ -541,7 +540,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * MODIFIED
          *****************************************************************/
         final int row = fm.getFocusedIndex();
-        // We try to make visible the rows that may be hiden by Fixed rows
+//        // We try to make visible the rows that may be hiden by Fixed rows
         if (!getFlow().getCells().isEmpty()
                 && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
                 && !spreadsheetView.getFixedRows().contains(row)) {
@@ -565,7 +564,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * MODIFIED
          *****************************************************************/
         final int row = fm.getFocusedIndex();
-        // FIXME This is not true anymore I think
         // We try to make visible the rows that may be hidden by Fixed rows
         if (!getFlow().getCells().isEmpty()
                 && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
@@ -594,9 +592,10 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     @Override
     protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
-        return new GridVirtualFlow<TableRow<ObservableList<SpreadsheetCell>>>(this);
+        return new GridVirtualFlow<>(this);
     }
 
+    @Override
     protected TableHeaderRow createTableHeaderRow() {
         return new HorizontalHeader(this);
     }
@@ -757,7 +756,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private void computeFixedRowHeight() {
         fixedRowHeight = 0;
         for (int i : getCurrentlyFixedRow()) {
-            fixedRowHeight += getRowHeight(i);// spreadsheetView.getGrid().getRowHeight(i);
+            fixedRowHeight += getRowHeight(i);
         }
     }
 

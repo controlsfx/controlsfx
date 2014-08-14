@@ -402,7 +402,6 @@ public class VerticalHeader extends StackPane {
     };
 
     private void rowResizing(GridRow gridRow, Label label, MouseEvent me) {
-        //FIXME Must block when resizing is below 0 (impact row spanning cell)
         double draggedY = me.getSceneY() - dragAnchorY;
         if (gridRow.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
             draggedY = -draggedY;
@@ -410,8 +409,9 @@ public class VerticalHeader extends StackPane {
 
         double delta = draggedY - lastY;
 
-        // FIXME Can gridRow be null?
         Double newHeight = gridRow.getHeight() + delta;
+        if(newHeight < 0)
+            return;
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);

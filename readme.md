@@ -28,8 +28,8 @@ If you think you have a feature you can contribute, a bug you want to fix please
 
 [
 ![Dependency Status](https://www.versioneye.com/java/org.controlsfx:controlsfx/badge.png)
-](https://www.versioneye.com/java/org.controlsfx:controlsfx)
+](http://www.versioneye.com/java/org.controlsfx:controlsfx)
 
 [
 ![Reference Status](https://www.versioneye.com/java/org.controlsfx:controlsfx/reference_badge.png?style=flat)
-](https://www.versioneye.com/java/org.controlsfx:controlsfx/references)
+](http://www.versioneye.com/java/org.controlsfx:controlsfx/references)

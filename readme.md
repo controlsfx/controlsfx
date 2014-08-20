@@ -25,3 +25,5 @@ If you think you have a feature you can contribute, a bug you want to fix please
 [
 ![Ohloh project report for ControlsFX](https://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)
 ](http://www.ohloh.net/p/controlsfx?ref=sample)
+[![Dependency Status](https://www.versioneye.com/java/org.controlsfx:controlsfx/8.0.6/badge.svg)](https://www.versioneye.com/java/org.controlsfx:controlsfx)
+[![Reference Status](https://www.versioneye.com/java/org.controlsfx:controlsfx/reference_badge.svg?style=flat)](https://www.versioneye.com/java/org.controlsfx:controlsfx/references)

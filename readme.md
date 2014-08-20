@@ -23,13 +23,13 @@ If you think you have a feature you can contribute, a bug you want to fix please
 
 
 [
-![Ohloh project report for ControlsFX](https://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)
+![Ohloh project report for ControlsFX](http://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)
 ](http://www.ohloh.net/p/controlsfx?ref=sample)
 
 [
-![Dependency Status](https://www.versioneye.com/java/org.controlsfx:controlsfx/badge.png)
+![Dependency Status](http://www.versioneye.com/java/org.controlsfx:controlsfx/badge.png)
 ](http://www.versioneye.com/java/org.controlsfx:controlsfx)
 
 [
-![Reference Status](https://www.versioneye.com/java/org.controlsfx:controlsfx/reference_badge.png?style=flat)
+![Reference Status](http://www.versioneye.com/java/org.controlsfx:controlsfx/reference_badge.png?style=flat)
 ](http://www.versioneye.com/java/org.controlsfx:controlsfx/references)

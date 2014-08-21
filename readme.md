@@ -12,23 +12,13 @@ If you think you have a feature you can contribute, a bug you want to fix please
    
    
 
-## Build Status
+## Build Status and Project Links
 
-|                                                                                                                 |
-|--------------------|--------------------------------------------------------------------------------------------|
-| ControlsFX         | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX)         |
-| ControlsFX Samples | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX Samples) |
-| FXSampler          | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=FXSampler)          |  
-
-
-[
-![Ohloh project report for ControlsFX](http://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)
-](http://www.ohloh.net/p/controlsfx?ref=sample)
-
-[
-![Dependency Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/badge.png)
-](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx)
-
-[
-![Reference Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/reference_badge.png?style=flat)
-](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/references)
+|                                                                                                                                          |
+|---------------------------------------------|--------------------------------------------------------------------------------------------|
+| Jenkins (ControlsFX build status)           | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX)         |
+| Jenkins (ControlsFX samples build status)   | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX Samples) |
+| Jenkins (FXSampler build status)            | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=FXSampler)          |  
+| Open Hub (Repository stats)                 | [![Ohloh project report for ControlsFX](http://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)](http://www.ohloh.net/p/controlsfx?ref=sample) |
+| Version Eye (External project dependencies) | [![Dependency Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/badge.png)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx) |
+| Version Eye (External project references)   | [![Reference Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/reference_badge.png?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/references) |

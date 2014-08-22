@@ -135,6 +135,7 @@ import com.sun.javafx.scene.traversal.TraverseListener;
  * buttonBar.setButtonOrder("+YN"); 
  * }</pre>
  */
+@Deprecated
 public final class ButtonBar extends ControlsFXControl {
     
     /**************************************************************************
@@ -174,6 +175,7 @@ public final class ButtonBar extends ControlsFXControl {
      * <p>For details on the button order code for each button type, refer to 
      * the javadoc comment for that type. 
      */
+    @Deprecated
     public static enum ButtonType {
         /**
          * Buttons with this style tag will statically end up on the left end of the bar.

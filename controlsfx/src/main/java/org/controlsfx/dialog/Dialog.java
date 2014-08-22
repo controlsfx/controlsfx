@@ -203,6 +203,7 @@ import org.controlsfx.tools.Utils;
  * @see Action
  * @see Actions
  */
+@Deprecated
 public class Dialog {
     
     /**************************************************************************

@@ -56,6 +56,7 @@ import javafx.stage.Window;
 import org.controlsfx.tools.Platform;
 
 // Not public API (class is package-protected), so no JavaDoc is required.
+@Deprecated
 class HeavyweightDialog extends FXDialog {
 
     /**************************************************************************

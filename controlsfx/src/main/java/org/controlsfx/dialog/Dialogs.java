@@ -387,6 +387,7 @@ import org.controlsfx.validation.Validator;
  * @see Action
  * @see Optional
  */
+@Deprecated
 public final class Dialogs {
 
     /**

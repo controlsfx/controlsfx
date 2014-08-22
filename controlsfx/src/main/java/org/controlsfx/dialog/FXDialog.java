@@ -69,6 +69,7 @@ import org.controlsfx.tools.Platform;
 
 import static org.controlsfx.dialog.Dialog.*;
 
+@Deprecated
 abstract class FXDialog {
     
     /**************************************************************************

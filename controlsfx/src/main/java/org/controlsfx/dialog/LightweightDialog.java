@@ -53,6 +53,7 @@ import javafx.stage.Window;
 import com.sun.javafx.Utils;
 import com.sun.javafx.tk.Toolkit;
 
+@Deprecated
 class LightweightDialog extends FXDialog {
 
     /**************************************************************************

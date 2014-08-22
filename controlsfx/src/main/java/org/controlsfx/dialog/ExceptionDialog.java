@@ -43,6 +43,7 @@ import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.ButtonBar.ButtonType;
 
 // Not public API (class is package-protected), so no JavaDoc is required.
+@Deprecated
 class ExceptionDialog extends HeavyweightDialog {
 
     public ExceptionDialog(Window owner, String moreDetails) {

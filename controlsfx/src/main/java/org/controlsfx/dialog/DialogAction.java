@@ -47,6 +47,7 @@ import org.controlsfx.control.action.Action;
  * 
  * @see Action
  */
+@Deprecated
 public class DialogAction extends Action {
 
 	private final boolean _cancel;

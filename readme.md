@@ -17,7 +17,7 @@ If you think you have a feature you can contribute, a bug you want to fix please
 |                                                                                                                                          |
 |---------------------------------------------|--------------------------------------------------------------------------------------------|
 | Jenkins (ControlsFX build status)           | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX)         |
-| Jenkins (ControlsFX samples build status)   | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX Samples) |
+| Jenkins (ControlsFX samples build status)   | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=ControlsFX%20Samples) |
 | Jenkins (FXSampler build status)            | ![Build Status](http://jonathangiles.no-ip.biz:81/buildStatus/icon?job=FXSampler)          | 
 | Latest published version in Maven Central   | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.controlsfx/controlsfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.controlsfx/controlsfx) |
 | Open Hub (Repository stats)                 | [![Ohloh project report for ControlsFX](http://www.ohloh.net/p/controlsfx/widgets/project_thin_badge.gif)](http://www.ohloh.net/p/controlsfx?ref=sample) |

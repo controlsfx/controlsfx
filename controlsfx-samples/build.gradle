@@ -2,7 +2,6 @@ import org.apache.tools.ant.filters.*
 apply plugin: 'application'
 apply from: '../javafx.plugin'
 
-
 applicationName = 'FXSampler'
 mainClassName = fxsampler_mainClass
 
@@ -18,7 +17,7 @@ sourceSets {
 
 dependencies {
     compile group + ':' + fxsampler_name +':'  + fxsampler_version
-    compile group + ':controlsfx:' + version
+    compile group + ':' + controlsfx_name + ':' + version
 
     try {
         jdk files(jfxrtJar)

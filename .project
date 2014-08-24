@@ -14,10 +14,11 @@
 	<natures>
 		<nature>org.springsource.ide.eclipse.gradle.core.nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.jdt.groovy.core.groovyNature</nature>
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1408901131627</id>
+			<id>1408918714062</id>
 			<name></name>
 			<type>26</type>
 			<matcher>

@@ -1,0 +1,67 @@
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'groovy'
+    apply plugin: 'osgi'
+    apply plugin: 'maven'
+    apply from  : '../mavenPublish.gradle'
+
+    ext {
+      artifact_suffix       = '-SNAPSHOT'
+      specification_title   = 'Java 8u20'
+      specification_version = '8.20.7'
+      fxsampler_name        = 'fxsampler'
+      fxsampler_version     = '1.0.8' + artifact_suffix
+      fxsampler_mainClass   = 'fxsampler.FXSampler'
+    }
+
+
+    group = 'org.controlsfx'
+    version = specification_version + artifact_suffix
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    repositories {
+       mavenCentral()
+    }
+
+    dependencies {
+       testCompile 'junit:junit:[4,)'
+    }
+
+    test {
+       testLogging {
+        // Show that tests are run in the command-line output
+           events 'started', 'passed'
+       }
+    }
+
+    task wrapper(type: Wrapper) {
+        gradleVersion = '1.8'
+    }
+
+    compileJava {  
+        options.encoding = "UTF-8"
+    }
+
+    task sourceJar(type: Jar) {
+        from sourceSets.main.java
+        from sourceSets.main.resources
+        classifier = 'sources'
+    }
+
+    task javadocJar(type: Jar) {
+        dependsOn javadoc
+        from javadoc.destinationDir
+        classifier = 'javadoc'
+    }
+
+    artifacts {
+        archives sourceJar
+        archives javadocJar
+    }
+
+}

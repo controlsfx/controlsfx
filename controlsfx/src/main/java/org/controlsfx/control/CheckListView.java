@@ -104,7 +104,7 @@ public class CheckListView<T> extends ListView<T> {
      * Creates a new CheckListView instance with an empty list of choices.
      */
     public CheckListView() {
-        this(null);
+        this(FXCollections.<T> observableArrayList());
     }
     
     /**

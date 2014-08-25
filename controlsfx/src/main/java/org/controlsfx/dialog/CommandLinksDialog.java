@@ -96,7 +96,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         }; 
         setDialogPane(dialogPane);
         
-        dialogPane.getStylesheets().add(getClass().getResource("commandlink.css").toExternalForm());
+        dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("commandlink.css").toExternalForm());
 
         setTitle(DialogResources.getString("Dialog.info.title"));
 

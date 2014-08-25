@@ -322,7 +322,7 @@ public class Notifications {
             // need to install our CSS
             if (owner instanceof Stage) {
                 Scene ownerScene = ((Stage) owner).getScene();
-                ownerScene.getStylesheets().add(getClass().getResource("notificationpopup.css").toExternalForm()); //$NON-NLS-1$
+                ownerScene.getStylesheets().add(Notifications.class.getResource("notificationpopup.css").toExternalForm()); //$NON-NLS-1$
             }
 
             final Popup popup = new Popup();

@@ -29,6 +29,7 @@ package impl.org.controlsfx.version;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 
 import com.sun.javafx.runtime.VersionInfo;
@@ -42,13 +43,15 @@ public class VersionChecker {
     
     private static final Package controlsFX;
     
+    private static Properties props;
+    
     static {
         controlsFX = VersionChecker.class.getPackage();
         
-        javaFXVersion = VersionInfo.getVersion();
-        controlsFXSpecTitle = getControlsFXSpecificationTitle();
+        javaFXVersion         = VersionInfo.getVersion();
+        controlsFXSpecTitle   = getControlsFXSpecificationTitle();
         controlsFXSpecVersion = getControlsFXSpecificationVersion();
-        controlsFXImpVersion = getControlsFXImplementationVersion();
+        controlsFXImpVersion  = getControlsFXImplementationVersion();
     }
 
     private VersionChecker() {
@@ -78,11 +81,12 @@ public class VersionChecker {
         // javaFXVersion may contain '-' like 8.0.20-ea so replace them with '.' before splitting.
         String[] splitJavaVersion = javaFXVersion.replace('-', '.').split("\\.");
 
-        for (int i=0; i < 3; i++) {
-            if (Integer.parseInt(splitJavaVersion[i]) < Integer.parseInt(splitSpecVersion[i])) {
+//        for (int i=0; i < 3; i++) {
+//            if (Integer.parseInt(splitJavaVersion[i]) < Integer.parseInt(splitSpecVersion[i])) {
+        if ( splitSpecVersion[0] != splitJavaVersion[0] || splitSpecVersion[1] != splitJavaVersion[2] ) {
                 throw new RuntimeException("ControlsFX Error: ControlsFX " +
                     controlsFXImpVersion + " requires at least " + controlsFXSpecTitle);
-            }
+//            }
         }
     }
 
@@ -96,21 +100,24 @@ public class VersionChecker {
         
         // try to read it from the controlsfx-build.properties if running
         // from within an IDE
-        try {
-            Properties prop = new Properties();
-            File file = new File("../controlsfx-build.properties");
-            if (file.exists()) {
-                prop.load(new FileReader(file));
-                String version = prop.getProperty("controlsfx_specification_title");
-                if (version != null && !version.isEmpty()) {
-                    return version;
-                }
-            }
-        } catch (IOException e) {
-            // no-op
-        }
+        return getPropertyValue("controlsfx_specification_title");
         
-        return null;
+        
+//        try {
+//            Properties prop = new Properties();
+//            File file = new File("../controlsfx-build.properties");
+//            if (file.exists()) {
+//                prop.load(new FileReader(file));
+//                String version = prop.getProperty("controlsfx_specification_title");
+//                if (version != null && !version.isEmpty()) {
+//                    return version;
+//                }
+//            }
+//        } catch (IOException e) {
+//            // no-op
+//        }
+//        
+//        return null;
     }
     
     private static String getControlsFXSpecificationVersion() {
@@ -124,21 +131,23 @@ public class VersionChecker {
         
         // try to read it from the controlsfx-build.properties if running
         // from within an IDE
-        try {
-            Properties prop = new Properties();
-            File file = new File("../controlsfx-build.properties");
-            if (file.exists()) {
-                prop.load(new FileReader(file));
-                String version = prop.getProperty("controlsfx_specification_version");
-                if (version != null && !version.isEmpty()) {
-                    return version;
-                }
-            }
-        } catch (IOException e) {
-            // no-op
-        }
+        return getPropertyValue("controlsfx_specification_title");
         
-        return null;
+//        try {
+//            Properties prop = new Properties();
+//            File file = new File("../controlsfx-build.properties");
+//            if (file.exists()) {
+//                prop.load(new FileReader(file));
+//                String version = prop.getProperty("controlsfx_specification_version");
+//                if (version != null && !version.isEmpty()) {
+//                    return version;
+//                }
+//            }
+//        } catch (IOException e) {
+//            // no-op
+//        }
+//        
+//        return null;
     }
     
     private static String getControlsFXImplementationVersion() {
@@ -152,20 +161,40 @@ public class VersionChecker {
         
         // try to read it from the controlsfx-build.properties if running
         // from within an IDE
-        try {
-            Properties prop = new Properties();
-            File file = new File("../controlsfx-build.properties");
-            if (file.exists()) {
-                prop.load(new FileReader(file));
-                String version = prop.getProperty("controlsfx_version");
-                if (version != null && !version.isEmpty()) {
-                    return version;
-                }
-            }
-        } catch (IOException e) {
-            // no-op
-        }
         
-        return null;
+        return getPropertyValue("controlsfx_specification_title") +
+        	   getPropertyValue("artifact_suffix");
+        
+        
+//        try {
+//            Properties prop = new Properties();
+//            File file = new File("../controlsfx-build.properties");
+//            if (file.exists()) {
+//                prop.load(new FileReader(file));
+//                String version = prop.getProperty("controlsfx_version");
+//                if (version != null && !version.isEmpty()) {
+//                    return version;
+//                }
+//            }
+//        } catch (IOException e) {
+//            // no-op
+//        }
+//        
+//        return null;
+    }
+    
+    private static synchronized String getPropertyValue(String key) {
+    	
+    	if ( props == null ) {
+        	try {
+                File file = new File("../controlsfx-build.properties");
+                if (file.exists()) {
+                    props.load(new FileReader(file));
+                }
+            } catch (IOException e) {
+                // no-op
+            }
+    	}
+    	return props.getProperty(key);
     }
 }

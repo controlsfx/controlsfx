@@ -3,26 +3,7 @@
 	<classpathentry kind="src" path="src/deploy/package"/>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry exported="true" kind="lib" path="C:/Program Files/Java/jdk1.8.0_20/jre/lib/ext/jfxrt.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.gradle/caches/artifacts-26/filestore/junit/junit/4.12-beta-1/jar/f516376d8dbcaf37ab11975cd7807e5e1782a847/junit-4.12-beta-1.jar" sourcepath="C:/Users/Eugene/.gradle/caches/artifacts-26/filestore/junit/junit/4.12-beta-1/source/6b1bbf7aedba23e3e43cb7afe0e9842c364065bd/junit-4.12-beta-1-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/commons-codec/commons-codec/1.6/commons-codec-1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar" sourcepath="C:/Users/Eugene/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="C:/Users/Eugene/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/net/sf/json-lib/json-lib/2.3/json-lib-2.3-jdk15.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/net/sourceforge/nekohtml/nekohtml/1.9.16/nekohtml-1.9.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/apache/httpcomponents/httpclient/4.2.1/httpclient-4.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/apache/httpcomponents/httpcore/4.2.1/httpcore-4.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/codehaus/groovy/modules/http-builder/http-builder/0.7.1/http-builder-0.7.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/controlsfx/controlsfx/8.20.7-SNAPSHOT/controlsfx-8.20.7-SNAPSHOT.jar" sourcepath="C:/Users/Eugene/.m2/repository/org/controlsfx/controlsfx/8.20.7-SNAPSHOT/controlsfx-8.20.7-SNAPSHOT-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/controlsfx/fxsampler/1.0.8-SNAPSHOT/fxsampler-1.0.8-SNAPSHOT.jar" sourcepath="C:/Users/Eugene/.m2/repository/org/controlsfx/fxsampler/1.0.8-SNAPSHOT/fxsampler-1.0.8-SNAPSHOT-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/controlsfx/openjfx-dialogs/1.0.0/openjfx-dialogs-1.0.0.jar" sourcepath="C:/Users/Eugene/.m2/repository/org/controlsfx/openjfx-dialogs/1.0.0/openjfx-dialogs-1.0.0-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" sourcepath="C:/Users/Eugene/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/xml-apis/xml-apis/1.3.04/xml-apis-1.3.04.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Eugene/.m2/repository/xml-resolver/xml-resolver/1.2/xml-resolver-1.2.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.springsource.ide.eclipse.gradle.classpathcontainer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

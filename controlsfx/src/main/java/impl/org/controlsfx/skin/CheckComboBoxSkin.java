@@ -28,7 +28,6 @@ package impl.org.controlsfx.skin;
 
 import java.util.Collections;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
@@ -77,6 +76,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
      * 
      **************************************************************************/
 
+    @SuppressWarnings("unchecked")
     public CheckComboBoxSkin(final CheckComboBox<T> control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
@@ -86,7 +86,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         selectedItems = (ReadOnlyUnbackedObservableList<T>) control.getCheckModel().getCheckedItems();
         
         comboBox = new ComboBox<T>(items) {
-            protected javafx.scene.control.Skin<?> createDefaultSkin() {
+            @Override protected javafx.scene.control.Skin<?> createDefaultSkin() {
                 return new ComboBoxListViewSkin<T>(this) {
                     // overridden to prevent the popup from disappearing
                     @Override protected boolean isHideOnClickEnabled() {
@@ -98,12 +98,8 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
-            public ListCell<T> call(ListView<T> listView) {
-                return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
-                    @Override public ObservableValue<Boolean> call(T item) {
-                        return control.getItemBooleanProperty(item);
-                    }
-                });
+            @Override public ListCell<T> call(ListView<T> listView) {
+                return new CheckBoxListCell<>(item -> control.getItemBooleanProperty(item));
             };
         });
         
@@ -120,13 +116,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         comboBox.setButtonCell(buttonCell);
         comboBox.setValue((T)buildString());
         
-        selectedIndices.addListener(new ListChangeListener<Integer>() {
-            @Override public void onChanged(final Change<? extends Integer> c) {
-                // we update the display of the ComboBox button cell by
-                // just dumbly updating the index every time selection changes.
-                buttonCell.updateIndex(1);
-            }
-        });
+        selectedIndices.addListener((ListChangeListener<Integer>) c -> buttonCell.updateIndex(1));
         
         getChildren().add(comboBox);
     }

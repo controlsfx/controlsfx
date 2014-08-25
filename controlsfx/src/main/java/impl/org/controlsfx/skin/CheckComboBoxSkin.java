@@ -114,17 +114,11 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 // we ignore whatever item is selected, instead choosing
                 // to display the selected item text using commas to separate
                 // each item
-                final StringBuilder sb = new StringBuilder();
-                for (int i = 0, max = selectedItems.size(); i < max; i++) {
-                    sb.append(selectedItems.get(i));
-                    if (i < max - 1) {
-                        sb.append(", "); //$NON-NLS-1$
-                    }
-                }
-                setText(sb.toString());
+                setText(buildString());
             }
         };
         comboBox.setButtonCell(buttonCell);
+        comboBox.setValue((T)buildString());
         
         selectedIndices.addListener(new ListChangeListener<Integer>() {
             @Override public void onChanged(final Change<? extends Integer> c) {
@@ -152,6 +146,16 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
      * 
      **************************************************************************/
     
+    private String buildString() {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0, max = selectedItems.size(); i < max; i++) {
+            sb.append(selectedItems.get(i));
+            if (i < max - 1) {
+                sb.append(", "); //$NON-NLS-1$
+            }
+        }
+        return sb.toString();
+    }
     
     
     /**************************************************************************

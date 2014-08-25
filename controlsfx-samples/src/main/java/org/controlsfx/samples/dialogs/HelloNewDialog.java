@@ -72,7 +72,7 @@ import org.controlsfx.dialog.wizard.Wizard;
 import org.controlsfx.dialog.wizard.Wizard.WizardPane;
 
 public class HelloNewDialog extends ControlsFXSample {
-
+    
 	@Override
 	public String getSampleName() {
 		return "Dialogs (New)";
@@ -111,6 +111,10 @@ public class HelloNewDialog extends ControlsFXSample {
         grid.setVgap(10);
 
         int row = 0;
+        
+        Label javafxDialogs = new Label("JavaFX Dialogs:");
+        javafxDialogs.setFont(Font.font(25));
+        grid.add(javafxDialogs, 0, row++, 2, 1);
 
         // *******************************************************************
         // Information Dialog
@@ -295,10 +299,18 @@ public class HelloNewDialog extends ControlsFXSample {
             showDialog(dlg);
         });
 
-        grid.add(
-                new HBox(10, Hyperlink8, Hyperlink9, Hyperlink10, Hyperlink11),
-                1, row);
+        grid.add(new HBox(10, Hyperlink8, Hyperlink9, Hyperlink10, Hyperlink11), 1, row);
         row++;
+        
+        
+        
+        
+        
+        
+        Label controlsfxDialogs = new Label("ControlsFX Dialogs:");
+        controlsfxDialogs.setFont(Font.font(25));
+        grid.add(controlsfxDialogs, 0, row++, 2, 1);
+        
 
         // *******************************************************************
         // Command links

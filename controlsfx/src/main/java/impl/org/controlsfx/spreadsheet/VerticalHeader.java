@@ -409,8 +409,9 @@ public class VerticalHeader extends StackPane {
 
         double delta = draggedY - lastY;
 
-        // FIXME Can gridRow be null?
         Double newHeight = gridRow.getHeight() + delta;
+        if(newHeight < 0)
+            return;
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);

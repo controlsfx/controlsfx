@@ -30,7 +30,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -96,37 +95,13 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         return handle.getView();
     }
 
-    /**
-     * Set this SpreadsheetRow hoverProperty
-     * 
-     * @param hover
-     */
-    void setHoverPublic(boolean hover) {
-        this.setHover(hover);
-    }
-
-    /**
-     * Return the SpreadsheetCell at the specified column. We have to be careful
-     * because if we have fixedColumns then the fixedColumns cells will be at
-     * the end of the Children's List
-     * 
-     * @param col
-     * @return the corresponding SpreadsheetCell
-     */
-    CellView getGridCell(int col) {
-
-        for (Node node : getChildrenUnmodifiable()) {
-            CellView cellView = (CellView) node;
-            SpreadsheetCell cell = cellView.getItem();
-            if (cell.getColumn() == col) {
-                return cellView;
-            }
-        }
-        return null;
-    }
-
     @Override
     protected double computePrefHeight(double width) {
+        return handle.getCellsViewSkin().getRowHeight(getIndex());
+    }
+    
+    @Override
+    protected double computeMinHeight(double width) {
         return handle.getCellsViewSkin().getRowHeight(getIndex());
     }
 

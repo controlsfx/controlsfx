@@ -110,16 +110,21 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
             }
         };
         
-        final MappingChange.Map<Integer,T> map = new MappingChange.Map<Integer,T>() {
-            @Override public T map(Integer f) {
-                return getItem(f);
-            }
-        };
+        final MappingChange.Map<Integer,T> map = f -> getItem(f);
+        
         checkedIndicesList.addListener(new ListChangeListener<Integer>() {
             @Override public void onChanged(final Change<? extends Integer> c) {
                 // when the selectedIndices ObservableList changes, we manually call
                 // the observers of the selectedItems ObservableList.
-                checkedItemsList.callObservers(new MappingChange<Integer,T>(c, map, checkedItemsList));
+                boolean hasRealChangeOccurred = false;
+                while (c.next() && ! hasRealChangeOccurred) {
+                    hasRealChangeOccurred = c.wasAdded() || c.wasRemoved();
+                }
+
+                if (hasRealChangeOccurred) {
+                    c.reset();
+                    checkedItemsList.callObservers(new MappingChange<>(c, map, checkedItemsList));
+                }
                 c.reset();
             }
         });
@@ -233,7 +238,7 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         checkedIndices.clear(index);
         
         final int changeIndex = checkedIndicesList.indexOf(index);
-        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex+1, index, checkedIndicesList));
+        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex+1, index, checkedIndicesList));
     }
     
     /** {@inheritDoc} */
@@ -260,7 +265,7 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         if (index < 0 || index >= getItemCount()) return;
         checkedIndices.set(index);
         final int changeIndex = checkedIndicesList.indexOf(index);
-        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, checkedIndicesList));
+        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<>(changeIndex, changeIndex+1, checkedIndicesList));
     }
 
     /** {@inheritDoc} */
@@ -297,11 +302,11 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
                     if (booleanProperty.get()) {
                         checkedIndices.set(index);
                         final int changeIndex = checkedIndicesList.indexOf(index);
-                        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<Integer>(changeIndex, changeIndex+1, checkedIndicesList));                            
+                        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<>(changeIndex, changeIndex+1, checkedIndicesList));                            
                     } else {
                         final int changeIndex = checkedIndicesList.indexOf(index);
                         checkedIndices.clear(index);
-                        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<Integer>(changeIndex, changeIndex, index, checkedIndicesList));
+                        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex, index, checkedIndicesList));
                     }
                 }
             });

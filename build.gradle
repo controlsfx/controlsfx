@@ -15,7 +15,7 @@ subprojects {
       artifact_suffix       = cfg.artifact_suffix
       specification_title   = cfg.controlsfx_specification_title  //'Java 8u20'
       specification_version = cfg.controlsfx_specification_version //'8.20.7'
-	  controlsfx_name       = 'controlsfx'
+      controlsfx_name       = 'controlsfx'
       fxsampler_name        = 'fxsampler'
       fxsampler_version     = cfg.fxsampler_specification_version + artifact_suffix
       fxsampler_mainClass   = 'fxsampler.FXSampler'

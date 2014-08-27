@@ -238,7 +238,7 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         checkedIndices.clear(index);
         
         final int changeIndex = checkedIndicesList.indexOf(index);
-        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex+1, index, checkedIndicesList));
+        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex, index, checkedIndicesList));
     }
     
     /** {@inheritDoc} */

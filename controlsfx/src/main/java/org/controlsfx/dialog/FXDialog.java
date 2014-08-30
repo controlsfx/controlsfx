@@ -78,7 +78,7 @@ abstract class FXDialog {
      * 
      **************************************************************************/
     
-    protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css"); //$NON-NLS-1$
+    protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("old-dialogs.css"); //$NON-NLS-1$
     protected static final int HEADER_HEIGHT = 28;
     
     public static final List<String> COMMON_STYLE_CLASSES;

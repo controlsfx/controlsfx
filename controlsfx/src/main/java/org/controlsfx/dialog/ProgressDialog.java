@@ -37,8 +37,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
@@ -50,13 +48,10 @@ public class ProgressDialog extends Dialog<Void> {
                 
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("progress.dlg.title"));
-        dialogPane.setHeaderText(asKey("progress.dlg.header"));
-
-        // FIXME extract to CSS
-        dialogPane.setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png")));
-//        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-//        dialogPane.setContent(fontPanel);
+        setTitle(asKey("Dialog.progress.title"));
+        dialogPane.setHeaderText(asKey("Dialog.progress.header"));
+        dialogPane.getStyleClass().add("progress-dialog");
+        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm());
         
         final Label progressMessage = new Label();
         progressMessage.textProperty().bind(worker.messageProperty());

@@ -30,10 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.controlsfx.DialogResources;
-
-import com.sun.javafx.scene.control.skin.AccordionSkin;
-
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -48,10 +44,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+
+import org.controlsfx.DialogResources;
 
 public class CommandLinksDialog extends Dialog<ButtonType> {
     
@@ -99,9 +96,8 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("commandlink.css").toExternalForm());
 
         setTitle(DialogResources.getString("Dialog.info.title"));
-
-        // FIXME extract to CSS
-        dialogPane.setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png")));
+        dialogPane.getStyleClass().add("command-links-dialog");
+        dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getButtonTypes().addAll(links);
         
         dialogPane.contentProperty().addListener(o -> updateGrid());

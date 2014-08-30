@@ -47,7 +47,7 @@ import org.controlsfx.control.ButtonBar.ButtonType;
 class ExceptionDialogImpl extends HeavyweightDialog {
 
     public ExceptionDialogImpl(Window owner, String moreDetails) {
-        super(localize(asKey("exception.dlg.title")), owner); //$NON-NLS-1$
+        super(localize(asKey("Dialog.exception.title")), owner); //$NON-NLS-1$
         
         // TODO use same style as owner window
         
@@ -67,7 +67,7 @@ class ExceptionDialogImpl extends HeavyweightDialog {
         if (moreDetails != null) {
             BorderPane labelPanel = new BorderPane();
 
-            Label label = new Label(localize(asKey("exception.dlg.label"))); //$NON-NLS-1$
+            Label label = new Label(localize(asKey("Dialog.exception.label"))); //$NON-NLS-1$
             labelPanel.setLeft(label);
 
             contentPanel.getChildren().add(labelPanel);
@@ -91,7 +91,7 @@ class ExceptionDialogImpl extends HeavyweightDialog {
      * dismiss the dialog and dispose of it.
      */
     private Node getBtnPanel() {
-        Button dismissBtn = new Button(localize(asKey("dlg.close.button"))); //$NON-NLS-1$
+        Button dismissBtn = new Button(localize(asKey("Dialog.close.button"))); //$NON-NLS-1$
         dismissBtn.setPrefWidth(80);
         dismissBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {

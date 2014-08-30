@@ -934,7 +934,7 @@ public final class Dialogs {
 		content.getChildren().add(txUserName);
 		content.getChildren().add(txPassword);
 		
-		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
+		Action actionLogin = new DialogAction(getString("Dialog.login.login.button"), null, false, false, true) {
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 				setEventHandler(this::handleAction);
@@ -974,8 +974,8 @@ public final class Dialogs {
 			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 		}
 		dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
-		String userNameCation = getString("login.dlg.user.caption");
-		String passwordCaption = getString("login.dlg.pswd.caption");
+		String userNameCation = getString("Dialog.login.user.caption");
+		String passwordCaption = getString("Dialog.login.pswd.caption");
 		txUserName.setPromptText(userNameCation);
 		txUserName.setText( initialUserInfo.getKey());
 		txPassword.setPromptText(passwordCaption);
@@ -1064,7 +1064,7 @@ public final class Dialogs {
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label( localize(asKey("exception.dlg.label")));
+        Label label = new Label( localize(asKey("Dialog.exception.label")));
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -1148,14 +1148,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.header"), ACTION_OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.header"), ACTION_OK),
-        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.header"), ACTION_OK),
-        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.header"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
-        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.header"), ACTION_OK, ACTION_CANCEL),
-        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.header"), ACTION_OK, ACTION_CANCEL),
-        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.header")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.header"), ACTION_OK, ACTION_CANCEL);
+        ERROR("error.image",          asKey("Dialog.error.title"),   asKey("Dialog.error.header"), ACTION_OK),
+        INFORMATION("info.image",     asKey("Dialog.info.title"),    asKey("Dialog.info.header"), ACTION_OK),
+        WARNING("warning.image",      asKey("Dialog.warning.title"), asKey("Dialog.warning.header"), ACTION_OK),
+        CONFIRMATION("confirm.image", asKey("Dialog.confirm.title"), asKey("Dialog.confirm.header"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
+        INPUT("confirm.image",        asKey("Dialog.input.title"),   asKey("Dialog.input.header"), ACTION_OK, ACTION_CANCEL),
+        FONT( null,                   asKey("Dialog.font.title"),    asKey("Dialog.font.header"), ACTION_OK, ACTION_CANCEL),
+        PROGRESS("info.image",        asKey("Dialog.progress.title"), asKey("Dialog.progress.header")),
+        LOGIN("login.image",          asKey("Dialog.login.title"),    asKey("Dialog.login.header"), ACTION_OK, ACTION_CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;
@@ -1318,7 +1318,7 @@ public final class Dialogs {
         private final ListView<String> fontListView = new ListView<String>(filteredFontList);
         private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
         private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
-        private final Text sample = new Text(localize(asKey("font.dlg.sample.text")));
+        private final Text sample = new Text(localize(asKey("Dialog.font.sample.text")));
         
         public FontPanel() {
             setHgap(HGAP);
@@ -1378,7 +1378,7 @@ public final class Dialogs {
 //            });
             
             // layout dialog
-            add( new Label(localize(asKey("font.dlg.font.label"))), 0, 0);
+            add( new Label(localize(asKey("Dialog.font.font.label"))), 0, 0);
 //            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( fontSearch, 0, 1);
             add(fontListView, 0, 1);
@@ -1414,13 +1414,13 @@ public final class Dialogs {
                     refreshSample();
                 }});
 
-            add( new Label(localize(asKey("font.dlg.style.label"))), 1, 0);
+            add( new Label(localize(asKey("Dialog.font.style.label"))), 1, 0);
 //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( postureSearch, 1, 1);
             add(styleListView, 1, 1);
             styleListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
             
-            add( new Label(localize(asKey("font.dlg.size.label"))), 2, 0);
+            add( new Label(localize(asKey("Dialog.font.size.label"))), 2, 0);
 //            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( sizeSearch, 2, 1);
             add(sizeListView, 2, 1);

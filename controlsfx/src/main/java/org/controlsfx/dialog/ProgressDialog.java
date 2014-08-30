@@ -48,8 +48,8 @@ public class ProgressDialog extends Dialog<Void> {
                 
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("Dialog.progress.title"));
-        dialogPane.setHeaderText(asKey("Dialog.progress.header"));
+        setTitle(asKey("progress.dlg.title"));
+        dialogPane.setHeaderText(asKey("progress.dlg.header"));
         dialogPane.getStyleClass().add("progress-dialog");
         dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm());
         

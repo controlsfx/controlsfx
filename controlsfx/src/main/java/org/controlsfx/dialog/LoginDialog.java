@@ -56,8 +56,8 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
     public LoginDialog(final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator) {
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("Dialog.progress.title"));
-        dialogPane.setHeaderText(asKey("Dialog.progress.header"));
+        setTitle(asKey("login.dlg.title"));
+        dialogPane.setHeaderText(asKey("login.dlg.header"));
         dialogPane.getStyleClass().add("login-dialog");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
@@ -84,7 +84,7 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
         
         dialogPane.setContent(content);
         
-        loginButtonType = new javafx.scene.control.ButtonType(getString("Dialog.login.login.button"), ButtonData.OK_DONE);
+        loginButtonType = new javafx.scene.control.ButtonType(getString("login.dlg.login.button"), ButtonData.OK_DONE);
         dialogPane.getButtonTypes().addAll(loginButtonType);
         Button loginButton = (Button) dialogPane.lookupButton(loginButtonType);
         loginButton.setOnAction(actionEvent -> {
@@ -115,8 +115,8 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
 //            dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 //        }
 //        dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
-        String userNameCation = getString("Dialog.login.user.caption");
-        String passwordCaption = getString("Dialog.login.pswd.caption");
+        String userNameCation = getString("login.dlg.user.caption");
+        String passwordCaption = getString("login.dlg.pswd.caption");
         txUserName.setPromptText(userNameCation);
         txUserName.setText(initialUserInfo == null ? "" : initialUserInfo.getKey());
         txPassword.setPromptText(passwordCaption);

@@ -47,8 +47,8 @@ public class ExceptionDialog extends Dialog<ButtonType> {
     public ExceptionDialog(final Throwable exception) {
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("Dialog.exception.title"));
-        dialogPane.setHeaderText(asKey("Dialog.exception.header"));
+        setTitle(asKey("exception.dlg.title"));
+        dialogPane.setHeaderText(asKey("exception.dlg.header"));
 
         // FIXME extract to CSS
         dialogPane.setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-error.png")));
@@ -65,7 +65,7 @@ public class ExceptionDialog extends Dialog<ButtonType> {
         exception.printStackTrace(pw);
         String exceptionText = sw.toString();
         
-        Label label = new Label( localize(asKey("Dialog.exception.label")));
+        Label label = new Label( localize(asKey("exception.dlg.label")));
 
         TextArea textArea = new TextArea(exceptionText);
         textArea.setEditable(false);

@@ -235,7 +235,7 @@ public class Dialog {
     /**
      * An action that, by default, will show 'Cancel'.
      */
-    public static final Action ACTION_CANCEL = new DialogAction( Localization.asKey("Dialog.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+    public static final Action ACTION_CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
         { lock();}
         public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
     }; 
@@ -243,7 +243,7 @@ public class Dialog {
     /**
      * An action that, by default, will show 'Close'.
      */
-    public static final Action ACTION_CLOSE = new DialogAction( Localization.asKey("Dialog.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
+    public static final Action ACTION_CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
         { lock();}
         public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
     }; 
@@ -251,7 +251,7 @@ public class Dialog {
     /**
      * An action that, by default, will show 'No'.
      */
-    public static final Action ACTION_NO = new DialogAction( Localization.asKey("Dialog.no.button"), ButtonType.NO ){ //$NON-NLS-1$
+    public static final Action ACTION_NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
         { lock();}
         public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
     }; 
@@ -259,7 +259,7 @@ public class Dialog {
     /**
      * An action that, by default, will show 'OK'.
      */
-    public static final Action ACTION_OK = new DialogAction( Localization.asKey("Dialog.ok.button"), ButtonType.OK_DONE,  false, true, true){ //$NON-NLS-1$
+    public static final Action ACTION_OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  false, true, true){ //$NON-NLS-1$
         { lock();}
         public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
     }; 
@@ -267,7 +267,7 @@ public class Dialog {
     /**
      * An action that, by default, will show 'Yes'.
      */
-    public static final Action ACTION_YES = new DialogAction( Localization.asKey("Dialog.yes.button"), ButtonType.YES, false, true, true ){ //$NON-NLS-1$
+    public static final Action ACTION_YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES, false, true, true ){ //$NON-NLS-1$
         { lock();}
         public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
     }; 
@@ -989,8 +989,8 @@ public class Dialog {
     private Hyperlink createDetailsButton() {
         final Hyperlink detailsButton = new Hyperlink();
         detailsButton.getStyleClass().setAll("details-button", "more"); //$NON-NLS-1$ //$NON-NLS-2$
-        final String moreText = Localization.getString("Dialog.detail.button.more"); //$NON-NLS-1$
-        final String lessText = Localization.getString("Dialog.detail.button.less"); //$NON-NLS-1$
+        final String moreText = Localization.getString("dlg.detail.button.more"); //$NON-NLS-1$
+        final String lessText = Localization.getString("dlg.detail.button.less"); //$NON-NLS-1$
         
         detailsButton.setText(moreText);
         detailsButton.setOnAction(new EventHandler<ActionEvent>() {

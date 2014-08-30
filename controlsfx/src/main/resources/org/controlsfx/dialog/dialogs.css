@@ -7,3 +7,7 @@
 .command-links-dialog.dialog-pane {
     -fx-graphic: url("dialog-confirm.png");
 }
+
+.exception-dialog.dialog-pane {
+    -fx-graphic: url("dialog-error.png");
+}

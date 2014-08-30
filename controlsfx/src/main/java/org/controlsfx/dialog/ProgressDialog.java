@@ -26,7 +26,7 @@
  */
 package org.controlsfx.dialog;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.getString;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -48,8 +48,8 @@ public class ProgressDialog extends Dialog<Void> {
                 
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("progress.dlg.title"));
-        dialogPane.setHeaderText(asKey("progress.dlg.header"));
+        setTitle(getString("progress.dlg.title"));
+        dialogPane.setHeaderText(getString("progress.dlg.header"));
         dialogPane.getStyleClass().add("progress-dialog");
         dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm());
         

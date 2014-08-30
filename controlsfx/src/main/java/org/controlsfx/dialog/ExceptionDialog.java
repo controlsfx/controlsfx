@@ -26,7 +26,7 @@
  */
 package org.controlsfx.dialog;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.getString;
 import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.io.PrintWriter;
@@ -37,8 +37,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
@@ -47,11 +45,10 @@ public class ExceptionDialog extends Dialog<ButtonType> {
     public ExceptionDialog(final Throwable exception) {
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("exception.dlg.title"));
-        dialogPane.setHeaderText(asKey("exception.dlg.header"));
-
-        // FIXME extract to CSS
-        dialogPane.setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-error.png")));
+        setTitle(getString("exception.dlg.title"));
+        dialogPane.setHeaderText(getString("exception.dlg.header"));
+        dialogPane.getStyleClass().add("exception-dialog");
+        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getButtonTypes().addAll(ButtonType.OK);
         
         // --- content
@@ -65,7 +62,7 @@ public class ExceptionDialog extends Dialog<ButtonType> {
         exception.printStackTrace(pw);
         String exceptionText = sw.toString();
         
-        Label label = new Label( localize(asKey("exception.dlg.label")));
+        Label label = new Label( localize(getString("exception.dlg.label")));
 
         TextArea textArea = new TextArea(exceptionText);
         textArea.setEditable(false);

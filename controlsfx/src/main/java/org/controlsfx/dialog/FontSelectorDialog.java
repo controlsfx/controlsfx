@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.sun.javafx.scene.control.skin.AccordionSkin;
-
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
@@ -48,8 +46,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -77,8 +73,8 @@ public class FontSelectorDialog extends Dialog<Font> {
                 
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle("Select font");
-        dialogPane.setHeaderText("Select font");
+        setTitle("Select Font");
+        dialogPane.setHeaderText("Select Font");
         dialogPane.getStyleClass().add("font-selector-dialog");
         dialogPane.getStylesheets().add(FontSelectorDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -203,12 +199,12 @@ public class FontSelectorDialog extends Dialog<Font> {
         private static final Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
 
         private static List<FontStyle> getFontStyles( String fontFamily ) {
-            Set<FontStyle> set = new HashSet<FontStyle>();
+            Set<FontStyle> set = new HashSet<>();
             for (String f : Font.getFontNames(fontFamily)) {
                 set.add(new FontStyle(f.replace(fontFamily, "")));
             }
 
-            List<FontStyle> result =  new ArrayList<FontStyle>(set);
+            List<FontStyle> result =  new ArrayList<>(set);
             Collections.sort(result);
             return result;
 
@@ -219,9 +215,9 @@ public class FontSelectorDialog extends Dialog<Font> {
         private final FilteredList<FontStyle> filteredStyleList = new FilteredList<>(FXCollections.<FontStyle>observableArrayList(), MATCH_ALL);
         private final FilteredList<Double> filteredSizeList = new FilteredList<>(FXCollections.observableArrayList(fontSizes), MATCH_ALL);
 
-        private final ListView<String> fontListView = new ListView<String>(filteredFontList);
-        private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
-        private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
+        private final ListView<String> fontListView = new ListView<>(filteredFontList);
+        private final ListView<FontStyle> styleListView = new ListView<>(filteredStyleList);
+        private final ListView<Double> sizeListView = new ListView<>(filteredSizeList);
         private final Text sample = new Text("Sample");
 
         public FontPanel() {

@@ -251,7 +251,7 @@ public class HelloNewDialog extends ControlsFXSample {
 //        row++;
 
         // *******************************************************************
-        // Input Dialog (with masthead)
+        // Input Dialog (with header)
         // *******************************************************************
 
         grid.add(createLabel("Input Dialog: "), 0, row);
@@ -341,10 +341,10 @@ public class HelloNewDialog extends ControlsFXSample {
             showDialog(dlg);
         });
 
-        final Button Hyperlink12a = new Button("Font Chooser");
+        final Button Hyperlink12a = new Button("Font Selector");
         Hyperlink12a.setOnAction(e -> {
             FontSelectorDialog dlg = new FontSelectorDialog(null);
-            configureSampleDialog(dlg, "");
+            configureSampleDialog(dlg, "Please select a font!");
             showDialog(dlg);
         });
         
@@ -506,8 +506,10 @@ public class HelloNewDialog extends ControlsFXSample {
         return dlg;
     }
     
-    private void configureSampleDialog(Dialog<?> dlg, String masthead) {
-        dlg.getDialogPane().setHeaderText(cbShowMasthead.isSelected() ? masthead : null);
+    private void configureSampleDialog(Dialog<?> dlg, String header) {
+        if (header != null && cbShowMasthead.isSelected()) {
+            dlg.getDialogPane().setHeaderText(header);
+        }
         
         if (cbCustomGraphic.isSelected()) {
             dlg.getDialogPane().setGraphic(new ImageView(new Image(getClass().getResource("tick.png").toExternalForm())));
@@ -571,8 +573,8 @@ public class HelloNewDialog extends ControlsFXSample {
         grid.add(cbCloseDialogAutomatically, 1, row);
         row++;
 
-        // show masthead
-        grid.add(createLabel("Show masthead: ", "property"), 0, row);
+        // show header
+        grid.add(createLabel("Show custom header text: ", "property"), 0, row);
         grid.add(cbShowMasthead, 1, row);
         row++;
 

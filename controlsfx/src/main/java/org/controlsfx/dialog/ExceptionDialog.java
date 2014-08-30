@@ -27,6 +27,7 @@
 package org.controlsfx.dialog;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -35,8 +36,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
 public class ExceptionDialog extends Dialog<ButtonType> {
 
@@ -60,6 +64,24 @@ public class ExceptionDialog extends Dialog<ButtonType> {
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
         String exceptionText = sw.toString();
-        dialogPane.setExpandableContent(new Label(exceptionText));
+        
+        Label label = new Label( localize(asKey("exception.dlg.label")));
+
+        TextArea textArea = new TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+        
+        GridPane root = new GridPane();
+        root.setMaxWidth(Double.MAX_VALUE);
+        root.add(label, 0, 0);
+        root.add(textArea, 0, 1);
+        
+        
+        dialogPane.setExpandableContent(root);
     }
 }

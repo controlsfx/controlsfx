@@ -32,7 +32,6 @@ import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -48,7 +47,6 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -231,24 +229,6 @@ public class HelloNewDialog extends ControlsFXSample {
 
         row++;
 
-        // *******************************************************************
-        // More Details Dialog
-        // *******************************************************************
-
-//        grid.add(createLabel("'Exception' Dialog: "), 0, row);
-//
-//        final Button Hyperlink5a = new Button("Show");
-//        Hyperlink5a.setOnAction(e -> {
-//            ExceptionDialog dlg = new ExceptionDialog(new RuntimeException("Exception text"));
-//            dlg.setTitle("It looks like you're making a bad decision");
-//            String optionalMasthead = "Exception Encountered";
-//            dlg.getDialogPane().setContentText("This is the content to show to the user - but it'll be a good idea to see what the exception text says...");
-//            configureSampleDialog(dlg, optionalMasthead);
-//            showDialog(dlg);
-//        });
-//
-//        grid.add(new HBox(10, Hyperlink5a), 1, row);
-//        row++;
 
         // *******************************************************************
         // Input Dialog (with header)
@@ -278,8 +258,8 @@ public class HelloNewDialog extends ControlsFXSample {
 
         final Button Hyperlink10 = new Button("Set Choices (< 10)");
         Hyperlink10.setOnAction(e -> {
-            ChoiceDialog<String> dlg = new ChoiceDialog<String>("Jonathan",
-                                                                "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
+            ChoiceDialog<String> dlg = new ChoiceDialog<>("Jonathan",
+                                                          "Matthew", "Jonathan", "Ian", "Sue", "Hannah");
             dlg.setTitle("Name Guess");
             String optionalMasthead = "Name Guess";
             dlg.getDialogPane().setContentText("Pick a name?");
@@ -289,10 +269,10 @@ public class HelloNewDialog extends ControlsFXSample {
 
         final Button Hyperlink11 = new Button("Set Choices (>= 10)");
         Hyperlink11.setOnAction(e -> {
-            ChoiceDialog<String> dlg = new ChoiceDialog<String>("Jonathan",
-                                                                "Matthew", "Jonathan", "Ian", "Sue",
-                                                                "Hannah", "Julia", "Denise", "Stephan",
-                                                                "Sarah", "Ron", "Ingrid");
+            ChoiceDialog<String> dlg = new ChoiceDialog<>("Jonathan",
+                                                          "Matthew", "Jonathan", "Ian", "Sue",
+                                                          "Hannah", "Julia", "Denise", "Stephan",
+                                                          "Sarah", "Ron", "Ingrid");
             dlg.setTitle("Name Guess");
             String optionalMasthead = "Name Guess";
             dlg.getDialogPane().setContentText("Pick a name?");
@@ -319,7 +299,7 @@ public class HelloNewDialog extends ControlsFXSample {
         // Command links
         // *******************************************************************
 
-        grid.add(createLabel("Other pre-built dialogs: "), 0, row);
+        grid.add(createLabel("Pre-built dialogs: "), 0, row);
         final Button Hyperlink12 = new Button("Command Links");
         Hyperlink12.setOnAction(e -> {
             List<CommandLinksButtonType> links = Arrays
@@ -397,78 +377,6 @@ public class HelloNewDialog extends ControlsFXSample {
         grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c, Hyperlink12d), 1, row);
         row++;
 
-        // *******************************************************************
-        // Custom dialogs
-        // *******************************************************************
-
-        grid.add(createLabel("Custom Dialog: "), 0, row);
-        final Button Hyperlink14 = new Button("Login");
-        Hyperlink14.setOnAction(new EventHandler<ActionEvent>() {
-            final TextField txUserName = new TextField();
-            final PasswordField txPassword = new PasswordField();
-            
-            final ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
-            
-            Dialog<String> dlg;
-
-            private void validate() {
-                boolean disabled = txUserName.getText().trim().isEmpty() || txPassword.getText().trim().isEmpty();
-                dlg.getDialogPane().lookupButton(loginButtonType).setDisable(disabled);
-            }
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                dlg = new Dialog<String>();
-                dlg.setResultConverter(buttonType -> buttonType == loginButtonType ? 
-                        "[" + txUserName.getText() + "/" + txPassword.getText() + "]" : 
-                         null);
-                dlg.initOwner(cbSetOwner.isSelected() ? stage : null);
-                dlg.setTitle("Login Dialog");
-                dlg.initModality(modalityCombobox.getValue());
-                
-                if (cbShowMasthead.isSelected()) {
-                    dlg.getDialogPane().setHeaderText("Login to ControlsFX");
-                }
-
-                ChangeListener<String> changeListener = (o, oldValue, newValue) -> validate();
-                txUserName.textProperty().addListener(changeListener);
-                txPassword.textProperty().addListener(changeListener);
-
-                final GridPane content = new GridPane();
-                content.setHgap(10);
-                content.setVgap(10);
-
-                content.add(new Label("User name"), 0, 0);
-                content.add(txUserName, 1, 0);
-                GridPane.setHgrow(txUserName, Priority.ALWAYS);
-                content.add(new Label("Password"), 0, 1);
-                content.add(txPassword, 1, 1);
-                GridPane.setHgrow(txPassword, Priority.ALWAYS);
-
-                dlg.setResizable(false);
-//                dlg.getDialogPane().setGraphic(new ImageView(new Image(HelloAccordion.class.getResource("heart_16.png").toExternalForm())));
-                dlg.getDialogPane().setContent(content);
-                
-                // instead of creating an action, we have to do the following:
-                dlg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-                Node loginButtonNode = dlg.getDialogPane().lookupButton(loginButtonType);
-                ((Button) loginButtonNode).setOnAction(evt -> {
-                    dlg.setResult("[" + txUserName.getText() + " " + txPassword.getText() + "]");
-                });
-                
-                validate();
-
-                Platform.runLater( () -> txUserName.requestFocus() );
-
-                dlg.showAndWait().ifPresent(result -> System.out.println("Result is " + result));
-            }
-        });
-        
-//        final Button Hyperlink14a = new Button("FXML");
-//        Hyperlink14a.setOnAction(event -> new FXMLSampleDialog().showAndWait());
-
-        grid.add(new HBox(10, Hyperlink14/*, Hyperlink14a*/), 1, row++);
-        
         
         // *******************************************************************
         // wizards
@@ -482,18 +390,6 @@ public class HelloNewDialog extends ControlsFXSample {
         Hyperlink15b.setOnAction(e -> showBranchingWizard());
         
         grid.add(new HBox(10, Hyperlink15a, Hyperlink15b), 1, row++);
-        
-        
-
-//        SplitPane splitPane = new SplitPane();
-//        splitPane.setPrefSize(1200, 500);
-//        splitPane.getItems().addAll(grid, getControlPanel());
-//        splitPane.setDividerPositions(0.6);
-//        
-//        Scene scene = new Scene(splitPane);
-//        stage.setScene(scene);
-//        stage.setTitle("JavaFX Dialogs");
-//        stage.show();
         
         return grid;
     }

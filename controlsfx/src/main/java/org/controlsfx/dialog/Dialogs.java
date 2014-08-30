@@ -614,7 +614,7 @@ public final class Dialogs {
             PrintWriter pw = new PrintWriter(sw);
             exception.printStackTrace(pw);
             String moreDetails = sw.toString();
-            new ExceptionDialog((Window)owner, moreDetails).show();
+            new ExceptionDialogImpl((Window)owner, moreDetails).show();
         });
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);

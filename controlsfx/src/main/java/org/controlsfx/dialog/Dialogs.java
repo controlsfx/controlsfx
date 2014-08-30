@@ -1148,14 +1148,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), ACTION_OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), ACTION_OK),
-        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), ACTION_OK),
-        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
-        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
-        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
-        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), ACTION_OK, ACTION_CANCEL);
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.header"), ACTION_OK),
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.header"), ACTION_OK),
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.header"), ACTION_OK),
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.header"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.header"), ACTION_OK, ACTION_CANCEL),
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.header"), ACTION_OK, ACTION_CANCEL),
+        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.header")),
+        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.header"), ACTION_OK, ACTION_CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;

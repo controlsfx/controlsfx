@@ -33,11 +33,11 @@ import java.util.Optional;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -49,7 +49,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -63,10 +62,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import javafx.util.Pair;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.dialog.CommandLinksDialog;
+import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.FontSelectorDialog;
+import org.controlsfx.dialog.LoginDialog;
+import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.dialog.wizard.LinearWizardFlow;
 import org.controlsfx.dialog.wizard.Wizard;
 import org.controlsfx.dialog.wizard.Wizard.WizardPane;
@@ -90,7 +93,7 @@ public class HelloNewDialog extends ControlsFXSample {
 	}
 
 	private final ComboBox<StageStyle> styleCombobox = new ComboBox<>();
-    private final ComboBox<Modality> modalityCombobox = new ComboBox<Modality>();
+    private final ComboBox<Modality> modalityCombobox = new ComboBox<>();
     private final CheckBox cbUseBlocking = new CheckBox();
     private final CheckBox cbCloseDialogAutomatically = new CheckBox();
     private final CheckBox cbShowMasthead = new CheckBox();
@@ -102,8 +105,6 @@ public class HelloNewDialog extends ControlsFXSample {
     @Override
     public Node getPanel(Stage stage) {
         this.stage = stage;
-        // VBox vbox = new VBox(10);
-        // vbox.setAlignment(Pos.CENTER);
 
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(10, 10, 10, 10));
@@ -307,6 +308,8 @@ public class HelloNewDialog extends ControlsFXSample {
         
         
         
+        // ---------  ControlsFX-specific Dialogs
+        
         Label controlsfxDialogs = new Label("ControlsFX Dialogs:");
         controlsfxDialogs.setFont(Font.font(25));
         grid.add(controlsfxDialogs, 0, row++, 2, 1);
@@ -338,8 +341,57 @@ public class HelloNewDialog extends ControlsFXSample {
             configureSampleDialog(dlg, "");
             showDialog(dlg);
         });
+        
+        final Button Hyperlink12b = new Button("Progress");
+        Hyperlink12b.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                Task<Object> worker = new Task<Object>() {
+                    @Override
+                    protected Object call() throws Exception {
+                        for (int i = 0; i <= 100; i++) {
+                            updateProgress(i, 99);
+                            updateMessage("progress: " + i);
+                            System.out.println("progress: " + i);
+                            Thread.sleep(100);
+                        }
+                        return null;
+                    }
+                };
 
-        grid.add(new HBox(10, Hyperlink12, Hyperlink12a), 1, row);
+                ProgressDialog dlg = new ProgressDialog(worker);
+                configureSampleDialog(dlg, "");
+
+                Thread th = new Thread(worker);
+                th.setDaemon(true);
+                th.start();
+            }
+        });
+        
+        final Button Hyperlink12c = new Button("Login");
+        Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                LoginDialog dlg = new LoginDialog(null, null);
+                configureSampleDialog(dlg, "");
+                showDialog(dlg);
+//                Optional<Pair<String,String>> response = 
+//                        configureSampleDialog(
+//                        Dialogs.create()
+//                            .masthead(isMastheadVisible() ? "Login to ControlsFX" : null))
+//                            .showLogin(new Pair<String,String>("user", "password"), info -> {
+//                                if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
+//                                    throw new RuntimeException("Service is not available... try again later!"); 
+//                                };
+//                                return null;
+//                            }
+//                         );
+//
+//                System.out.println("User info: " + response);
+            }
+        });
+
+        grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c), 1, row);
         row++;
 
         // *******************************************************************

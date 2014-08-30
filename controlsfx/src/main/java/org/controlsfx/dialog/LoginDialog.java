@@ -56,8 +56,8 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
     public LoginDialog(final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator) {
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(asKey("login.dlg.title"));
-        dialogPane.setHeaderText(asKey("login.dlg.header"));
+        setTitle(getString("login.dlg.title"));
+        dialogPane.setHeaderText(getString("login.dlg.header"));
         dialogPane.getStyleClass().add("login-dialog");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);

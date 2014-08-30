@@ -142,6 +142,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
     public CommandLinksDialog(List<CommandLinksButtonType> links) {
         this.grid.setHgap(gapSize);
         this.grid.setVgap(gapSize);
+        this.grid.getStyleClass().add("container");
         
         final DialogPane dialogPane = new DialogPane() {
             @Override protected Node createButtonBar() {
@@ -169,16 +170,14 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         dialogPane.getButtonTypes().addAll(typeMap.keySet());
 
         updateGrid();
-        dialogPane.getButtonTypes().addListener((ListChangeListener<? super ButtonType>)c -> {
-            updateGrid();
-        });
+        dialogPane.getButtonTypes().addListener((ListChangeListener<? super ButtonType>)c -> updateGrid());
+        
+        contentTextProperty().addListener(o -> updateContentText());
     }
     
-    private void updateGrid() {
-        grid.getChildren().clear();
-        
-        // add the message to the top of the dialog
+    private void updateContentText() {
         String contentText = getDialogPane().getContentText();
+        grid.getChildren().remove(contentTextLabel);
         if (contentText != null && ! contentText.isEmpty()) {
             if (contentTextLabel != null) {
                 contentTextLabel.setText(contentText);
@@ -188,6 +187,13 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
             }
             grid.add(contentTextLabel, 0, 0);
         }
+    }
+    
+    private void updateGrid() {
+        grid.getChildren().clear();
+        
+        // add the message to the top of the dialog
+        updateContentText();
         
         // then build all the buttons
         int row = 1;

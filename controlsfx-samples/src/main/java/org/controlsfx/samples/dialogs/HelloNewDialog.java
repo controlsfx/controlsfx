@@ -67,6 +67,7 @@ import javafx.util.Pair;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.dialog.CommandLinksDialog;
 import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.FontSelectorDialog;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.dialog.ProgressDialog;
@@ -375,23 +376,20 @@ public class HelloNewDialog extends ControlsFXSample {
                 LoginDialog dlg = new LoginDialog(null, null);
                 configureSampleDialog(dlg, "");
                 showDialog(dlg);
-//                Optional<Pair<String,String>> response = 
-//                        configureSampleDialog(
-//                        Dialogs.create()
-//                            .masthead(isMastheadVisible() ? "Login to ControlsFX" : null))
-//                            .showLogin(new Pair<String,String>("user", "password"), info -> {
-//                                if ( !"controlsfx".equalsIgnoreCase(info.getKey())) {
-//                                    throw new RuntimeException("Service is not available... try again later!"); 
-//                                };
-//                                return null;
-//                            }
-//                         );
-//
-//                System.out.println("User info: " + response);
+            }
+        });
+        
+        final Button Hyperlink12d = new Button("Exception");
+        Hyperlink12d.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ExceptionDialog dlg = new ExceptionDialog(new Exception("ControlsFX is _too_ awesome!"));
+                configureSampleDialog(dlg, "");
+                showDialog(dlg);
             }
         });
 
-        grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c), 1, row);
+        grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c, Hyperlink12d), 1, row);
         row++;
 
         // *******************************************************************

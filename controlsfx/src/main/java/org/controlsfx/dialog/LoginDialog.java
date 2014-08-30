@@ -54,9 +54,6 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
     private final CustomPasswordField txPassword;
 
     public LoginDialog(final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator) {
-        setResultConverter(dialogButton -> dialogButton == loginButtonType ? 
-                new Pair<>(txUserName.getText(), txPassword.getText()) : null);
-                
         final DialogPane dialogPane = getDialogPane();
         
         setTitle(asKey("progress.dlg.title"));
@@ -134,6 +131,10 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
 //            loginButton.disabledProperty().bind(validationSupport.invalidProperty());
             txUserName.requestFocus();
         } );
+        
+        
+        setResultConverter(dialogButton -> dialogButton == loginButtonType ? 
+                new Pair<>(txUserName.getText(), txPassword.getText()) : null);
 
 //        return Optional.ofNullable( 
 //                dlg.show() == actionLogin? 

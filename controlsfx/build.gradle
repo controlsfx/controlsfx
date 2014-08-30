@@ -1,6 +1,6 @@
 
 dependencies {
-    compile 'org.controlsfx:openjfx-dialogs:1.0.0'
+    compile 'org.controlsfx:openjfx-dialogs:1.0.1'
     compile localGroovy()
     compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'

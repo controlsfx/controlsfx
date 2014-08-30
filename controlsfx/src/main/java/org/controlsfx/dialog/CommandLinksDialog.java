@@ -26,14 +26,13 @@
  */
 package org.controlsfx.dialog;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -46,23 +45,79 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
 import org.controlsfx.DialogResources;
 
 public class CommandLinksDialog extends Dialog<ButtonType> {
     
+    public static class CommandLinksButtonType {
+        private final ButtonType buttonType;
+        private final String longText;
+        private final Node graphic;
+        
+        public CommandLinksButtonType(String text) {
+            this(new ButtonType(text), null);
+        }
+        
+        public CommandLinksButtonType(String text, String longText) {
+            this(new ButtonType(text), longText, null);
+        }
+        
+        public CommandLinksButtonType(String text, String longText, Node graphic) {
+            this(new ButtonType(text), longText, graphic);
+        }
+        
+        public CommandLinksButtonType(ButtonType buttonType) {
+            this(buttonType, null);
+        }
+        
+        public CommandLinksButtonType(ButtonType buttonType, String longText) {
+            this(buttonType, longText, null);
+        }
+        
+        public CommandLinksButtonType(ButtonType buttonType, String longText, Node graphic) {
+            this.buttonType = buttonType;
+            this.longText = longText;
+            this.graphic = graphic;
+        }
+        
+        public ButtonType getButtonType() {
+            return buttonType;
+        }
+        
+        public Node getGraphic() {
+            return graphic;
+        }
+        
+        public String getLongText() {
+            return longText;
+        }
+    }
+    
+    
     private final static int gapSize = 10;
     
-    private final List<Button> buttons = new ArrayList<>();
+    private final Map<ButtonType, CommandLinksButtonType> typeMap;
+    
+    private Label contentTextLabel;
     
     private GridPane grid = new GridPane() {
         @Override protected double computePrefWidth(double height) {
+            boolean isDefault = true;
             double pw = 0;
 
-            for (int i = 0; i < buttons.size(); i++) {
-                Button btn = buttons.get(i);
-                pw = Math.min(pw, btn.prefWidth(-1));
+            for (ButtonType buttonType : getDialogPane().getButtonTypes()) {
+                Button button = (Button) getDialogPane().lookupButton(buttonType);
+                double buttonPrefWidth = button.getGraphic().prefWidth(-1);
+                
+                if (isDefault) {
+                    pw = buttonPrefWidth;
+                    isDefault = false;
+                } else {
+                    pw = Math.min(pw, buttonPrefWidth);
+                }
             }
             return pw + gapSize;
         }
@@ -70,19 +125,21 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         @Override protected double computePrefHeight(double width) {
             double ph = getDialogPane().getHeader() == null ? 0 : 10;
 
-            for (int i = 0; i < buttons.size(); i++) {
-                Button btn = buttons.get(i);
-                ph += btn.prefHeight(width) + gapSize;
+            for (ButtonType buttonType : getDialogPane().getButtonTypes()) {
+                Button button = (Button) getDialogPane().lookupButton(buttonType);
+                ph += button.prefHeight(width) + gapSize;
             }
-            return ph * 1.5;
+            
+            // TODO remove magic number
+            return ph * 1.2;
         }
     };
     
-    public CommandLinksDialog(ButtonType... links) {
+    public CommandLinksDialog(CommandLinksButtonType... links) {
         this(Arrays.asList(links));
     }
     
-    public CommandLinksDialog(List<ButtonType> links) {
+    public CommandLinksDialog(List<CommandLinksButtonType> links) {
         this.grid.setHgap(gapSize);
         this.grid.setVgap(gapSize);
         
@@ -90,17 +147,26 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
             @Override protected Node createButtonBar() {
                 return null;
             }
+            
+            @Override protected Node createButton(ButtonType buttonType) {
+                return createCommandLinksButton(buttonType);
+            }
         }; 
         setDialogPane(dialogPane);
         
-        dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("commandlink.css").toExternalForm());
-
         setTitle(DialogResources.getString("Dialog.info.title"));
         dialogPane.getStyleClass().add("command-links-dialog");
         dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("dialogs.css").toExternalForm());
-        dialogPane.getButtonTypes().addAll(links);
+        dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("commandlink.css").toExternalForm());
         
-        dialogPane.contentProperty().addListener(o -> updateGrid());
+        // create a map from ButtonType -> CommandLinkButtonType.
+        typeMap = links.stream()
+             .collect(Collectors.toMap(
+                     commandLinkButtonType -> commandLinkButtonType.getButtonType(), 
+                     commandLinkButtonType -> commandLinkButtonType));
+        
+        // put the ButtonType values into the dialog pane
+        dialogPane.getButtonTypes().addAll(typeMap.keySet());
 
         updateGrid();
         dialogPane.getButtonTypes().addListener((ListChangeListener<? super ButtonType>)c -> {
@@ -109,68 +175,55 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
     }
     
     private void updateGrid() {
-        final Node content = getDialogPane().getContent();
-        final boolean dialogContentIsGrid = grid == content;
+        grid.getChildren().clear();
         
-        if (! dialogContentIsGrid) {
-            if (content != null) {
-                content.getStyleClass().add("command-link-message");
-                grid.add(content, 0, 0);
+        // add the message to the top of the dialog
+        String contentText = getDialogPane().getContentText();
+        if (contentText != null && ! contentText.isEmpty()) {
+            if (contentTextLabel != null) {
+                contentTextLabel.setText(contentText);
+            } else {
+                contentTextLabel = new Label(getDialogPane().getContentText());
+                contentTextLabel.getStyleClass().add("command-link-message");
             }
+            grid.add(contentTextLabel, 0, 0);
         }
         
-        grid.getChildren().removeAll(buttons);
+        // then build all the buttons
         int row = 1;
-        for (final ButtonType action : getDialogPane().getButtonTypes()) {
-            if (action == null) continue; 
-            
-//            if (! (action instanceof DialogButton)) {
-//                throw new IllegalArgumentException("All actions in CommandLinksDialog must be instances of DialogAction");
-//            }
-//            
-//            DialogButton commandLink = (DialogButton) action;
+        for (final ButtonType buttonType : getDialogPane().getButtonTypes()) {
+            if (buttonType == null) continue; 
 
-//            //replace link's event handler with a proper one
-//            commandLink.setOnAction(new EventHandler<ActionEvent>() {
-//                @Override public void handle(ActionEvent ae) {
-//                    setResult(commandLink);
-//                }
-//            });
-
-            final Button button = buildCommandLinkButton(action);   
-            final ButtonData buttonType = action.getButtonData();
-            button.setDefaultButton(buttonType != null && buttonType.isDefaultButton());
-//            button.setOnAction(commandLink);
-            
-            button.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent ae) {
-                    setResult(action);
-                }
-            });
+            final Button button = (Button)getDialogPane().lookupButton(buttonType);   
 
             GridPane.setHgrow(button, Priority.ALWAYS);
             GridPane.setVgrow(button, Priority.ALWAYS);
             grid.add(button, 0, row++);
-            buttons.add(button);
         }
 
-        // last button gets some extra padding (hacky)
-        GridPane.setMargin(buttons.get(buttons.size() - 1), new Insets(0,0,10,0));
+//        // last button gets some extra padding (hacky)
+//        GridPane.setMargin(buttons.get(buttons.size() - 1), new Insets(0,0,10,0));
 
-        if (! dialogContentIsGrid) {
-            getDialogPane().setContent(grid);
-        }
+        getDialogPane().setContent(grid);
+        getDialogPane().requestLayout();
     }
     
-    private Button buildCommandLinkButton(ButtonType commandLink) {
+    private Button createCommandLinksButton(ButtonType buttonType) {
+        // look up the CommandLinkButtonType for the given ButtonType
+        CommandLinksButtonType commandLink = typeMap.getOrDefault(buttonType, new CommandLinksButtonType(buttonType));
+        
         // put the content inside a button
         final Button button = new Button();
         button.getStyleClass().addAll("command-link-button");
         button.setMaxHeight(Double.MAX_VALUE);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
+        
+        final ButtonData buttonData = buttonType.getButtonData();
+        button.setDefaultButton(buttonData != null && buttonData.isDefaultButton());
+        button.setOnAction(ae -> setResult(buttonType));
 
-        final Label titleLabel = new Label(commandLink.getText() );
+        final Label titleLabel = new Label(commandLink.getButtonType().getText() );
         titleLabel.minWidthProperty().bind(new DoubleBinding() {
             {
                 bind(titleLabel.prefWidthProperty());
@@ -185,32 +238,30 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         titleLabel.setAlignment(Pos.TOP_LEFT);
         GridPane.setVgrow(titleLabel, Priority.NEVER);
 
-        // TODO no support in DialogButton for long text or graphic
-//        Label messageLabel = new Label(commandLink.getLongText() );
-//        messageLabel.getStyleClass().addAll("line-2");
-//        messageLabel.setWrapText(true);
-//        messageLabel.setAlignment(Pos.TOP_LEFT);
-//        messageLabel.setMaxHeight(Double.MAX_VALUE);
-//        GridPane.setVgrow(messageLabel, Priority.SOMETIMES);
-//
-//        Image commandLinkImage = commandLink.getGraphic();
-//        Node view = commandLinkImage == null ? 
-//                new ImageView(getClass().getResource("arrow-green-right.png").toExternalForm()) : 
-//                new ImageView(commandLinkImage);
-//        Pane graphicContainer = new Pane(view);
-//        graphicContainer.getStyleClass().add("graphic-container");
-        ImageView arrow = new ImageView(CommandLinksDialog.class.getResource("arrow-green-right.png").toExternalForm());
-        GridPane.setValignment(arrow, VPos.TOP);
-        GridPane.setMargin(arrow, new Insets(0,10,0,0));
+        Label messageLabel = new Label(commandLink.getLongText() );
+        messageLabel.getStyleClass().addAll("line-2");
+        messageLabel.setWrapText(true);
+        messageLabel.setAlignment(Pos.TOP_LEFT);
+        messageLabel.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(messageLabel, Priority.SOMETIMES);
+
+        Node commandLinkImage = commandLink.getGraphic();
+        Node view = commandLinkImage == null ? 
+                new ImageView(CommandLinksDialog.class.getResource("arrow-green-right.png").toExternalForm()) : 
+                commandLinkImage;
+        Pane graphicContainer = new Pane(view);
+        graphicContainer.getStyleClass().add("graphic-container");
+        GridPane.setValignment(graphicContainer, VPos.TOP);
+        GridPane.setMargin(graphicContainer, new Insets(0,10,0,0));
 
         GridPane grid = new GridPane();
         grid.minWidthProperty().bind(titleLabel.prefWidthProperty());
         grid.setMaxHeight(Double.MAX_VALUE);
         grid.setMaxWidth(Double.MAX_VALUE);
         grid.getStyleClass().add("container");
-        grid.add(arrow, 0, 0, 1, 2);
+        grid.add(graphicContainer, 0, 0, 1, 2);
         grid.add(titleLabel, 1, 0);
-//        grid.add(messageLabel, 1, 1);
+        grid.add(messageLabel, 1, 1);
 
         button.setGraphic(grid);
         button.minWidthProperty().bind(titleLabel.prefWidthProperty());

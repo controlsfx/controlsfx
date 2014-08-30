@@ -62,11 +62,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import javafx.util.Pair;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.dialog.CommandLinksDialog;
-import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.dialog.CommandLinksDialog.CommandLinksButtonType;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.FontSelectorDialog;
 import org.controlsfx.dialog.LoginDialog;
@@ -323,10 +322,16 @@ public class HelloNewDialog extends ControlsFXSample {
         grid.add(createLabel("Other pre-built dialogs: "), 0, row);
         final Button Hyperlink12 = new Button("Command Links");
         Hyperlink12.setOnAction(e -> {
-            List<ButtonType> links = Arrays
-                    .asList(buildCommandLink("Add a network that is in the range of this computer", false),
-                            buildCommandLink("Manually create a network profile", true),
-                            buildCommandLink("Create an ad hoc network", false));
+            List<CommandLinksButtonType> links = Arrays
+                    .asList(buildCommandLink(
+                            "Add a network that is in the range of this computer",
+                            "This shows you a list of networks that are currently available and lets you connect to one."),
+                    buildCommandLink(
+                            "Manually create a network profile",
+                            "This creates a new network profile or locates an existing one and saves it on your computer",
+                             true /*default*/),
+                    buildCommandLink("Create an ad hoc network",
+                            "This creates a temporary network for sharing files or and Internet connection"));
 
             CommandLinksDialog dlg = new CommandLinksDialog(links);
             dlg.setTitle("Manually connect to wireless network");
@@ -584,8 +589,16 @@ public class HelloNewDialog extends ControlsFXSample {
         return grid;
     }
     
-    private ButtonType buildCommandLink(String text, boolean isDefault) {
-        return new ButtonType(text, isDefault ? ButtonData.OK_DONE : ButtonData.OTHER);
+    private CommandLinksButtonType buildCommandLink( String text, String comment, boolean isDefault ) {
+        if (isDefault) {
+            return new CommandLinksButtonType(new ButtonType(text, ButtonData.OK_DONE), comment);
+        } else {
+            return new CommandLinksButtonType(text, comment);
+        }
+    }
+
+    public CommandLinksButtonType buildCommandLink( String text, String comment ) {
+        return buildCommandLink(text, comment, false);
     }
 
     public static void main(String[] args) {

@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
+import java.util.function.BooleanSupplier;
 
-import com.sun.javafx.scene.control.skin.AccordionSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -40,12 +40,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import org.controlsfx.validation.ValidationSupport;
 
 public class Wizard {
     
@@ -72,7 +74,7 @@ public class Wizard {
     
     private Optional<WizardPane> currentPage = Optional.empty();
     
-//    private final ValidationSupport validationSupport = new ValidationSupport();
+    private final ValidationSupport validationSupport = new ValidationSupport();
     
 //    
     private final ButtonType BUTTON_PREVIOUS = new ButtonType("< Previous", ButtonData.BACK_PREVIOUS);
@@ -122,7 +124,7 @@ public class Wizard {
 //        this.owner = owner;
 //        this.title = title;
         
-//        validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
+        validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
         
         dialog = new Dialog<ButtonType>();
         dialog.setTitle(title);
@@ -243,9 +245,9 @@ public class Wizard {
     }
     
     
-//    public ValidationSupport getValidationSupport() {
-//		return validationSupport;
-//	}
+    public ValidationSupport getValidationSupport() {
+		return validationSupport;
+	}
     
     
     /**************************************************************************
@@ -303,13 +305,6 @@ public class Wizard {
     private void validateActionState() {
         final List<ButtonType> currentPaneButtons = dialog.getDialogPane().getButtonTypes();
         
-        // TODO can't set a DialogButton to be disabled at present
-//        BUTTON_PREVIOUS.setDisabled(pageHistory.isEmpty());
-        Button prevButton = (Button)dialog.getDialogPane().lookupButton(BUTTON_PREVIOUS);
-        if ( prevButton != null ) {
-        	prevButton.setDisable(pageHistory.isEmpty());
-        }
-        
         // Note that we put the 'next' and 'finish' actions at the beginning of 
         // the actions list, so that it takes precedence as the default button, 
         // over, say, cancel. We will probably want to handle this better in the
@@ -329,6 +324,18 @@ public class Wizard {
             }
             currentPaneButtons.remove(ButtonType.FINISH);
 //            ACTION_NEXT.setDisabled( validationSupport.isInvalid());
+        }
+
+        validateButton( BUTTON_PREVIOUS, () -> pageHistory.isEmpty());
+        validateButton( BUTTON_NEXT,     () -> validationSupport.isInvalid());
+
+    }
+    
+    // Functional design allows to delay condition evaluation until it is actually needed 
+    private void validateButton( ButtonType buttonType, BooleanSupplier condition) {
+    	Button btn = (Button)dialog.getDialogPane().lookupButton(buttonType);
+        if ( btn != null ) {
+        	btn.setDisable(condition.getAsBoolean());
         }
     }
     

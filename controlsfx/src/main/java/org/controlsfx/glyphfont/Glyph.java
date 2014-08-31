@@ -26,12 +26,15 @@
  */
 package org.controlsfx.glyphfont;
 
+import java.util.Optional;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.*;
 import javafx.scene.text.Font;
+
 import org.controlsfx.control.action.Action;
 import org.controlsfx.tools.Duplicatable;
 
@@ -167,6 +170,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
         return this;
     }
 
+
     /**
      * Adds the hover effect style
      * @return Returns this instance for fluent API
@@ -221,12 +225,16 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Sets the font family of this glyph
+     * Font size is reset to default glyph font size
      * @param family
      */
     public void setFontFamily(String family){
-        if(family != getFont().getFamily()){
-            Font newFont = Font.font(family, getFont().getSize());
-            setFont(newFont);
+        if( !getFont().getFamily().equals(family)){
+        	Optional.ofNullable(GlyphFontRegistry.font(family)).ifPresent( glyphFont -> {
+        		glyphFont.ensureFontIsLoaded(); // Make sure font is loaded 
+        		Font newFont = Font.font(family, glyphFont.getDefaultSize()); // Reset to default font size
+                setFont(newFont);
+        	});
         }
     }
 

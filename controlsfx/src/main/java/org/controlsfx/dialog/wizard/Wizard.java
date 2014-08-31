@@ -75,14 +75,14 @@ public class Wizard {
 //    private final ValidationSupport validationSupport = new ValidationSupport();
     
 //    
-    private final ButtonType BUTTON_PREVIOUS = new ButtonType("Previous", ButtonData.BACK_PREVIOUS);
+    private final ButtonType BUTTON_PREVIOUS = new ButtonType("< Previous", ButtonData.BACK_PREVIOUS);
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
         currentPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.pop() );
         updatePage(dialog,false);
     };
     
-    private final ButtonType BUTTON_NEXT = new ButtonType("Next", ButtonData.NEXT_FORWARD);
+    private final ButtonType BUTTON_NEXT = new ButtonType("Next >", ButtonData.NEXT_FORWARD);
     private final EventHandler<ActionEvent> BUTTON_NEXT_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
         currentPage.ifPresent(page->pageHistory.push(page));
@@ -305,6 +305,10 @@ public class Wizard {
         
         // TODO can't set a DialogButton to be disabled at present
 //        BUTTON_PREVIOUS.setDisabled(pageHistory.isEmpty());
+        Button prevButton = (Button)dialog.getDialogPane().lookupButton(BUTTON_PREVIOUS);
+        if ( prevButton != null ) {
+        	prevButton.setDisable(pageHistory.isEmpty());
+        }
         
         // Note that we put the 'next' and 'finish' actions at the beginning of 
         // the actions list, so that it takes precedence as the default button, 

@@ -128,8 +128,9 @@ public class HelloGlyphFont extends ControlsFXSample {
         GridPane fontDemo = new GridPane();
         fontDemo.setHgap(5);
         fontDemo.setVgap(5);
-        int col = 1;
-        int row = 1;
+        int maxColumns = 10;
+        int col = 0;
+        int row = 0;
         
         for ( FontAwesome.Glyph glyph:  FontAwesome.Glyph.values() ){
         	Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
@@ -137,13 +138,11 @@ public class HelloGlyphFont extends ControlsFXSample {
         	Button button = new Button(glyph.name(), graphic);
         	button.setContentDisplay(ContentDisplay.TOP);
         	button.setMaxWidth(Double.MAX_VALUE);
-        	fontDemo.add( button, col++, row);
+        	col = col % maxColumns + 1;
+        	if ( col == 1 ) row++;
+        	fontDemo.add( button, col, row);
         	GridPane.setFillHeight(button, true);
         	GridPane.setFillWidth(button, true);
-        	if ( col > 10 ) {
-        		col = 1;
-        		row++;
-        	}
         }
         
         ScrollPane scroller = new ScrollPane(fontDemo);

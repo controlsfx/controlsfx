@@ -34,7 +34,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -122,9 +121,8 @@ public class HelloNewDialog extends ControlsFXSample {
         grid.add(createLabel("Information Dialog: "), 0, row);
 
         final Button Hyperlink2 = new Button("Show");
-        Hyperlink2.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+        Hyperlink2.setOnAction( (ActionEvent e) -> {
+        		
                 Alert dlg = createAlert(AlertType.INFORMATION);
                 dlg.setTitle("Custom title");
                 String optionalMasthead = "Wouldn't this be nice?";
@@ -140,13 +138,10 @@ public class HelloNewDialog extends ControlsFXSample {
 //              dlg.setOnCloseRequest(evt -> evt.consume());
                 
                 showDialog(dlg);
-            }
         });
 
         final Button Hyperlink2a = new Button("2 x Buttons (no cancel)");
-        Hyperlink2a.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+        Hyperlink2a.setOnAction( (ActionEvent e) -> {
                 Alert dlg = createAlert(AlertType.INFORMATION);
                 dlg.setTitle("Custom title");
                 String optionalMasthead = "Wouldn't this be nice?";
@@ -157,7 +152,7 @@ public class HelloNewDialog extends ControlsFXSample {
 //              dlg.setOnCloseRequest(evt -> evt.consume());
 
                 showDialog(dlg);
-            }
+            
         });
 
         grid.add(new HBox(10, Hyperlink2, Hyperlink2a), 1, row);
@@ -303,15 +298,15 @@ public class HelloNewDialog extends ControlsFXSample {
         final Button Hyperlink12 = new Button("Command Links");
         Hyperlink12.setOnAction(e -> {
             List<CommandLinksButtonType> links = Arrays
-                    .asList(buildCommandLink(
+                    .asList(new CommandLinksButtonType(
                             "Add a network that is in the range of this computer",
-                            "This shows you a list of networks that are currently available and lets you connect to one."),
-                    buildCommandLink(
+                            "This shows you a list of networks that are currently available and lets you connect to one.", false),
+                            new CommandLinksButtonType(
                             "Manually create a network profile",
                             "This creates a new network profile or locates an existing one and saves it on your computer",
                              true /*default*/),
-                    buildCommandLink("Create an ad hoc network",
-                            "This creates a temporary network for sharing files or and Internet connection"));
+                             new CommandLinksButtonType("Create an ad hoc network",
+                            "This creates a temporary network for sharing files or and Internet connection", false));
 
             CommandLinksDialog dlg = new CommandLinksDialog(links);
             dlg.setTitle("Manually connect to wireless network");
@@ -329,9 +324,7 @@ public class HelloNewDialog extends ControlsFXSample {
         });
         
         final Button Hyperlink12b = new Button("Progress");
-        Hyperlink12b.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+        Hyperlink12b.setOnAction((ActionEvent e) -> {
                 Task<Object> worker = new Task<Object>() {
                     @Override
                     protected Object call() throws Exception {
@@ -351,27 +344,20 @@ public class HelloNewDialog extends ControlsFXSample {
                 Thread th = new Thread(worker);
                 th.setDaemon(true);
                 th.start();
-            }
         });
         
         final Button Hyperlink12c = new Button("Login");
-        Hyperlink12c.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+        Hyperlink12c.setOnAction((ActionEvent e) -> {
                 LoginDialog dlg = new LoginDialog(null, null);
                 configureSampleDialog(dlg, "");
                 showDialog(dlg);
-            }
         });
         
         final Button Hyperlink12d = new Button("Exception");
-        Hyperlink12d.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+        Hyperlink12d.setOnAction((ActionEvent e) -> {
                 ExceptionDialog dlg = new ExceptionDialog(new Exception("ControlsFX is _too_ awesome!"));
                 configureSampleDialog(dlg, "");
                 showDialog(dlg);
-            }
         });
 
         grid.add(new HBox(10, Hyperlink12, Hyperlink12a, Hyperlink12b, Hyperlink12c, Hyperlink12d), 1, row);
@@ -487,17 +473,10 @@ public class HelloNewDialog extends ControlsFXSample {
         return grid;
     }
     
-    private CommandLinksButtonType buildCommandLink( String text, String comment, boolean isDefault ) {
-        if (isDefault) {
-            return new CommandLinksButtonType(new ButtonType(text, ButtonData.OK_DONE), comment);
-        } else {
-            return new CommandLinksButtonType(text, comment);
-        }
-    }
+//    private CommandLinksButtonType buildCommandLink( String text, String comment, boolean isDefault ) {
+//            return new CommandLinksButtonType(text, comment, isDefault);
+//    }
 
-    public CommandLinksButtonType buildCommandLink( String text, String comment ) {
-        return buildCommandLink(text, comment, false);
-    }
 
     public static void main(String[] args) {
         Application.launch(args);

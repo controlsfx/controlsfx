@@ -57,30 +57,35 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         private final String longText;
         private final Node graphic;
         
-        public CommandLinksButtonType(String text) {
-            this(new ButtonType(text), null);
+        public CommandLinksButtonType(String text, boolean isDefault ) {
+            this(new ButtonType(text, buildButtonData(isDefault)), null);
         }
         
-        public CommandLinksButtonType(String text, String longText) {
-            this(new ButtonType(text), longText, null);
+        public CommandLinksButtonType(String text, String longText, boolean isDefault) {
+            this(new ButtonType(text, buildButtonData(isDefault)), longText, null);
         }
         
-        public CommandLinksButtonType(String text, String longText, Node graphic) {
-            this(new ButtonType(text), longText, graphic);
+        public CommandLinksButtonType(String text, String longText, Node graphic, boolean isDefault) {
+            this(new ButtonType(text, buildButtonData(isDefault)), longText, graphic);
         }
         
-        public CommandLinksButtonType(ButtonType buttonType) {
+        private CommandLinksButtonType(ButtonType buttonType) {
             this(buttonType, null);
         }
         
-        public CommandLinksButtonType(ButtonType buttonType, String longText) {
+        private CommandLinksButtonType(ButtonType buttonType, String longText) {
             this(buttonType, longText, null);
         }
         
-        public CommandLinksButtonType(ButtonType buttonType, String longText, Node graphic) {
+        private CommandLinksButtonType(ButtonType buttonType, String longText, Node graphic) {
             this.buttonType = buttonType;
             this.longText = longText;
             this.graphic = graphic;
+            
+        }
+        
+        private static ButtonData buildButtonData( boolean isDeafault) {
+        	return isDeafault? ButtonData.OK_DONE :ButtonData.CANCEL_CLOSE;
         }
         
         public ButtonType getButtonType() {
@@ -157,8 +162,8 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         
         setTitle(DialogResources.getString("Dialog.info.title"));
         dialogPane.getStyleClass().add("command-links-dialog");
-        dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("dialogs.css").toExternalForm());
-        dialogPane.getStylesheets().add(CommandLinksDialog.class.getResource("commandlink.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource("dialogs.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource("commandlink.css").toExternalForm());
         
         // create a map from ButtonType -> CommandLinkButtonType.
         typeMap = links.stream()

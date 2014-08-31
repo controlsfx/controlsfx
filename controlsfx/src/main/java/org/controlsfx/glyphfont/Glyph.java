@@ -170,6 +170,19 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
         return this;
     }
 
+    /**
+     * Sets glyph size using size factor based on default font size
+     * @param factor
+     * @return Returns this instance for fluent API
+     */
+    public Glyph sizeFactor(int factor) {
+    	Optional.of(GlyphFontRegistry.font(getFont().getFamily())).ifPresent( glyphFont ->{
+    		setFontSize(glyphFont.getDefaultSize()* (factor < 1? 1: factor));
+    	});
+    	return this;
+    }
+
+    
 
     /**
      * Adds the hover effect style

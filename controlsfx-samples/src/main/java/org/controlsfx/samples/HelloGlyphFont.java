@@ -134,7 +134,7 @@ public class HelloGlyphFont extends ControlsFXSample {
         
         for ( FontAwesome.Glyph glyph:  FontAwesome.Glyph.values() ){
         	Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
-        	Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).size(32).color(randomColor).useGradientEffect();
+        	Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).sizeFactor(2).color(randomColor).useGradientEffect();
         	Button button = new Button(glyph.name(), graphic);
         	button.setContentDisplay(ContentDisplay.TOP);
         	button.setMaxWidth(Double.MAX_VALUE);

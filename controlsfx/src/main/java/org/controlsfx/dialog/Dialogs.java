@@ -1155,7 +1155,7 @@ public final class Dialogs {
         INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.header"), ACTION_OK, ACTION_CANCEL),
         FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.header"), ACTION_OK, ACTION_CANCEL),
         PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.header")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.header"), ACTION_OK, ACTION_CANCEL);
+        LOGIN("login.icon",           asKey("login.dlg.title"),    asKey("login.dlg.header"), ACTION_OK, ACTION_CANCEL);
 
         private final String defaultTitle;
         private final String defaultMasthead;

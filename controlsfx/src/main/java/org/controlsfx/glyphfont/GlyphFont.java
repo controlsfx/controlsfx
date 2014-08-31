@@ -195,7 +195,7 @@ public class GlyphFont {
      * @param glyph
      * @return
      */
-    public Glyph create(Enum glyph) {
+    public Glyph create(Enum<?> glyph) {
         return new Glyph(fontName, glyph);
     }
 

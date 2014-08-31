@@ -29,11 +29,18 @@ package org.controlsfx.samples;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
@@ -116,9 +123,45 @@ public class HelloGlyphFont extends ControlsFXSample {
                 new Button("", effectGlyph),
                 new Button("", effectGlyph2));
         root.getChildren().add(toolbar);
+        
+        
+        GridPane fontDemo = new GridPane();
+        fontDemo.setHgap(5);
+        fontDemo.setVgap(5);
+        int col = 1;
+        int row = 1;
+        
+        for ( FontAwesome.Glyph glyph:  FontAwesome.Glyph.values() ){
+        	Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
+        	Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).size(32).color(randomColor).useGradientEffect();
+        	Button button = new Button(glyph.name(), graphic);
+        	button.setContentDisplay(ContentDisplay.TOP);
+        	button.setMaxWidth(Double.MAX_VALUE);
+        	fontDemo.add( button, col++, row);
+        	GridPane.setFillHeight(button, true);
+        	GridPane.setFillWidth(button, true);
+        	if ( col > 10 ) {
+        		col = 1;
+        		row++;
+        	}
+        }
+        
+        ScrollPane scroller = new ScrollPane(fontDemo);
+        scroller.setFitToWidth(true);
+        
+        TabPane tabs = new TabPane();
+        Tab tab = new Tab("FontAwesome Glyph Demo");
+        tab.setContent(scroller);
+        tabs.getTabs().add(tab);
+
+        
+        root.getChildren().add(tabs);
+        VBox.setVgrow(tabs, Priority.ALWAYS);
+        
         return root;
 
     }
+    
 
     public static void main(String[] args) {
         launch(args);

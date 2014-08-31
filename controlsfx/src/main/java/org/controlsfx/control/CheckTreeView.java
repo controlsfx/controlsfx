@@ -79,7 +79,7 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
  * // selected items change).
  * checkTreeView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
  *     public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
- *         System.out.println(checkListView.getCheckModel().getSelectedIndices());
+ *         System.out.println(checkTreeView.getCheckModel().getSelectedIndices());
  *     }
  * });
  * }</pre>

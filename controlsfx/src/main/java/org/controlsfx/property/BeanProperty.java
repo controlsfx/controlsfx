@@ -131,13 +131,13 @@ public class BeanProperty implements PropertySheet.Item {
     }
     
     /** {@inheritDoc} */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+    @SuppressWarnings({ "unchecked" })
+	@Override public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
         
         if (beanPropertyDescriptor.getPropertyEditorClass() != null && 
                 PropertyEditor.class.isAssignableFrom(beanPropertyDescriptor.getPropertyEditorClass())) {
             
-            return Optional.of((Class<PropertyEditor>)beanPropertyDescriptor.getPropertyEditorClass());
+            return Optional.of((Class<PropertyEditor<?>>)beanPropertyDescriptor.getPropertyEditorClass());
         }
         
         return Item.super.getPropertyEditorClass();

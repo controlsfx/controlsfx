@@ -100,7 +100,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
      * as selectedCrumb node to be shown 
      * @param crumbs
      */
-    public static <T> TreeItem<T> buildTreeModel(T... crumbs){
+    public static <T> TreeItem<T> buildTreeModel(@SuppressWarnings("unchecked") T... crumbs){
         TreeItem<T> subRoot = null;
         for (T crumb : crumbs) {
             TreeItem<T> currentNode = new TreeItem<T>(crumb);
@@ -307,7 +307,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
     }
     
     private ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override protected void invalidated() {
             eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
         }

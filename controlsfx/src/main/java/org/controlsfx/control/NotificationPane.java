@@ -45,7 +45,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.web.WebView;
 
 import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.Action;
 
 /**
  * The NotificationPane control is a container control that, when prompted by

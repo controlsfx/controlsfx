@@ -68,7 +68,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, BehaviorBase<GridRo
      *  @param index The index of the wanted cell element
      *  @return Cell element if exist else null
      */
-    public GridCell<T> getCellAtIndex(int index) {
+    @SuppressWarnings("unchecked")
+	public GridCell<T> getCellAtIndex(int index) {
         if( index < getChildren().size() ) {
             return (GridCell<T>)getChildren().get(index);
         }
@@ -83,7 +84,7 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, BehaviorBase<GridRo
         int rowIndex = getSkinnable().getIndex();
         if (rowIndex >= 0) {
             GridView<T> gridView = getSkinnable().getGridView();
-            int maxCellsInRow = ((GridViewSkin)gridView.getSkin()).computeMaxCellsInRow();
+            int maxCellsInRow = ((GridViewSkin<?>)gridView.getSkin()).computeMaxCellsInRow();
             int totalCellsInGrid = gridView.getItems().size();
             int startCellIndex = rowIndex * maxCellsInRow;
             int endCellIndex = startCellIndex + maxCellsInRow - 1;

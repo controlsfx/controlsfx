@@ -26,6 +26,10 @@
  */
 package org.controlsfx.dialog;
 
+import static org.controlsfx.dialog.Dialog.STYLE_CLASS_CROSS_PLATFORM;
+import static org.controlsfx.dialog.Dialog.STYLE_CLASS_NATIVE;
+import static org.controlsfx.dialog.Dialog.STYLE_CLASS_UNDECORATED;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +48,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -66,8 +69,6 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 import org.controlsfx.tools.Platform;
-
-import static org.controlsfx.dialog.Dialog.*;
 
 @Deprecated
 abstract class FXDialog {
@@ -398,7 +399,7 @@ abstract class FXDialog {
         }
         
         updateLock = true;
-        ObservableList<String> styleClasses = getStyleClass();
+//        ObservableList<String> styleClasses = getStyleClass();
         
         if (removedStyles != null && ! removedStyles.isEmpty()) {
             // remove styling

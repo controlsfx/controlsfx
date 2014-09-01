@@ -27,7 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridViewSkin;
-import impl.org.controlsfx.version.VersionChecker;
 
 import java.util.ArrayList;
 import java.util.Collections;

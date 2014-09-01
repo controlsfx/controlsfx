@@ -27,7 +27,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      * Add the given new possible suggestions to this  SuggestionProvider
      * @param newPossible
      */
-    public void addPossibleSuggestions(T... newPossible){     
+    public void addPossibleSuggestions(@SuppressWarnings("unchecked") T... newPossible){     
         addPossibleSuggestions(Arrays.asList(newPossible));
     }
 

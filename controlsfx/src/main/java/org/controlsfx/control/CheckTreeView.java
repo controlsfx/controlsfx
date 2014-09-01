@@ -27,7 +27,6 @@
 package org.controlsfx.control;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import javafx.beans.property.BooleanProperty;
@@ -39,7 +38,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.CheckBoxTreeItem.TreeModificationEvent;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;

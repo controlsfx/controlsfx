@@ -148,7 +148,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     public final void setOnSuggestion(EventHandler<SuggestionEvent<T>> value) { onSuggestionProperty().set(value); }
     public final EventHandler<SuggestionEvent<T>> getOnSuggestion() { return onSuggestionProperty().get(); }
     private ObjectProperty<EventHandler<SuggestionEvent<T>>> onSuggestion = new ObjectPropertyBase<EventHandler<SuggestionEvent<T>>>() {
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override protected void invalidated() {
             eventHandlerManager.setEventHandler(SuggestionEvent.SUGGESTION, (EventHandler<SuggestionEvent>)(Object)get());
         }

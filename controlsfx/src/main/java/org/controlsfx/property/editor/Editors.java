@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
+
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
@@ -18,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
@@ -177,7 +179,7 @@ public class Editors {
     public static final Optional<PropertyEditor<?>> createCustomEditor(final Item property ) {
         return property.getPropertyEditorClass().map(cls -> {
             try {
-                Constructor cn = cls.getConstructor(PropertySheet.Item.class);
+                Constructor<?> cn = cls.getConstructor(PropertySheet.Item.class);
                 if (cn != null) {
                     return (PropertyEditor<?>) cn.newInstance(property);
                 }

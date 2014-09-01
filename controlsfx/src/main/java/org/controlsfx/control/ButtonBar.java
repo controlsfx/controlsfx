@@ -37,9 +37,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Skin;
@@ -49,11 +47,9 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.tools.Platform;
 
 import com.sun.javafx.scene.traversal.Algorithm;
+import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import com.sun.javafx.scene.traversal.TraversalContext;
-import com.sun.javafx.scene.traversal.Direction;
-import com.sun.javafx.scene.traversal.TraversalEngine;
-import com.sun.javafx.scene.traversal.TraverseListener;
 
 /**
  * A ButtonBar is essentially an {@link HBox} for controls extending

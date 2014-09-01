@@ -157,8 +157,8 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     private void selectFirstSuggestion(AutoCompletePopup<?> autoCompletionPopup){
         Skin<?> skin = autoCompletionPopup.getSkin();
         if(skin instanceof AutoCompletePopupSkin){
-            AutoCompletePopupSkin au = (AutoCompletePopupSkin)skin;
-            ListView li = (ListView)au.getNode();
+            AutoCompletePopupSkin<?> au = (AutoCompletePopupSkin<?>)skin;
+            ListView<?> li = (ListView<?>)au.getNode();
             if(li.getItems() != null && !li.getItems().isEmpty()){
                 li.getSelectionModel().select(0);
             }

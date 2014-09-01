@@ -149,7 +149,7 @@ public class TextFields {
      * @return The AutoCompletionBinding
      */
 	public static <T> AutoCompletionBinding<T> bindAutoCompletion(
-			TextField textField, T... possibleSuggestions) {
+			TextField textField, @SuppressWarnings("unchecked") T... possibleSuggestions) {
 		return bindAutoCompletion(textField, Arrays.asList(possibleSuggestions));
 	}
     

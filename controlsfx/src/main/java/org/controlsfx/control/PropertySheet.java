@@ -173,7 +173,7 @@ public class PropertySheet extends ControlsFXControl {
          * The class must have a constructor that can accept a single argument 
          * of type PropertySheet.Item
          */
-        default public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+        default public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
             return Optional.empty();
         }
         

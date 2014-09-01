@@ -53,7 +53,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -139,12 +138,7 @@ public class VerticalHeader extends StackPane {
         });
 
         // When the Grid is changing, we need to update our information.
-        handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
-            @Override
-            public void changed(ObservableValue<? extends Grid> arg0, Grid arg1, Grid arg2) {
-                requestLayout();
-            }
-        });
+        handle.getView().gridProperty().addListener(layout);
 
         // Clip property to stay within bounds
         clip = new Rectangle(getVerticalHeaderWidth(), snapSize(skin.getSkinnable().getHeight()));
@@ -155,12 +149,7 @@ public class VerticalHeader extends StackPane {
         VerticalHeader.this.setClip(clip);
 
         // We desactivate and activate the verticalHeader upon request
-        spreadsheetView.showRowHeaderProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
-                requestLayout();
-            }
-        });
+        spreadsheetView.showRowHeaderProperty().addListener(layout);
 
         // When the Column header is showing or not, we need to update the
         // position of the verticalHeader
@@ -171,6 +160,9 @@ public class VerticalHeader extends StackPane {
 
         // In case we resize the view in any manners
         spreadsheetView.heightProperty().addListener(layout);
+        
+        //When rowPickers is changing
+        spreadsheetView.getRowPickers().addListener(layout);
 
         // For layout properly the verticalHeader when there are some selected
         // items

@@ -199,7 +199,7 @@ public final class SpreadsheetColumn {
      * visible cells to be visible.
      */
     public void fitColumn() {
-        if (column.isResizable()) {
+        if (column.isResizable() && spreadsheetView.getCellsViewSkin() != null) {
             spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, -1);
         }
     }

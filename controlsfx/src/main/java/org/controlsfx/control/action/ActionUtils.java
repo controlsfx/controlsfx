@@ -510,6 +510,9 @@ public class ActionUtils {
         }
         
         // button bind to action properties
+        
+        btn.styleProperty().bind(action.styleProperty());
+        
         //btn.textProperty().bind(action.textProperty());
         if ( textBahavior == ActionTextBehavior.SHOW ) {
             btn.textProperty().bind(action.textProperty());
@@ -547,8 +550,13 @@ public class ActionUtils {
             } 
         });
         
-        // TODO handle the selected state of the button if it is of the applicable
-        // type
+        
+        
+        // Handle the selected state of the button if it is of the applicable type
+        
+        if ( btn instanceof ToggleButton ) {
+        	((ToggleButton)btn).selectedProperty().bindBidirectional(action.selectedProperty());
+        }
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button
@@ -563,6 +571,7 @@ public class ActionUtils {
         }
         
         // button bind to action properties
+        menuItem.styleProperty().bind(action.styleProperty());
         menuItem.textProperty().bind(action.textProperty());
         menuItem.disableProperty().bind(action.disabledProperty());
         menuItem.acceleratorProperty().bind(action.acceleratorProperty());
@@ -581,8 +590,14 @@ public class ActionUtils {
         menuItem.getProperties().putAll(action.getProperties());
         action.getProperties().addListener(new MenuItemPropertiesMapChangeListener<>(menuItem, action));
         
-        // TODO handle the selected state of the menu item if it is a 
+        // Handle the selected state of the menu item if it is a 
         // CheckMenuItem or RadioMenuItem
+        
+        if ( menuItem instanceof RadioMenuItem ) {
+        	((RadioMenuItem)menuItem).selectedProperty().bindBidirectional(action.selectedProperty());
+        } else if ( menuItem instanceof CheckMenuItem ) {
+        	((CheckMenuItem)menuItem).selectedProperty().bindBidirectional(action.selectedProperty());
+        }
         
         // Just call the execute method on the action itself when the action
         // event occurs on the button

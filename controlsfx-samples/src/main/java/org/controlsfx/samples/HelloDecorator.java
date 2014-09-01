@@ -154,7 +154,7 @@ public class HelloDecorator extends ControlsFXSample {
     }
     
     private Node createImageNode() {
-        Image image = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/security-low.png");
+        Image image = new Image("/org/controlsfx/samples/security-low.png");
         ImageView imageView = new ImageView(image);
         return imageView;
     }

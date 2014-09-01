@@ -238,8 +238,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class ActionChangeMode extends Action {
         
-    	private final Image CATEGORY_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-indent-more.png");
-    	private final Image NAME_IMAGE = new Image("/impl/org/controlsfx/dialog/resources/oxygen/16/format-line-spacing-triple.png");
+    	private final Image CATEGORY_IMAGE = new Image("/org/controlsfx/control/format-indent-more.png");
+    	private final Image NAME_IMAGE = new Image("/org/controlsfx/control/format-line-spacing-triple.png");
     	
         public ActionChangeMode(PropertySheet.Mode mode) {
             super("");

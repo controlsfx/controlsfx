@@ -142,7 +142,9 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         mouseNode.widthProperty().bind(getSkinnable().widthProperty());
         mouseNode.heightProperty().bind(getSkinnable().heightProperty());
 
+        // let it handle the mouse events if allowed by the user
         mouseNode.addEventHandler(MouseEvent.ANY, this::handleMouseEvent);
+        mouseNode.mouseTransparentProperty().bind(getSkinnable().selectionMouseTransparentProperty());
 
         return mouseNode;
     }

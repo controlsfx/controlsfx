@@ -123,6 +123,8 @@ public class SnapshotView extends ControlsFXControl {
      */
     private final BooleanProperty selectionActivityExplicitlyManaged;
 
+    private final BooleanProperty selectionMouseTransparent;
+
     // VISUALIZATION
 
     /**
@@ -168,6 +170,8 @@ public class SnapshotView extends ControlsFXControl {
         this.selectionAreaBoundary =
                 new SimpleObjectProperty<SnapshotView.Boundary>(this, "selectionAreaBoundary", Boundary.CONTROL);
         this.selectionActivityExplicitlyManaged =
+                new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
+        this.selectionMouseTransparent =
                 new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
 
         // VISUALIZATION
@@ -551,6 +555,28 @@ public class SnapshotView extends ControlsFXControl {
      */
     public void setSelectionActivityExplicitlyManaged(boolean selectionActivityExplicitlyManaged) {
         selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
+    }
+
+    /**
+     * @return the selectionMouseTransparent as a property
+     */
+    public BooleanProperty selectionMouseTransparentProperty() {
+        return selectionMouseTransparent;
+    }
+
+    /**
+     * @return the selectionMouseTransparent
+     */
+    public boolean isSelectionMouseTransparent() {
+        return selectionMouseTransparentProperty().get();
+    }
+
+    /**
+     * @param selectionMouseTransparent
+     *            the selectionMouseTransparent to set
+     */
+    public void setSelectionMouseTransparent(boolean selectionMouseTransparent) {
+        selectionMouseTransparentProperty().set(selectionMouseTransparent);
     }
 
     // VISUALIZATION

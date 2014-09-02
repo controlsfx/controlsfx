@@ -26,9 +26,9 @@
  */
 package impl.org.controlsfx.behavior;
 
-import impl.org.controlsfx.tools.MathTools;
 import impl.org.controlsfx.tools.rectangle.CoordinatePosition;
 import impl.org.controlsfx.tools.rectangle.CoordinatePositions;
+import impl.org.controlsfx.tools.rectangle.Rectangles2D;
 import impl.org.controlsfx.tools.rectangle.change.MoveChangeStrategy;
 import impl.org.controlsfx.tools.rectangle.change.NewChangeStrategy;
 import impl.org.controlsfx.tools.rectangle.change.Rectangle2DChangeStrategy;
@@ -42,16 +42,18 @@ import impl.org.controlsfx.tools.rectangle.change.ToSouthwestChangeStrategy;
 import impl.org.controlsfx.tools.rectangle.change.ToWestChangeStrategy;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import org.controlsfx.control.SnapshotView;
+import org.controlsfx.control.SnapshotView.Boundary;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
@@ -62,9 +64,10 @@ import com.sun.javafx.scene.control.behavior.KeyBinding;
 public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
     /**
-     * The percentage of the image's width/height used as a tolerance for determining whether the cursor is on an edge.
+     * The percentage of the control's node's width/height used as a tolerance for determining whether the cursor is on
+     * an edge of the selection.
      */
-    private static final double relativeEdgeTolerance = 0.01;
+    private static final double RELATIVE_EDGE_TOLERANCE = 0.015;
 
     /* ************************************************************************
      *                                                                         *
@@ -76,6 +79,8 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * The current selection change; might be null.
      */
     private SelectionChange selectionChange;
+
+    private final Consumer<Boolean> setSelectionChanging;
 
     /* ************************************************************************
      *                                                                         *
@@ -89,26 +94,16 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @param snapshotView
      *            the control which this behavior will control
      */
-    public SnapshotViewBehavior(SnapshotView snapshotView) {
+    public SnapshotViewBehavior(SnapshotView snapshotView, Consumer<Boolean> setSelectionChanging) {
         super(snapshotView, new ArrayList<KeyBinding>());
+        this.setSelectionChanging = setSelectionChanging;
     }
 
     /* ************************************************************************
      *                                                                         *
-     * Usability Access Functions to SnapshotView Properties            *
+     * Usability Access Functions to SnapshotView Properties                   *
      *                                                                         *
      **************************************************************************/
-
-    /**
-     * Returns the tolerance used to compute whether the cursor is on an edge.
-     * 
-     * @return the tolerance based on the currently shown image's width and height.
-     */
-    private double getTolerance() {
-        // TODO better way to compute this?
-        double meanLength = Math.sqrt(getImageWidth() * getImageHeight());
-        return meanLength * relativeEdgeTolerance;
-    }
 
     /**
      * The current selection.
@@ -119,22 +114,12 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         return getControl().getSelection();
     }
 
-    /**
-     * The image's width.
-     * 
-     * @return {@link Image#getWidth() width} of {@link SnapshotView#getImage()}
-     */
-    private double getImageWidth() {
-        return getControl().getNode().prefWidth(-1);
+    private double getSelectionMaxWidth() {
+        return getControl().getWidth();
     }
 
-    /**
-     * The image's height.
-     * 
-     * @return {@link Image#getHeight() height} of {@link SnapshotView#getImage()}
-     */
-    private double getImageHeight() {
-        return getControl().getNode().prefHeight(-1);
+    private double getSelectionMaxHeight() {
+        return getControl().getHeight();
     }
 
     /**
@@ -162,27 +147,120 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      **************************************************************************/
 
     /**
-     * Handles the specified selection event (possibly by creating/changing/removing a selection) and returns the
-     * matching cursor.
+     * Handles the specified mouse event (possibly by creating/changing/removing a selection) and returns the matching
+     * cursor.
      * 
-     * @param selectionEvent
-     *            the handled {@link SelectionEvent}
+     * @param mouseEvent
+     *            the handled {@link MouseEvent}
      * @return the cursor which will be used for this event
      */
-    public Cursor handleSelectionEvent(MouseEvent selectionEvent) {
-        EventType<? extends MouseEvent> eventType = selectionEvent.getEventType();
+    public Cursor handleMouseEvent(MouseEvent mouseEvent) {
+        EventType<? extends MouseEvent> eventType = mouseEvent.getEventType();
+        SelectionEvent selectionEvent = createSelectionEvent(mouseEvent);
 
-        if (eventType == MouseEvent.MOUSE_MOVED)
+        if (eventType == MouseEvent.MOUSE_MOVED) {
             return getCursor(selectionEvent);
-        if (eventType == MouseEvent.MOUSE_PRESSED)
+        }
+        if (eventType == MouseEvent.MOUSE_PRESSED) {
             return handleMousePressedEvent(selectionEvent);
-        if (eventType == MouseEvent.MOUSE_DRAGGED)
+        }
+        if (eventType == MouseEvent.MOUSE_DRAGGED) {
             return handleMouseDraggedEvent(selectionEvent);
-        if (eventType == MouseEvent.MOUSE_RELEASED)
+        }
+        if (eventType == MouseEvent.MOUSE_RELEASED) {
             return handleMouseReleasedEvent(selectionEvent);
+        }
 
         return Cursor.DEFAULT;
     }
+
+    // TRANSFORM MOUSE EVENT TO SELECTION EVENT
+
+    /**
+     * Creates a selection event for the specified mouse event
+     * 
+     * @param mouseEvent
+     *            the {@link MouseEvent} for which the selection event will be created
+     * @return the {@link SelectionEvent} for the specified mouse event
+     */
+    private SelectionEvent createSelectionEvent(MouseEvent mouseEvent) {
+        Point2D point = new Point2D(mouseEvent.getX(), mouseEvent.getY());
+        Rectangle2D selectionBounds = createBoundsForBoundary(getControl().getSelectionAreaBoundary());
+        CoordinatePosition position = computePosition(point);
+        return new SelectionEvent(mouseEvent, point, selectionBounds, position);
+    }
+
+    private Rectangle2D createBoundsForBoundary(Boundary boundary) {
+        switch (boundary) {
+        case CONTROL:
+            return new Rectangle2D(0, 0, getControl().getWidth(), getControl().getHeight());
+        case NODE:
+            boolean nodeExists = getControl().getNode() != null;
+            if (nodeExists) {
+                Bounds nodeBounds = getControl().getNode().getBoundsInParent();
+                return Rectangles2D.fromBounds(nodeBounds);
+            } else {
+                return new Rectangle2D(0, 0, 0, 0);
+            }
+        default:
+            throw new IllegalArgumentException("The boundary " + boundary + " is not fully implemented.");
+        }
+    }
+
+    /**
+     * Returns the position of the specified point relative to a possible selection.
+     * 
+     * @param point
+     *            the point (in the node's preferred coordinates) whose position will be computed
+     * 
+     * @return the {@link CoordinatePosition} the event's point has relative to the control's current selection; if the
+     *         selection is inactive this always returns {@link CoordinatePosition#OUT_OF_RECTANGLE}.
+     */
+    private CoordinatePosition computePosition(Point2D point) {
+        boolean noSelection = !getControl().hasSelection() || !getControl().isSelectionActive();
+        boolean controlHasNoSpace = getControl().getWidth() == 0 || getControl().getHeight() == 0;
+        if (noSelection || controlHasNoSpace) {
+            return CoordinatePosition.OUT_OF_RECTANGLE;
+        }
+
+        double tolerance = computeTolerance();
+        return computePosition(getSelection(), point, tolerance);
+    }
+
+    /**
+     * Returns the position of the specified point relative to a possible selection with the specified tolerance.
+     * 
+     * @param point
+     *            the point (in the node's preferred coordinates) whose position will be computed
+     * @param tolerance
+     *            the absolute tolerance used to determine whether the point is on an edge
+     * 
+     * @return the {@link CoordinatePosition} the event's point has relative to the control's current selection; if the
+     *         selection is inactive this always returns {@link CoordinatePosition#OUT_OF_RECTANGLE}.
+     */
+    private static CoordinatePosition computePosition(Rectangle2D selection, Point2D point, double tolerance) {
+        CoordinatePosition onEdge = CoordinatePositions.onEdges(selection, point, tolerance);
+        if (onEdge != null) {
+            return onEdge;
+        } else {
+            return CoordinatePositions.inRectangle(selection, point);
+        }
+    }
+
+    /**
+     * Computes the tolerance which is used to determine whether the cursor is on an edge.
+     * 
+     * @return the absolute tolerance
+     */
+    private double computeTolerance() {
+        double controlWidth = getControl().getWidth();
+        double controlHeight = getControl().getHeight();
+        double controlMeanLength = Math.sqrt(controlWidth * controlHeight);
+
+        return RELATIVE_EDGE_TOLERANCE * controlMeanLength;
+    }
+
+    // HANDLE SELECTION EVENTS
 
     /**
      * Handles {@link MouseEvent#MOUSE_PRESSED} events by creating a new {@link #selectionChange} and beginning the
@@ -192,20 +270,24 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *            the handled {@link SelectionEvent}
      * @return the cursor which will be used while the selection changes
      */
-    private Cursor handleMousePressedEvent(MouseEvent selectionEvent) {
-        // get all necessary information to create a selection change
-        Cursor cursor = getCursor(selectionEvent);
-        Rectangle2DChangeStrategy selectionChangeStrategy = getChangeStrategy(selectionEvent);
-        boolean deactivateSelectionIfClick = willDeactivateSelectionIfClick(selectionEvent);
+    private Cursor handleMousePressedEvent(SelectionEvent selectionEvent) {
+        if (selectionEvent.isPointInSelectionBounds()) {
+            // get all necessary information to create a selection change
+            Cursor cursor = getCursor(selectionEvent);
+            Rectangle2DChangeStrategy selectionChangeStrategy = getChangeStrategy(selectionEvent);
+            boolean deactivateSelectionIfClick = willDeactivateSelectionIfClick(selectionEvent);
 
-        // create and begin the selection change
-        Point2D pointInImage = transformToImageCoordiantes(selectionEvent);
-        selectionChange = new SelectionChange(getControl(), selectionChangeStrategy, cursor, deactivateSelectionIfClick);
-        selectionChange.beginSelectionChange(pointInImage);
+            // create and begin the selection change
+            selectionChange = new SelectionChangeByStrategy(
+                    getControl(), setSelectionChanging, selectionChangeStrategy, cursor, deactivateSelectionIfClick);
+            selectionChange.beginSelectionChange(selectionEvent.getPoint());
+        } else {
+            // if the mouse is outside the legal bounds, the selection will not actually change
+            selectionChange = NoSelectionChange.INSTANCE;
+        }
 
         return selectionChange.getCursor();
     }
-
     /**
      * Handles {@link MouseEvent#MOUSE_DRAGGED} events by continuing the current {@link #selectionChange}.
      * 
@@ -213,9 +295,8 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *            the handled {@link SelectionEvent}
      * @return the cursor which will be used while the selection changes
      */
-    private Cursor handleMouseDraggedEvent(MouseEvent selectionEvent) {
-        Point2D pointInImage = transformToImageCoordiantes(selectionEvent);
-        selectionChange.continueSelectionChange(pointInImage);
+    private Cursor handleMouseDraggedEvent(SelectionEvent selectionEvent) {
+        selectionChange.continueSelectionChange(selectionEvent.getPoint());
         return selectionChange.getCursor();
     }
 
@@ -227,45 +308,15 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *            the handled {@link SelectionEvent}
      * @return the cursor which will be used after the selection change ends
      */
-    private Cursor handleMouseReleasedEvent(MouseEvent selectionEvent) {
+    private Cursor handleMouseReleasedEvent(SelectionEvent selectionEvent) {
         // end and deactivate the selection change
-        Point2D pointInImage = transformToImageCoordiantes(selectionEvent);
-        selectionChange.endSelectionChange(pointInImage);
+        selectionChange.endSelectionChange(selectionEvent.getPoint());
         selectionChange = null;
 
         return getCursor(selectionEvent);
     }
 
-    /* ************************************************************************
-     *                                                                         *
-     * Selection Change                                                        *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * Returns the position the selection event's coordinates have relative to a possible selection.
-     * 
-     * @param selectionEvent
-     *            the {@link SelectionEvent} whose {@link SelectionEvent#getPointInImage() pointInImage} will be checked
-     * @return the {@link CoordinatePosition} the selection's point has relative to the control's current selection; if
-     *         the selection is inactive this always returns {@link CoordinatePosition#OUT_OF_RECTANGLE}.
-     */
-    private CoordinatePosition getPosition(MouseEvent selectionEvent) {
-        boolean noSelection = !getControl().isSelectionValid() || !getControl().isSelectionActive();
-        if (noSelection) {
-            return CoordinatePosition.OUT_OF_RECTANGLE;
-        }
-        
-        Point2D pointInImage = transformToImageCoordiantes(selectionEvent);
-
-        CoordinatePosition onEdge = CoordinatePositions
-                .onEdges(getSelection(), pointInImage, getTolerance());
-        if (onEdge != null) {
-            return onEdge;
-        } else {
-            return CoordinatePositions.inRectangle(getSelection(), pointInImage);
-        }
-    }
+    // CURSOR AND SELECTION CHANGE
 
     /**
      * Returns the cursor which will be used for the specified selection event.
@@ -274,26 +325,43 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *            the {@link SelectionEvent} to check
      * @return the {@link Cursor} which will be used for the event
      */
-    private Cursor getCursor(MouseEvent selectionEvent) {
-        CoordinatePosition position = getPosition(selectionEvent);
-        switch (position) {
-            case IN_RECTANGLE:     return Cursor.MOVE;
-            case OUT_OF_RECTANGLE: return Cursor.DEFAULT;
-            case NORTH_EDGE:       return Cursor.N_RESIZE;
-            case NORTHEAST_EDGE:   return Cursor.NE_RESIZE;
-            case EAST_EDGE:        return Cursor.E_RESIZE;
-            case SOUTHEAST_EDGE:   return Cursor.SE_RESIZE;
-            case SOUTH_EDGE:       return Cursor.S_RESIZE;
-            case SOUTHWEST_EDGE:   return Cursor.SW_RESIZE;
-            case WEST_EDGE:        return Cursor.W_RESIZE;
-            case NORTHWEST_EDGE:   return Cursor.NW_RESIZE;
-            default: throw new IllegalArgumentException("The position " + position + " is not fully implemented.");
+    private static Cursor getCursor(SelectionEvent selectionEvent) {
+        // show the default cursor if the mouse is out of the selection bounds
+        if (!selectionEvent.isPointInSelectionBounds()) {
+            return Cursor.DEFAULT;
+        }
+
+        // otherwise pick a cursor from the relative position
+        switch (selectionEvent.getPosition()) {
+        case IN_RECTANGLE:
+            return Cursor.MOVE;
+        case OUT_OF_RECTANGLE:
+            return Cursor.DEFAULT;
+        case NORTH_EDGE:
+            return Cursor.N_RESIZE;
+        case NORTHEAST_EDGE:
+            return Cursor.NE_RESIZE;
+        case EAST_EDGE:
+            return Cursor.E_RESIZE;
+        case SOUTHEAST_EDGE:
+            return Cursor.SE_RESIZE;
+        case SOUTH_EDGE:
+            return Cursor.S_RESIZE;
+        case SOUTHWEST_EDGE:
+            return Cursor.SW_RESIZE;
+        case WEST_EDGE:
+            return Cursor.W_RESIZE;
+        case NORTHWEST_EDGE:
+            return Cursor.NW_RESIZE;
+        default:
+            throw new IllegalArgumentException("The position " + selectionEvent.getPosition()
+                    + " is not fully implemented.");
         }
     }
 
     /**
-     * Returns the selection change strategy based on the specified selection event, which must be based on a
-     * {@link MouseEvent#MOUSE_PRESSED} event.
+     * Returns the selection change strategy based on the specified selection event, which must be a
+     * {@link MouseEvent#MOUSE_PRESSED MOUSE_PRESSED} event.
      * 
      * @param selectionEvent
      *            the {@link SelectionEvent} which will be checked
@@ -301,39 +369,47 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @throws IllegalArgumentException
      *             if {@link SelectionEvent#getMouseEvent()} is not of type {@link MouseEvent#MOUSE_PRESSED}.
      */
-    private Rectangle2DChangeStrategy getChangeStrategy(MouseEvent selectionEvent) {
-        boolean mousePressed = selectionEvent.getEventType() == MouseEvent.MOUSE_PRESSED;
-        if (!mousePressed)
+    private Rectangle2DChangeStrategy getChangeStrategy(SelectionEvent selectionEvent) {
+        boolean mousePressed = selectionEvent.getMouseEvent().getEventType() == MouseEvent.MOUSE_PRESSED;
+        if (!mousePressed) {
             throw new IllegalArgumentException();
+        }
 
-        CoordinatePosition position = getPosition(selectionEvent);
-        switch (position) {
+        Rectangle2D selectionBounds = selectionEvent.getSelectionBounds();
+
+        switch (selectionEvent.getPosition()) {
         case IN_RECTANGLE:
-            return new MoveChangeStrategy(getSelection(), getImageWidth(), getImageHeight());
+            return new MoveChangeStrategy(getSelection(), selectionBounds);
         case OUT_OF_RECTANGLE:
-            return new NewChangeStrategy(isSelectionRatioFixed(), getSelectionRatio());
+            return new NewChangeStrategy(
+                    isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case NORTH_EDGE:
             return new ToNorthChangeStrategy(
-                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case NORTHEAST_EDGE:
-            return new ToNortheastChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
+            return new ToNortheastChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case EAST_EDGE:
             return new ToEastChangeStrategy(
-                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case SOUTHEAST_EDGE:
-            return new ToSoutheastChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
+            return new ToSoutheastChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case SOUTH_EDGE:
             return new ToSouthChangeStrategy(
-                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case SOUTHWEST_EDGE:
-            return new ToSouthwestChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
+            return new ToSouthwestChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case WEST_EDGE:
             return new ToWestChangeStrategy(
-                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), getImageWidth(), getImageHeight());
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         case NORTHWEST_EDGE:
-            return new ToNorthwestChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
+            return new ToNorthwestChangeStrategy(
+                    getSelection(), isSelectionRatioFixed(), getSelectionRatio(), selectionBounds);
         default:
-            throw new IllegalArgumentException("The position " + position + " is not fully implemented.");
+            throw new IllegalArgumentException("The position " + selectionEvent.getPosition()
+                    + " is not fully implemented.");
         }
     }
 
@@ -345,34 +421,11 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return {@code true} if the selection event is such that the selection will be deactivated if the mouse is only
      *         clicked
      */
-    private boolean willDeactivateSelectionIfClick(MouseEvent selectionEvent) {
-        CoordinatePosition position = getPosition(selectionEvent);
-        return position == CoordinatePosition.OUT_OF_RECTANGLE;
-    }
-    
-    /**
-     * Transforms the specified x and y coordinates from the mouse node to a point which has the coordinates of the
-     * corresponding position in the displayed image (which must not be null).
-     * 
-     * @param x
-     *            the x coordinate within the mouse node
-     * @param y
-     *            the y coordinate within the mouse node
-     * @return a point which represents the specified coordinates in the image
-     */
-    private Point2D transformToImageCoordiantes(MouseEvent me) {
-        final Node n = getControl().getNode();
-        
-        double nodeWidth = n == null ? 0 : n.prefWidth(-1);
-        double nodeHeight = n == null ? 0 : n.prefHeight(-1);
-        
-        double xRatio = 1;//getControl().getWidth() / nodeWidth;
-        double yRatio = 1;//getControl().getHeight() / nodeHeight;
+    private static boolean willDeactivateSelectionIfClick(SelectionEvent selectionEvent) {
+        boolean rightClick = selectionEvent.getMouseEvent().getButton() == MouseButton.SECONDARY;
+        boolean outOfAreaClick = selectionEvent.getPosition() == CoordinatePosition.OUT_OF_RECTANGLE;
 
-        double xInPicture = MathTools.inInterval(0, me.getX() / xRatio, nodeWidth);
-        double yInPicture = MathTools.inInterval(0, me.getY() / yRatio, nodeHeight);
-
-        return new Point2D(xInPicture, yInPicture);
+        return rightClick || outOfAreaClick;
     }
 
     /* ************************************************************************
@@ -382,11 +435,167 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      **************************************************************************/
 
     /**
-     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link SnapshotView}'s
-     * {@link SnapshotView#selectionProperty() selection} property. This includes to check whether the mouse
-     * moved from the change's start to end and to possibly deactivate the selection if not.
+     * A selection event encapsulates a {@link MouseEvent} and adds some additional information like the coordinates
+     * relative to the node's preferred size and its position relative to a selection.
      */
-    private static class SelectionChange {
+    private static class SelectionEvent {
+
+        /**
+         * The mouse event for which this selection event was created.
+         */
+        private final MouseEvent mouseEvent;
+
+        /**
+         * The coordinates of the mouse event as a {@link Point2D}.
+         */
+        private final Point2D point;
+
+        /**
+         * The {@link Rectangle2D} within which any new selection must be contained.
+         */
+        private final Rectangle2D selectionBounds;
+
+        /**
+         * The {@link #point}'s position relative to a possible selection.
+         */
+        private final CoordinatePosition position;
+
+        /**
+         * Creates a new selection event with the specified arguments.
+         * 
+         * @param mouseEvent
+         *            the {@link MouseEvent} for which this selection event is created
+         * @param point
+         *            the coordinates of the mouse event as a {@link Point2D}
+         * @param selectionBounds
+         *            the {@link Rectangle2D} within which any new selection must be contained
+         * @param position
+         *            the point's position relative to a possible selection
+         */
+        public SelectionEvent(
+                MouseEvent mouseEvent, Point2D point, Rectangle2D selectionBounds, CoordinatePosition position) {
+
+            this.mouseEvent = mouseEvent;
+            this.point = point;
+            this.selectionBounds = selectionBounds;
+            this.position = position;
+        }
+
+        /**
+         * @return the mouse event for which this selection event was created
+         */
+        public MouseEvent getMouseEvent() {
+            return mouseEvent;
+        }
+
+        /**
+         * @return the coordinates of the mouse event in the nodes' preferred coordinates
+         */
+        public Point2D getPoint() {
+            return point;
+        }
+
+        /**
+         * @return the {@link Rectangle2D} within which any new selection must be contained
+         */
+        public Rectangle2D getSelectionBounds() {
+            return selectionBounds;
+        }
+
+        /**
+         * @return {@code true} if the {@link #getSelectionBounds() selectionBounds} contains the {@link #getPoint()
+         *         point}; otherwise {@code false}
+         */
+        public boolean isPointInSelectionBounds() {
+            return selectionBounds.contains(point);
+        }
+
+        /**
+         * @return the {@link #getPoint() point}'s position relative to a possible selection.
+         */
+        public CoordinatePosition getPosition() {
+            return position;
+        }
+
+    }
+
+    /**
+     * Handles the actual change of a selection when the mouse is pressed, dragged and released.
+     */
+    private static interface SelectionChange {
+
+        /**
+         * Begins the selection change at the specified point.
+         * 
+         * @param point
+         *            the starting point of the selection change
+         */
+        public abstract void beginSelectionChange(Point2D point);
+
+        /**
+         * Continues the selection change to the specified point.
+         * 
+         * @param point
+         *            the next point of this selection change
+         */
+        public abstract void continueSelectionChange(Point2D point);
+
+        /**
+         * Ends the selection change at the specified point.
+         * 
+         * @param point
+         *            the final point of this selection change
+         */
+        public abstract void endSelectionChange(Point2D point);
+
+        /**
+         * The cursor for this selection change.
+         * 
+         * @return the cursor for this selection change
+         */
+        public abstract Cursor getCursor();
+
+    }
+
+    /**
+     * Implementation of {@link SelectionChange} which does not actually change anything.
+     */
+    private static class NoSelectionChange implements SelectionChange {
+
+        public static final NoSelectionChange INSTANCE = new NoSelectionChange();
+
+        private NoSelectionChange() {
+            // nothing to do
+        }
+
+        @Override
+        public void beginSelectionChange(Point2D point) {
+            // nothing to do
+        }
+
+        @Override
+        public void continueSelectionChange(Point2D point) {
+            // nothing to do
+        }
+
+        @Override
+        public void endSelectionChange(Point2D point) {
+            // nothing to do
+        }
+
+        @Override
+        public Cursor getCursor() {
+            return Cursor.DEFAULT;
+        }
+
+    }
+
+    /**
+     * Executes the changes from a {@link Rectangle2DChangeStrategy} on a {@link SnapshotView}'s
+     * {@link SnapshotView#selectionProperty() selection} property. This includes to check whether the mouse moved from
+     * the change's start to end and to possibly deactivate the selection if not.
+     */
+    private static class SelectionChangeByStrategy implements SelectionChange {
 
         // Attributes
 
@@ -394,6 +603,8 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
          * The image view whose selection will be changed.
          */
         private final SnapshotView snapshotView;
+
+        private final Consumer<Boolean> setSelectionChanging;
 
         /**
          * The executed change strategy.
@@ -436,10 +647,12 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
          * @param deactivateSelectionIfClick
          *            indicates whether the selection will be deactivated if the change is only a click
          */
-        public SelectionChange(SnapshotView snapshotView, Rectangle2DChangeStrategy selectionChangeStrategy,
-                Cursor cursor, boolean deactivateSelectionIfClick) {
-            super();
+        public SelectionChangeByStrategy(
+                SnapshotView snapshotView, Consumer<Boolean> setSelectionChanging,
+                Rectangle2DChangeStrategy selectionChangeStrategy, Cursor cursor, boolean deactivateSelectionIfClick) {
+
             this.snapshotView = snapshotView;
+            this.setSelectionChanging = setSelectionChanging;
             this.selectionChangeStrategy = selectionChangeStrategy;
             this.cursor = cursor;
             this.deactivateSelectionIfClick = deactivateSelectionIfClick;
@@ -448,25 +661,21 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         // Selection Change
 
         /**
-         * Begins the selection change at the specified point.
-         * 
-         * @param point
-         *            the starting point of the selection change
+         * {@inheritDoc}
          */
+        @Override
         public void beginSelectionChange(Point2D point) {
             startingPoint = point;
-            snapshotView.selectionChangingProperty().set(true);
+            setSelectionChanging.accept(true);
 
             Rectangle2D newSelection = selectionChangeStrategy.beginChange(point);
             snapshotView.setSelection(newSelection);
         }
 
         /**
-         * Continues the selection change to the specified point.
-         * 
-         * @param point
-         *            the next point of this selection change
+         * {@inheritDoc}
          */
+        @Override
         public void continueSelectionChange(Point2D point) {
             updateMouseMoved(point);
 
@@ -475,11 +684,9 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         }
 
         /**
-         * Ends the selection change at the specified point.
-         * 
-         * @param point
-         *            the final point of this selection change
+         * {@inheritDoc}
          */
+        @Override
         public void endSelectionChange(Point2D point) {
             updateMouseMoved(point);
 
@@ -487,9 +694,10 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
             snapshotView.setSelection(newSelection);
 
             boolean deactivateSelection = deactivateSelectionIfClick && !mouseMoved;
-            if (deactivateSelection)
+            if (deactivateSelection) {
                 snapshotView.setSelection(null);
-            snapshotView.selectionChangingProperty().set(false);
+            }
+            setSelectionChanging.accept(false);
         }
 
         /**
@@ -501,10 +709,11 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
          */
         private void updateMouseMoved(Point2D point) {
             // if the mouse already moved, do nothing
-            if (mouseMoved)
+            if (mouseMoved) {
                 return;
+            }
 
-            // of the mouse did not move yet, check whether it did now
+            // if the mouse did not move yet, check whether it did now
             boolean mouseMovedNow = !startingPoint.equals(point);
             mouseMoved = mouseMovedNow;
         }
@@ -512,10 +721,9 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         // Attribute Access
 
         /**
-         * The cursor for this selection change.
-         * 
-         * @return the cursor for this selection change
+         * {@inheritDoc}
          */
+        @Override
         public Cursor getCursor() {
             return cursor;
         }

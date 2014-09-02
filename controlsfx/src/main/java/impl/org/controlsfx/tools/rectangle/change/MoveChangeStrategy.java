@@ -65,7 +65,7 @@ public class MoveChangeStrategy extends AbstractPreviousRectangleChangeStrategy 
      * @param bounds
      *            the bounds within which the rectangle can be moved
      */
-    protected MoveChangeStrategy(Rectangle2D previous, Rectangle2D bounds) {
+    public MoveChangeStrategy(Rectangle2D previous, Rectangle2D bounds) {
         super(previous, false, 0);
         Objects.requireNonNull(bounds, "The specified bounds must not be null.");
         this.bounds = bounds;
@@ -86,12 +86,14 @@ public class MoveChangeStrategy extends AbstractPreviousRectangleChangeStrategy 
      */
     public MoveChangeStrategy(Rectangle2D previous, double maxX, double maxY) {
         super(previous, false, 0);
-        if (maxX < previous.getWidth())
+        if (maxX < previous.getWidth()) {
             throw new IllegalArgumentException(
                     "The specified maximal x-coordinate must be greater than or equal to the previous rectangle's width.");
-        if (maxY < previous.getHeight())
+        }
+        if (maxY < previous.getHeight()) {
             throw new IllegalArgumentException(
                     "The specified maximal y-coordinate must be greater than or equal to the previous rectangle's height.");
+        }
 
         bounds = new Rectangle2D(0, 0, maxX, maxY);
     }

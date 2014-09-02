@@ -55,12 +55,17 @@ public class ToSouthwestChangeStrategy extends AbstractFixedPointChangeStrategy 
      * Creates a new change strategy which enlarges the specified {@code original} rectangle to the southwest. The given
      * {@code ratio} is enforced when indicated by {@code ratioFixed}.
      * 
-     * @param original the original rectangle
-     * @param ratioFixed indicates whether the rectangle's ratio will be fixed to the {@code ratio}
-     * @param ratio the possibly fixed ratio of the rectangle created by this strategy
+     * @param original
+     *            the original rectangle
+     * @param ratioFixed
+     *            indicates whether the rectangle's ratio will be fixed to the {@code ratio}
+     * @param ratio
+     *            the possibly fixed ratio of the rectangle created by this strategy
+     * @param bounds
+     *            the bounds within which the new rectangle must be contained
      */
-    public ToSouthwestChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio) {
-        super(ratioFixed, ratio);
+    public ToSouthwestChangeStrategy(Rectangle2D original, boolean ratioFixed, double ratio, Rectangle2D bounds) {
+        super(ratioFixed, ratio, bounds);
         northeasternCorner = new Point2D(original.getMaxX(), original.getMinY());
     }
 

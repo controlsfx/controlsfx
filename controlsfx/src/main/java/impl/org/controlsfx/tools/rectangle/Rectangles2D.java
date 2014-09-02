@@ -30,6 +30,7 @@ import impl.org.controlsfx.tools.MathTools;
 
 import java.util.Objects;
 
+import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -54,8 +55,86 @@ public class Rectangles2D {
      *         rectangle
      */
     public static boolean contains(Rectangle2D rectangle, Edge2D edge) {
+        Objects.requireNonNull(rectangle, "The argument 'rectangle' must not be null.");
+        Objects.requireNonNull(edge, "The argument 'edge' must not be null.");
+
         boolean edgeInBounds = rectangle.contains(edge.getUpperLeft()) && rectangle.contains(edge.getLowerRight());
         return edgeInBounds;
+    }
+
+    /*
+     * POINT
+     */
+
+    /**
+     * Moves the specified point into the specified rectangle. If the point is already with the rectangle, it is
+     * returned. Otherwise the point in the rectangle which is closest to the specified one is returned.
+     * 
+     * @param rectangle
+     *            the {@link Rectangle2D} into which the point should be moved
+     * @param point
+     *            the {@link Point2D} which is checked
+     * @return either the specified {@code point} or the {@link Point2D} which is closest to it while still being
+     *         contained on the {@code rectangle}
+     */
+    public static Point2D inRectangle(Rectangle2D rectangle, Point2D point) {
+        Objects.requireNonNull(rectangle, "The argument 'rectangle' must not be null.");
+        Objects.requireNonNull(point, "The argument 'point' must not be null.");
+
+        if (rectangle.contains(point)) {
+            return point;
+        }
+
+        // force the x and y coordinate into the rectangle
+        double newX = MathTools.inInterval(rectangle.getMinX(), point.getX(), rectangle.getMaxX());
+        double newY = MathTools.inInterval(rectangle.getMinY(), point.getY(), rectangle.getMaxY());
+        return new Point2D(newX, newY);
+    }
+
+    /**
+     * Returns the center of the specified rectangle as a point.
+     * 
+     * @param rectangle
+     *            the {@link Rectangle2D} whose center point will be returned
+     * @return the {@link Point2D} whose x/y coordinates lie at {@code (min + max) / 2}.
+     */
+    public static Point2D getCenterPoint(Rectangle2D rectangle) {
+        Objects.requireNonNull(rectangle, "The argument 'rectangle' must not be null.");
+
+        double centerX = (rectangle.getMinX() + rectangle.getMaxX()) / 2;
+        double centerY = (rectangle.getMinY() + rectangle.getMaxY()) / 2;
+        return new Point2D(centerX, centerY);
+    }
+
+    /*
+     * OTHER RECTANGLE
+     */
+
+    /**
+     * Returns the rectangle which represents the intersection of the two specified rectangles.
+     * 
+     * @param a
+     *            a {@link Rectangle2D}
+     * @param b
+     *            another {@link Rectangle2D}
+     * @return a {@link Rectangle2D} which is the intersection of {@code a} and {@code b}; possible
+     *         {@link Rectangle2D#EMPTY}.
+     */
+    public static Rectangle2D intersection(Rectangle2D a, Rectangle2D b) {
+        Objects.requireNonNull(a, "The argument 'a' must not be null.");
+        Objects.requireNonNull(b, "The argument 'b' must not be null.");
+
+        if (a.intersects(b)) {
+            double intersectionMinX = Math.max(a.getMinX(), b.getMinX());
+            double intersectionMaxX = Math.min(a.getMaxX(), b.getMaxX());
+            double intersectionWidth = intersectionMaxX - intersectionMinX;
+            double intersectionMinY = Math.max(a.getMinY(), b.getMinY());
+            double intersectionMaxY = Math.min(a.getMaxY(), b.getMaxY());
+            double intersectionHeight = intersectionMaxY - intersectionMinY;
+            return new Rectangle2D(intersectionMinX, intersectionMinY, intersectionWidth, intersectionHeight);
+        } else {
+            return Rectangle2D.EMPTY;
+        }
     }
 
     /*
@@ -126,8 +205,9 @@ public class Rectangles2D {
     public static Rectangle2D forDiagonalCornersAndRatio(Point2D fixedCorner, Point2D diagonalCorner, double ratio) {
         Objects.requireNonNull(fixedCorner, "The specified fixed corner must not be null.");
         Objects.requireNonNull(diagonalCorner, "The specified diagonal corner must not be null.");
-        if (ratio < 0)
+        if (ratio < 0) {
             throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+        }
 
         // the coordinate differences - note that they can be negative
         double xDifference = diagonalCorner.getX() - fixedCorner.getX();
@@ -184,8 +264,9 @@ public class Rectangles2D {
      *         fixedCoordinate; else
      */
     private static double getMinCoordinate(double fixedCoordinate, double difference) {
-        if (difference < 0)
+        if (difference < 0) {
             return fixedCoordinate + difference;
+        }
 
         return fixedCoordinate;
     }
@@ -235,8 +316,9 @@ public class Rectangles2D {
      */
     public static Rectangle2D fixRatio(Rectangle2D original, double ratio) {
         Objects.requireNonNull(original, "The specified original rectangle must not be null.");
-        if (ratio < 0)
+        if (ratio < 0) {
             throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+        }
 
         return createWithFixedRatioWithinBounds(original, ratio, null);
     }
@@ -262,8 +344,9 @@ public class Rectangles2D {
     public static Rectangle2D fixRatioWithinBounds(Rectangle2D original, double ratio, Rectangle2D bounds) {
         Objects.requireNonNull(original, "The specified original rectangle must not be null.");
         Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null.");
-        if (ratio < 0)
+        if (ratio < 0) {
             throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+        }
 
         return createWithFixedRatioWithinBounds(original, ratio, bounds);
     }
@@ -285,14 +368,13 @@ public class Rectangles2D {
      *             if the {@code original} rectangle's center point is out of the {@code bounds}
      */
     private static Rectangle2D createWithFixedRatioWithinBounds(Rectangle2D original, double ratio, Rectangle2D bounds) {
-        double centerX = original.getMinX() + original.getWidth() / 2;
-        double centerY = original.getMinY() + original.getHeight() / 2;
-        Point2D centerPoint = new Point2D(centerX, centerY);
+        Point2D centerPoint = getCenterPoint(original);
 
         boolean centerPointInBounds = bounds == null || bounds.contains(centerPoint);
-        if (!centerPointInBounds)
+        if (!centerPointInBounds) {
             throw new IllegalArgumentException("The center point " + centerPoint
                     + " of the original rectangle is out of the specified bounds.");
+        }
 
         double area = original.getWidth() * original.getHeight();
 
@@ -318,10 +400,12 @@ public class Rectangles2D {
      */
     public static Rectangle2D forCenterAndAreaAndRatio(Point2D centerPoint, double area, double ratio) {
         Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null.");
-        if (area < 0)
+        if (area < 0) {
             throw new IllegalArgumentException("The specified area " + area + " must be larger than zero.");
-        if (ratio < 0)
+        }
+        if (ratio < 0) {
             throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+        }
 
         return createForCenterAreaAndRatioWithinBounds(centerPoint, area, ratio, null);
     }
@@ -350,13 +434,16 @@ public class Rectangles2D {
         Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null.");
         Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null.");
         boolean centerPointInBounds = bounds.contains(centerPoint);
-        if (!centerPointInBounds)
+        if (!centerPointInBounds) {
             throw new IllegalArgumentException("The center point " + centerPoint
                     + " of the original rectangle is out of the specified bounds.");
-        if (area < 0)
+        }
+        if (area < 0) {
             throw new IllegalArgumentException("The specified area " + area + " must be larger than zero.");
-        if (ratio < 0)
+        }
+        if (ratio < 0) {
             throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+        }
 
         return createForCenterAreaAndRatioWithinBounds(centerPoint, area, ratio, bounds);
     }
@@ -419,13 +506,16 @@ public class Rectangles2D {
         Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null.");
         Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null.");
         boolean centerPointInBounds = bounds.contains(centerPoint);
-        if (!centerPointInBounds)
+        if (!centerPointInBounds) {
             throw new IllegalArgumentException("The center point " + centerPoint
                     + " of the original rectangle is out of the specified bounds.");
-        if (width < 0)
+        }
+        if (width < 0) {
             throw new IllegalArgumentException("The specified width " + width + " must be larger than zero.");
-        if (height < 0)
+        }
+        if (height < 0) {
             throw new IllegalArgumentException("The specified height " + height + " must be larger than zero.");
+        }
 
         /*
          * Compute the center point's distance to all edges. The width and height must be reduced (by the returned
@@ -447,6 +537,21 @@ public class Rectangles2D {
     /*
      * EDGES
      */
+
+    /**
+     * Returns a rectangle that has the specified edge and has its opposing edge on the parallel axis defined by the
+     * specified point's X or Y coordinate (depending on the edge's orientation).
+     * 
+     * @param edge
+     *            the edge which will be contained in the returned rectangle
+     * @param point
+     *            the point whose X or Y coordinate defines the other edge
+     * @return a rectangle
+     */
+    public static Rectangle2D forEdgeAndOpposingPoint(Edge2D edge, Point2D point) {
+        double otherDimension = edge.getOrthogonalDifference(point);
+        return createForEdgeAndOtherDimension(edge, otherDimension);
+    }
 
     /**
      * Returns a rectangle that is principally defined by the specified edge and point. It should have the specified
@@ -479,11 +584,13 @@ public class Rectangles2D {
         Objects.requireNonNull(point, "The specified point must not be null.");
         Objects.requireNonNull(bounds, "The specified bounds must not be null.");
         boolean edgeInBounds = contains(bounds, edge);
-        if (!edgeInBounds)
+        if (!edgeInBounds) {
             throw new IllegalArgumentException(
                     "The specified edge " + edge + " is not entirely contained on the specified bounds.");
-        if (ratio < 0)
+        }
+        if (ratio < 0) {
             throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+        }
 
         /*
          * 1. move the point into the bounds
@@ -499,12 +606,13 @@ public class Rectangles2D {
         // when computing the other dimension, note that the sign of the original difference between edge and point is
         // important; otherwise the "direction" of the resize is wrong
         double otherDimension = Math.signum(boundedEdge.getOrthogonalDifference(boundedPoint));
-        if (boundedEdge.isHorizontal())
+        if (boundedEdge.isHorizontal()) {
             // edge horizontal -> width fixed -> use length to compute height
             otherDimension *= boundedEdge.getLength() / ratio;
-        else
+        } else {
             // edge vertical -> height fixed -> use length to compute width
             otherDimension *= boundedEdge.getLength() * ratio;
+        }
 
         return createForEdgeAndOtherDimension(boundedEdge, otherDimension);
     }
@@ -521,9 +629,9 @@ public class Rectangles2D {
      *         {@code bounds}
      */
     private static Point2D movePointIntoBounds(Point2D point, Rectangle2D bounds) {
-        if (bounds.contains(point))
+        if (bounds.contains(point)) {
             return point;
-        else {
+        } else {
             double boundedPointX = MathTools.inInterval(bounds.getMinX(), point.getX(), bounds.getMaxX());
             double boundedPointY = MathTools.inInterval(bounds.getMinY(), point.getY(), bounds.getMaxY());
             return new Point2D(boundedPointX, boundedPointY);
@@ -568,8 +676,9 @@ public class Rectangles2D {
      */
     private static Edge2D resizeEdgeForBounds(Edge2D edge, Rectangle2D bounds) {
         boolean edgeInBounds = contains(bounds, edge);
-        if (edgeInBounds)
+        if (edgeInBounds) {
             return edge;
+        }
 
         if (edge.isHorizontal()) {
             // compute the length bounds for the left and right part of the edge
@@ -607,10 +716,11 @@ public class Rectangles2D {
      * @return a rectangle
      */
     private static Rectangle2D createForEdgeAndOtherDimension(Edge2D edge, double otherDimension) {
-        if (edge.isHorizontal())
+        if (edge.isHorizontal()) {
             return createForHorizontalEdgeAndHeight(edge, otherDimension);
-        else
+        } else {
             return createForVerticalEdgeAndWidth(edge, otherDimension);
+        }
     }
 
     /**
@@ -657,19 +767,19 @@ public class Rectangles2D {
         return new Rectangle2D(upperLeftX, upperLeftY, absoluteWidth, absoluteHeight);
     }
 
-    /**
-     * Returns a rectangle that has the specified edge and has its opposing edge on the parallel axis defined by the
-     * specified point's X or Y coordinate (depending on the edge's orientation).
-     * 
-     * @param edge
-     *            the edge which will be contained in the returned rectangle
-     * @param point
-     *            the point whose X or Y coordinate defines the other edge
-     * @return a rectangle
+    /*
+     * MISC
      */
-    public static Rectangle2D forEdgeAndOpposingPoint(Edge2D edge, Point2D point) {
-        double otherDimension = edge.getOrthogonalDifference(point);
-        return createForEdgeAndOtherDimension(edge, otherDimension);
+
+    /**
+     * Returns a rectangle with the same coordinates as the specified bounds.
+     * 
+     * @param bounds
+     *            the {@link Bounds} for which the rectangle will be created
+     * @return a {@link Rectangle2D} with the same minX-, minY-, maxX- and maxY-coordiantes as the specified bounds
+     */
+    public static Rectangle2D fromBounds(Bounds bounds) {
+        return new Rectangle2D(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
     }
 
 }

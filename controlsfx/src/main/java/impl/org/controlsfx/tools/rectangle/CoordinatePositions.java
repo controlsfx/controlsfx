@@ -48,7 +48,9 @@ public class CoordinatePositions {
      *            the tolerance in pixels used to determine whether the coordinates are on some edge
      * @return a set of those positions the coordinates have regarding the specified rectangle
      */
-    public static EnumSet<CoordinatePosition> onRectangleAndEdges(Rectangle2D rectangle, Point2D point, double edgeTolerance) {
+    public static EnumSet<CoordinatePosition> onRectangleAndEdges(
+            Rectangle2D rectangle, Point2D point, double edgeTolerance) {
+
         EnumSet<CoordinatePosition> positions = EnumSet.noneOf(CoordinatePosition.class);
         positions.add(inRectangle(rectangle, point));
         positions.add(onEdges(rectangle, point, edgeTolerance));
@@ -66,13 +68,15 @@ public class CoordinatePositions {
      *            the rectangle relative to which the point will be checked
      * @param point
      *            the checked point
-     * @return a set of those positions the coordinates have regarding the specified rectangle
+     * @return depending on the point either {@link CoordinatePosition#IN_RECTANGLE IN_RECTANGLE} or
+     *         {@link CoordinatePosition#OUT_OF_RECTANGLE OUT_OF_RECTANGLE}
      */
     public static CoordinatePosition inRectangle(Rectangle2D rectangle, Point2D point) {
-        if (rectangle.contains(point))
+        if (rectangle.contains(point)) {
             return CoordinatePosition.IN_RECTANGLE;
-        else
+        } else {
             return CoordinatePosition.OUT_OF_RECTANGLE;
+        }
     }
 
     /*
@@ -89,7 +93,8 @@ public class CoordinatePositions {
      *            the checked point
      * @param edgeTolerance
      *            the tolerance in pixels used to determine whether the coordinates are on some edge
-     * @return that edge position the coordinates have regarding the specified rectangle; the value might be null
+     * @return the edge position the coordinates have regarding the specified rectangle; the value will be null if the
+     *         point is not near any edge
      */
     public static CoordinatePosition onEdges(Rectangle2D rectangle, Point2D point,
             double edgeTolerance) {
@@ -119,16 +124,19 @@ public class CoordinatePositions {
         boolean xCloseToLeft = xDistanceToLeft < edgeTolerance && xDistanceToLeft < xDistanceToRight;
         boolean xCloseToRight = xDistanceToRight < edgeTolerance && xDistanceToRight < xDistanceToLeft;
 
-        if (!xCloseToLeft && !xCloseToRight)
+        if (!xCloseToLeft && !xCloseToRight) {
             return null;
+        }
 
         boolean yCloseToVertical = rectangle.getMinY() - edgeTolerance < point.getY()
                 && point.getY() < rectangle.getMaxY() + edgeTolerance;
         if (yCloseToVertical) {
-            if (xCloseToLeft)
+            if (xCloseToLeft) {
                 return CoordinatePosition.WEST_EDGE;
-            if (xCloseToRight)
+            }
+            if (xCloseToRight) {
                 return CoordinatePosition.EAST_EDGE;
+            }
         }
 
         return null;
@@ -153,16 +161,19 @@ public class CoordinatePositions {
         boolean yCloseToUpper = yDistanceToUpper < edgeTolerance && yDistanceToUpper < yDistanceToLower;
         boolean yCloseToLower = yDistanceToLower < edgeTolerance && yDistanceToLower < yDistanceToUpper;
 
-        if (!yCloseToUpper && !yCloseToLower)
+        if (!yCloseToUpper && !yCloseToLower) {
             return null;
+        }
 
         boolean xCloseToHorizontal = rectangle.getMinX() - edgeTolerance < point.getX()
                 && point.getX() < rectangle.getMaxX() + edgeTolerance;
         if (xCloseToHorizontal) {
-            if (yCloseToUpper)
+            if (yCloseToUpper) {
                 return CoordinatePosition.NORTH_EDGE;
-            if (yCloseToLower)
+            }
+            if (yCloseToLower) {
                 return CoordinatePosition.SOUTH_EDGE;
+            }
         }
 
         return null;
@@ -181,23 +192,29 @@ public class CoordinatePositions {
      */
     private static CoordinatePosition extractSingleCardinalDirection(CoordinatePosition vertical,
             CoordinatePosition horizontal) {
-        if (vertical == null)
+        if (vertical == null) {
             return horizontal;
+        }
 
-        if (horizontal == null)
+        if (horizontal == null) {
             return vertical;
+        }
 
         // north
-        if (horizontal == CoordinatePosition.NORTH_EDGE && vertical == CoordinatePosition.EAST_EDGE)
+        if (horizontal == CoordinatePosition.NORTH_EDGE && vertical == CoordinatePosition.EAST_EDGE) {
             return CoordinatePosition.NORTHEAST_EDGE;
-        if (horizontal == CoordinatePosition.NORTH_EDGE && vertical == CoordinatePosition.WEST_EDGE)
+        }
+        if (horizontal == CoordinatePosition.NORTH_EDGE && vertical == CoordinatePosition.WEST_EDGE) {
             return CoordinatePosition.NORTHWEST_EDGE;
+        }
 
         // south
-        if (horizontal == CoordinatePosition.SOUTH_EDGE && vertical == CoordinatePosition.EAST_EDGE)
+        if (horizontal == CoordinatePosition.SOUTH_EDGE && vertical == CoordinatePosition.EAST_EDGE) {
             return CoordinatePosition.SOUTHEAST_EDGE;
-        if (horizontal == CoordinatePosition.SOUTH_EDGE && vertical == CoordinatePosition.WEST_EDGE)
+        }
+        if (horizontal == CoordinatePosition.SOUTH_EDGE && vertical == CoordinatePosition.WEST_EDGE) {
             return CoordinatePosition.SOUTHWEST_EDGE;
+        }
 
         throw new IllegalArgumentException();
     }

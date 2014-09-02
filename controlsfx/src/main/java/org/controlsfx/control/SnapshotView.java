@@ -53,6 +53,8 @@ import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 public class SnapshotView extends ControlsFXControl {
 
@@ -133,6 +135,14 @@ public class SnapshotView extends ControlsFXControl {
      */
     private final ObjectProperty<Boundary> unselectedAreaBoundary;
 
+    private final ObjectProperty<Paint> selectionStroke;
+
+    private final DoubleProperty selectionStrokeWidth;
+
+    private final ObjectProperty<Paint> selectionFill;
+
+    private final ObjectProperty<Paint> unselectedAreaFill;
+
     /* ************************************************************************
      *                                                                         * 
      * Constructors                                                            * 
@@ -146,17 +156,17 @@ public class SnapshotView extends ControlsFXControl {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // NODE
-        this.node = new SimpleObjectProperty<>(this, "node");
+        node = new SimpleObjectProperty<>(this, "node");
 
         // SELECTION
-        this.selection = new SimpleObjectProperty<>(this, "selection");
-        this.hasSelection = new SimpleBooleanProperty(this, "hasSelection", false);
-        this.hasSelection.bind(and(isNotNull(selection), notEqual(Rectangle2D.EMPTY, selection)));
-        this.selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
-        this.selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false);
+        selection = new SimpleObjectProperty<>(this, "selection");
+        hasSelection = new SimpleBooleanProperty(this, "hasSelection", false);
+        hasSelection.bind(and(isNotNull(selection), notEqual(Rectangle2D.EMPTY, selection)));
+        selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
+        selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false);
 
-        this.selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixed", false);
-        this.fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatio", 1) {
+        selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixed", false);
+        fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatio", 1) {
             @Override
             public void set(double newValue) {
                 if (newValue <= 0) {
@@ -167,16 +177,19 @@ public class SnapshotView extends ControlsFXControl {
         };
 
         // META
-        this.selectionAreaBoundary =
+        selectionAreaBoundary =
                 new SimpleObjectProperty<SnapshotView.Boundary>(this, "selectionAreaBoundary", Boundary.CONTROL);
-        this.selectionActivityExplicitlyManaged =
-                new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
-        this.selectionMouseTransparent =
-                new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
+        selectionActivityExplicitlyManaged = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged",
+                false);
+        selectionMouseTransparent = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
 
         // VISUALIZATION
-        this.unselectedAreaBoundary =
+        unselectedAreaBoundary =
                 new SimpleObjectProperty<SnapshotView.Boundary>(this, "unselectedAreaBoundary", Boundary.CONTROL);
+        selectionStroke = new SimpleObjectProperty<Paint>(this, "selectionStroke", Color.WHITESMOKE);
+        selectionStrokeWidth = new SimpleDoubleProperty(this, "selectionStrokeWidth", 2.5);
+        selectionFill = new SimpleObjectProperty<Paint>(this, "selectionFill", Color.TRANSPARENT);
+        unselectedAreaFill = new SimpleObjectProperty<Paint>(this, "unselectedAreaFill", new Color(0, 0, 0, 0.5));
 
         addStateUpdatingListeners();
         // update selection when resizing
@@ -601,6 +614,98 @@ public class SnapshotView extends ControlsFXControl {
      */
     public void setUnselectedAreaBoundary(Boundary unselectedAreaBoundary) {
         unselectedAreaBoundaryProperty().set(unselectedAreaBoundary);
+    }
+
+    /**
+     * @return the selectionStroke as a property
+     */
+    public ObjectProperty<Paint> selectionStrokeProperty() {
+        return selectionStroke;
+    }
+
+    /**
+     * @return the selectionStroke
+     */
+    public Paint getSelectionStroke() {
+        return selectionStrokeProperty().get();
+    }
+
+    /**
+     * @param selectionStroke
+     *            the selectionStroke to set
+     */
+    public void setSelectionStroke(Paint selectionStroke) {
+        selectionStrokeProperty().set(selectionStroke);
+    }
+
+    /**
+     * @return the selectionStrokeWidth as a property
+     */
+    public DoubleProperty selectionStrokeWidthProperty() {
+        return selectionStrokeWidth;
+    }
+
+    /**
+     * This will only ever return strictly positive values.
+     * 
+     * @return the selectionStrokeWidth
+     */
+    public double getSelectionStrokeWidth() {
+        return selectionStrokeWidthProperty().get();
+    }
+
+    /**
+     * @param selectionStrokeWidth
+     *            the selectionStrokeWidth to set
+     * @throws IllegalArgumentException
+     *             if {@code selectionStrokeWidth} is not strictly positive
+     */
+    public void setSelectionStrokeWidth(double selectionStrokeWidth) {
+        selectionStrokeWidthProperty().set(selectionStrokeWidth);
+    }
+
+    /**
+     * @return the selectionFill as a property
+     */
+    public ObjectProperty<Paint> selectionFillProperty() {
+        return selectionFill;
+    }
+
+    /**
+     * @return the selectionFill
+     */
+    public Paint getSelectionFill() {
+        return selectionFillProperty().get();
+    }
+
+    /**
+     * @param selectionFill
+     *            the selectionFill to set
+     */
+    public void setSelectionFill(Paint selectionFill) {
+        selectionFillProperty().set(selectionFill);
+    }
+
+    /**
+     * @return the unselectedAreaFill as a property
+     */
+    public ObjectProperty<Paint> unselectedAreaFillProperty() {
+        return unselectedAreaFill;
+    }
+
+    /**
+     * @return the unselectedAreaFill
+     */
+    public Paint getUnselectedAreaFill() {
+        return unselectedAreaFillProperty().get();
+    }
+
+    /**
+     * @param unselectedAreaFill
+     *            the unselectedAreaFill to set
+     */
+    public void setUnselectedAreaFill(Paint unselectedAreaFill) {
+        unselectedAreaFillProperty().set(unselectedAreaFill);
     }
 
     /* ************************************************************************

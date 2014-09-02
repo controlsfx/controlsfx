@@ -44,9 +44,11 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
@@ -212,7 +214,8 @@ public class HelloSnapshotView extends ControlsFXSample {
     @Override
     public Node getControlPanel() {
         return new VBox(10,
-                createNodeControl(), createSettingsControl(), createSelectionControl(), createSnapshotImageView());
+                createNodeControl(), createSettingsControl(), 
+                createVisualizationControl(), createSelectionControl(), createSnapshotImageView());
     }
 
     /**
@@ -220,9 +223,9 @@ public class HelloSnapshotView extends ControlsFXSample {
      */
     private Node createNodeControl() {
         GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(10));
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
 
         int row = 0;
 
@@ -284,41 +287,29 @@ public class HelloSnapshotView extends ControlsFXSample {
      */
     private Node createSettingsControl() {
         GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(10));
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
 
         int row = 0;
 
-        // --- selection area boundary
-        final Label selectionBoundaryLabel = new Label("Selection Area Boundary: ");
-        selectionBoundaryLabel.getStyleClass().add("property");
-        grid.add(selectionBoundaryLabel, 0, row);
+        // selection active
+        CheckBox selectionActive = new CheckBox();
+        selectionActive.selectedProperty().bindBidirectional(snapshotView.selectionActiveProperty());
+        selectionActive.disableProperty().bind(snapshotView.selectionActivityExplicitlyManagedProperty().not());
+        grid.addRow(row++, new Label("Active:"), selectionActive);
+        
+        // selection actively managed
+        CheckBox selectionActivityExplicitlyManaged = new CheckBox();
+        selectionActivityExplicitlyManaged.selectedProperty().bindBidirectional(
+                snapshotView.selectionActivityExplicitlyManagedProperty());
+        grid.addRow(row++, new Label("Activity Explicitly Managed:"), selectionActivityExplicitlyManaged);
 
-        final ChoiceBox<Boundary> selectionBoundaryOptions = new ChoiceBox<>(
-                FXCollections.observableArrayList(Boundary.CONTROL, Boundary.NODE));
-        selectionBoundaryOptions.getSelectionModel().select(Boundary.CONTROL);
-        snapshotView.selectionAreaBoundaryProperty().bind(
-                selectionBoundaryOptions.getSelectionModel().selectedItemProperty());
-
-        selectionBoundaryOptions.setMaxWidth(Double.MAX_VALUE);
-        GridPane.setHgrow(selectionBoundaryOptions, Priority.ALWAYS);
-        grid.add(selectionBoundaryOptions, 1, row++);
-
-        // --- unselected area boundary
-        final Label unselectedBoundaryLabel = new Label("Unselected Area Boundary: ");
-        unselectedBoundaryLabel.getStyleClass().add("property");
-        grid.add(unselectedBoundaryLabel, 0, row);
-
-        final ChoiceBox<Boundary> unselectedBoundaryOptions = new ChoiceBox<>(
-                FXCollections.observableArrayList(Boundary.CONTROL, Boundary.NODE));
-        unselectedBoundaryOptions.getSelectionModel().select(Boundary.CONTROL);
-        snapshotView.unselectedAreaBoundaryProperty().bind(
-                unselectedBoundaryOptions.getSelectionModel().selectedItemProperty());
-
-        unselectedBoundaryOptions.setMaxWidth(Double.MAX_VALUE);
-        GridPane.setHgrow(unselectedBoundaryOptions, Priority.ALWAYS);
-        grid.add(unselectedBoundaryOptions, 1, row++);
+        // selection mouse transparent
+        CheckBox selectionMouseTransparent = new CheckBox();
+        selectionMouseTransparent.selectedProperty().bindBidirectional(
+                snapshotView.selectionMouseTransparentProperty());
+        grid.addRow(row++, new Label("Mouse Transparent:"), selectionMouseTransparent);
 
         // --- fixed ratio
         Label fixedRatioLabel = new Label("Fixed selection ratio: ");
@@ -351,25 +342,71 @@ public class HelloSnapshotView extends ControlsFXSample {
                 });
         grid.add(ratioTextField, 1, row++);
 
-        // selection active
-        CheckBox selectionActive = new CheckBox();
-        selectionActive.selectedProperty().bindBidirectional(snapshotView.selectionActiveProperty());
-        grid.addRow(row++, new Label("Active:"), selectionActive);
-        selectionActive.disableProperty().bind(snapshotView.selectionActivityExplicitlyManagedProperty().not());
+        // --- selection area boundary
+        final Label selectionBoundaryLabel = new Label("Selection Area Boundary: ");
+        selectionBoundaryLabel.getStyleClass().add("property");
+        grid.add(selectionBoundaryLabel, 0, row);
+
+        final ChoiceBox<Boundary> selectionBoundaryOptions = new ChoiceBox<>(
+                FXCollections.observableArrayList(Boundary.CONTROL, Boundary.NODE));
+        selectionBoundaryOptions.getSelectionModel().select(Boundary.CONTROL);
+        snapshotView.selectionAreaBoundaryProperty().bind(
+                selectionBoundaryOptions.getSelectionModel().selectedItemProperty());
+
+        selectionBoundaryOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(selectionBoundaryOptions, Priority.ALWAYS);
+        grid.add(selectionBoundaryOptions, 1, row++);
+
+        // --- unselected area boundary
+        final Label unselectedBoundaryLabel = new Label("Unselected Area Boundary: ");
+        unselectedBoundaryLabel.getStyleClass().add("property");
+        grid.add(unselectedBoundaryLabel, 0, row);
+
+        final ChoiceBox<Boundary> unselectedBoundaryOptions = new ChoiceBox<>(
+                FXCollections.observableArrayList(Boundary.CONTROL, Boundary.NODE));
+        unselectedBoundaryOptions.getSelectionModel().select(Boundary.CONTROL);
+        snapshotView.unselectedAreaBoundaryProperty().bind(
+                unselectedBoundaryOptions.getSelectionModel().selectedItemProperty());
+
+        unselectedBoundaryOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(unselectedBoundaryOptions, Priority.ALWAYS);
+        grid.add(unselectedBoundaryOptions, 1, row++);
+
+        return new TitledPane("Selection Settings", grid);
+    }
+
+    /**
+     * @return a control for all the visualization related properties
+     */
+    private Node createVisualizationControl() {
+        GridPane grid = new GridPane();
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
+
+        int row = 0;
+
+        // selection fill color
+        ColorPicker selectionFillPicker = new ColorPicker((Color)snapshotView.getSelectionFill());
+        snapshotView.selectionFillProperty().bind(selectionFillPicker.valueProperty());
+        grid.addRow(row++, new Label("Fill Color:"), selectionFillPicker);
         
-        // selection actively managed
-        CheckBox selectionActivityExplicitlyManaged = new CheckBox();
-        selectionActivityExplicitlyManaged.selectedProperty().bindBidirectional(
-                snapshotView.selectionActivityExplicitlyManagedProperty());
-        grid.addRow(row++, new Label("Activity Explicitly Managed:"), selectionActivityExplicitlyManaged);
+        // selection stroke color
+        ColorPicker selectionStrokePicker = new ColorPicker((Color)snapshotView.getSelectionStroke());
+        snapshotView.selectionStrokeProperty().bind(selectionStrokePicker.valueProperty());
+        grid.addRow(row++, new Label("Stroke Color:"), selectionStrokePicker);
+        
+        // selection stroke width
+        Slider selectionStrokeWidth = new Slider(0, 25, snapshotView.getSelectionStrokeWidth());
+        snapshotView.selectionStrokeWidthProperty().bind(selectionStrokeWidth.valueProperty());
+        grid.addRow(row++, new Label("Stroke Width:"), selectionStrokeWidth);
+        
+        // unselected area fill color
+        ColorPicker unselectedAreaFillPicker = new ColorPicker((Color)snapshotView.getUnselectedAreaFill());
+        snapshotView.unselectedAreaFillProperty().bind(unselectedAreaFillPicker.valueProperty());
+        grid.addRow(row++, new Label("Outer Color:"), unselectedAreaFillPicker);
 
-        // selection mouse transparent
-        CheckBox selectionMouseTransparent = new CheckBox();
-        selectionMouseTransparent.selectedProperty().bindBidirectional(
-                snapshotView.selectionMouseTransparentProperty());
-        grid.addRow(row++, new Label("Mouse Transparent:"), selectionMouseTransparent);
-
-        return new TitledPane("Settings", grid);
+        return new TitledPane("Visualization Settings", grid);
     }
 
     /**
@@ -429,9 +466,9 @@ public class HelloSnapshotView extends ControlsFXSample {
 
         // put it all together
         GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(10));
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
 
         int row = 0;
 

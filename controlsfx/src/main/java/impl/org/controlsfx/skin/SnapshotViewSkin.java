@@ -172,9 +172,9 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
      */
     @SuppressWarnings("unused")
     private void styleAreas() {
-        selectedArea.setFill(Color.TRANSPARENT);
-        selectedArea.setStroke(Color.WHITESMOKE);
-        selectedArea.setStrokeWidth(2d);
+        selectedArea.fillProperty().bind(getSkinnable().selectionFillProperty());
+        selectedArea.strokeProperty().bind(getSkinnable().selectionStrokeProperty());
+        selectedArea.strokeWidthProperty().bind(getSkinnable().selectionStrokeWidthProperty());
         selectedArea.setStrokeType(StrokeType.OUTSIDE);
         // if the control's layout depends on this rectangle,
         // the stroke's width messes up the layout if the selection is on the pane's edge
@@ -182,7 +182,7 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         selectedArea.setMouseTransparent(true);
 
         unselectedArea.setFill(Color.TRANSPARENT);
-        unselectedArea.setStroke(new Color(0, 0, 0, 0.5));
+        unselectedArea.strokeProperty().bind(getSkinnable().unselectedAreaFillProperty());
         unselectedArea.strokeWidthProperty().bind(
                 Bindings.max(getSkinnable().widthProperty(), getSkinnable().heightProperty()));
         unselectedArea.setStrokeType(StrokeType.OUTSIDE);

@@ -583,6 +583,7 @@ public class Rectangles2D {
         Objects.requireNonNull(edge, "The specified edge must not be null.");
         Objects.requireNonNull(point, "The specified point must not be null.");
         Objects.requireNonNull(bounds, "The specified bounds must not be null.");
+
         boolean edgeInBounds = contains(bounds, edge);
         if (!edgeInBounds) {
             throw new IllegalArgumentException(
@@ -669,15 +670,25 @@ public class Rectangles2D {
      * 
      * @param edge
      *            the edge whose center point and orientation defines the returned edge's center point and orientation;
-     *            the center point must be within the bounds or the result is undefined
+     *            the center point must be within the bounds or an {@link IllegalArgumentException} will be thrown
      * @param bounds
      *            the bounds within which the returned edge must be contained
      * @return either the specified {@code edge} if it is with in the {@code bounds} or one with a corrected length
+     * @throws IllegalArgumentException
+     *             if the {@code edge}'s center point is out of {@code bounds}
      */
     private static Edge2D resizeEdgeForBounds(Edge2D edge, Rectangle2D bounds) {
+        // return the same edge if it is in the bounds
         boolean edgeInBounds = contains(bounds, edge);
         if (edgeInBounds) {
             return edge;
+        }
+
+        // make sure the bounds contain the edge's center point
+        boolean centerPointInBounds = bounds.contains(edge.getCenterPoint());
+        if (!centerPointInBounds) {
+            throw new IllegalArgumentException(
+                    "The specified edge's center point (" + edge + ") is out of the specified bounds (" + bounds + ").");
         }
 
         if (edge.isHorizontal()) {
@@ -692,8 +703,8 @@ public class Rectangles2D {
             return new Edge2D(edge.getCenterPoint(), edge.getOrientation(), horizontalLength);
         } else {
             // compute the length bounds for the lower and upper part of the edge
-            double lowerPartLengthBound = Math.abs(bounds.getMinX() - edge.getCenterPoint().getX());
-            double upperPartLengthBound = Math.abs(bounds.getMaxX() - edge.getCenterPoint().getX());
+            double lowerPartLengthBound = Math.abs(bounds.getMinY() - edge.getCenterPoint().getY());
+            double upperPartLengthBound = Math.abs(bounds.getMaxY() - edge.getCenterPoint().getY());
             // compute the length of the lower and upper part of the edge
             double lowerPartLength = MathTools.inInterval(0, edge.getLength() / 2, lowerPartLengthBound);
             double upperPartLength = MathTools.inInterval(0, edge.getLength() / 2, upperPartLengthBound);

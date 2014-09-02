@@ -295,7 +295,7 @@ public class SnapshotView extends ControlsFXControl {
      * Fixes the ratio of the current selection (if it exists).
      */
     private void fixSelectionRatio() {
-        boolean noSelectionToFix = getNode() == null || getSelection() == null;
+        boolean noSelectionToFix = getNode() == null || !hasSelection();
         if (noSelectionToFix) {
             return;
         }
@@ -763,7 +763,23 @@ public class SnapshotView extends ControlsFXControl {
             }
 
             Rectangle2D newSelection = transformSelectionToNewBounds(getSelection(), oldBounds, newBounds);
-            setSelection(newSelection);
+            if (isSelectionValid(newSelection)) {
+                setSelection(newSelection);
+            } else {
+                setSelection(null);
+            }
+        }
+
+        private boolean isSelectionValid(Rectangle2D newSelection) {
+            // make sure width and height are finite values
+            if (!Double.isFinite(newSelection.getWidth())) {
+                return false;
+            }
+            if (!Double.isFinite(newSelection.getHeight())) {
+                return false;
+            }
+
+            return true;
         }
 
         private Rectangle2D transformSelectionToNewBounds(

@@ -386,7 +386,7 @@ public class SnapshotView extends ControlsFXControl {
      * @param node
      *            the node to set
      */
-    public void setNode(Node node) {
+    public final void setNode(Node node) {
         nodeProperty().set(node);
     }
 
@@ -395,14 +395,14 @@ public class SnapshotView extends ControlsFXControl {
     /**
      * @return the selection as a property
      */
-    public ObjectProperty<Rectangle2D> selectionProperty() {
+    public final ObjectProperty<Rectangle2D> selectionProperty() {
         return selection;
     }
 
     /**
      * @return the selection
      */
-    public Rectangle2D getSelection() {
+    public final Rectangle2D getSelection() {
         return selectionProperty().get();
     }
 
@@ -410,7 +410,7 @@ public class SnapshotView extends ControlsFXControl {
      * @param selection
      *            the selection to set
      */
-    public void setSelection(Rectangle2D selection) {
+    public final void setSelection(Rectangle2D selection) {
         selectionProperty().set(selection);
     }
 
@@ -428,29 +428,29 @@ public class SnapshotView extends ControlsFXControl {
      *            the selection's height
      * 
      */
-    public void setSelection(double upperLeftX, double upperLeftY, double width, double height) {
+    public final void setSelection(double upperLeftX, double upperLeftY, double width, double height) {
         selectionProperty().set(new Rectangle2D(upperLeftX, upperLeftY, width, height));
     }
 
-    public ReadOnlyBooleanProperty hasSelectionProperty() {
+    public final ReadOnlyBooleanProperty hasSelectionProperty() {
         return hasSelection;
     }
 
-    public boolean hasSelection() {
+    public final boolean hasSelection() {
         return hasSelectionProperty().get();
     }
 
     /**
      * @return the selectionActive as a property
      */
-    public BooleanProperty selectionActiveProperty() {
+    public final BooleanProperty selectionActiveProperty() {
         return selectionActive;
     }
 
     /**
      * @return whether the selection is active
      */
-    public boolean isSelectionActive() {
+    public final boolean isSelectionActive() {
         return selectionActiveProperty().get();
     }
 
@@ -458,35 +458,35 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionActive
      *            the new selection active status
      */
-    public void setSelectionActive(boolean selectionActive) {
+    public final void setSelectionActive(boolean selectionActive) {
         selectionActiveProperty().set(selectionActive);
     }
 
     /**
      * @return the selectionChanging as a property
      */
-    public ReadOnlyBooleanProperty selectionChangingProperty() {
+    public final ReadOnlyBooleanProperty selectionChangingProperty() {
         return selectionChanging;
     }
 
     /**
      * @return the selectionChanging
      */
-    public boolean isSelectionChanging() {
+    public final boolean isSelectionChanging() {
         return selectionChangingProperty().get();
     }
 
     /**
      * @return the selectionRatioFixed as a property
      */
-    public BooleanProperty selectionRatioFixedProperty() {
+    public final BooleanProperty selectionRatioFixedProperty() {
         return selectionRatioFixed;
     }
 
     /**
      * @return the selectionRatioFixed
      */
-    public boolean isSelectionRatioFixed() {
+    public final boolean isSelectionRatioFixed() {
         return selectionRatioFixedProperty().get();
     }
 
@@ -494,14 +494,14 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionRatioFixed
      *            the selectionRatioFixed to set
      */
-    public void setSelectionRatioFixed(boolean selectionRatioFixed) {
+    public final void setSelectionRatioFixed(boolean selectionRatioFixed) {
         selectionRatioFixedProperty().set(selectionRatioFixed);
     }
 
     /**
      * @return the fixedSelectionRatio as a property
      */
-    public DoubleProperty fixedSelectionRatioProperty() {
+    public final DoubleProperty fixedSelectionRatioProperty() {
         return fixedSelectionRatio;
     }
 
@@ -510,7 +510,7 @@ public class SnapshotView extends ControlsFXControl {
      * 
      * @return the fixedSelectionRatio
      */
-    public double getFixedSelectionRatio() {
+    public final double getFixedSelectionRatio() {
         return fixedSelectionRatioProperty().get();
     }
 
@@ -520,7 +520,7 @@ public class SnapshotView extends ControlsFXControl {
      * @throws IllegalArgumentException
      *             if {@code fixedSelectionRatio} is not strictly positive
      */
-    public void setFixedSelectionRatio(double fixedSelectionRatio) {
+    public final void setFixedSelectionRatio(double fixedSelectionRatio) {
         fixedSelectionRatioProperty().set(fixedSelectionRatio);
     }
 
@@ -529,14 +529,14 @@ public class SnapshotView extends ControlsFXControl {
     /**
      * @return the selectionAreaBoundary as a property
      */
-    public ObjectProperty<Boundary> selectionAreaBoundaryProperty() {
+    public final ObjectProperty<Boundary> selectionAreaBoundaryProperty() {
         return selectionAreaBoundary;
     }
 
     /**
      * @return the selectionAreaBoundary
      */
-    public Boundary getSelectionAreaBoundary() {
+    public final Boundary getSelectionAreaBoundary() {
         return selectionAreaBoundaryProperty().get();
     }
 
@@ -544,21 +544,21 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionAreaBoundary
      *            the selectionAreaBoundary to set
      */
-    public void setSelectionAreaBoundary(Boundary selectionAreaBoundary) {
+    public final void setSelectionAreaBoundary(Boundary selectionAreaBoundary) {
         selectionAreaBoundaryProperty().set(selectionAreaBoundary);
     }
 
     /**
      * @return the selectionActivityExplicitlyManaged as a property
      */
-    public BooleanProperty selectionActivityExplicitlyManagedProperty() {
+    public final BooleanProperty selectionActivityExplicitlyManagedProperty() {
         return selectionActivityExplicitlyManaged;
     }
 
     /**
      * @return the selectionActivityExplicitlyManaged
      */
-    public boolean isSelectionActivityExplicitlyManaged() {
+    public final boolean isSelectionActivityExplicitlyManaged() {
         return selectionActivityExplicitlyManagedProperty().get();
     }
 
@@ -566,21 +566,21 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionActivityExplicitlyManaged
      *            the selectionActivityExplicitlyManaged to set
      */
-    public void setSelectionActivityExplicitlyManaged(boolean selectionActivityExplicitlyManaged) {
+    public final void setSelectionActivityExplicitlyManaged(boolean selectionActivityExplicitlyManaged) {
         selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
     }
 
     /**
      * @return the selectionMouseTransparent as a property
      */
-    public BooleanProperty selectionMouseTransparentProperty() {
+    public final BooleanProperty selectionMouseTransparentProperty() {
         return selectionMouseTransparent;
     }
 
     /**
      * @return the selectionMouseTransparent
      */
-    public boolean isSelectionMouseTransparent() {
+    public final boolean isSelectionMouseTransparent() {
         return selectionMouseTransparentProperty().get();
     }
 
@@ -588,7 +588,7 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionMouseTransparent
      *            the selectionMouseTransparent to set
      */
-    public void setSelectionMouseTransparent(boolean selectionMouseTransparent) {
+    public final void setSelectionMouseTransparent(boolean selectionMouseTransparent) {
         selectionMouseTransparentProperty().set(selectionMouseTransparent);
     }
 
@@ -597,14 +597,14 @@ public class SnapshotView extends ControlsFXControl {
     /**
      * @return the unselectedAreaBoundary as a property
      */
-    public ObjectProperty<Boundary> unselectedAreaBoundaryProperty() {
+    public final ObjectProperty<Boundary> unselectedAreaBoundaryProperty() {
         return unselectedAreaBoundary;
     }
 
     /**
      * @return the unselectedAreaBoundary
      */
-    public Boundary getUnselectedAreaBoundary() {
+    public final Boundary getUnselectedAreaBoundary() {
         return unselectedAreaBoundaryProperty().get();
     }
 
@@ -612,21 +612,21 @@ public class SnapshotView extends ControlsFXControl {
      * @param unselectedAreaBoundary
      *            the unselectedAreaBoundary to set
      */
-    public void setUnselectedAreaBoundary(Boundary unselectedAreaBoundary) {
+    public final void setUnselectedAreaBoundary(Boundary unselectedAreaBoundary) {
         unselectedAreaBoundaryProperty().set(unselectedAreaBoundary);
     }
 
     /**
      * @return the selectionStroke as a property
      */
-    public ObjectProperty<Paint> selectionStrokeProperty() {
+    public final ObjectProperty<Paint> selectionStrokeProperty() {
         return selectionStroke;
     }
 
     /**
      * @return the selectionStroke
      */
-    public Paint getSelectionStroke() {
+    public final Paint getSelectionStroke() {
         return selectionStrokeProperty().get();
     }
 
@@ -634,14 +634,14 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionStroke
      *            the selectionStroke to set
      */
-    public void setSelectionStroke(Paint selectionStroke) {
+    public final void setSelectionStroke(Paint selectionStroke) {
         selectionStrokeProperty().set(selectionStroke);
     }
 
     /**
      * @return the selectionStrokeWidth as a property
      */
-    public DoubleProperty selectionStrokeWidthProperty() {
+    public final DoubleProperty selectionStrokeWidthProperty() {
         return selectionStrokeWidth;
     }
 
@@ -650,7 +650,7 @@ public class SnapshotView extends ControlsFXControl {
      * 
      * @return the selectionStrokeWidth
      */
-    public double getSelectionStrokeWidth() {
+    public final double getSelectionStrokeWidth() {
         return selectionStrokeWidthProperty().get();
     }
 
@@ -660,21 +660,21 @@ public class SnapshotView extends ControlsFXControl {
      * @throws IllegalArgumentException
      *             if {@code selectionStrokeWidth} is not strictly positive
      */
-    public void setSelectionStrokeWidth(double selectionStrokeWidth) {
+    public final void setSelectionStrokeWidth(double selectionStrokeWidth) {
         selectionStrokeWidthProperty().set(selectionStrokeWidth);
     }
 
     /**
      * @return the selectionFill as a property
      */
-    public ObjectProperty<Paint> selectionFillProperty() {
+    public final ObjectProperty<Paint> selectionFillProperty() {
         return selectionFill;
     }
 
     /**
      * @return the selectionFill
      */
-    public Paint getSelectionFill() {
+    public final Paint getSelectionFill() {
         return selectionFillProperty().get();
     }
 
@@ -682,21 +682,21 @@ public class SnapshotView extends ControlsFXControl {
      * @param selectionFill
      *            the selectionFill to set
      */
-    public void setSelectionFill(Paint selectionFill) {
+    public final void setSelectionFill(Paint selectionFill) {
         selectionFillProperty().set(selectionFill);
     }
 
     /**
      * @return the unselectedAreaFill as a property
      */
-    public ObjectProperty<Paint> unselectedAreaFillProperty() {
+    public final ObjectProperty<Paint> unselectedAreaFillProperty() {
         return unselectedAreaFill;
     }
 
     /**
      * @return the unselectedAreaFill
      */
-    public Paint getUnselectedAreaFill() {
+    public final Paint getUnselectedAreaFill() {
         return unselectedAreaFillProperty().get();
     }
 
@@ -704,7 +704,7 @@ public class SnapshotView extends ControlsFXControl {
      * @param unselectedAreaFill
      *            the unselectedAreaFill to set
      */
-    public void setUnselectedAreaFill(Paint unselectedAreaFill) {
+    public final void setUnselectedAreaFill(Paint unselectedAreaFill) {
         unselectedAreaFillProperty().set(unselectedAreaFill);
     }
 

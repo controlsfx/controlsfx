@@ -170,7 +170,6 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
     /**
      * Styles the selected and unselected area.
      */
-    @SuppressWarnings("unused")
     private void styleAreas() {
         selectedArea.fillProperty().bind(getSkinnable().selectionFillProperty());
         selectedArea.strokeProperty().bind(getSkinnable().selectionStrokeProperty());
@@ -189,9 +188,6 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         // this call is crucial! it prevents the enormous unselected area from messing up the layout
         unselectedArea.setManaged(false);
         unselectedArea.setMouseTransparent(true);
-
-        // clip the unselected area according to the view's property - this is done by a designated inner class
-        new Clipper(getSkinnable(), unselectedArea);
     }
 
     /**
@@ -216,6 +212,19 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
 
         selectedArea.visibleProperty().bind(existsAndActive);
         unselectedArea.visibleProperty().bind(existsAndActive);
+
+        // /// MAJOR WORKAROUND AHEAD! /// //
+
+        // The clipper should be created in 'styleAreas' but due to the following problem it has to be created here
+        // where the visibility is determined:
+        // Setting the clip on the unselected area while it is invisible leads to either the clip having no effect
+        // or no area being displayed at all. Obviously I'm doing something wrong but I couldn't determine the root
+        // cause so I fixed the symptom. Now the area is turned visible, the clip is set and then it is made invisible
+        // again (see 'Clipper.setClip').
+        // If someone finds out what the *$#&? I've been doing wrong, please mail to nipa@codefx.org! :)
+
+        // clip the unselected area according to the view's property - this is done by a designated inner class
+        new Clipper(getSkinnable(), unselectedArea, () -> unselectedArea.visibleProperty().bind(existsAndActive));
     }
 
     /* ************************************************************************
@@ -312,6 +321,8 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
 
         private final Node clippedNode;
 
+        private final Runnable rebindClippedNodeVisibility;
+
         private final Rectangle controlClip;
 
         private final Rectangle nodeClip;
@@ -320,9 +331,10 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
 
         private final ChangeListener<Bounds> updateNodeClipToNodeBounds;
 
-        public Clipper(SnapshotView snapshotView, Node clippedNode) {
+        public Clipper(SnapshotView snapshotView, Node clippedNode, Runnable rebindClippedNodeVisibility) {
             this.snapshotView = snapshotView;
             this.clippedNode = clippedNode;
+            this.rebindClippedNodeVisibility = rebindClippedNodeVisibility;
 
             // for 'CONTROL', clip to the control's bounds
             controlClip = new Rectangle();
@@ -352,6 +364,20 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
             }
         }
 
+        private void setClip(Node clip) {
+            boolean workAroundVisibilityProblem = !clippedNode.isVisible();
+            if (workAroundVisibilityProblem) {
+                clippedNode.visibleProperty().unbind();
+                clippedNode.setVisible(true);
+            }
+
+            clippedNode.setClip(clip);
+
+            if (workAroundVisibilityProblem) {
+                rebindClippedNodeVisibility.run();
+            }
+        }
+
         private void clipToControl() {
             // stop resizing the node clip
             updateNodeClipToChangingNode(snapshotView.nodeProperty(), snapshotView.getNode(), null);
@@ -360,8 +386,8 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
             resizeRectangleToBounds(controlClip, snapshotView.getBoundsInLocal());
             snapshotView.boundsInLocalProperty().addListener(updateControlClipToNodeBounds);
 
-            // set the control
-            clippedNode.setClip(controlClip);
+            // set the clip
+            setClip(controlClip);
         }
 
         private void clipToNode() {
@@ -371,7 +397,7 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
             snapshotView.nodeProperty().addListener(this::updateNodeClipToChangingNode);
 
             // set the clip
-            clippedNode.setClip(nodeClip);
+            setClip(nodeClip);
         }
 
         private void updateNodeClipToChangingNode(ObservableValue<? extends Node> o, Node oldNode, Node newNode) {

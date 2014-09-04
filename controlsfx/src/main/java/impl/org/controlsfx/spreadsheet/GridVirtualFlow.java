@@ -41,6 +41,7 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TableRow;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -109,12 +110,20 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     public void init(SpreadsheetView spv) {
         this.spreadSheetView = spv;
        
+        //We clip the rectangle selection with a rectangle, inception style.
+        Rectangle rec = new Rectangle();
+        rec.widthProperty().bind(widthProperty().subtract(getVbar().widthProperty()));
+        rec.heightProperty().bind(heightProperty().subtract(getHbar().heightProperty()));
+        gridViewSkin.rectangleSelection.setClip(rec);
+        
+        getChildren().add(gridViewSkin.rectangleSelection);
+        
         spv.getFixedRows().addListener(new ListChangeListener<Integer>(){
 			@Override
-			public void onChanged(javafx.collections.ListChangeListener.Change<? extends Integer> arg0) {
-				while(arg0.next()){
-					if(arg0.wasRemoved()){
-						List<? extends Integer> list = arg0.getRemoved();
+			public void onChanged(javafx.collections.ListChangeListener.Change<? extends Integer> change) {
+				while(change.next()){
+					if(change.wasRemoved()){
+						List<? extends Integer> list = change.getRemoved();
 						for(Integer i:list){
 							for(T cell:myFixedCells){
 								if(cell.getIndex() == i){

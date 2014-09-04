@@ -129,8 +129,8 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         /**
          * FOR FIXED ROWS
          */
-        double tableCellY = getFixedRowShift(index);
-        
+        ((GridRow)getSkinnable()).verticalShift.setValue(getFixedRowShift(index));
+
 
         double fixedColumnWidth = 0;
         List<CellView> fixedCells = new ArrayList();
@@ -250,7 +250,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                 }
 
                 tableCell.relocate(x + tableCellX, snappedTopInset()
-                        - spaceBetweenTopAndMe + tableCellY);
+                        - spaceBetweenTopAndMe + ((GridRow)getSkinnable()).verticalShift.get());
 
                 // Request layout is here as (partial) fix for RT-28684
 //                 tableCell.requestLayout();
@@ -259,7 +259,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             }
             x += width;
         }
-        
+        handle.getCellsViewSkin().fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
     }
 

@@ -173,6 +173,16 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     BitSet hBarValue;
     BitSet rowToLayout;
     
+    /**
+     * This rectangle will be used for drawing a border around the selection.
+     */
+    RectangleSelection rectangleSelection;
+    
+    /**
+     * This is the current width used by the currently fixed column on the left. 
+     */
+    double fixedColumnWidth;
+    
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -242,6 +252,29 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         return gridCellEditor;
     }
 
+    /**
+     * This return the GridRow which has the specified index if found. Otherwise
+     * null is returned.
+     *
+     * @param index
+     * @return
+     */
+    public GridRow getRowIndexed(int index) {
+        for (GridRow obj : (List<GridRow>) getFlow().getCells()) {
+            if (obj.getIndex() == index) {
+                return obj;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * This return the row at the specified index in the list. The index
+     * specified HAS NOTHING to do with the index of the row.
+     * @see #getRowIndexed(int) for a getting a row with its real index.
+     * @param index
+     * @return
+     */
     public GridRow getRow(int index) {
         return (GridRow) getFlow().getCells().get(index);
     }
@@ -463,6 +496,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * * PRIVATE/PROTECTED METHOD * *
      **************************************************************************/
     protected final void init() {
+        rectangleSelection = new RectangleSelection(this, (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel());
         getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle);
         getChildren().add(verticalHeader);

@@ -28,6 +28,8 @@ package impl.org.controlsfx.spreadsheet;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Skin;
@@ -46,6 +48,12 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
      * * Private Fields * *
      **************************************************************************/
     private final SpreadsheetHandle handle;
+    /**
+     * When the row is fixed, it may have a shift from its original position
+     * which we need in order to layout the cells properly and also for the
+     * rectangle selection.
+     */
+    DoubleProperty verticalShift = new SimpleDoubleProperty();
 
     /***************************************************************************
      * * Constructor * *

@@ -8,6 +8,11 @@ dependencies {
     }
 }
 
+ext {
+  pomExclusions = ['http-builder']
+}
+
+
 test {
     testLogging {
         // Show that tests are run in the command-line output
@@ -22,6 +27,7 @@ ext {
 }
 
 configurations {
+
     jdk
     
     if (project.hasProperty("transifex.username")) {
@@ -133,4 +139,25 @@ jar {
     }
 }
 
+/*
+def pomExclusions = []
 
+
+task writeNewPom << {
+    pom {
+        project {
+            inceptionYear '2008'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+        whenConfigured{
+           dependencies = dependencies.findAll {dep -> !pomExclusions.contains(dep.artifactId) } 
+        }
+    }.writeTo("$buildDir/newpom.xml")
+}
+*/

@@ -128,6 +128,15 @@ import javafx.scene.paint.Paint;
  */
 public class SnapshotView extends ControlsFXControl {
 
+    /**
+     * The maximal divergence between a selection's ratio and the {@link #fixedSelectionRatioProperty()
+     * fixedselectionRatio} for the selection to still have the correct ratio (see {@link #hasCorrectRatio(Rectangle2D)
+     * hasCorrectRatio}).
+     * <p>
+     * The divergence is expressed relative to the {@code fixedselectionRatio}.
+     */
+    public static final double MAX_SELECTION_RATIO_DIVERGENCE = 1e-6;
+
     /* ************************************************************************
      *                                                                         * 
      * Attributes & Properties                                                 * 
@@ -233,7 +242,17 @@ public class SnapshotView extends ControlsFXControl {
         node = new SimpleObjectProperty<>(this, "node");
 
         // SELECTION
-        selection = new SimpleObjectProperty<>(this, "selection");
+        selection = new SimpleObjectProperty<Rectangle2D>(this, "selection") {
+            @Override
+            public void set(Rectangle2D selection) {
+                if (!isSelectionValid(selection)) {
+                    throw new IllegalArgumentException("The selection \"" + selection + "\" is invalid. " +
+                            "Check the comment on 'SnapshotView.selectionProperty()' " +
+                            "for all criteria a selection must fulfill.");
+                }
+                super.set(selection);
+            }
+        };
         hasSelection = new SimpleBooleanProperty(this, "hasSelection", false);
         hasSelection.bind(and(isNotNull(selection), notEqual(Rectangle2D.EMPTY, selection)));
         selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
@@ -407,6 +426,108 @@ public class SnapshotView extends ControlsFXControl {
         }
     }
 
+    /**
+     * Checks whether the specified selection is valid. This includes checking whether the selection is in bounds and
+     * has the correct ratio (if the ratio is fixed).
+     * 
+     * @param selection
+     *            the selection to check as a {@link Rectangle2D}
+     * @return {@code true} if the selection is valid; {@code false} otherwise
+     */
+    private boolean isSelectionValid(Rectangle2D selection) {
+        // empty selections are valid
+        boolean emptySelection = selection == null || selection == Rectangle2D.EMPTY;
+        if (emptySelection) {
+            return true;
+        }
+
+        // check values
+        if (!valuesFinite(selection)) {
+            return false;
+        }
+
+        // check bounds
+        if (!inBounds(selection)) {
+            return false;
+        }
+
+        // check ratio
+        if (!hasCorrectRatio(selection)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Indicates whether the specified selection has only finite values (e.g. width and height).
+     * 
+     * @param selection
+     *            the selection as a {@link Rectangle2D}
+     * @return {@code true} if the selection has only finite values.
+     */
+    private static boolean valuesFinite(Rectangle2D selection) {
+        return Double.isFinite(selection.getMinX()) && Double.isFinite(selection.getMinY()) &&
+                Double.isFinite(selection.getWidth()) && Double.isFinite(selection.getHeight());
+    }
+
+    /**
+     * Indicates whether the specified selection is inside the bounds determined by the
+     * {@link #selectionAreaBoundaryProperty() selectionAreaBoundary} property.
+     * 
+     * @param selection
+     *            the non-null and non-empty selection as a {@link Rectangle2D}
+     * @return {@code true} if the selection is fully contained in the bounds; otherwise {@code false}
+     */
+    private boolean inBounds(Rectangle2D selection) {
+        Boundary boundary = getSelectionAreaBoundary();
+        switch (boundary) {
+        case CONTROL:
+            return inBounds(selection, getBoundsInLocal());
+        case NODE:
+            if (getNode() == null) {
+                return false;
+            } else {
+                return inBounds(selection, getNode().getBoundsInParent());
+            }
+        default:
+            throw new IllegalArgumentException("The boundary '" + boundary + "' is not fully implemented yet.");
+        }
+    }
+
+    /**
+     * Indicates whether the specified selection is inside the specified bounds.
+     * 
+     * @param selection
+     *            the selection as a {@link Rectangle2D}
+     * @param bounds
+     *            the {@link Bounds} to check the selection against
+     * @return {@code true} if the selection is fully contained in the bounds; otherwise {@code false}
+     */
+    private static boolean inBounds(Rectangle2D selection, Bounds bounds) {
+        return bounds.getMinX() <= selection.getMinX() && bounds.getMinY() <= selection.getMinY() &&
+                selection.getMaxX() <= bounds.getMaxX() && selection.getMaxY() <= bounds.getMaxY();
+    }
+
+    /**
+     * Indicates whether the specified selection has the correct ratio (which depends on whether the ratio is even
+     * {@link #selectionRatioFixedProperty() fixed}).
+     * 
+     * @param selection
+     *            the selection to check as a {@link Rectangle2D}
+     * @return {@code true} if the selection has the correct ratio.
+     */
+    private boolean hasCorrectRatio(Rectangle2D selection) {
+        if (!isSelectionRatioFixed()) {
+            return true;
+        }
+
+        double ratio = selection.getWidth() / selection.getHeight();
+        // compute the divergence relative to the fixed selection ratio
+        double ratioDivergence = Math.abs(1 - ratio / getFixedSelectionRatio());
+        return ratioDivergence <= MAX_SELECTION_RATIO_DIVERGENCE;
+    }
+
     /* ************************************************************************
      *                                                                         * 
      * Style Sheet & Skin Handling                                             * 
@@ -479,8 +600,8 @@ public class SnapshotView extends ControlsFXControl {
     // SELECTION
 
     /**
-     * The current selection as a {@link Rectangle2D}. As such an instance is immutable the selection can only ever
-     * change if a new one is set.
+     * The current selection as a {@link Rectangle2D}. As such an instance is immutable a new one must be set to chane
+     * the selection.
      * <p>
      * The rectangle's coordinates are interpreted relative to this control. The top left corner is the origin (0, 0)
      * and the lower right corner is ({@link #widthProperty() width}, {@link #heightProperty() height}). It is
@@ -490,6 +611,13 @@ public class SnapshotView extends ControlsFXControl {
      * The same is true if the {@link #selectionAreaBoundaryProperty() selectionAreaBoundary} is set to {@code NODE} but
      * with the stricter condition that the selection must lie within the {@link #nodeProperty() node}'s
      * {@link Node#boundsInParentProperty() boundsInParent}.
+     * <p>
+     * If the selection ratio is {@link #selectionRatioFixedProperty() fixed}, any new selection must have the
+     * {@link #fixedSelectionRatioProperty() fixedSelectionRatio}. Otherwise, an {@code IllegalArgumentException} is
+     * thrown.
+     * <p>
+     * An {@code IllegalArgumentException} is also thrown if not all of the selection's values (e.g. width and height)
+     * are finite.
      * <p>
      * The selection might be {@code null} or {@link Rectangle2D#EMPTY} in which case no selection is displayed and
      * {@link #hasSelectionProperty() hasSelection} is {@code false}.
@@ -513,7 +641,9 @@ public class SnapshotView extends ControlsFXControl {
      * @param selection
      *            the new selection
      * @throws IllegalArgumentException
-     *             if the selection is out of this control's bounds
+     *             if the selection is out of the bounds defined by the {@link #selectionAreaBoundaryProperty()
+     *             selectionAreaBoundary} or the selection ratio is {@link #selectionRatioFixedProperty() fixed} and the
+     *             new selection does not have the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}.
      * @see #selectionProperty()
      */
     public final void setSelection(Rectangle2D selection) {
@@ -534,7 +664,9 @@ public class SnapshotView extends ControlsFXControl {
      * @param height
      *            the selection's height
      * @throws IllegalArgumentException
-     *             if the selection is out of this control's bounds
+     *             if the selection is out of the bounds defined by the {@link #selectionAreaBoundaryProperty()
+     *             selectionAreaBoundary} or the selection ratio is {@link #selectionRatioFixedProperty() fixed} and the
+     *             new selection does not have the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}.
      * @see #selectionProperty()
      * 
      */
@@ -617,8 +749,7 @@ public class SnapshotView extends ControlsFXControl {
      * By default this property is {@code false} and the user interacting with this control can make arbitrary
      * selections with any ratio of width to height. If it is {@code true}, the user is limited to making selections
      * with the ratio defined by the {@link #fixedSelectionRatioProperty() fixedSelectionRatio} property. If the ratio
-     * is fixed and a selection with a different ratio is set by code (e.g. by calling
-     * {@link #setSelection(Rectangle2D) setSelection}), an {@link IllegalArgumentException} is thrown.
+     * is fixed and a selection with a different ratio is set, an {@link IllegalArgumentException} is thrown.
      * <p>
      * If a selection exists and this property is set to {@code true}, the selection is immediately resized to the
      * currently set ratio.
@@ -1241,26 +1372,6 @@ public class SnapshotView extends ControlsFXControl {
             } else {
                 setSelection(null);
             }
-        }
-
-        /**
-         * Checks whether the specified selection is valid. This is not the case if its width or height are
-         * {@link Double#NaN NaN}.
-         * 
-         * @param selection
-         *            the selection to check as a {@link Rectangle2D}
-         * @return {@code true} if the selection is valid; {@code false} otherwise
-         */
-        private boolean isSelectionValid(Rectangle2D selection) {
-            // make sure width and height are finite values
-            if (!Double.isFinite(selection.getWidth())) {
-                return false;
-            }
-            if (!Double.isFinite(selection.getHeight())) {
-                return false;
-            }
-
-            return true;
         }
 
         /**

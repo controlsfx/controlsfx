@@ -50,8 +50,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Skin;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -318,19 +316,6 @@ public class SnapshotView extends ControlsFXControl {
     public SnapshotView(Node node) {
         this();
         setNode(node);
-    }
-
-    /**
-     * Creates a new SnapshotView with an {@link ImageView} as its {@link #nodeProperty() node} which displays the image
-     * loaded from the specified URL.
-     * 
-     * @param url
-     *            the string representing the URL from which to load the image
-     */
-    public SnapshotView(String url) {
-        this();
-        Image image = new Image(url);
-        setNode(new ImageView(image));
     }
 
     /* ************************************************************************

@@ -53,9 +53,79 @@ import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+/**
+ * A {@code SnapshotView} is a control which allows the user to select an area of a node in the typical manner used by
+ * picture editors and crate snapshots of the selection.
+ * <p>
+ * While holding the left mouse key down, a rectangular selection can be drawn. This selection can be moved, resized in
+ * eight cardinal directions and removed. Additionally, the selection's ratio can be fixed in which case the user's
+ * resizing will be limited such that the ratio is always upheld.
+ * <p>
+ * The area where the selection is possible is either this entire control or limited to the displayed node.
+ * 
+ * <h3>Screenshots</h3>
+ * <center><img src="snapshotView.png"></center>
+ * 
+ * <h3>Code Samples</h3>
+ * The following snippet creates a new instance with the ControlsFX logo loaded from the web, sets a selected area and
+ * fixes its ratio:
+ * 
+ * <pre>
+ * ImageView controlsFxView = new ImageView(
+ *         &quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot);
+ * SnapshotView snapshotView = new SnapshotView(controlsFxView);
+ * snapshotView.setSelection(33, 50, 100, 100);
+ * snapshotView.setFixedSelectionRatio(1); // (this is actually the default value)
+ * snapshotView.setSelectionRatioFixed(true);
+ * </pre>
+ * 
+ * <h3>Functionality Overview</h3>
+ * 
+ * This is just a vague overview. The linked properties provide a more detailed explanation.
+ * 
+ * <h4>Node</h4>
+ * 
+ * The node which this control displays is held by the {@link #nodeProperty() node} property.
+ * 
+ * <h4>Selection</h4>
+ * 
+ * There are several properties which interact to manage and indicate the selection.
+ * 
+ * <h5>State</h5>
+ * <ul>
+ * <li>the selection is held by the {@link #selectionProperty() selection} property
+ * <li>the {@link #hasSelectionProperty() hasSelection} property indicates whether a selection exists
+ * <li>the {@link #selectionActiveProperty() selectionActive} property indicates whether the current selection is active
+ * (it is only displayed if it is); by default this property is updated by this control which is determined by the
+ * {@link #selectionActivityManagedProperty() selectionActivityManaged} property
+ * </ul>
+ * 
+ * <h5>Interaction</h5>
+ * <ul>
+ * <li>if the selection is changing due to the user interacting with the control, this is indicated by the
+ * {@link #selectionChangingProperty() selectionChanging} property
+ * <li>whether the user can select any area of the control or only one above the node is determined by the
+ * {@link #selectionAreaBoundaryProperty() selectionAreaBoundary} property
+ * <li>with the {@link #selectionMouseTransparentProperty() selectionMouseTransparent} property the control can be made
+ * mouse transparent so the user can interact with the displayed node
+ * <li>the selection's ratio of width to height can be fixed with the {@link #selectionRatioFixedProperty()
+ * selectionRatioFixed} and the {@link #fixedSelectionRatioProperty() fixedSelectionRatio} properties
+ * </ul>
+ * 
+ * <h5>Visualization</h5>
+ * <ul>
+ * <li> {@link #selectionFillProperty() selectionFill} property for the selected area's paint
+ * <li> {@link #selectionStrokeProperty() selectionStroke} property for the selection border's paint
+ * <li> {@link #selectionStrokeWidthProperty() selectionStrokeWidth} property for the selection border's width
+ * <li> {@link #unselectedAreaFillProperty() unselectedAreaFill} property for the area outside of the selection
+ * <li> {@link #unselectedAreaBoundaryProperty() unselectedAreaBoundary} property which defined what the unselected area
+ * covers
+ * </ul>
+ */
 public class SnapshotView extends ControlsFXControl {
 
     /* ************************************************************************
@@ -67,80 +137,84 @@ public class SnapshotView extends ControlsFXControl {
     // NODE
 
     /**
-     * The {@link Node} to be displayed by this {@code SnapshotView}.
+     * @see #nodeProperty()
      */
     private final ObjectProperty<Node> node;
 
     // SELECTION
 
+    /**
+     * @see #selectionProperty()
+     */
     private final ObjectProperty<Rectangle2D> selection;
 
+    /**
+     * @see #hasSelectionProperty()
+     */
     private final BooleanProperty hasSelection;
 
     /**
-     * Indicates whether an area is currently selected. A selection will only be displayed if it is active (and valid).
-     * <p>
-     * If {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} is set to
-     * {@code false} (which is the default) this control will update this property immediately after a new
-     * {@link #selectionProperty() selection} is set: if the new selection is {@code null}, it will be set to false;
-     * otherwise to {@code true}.
-     * <p>
-     * If {@code selectionActivityExplicitlyManaged} is {@code true} this control will never change this property's
-     * value. In this case it must be managed by the using code but it is possible to unidirectionally bind it to
-     * another property.
+     * @see #selectionActiveProperty()
      */
     private final BooleanProperty selectionActive;
 
     /**
-     * Indicates whether the {@link #selection} is currently changing due to GUI interaction. This will be set to
-     * {@code true} when changing the selection begins and set to {@code false} when it ends.
+     * @see #selectionChangingProperty()
      */
     private final BooleanProperty selectionChanging;
 
     /**
-     * Indicates whether the ratio of the selection will be fixed. When the value changes from {@code false} to
-     * {@code true} and a selection exists, the value of the {@link #fixedSelectionRatioProperty() selectionRatio}
-     * property will immediately be enforced so consider setting it first.
+     * @see #selectionRatioFixedProperty()
      */
     private final BooleanProperty selectionRatioFixed;
 
     /**
-     * The fixed ratio of the selection interpreted as {@code width / height}. If {@link #selectionRatioFixedProperty()
-     * selectionRatioFixed} is {@code true}, this ratio will be upheld by all changes made by GUI interaction. This
-     * explicitly excludes setting the {@link #selectionProperty() selection} property directly in which case the
-     * selection's ratio will not be checked!
-     * <p>
-     * Only strictly positive values are allowed as ratio, otherwise an {@link IllegalArgumentException} is thrown.
+     * @see #fixedSelectionRatioProperty()
      */
     private final DoubleProperty fixedSelectionRatio;
 
     // META
 
+    /**
+     * @see #selectionAreaBoundaryProperty()
+     */
     private final ObjectProperty<Boundary> selectionAreaBoundary;
 
     /**
-     * Indicates whether the {@link #selectionActiveProperty() selectionActive} property will be explicitly managed by
-     * the code using this control. This can be useful if the {@code selectionActive} property should be bound to
-     * another property.
+     * @see #selectionActivityManagedProperty()
      */
-    private final BooleanProperty selectionActivityExplicitlyManaged;
+    private final BooleanProperty selectionActivityManaged;
 
+    /**
+     * @see #selectionMouseTransparentProperty()
+     */
     private final BooleanProperty selectionMouseTransparent;
 
     // VISUALIZATION
 
     /**
-     * Indicates where the visualization of the unselected area (i.e. the area outside of the selection rectangle) ends.
-     * The default value is {@link Boundary#CONTROL}.
+     * @see #unselectedAreaBoundaryProperty()
      */
     private final ObjectProperty<Boundary> unselectedAreaBoundary;
 
+    /**
+     * @see #selectionStrokeProperty()
+     */
     private final ObjectProperty<Paint> selectionStroke;
 
+    /**
+     * @see #selectionStrokeWidthProperty()
+     */
     private final DoubleProperty selectionStrokeWidth;
 
+    /**
+     * @see #selectionFillProperty()
+     */
     private final ObjectProperty<Paint> selectionFill;
 
+    /**
+     * @see #unselectedAreaFillProperty()
+     */
     private final ObjectProperty<Paint> unselectedAreaFill;
 
     /* ************************************************************************
@@ -179,9 +253,8 @@ public class SnapshotView extends ControlsFXControl {
         // META
         selectionAreaBoundary =
                 new SimpleObjectProperty<SnapshotView.Boundary>(this, "selectionAreaBoundary", Boundary.CONTROL);
-        selectionActivityExplicitlyManaged = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged",
-                false);
-        selectionMouseTransparent = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
+        selectionActivityManaged = new SimpleBooleanProperty(this, "selectionActivityManaged", true);
+        selectionMouseTransparent = new SimpleBooleanProperty(this, "selectionMouseTransparent", false);
 
         // VISUALIZATION
         unselectedAreaBoundary =
@@ -201,7 +274,7 @@ public class SnapshotView extends ControlsFXControl {
      */
     private void addStateUpdatingListeners() {
         // update the selection activity state when the selection is set
-        selection.addListener((o, oldValue, newValue) -> updateSelectionActiviteState());
+        selection.addListener((o, oldValue, newValue) -> updateSelectionActivityState());
 
         // ratio
         selectionRatioFixed.addListener((o, oldValue, newValue) -> {
@@ -248,11 +321,10 @@ public class SnapshotView extends ControlsFXControl {
      **************************************************************************/
 
     /**
-     * Will return an image of the selected area if the selection is currently {@link #selectionValidProperty() valid};
-     * otherwise returns null.
+     * Creates an image of the selected area and returns it. If {@link #nodeProperty() node} is {@code null} or this
+     * control {@link #hasSelection() has no selection}, {@code null} is returned.
      * 
-     * @return the {@link WritableImage} that will be used to hold the rendered selection
-     * 
+     * @return the {@link WritableImage} that holds the rendered selection
      * @see Node#snapshot
      */
     public WritableImage createSnapshot() {
@@ -262,14 +334,12 @@ public class SnapshotView extends ControlsFXControl {
     }
 
     /**
-     * Will return an image of the selected area if the selection is currently {@link #selectionValidProperty() valid};
-     * otherwise returns null.
+     * Creates an image of the selected area and returns it. If {@link #nodeProperty() node} is {@code null} or this
+     * control {@link #hasSelection() has no selection}, {@code null} is returned.
      * 
      * @param parameters
-     *            the {@link SnapshotParameters} used for the snapshot; must not be null
-     * 
-     * @return the {@link WritableImage} that will be used to hold the rendered selection
-     * 
+     *            the {@link SnapshotParameters} used for the snapshot; must not be {@code null}
+     * @return the {@link WritableImage} that holds the rendered selection
      * @see Node#snapshot
      */
     public WritableImage createSnapshot(SnapshotParameters parameters) {
@@ -291,21 +361,21 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * Updates the {@link #selectionActiveProperty() selectionActive} property if the
-     * {@link #selectionActivityExplicitlyManagedProperty() selectionActivityExplicitlyManaged} property indicates that
-     * it is not explicitly managed by the using code (i.e. contains {@code false}.
+     * {@link #selectionActivityManagedProperty() selectionActivityManaged} property indicates that it is managed by
+     * this control.
      */
-    private void updateSelectionActiviteState() {
-        boolean explicitlyManaged = isSelectionActivityExplicitlyManaged();
-        if (explicitlyManaged) {
+    private void updateSelectionActivityState() {
+        boolean userManaged = !isSelectionActivityManaged();
+        if (userManaged) {
             return;
         }
 
-        boolean selectionActive = getSelection() != null;
+        boolean selectionActive = getSelection() != null && getSelection() != Rectangle2D.EMPTY;
         setSelectionActive(selectionActive);
     }
 
     /**
-     * Fixes the ratio of the current selection (if it exists).
+     * Resizes the current selection (if it exists) to the {@link #fixedSelectionRatioProperty() fixedSelectionRatio}.
      */
     private void fixSelectionRatio() {
         boolean noSelectionToFix = getNode() == null || !hasSelection();
@@ -320,6 +390,11 @@ public class SnapshotView extends ControlsFXControl {
         selection.set(resizedSelection);
     }
 
+    /**
+     * 
+     * @return the bounds of the current selection according to the {@link #selectionAreaBoundaryProperty()
+     *         selectionAreaBoundary}.
+     */
     private Rectangle2D getSelectionBounds() {
         Boundary boundary = getSelectionAreaBoundary();
         switch (boundary) {
@@ -369,14 +444,24 @@ public class SnapshotView extends ControlsFXControl {
     // NODE
 
     /**
-     * @return the node as a property
+     * The {@link Node} which will be displayed in the center of this control.
+     * <p>
+     * The node's {@link Node#boundsInParentProperty() boundsInParent} show its relative position inside this control.
+     * Since the {@link #selectionProperty() selection} property also uses this control as its reference coordinate
+     * system, the bounds can be used to compute which area of the node is selected.
+     * <p>
+     * If this control or the node behaves strangely when resized, try embedding the original node in a {@link Pane} and
+     * setting the pane here.
+     * 
+     * @return the property holding the displayed node
      */
     public final ObjectProperty<Node> nodeProperty() {
         return node;
     }
 
     /**
-     * @return the node
+     * @return the displayed node
+     * @see #nodeProperty()
      */
     public final Node getNode() {
         return nodeProperty().get();
@@ -384,7 +469,8 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param node
-     *            the node to set
+     *            the node to display
+     * @see #nodeProperty()
      */
     public final void setNode(Node node) {
         nodeProperty().set(node);
@@ -393,14 +479,31 @@ public class SnapshotView extends ControlsFXControl {
     // SELECTION
 
     /**
-     * @return the selection as a property
+     * The current selection as a {@link Rectangle2D}. As such an instance is immutable the selection can only ever
+     * change if a new one is set.
+     * <p>
+     * The rectangle's coordinates are interpreted relative to this control. The top left corner is the origin (0, 0)
+     * and the lower right corner is ({@link #widthProperty() width}, {@link #heightProperty() height}). It is
+     * guaranteed that the selection always lies within these bounds. If the control is resized, so is the selection. If
+     * a selection which violates these bounds is set, an {@link IllegalArgumentException} is thrown.
+     * <p>
+     * The same is true if the {@link #selectionAreaBoundaryProperty() selectionAreaBoundary} is set to {@code NODE} but
+     * with the stricter condition that the selection must lie within the {@link #nodeProperty() node}'s
+     * {@link Node#boundsInParentProperty() boundsInParent}.
+     * <p>
+     * The selection might be {@code null} or {@link Rectangle2D#EMPTY} in which case no selection is displayed and
+     * {@link #hasSelectionProperty() hasSelection} is {@code false}.
+     * 
+     * @return the property holding the current selection
+     * @see #hasSelectionProperty()
      */
     public final ObjectProperty<Rectangle2D> selectionProperty() {
         return selection;
     }
 
     /**
-     * @return the selection
+     * @return the current selection
+     * @see #selectionProperty()
      */
     public final Rectangle2D getSelection() {
         return selectionProperty().get();
@@ -408,15 +511,19 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selection
-     *            the selection to set
+     *            the new selection
+     * @throws IllegalArgumentException
+     *             if the selection is out of this control's bounds
+     * @see #selectionProperty()
      */
     public final void setSelection(Rectangle2D selection) {
         selectionProperty().set(selection);
     }
 
     /**
-     * Sets the selected area as the rectangle's upper left point's coordinates and the rectangle's width and height.
-     * These coordinates are interpreted relative to the node's preferred size.
+     * Creates a new {@link Rectangle2D} from the specified arguments and sets it as the new
+     * {@link #selectionProperty() selection}. It will have ({@code upperLeftX}, {@code upperLeftY}) as its upper left
+     * point and span {@code width} to the right and {@code height} down.
      * 
      * @param upperLeftX
      *            the x coordinate of the selection's upper left point
@@ -426,22 +533,40 @@ public class SnapshotView extends ControlsFXControl {
      *            the selection's width
      * @param height
      *            the selection's height
+     * @throws IllegalArgumentException
+     *             if the selection is out of this control's bounds
+     * @see #selectionProperty()
      * 
      */
     public final void setSelection(double upperLeftX, double upperLeftY, double width, double height) {
         selectionProperty().set(new Rectangle2D(upperLeftX, upperLeftY, width, height));
     }
 
+    /**
+     * Indicates whether there currently is a selection. This will be {@code false} if the {@link #selectionProperty()
+     * selection} property holds {@code null} or {@link Rectangle2D#EMPTY} .
+     * 
+     * @return a property indicating whether there currently is a selection
+     */
     public final ReadOnlyBooleanProperty hasSelectionProperty() {
         return hasSelection;
     }
 
+    /**
+     * @return whether there currently is a selection
+     * @see #hasSelectionProperty()
+     */
     public final boolean hasSelection() {
         return hasSelectionProperty().get();
     }
 
     /**
-     * @return the selectionActive as a property
+     * Indicates whether the selection is currently active. Only an active selection will be displayed by the control.
+     * <p>
+     * See {@link #selectionActivityManagedProperty() selectionActivityManaged} for documentation on how this property
+     * might be changed by this control.
+     * 
+     * @return the property indicating whether the selection is active
      */
     public final BooleanProperty selectionActiveProperty() {
         return selectionActive;
@@ -449,6 +574,7 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @return whether the selection is active
+     * @see #selectionActiveProperty()
      */
     public final boolean isSelectionActive() {
         return selectionActiveProperty().get();
@@ -457,34 +583,56 @@ public class SnapshotView extends ControlsFXControl {
     /**
      * @param selectionActive
      *            the new selection active status
+     * @see #selectionActiveProperty()
      */
     public final void setSelectionActive(boolean selectionActive) {
         selectionActiveProperty().set(selectionActive);
     }
 
     /**
-     * @return the selectionChanging as a property
+     * Indicates whether the {@link #selectionProperty() selection} is currently changing due to user interaction with
+     * the control. It will be set to {@code true} when changing the selection begins and set to {@code false} when it
+     * ends.
+     * <p>
+     * If a selection is set by the code using this control (e.g. by calling {@link #setSelection(Rectangle2D)
+     * setSelection}) this property does not change its value.
+     * 
+     * @return a property indicating whether the selection is changing by user interaction
      */
     public final ReadOnlyBooleanProperty selectionChangingProperty() {
         return selectionChanging;
     }
 
     /**
-     * @return the selectionChanging
+     * @return whether the selection is changing by user interaction
+     * @see #selectionChangingProperty()
      */
     public final boolean isSelectionChanging() {
         return selectionChangingProperty().get();
     }
 
     /**
-     * @return the selectionRatioFixed as a property
+     * Indicates whether the ratio of the {@link #selectionProperty() selection} is fixed.
+     * <p>
+     * By default this property is {@code false} and the user interacting with this control can make arbitrary
+     * selections with any ratio of width to height. If it is {@code true}, the user is limited to making selections
+     * with the ratio defined by the {@link #fixedSelectionRatioProperty() fixedSelectionRatio} property. If the ratio
+     * is fixed and a selection with a different ratio is set by code (e.g. by calling
+     * {@link #setSelection(Rectangle2D) setSelection}), an {@link IllegalArgumentException} is thrown.
+     * <p>
+     * If a selection exists and this property is set to {@code true}, the selection is immediately resized to the
+     * currently set ratio.
+     * 
+     * @defaultValue {@code false}
+     * @return the property indicating whether the selection ratio is fixed
      */
     public final BooleanProperty selectionRatioFixedProperty() {
         return selectionRatioFixed;
     }
 
     /**
-     * @return the selectionRatioFixed
+     * @return whether the selection ratio is fixed
+     * @see #selectionRatioFixedProperty()
      */
     public final boolean isSelectionRatioFixed() {
         return selectionRatioFixedProperty().get();
@@ -492,23 +640,36 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selectionRatioFixed
-     *            the selectionRatioFixed to set
+     *            whether the selection ratio will be fixed
+     * @see #selectionRatioFixedProperty()
      */
     public final void setSelectionRatioFixed(boolean selectionRatioFixed) {
         selectionRatioFixedProperty().set(selectionRatioFixed);
     }
 
     /**
-     * @return the fixedSelectionRatio as a property
+     * The value to which the selection ratio is fixed. The ratio is defined as {@code width / height} and its value
+     * must be strictly positive.
+     * <p>
+     * If {@link #selectionRatioFixedProperty() selectionRatioFixed} is {@code true}, this ratio will be upheld by all
+     * changes made by user interaction with this control. If the ratio is fixed and a selection is set by code (e.g. by
+     * calling {@link #setSelection(Rectangle2D) setSelection}), this ratio is checked and if violated an
+     * {@link IllegalArgumentException} is thrown.
+     * <p>
+     * If a selection exists and {@code selectionRatioFixed} is set to {@code true}, the selection is immediately
+     * resized to this ratio. Similarly, if a selection exists and its ratio is fixed, setting a new value resizes the
+     * selection to the new ratio.
+     * 
+     * @defaultValue 1.0
+     * @return a property containing the fixed selection ratio
      */
     public final DoubleProperty fixedSelectionRatioProperty() {
         return fixedSelectionRatio;
     }
 
     /**
-     * This will only ever return strictly positive values.
-     * 
-     * @return the fixedSelectionRatio
+     * @return the fixedSelectionRatio, which will always be a strictly positive value
+     * @see #fixedSelectionRatioProperty()
      */
     public final double getFixedSelectionRatio() {
         return fixedSelectionRatioProperty().get();
@@ -516,9 +677,10 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param fixedSelectionRatio
-     *            the fixedSelectionRatio to set
+     *            the fixed selection ratio to set
      * @throws IllegalArgumentException
      *             if {@code fixedSelectionRatio} is not strictly positive
+     * @see #fixedSelectionRatioProperty()
      */
     public final void setFixedSelectionRatio(double fixedSelectionRatio) {
         fixedSelectionRatioProperty().set(fixedSelectionRatio);
@@ -527,14 +689,28 @@ public class SnapshotView extends ControlsFXControl {
     // META
 
     /**
-     * @return the selectionAreaBoundary as a property
+     * Indicates which {@link Boundary} is set for the area the user can select.
+     * <p>
+     * By default the user can select any area of the control. If this should be limited to the area over the displayed
+     * node instead, this property can be set to {@link Boundary#NODE NODE}. If the value is changed from
+     * {@code CONTROL} to {@code NODE} a possibly existing selection is resized accordingly.
+     * <p>
+     * If the boundary is set to {@code NODE}, this is also respected when a new {@link #selectionProperty() selection}
+     * is set. This means the condition for the new selection's coordinates is made stricter and setting a selection out
+     * of the node's bounds (instead of only out of the control's bounds) throws an {@link IllegalArgumentException}.
+     * <p>
+     * Note that this does <b>not</b> change the reference coordinate system! The selection's coordinates are still
+     * interpreted relative to the {@link #nodeProperty() node}'s {@link Node#boundsInParentProperty() boundsInParent}.
+     * 
+     * @defaultValue {@link Boundary#CONTROL CONTROL}
+     * @return the property indicating the {@link Boundary} for the area the user can select
      */
     public final ObjectProperty<Boundary> selectionAreaBoundaryProperty() {
         return selectionAreaBoundary;
     }
 
     /**
-     * @return the selectionAreaBoundary
+     * @return the {@link Boundary} for the area the user can select
      */
     public final Boundary getSelectionAreaBoundary() {
         return selectionAreaBoundaryProperty().get();
@@ -542,43 +718,66 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selectionAreaBoundary
-     *            the selectionAreaBoundary to set
+     *            the new {@link Boundary} for the area the user can select
      */
     public final void setSelectionAreaBoundary(Boundary selectionAreaBoundary) {
         selectionAreaBoundaryProperty().set(selectionAreaBoundary);
     }
 
     /**
-     * @return the selectionActivityExplicitlyManaged as a property
+     * Indicates whether the value of the {@link #selectionActiveProperty() selectionActive} property is managed by this
+     * control.
+     * <p>
+     * If this property is set to {@code true} (which is the default) this control will update the
+     * {@code selectionActive} property immediately after a new selection is set: if the new selection is {@code null}
+     * or {@link Rectangle2D#EMPTY}, it will be set to {@code false}; otherwise to {@code true}.
+     * <p>
+     * If this property is {@code false} this control will never change {@code selectionActive}'s value. In this case it
+     * must be managed by the using code but it is possible to unidirectionally bind it to another property without this
+     * control interfering.
+     * 
+     * @defaultValue {@code true}
+     * @return the property indicating whether the value of the {@link #selectionActiveProperty() selectionActive}
+     *         property is managed by this control
      */
-    public final BooleanProperty selectionActivityExplicitlyManagedProperty() {
-        return selectionActivityExplicitlyManaged;
+    public final BooleanProperty selectionActivityManagedProperty() {
+        return selectionActivityManaged;
     }
 
     /**
-     * @return the selectionActivityExplicitlyManaged
+     * @return whether the selection activity is managed by this control
+     * @see #selectionActivityManagedProperty()
      */
-    public final boolean isSelectionActivityExplicitlyManaged() {
-        return selectionActivityExplicitlyManagedProperty().get();
+    public final boolean isSelectionActivityManaged() {
+        return selectionActivityManagedProperty().get();
     }
 
     /**
-     * @param selectionActivityExplicitlyManaged
-     *            the selectionActivityExplicitlyManaged to set
+     * @param selectionActivityManaged
+     *            whether the selection activity will be managed by this control
+     * @see #selectionActivityManagedProperty()
      */
-    public final void setSelectionActivityExplicitlyManaged(boolean selectionActivityExplicitlyManaged) {
-        selectionActivityExplicitlyManagedProperty().set(selectionActivityExplicitlyManaged);
+    public final void setSelectionActivityManaged(boolean selectionActivityManaged) {
+        selectionActivityManagedProperty().set(selectionActivityManaged);
     }
 
     /**
-     * @return the selectionMouseTransparent as a property
+     * Indicates whether the overlay which displays the selection is mouse transparent.
+     * <p>
+     * By default all mouse events are captured by this control and used to interact with the selection. If this
+     * property is set to {@code true}, this behavior changes and the user is able to interact with the displayed
+     * {@link #nodeProperty() node}.
+     * 
+     * @defaultValue {@code false}
+     * @return the property indicating whether the selection is mouse transparent
      */
     public final BooleanProperty selectionMouseTransparentProperty() {
         return selectionMouseTransparent;
     }
 
     /**
-     * @return the selectionMouseTransparent
+     * @return whether the selection is mouse transparent
+     * @see #selectionMouseTransparentProperty()
      */
     public final boolean isSelectionMouseTransparent() {
         return selectionMouseTransparentProperty().get();
@@ -586,7 +785,8 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selectionMouseTransparent
-     *            the selectionMouseTransparent to set
+     *            whether the selection will be mouse transparent
+     * @see #selectionMouseTransparentProperty()
      */
     public final void setSelectionMouseTransparent(boolean selectionMouseTransparent) {
         selectionMouseTransparentProperty().set(selectionMouseTransparent);
@@ -595,14 +795,26 @@ public class SnapshotView extends ControlsFXControl {
     // VISUALIZATION
 
     /**
-     * @return the unselectedAreaBoundary as a property
+     * Indicates which {@link Boundary} is set for the visualization of the unselected area (i.e. the area outside of
+     * the selection rectangle).
+     * <p>
+     * If it is set to {@link Boundary#CONTROL CONTROL} (which is the default), the unselected area covers the whole
+     * control.
+     * <p>
+     * If it is set to {@link Boundary#NODE NODE}, the area only covers the displayed {@link #nodeProperty() node}. In
+     * most cases this only makes sense if the {@link #selectionAreaBoundaryProperty() selectionAreaBoundary} is also
+     * set to {@code NODE}.
+     * 
+     * @defaultValue {@link Boundary#CONTROL}
+     * @return the property defining the {@link Boundary} of the unselected area
      */
     public final ObjectProperty<Boundary> unselectedAreaBoundaryProperty() {
         return unselectedAreaBoundary;
     }
 
     /**
-     * @return the unselectedAreaBoundary
+     * @return the {@link Boundary} for the unselected area
+     * @see #unselectedAreaBoundaryProperty()
      */
     public final Boundary getUnselectedAreaBoundary() {
         return unselectedAreaBoundaryProperty().get();
@@ -610,21 +822,27 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param unselectedAreaBoundary
-     *            the unselectedAreaBoundary to set
+     *            the new {@link Boundary} for the unselected area
+     * @see #unselectedAreaBoundaryProperty()
      */
     public final void setUnselectedAreaBoundary(Boundary unselectedAreaBoundary) {
         unselectedAreaBoundaryProperty().set(unselectedAreaBoundary);
     }
 
     /**
-     * @return the selectionStroke as a property
+     * Determines the visualization of the selection's border.
+     * 
+     * @defaultValue {@link Color#WHITESMOKE}
+     * @return the property holding the {@link Paint} of the selection border
+     * @see #selectionStrokeWidthProperty()
      */
     public final ObjectProperty<Paint> selectionStrokeProperty() {
         return selectionStroke;
     }
 
     /**
-     * @return the selectionStroke
+     * @return the {@link Paint} of the selection border
+     * @see #selectionStrokeProperty()
      */
     public final Paint getSelectionStroke() {
         return selectionStrokeProperty().get();
@@ -632,23 +850,29 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selectionStroke
-     *            the selectionStroke to set
+     *            the new {@link Paint} of the selection border
+     * @see #selectionStrokeProperty()
      */
     public final void setSelectionStroke(Paint selectionStroke) {
         selectionStrokeProperty().set(selectionStroke);
     }
 
     /**
-     * @return the selectionStrokeWidth as a property
+     * Determines the width of the selection's border. The border is always painted to the outside of the selected area,
+     * i.e. the selected area is never covered by the border.
+     * 
+     * @defaultValue 2.5
+     * @return the property defining the selection border's width
+     * @see #selectionStrokeProperty()
+     * @see javafx.scene.shape.Shape#strokeWidthProperty() Shape.strokeWidthProperty()
      */
     public final DoubleProperty selectionStrokeWidthProperty() {
         return selectionStrokeWidth;
     }
 
     /**
-     * This will only ever return strictly positive values.
-     * 
-     * @return the selectionStrokeWidth
+     * @return the selection stroke width
+     * @see #selectionStrokeWidthProperty()
      */
     public final double getSelectionStrokeWidth() {
         return selectionStrokeWidthProperty().get();
@@ -656,23 +880,26 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selectionStrokeWidth
-     *            the selectionStrokeWidth to set
-     * @throws IllegalArgumentException
-     *             if {@code selectionStrokeWidth} is not strictly positive
+     *            the selection stroke width to set
+     * @see #selectionStrokeWidthProperty()
      */
     public final void setSelectionStrokeWidth(double selectionStrokeWidth) {
         selectionStrokeWidthProperty().set(selectionStrokeWidth);
     }
 
     /**
-     * @return the selectionFill as a property
+     * Determines the visualization of the selected area.
+     * 
+     * @defaultValue {@link Color#TRANSPARENT}
+     * @return the property holding the {@link Paint} of the selected area
      */
     public final ObjectProperty<Paint> selectionFillProperty() {
         return selectionFill;
     }
 
     /**
-     * @return the selectionFill
+     * @return the {@link Paint} of the selected area
+     * @see #selectionFillProperty()
      */
     public final Paint getSelectionFill() {
         return selectionFillProperty().get();
@@ -680,21 +907,26 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param selectionFill
-     *            the selectionFill to set
+     *            the new {@link Paint} of the selected area
+     * @see #selectionFillProperty()
      */
     public final void setSelectionFill(Paint selectionFill) {
         selectionFillProperty().set(selectionFill);
     }
 
     /**
-     * @return the unselectedAreaFill as a property
+     * Determines the visualization of the area outside of the selection.
+     * 
+     * @defaultValue {@link Color#BLACK black} with {@link Color#getOpacity() opacity} 0.5
+     * @return the property holding the {@link Paint} of the area outside of the selection
      */
     public final ObjectProperty<Paint> unselectedAreaFillProperty() {
         return unselectedAreaFill;
     }
 
     /**
-     * @return the unselectedAreaFill
+     * @return the {@link Paint} of the area outside of the selection
+     * @see #unselectedAreaFillProperty()
      */
     public final Paint getUnselectedAreaFill() {
         return unselectedAreaFillProperty().get();
@@ -702,7 +934,8 @@ public class SnapshotView extends ControlsFXControl {
 
     /**
      * @param unselectedAreaFill
-     *            the unselectedAreaFill to set
+     *            the new {@link Paint} of the area outside of the selection
+     * @see #unselectedAreaFillProperty()
      */
     public final void setUnselectedAreaFill(Paint unselectedAreaFill) {
         unselectedAreaFillProperty().set(unselectedAreaFill);
@@ -714,44 +947,101 @@ public class SnapshotView extends ControlsFXControl {
      *                                                                         *
      **************************************************************************/
 
+    /**
+     * The {@link SnapshotView#selectionAreaBoundaryProperty() selectionArea}, in which the user can create a selection,
+     * and the {@link SnapshotView#unselectedAreaBoundaryProperty() unselectedArea}, in which the unselected area is
+     * visualized, are limited to a certain area of the control. This area's boundary is represented by this enum.
+     *
+     */
     public static enum Boundary {
 
+        /**
+         * The boundary is this control's bound.
+         */
         CONTROL,
 
+        /**
+         * The boundary is the displayed node's bound.
+         */
         NODE,
 
     }
 
+    /**
+     * Updates the size of the {@link SnapshotView#selectionProperty() selection} whenever necessary. This is the case
+     * if the {@link SnapshotView#selectionAreaBoundaryProperty() selectionAreaBoundary} is set to
+     * {@link Boundary#CONTROL CONTROL} and the control is resized or when it is set to {@link Boundary#NODE NODE} and
+     * the node is changed or resized.
+     *
+     */
     private class SelectionSizeUpdater {
+
+        /*
+         * If the 'selectionAreaBoundary' is set to 'CONTROL', the selection is only updated when the control changes
+         * its width or height. If it is set to 'NODE', the selection is resized whenever the node or its
+         * 'boundsInParent' change.
+         * For both cases methods exist which resize the selection. The listeners which call those methods are only
+         * added to the corresponding properties when the matching boundary is selected.
+         */
 
         // CONTROL
 
-        private final ChangeListener<Number> updateSelectionToNewControlWidthListener;
+        /**
+         * Calls {@link #resizeSelectionToNewControlWidth(ObservableValue, Number, Number)
+         * updateSelectionToNewControlWidth} whenever the control's width changes.
+         */
+        private final ChangeListener<Number> resizeSelectionToNewControlWidthListener;
 
-        private final ChangeListener<Number> updateSelectionToNewControlHeightListener;
+        /**
+         * Calls {@link #resizeSelectionToNewControlHeight(ObservableValue, Number, Number)
+         * updateSelectionToNewControlWidth} whenever the control's height changes.
+         */
+        private final ChangeListener<Number> resizeSelectionToNewControlHeightListener;
 
         // NODE
 
+        /**
+         * Calls {@link #updateSelectionToNewNode(ObservableValue, Node, Node) updateSelectionToNewNode} whenever a new
+         * {@link SnapshotView#nodeProperty() node} is set.
+         */
         private final ChangeListener<Node> updateSelectionToNodeListener;
 
-        private final ChangeListener<Bounds> updateSelectionToNewNodeBoundsListener;
+        /**
+         * Calls {@link #resizeSelectionToNewNodeBounds(ObservableValue, Bounds, Bounds) updateSelectionToNewNodeBounds}
+         * whenever the node's {@link Node#boundsInParentProperty() boundsInParent} change.
+         */
+        private final ChangeListener<Bounds> resizeSelectionToNewNodeBoundsListener;
 
+        // CONSTRUCTION
+
+        /**
+         * Creates a new selection size updater.
+         */
         public SelectionSizeUpdater() {
-            // create listener which point to methods
-            updateSelectionToNewControlWidthListener = this::updateSelectionToNewControlWidth;
-            updateSelectionToNewControlHeightListener = this::updateSelectionToNewControlHeight;
+            // create listeners which point to methods
+            resizeSelectionToNewControlWidthListener = this::resizeSelectionToNewControlWidth;
+            resizeSelectionToNewControlHeightListener = this::resizeSelectionToNewControlHeight;
             updateSelectionToNodeListener = this::updateSelectionToNewNode;
-            updateSelectionToNewNodeBoundsListener = this::updateSelectionToNewNodeBounds;
+            resizeSelectionToNewNodeBoundsListener = this::resizeSelectionToNewNodeBounds;
         }
 
         // ENABLE RESIZING
 
+        /**
+         * Enables resizing of the control.
+         */
         public void enableResizing() {
             // only resize if the selection is not null
             enableResizingForBoundary(getSelectionAreaBoundary());
             selectionAreaBoundary.addListener((o, oldBoundary, newBoundary) -> enableResizingForBoundary(newBoundary));
         }
 
+        /**
+         * Enables resizing for the specified boundary.
+         * 
+         * @param boundary
+         *            the {@link Boundary} for which the control will be resized.
+         */
         private void enableResizingForBoundary(Boundary boundary) {
             switch (boundary) {
             case CONTROL:
@@ -765,83 +1055,141 @@ public class SnapshotView extends ControlsFXControl {
             }
         }
 
+        /**
+         * Enables resizing if the {@link SnapshotView#selectionAreaBoundary selectionAreaBoundary} is
+         * {@link Boundary#CONTROL CONTROL}.
+         */
         private void enableResizingForControl() {
             // remove listeners for node and its bounds
             node.removeListener(updateSelectionToNodeListener);
             if (getNode() != null) {
-                getNode().boundsInParentProperty().removeListener(updateSelectionToNewNodeBoundsListener);
+                getNode().boundsInParentProperty().removeListener(resizeSelectionToNewNodeBoundsListener);
             }
 
             // add listener for the control's size
-            widthProperty().addListener(updateSelectionToNewControlWidthListener);
-            heightProperty().addListener(updateSelectionToNewControlHeightListener);
+            widthProperty().addListener(resizeSelectionToNewControlWidthListener);
+            heightProperty().addListener(resizeSelectionToNewControlHeightListener);
 
-            // resize the selection
-            updateSelectionFromNodeToControl();
+            resizeSelectionFromNodeToControl();
         }
 
+        /**
+         * Enables resizing if the {@link SnapshotView#selectionAreaBoundary selectionAreaBoundary} is
+         * {@link Boundary#NODE NODE}.
+         */
         private void enableResizingForNode() {
             // remove listeners for the control's size
-            widthProperty().removeListener(updateSelectionToNewControlWidthListener);
-            heightProperty().removeListener(updateSelectionToNewControlHeightListener);
+            widthProperty().removeListener(resizeSelectionToNewControlWidthListener);
+            heightProperty().removeListener(resizeSelectionToNewControlHeightListener);
 
-            // add listener for new nodes
+            // add listener for the node's bounds and for new nodes
+            if (getNode() != null) {
+                getNode().boundsInParentProperty().addListener(resizeSelectionToNewNodeBoundsListener);
+            }
             node.addListener(updateSelectionToNodeListener);
-            // update selection to the current node
-            updateSelectionFromControlToNode();
+
+            resizeSelectionFromControlToNode();
         }
 
         // RESIZE TO CONTROL
 
-        private void updateSelectionFromNodeToControl() {
+        /**
+         * Resizes the current {@link SnapshotView#selectionProperty() selection} from the node's to the control's
+         * bounds.
+         */
+        private void resizeSelectionFromNodeToControl() {
             if (getNode() == null) {
                 setSelection(null);
             } else {
                 // transform the selection from the control's to the node's bounds
                 Rectangle2D controlBounds = new Rectangle2D(0, 0, getWidth(), getHeight());
                 Rectangle2D nodeBounds = Rectangles2D.fromBounds(getNode().getBoundsInParent());
-                updateSelectionToNewBounds(nodeBounds, controlBounds);
+                resizeSelectionToNewBounds(nodeBounds, controlBounds);
             }
         }
 
-        private void updateSelectionToNewControlWidth(
-                ObservableValue<? extends Number> o, Number oldWidth, Number newWidth) {
+        /**
+         * Resizes the current {@link SnapshotView#selectionProperty() selection} from the control's specified old width
+         * to its specified new width.
+         * <p>
+         * Designed to be used as a lambda method reference.
+         * 
+         * @param o
+         *            the {@link ObservableValue} which changed its value
+         * @param oldWidth
+         *            the control's old width
+         * @param newWidth
+         *            the control's new width
+         */
+        private void resizeSelectionToNewControlWidth(
+                @SuppressWarnings("unused") ObservableValue<? extends Number> o, Number oldWidth, Number newWidth) {
 
             Rectangle2D oldBounds = new Rectangle2D(0, 0, oldWidth.doubleValue(), getHeight());
             Rectangle2D newBounds = new Rectangle2D(0, 0, newWidth.doubleValue(), getHeight());
-            updateSelectionToNewBounds(oldBounds, newBounds);
+            resizeSelectionToNewBounds(oldBounds, newBounds);
         }
 
-        private void updateSelectionToNewControlHeight(
-                ObservableValue<? extends Number> o, Number oldHeight, Number newHeight) {
+        /**
+         * Resizes the current {@link SnapshotView#selectionProperty() selection} from the control's specified old
+         * height to its specified new height.
+         * <p>
+         * Designed to be used as a lambda method reference.
+         * 
+         * @param o
+         *            the {@link ObservableValue} which changed its value
+         * @param oldHeight
+         *            the control's old height
+         * @param newHeight
+         *            the control's new height
+         */
+        private void resizeSelectionToNewControlHeight(
+                @SuppressWarnings("unused") ObservableValue<? extends Number> o, Number oldHeight, Number newHeight) {
 
             Rectangle2D oldBounds = new Rectangle2D(0, 0, getWidth(), oldHeight.doubleValue());
             Rectangle2D newBounds = new Rectangle2D(0, 0, getWidth(), newHeight.doubleValue());
-            updateSelectionToNewBounds(oldBounds, newBounds);
+            resizeSelectionToNewBounds(oldBounds, newBounds);
         }
 
         // RESIZE TO NODE
 
-        private void updateSelectionFromControlToNode() {
+        /**
+         * Resizes the current {@link SnapshotView#selectionProperty() selection} from the control's to the node's
+         * bounds
+         */
+        private void resizeSelectionFromControlToNode() {
             if (getNode() == null) {
                 setSelection(null);
             } else {
-                // add the listener for the current node's bounds
-                getNode().boundsInParentProperty().addListener(updateSelectionToNewNodeBoundsListener);
                 // transform the selection from the control's to the node's bounds
                 Rectangle2D controlBounds = new Rectangle2D(0, 0, getWidth(), getHeight());
                 Rectangle2D nodeBounds = Rectangles2D.fromBounds(getNode().getBoundsInParent());
-                updateSelectionToNewBounds(controlBounds, nodeBounds);
+                resizeSelectionToNewBounds(controlBounds, nodeBounds);
             }
         }
 
-        private void updateSelectionToNewNode(ObservableValue<? extends Node> o, Node oldNode, Node newNode) {
+        /**
+         * Moves the {@link #resizeSelectionToNewNodeBoundsListener} from the specified old to the specified new node's
+         * {@link Node#boundsInParentProperty() boundsInParent} property and resizes the current
+         * {@link SnapshotView#selectionProperty() selection} from the old to the new node's bounds.
+         * <p>
+         * Designed to be used as a lambda method reference.
+         * 
+         * @param o
+         *            the {@link ObservableValue} which changed its value
+         * @param oldNode
+         *            the old node
+         * @param newNode
+         *            the new node
+         */
+        private void updateSelectionToNewNode(
+                @SuppressWarnings("unused") ObservableValue<? extends Node> o, Node oldNode, Node newNode) {
+
             // move the bounds listener from the old to the new node
             if (oldNode != null) {
-                oldNode.boundsInParentProperty().removeListener(updateSelectionToNewNodeBoundsListener);
+                oldNode.boundsInParentProperty().removeListener(resizeSelectionToNewNodeBoundsListener);
             }
             if (newNode != null) {
-                newNode.boundsInParentProperty().addListener(updateSelectionToNewNodeBoundsListener);
+                newNode.boundsInParentProperty().addListener(resizeSelectionToNewNodeBoundsListener);
             }
 
             // update selection
@@ -850,19 +1198,39 @@ public class SnapshotView extends ControlsFXControl {
                 setSelection(null);
             } else {
                 // transform the current selection
-                updateSelectionToNewNodeBounds(null, oldNode.getBoundsInParent(), newNode.getBoundsInParent());
+                resizeSelectionToNewNodeBounds(null, oldNode.getBoundsInParent(), newNode.getBoundsInParent());
             }
         }
 
-        private void updateSelectionToNewNodeBounds(
-                ObservableValue<? extends Bounds> o, Bounds oldBounds, Bounds newBounds) {
+        /**
+         * Resizes the current {@link SnapshotView#selectionProperty() selection} from the specified old to the
+         * specified new bounds of the {@link SnapshotView#nodeProperty() node}.
+         * 
+         * @param o
+         *            the {@link ObservableValue} which changed its value
+         * @param oldBounds
+         *            the node's old bounds
+         * @param newBounds
+         *            the node's new bounds
+         */
+        private void resizeSelectionToNewNodeBounds(
+                @SuppressWarnings("unused") ObservableValue<? extends Bounds> o, Bounds oldBounds, Bounds newBounds) {
 
-            updateSelectionToNewBounds(Rectangles2D.fromBounds(oldBounds), Rectangles2D.fromBounds(newBounds));
+            resizeSelectionToNewBounds(Rectangles2D.fromBounds(oldBounds), Rectangles2D.fromBounds(newBounds));
         }
 
         // GENERAL RESIZING
 
-        private void updateSelectionToNewBounds(Rectangle2D oldBounds, Rectangle2D newBounds) {
+        /**
+         * If this control {@link SnapshotView#hasSelection() has a selection} it is resized from the specified old to
+         * the specified new bounds.
+         * 
+         * @param oldBounds
+         *            the {@link SnapshotView#selectionProperty() selection}'s old bounds as a {@link Rectangle2D}
+         * @param newBounds
+         *            the {@link SnapshotView#selectionProperty() selection}'s new bounds as a {@link Rectangle2D}
+         */
+        private void resizeSelectionToNewBounds(Rectangle2D oldBounds, Rectangle2D newBounds) {
             if (!hasSelection()) {
                 return;
             }
@@ -875,26 +1243,50 @@ public class SnapshotView extends ControlsFXControl {
             }
         }
 
-        private boolean isSelectionValid(Rectangle2D newSelection) {
+        /**
+         * Checks whether the specified selection is valid. This is not the case if its width or height are
+         * {@link Double#NaN NaN}.
+         * 
+         * @param selection
+         *            the selection to check as a {@link Rectangle2D}
+         * @return {@code true} if the selection is valid; {@code false} otherwise
+         */
+        private boolean isSelectionValid(Rectangle2D selection) {
             // make sure width and height are finite values
-            if (!Double.isFinite(newSelection.getWidth())) {
+            if (!Double.isFinite(selection.getWidth())) {
                 return false;
             }
-            if (!Double.isFinite(newSelection.getHeight())) {
+            if (!Double.isFinite(selection.getHeight())) {
                 return false;
             }
 
             return true;
         }
 
+        /**
+         * Returns a new selection which is a transformation of the specified old selection. The transformation is such
+         * that the new selection's "relative position" in the specified new bounds is the same as the old selection's
+         * relative position in the specified old bounds.
+         * <p>
+         * Here, "relative position" is a representation of the selection where the coordinates of its upper left point
+         * and its width and height are expressed in a percentage of its bounds. Those percentages are the same for
+         * "old selection in old bounds" and "returned selection in new bounds"
+         * 
+         * @param oldSelection
+         *            the selection to be transformed as a {@link Rectangle2D}
+         * @param oldBounds
+         *            the {@code oldSelection}'s old bounds as a {@link Rectangle2D}
+         * @param newBounds
+         *            the {@code oldSelection}'s new bounds as a {@link Rectangle2D}
+         * @return s {@link Rectangle2D} which is the transformation of the old selection to the new bounds
+         */
         private Rectangle2D transformSelectionToNewBounds(
                 Rectangle2D oldSelection, Rectangle2D oldBounds, Rectangle2D newBounds) {
 
+            Point2D newSelectionCenter = computeNewSelectionCenter(oldSelection, oldBounds, newBounds);
+
             double widthRatio = newBounds.getWidth() / oldBounds.getWidth();
             double heightRatio = newBounds.getHeight() / oldBounds.getHeight();
-
-            Point2D newSelectionCenter = computeNewSelectionCenter(
-                    oldSelection, oldBounds, newBounds, widthRatio, heightRatio);
 
             if (isSelectionRatioFixed()) {
                 double newArea = (oldSelection.getWidth() * widthRatio) * (oldSelection.getHeight() * heightRatio);
@@ -907,13 +1299,30 @@ public class SnapshotView extends ControlsFXControl {
             }
         }
 
-        private Point2D computeNewSelectionCenter(
-                Rectangle2D oldSelection, Rectangle2D oldBounds, Rectangle2D newBounds,
-                double widthRatio, double heightRatio) {
+        /**
+         * Computes a point with the same relative position in the specified new bounds as the specified old selection's
+         * center point in the specified old bounds. (See
+         * {@link #transformSelectionToNewBounds(Rectangle2D, Rectangle2D, Rectangle2D) transformSelectionToNewBounds}
+         * for a definition of "relative position").
+         * 
+         * @param oldSelection
+         *            the selection whose center point is the base for the returned center point as a
+         *            {@link Rectangle2D}
+         * @param oldBounds
+         *            the bounds of the old selection as a {@link Rectangle2D}
+         * @param newBounds
+         *            the bounds for the new selection as a {@link Rectangle2D}
+         * @return a {@link Point2D} with the same relative position in the new bounds as the old selection's center
+         *         point in the old bounds
+         */
+        private Point2D computeNewSelectionCenter(Rectangle2D oldSelection, Rectangle2D oldBounds, Rectangle2D newBounds) {
 
             Point2D oldSelectionCenter = Rectangles2D.getCenterPoint(oldSelection);
             Point2D oldBoundsCenter = Rectangles2D.getCenterPoint(oldBounds);
             Point2D oldSelectionCenterOffset = oldSelectionCenter.subtract(oldBoundsCenter);
+
+            double widthRatio = newBounds.getWidth() / oldBounds.getWidth();
+            double heightRatio = newBounds.getHeight() / oldBounds.getHeight();
 
             Point2D newSelectionCenterOffset = new Point2D(
                     oldSelectionCenterOffset.getX() * widthRatio, oldSelectionCenterOffset.getY() * heightRatio);

@@ -42,6 +42,7 @@ import impl.org.controlsfx.tools.rectangle.change.ToSouthwestChangeStrategy;
 import impl.org.controlsfx.tools.rectangle.change.ToWestChangeStrategy;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import javafx.event.EventType;
@@ -49,6 +50,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -59,7 +61,8 @@ import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 
 /**
- * The behavior for the {@link SnapshotView}.
+ * The behavior for the {@link SnapshotView}. It is concerned with creating and changing selections according to mouse
+ * events handed to {@link #handleMouseEvent(MouseEvent) handleMouseEvents}.
  */
 public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
@@ -76,10 +79,14 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      **************************************************************************/
 
     /**
-     * The current selection change; might be null.
+     * The current selection change; might be {@code null}.
      */
     private SelectionChange selectionChange;
 
+    /**
+     * A function which sets the {@link SnapshotView#selectionChangingProperty() selectionChanging} property to the
+     * given value.
+     */
     private final Consumer<Boolean> setSelectionChanging;
 
     /* ************************************************************************
@@ -93,51 +100,13 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * 
      * @param snapshotView
      *            the control which this behavior will control
+     * @param setSelectionChanging
+     *            a function which sets the {@link SnapshotView#selectionChangingProperty() selectionChanging} property
+     *            to the given value
      */
     public SnapshotViewBehavior(SnapshotView snapshotView, Consumer<Boolean> setSelectionChanging) {
         super(snapshotView, new ArrayList<KeyBinding>());
         this.setSelectionChanging = setSelectionChanging;
-    }
-
-    /* ************************************************************************
-     *                                                                         *
-     * Usability Access Functions to SnapshotView Properties                   *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * The current selection.
-     * 
-     * @return {@link SnapshotView#getSelection()}
-     */
-    private Rectangle2D getSelection() {
-        return getControl().getSelection();
-    }
-
-    private double getSelectionMaxWidth() {
-        return getControl().getWidth();
-    }
-
-    private double getSelectionMaxHeight() {
-        return getControl().getHeight();
-    }
-
-    /**
-     * Indicates whether the current selection has a fixed ratio.
-     * 
-     * @return {@link SnapshotView#isSelectionRatioFixed()}
-     */
-    private boolean isSelectionRatioFixed() {
-        return getControl().isSelectionRatioFixed();
-    }
-
-    /**
-     * The current selection's fixed ratio.
-     * 
-     * @return {@link SnapshotView#getFixedSelectionRatio()}
-     */
-    private double getSelectionRatio() {
-        return getControl().getFixedSelectionRatio();
     }
 
     /* ************************************************************************
@@ -151,10 +120,12 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * cursor.
      * 
      * @param mouseEvent
-     *            the handled {@link MouseEvent}
+     *            the handled {@link MouseEvent}; must not be {@code null}
      * @return the cursor which will be used for this event
      */
     public Cursor handleMouseEvent(MouseEvent mouseEvent) {
+        Objects.requireNonNull(mouseEvent, "The argument 'mouseEvent' must not be null.");
+
         EventType<? extends MouseEvent> eventType = mouseEvent.getEventType();
         SelectionEvent selectionEvent = createSelectionEvent(mouseEvent);
 
@@ -185,22 +156,29 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      */
     private SelectionEvent createSelectionEvent(MouseEvent mouseEvent) {
         Point2D point = new Point2D(mouseEvent.getX(), mouseEvent.getY());
-        Rectangle2D selectionBounds = createBoundsForBoundary(getControl().getSelectionAreaBoundary());
+        Rectangle2D selectionBounds = createBoundsForCurrentBoundary();
         CoordinatePosition position = computePosition(point);
         return new SelectionEvent(mouseEvent, point, selectionBounds, position);
     }
 
-    private Rectangle2D createBoundsForBoundary(Boundary boundary) {
+    /**
+     * Returns the bounds according to the current {@link SnapshotView#selectionAreaBoundaryProperty()
+     * selectionAreaBoundary}.
+     * 
+     * @return the bounds as a {@link Rectangle2D}
+     */
+    private Rectangle2D createBoundsForCurrentBoundary() {
+        Boundary boundary = getControl().getSelectionAreaBoundary();
         switch (boundary) {
         case CONTROL:
-            return new Rectangle2D(0, 0, getControl().getWidth(), getControl().getHeight());
+            return new Rectangle2D(0, 0, getControlWidth(), getControlHeight());
         case NODE:
-            boolean nodeExists = getControl().getNode() != null;
+            boolean nodeExists = getNode() != null;
             if (nodeExists) {
-                Bounds nodeBounds = getControl().getNode().getBoundsInParent();
+                Bounds nodeBounds = getNode().getBoundsInParent();
                 return Rectangles2D.fromBounds(nodeBounds);
             } else {
-                return new Rectangle2D(0, 0, 0, 0);
+                return Rectangle2D.EMPTY;
             }
         default:
             throw new IllegalArgumentException("The boundary " + boundary + " is not fully implemented.");
@@ -218,7 +196,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      */
     private CoordinatePosition computePosition(Point2D point) {
         boolean noSelection = !getControl().hasSelection() || !getControl().isSelectionActive();
-        boolean controlHasNoSpace = getControl().getWidth() == 0 || getControl().getHeight() == 0;
+        boolean controlHasNoSpace = getControlWidth() == 0 || getControlHeight() == 0;
         if (noSelection || controlHasNoSpace) {
             return CoordinatePosition.OUT_OF_RECTANGLE;
         }
@@ -228,10 +206,22 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
     }
 
     /**
-     * Returns the position of the specified point relative to a possible selection with the specified tolerance.
+     * Computes the tolerance which is used to determine whether the cursor is on an edge.
      * 
+     * @return the absolute tolerance
+     */
+    private double computeTolerance() {
+        double controlMeanLength = Math.sqrt(getControlWidth() * getControlHeight());
+        return RELATIVE_EDGE_TOLERANCE * controlMeanLength;
+    }
+
+    /**
+     * Returns the position of the specified point relative to the specified selection with the specified tolerance.
+     * 
+     * @param selection
+     *            the selection relative to which the point's position will be computed; as a {@link Rectangle2D}
      * @param point
-     *            the point (in the node's preferred coordinates) whose position will be computed
+     *            the {@link Point2D} whose position will be computed
      * @param tolerance
      *            the absolute tolerance used to determine whether the point is on an edge
      * 
@@ -245,19 +235,6 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         } else {
             return CoordinatePositions.inRectangle(selection, point);
         }
-    }
-
-    /**
-     * Computes the tolerance which is used to determine whether the cursor is on an edge.
-     * 
-     * @return the absolute tolerance
-     */
-    private double computeTolerance() {
-        double controlWidth = getControl().getWidth();
-        double controlHeight = getControl().getHeight();
-        double controlMeanLength = Math.sqrt(controlWidth * controlHeight);
-
-        return RELATIVE_EDGE_TOLERANCE * controlMeanLength;
     }
 
     // HANDLE SELECTION EVENTS
@@ -430,6 +407,65 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
     /* ************************************************************************
      *                                                                         *
+     * Usability Access Functions to SnapshotView Properties                   *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * The control's width.
+     * 
+     * @return {@link SnapshotView#getWidth()}
+     */
+    private double getControlWidth() {
+        return getControl().getWidth();
+    }
+
+    /**
+     * The control's height.
+     * 
+     * @return {@link SnapshotView#getHeight()}
+     */
+    private double getControlHeight() {
+        return getControl().getHeight();
+    }
+
+    /**
+     * The currently displayed node.
+     * 
+     * @return {@link SnapshotView#getNode()}
+     */
+    private Node getNode() {
+        return getControl().getNode();
+    }
+
+    /**
+     * The current selection.
+     * 
+     * @return {@link SnapshotView#getSelection()}
+     */
+    private Rectangle2D getSelection() {
+        return getControl().getSelection();
+    }
+    /**
+     * Indicates whether the current selection has a fixed ratio.
+     * 
+     * @return {@link SnapshotView#isSelectionRatioFixed()}
+     */
+    private boolean isSelectionRatioFixed() {
+        return getControl().isSelectionRatioFixed();
+    }
+
+    /**
+     * The current selection's fixed ratio.
+     * 
+     * @return {@link SnapshotView#getFixedSelectionRatio()}
+     */
+    private double getSelectionRatio() {
+        return getControl().getFixedSelectionRatio();
+    }
+
+    /* ************************************************************************
+     *                                                                         *
      * Inner Classes                                                           *
      *                                                                         *
      **************************************************************************/
@@ -441,7 +477,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
     private static class SelectionEvent {
 
         /**
-         * The mouse event for which this selection event was created.
+         * The {@link MouseEvent} for which this selection event was created.
          */
         private final MouseEvent mouseEvent;
 
@@ -562,8 +598,14 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      */
     private static class NoSelectionChange implements SelectionChange {
 
+        /**
+         * The singleton instance.
+         */
         public static final NoSelectionChange INSTANCE = new NoSelectionChange();
 
+        /**
+         * Private constructor for singleton.
+         */
         private NoSelectionChange() {
             // nothing to do
         }
@@ -600,10 +642,14 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         // Attributes
 
         /**
-         * The image view whose selection will be changed.
+         * The snapshot view whose selection will be changed.
          */
         private final SnapshotView snapshotView;
 
+        /**
+         * A function which sets the {@link SnapshotView#selectionChangingProperty() selectionChanging} property to the
+         * given value.
+         */
         private final Consumer<Boolean> setSelectionChanging;
 
         /**
@@ -640,6 +686,9 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
          * 
          * @param snapshotView
          *            the {@link SnapshotView} whose selection will be changed
+         * @param setSelectionChanging
+         *            a function which sets the {@link SnapshotView#selectionChangingProperty() selectionChanging}
+         *            property to the given value
          * @param selectionChangeStrategy
          *            the {@link Rectangle2DChangeStrategy} used to change the selection
          * @param cursor
@@ -660,9 +709,6 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
         // Selection Change
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void beginSelectionChange(Point2D point) {
             startingPoint = point;
@@ -672,9 +718,6 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
             snapshotView.setSelection(newSelection);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void continueSelectionChange(Point2D point) {
             updateMouseMoved(point);
@@ -683,9 +726,6 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
             snapshotView.setSelection(newSelection);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void endSelectionChange(Point2D point) {
             updateMouseMoved(point);
@@ -720,9 +760,6 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
         // Attribute Access
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Cursor getCursor() {
             return cursor;

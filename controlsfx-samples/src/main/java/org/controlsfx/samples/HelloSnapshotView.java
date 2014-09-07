@@ -296,14 +296,13 @@ public class HelloSnapshotView extends ControlsFXSample {
         // selection active
         CheckBox selectionActive = new CheckBox();
         selectionActive.selectedProperty().bindBidirectional(snapshotView.selectionActiveProperty());
-        selectionActive.disableProperty().bind(snapshotView.selectionActivityExplicitlyManagedProperty().not());
+        selectionActive.disableProperty().bind(snapshotView.selectionActivityManagedProperty().not());
         grid.addRow(row++, new Label("Active:"), selectionActive);
         
-        // selection actively managed
-        CheckBox selectionActivityExplicitlyManaged = new CheckBox();
-        selectionActivityExplicitlyManaged.selectedProperty().bindBidirectional(
-                snapshotView.selectionActivityExplicitlyManagedProperty());
-        grid.addRow(row++, new Label("Activity Explicitly Managed:"), selectionActivityExplicitlyManaged);
+        // selection managed
+        CheckBox selectionActivityManaged = new CheckBox();
+        selectionActivityManaged.selectedProperty().bindBidirectional(snapshotView.selectionActivityManagedProperty());
+        grid.addRow(row++, new Label("Activity Explicitly Managed:"), selectionActivityManaged);
 
         // selection mouse transparent
         CheckBox selectionMouseTransparent = new CheckBox();

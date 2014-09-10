@@ -128,6 +128,30 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
      * 
      **************************************************************************/
     
+    @Override protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return comboBox.minWidth(height);
+    }
+
+    @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return comboBox.minHeight(width);
+    }
+    
+    @Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return comboBox.prefWidth(height);
+    }
+
+    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return comboBox.prefHeight(width);
+    }
+    
+    @Override protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+    }
+
+    @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+    }
+    
     
     
     /**************************************************************************

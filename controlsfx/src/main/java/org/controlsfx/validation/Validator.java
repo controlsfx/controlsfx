@@ -29,6 +29,8 @@ package org.controlsfx.validation;
 import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.scene.control.Control;
 
@@ -40,6 +42,17 @@ import javafx.scene.control.Control;
  * @param <T> type of the controls value
  */
 public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
+    
+    /**
+     * Combines the given validators into a single Validator instance. 
+     * @param validators the validators to combine
+     * @return a Validator instance
+     */
+    static <T> Validator<T> combine(Validator<T>... validators) {
+        return (control, value) -> Stream.of(validators)
+            .map(validator -> validator.apply(control, value))
+            .collect(Collectors.reducing(new ValidationResult(), ValidationResult::combine));
+    }
 
     /**
      * Factory method to create a validator, which checks if value exists. 

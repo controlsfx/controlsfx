@@ -35,8 +35,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -68,33 +66,16 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     
     private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 
-//    private final HBox layout;
-
     public BreadCrumbBarSkin(final BreadCrumbBar<T> control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
-
-//        layout = new HBox();
-//        getChildren().add(layout);
-
         control.selectedCrumbProperty().addListener(selectedPathChangeListener);
-
         updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
     }
 
     private final ChangeListener<TreeItem<T>> selectedPathChangeListener =
-            new ChangeListener<TreeItem<T>>() {
-        @Override
-        public void changed(
-                ObservableValue<? extends TreeItem<T>> obs,
-                        TreeItem<T> oldItem,
-                        TreeItem<T> newItem) {
-
-            updateSelectedPath(newItem, oldItem);
-        }
-    };
+            (obs, oldItem, newItem) -> updateSelectedPath(newItem, oldItem);
 
     private void updateSelectedPath(TreeItem<T> newTarget, TreeItem<T> oldTarget) {
-
         if(oldTarget != null){
             // remove old listener
             newTarget.removeEventHandler(
@@ -108,12 +89,8 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     }
 
 
-    private final EventHandler<TreeModificationEvent<Object>> treeChildrenModifiedHandler =
-            new EventHandler<TreeModificationEvent<Object>>(){
-        @Override public void handle(TreeModificationEvent<Object> args) {
-            updateBreadCrumbs();
-        }
-    };
+    private final EventHandler<TreeModificationEvent<Object>> treeChildrenModifiedHandler = 
+            args -> updateBreadCrumbs();
 
 
     private void updateBreadCrumbs() {
@@ -192,12 +169,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
 //        crumb.prefHeightProperty().bind(getSkinnable().heightProperty());
 
         // listen to the action event of each bread crumb
-        crumb.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent ae) {
-                onBreadCrumbAction(selectedCrumb);
-            }
-        });
+        crumb.setOnAction(ae -> onBreadCrumbAction(selectedCrumb));
 
         return crumb;
     }
@@ -211,7 +183,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
         final BreadCrumbBar<T> breadCrumbBar = getSkinnable();
 
         // fire the composite event in the breadCrumbBar
-        Event.fireEvent(breadCrumbBar, new BreadCrumbActionEvent<T>(crumbModel));
+        Event.fireEvent(breadCrumbBar, new BreadCrumbActionEvent<>(crumbModel));
 
         // navigate to the clicked crumb
         if(breadCrumbBar.isAutoNavigationEnabled()){
@@ -236,7 +208,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
      */
     public static class BreadCrumbButton extends Button {
 
-        private final ObjectProperty<Boolean> first = new SimpleObjectProperty<Boolean>(this, "first"); //$NON-NLS-1$
+        private final ObjectProperty<Boolean> first = new SimpleObjectProperty<>(this, "first"); //$NON-NLS-1$
 
         private final double arrowWidth = 5;
         private final double arrowHeight = 20;

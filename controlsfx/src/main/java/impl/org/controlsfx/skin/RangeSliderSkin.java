@@ -52,7 +52,6 @@ import org.controlsfx.control.RangeSlider;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
-import com.sun.javafx.scene.traversal.TraversalEngine;
 
 public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBehavior> {
     /** Track if slider is vertical/horizontal and cause re layout */
@@ -201,7 +200,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                 getBehavior().lowThumbPressed(me, 0.0f);
                 preDragThumbPoint = lowThumb.localToParent(me.getX(), me.getY());
                 preDragPos = (getSkinnable().getLowValue() - getSkinnable().getMin()) /
-                        (getSkinnable().getMax() - getSkinnable().getMin());
+                        (getMaxMinusMinNoZero());
             }
         });
 
@@ -236,7 +235,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                 ((RangeSliderBehavior) getBehavior()).highThumbPressed(e, 0.0D);
                 preDragThumbPoint = highThumb.localToParent(e.getX(), e.getY());
                 preDragPos = (((RangeSlider) getSkinnable()).getHighValue() - ((RangeSlider) getSkinnable()).getMin()) / 
-                            (((RangeSlider) getSkinnable()).getMax() - ((RangeSlider) getSkinnable()).getMin());
+                            (getMaxMinusMinNoZero());
             }
         }
         );
@@ -376,16 +375,27 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
     }
     
     /**
+     *
+     * @return the difference between max and min, but if they have the same
+     * value, 1 is returned instead of 0 because otherwise the division where it
+     * can be used will return Nan.
+     */
+    private double getMaxMinusMinNoZero() {
+        RangeSlider s = getSkinnable();
+        return s.getMax() - s.getMin() == 0 ? 1 : s.getMax() - s.getMin();
+    }
+    
+    /**
      * Called when ever either min, max or lowValue changes, so lowthumb's layoutX, Y is recomputed.
      */
     private void positionLowThumb() {
         RangeSlider s = getSkinnable();
         boolean horizontal = isHorizontal();
         double lx = (horizontal) ? trackStart + (((trackLength * ((s.getLowValue() - s.getMin()) /
-                (s.getMax() - s.getMin()))) - thumbWidth/2)) : lowThumbPos;
+                (getMaxMinusMinNoZero()))) - thumbWidth/2)) : lowThumbPos;
         double ly = (horizontal) ? lowThumbPos :
             getSkinnable().getInsets().getTop() + trackLength - (trackLength * ((s.getLowValue() - s.getMin()) /
-                (s.getMax() - s.getMin()))); //  - thumbHeight/2
+                (getMaxMinusMinNoZero()))); //  - thumbHeight/2
         lowThumb.setLayoutX(lx);
         lowThumb.setLayoutY(ly);
         if (horizontal) rangeStart = lx + thumbWidth; else rangeEnd = ly;
@@ -408,8 +418,8 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         double trackLength = orientation ? track.getWidth() : track.getHeight();
         trackLength -= 2 * pad;
 
-        double x = orientation ? trackStart + (trackLength * ((slider.getHighValue() - slider.getMin()) / (slider.getMax() - slider.getMin())) - thumbWidth / 2D) : lowThumb.getLayoutX();
-        double y = orientation ? lowThumb.getLayoutY() : (getSkinnable().getInsets().getTop() + trackLength) - trackLength * ((slider.getHighValue() - slider.getMin()) / (slider.getMax() - slider.getMin()));
+        double x = orientation ? trackStart + (trackLength * ((slider.getHighValue() - slider.getMin()) / (getMaxMinusMinNoZero())) - thumbWidth / 2D) : lowThumb.getLayoutX();
+        double y = orientation ? lowThumb.getLayoutY() : (getSkinnable().getInsets().getTop() + trackLength) - trackLength * ((slider.getHighValue() - slider.getMin()) / (getMaxMinusMinNoZero()));
         highThumb.setLayoutX(x);
         highThumb.setLayoutY(y);
         if (orientation) rangeEnd = x; else rangeStart = y + thumbWidth;

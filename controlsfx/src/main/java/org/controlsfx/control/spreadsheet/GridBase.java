@@ -116,7 +116,7 @@ public class GridBase implements Grid, EventTarget {
      * This static method creates a sample Grid with 100 rows and 15 columns.
      * All cells are typed as String.
      *
-     * @return
+     * @return the sample Grid
      * @see SpreadsheetCellType#STRING
      */
     public static Grid getSampleGrid() {

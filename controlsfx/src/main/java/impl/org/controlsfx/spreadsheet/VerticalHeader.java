@@ -49,10 +49,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.WindowEvent;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -516,10 +519,20 @@ public class VerticalHeader extends StackPane {
         if (spreadsheetView.isRowFixable(row)) {
             final ContextMenu contextMenu = new ContextMenu();
 
-            MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.header.menu.fix")));
+            MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.verticalheader.menu.fix")));
+            contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
 
-            // fixItem.setGraphic(new ImageView(new
-            // Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));
+                @Override
+                public void handle(WindowEvent event) {
+                    if (spreadsheetView.getFixedRows().contains(row)) {
+                        fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.unfix")));
+                    } else {
+                        fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.fix")));
+                    }
+                }
+            });
+            fixItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));
+            
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {

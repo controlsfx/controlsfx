@@ -344,10 +344,21 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     /**
+     * This constructor will generate a sample Grid with {@link GridBase#getSampleGrid()
+     * } and pass it to the other constructor {@link #SpreadsheetView(org.controlsfx.control.spreadsheet.Grid)
+     * }.
+     */
+    public SpreadsheetView(){
+        this(GridBase.getSampleGrid());
+        for(SpreadsheetColumn column: getColumns()){
+            column.setPrefWidth(100);
+        }
+    }
+    
+    /**
      * Creates a SpreadsheetView control with the {@link Grid} specified.
-     * 
-     * @param grid
-     *            The Grid that contains the items to be rendered
+     *
+     * @param grid The Grid that contains the items to be rendered
      */
     public SpreadsheetView(final Grid grid) {
         super();
@@ -397,12 +408,6 @@ public class SpreadsheetView extends Control {
         cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                // Copy
-//                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
-//                    copyClipboard();
-//                // Paste
-//                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
-//                    pasteClipboard();
                 // Go to the next row
                 if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
@@ -578,7 +583,7 @@ public class SpreadsheetView extends Control {
      * 
      * @return An unmodifiable observableList.
      */
-    public ObservableList<SpreadsheetColumn> getColumns() {
+    public final ObservableList<SpreadsheetColumn> getColumns() {
         return FXCollections.unmodifiableObservableList(columns);
     }
 
@@ -1118,7 +1123,7 @@ public class SpreadsheetView extends Control {
         cornerMenu.setGraphic(new ImageView(new Image(SpreadsheetView.class
                 .getResourceAsStream("comment.png"))));
 
-        final MenuItem topLeftItem = new MenuItem("top-left");
+        final MenuItem topLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-left")));
         topLeftItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1128,7 +1133,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
             }
         });
-        final MenuItem topRightItem = new MenuItem("top-right");
+        final MenuItem topRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-right")));
         topRightItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1138,7 +1143,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
             }
         });
-        final MenuItem bottomRightItem = new MenuItem("bottom-right");
+        final MenuItem bottomRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-right")));
         bottomRightItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1148,7 +1153,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
             }
         });
-        final MenuItem bottomLeftItem = new MenuItem("bottom-left");
+        final MenuItem bottomLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-left")));
         bottomLeftItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override

@@ -398,6 +398,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                 row.requestLayout();
             }
         }
+        
+        //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
+        getFlow().layoutChildren();
     }
     /**
      * We want to have extra space when displaying LocalDate because they will

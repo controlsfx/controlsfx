@@ -884,7 +884,20 @@ public class RangeSlider extends ControlsFXControl {
     }
 
     private void adjustLowValues() {
-        if (getLowValue() < getMin() || getLowValue() >= getHighValue()) {
+        /**
+         * We first look if the LowValue is between the min and max.
+         */
+        if (getLowValue() < getMin() || getLowValue() > getMax()) {
+            double value = Utils.clamp(getMin(), getLowValue(), getMax());
+            setLowValue(value);
+        /**
+         * If the LowValue seems right, we check if it's not superior to
+         * HighValue ONLY if the highValue itself is right. Because it may
+         * happen that the highValue has not yet been computed and is
+         * wrong, and therefore force the lowValue to change in a wrong way
+         * which may end up in an infinite loop.
+         */
+        } else if (getLowValue() >= getHighValue() && (getHighValue() >= getMin() && getHighValue() <= getMax())) {
             double value = Utils.clamp(getMin(), getLowValue(), getHighValue());
             setLowValue(value);
         }
@@ -908,7 +921,9 @@ public class RangeSlider extends ControlsFXControl {
     }
 
     private void adjustHighValues() {
-        if (getHighValue() < getLowValue() || getHighValue() > getMax()) {
+        if (getHighValue() < getMin() || getHighValue() > getMax()) {
+            setHighValue(Utils.clamp(getMin(), getHighValue(), getMax()));
+        } else if (getHighValue() < getLowValue() && (getLowValue() >= getMin() && getLowValue() <= getMax())) {
             setHighValue(Utils.clamp(getLowValue(), getHighValue(), getMax()));
         }
     }

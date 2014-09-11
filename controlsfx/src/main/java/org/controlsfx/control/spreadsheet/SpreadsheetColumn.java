@@ -29,9 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
-
 import java.util.List;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
@@ -40,6 +38,9 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.WindowEvent;
 import org.controlsfx.tools.Utils;
 
 /**
@@ -237,8 +238,18 @@ public final class SpreadsheetColumn {
             final ContextMenu contextMenu = new ContextMenu();
 
             this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix")));
-            // fixItem.setGraphic(new ImageView(new
-            // Image(spreadsheetView.getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+            contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+
+                @Override
+                public void handle(WindowEvent event) {
+                    if (!isFixed()) {
+                        fixItem.setText(localize(asKey("spreadsheet.column.menu.fix")));
+                    } else {
+                        fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix")));
+                    }
+                }
+            });
+            fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png"))));
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {

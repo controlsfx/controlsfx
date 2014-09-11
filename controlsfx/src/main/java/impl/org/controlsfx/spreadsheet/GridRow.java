@@ -67,6 +67,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
          *  keep the old value.
          */
         this.indexProperty().addListener(setPrefHeightListener);
+        this.visibleProperty().addListener(setPrefHeightListener);
         
         handle.getView().gridProperty().addListener(setPrefHeightListener);
         
@@ -78,11 +79,9 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
             @Override
             public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
                 if(change.wasAdded() && change.getKey() == getIndex()){
-                    setPrefHeight(change.getValueAdded());
-                    requestLayout();
+                    setRowHeight(change.getValueAdded());
                 }else if(change.wasRemoved() && change.getKey() == getIndex()){
-                    setPrefHeight(computePrefHeight(-1));
-                    requestLayout();
+                    setRowHeight(computePrefHeight(-1));
                 }
             }
         });
@@ -122,7 +121,12 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 
         @Override
         public void invalidated(Observable o) {
-            setPrefHeight(computePrefHeight(-1));
+            setRowHeight(computePrefHeight(-1));
         }
     };
+    
+    private void setRowHeight(double height) {
+        setHeight(height);
+        setPrefHeight(height);
+    }
 }

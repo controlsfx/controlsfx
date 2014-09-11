@@ -344,10 +344,21 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     /**
+     * This constructor will generate a sample Grid with {@link GridBase#getSampleGrid()
+     * } and pass it to the other constructor {@link #SpreadsheetView(org.controlsfx.control.spreadsheet.Grid)
+     * }.
+     */
+    public SpreadsheetView(){
+        this(GridBase.getSampleGrid());
+        for(SpreadsheetColumn column: getColumns()){
+            column.setPrefWidth(100);
+        }
+    }
+    
+    /**
      * Creates a SpreadsheetView control with the {@link Grid} specified.
-     * 
-     * @param grid
-     *            The Grid that contains the items to be rendered
+     *
+     * @param grid The Grid that contains the items to be rendered
      */
     public SpreadsheetView(final Grid grid) {
         super();
@@ -578,7 +589,7 @@ public class SpreadsheetView extends Control {
      * 
      * @return An unmodifiable observableList.
      */
-    public ObservableList<SpreadsheetColumn> getColumns() {
+    public final ObservableList<SpreadsheetColumn> getColumns() {
         return FXCollections.unmodifiableObservableList(columns);
     }
 

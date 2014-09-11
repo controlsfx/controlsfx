@@ -41,6 +41,7 @@ import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableView;
@@ -99,7 +100,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // When we detect a drag, we start the Full Drag so that other event
         // will be fired
         this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
-
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
         itemProperty().addListener(itemChangeListener);
@@ -476,8 +476,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private final EventHandler<MouseEvent> startFullDragEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent arg0) {
-            setAnchor(getTableView(), getTableView().getFocusModel().getFocusedCell());
-            startFullDrag();
+            if (handle.getGridView().getSelectionModel().getSelectionMode().equals(SelectionMode.MULTIPLE)) {
+                setAnchor(getTableView(), getTableView().getFocusModel().getFocusedCell());
+                startFullDrag();
+            }
         }
     };
     

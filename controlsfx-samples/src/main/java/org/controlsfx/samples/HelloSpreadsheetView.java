@@ -47,6 +47,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -76,6 +77,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     private StackPane centerPane;
     private final CheckBox rowHeader = new CheckBox();
     private final CheckBox columnHeader = new CheckBox();
+    private final CheckBox selectionMode = new CheckBox();
     private final CheckBox editable = new CheckBox();
 
     /**
@@ -126,6 +128,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.setShowRowHeader(rowHeader.isSelected());
         spreadSheetView.setShowColumnHeader(columnHeader.isSelected());
         spreadSheetView.setEditable(editable.isSelected());
+        spreadSheetView.getSelectionModel().setSelectionMode(selectionMode.isSelected() ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
 
         generatePickers();
 
@@ -134,7 +137,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.getColumns().get(1).setPrefWidth(250);
         centerPane.getChildren().setAll(spreadSheetView);
 
-        spreadSheetView.getStylesheets().add(HelloDecorator.class.getResource("spreadsheetSample.css").toExternalForm());
+        spreadSheetView.getStylesheets().add(getClass().getResource("spreadsheetSample.css").toExternalForm());
         return centerPane;
     }
 
@@ -681,6 +684,20 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         Slider slider = new Slider(15, 100, 30);
         spreadSheetView.rowHeaderWidthProperty().bind(slider.valueProperty());
         grid.add(slider, 1, row++);
+        
+        // Multiple Selection
+        Label selectionModeLabel = new Label("Multiple selection: ");
+        selectionModeLabel.getStyleClass().add("property");
+        grid.add(selectionModeLabel, 0, row);
+        selectionMode.setSelected(true);
+        grid.add(selectionMode, 1, row++);
+        selectionMode.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean isSelected) {
+                spreadSheetView.getSelectionModel().clearSelection();
+                spreadSheetView.getSelectionModel().setSelectionMode(isSelected ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
+            }
+        });
         
         return grid;
     }

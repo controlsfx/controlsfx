@@ -292,6 +292,10 @@ public class SpreadsheetViewSelectionModel extends
 
         old = posFinal;
 
+        if (getSelectionMode() == SelectionMode.SINGLE) {
+            quietClearSelection();
+        }
+        
         selectedCellsMap.add(posFinal);
 
         updateScroll(posFinal);
@@ -358,6 +362,12 @@ public class SpreadsheetViewSelectionModel extends
     @Override
     public void selectRange(int minRow, TableColumnBase<ObservableList<SpreadsheetCell>, ?> minColumn, int maxRow,
             TableColumnBase<ObservableList<SpreadsheetCell>, ?> maxColumn) {
+        
+        if (getSelectionMode() == SelectionMode.SINGLE) {
+            quietClearSelection();
+            select(maxRow, maxColumn);
+            return;
+        }
         makeAtomic = true;
 
         final int itemCount = getItemCount();

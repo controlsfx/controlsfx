@@ -1,16 +1,21 @@
 
 dependencies {
-    compile 'org.controlsfx:openjfx-dialogs:1.0.1'
     compile localGroovy()
     compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         exclude group: 'org.codehaus.groovy', module: 'groovy'
     }
+    compile 'org.controlsfx:openjfx-dialogs:1.0.1'
+    try {
+        jdk files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        // javafx plugin will provide in this case
+    }
 }
 
-ext {
-  pomExclusions = ['http-builder']
-}
+//ext {
+//  pomExclusions = ['http-builder']
+//}
 
 
 test {
@@ -44,13 +49,6 @@ sourceSets {
     }
 }
 
-dependencies {
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        // javafx plugin will provide in this case
-    }
-}
 
 task downloadTranslations << {
     description = "Download translations from Transifex"

@@ -46,13 +46,12 @@ install {
     configuration = configurations.published
 }
 
-ext {
-  pomExclusions = []
-}
+//ext {
+//  pomExclusions = []
+//}
 
 private configurePOM(def pom) {
-    pom{
-      project {
+    pom.project {
         name 'ControlsFX'
         description 'High quality UI controls and other tools to complement the core JavaFX distribution'
         url 'http://www.controlsfx.org/'
@@ -84,10 +83,10 @@ private configurePOM(def pom) {
             //project.build.sourceEncoding='UTF-8'
             setProperty('project.build.sourceEncoding', 'UTF8')
         }
-      }
-      whenConfigured{
-         dependencies = dependencies.findAll {dep -> !pomExclusions.contains(dep.artifactId) } 
-      }
+      //}
+      //whenConfigured{
+      //   dependencies = dependencies.findAll {dep -> !pomExclusions.contains(dep.artifactId) } 
+      //}
 
     }
 }

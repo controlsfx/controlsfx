@@ -114,6 +114,11 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     }
 
     @Override
+    public String getControlStylesheetURL() {
+    	return "/org/controlsfx/samples/spreadsheetSample.css";
+    }
+    
+    @Override
     public Node getPanel(Stage stage) {
         centerPane = new StackPane();
 

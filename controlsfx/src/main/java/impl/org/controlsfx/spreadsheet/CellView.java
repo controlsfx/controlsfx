@@ -70,8 +70,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor"; //$NON-NLS-1$
     private static final int TOOLTIP_MAX_WIDTH = 400;
-    private static final int WRAP_HEIGHT = 35;
-    private static final Duration FADE_DURATION = Duration.millis(500);
+    private static final Duration FADE_DURATION = Duration.millis(200);
 
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
@@ -271,8 +270,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * value (the right one) if the new value goes out of bounds.
              */
             if (item.getRow() == 0) {
-                item.getGraphic().layoutXProperty().removeListener(new WeakChangeListener<>(firstRowLayoutXListener));
-                item.getGraphic().layoutXProperty().addListener(new WeakChangeListener<>(firstRowLayoutXListener));
+                item.getGraphic().layoutXProperty().removeListener(firstRowLayoutXListener);
+                item.getGraphic().layoutXProperty().addListener(firstRowLayoutXListener);
 
                 item.getGraphic().layoutYProperty().removeListener(firstRowLayoutYListener);
                 item.getGraphic().layoutYProperty().addListener(firstRowLayoutYListener);

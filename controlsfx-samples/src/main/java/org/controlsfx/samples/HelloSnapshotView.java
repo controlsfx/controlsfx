@@ -122,25 +122,25 @@ public class HelloSnapshotView extends ControlsFXSample {
             "Java's Duke",
             "Null Image",
     };
-    
-    private final IntegerProperty selectedImageIndex  = new SimpleIntegerProperty();
+
+    private final IntegerProperty selectedImageIndex = new SimpleIntegerProperty();
 
     /**
      * The demonstrated view.
      */
     private final SnapshotView snapshotView = new SnapshotView();
-    
+
     /* ************************************************************************
      *                                                                         *
      * Construction                                                            *
      *                                                                         *
      **************************************************************************/
-    
+
     public HelloSnapshotView() {
         images = loadImages();
         nodes = createNodes();
     }
-    
+
     /* ************************************************************************
      *                                                                         *
      * Displayed Controls                                                      *
@@ -149,8 +149,6 @@ public class HelloSnapshotView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        StyleManager.getInstance().addUserAgentStylesheet("file:///D:/Downloads/test.css");
-        
         snapshotView.setNode(nodes[0]);
         return snapshotView;
     }
@@ -214,11 +212,11 @@ public class HelloSnapshotView extends ControlsFXSample {
         int nextImageIndex = (currentImageIndex + 1) % (images.length - 1);
         selectedImageIndex.set(nextImageIndex);
     }
-    
+
     @Override
     public Node getControlPanel() {
         return new VBox(10,
-                createNodeControl(), createSettingsControl(), 
+                createNodeControl(), createSettingsControl(),
                 createVisualizationControl(), createSelectionControl(), createSnapshotImageView());
     }
 
@@ -285,7 +283,7 @@ public class HelloSnapshotView extends ControlsFXSample {
         ImageView view = (ImageView) containingPane.getChildren().get(0);
         view.setImage(image);
     }
-    
+
     /**
      * @return a control for all the view related properties
      */
@@ -302,7 +300,7 @@ public class HelloSnapshotView extends ControlsFXSample {
         selectionActive.selectedProperty().bindBidirectional(snapshotView.selectionActiveProperty());
         selectionActive.disableProperty().bind(snapshotView.selectionActivityManagedProperty());
         grid.addRow(row++, new Label("Active:"), selectionActive);
-        
+
         // selection managed
         CheckBox selectionActivityManaged = new CheckBox();
         selectionActivityManaged.selectedProperty().bindBidirectional(snapshotView.selectionActivityManagedProperty());
@@ -390,22 +388,22 @@ public class HelloSnapshotView extends ControlsFXSample {
         int row = 0;
 
         // selection fill color
-        ColorPicker selectionFillPicker = new ColorPicker((Color)snapshotView.getSelectionAreaFill());
+        ColorPicker selectionFillPicker = new ColorPicker((Color) snapshotView.getSelectionAreaFill());
         snapshotView.selectionAreaFillProperty().bind(selectionFillPicker.valueProperty());
         grid.addRow(row++, new Label("Fill Color:"), selectionFillPicker);
-        
+
         // selection border color
-        ColorPicker selectionBorderPaintPicker = new ColorPicker((Color)snapshotView.getSelectionBorderPaint());
+        ColorPicker selectionBorderPaintPicker = new ColorPicker((Color) snapshotView.getSelectionBorderPaint());
         snapshotView.selectionBorderPaintProperty().bind(selectionBorderPaintPicker.valueProperty());
         grid.addRow(row++, new Label("Stroke Color:"), selectionBorderPaintPicker);
-        
+
         // selection border width
         Slider selectionStrokeWidth = new Slider(0, 25, snapshotView.getSelectionBorderWidth());
         snapshotView.selectionBorderWidthProperty().bindBidirectional(selectionStrokeWidth.valueProperty());
         grid.addRow(row++, new Label("Stroke Width:"), selectionStrokeWidth);
-        
+
         // unselected area fill color
-        ColorPicker unselectedAreaFillPicker = new ColorPicker((Color)snapshotView.getUnselectedAreaFill());
+        ColorPicker unselectedAreaFillPicker = new ColorPicker((Color) snapshotView.getUnselectedAreaFill());
         snapshotView.unselectedAreaFillProperty().bind(unselectedAreaFillPicker.valueProperty());
         grid.addRow(row++, new Label("Outer Color:"), unselectedAreaFillPicker);
 
@@ -499,7 +497,10 @@ public class HelloSnapshotView extends ControlsFXSample {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long timestamp) {
-                WritableImage snapshot = snapshotView.createSnapshot();
+                Image snapshot = null;
+                if (snapshotView.getNode() != null && snapshotView.hasSelection()) {
+                    snapshot = snapshotView.createSnapshot();
+                }
                 snapshotImageView.setImage(snapshot);
             }
         };

@@ -345,36 +345,49 @@ public class SnapshotView extends ControlsFXControl {
      **************************************************************************/
 
     /**
-     * Creates an image of the selected area and returns it. If {@link #nodeProperty() node} is {@code null} or this
-     * control {@link #hasSelection() has no selection}, {@code null} is returned.
+     * Creates a snapshot of the selected area of the node.
      * 
      * @return the {@link WritableImage} that holds the rendered selection
+     * @throws IllegalStateException
+     *             if {@link #nodeProperty() node} is {@code null} or {@link #hasSelection() hasSelection} is
+     *             {@code false}
      * @see Node#snapshot
      */
-    public WritableImage createSnapshot() {
+    public WritableImage createSnapshot() throws IllegalStateException {
+        // make sure the node and the selection exist
+        if (getNode() == null) {
+            throw new IllegalStateException("No snapshot can be created if the node is null (check 'getNode()').");
+        }
+        if (!hasSelection()) {
+            throw new IllegalStateException(
+                    "No snapshot can be created if there is no selection (check 'hasSelection()').");
+        }
+
         SnapshotParameters parameters = new SnapshotParameters();
         parameters.setViewport(getSelection());
         return createSnapshot(parameters);
     }
 
     /**
-     * Creates an image of the selected area and returns it. If {@link #nodeProperty() node} is {@code null} or this
-     * control {@link #hasSelection() has no selection}, {@code null} is returned.
+     * Creates a snapshot of the node with the specified parameters.
      * 
      * @param parameters
-     *            the {@link SnapshotParameters} used for the snapshot; must not be {@code null}
-     * @return the {@link WritableImage} that holds the rendered selection
+     *            the {@link SnapshotParameters} used for the snapshot (must not be {@code null}); the viewport will be
+     *            interpreted relative to this control (like the {@link #selectionProperty() selection})
+     * @return the {@link WritableImage} that holds the rendered viewport
+     * @throws IllegalStateException
+     *             if {@link #nodeProperty() node} is {@code null}
      * @see Node#snapshot
      */
-    public WritableImage createSnapshot(SnapshotParameters parameters) {
+    public WritableImage createSnapshot(SnapshotParameters parameters) throws IllegalStateException {
+        // make sure the node and the snapshot parameters exist
         Objects.requireNonNull(parameters, "The argument 'parameters' must not be null.");
-
-        boolean noNodeOrNoSelection = getNode() == null || !hasSelection();
-        if (noNodeOrNoSelection) {
-            return null;
+        if (getNode() == null) {
+            throw new IllegalStateException("No snapshot can be created if the node is null (check 'getNode()').");
         }
 
-        return snapshot(parameters, null);
+        // take the snapshot
+        return getNode().snapshot(parameters, null);
     }
 
     /* ************************************************************************

@@ -345,6 +345,56 @@ public class SnapshotView extends ControlsFXControl {
      **************************************************************************/
 
     /**
+     * Transforms the {@link #selectionProperty() selection} to node coordinates by calling
+     * {@link #transformToNodeCoordinates(Rectangle2D) transformToNodeCoordinates}.
+     * 
+     * @return a {@link Rectangle2D} which expresses the selection in the node's coordinates
+     * @throws IllegalStateException
+     *             if {@link #nodeProperty() node} is {@code null} or {@link #hasSelection() hasSelection} is
+     *             {@code false}
+     * @see #transformToNodeCoordinates(Rectangle2D)
+     */
+    public Rectangle2D transformSelectionToNodeCoordinates() {
+        if (!hasSelection()) {
+            throw new IllegalStateException(
+                    "The selection can not be transformed if it does not exist (check 'hasSelection()').");
+        }
+
+        return transformToNodeCoordinates(getSelection());
+    }
+
+    /**
+     * Transforms the specified area's coordinates to coordinates relative to the node. (The node's coordinate system
+     * has its origin in the upper left corner of the node.)
+     * 
+     * @param area
+     *            the {@link Rectangle2D} which will be transformed (must not be {@code null}); its coordinates will be
+     *            interpreted relative to the control (like the {@link #selectionProperty() selection})
+     * @return a {@link Rectangle2D} with the same width and height as the specified {@code area} but with coordinates
+     *         which are relative to the current {@link #nodeProperty() node}
+     * @throws IllegalStateException
+     *             if {@link #nodeProperty() node} is {@code null}
+     */
+    public Rectangle2D transformToNodeCoordinates(Rectangle2D area) throws IllegalStateException {
+        Objects.requireNonNull(area, "The argument 'area' must not be null.");
+        if (getNode() == null) {
+            throw new IllegalStateException(
+                    "The selection can not be transformed if the node is null (check 'getNode()').");
+        }
+
+        // get the offset from the node's bounds
+        Bounds nodeBounds = getNode().getBoundsInParent();
+        double xOffset = nodeBounds.getMinX();
+        double yOffset = nodeBounds.getMinY();
+
+        // the coordinates of the transformed selection
+        double minX = area.getMinX() - xOffset;
+        double minY = area.getMinY() - yOffset;
+
+        return new Rectangle2D(minX, minY, area.getWidth(), area.getHeight());
+    }
+
+    /**
      * Creates a snapshot of the selected area of the node.
      * 
      * @return the {@link WritableImage} that holds the rendered selection

@@ -37,6 +37,7 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
@@ -101,13 +102,15 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         }
         
         final List<SpreadsheetCell> row = grid.getRows().get(index);
+        final List<SpreadsheetColumn> columns = spreadsheetView.getColumns();
+        final ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> tableViewColumns = gridView.getColumns();
         /**
          * If we use "setGrid" on SpreadsheetView, we must be careful because we
          * set our columns after (due to threading safety). So if, by mistake,
          * we are in layout and the columns are set in SpreadsheetView, but not
          * in TableView (yet). Then just return and wait for next calling.
          */
-        if (spreadsheetView.getColumns().size() != gridView.getColumns().size()) {
+        if (columns.size() != tableViewColumns.size()) {
             return;
         }
         
@@ -157,7 +160,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, spreadsheetCell.getColumnSpan());
 
             // We translate that column by the Hbar Value if it's fixed
-            if (spreadsheetView.getColumns().get(column).isFixed()) {
+            if (columns.get(column).isFixed()) {
                 if (hbarValue + fixedColumnWidth > x) {
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();
@@ -183,7 +186,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
                         final SpreadsheetViewSelectionModel sm = (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel();
-                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = gridView.getColumns().get(column);
+                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(column);
 
                         /**
                          * In case this cell was selected before but we scroll
@@ -224,7 +227,7 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
                      */
                     for (int i = 1, colSpan = spreadsheetCell.getColumnSpan(), max1 = cells
                             .size() - column; i < colSpan && i < max1; i++) {
-                        width += snapSize(spreadsheetView.getColumns().get(column + i).getWidth());
+                        width += snapSize(columns.get(column + i).getWidth());
                     }
                 }
 

@@ -577,13 +577,14 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return an unmodifiable observableList of the {@link SpreadsheetColumn}
-     * used.
-     * 
-     * @return An unmodifiable observableList.
+     * Return an ObservableList of the {@link SpreadsheetColumn} used. This list
+     * is filled automatically by the SpreadsheetView. Adding and removing
+     * columns should be done in the model {@link Grid}.
+     *
+     * @return An ObservableList of the {@link SpreadsheetColumn}
      */
     public final ObservableList<SpreadsheetColumn> getColumns() {
-        return FXCollections.unmodifiableObservableList(columns);
+        return columns;
     }
 
     /**

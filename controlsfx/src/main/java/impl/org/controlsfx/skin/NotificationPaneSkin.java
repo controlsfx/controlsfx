@@ -34,11 +34,18 @@ import javafx.scene.Node;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                NotificationPane.class.getResource("notificationpane.css").toExternalForm());
+    }
     
     private NotificationBar notificationBar;
     private Node content;

@@ -380,13 +380,13 @@ public class SnapshotView extends ControlsFXControl {
      */
     private static final String DEFAULT_STYLE_CLASS = "snapshot-view";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getUserAgentStylesheet() {
-        return SnapshotView.class.getResource("snapshot-view.css").toExternalForm();
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    protected String getUserAgentStylesheet() {
+//        return SnapshotView.class.getResource("snapshot-view.css").toExternalForm();
+//    }
 
     /**
      * {@inheritDoc}

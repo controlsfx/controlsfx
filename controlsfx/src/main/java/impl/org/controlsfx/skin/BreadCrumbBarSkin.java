@@ -53,6 +53,7 @@ import javafx.util.Callback;
 import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -63,6 +64,12 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  * @param <T>
  */
 public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, BehaviorBase<BreadCrumbBar<T>>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm());
+    }
     
     private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 

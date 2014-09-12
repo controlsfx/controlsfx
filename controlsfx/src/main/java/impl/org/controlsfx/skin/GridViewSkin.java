@@ -35,12 +35,19 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.GridView;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorBase<GridView<T>>, GridRow<T>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                GridView.class.getResource("gridview.css").toExternalForm());
+    }
 
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
         @Override public void onChanged(ListChangeListener.Change<? extends T> change) {

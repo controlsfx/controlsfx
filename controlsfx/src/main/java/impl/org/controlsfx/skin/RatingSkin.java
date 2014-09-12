@@ -26,11 +26,12 @@
  */
 package impl.org.controlsfx.skin;
 
+import impl.org.controlsfx.behavior.RatingBehavior;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import impl.org.controlsfx.behavior.RatingBehavior;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -45,12 +46,19 @@ import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.Rating;
 
 import com.sun.javafx.Utils;
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
  *
  */
 public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                Rating.class.getResource("rating.css").toExternalForm());
+    }
     
     /***************************************************************************
      * 

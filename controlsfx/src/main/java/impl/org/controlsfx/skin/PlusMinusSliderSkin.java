@@ -21,7 +21,15 @@ import javafx.util.Duration;
 import org.controlsfx.control.PlusMinusSlider;
 import org.controlsfx.control.PlusMinusSlider.PlusMinusEvent;
 
+import com.sun.javafx.css.StyleManager;
+
 public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                PlusMinusSlider.class.getResource("plusminusslider.css").toExternalForm());
+    }
 
 	private SliderReader reader;
 

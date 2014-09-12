@@ -247,12 +247,12 @@ public class PropertySheet extends ControlsFXControl {
         return new PropertySheetSkin(this);
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected String getUserAgentStylesheet() {
-        return PropertySheet.class.getResource("propertysheet.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override protected String getUserAgentStylesheet() {
+//        return PropertySheet.class.getResource("propertysheet.css").toExternalForm(); //$NON-NLS-1$
+//    }
     
     
     

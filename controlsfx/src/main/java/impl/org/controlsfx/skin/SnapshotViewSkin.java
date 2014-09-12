@@ -46,6 +46,7 @@ import javafx.scene.shape.StrokeType;
 
 import org.controlsfx.control.SnapshotView;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
@@ -53,6 +54,12 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  * MouseEvents are handed over to the {@link SnapshotViewBehavior} which uses them to change the selection.
  */
 public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotViewBehavior> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                SnapshotView.class.getResource("snapshot-view.css").toExternalForm());
+    }
 
     /*
      * IMAGE:

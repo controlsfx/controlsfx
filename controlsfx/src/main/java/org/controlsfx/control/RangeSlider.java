@@ -179,12 +179,12 @@ public class RangeSlider extends ControlsFXControl {
         setHighValue(highValue);
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected String getUserAgentStylesheet() {
-        return RangeSlider.class.getResource("rangeslider.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override protected String getUserAgentStylesheet() {
+//        return RangeSlider.class.getResource("rangeslider.css").toExternalForm(); //$NON-NLS-1$
+//    }
     
     /**
      * {@inheritDoc}

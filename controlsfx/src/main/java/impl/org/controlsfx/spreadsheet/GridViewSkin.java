@@ -26,10 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.BitSet;
@@ -38,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -61,10 +58,17 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.util.Callback;
+
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
+import com.sun.javafx.css.StyleManager;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -73,6 +77,14 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  * 
  */
 public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm());
+    }
+    
+    
     /***************************************************************************
      * * STATIC FIELDS * *
      **************************************************************************/

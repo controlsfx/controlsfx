@@ -169,10 +169,10 @@ public class CustomTextField extends TextField {
         };
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected String getUserAgentStylesheet() {
-        return CustomTextField.class.getResource("customtextfield.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override protected String getUserAgentStylesheet() {
+//        return CustomTextField.class.getResource("customtextfield.css").toExternalForm(); //$NON-NLS-1$
+//    }
 }

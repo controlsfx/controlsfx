@@ -64,7 +64,7 @@ import javafx.scene.control.Skin;
  * statusBar.setProgress(.5);
  * </pre>
  */
-public class StatusBar extends Control {
+public class StatusBar extends ControlsFXControl {
 
     /**
      * Constructs a new status bar control.
@@ -76,11 +76,6 @@ public class StatusBar extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new StatusBarSkin(this);
-    }
-
-    @Override
-    protected String getUserAgentStylesheet() {
-        return StatusBar.class.getResource("statusbar.css").toExternalForm();
     }
 
     private final StringProperty text = new SimpleStringProperty(this, "text",

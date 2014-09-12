@@ -105,28 +105,36 @@ public class ImplUtils {
         } else if (p instanceof Control) {
             Control c = (Control) p;
             Skin<?> s = c.getSkin();
-            children = s instanceof SkinBase ? ((SkinBase<?>)s).getChildren() : null;
+            children = s instanceof SkinBase ? ((SkinBase<?>)s).getChildren() : getChildrenReflectively(p);
         } else if (useReflection) {
             // we really want to avoid using this!!!!
-            try {
-                Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
-                
-                if (getChildrenMethod != null) {
-                    if (! getChildrenMethod.isAccessible()) {
-                        getChildrenMethod.setAccessible(true);
-                    }
-                    children = (ObservableList<Node>) getChildrenMethod.invoke(p);
-                } else {
-                    // uh oh, trouble
-                }
-            } catch (ReflectiveOperationException | IllegalArgumentException e) {
-            	throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
-            }
+            children = getChildrenReflectively(p);
         }
         
         if (children == null) {
             throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() + 
                                        ". useReflection is set to " + useReflection);
+        }
+        
+        return children;
+    }
+    
+    public static ObservableList<Node> getChildrenReflectively(Parent p) {
+        ObservableList<Node> children = null;
+        
+        try {
+            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
+            
+            if (getChildrenMethod != null) {
+                if (! getChildrenMethod.isAccessible()) {
+                    getChildrenMethod.setAccessible(true);
+                }
+                children = (ObservableList<Node>) getChildrenMethod.invoke(p);
+            } else {
+                // uh oh, trouble
+            }
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
         }
         
         return children;

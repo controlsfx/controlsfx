@@ -29,8 +29,12 @@ package org.controlsfx.control.decoration;
 import impl.org.controlsfx.ImplUtils;
 import impl.org.controlsfx.skin.DecorationPane;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -159,36 +163,67 @@ public class Decorator {
     private static void updateDecorationsOnNode(Node target, List<Decoration> added, List<Decoration> removed) {
         // find a DecorationPane parent and notify it that a node has updated
         // decorations
-        DecorationPane p = getDecorationPane(target);
-        if (p == null) return;
-        
-        p.updateDecorationsOnNode(target, added, removed);
+        getDecorationPane(target, (pane) -> pane.updateDecorationsOnNode(target, added, removed));
     }
     
-    private static DecorationPane getDecorationPane(Node target) {
+    private static List<Scene> currentlyInstallingScenes = new ArrayList<>();
+    
+    private static void getDecorationPane(Node target, Consumer<DecorationPane> task) {
         // find a DecorationPane parent and notify it that a node has updated
         // decorations. If a DecorationPane doesn't exist, we install it into
-        // the scene.
+        // the scene. If a Scene does not exist, we add a listener to try again
+        // when a scene is available.
+        
+        DecorationPane pane = getDecorationPaneInParentHierarchy(target);
+        
+        if (pane != null) {
+            task.accept(pane);
+        } else {
+            // install decoration pane
+            final Consumer<Scene> sceneConsumer = scene -> {
+                if (currentlyInstallingScenes.contains(scene)) {
+                    return;
+                }
+                
+                DecorationPane _pane = getDecorationPaneInParentHierarchy(target);
+                if (_pane == null) {
+                    currentlyInstallingScenes.add(scene);
+                    _pane = new DecorationPane();
+                }
+                
+                Node oldRoot = scene.getRoot();
+                ImplUtils.injectAsRootPane(scene, _pane, true);
+                _pane.setRoot(oldRoot);
+                currentlyInstallingScenes.remove(scene);
+                task.accept(_pane);
+            };
+            
+            Scene scene = target.getScene();
+            if (scene != null) {
+                sceneConsumer.accept(scene);
+            } else {
+                // install listener to try again later
+                InvalidationListener sceneListener = new InvalidationListener() {
+                    @Override public void invalidated(Observable o) {
+                        if (target.getScene() != null) {
+                            sceneConsumer.accept(target.getScene());
+                            target.sceneProperty().removeListener(this);
+                        }
+                    }
+                };
+                target.sceneProperty().addListener(sceneListener);
+            }
+        }
+    }
+    
+    private static DecorationPane getDecorationPaneInParentHierarchy(Node target) {
         Parent p = target.getParent();
         while (p != null) {
             if (p instanceof DecorationPane) {
-                break;
+                return (DecorationPane) p;
             }
             p = p.getParent();
         }
-        
-        if (p == null) {
-            // install decoration pane
-            Scene scene = target.getScene();
-            if (scene == null) {
-                return null;
-            }
-            p = new DecorationPane();
-            Node oldRoot = scene.getRoot();
-            ImplUtils.injectAsRootPane(scene, p, true);
-            ((DecorationPane)p).setRoot(oldRoot);
-        }
-        
-        return (DecorationPane)p;
+        return null;
     }
 }

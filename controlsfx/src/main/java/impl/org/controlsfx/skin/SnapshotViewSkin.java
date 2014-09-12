@@ -189,9 +189,9 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
      * Styles the selected and unselected area.
      */
     private void styleAreas() {
-        selectedArea.fillProperty().bind(getSkinnable().selectionFillProperty());
-        selectedArea.strokeProperty().bind(getSkinnable().selectionStrokeProperty());
-        selectedArea.strokeWidthProperty().bind(getSkinnable().selectionStrokeWidthProperty());
+        selectedArea.fillProperty().bind(getSkinnable().selectionAreaFillProperty());
+        selectedArea.strokeProperty().bind(getSkinnable().selectionBorderPaintProperty());
+        selectedArea.strokeWidthProperty().bind(getSkinnable().selectionBorderWidthProperty());
         selectedArea.setStrokeType(StrokeType.OUTSIDE);
         // if the control's layout depends on this rectangle,
         // the stroke's width messes up the layout if the selection is on the pane's edge

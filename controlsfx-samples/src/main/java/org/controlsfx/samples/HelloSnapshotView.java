@@ -70,6 +70,8 @@ import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SnapshotView;
 import org.controlsfx.control.SnapshotView.Boundary;
 
+import com.sun.javafx.css.StyleManager;
+
 /**
  * Demonstrates the {@link SnapshotView}.
  */
@@ -147,6 +149,8 @@ public class HelloSnapshotView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
+        StyleManager.getInstance().addUserAgentStylesheet("file:///D:/Downloads/test.css");
+        
         snapshotView.setNode(nodes[0]);
         return snapshotView;
     }
@@ -296,13 +300,13 @@ public class HelloSnapshotView extends ControlsFXSample {
         // selection active
         CheckBox selectionActive = new CheckBox();
         selectionActive.selectedProperty().bindBidirectional(snapshotView.selectionActiveProperty());
-        selectionActive.disableProperty().bind(snapshotView.selectionActivityManagedProperty().not());
+        selectionActive.disableProperty().bind(snapshotView.selectionActivityManagedProperty());
         grid.addRow(row++, new Label("Active:"), selectionActive);
         
         // selection managed
         CheckBox selectionActivityManaged = new CheckBox();
         selectionActivityManaged.selectedProperty().bindBidirectional(snapshotView.selectionActivityManagedProperty());
-        grid.addRow(row++, new Label("Activity Explicitly Managed:"), selectionActivityManaged);
+        grid.addRow(row++, new Label("Activity Managed:"), selectionActivityManaged);
 
         // selection mouse transparent
         CheckBox selectionMouseTransparent = new CheckBox();
@@ -386,18 +390,18 @@ public class HelloSnapshotView extends ControlsFXSample {
         int row = 0;
 
         // selection fill color
-        ColorPicker selectionFillPicker = new ColorPicker((Color)snapshotView.getSelectionFill());
-        snapshotView.selectionFillProperty().bind(selectionFillPicker.valueProperty());
+        ColorPicker selectionFillPicker = new ColorPicker((Color)snapshotView.getSelectionAreaFill());
+        snapshotView.selectionAreaFillProperty().bind(selectionFillPicker.valueProperty());
         grid.addRow(row++, new Label("Fill Color:"), selectionFillPicker);
         
-        // selection stroke color
-        ColorPicker selectionStrokePicker = new ColorPicker((Color)snapshotView.getSelectionStroke());
-        snapshotView.selectionStrokeProperty().bind(selectionStrokePicker.valueProperty());
-        grid.addRow(row++, new Label("Stroke Color:"), selectionStrokePicker);
+        // selection border color
+        ColorPicker selectionBorderPaintPicker = new ColorPicker((Color)snapshotView.getSelectionBorderPaint());
+        snapshotView.selectionBorderPaintProperty().bind(selectionBorderPaintPicker.valueProperty());
+        grid.addRow(row++, new Label("Stroke Color:"), selectionBorderPaintPicker);
         
-        // selection stroke width
-        Slider selectionStrokeWidth = new Slider(0, 25, snapshotView.getSelectionStrokeWidth());
-        snapshotView.selectionStrokeWidthProperty().bind(selectionStrokeWidth.valueProperty());
+        // selection border width
+        Slider selectionStrokeWidth = new Slider(0, 25, snapshotView.getSelectionBorderWidth());
+        snapshotView.selectionBorderWidthProperty().bindBidirectional(selectionStrokeWidth.valueProperty());
         grid.addRow(row++, new Label("Stroke Width:"), selectionStrokeWidth);
         
         // unselected area fill color

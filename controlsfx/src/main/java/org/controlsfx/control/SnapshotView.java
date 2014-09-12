@@ -32,28 +32,44 @@ import static javafx.beans.binding.Bindings.notEqual;
 import impl.org.controlsfx.skin.SnapshotViewSkin;
 import impl.org.controlsfx.tools.rectangle.Rectangles2D;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
+import javafx.css.Styleable;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+
+import com.sun.javafx.css.converters.EnumConverter;
+import com.sun.javafx.css.converters.PaintConverter;
+import com.sun.javafx.css.converters.SizeConverter;
 
 /**
  * A {@code SnapshotView} is a control which allows the user to select an area of a node in the typical manner used by
@@ -116,9 +132,9 @@ import javafx.scene.paint.Paint;
  * 
  * <h5>Visualization</h5>
  * <ul>
- * <li> {@link #selectionFillProperty() selectionFill} property for the selected area's paint
- * <li> {@link #selectionStrokeProperty() selectionStroke} property for the selection border's paint
- * <li> {@link #selectionStrokeWidthProperty() selectionStrokeWidth} property for the selection border's width
+ * <li> {@link #selectionAreaFillProperty() selectionAreaFill} property for the selected area's paint
+ * <li> {@link #selectionBorderPaintProperty() selectionBorderPaint} property for the selection border's paint
+ * <li> {@link #selectionBorderWidthProperty() selectionBorderWidth} property for the selection border's width
  * <li> {@link #unselectedAreaFillProperty() unselectedAreaFill} property for the area outside of the selection
  * <li> {@link #unselectedAreaBoundaryProperty() unselectedAreaBoundary} property which defined what the unselected area
  * covers
@@ -205,19 +221,19 @@ public class SnapshotView extends ControlsFXControl {
     private final ObjectProperty<Boundary> unselectedAreaBoundary;
 
     /**
-     * @see #selectionStrokeProperty()
+     * @see #selectionBorderPaintProperty()
      */
-    private final ObjectProperty<Paint> selectionStroke;
+    private final ObjectProperty<Paint> selectionBorderPaint;
 
     /**
-     * @see #selectionStrokeWidthProperty()
+     * @see #selectionBorderWidthProperty()
      */
-    private final DoubleProperty selectionStrokeWidth;
+    private final DoubleProperty selectionBorderWidth;
 
     /**
-     * @see #selectionFillProperty()
+     * @see #selectionAreaFillProperty()
      */
-    private final ObjectProperty<Paint> selectionFill;
+    private final ObjectProperty<Paint> selectionAreaFill;
 
     /**
      * @see #unselectedAreaFillProperty()
@@ -268,18 +284,22 @@ public class SnapshotView extends ControlsFXControl {
         };
 
         // META
-        selectionAreaBoundary =
-                new SimpleObjectProperty<SnapshotView.Boundary>(this, "selectionAreaBoundary", Boundary.CONTROL);
+        selectionAreaBoundary = createStylableObjectProperty(
+                this, "selectionAreaBoundary", Boundary.CONTROL, StyleableProperties.SELECTION_AREA_BOUNDARY);
         selectionActivityManaged = new SimpleBooleanProperty(this, "selectionActivityManaged", true);
         selectionMouseTransparent = new SimpleBooleanProperty(this, "selectionMouseTransparent", false);
 
         // VISUALIZATION
-        unselectedAreaBoundary =
-                new SimpleObjectProperty<SnapshotView.Boundary>(this, "unselectedAreaBoundary", Boundary.CONTROL);
-        selectionStroke = new SimpleObjectProperty<Paint>(this, "selectionStroke", Color.WHITESMOKE);
-        selectionStrokeWidth = new SimpleDoubleProperty(this, "selectionStrokeWidth", 2.5);
-        selectionFill = new SimpleObjectProperty<Paint>(this, "selectionFill", Color.TRANSPARENT);
-        unselectedAreaFill = new SimpleObjectProperty<Paint>(this, "unselectedAreaFill", new Color(0, 0, 0, 0.5));
+        unselectedAreaBoundary = createStylableObjectProperty(
+                this, "unselectedAreaBoundary", Boundary.CONTROL, StyleableProperties.UNSELECTED_AREA_BOUNDARY);
+        selectionBorderPaint = createStylableObjectProperty(
+                this, "selectionBorderPaint", Color.WHITESMOKE, StyleableProperties.SELECTION_BORDER_PAINT);
+        selectionBorderWidth = createStylableDoubleProperty(
+                this, "selectionBorderWidth", 2.5, StyleableProperties.SELECTION_BORDER_WIDTH);
+        selectionAreaFill = createStylableObjectProperty(
+                this, "selectionAreaFill", Color.TRANSPARENT, StyleableProperties.SELECTION_AREA_FILL);
+        unselectedAreaFill = createStylableObjectProperty(
+                this, "unselectedAreaFill", new Color(0, 0, 0, 0.5), StyleableProperties.UNSELECTED_AREA_FILL);
 
         addStateUpdatingListeners();
         // update selection when resizing
@@ -532,9 +552,136 @@ public class SnapshotView extends ControlsFXControl {
         return SnapshotView.class.getResource("snapshot-view.css").toExternalForm();
     }
 
+    private static StyleableDoubleProperty createStylableDoubleProperty(
+            Object bean, String name, double initialValue, CssMetaData<? extends Styleable, Number> cssMetaData) {
+
+        return new StyleableDoubleProperty(initialValue) {
+
+            @Override
+            public Object getBean() {
+                return bean;
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public CssMetaData<? extends Styleable, Number> getCssMetaData() {
+                return cssMetaData;
+            }
+
+        };
+    }
+
+    private static <T> StyleableObjectProperty<T> createStylableObjectProperty(
+            Object bean, String name, T initialValue, CssMetaData<? extends Styleable, T> cssMetaData) {
+
+        return new StyleableObjectProperty<T>(initialValue) {
+
+            @Override
+            public Object getBean() {
+                return bean;
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public CssMetaData<? extends Styleable, T> getCssMetaData() {
+                return cssMetaData;
+            }
+
+        };
+    }
+
+    private static <S extends Styleable, T> CssMetaData<S, T> createCssMetaData(
+            Function<S, Property<T>> getProperty, String cssPropertyName, StyleConverter<?, T> styleConverter) {
+
+        return new CssMetaData<S, T>(cssPropertyName, styleConverter) {
+
+            @Override
+            public boolean isSettable(S styleable) {
+                final Property<T> property = getProperty.apply(styleable);
+                return property != null && !property.isBound();
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public StyleableProperty<T> getStyleableProperty(S styleable) {
+                return (StyleableProperty<T>) getProperty.apply(styleable);
+            }
+        };
+    }
+
+    private static class StyleableProperties {
+
+        public static final CssMetaData<SnapshotView, Boundary> SELECTION_AREA_BOUNDARY =
+                createCssMetaData(
+                        snapshotView -> snapshotView.selectionAreaBoundary,
+                        "-fx-selection-area-boundary",
+                        new EnumConverter<>(Boundary.class));
+
+        public static final CssMetaData<SnapshotView, Boundary> UNSELECTED_AREA_BOUNDARY =
+                createCssMetaData(
+                        snapshotView -> snapshotView.unselectedAreaBoundary,
+                        "-fx-unselected-area-boundary",
+                        new EnumConverter<>(Boundary.class));
+
+        public static final CssMetaData<SnapshotView, Paint> SELECTION_BORDER_PAINT =
+                createCssMetaData(
+                        snapshotView -> snapshotView.selectionBorderPaint,
+                        "-fx-selection-border-paint",
+                        PaintConverter.getInstance());
+
+        public static final CssMetaData<SnapshotView, Number> SELECTION_BORDER_WIDTH =
+                createCssMetaData(
+                        snapshotView -> snapshotView.selectionBorderWidth,
+                        "-fx-selection-border-width",
+                        SizeConverter.getInstance());
+
+        public static final CssMetaData<SnapshotView, Paint> SELECTION_AREA_FILL =
+                createCssMetaData(
+                        snapshotView -> snapshotView.selectionAreaFill,
+                        "-fx-selection-area-fill",
+                        PaintConverter.getInstance());
+
+        public static final CssMetaData<SnapshotView, Paint> UNSELECTED_AREA_FILL =
+                createCssMetaData(
+                        snapshotView -> snapshotView.unselectedAreaFill,
+                        "-fx-unselected-area-fill",
+                        PaintConverter.getInstance());
+
+        public static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(SELECTION_AREA_BOUNDARY);
+            styleables.add(UNSELECTED_AREA_BOUNDARY);
+            styleables.add(SELECTION_BORDER_PAINT);
+            styleables.add(SELECTION_BORDER_WIDTH);
+            styleables.add(SELECTION_AREA_FILL);
+            styleables.add(UNSELECTED_AREA_FILL);
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
     /**
-     * {@inheritDoc}
+     * @return the {@link CssMetaData} associated with this class, which includes the {@code CssMetaData} of its super
+     *         classes
      */
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+
     @Override
     protected Skin<?> createDefaultSkin() {
         Consumer<Boolean> setSelectionChanging = changing -> selectionChanging.set(changing);
@@ -950,27 +1097,27 @@ public class SnapshotView extends ControlsFXControl {
      * 
      * @defaultValue {@link Color#WHITESMOKE}
      * @return the property holding the {@link Paint} of the selection border
-     * @see #selectionStrokeWidthProperty()
+     * @see #selectionBorderWidthProperty()
      */
-    public final ObjectProperty<Paint> selectionStrokeProperty() {
-        return selectionStroke;
+    public final ObjectProperty<Paint> selectionBorderPaintProperty() {
+        return selectionBorderPaint;
     }
 
     /**
      * @return the {@link Paint} of the selection border
-     * @see #selectionStrokeProperty()
+     * @see #selectionBorderPaintProperty()
      */
-    public final Paint getSelectionStroke() {
-        return selectionStrokeProperty().get();
+    public final Paint getSelectionBorderPaint() {
+        return selectionBorderPaintProperty().get();
     }
 
     /**
-     * @param selectionStroke
+     * @param selectionBorderPaint
      *            the new {@link Paint} of the selection border
-     * @see #selectionStrokeProperty()
+     * @see #selectionBorderPaintProperty()
      */
-    public final void setSelectionStroke(Paint selectionStroke) {
-        selectionStrokeProperty().set(selectionStroke);
+    public final void setSelectionBorderPaint(Paint selectionBorderPaint) {
+        selectionBorderPaintProperty().set(selectionBorderPaint);
     }
 
     /**
@@ -979,28 +1126,28 @@ public class SnapshotView extends ControlsFXControl {
      * 
      * @defaultValue 2.5
      * @return the property defining the selection border's width
-     * @see #selectionStrokeProperty()
+     * @see #selectionBorderPaintProperty()
      * @see javafx.scene.shape.Shape#strokeWidthProperty() Shape.strokeWidthProperty()
      */
-    public final DoubleProperty selectionStrokeWidthProperty() {
-        return selectionStrokeWidth;
+    public final DoubleProperty selectionBorderWidthProperty() {
+        return selectionBorderWidth;
     }
 
     /**
-     * @return the selection stroke width
-     * @see #selectionStrokeWidthProperty()
+     * @return the selection border width
+     * @see #selectionBorderWidthProperty()
      */
-    public final double getSelectionStrokeWidth() {
-        return selectionStrokeWidthProperty().get();
+    public final double getSelectionBorderWidth() {
+        return selectionBorderWidthProperty().get();
     }
 
     /**
-     * @param selectionStrokeWidth
-     *            the selection stroke width to set
-     * @see #selectionStrokeWidthProperty()
+     * @param selectionBorderWidth
+     *            the selection border width to set
+     * @see #selectionBorderWidthProperty()
      */
-    public final void setSelectionStrokeWidth(double selectionStrokeWidth) {
-        selectionStrokeWidthProperty().set(selectionStrokeWidth);
+    public final void setSelectionBorderWidth(double selectionBorderWidth) {
+        selectionBorderWidthProperty().set(selectionBorderWidth);
     }
 
     /**
@@ -1009,25 +1156,25 @@ public class SnapshotView extends ControlsFXControl {
      * @defaultValue {@link Color#TRANSPARENT}
      * @return the property holding the {@link Paint} of the selected area
      */
-    public final ObjectProperty<Paint> selectionFillProperty() {
-        return selectionFill;
+    public final ObjectProperty<Paint> selectionAreaFillProperty() {
+        return selectionAreaFill;
     }
 
     /**
      * @return the {@link Paint} of the selected area
-     * @see #selectionFillProperty()
+     * @see #selectionAreaFillProperty()
      */
-    public final Paint getSelectionFill() {
-        return selectionFillProperty().get();
+    public final Paint getSelectionAreaFill() {
+        return selectionAreaFillProperty().get();
     }
 
     /**
-     * @param selectionFill
+     * @param selectionAreaFill
      *            the new {@link Paint} of the selected area
-     * @see #selectionFillProperty()
+     * @see #selectionAreaFillProperty()
      */
-    public final void setSelectionFill(Paint selectionFill) {
-        selectionFillProperty().set(selectionFill);
+    public final void setSelectionAreaFill(Paint selectionAreaFill) {
+        selectionAreaFillProperty().set(selectionAreaFill);
     }
 
     /**

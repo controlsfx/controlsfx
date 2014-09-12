@@ -27,22 +27,31 @@
 package impl.org.controlsfx.tools.rectangle.change;
 
 import impl.org.controlsfx.tools.rectangle.Rectangles2D;
+
+import java.util.Objects;
+
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
 /**
- * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy} which computed their rectangle by spanning it
- * from a fixed point to the point given to {@link Rectangle2DChangeStrategy#continueChange(Point2D) continueChange}. <br>
- * The point is fixed during the change but can be changed in between changes. Implemented such that a ratio is respected
- * if specified.
+ * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy} which compute their rectangle by
+ * spanning it from a fixed point to the point given to {@link Rectangle2DChangeStrategy#continueChange(Point2D)
+ * continueChange}. <br>
+ * The point is fixed during the change but can be changed in between changes. Implemented such that a ratio is
+ * respected if specified.
  */
 abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingChangeStrategy {
 
     // ATTRIBUTES
 
     /**
-     * The point which is fixed during the change. In {@link #doBegin(Point2D)} it is set to {@link #getFixedCorner()}; in
-     * {@link #doEnd(Point2D)} it is set to {@code null}.
+     * A rectangle which defines the bounds within which the new rectangle must be contained.
+     */
+    private final Rectangle2D bounds;
+
+    /**
+     * The point which is fixed during the change. In {@link #doBegin(Point2D)} it is set to {@link #getFixedCorner()};
+     * in {@link #doEnd(Point2D)} it is set to {@code null}.
      */
     private Point2D fixedCorner;
 
@@ -56,9 +65,14 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
      *            indicates whether the ratio will be fixed
      * @param ratio
      *            defines the fixed ratio
+     * @param bounds
+     *            the bounds within which the new rectangle must be contained
      */
-    protected AbstractFixedPointChangeStrategy(boolean ratioFixed, double ratio) {
+    protected AbstractFixedPointChangeStrategy(boolean ratioFixed, double ratio, Rectangle2D bounds) {
         super(ratioFixed, ratio);
+        Objects.requireNonNull(bounds, "The argument 'bounds' must not be null.");
+
+        this.bounds = bounds;
     }
 
     // ABSTRACT METHODS
@@ -80,10 +94,13 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
      * @return the rectangle defined the two corners
      */
     private final Rectangle2D createFromCorners(Point2D point) {
-        if (isRatioFixed())
-            return Rectangles2D.forDiagonalCornersAndRatio(fixedCorner, point, getRatio());
-        else
-            return Rectangles2D.forDiagonalCorners(fixedCorner, point);
+        Point2D pointInBounds = Rectangles2D.inRectangle(bounds, point);
+
+        if (isRatioFixed()) {
+            return Rectangles2D.forDiagonalCornersAndRatio(fixedCorner, pointInBounds, getRatio());
+        } else {
+            return Rectangles2D.forDiagonalCorners(fixedCorner, pointInBounds);
+        }
     }
 
     /**
@@ -91,6 +108,12 @@ abstract class AbstractFixedPointChangeStrategy extends AbstractRatioRespectingC
      */
     @Override
     protected final Rectangle2D doBegin(Point2D point) {
+        boolean startPointNotInBounds = !bounds.contains(point);
+        if (startPointNotInBounds) {
+            throw new IllegalArgumentException(
+                    "The change's start point (" + point + ") must lie within the bounds (" + bounds + ").");
+        }
+
         fixedCorner = getFixedCorner();
         return createFromCorners(point);
     }

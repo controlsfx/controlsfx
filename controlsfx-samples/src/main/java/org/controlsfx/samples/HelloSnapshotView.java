@@ -1,3 +1,5 @@
+package org.controlsfx.samples;
+
 /**
  * Copyright (c) 2014, ControlsFX
  * All rights reserved.
@@ -24,44 +26,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.samples;
-
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.Random;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.RotateTransition;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.SnapshotResult;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SnapshotView;
+import org.controlsfx.control.SnapshotView.Boundary;
+
+import com.sun.javafx.css.StyleManager;
 
 /**
  * Demonstrates the {@link SnapshotView}.
@@ -82,36 +91,55 @@ public class HelloSnapshotView extends ControlsFXSample {
     private static final DecimalFormat zeroDpFormat = new DecimalFormat("0");
     private static final DecimalFormat twoDpFormat = new DecimalFormat("0.00");
 
-    /**
-     * The names of the displayed images.
-     */
-    private final String[] nodeNames = new String[] {
-        "ControlsFX Logo",
-        "Java's Duke",
-        "Rotating Node"
-    };
-    
-    /**
-     * the displayed nodes.
-     */
-    private Node[] nodes;
-
     // INSTANCE
 
     /**
-     * The demoed view.
+     * The displayed nodes.
      */
-    private final SnapshotView selector = new SnapshotView();
+    private final Node[] nodes;
 
     /**
-     * The label showing the name of the currently displayed image.
+     * The names of the displayed nodes.
      */
-    private final Label imageNameTestField = new Label();
+    private final String[] nodeNames = new String[] {
+            "ImageView",
+            "Fitted ImageView",
+            "Transformed ImageView",
+            "Rotating Node",
+            "Null Node",
+    };
 
     /**
-     * The index in the array of images and image names.
+     * The images displayed by the image views.
      */
-    private int imageIndex = 0;
+    private final Image[] images;
+
+    /**
+     * The names of the displayed nodes.
+     */
+    private final String[] imageNames = new String[] {
+            "ControlsFX",
+            "Java's Duke",
+            "Null Image",
+    };
+
+    private final IntegerProperty selectedImageIndex = new SimpleIntegerProperty();
+
+    /**
+     * The demonstrated view.
+     */
+    private final SnapshotView snapshotView = new SnapshotView();
+
+    /* ************************************************************************
+     *                                                                         *
+     * Construction                                                            *
+     *                                                                         *
+     **************************************************************************/
+
+    public HelloSnapshotView() {
+        images = loadImages();
+        nodes = createNodes();
+    }
 
     /* ************************************************************************
      *                                                                         *
@@ -121,140 +149,299 @@ public class HelloSnapshotView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
+        snapshotView.setNode(nodes[0]);
+        return snapshotView;
+    }
+
+    /**
+     * Loads the displayed images.
+     * 
+     * @return an array of {@link Image image}s
+     */
+    private Image[] loadImages() {
+        Image controlsFX = new Image(getClass().getResource("ControlsFX.png").toExternalForm());
+        Image duke = new Image(getClass().getResource("duke_wave.png").toExternalForm());
+        return new Image[] { controlsFX, duke, null };
+    }
+
+    /**
+     * Creates the nodes used by the snapshot view.
+     * 
+     * @return an array of {@link Node node}s
+     */
+    private Node[] createNodes() {
+        // regular image view
+        ImageView imageView = new ImageView(images[0]);
+        imageView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> increaseImageIndex());
+
+        // fitted image view
+        ImageView fittedImageView = new ImageView(images[0]);
+        fittedImageView.setPreserveRatio(true);
+        fittedImageView.fitWidthProperty().bind(snapshotView.widthProperty());
+        fittedImageView.fitHeightProperty().bind(snapshotView.heightProperty());
+        fittedImageView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> increaseImageIndex());
+
+        // transformed image view
+        ImageView transformedImageView = new ImageView(images[0]);
+        transformedImageView.setScaleX(0.5);
+        transformedImageView.setRotate(45);
+        transformedImageView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> increaseImageIndex());
+
+        // rotating rectangle
         Rectangle rotatingRect = new Rectangle(200, 300, Color.GREEN);
+        rotatingRect.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            Random r = new Random();
+            Color newColor = new Color(r.nextDouble(), r.nextDouble(), r.nextDouble(), r.nextDouble());
+            rotatingRect.setFill(newColor);
+        });
         RotateTransition rotator = new RotateTransition(Duration.seconds(3), rotatingRect);
         rotator.setAutoReverse(true);
         rotator.setByAngle(360);
         rotator.setCycleCount(Integer.MAX_VALUE);
         rotator.play();
-        
-        nodes = new Node[] {
-            new ImageView(new Image(getClass().getResource("ControlsFX.png").toExternalForm())),
-            new ImageView(new Image(getClass().getResource("duke_wave.png").toExternalForm())),
-            rotatingRect
+
+        return new Node[] {
+                new Pane(imageView), new Pane(fittedImageView), new Pane(transformedImageView),
+                new Pane(rotatingRect), null
         };
-        
-        displayImageAndNameforIndex(imageIndex);
-        return selector;
     }
 
-    /**
-     * Displays the image and its name at the specified index.
-     * 
-     * @param index
-     *            the index used to access {@link #images} and {@link #imageNames}
-     */
-    private void displayImageAndNameforIndex(int index) {
-        imageNameTestField.setText(nodeNames[index]);
-        selector.setNode(nodes[index]);
+    private void increaseImageIndex() {
+        int currentImageIndex = selectedImageIndex.get();
+        // set the next index but leave out the null image (which is assumed to be last in the array)
+        int nextImageIndex = (currentImageIndex + 1) % (images.length - 1);
+        selectedImageIndex.set(nextImageIndex);
     }
 
     @Override
     public Node getControlPanel() {
-        return new VBox(10, createSettingsControl(), createSelectionControl(), createSnapshot());
+        return new VBox(10,
+                createNodeControl(), createSettingsControl(),
+                createVisualizationControl(), createSelectionControl(), createSnapshotImageView());
     }
-    
-    private ImageView snapshotImageView;
-    
+
     /**
-     * @return a control for all the image related properties
+     * @return a control for all the node related properties
+     */
+    private Node createNodeControl() {
+        GridPane grid = new GridPane();
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
+
+        int row = 0;
+
+        // --- node
+        final Label nodeTypeLabel = new Label("Node type: ");
+        nodeTypeLabel.getStyleClass().add("property");
+        grid.add(nodeTypeLabel, 0, row);
+
+        final ChoiceBox<String> nodeOptions = new ChoiceBox<>(FXCollections.observableArrayList(nodeNames));
+        final SelectionModel<String> nodeSelectionModel = nodeOptions.getSelectionModel();
+        nodeSelectionModel.selectedIndexProperty().addListener(
+                (o, oldNodeIndex, newNodeIndex) -> snapshotView.setNode(nodes[newNodeIndex.intValue()]));
+        nodeSelectionModel.select(0);
+
+        nodeOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(nodeOptions, Priority.ALWAYS);
+        grid.add(nodeOptions, 1, row++);
+
+        // --- image
+        final Label imageLabel = new Label("Image: ");
+        imageLabel.getStyleClass().add("property");
+        grid.add(imageLabel, 0, row);
+
+        final ChoiceBox<String> imageOptions = new ChoiceBox<>(FXCollections.observableArrayList(imageNames));
+        // disable the box if no image view is shown
+        imageOptions.disableProperty().bind(Bindings.equal(3, nodeSelectionModel.selectedIndexProperty()));
+        // bind 'selectedImageIndex' and the box' selection model together
+        final SelectionModel<String> imageSelectionModel = imageOptions.getSelectionModel();
+        imageSelectionModel.selectedIndexProperty().addListener(
+                (o, oldIndex, newIndex) -> selectedImageIndex.set(newIndex.intValue()));
+        selectedImageIndex.addListener((o, oldIndex, newIndex) -> {
+            imageSelectionModel.clearAndSelect(newIndex.intValue());
+            setImageForAllViews(newIndex.intValue());
+        });
+        imageSelectionModel.select(0);
+
+        imageOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(imageOptions, Priority.ALWAYS);
+        grid.add(imageOptions, 1, row++);
+
+        return new TitledPane("Node", grid);
+    }
+
+    private void setImageForAllViews(int index) {
+        Image image = images[index];
+        for (int i = 0; i < 3; i++) {
+            setImageForView(i, image);
+        }
+    }
+
+    private void setImageForView(int imageViewIndex, Image image) {
+        Pane containingPane = (Pane) nodes[imageViewIndex];
+        ImageView view = (ImageView) containingPane.getChildren().get(0);
+        view.setImage(image);
+    }
+
+    /**
+     * @return a control for all the view related properties
      */
     private Node createSettingsControl() {
         GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(10));
-        
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
+
         int row = 0;
-        
-        // --- Node
-        Label nodeTypeLabel = new Label("Node type: ");
-        nodeTypeLabel.getStyleClass().add("property");
-        grid.add(nodeTypeLabel, 0, row);
-        final ChoiceBox<String> graphicOptions = new ChoiceBox<>(FXCollections.observableArrayList(nodeNames));
-        graphicOptions.setMaxWidth(Double.MAX_VALUE);
-        GridPane.setHgrow(graphicOptions, Priority.ALWAYS);
-        final SelectionModel<String> sm = graphicOptions.getSelectionModel();
-        sm.selectedItemProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {
-                imageIndex = sm.getSelectedIndex();
-                displayImageAndNameforIndex(imageIndex);
-            }
-        });
-        sm.select(0);
-        grid.add(graphicOptions, 1, row++);
-        
+
+        // selection active
+        CheckBox selectionActive = new CheckBox();
+        selectionActive.selectedProperty().bindBidirectional(snapshotView.selectionActiveProperty());
+        selectionActive.disableProperty().bind(snapshotView.selectionActivityManagedProperty());
+        grid.addRow(row++, new Label("Active:"), selectionActive);
+
+        // selection managed
+        CheckBox selectionActivityManaged = new CheckBox();
+        selectionActivityManaged.selectedProperty().bindBidirectional(snapshotView.selectionActivityManagedProperty());
+        grid.addRow(row++, new Label("Activity Managed:"), selectionActivityManaged);
+
+        // selection mouse transparent
+        CheckBox selectionMouseTransparent = new CheckBox();
+        selectionMouseTransparent.selectedProperty().bindBidirectional(
+                snapshotView.selectionMouseTransparentProperty());
+        grid.addRow(row++, new Label("Mouse Transparent:"), selectionMouseTransparent);
+
         // --- fixed ratio
         Label fixedRatioLabel = new Label("Fixed selection ratio: ");
         fixedRatioLabel.getStyleClass().add("property");
         grid.add(fixedRatioLabel, 0, row);
         CheckBox ratioFixed = new CheckBox();
-        ratioFixed.selectedProperty().bindBidirectional(selector.selectionRatioFixedProperty());
+        ratioFixed.selectedProperty().bindBidirectional(snapshotView.selectionRatioFixedProperty());
         grid.add(ratioFixed, 1, row++);
-        
+
         // --- ratio
         Label ratioLabel = new Label("Fixed ratio: ");
         ratioLabel.getStyleClass().add("property");
         grid.add(ratioLabel, 0, row);
         TextField ratioTextField = new TextField();
-        ratioTextField.textProperty().bindBidirectional(selector.fixedSelectionRatioProperty(), new StringConverter<Number>() {
-            @Override public Number fromString(String value) {
-                try {
-                    return twoDpFormat.parse(value);
-                } catch (ParseException e) {
-                    return 1;
-                }
-            }
+        ratioTextField.textProperty().bindBidirectional(snapshotView.fixedSelectionRatioProperty(),
+                new StringConverter<Number>() {
+                    @Override
+                    public Number fromString(String value) {
+                        try {
+                            return twoDpFormat.parse(value);
+                        } catch (ParseException e) {
+                            return 1;
+                        }
+                    }
 
-            @Override public String toString(Number value) {
-                return twoDpFormat.format(value);
-            }
-        });
+                    @Override
+                    public String toString(Number value) {
+                        return twoDpFormat.format(value);
+                    }
+                });
         grid.add(ratioTextField, 1, row++);
-        
-        return new TitledPane("Settings", grid);
+
+        // --- selection area boundary
+        final Label selectionBoundaryLabel = new Label("Selection Area Boundary: ");
+        selectionBoundaryLabel.getStyleClass().add("property");
+        grid.add(selectionBoundaryLabel, 0, row);
+
+        final ChoiceBox<Boundary> selectionBoundaryOptions = new ChoiceBox<>(
+                FXCollections.observableArrayList(Boundary.CONTROL, Boundary.NODE));
+        selectionBoundaryOptions.getSelectionModel().select(Boundary.CONTROL);
+        snapshotView.selectionAreaBoundaryProperty().bind(
+                selectionBoundaryOptions.getSelectionModel().selectedItemProperty());
+
+        selectionBoundaryOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(selectionBoundaryOptions, Priority.ALWAYS);
+        grid.add(selectionBoundaryOptions, 1, row++);
+
+        // --- unselected area boundary
+        final Label unselectedBoundaryLabel = new Label("Unselected Area Boundary: ");
+        unselectedBoundaryLabel.getStyleClass().add("property");
+        grid.add(unselectedBoundaryLabel, 0, row);
+
+        final ChoiceBox<Boundary> unselectedBoundaryOptions = new ChoiceBox<>(
+                FXCollections.observableArrayList(Boundary.CONTROL, Boundary.NODE));
+        unselectedBoundaryOptions.getSelectionModel().select(Boundary.CONTROL);
+        snapshotView.unselectedAreaBoundaryProperty().bind(
+                unselectedBoundaryOptions.getSelectionModel().selectedItemProperty());
+
+        unselectedBoundaryOptions.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(unselectedBoundaryOptions, Priority.ALWAYS);
+        grid.add(unselectedBoundaryOptions, 1, row++);
+
+        return new TitledPane("Selection Settings", grid);
     }
 
-    private TextField upperLeftX;
-    private TextField upperLeftY;
-    private TextField lowerRightX;
-    private TextField lowerRightY;
-    private TextField width;
-    private TextField height;
-    private TextField ratio;
-    
+    /**
+     * @return a control for all the visualization related properties
+     */
+    private Node createVisualizationControl() {
+        GridPane grid = new GridPane();
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
+
+        int row = 0;
+
+        // selection fill color
+        ColorPicker selectionFillPicker = new ColorPicker((Color) snapshotView.getSelectionAreaFill());
+        snapshotView.selectionAreaFillProperty().bind(selectionFillPicker.valueProperty());
+        grid.addRow(row++, new Label("Fill Color:"), selectionFillPicker);
+
+        // selection border color
+        ColorPicker selectionBorderPaintPicker = new ColorPicker((Color) snapshotView.getSelectionBorderPaint());
+        snapshotView.selectionBorderPaintProperty().bind(selectionBorderPaintPicker.valueProperty());
+        grid.addRow(row++, new Label("Stroke Color:"), selectionBorderPaintPicker);
+
+        // selection border width
+        Slider selectionStrokeWidth = new Slider(0, 25, snapshotView.getSelectionBorderWidth());
+        snapshotView.selectionBorderWidthProperty().bindBidirectional(selectionStrokeWidth.valueProperty());
+        grid.addRow(row++, new Label("Stroke Width:"), selectionStrokeWidth);
+
+        // unselected area fill color
+        ColorPicker unselectedAreaFillPicker = new ColorPicker((Color) snapshotView.getUnselectedAreaFill());
+        snapshotView.unselectedAreaFillProperty().bind(unselectedAreaFillPicker.valueProperty());
+        grid.addRow(row++, new Label("Outer Color:"), unselectedAreaFillPicker);
+
+        return new TitledPane("Visualization Settings", grid);
+    }
+
     /**
      * @return a control for all the selection related properties
      */
     private Node createSelectionControl() {
         // upper left
-        upperLeftX = new TextField();
+        TextField upperLeftX = new TextField();
         upperLeftX.setPrefColumnCount(3);
         upperLeftX.setEditable(false);
-        upperLeftY = new TextField();
+        TextField upperLeftY = new TextField();
         upperLeftY.setPrefColumnCount(3);
         upperLeftY.setEditable(false);
 
         // lower right
-        lowerRightX = new TextField();
+        TextField lowerRightX = new TextField();
         lowerRightX.setPrefColumnCount(3);
         lowerRightX.setEditable(false);
-        lowerRightY = new TextField();
+        TextField lowerRightY = new TextField();
         lowerRightY.setPrefColumnCount(3);
         lowerRightY.setEditable(false);
 
         // size
-        width = new TextField();
+        TextField width = new TextField();
         width.setPrefColumnCount(3);
         width.setEditable(false);
-        height = new TextField();
+        TextField height = new TextField();
         height.setPrefColumnCount(3);
         height.setEditable(false);
-        ratio = new TextField();
+        TextField ratio = new TextField();
         ratio.setPrefColumnCount(3);
-        
+
         // set up the binding
-        selector.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
+        snapshotView.selectionProperty().addListener(new ChangeListener<Rectangle2D>() {
             @Override
             public void changed(
                     ObservableValue<? extends Rectangle2D> observable, Rectangle2D oldValue, Rectangle2D newValue) {
@@ -277,45 +464,52 @@ public class HelloSnapshotView extends ControlsFXSample {
                 }
             }
         });
-        
+
         // put it all together
         GridPane grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setPadding(new Insets(10));
-        
+        grid.setVgap(5);
+        grid.setHgap(5);
+        grid.setPadding(new Insets(5));
+
         int row = 0;
 
         grid.addRow(row++, new Label("Upper Left Corner:"), upperLeftX, new Label("/"), upperLeftY);
         grid.addRow(row++, new Label("Lower Right Corner:"), lowerRightX, new Label("/"), lowerRightY);
-        grid.addRow(row++, new Label("Size (Ratio):"), width, new Label("x"), height, new Label(" ("), ratio, new Label(")"));
+        grid.addRow(row++, new Label("Size (Ratio):"), width, new Label("x"), height, new Label(" ("), ratio,
+                new Label(")"));
 
+        // selection changing
         CheckBox selectionChanging = new CheckBox();
         selectionChanging.setDisable(true);
-        selectionChanging.selectedProperty().bindBidirectional(selector.selectionChangingProperty());
-
-        CheckBox selectionValid = new CheckBox();
-        selectionValid.selectedProperty().bind(selector.selectionValidProperty());
-        selectionValid.setDisable(true);
-        
+        selectionChanging.selectedProperty().bind(snapshotView.selectionChangingProperty());
         grid.addRow(row++, new Label("Selection Changing:"), selectionChanging);
-        grid.addRow(row++, new Label("Selection Valid:"), selectionValid);
 
         return new TitledPane("Selection Stats", grid);
     }
 
-    private Node createSnapshot() {
+    /**
+     * @return a control which displays the current snapshot
+     */
+    private Node createSnapshotImageView() {
+        final ImageView snapshotImageView = new ImageView();
+
+        // display snapshots which are constantly taken
         AnimationTimer timer = new AnimationTimer() {
-            @Override public void handle(long arg0) {
-                snapshotImageView.setImage(selector.createSnapshot());
+            @Override
+            public void handle(long timestamp) {
+                Image snapshot = null;
+                if (snapshotView.getNode() != null && snapshotView.hasSelection()) {
+                    snapshot = snapshotView.createSnapshot();
+                }
+                snapshotImageView.setImage(snapshot);
             }
         };
         timer.start();
-        
-        snapshotImageView = new ImageView();
-        return new TitledPane("Snapshot", snapshotImageView);
-    }
 
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(snapshotImageView);
+        return new TitledPane("Snapshot", scrollPane);
+    }
 
     /* ************************************************************************
      *                                                                         *
@@ -334,19 +528,19 @@ public class HelloSnapshotView extends ControlsFXSample {
 
     @Override
     public String getJavaDocURL() {
-        return Utils.JAVADOC_BASE
-                + "org/controlsfx/control/SnapshotView.html";
+        return "org/controlsfx/control/SnapshotView.html";
     }
 
-    
     @Override
     public String getControlStylesheetURL() {
-    	return "/org/controlsfx/control/snapshot-view.css";
+        return "/org/controlsfx/control/snapshot-view.css";
     }
-    
+
     @Override
     public String getSampleDescription() {
-        return "A tool which allows the user to select a rectangular area of the displayed node. " +
-                "The selection's ratio can be fixed so that the user can only make selections with that ratio.";
+        return "A control which allows the user to select a rectangular area of the displayed node. " +
+                "The selection's ratio can be fixed so that the user can only make selections with that ratio. " +
+                "The method 'createSnapshot()' returns an Image of the selected area. " +
+                "The displayed node can be interacted with if the selection is set to be mouse transparent. ";
     }
 }

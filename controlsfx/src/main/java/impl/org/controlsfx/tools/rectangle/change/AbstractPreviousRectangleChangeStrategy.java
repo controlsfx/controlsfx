@@ -31,8 +31,8 @@ import java.util.Objects;
 import javafx.geometry.Rectangle2D;
 
 /**
- * Abstract superclass to most implementations of {@link Rectangle2DChangeStrategy}. Stores a ratio and is based on a previous
- * rectangle. Both behaviors are determined during construction.
+ * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy}, which are based on a previous
+ * rectangle. Respects a ratio if one is set.
  */
 abstract class AbstractPreviousRectangleChangeStrategy extends AbstractRatioRespectingChangeStrategy {
 

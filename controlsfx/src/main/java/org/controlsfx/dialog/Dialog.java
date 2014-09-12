@@ -237,7 +237,7 @@ public class Dialog {
      */
     public static final Action ACTION_CANCEL = new DialogAction( Localization.asKey("dlg.cancel.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
         { lock();}
-        public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
+        @Override public String toString() { return "DialogAction.CANCEL";} //$NON-NLS-1$
     }; 
     
     /**
@@ -245,7 +245,7 @@ public class Dialog {
      */
     public static final Action ACTION_CLOSE = new DialogAction( Localization.asKey("dlg.close.button"), ButtonType.CANCEL_CLOSE ){ //$NON-NLS-1$
         { lock();}
-        public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
+        @Override public String toString() { return "DialogAction.CLOSE";} //$NON-NLS-1$
     }; 
     
     /**
@@ -253,7 +253,7 @@ public class Dialog {
      */
     public static final Action ACTION_NO = new DialogAction( Localization.asKey("dlg.no.button"), ButtonType.NO ){ //$NON-NLS-1$
         { lock();}
-        public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
+        @Override public String toString() { return "DialogAction.NO";} //$NON-NLS-1$
     }; 
     
     /**
@@ -261,7 +261,7 @@ public class Dialog {
      */
     public static final Action ACTION_OK = new DialogAction( Localization.asKey("dlg.ok.button"), ButtonType.OK_DONE,  false, true, true){ //$NON-NLS-1$
         { lock();}
-        public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
+        @Override public String toString() { return "DialogAction.OK";} //$NON-NLS-1$
     }; 
     
     /**
@@ -269,7 +269,7 @@ public class Dialog {
      */
     public static final Action ACTION_YES = new DialogAction( Localization.asKey("dlg.yes.button"), ButtonType.YES, false, true, true ){ //$NON-NLS-1$
         { lock();}
-        public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
+        @Override public String toString() { return "DialogAction.YES";} //$NON-NLS-1$
     }; 
     
     
@@ -490,7 +490,7 @@ public class Dialog {
     
     // --- graphic
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>() {
-        protected void invalidated() {
+        @Override protected void invalidated() {
             updateGraphic();
         }
     };
@@ -526,7 +526,7 @@ public class Dialog {
     
     // --- masthead
     private final ObjectProperty<Node> masthead = new SimpleObjectProperty<Node>() {
-        protected void invalidated() {
+        @Override protected void invalidated() {
             // we don't know where this masthead come from, so we reset the
             // default masthead flag to false.
             isDefaultMasthead = false;
@@ -673,7 +673,7 @@ public class Dialog {
 
     
     // --- expandable content
-    private final ObjectProperty<Node> expandableContentProperty = new SimpleObjectProperty<Node>();
+    private final ObjectProperty<Node> expandableContentProperty = new SimpleObjectProperty<>();
     
     /**
      * A property that represents the dialog expandable content area. Any Node 
@@ -772,7 +772,7 @@ public class Dialog {
     
     // --- background effect
     private final ObjectProperty<Effect> backgroundEffectProperty = new SimpleObjectProperty<Effect>() {
-        protected void invalidated() {
+        @Override protected void invalidated() {
             dialog.setEffect(getValue());
         }
     };
@@ -965,7 +965,7 @@ public class Dialog {
             buttonBar.addSizeIndependentButton(createDetailsButton(), ButtonType.HELP_2);
         }
 
-        List<ButtonBase> buttons = new ArrayList<ButtonBase>();
+        List<ButtonBase> buttons = new ArrayList<>();
         boolean hasDefault = false;
         for (Action cmd : getActions()) {
             ButtonBase b = createButton(cmd, !hasDefault);

@@ -157,25 +157,25 @@ public class NotificationPane extends ControlsFXControl {
      * Called when the NotificationPane <b>will</b> be shown.
      */
     public static final EventType<Event> ON_SHOWING =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWING"); //$NON-NLS-1$
+            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWING"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane shows.
      */
     public static final EventType<Event> ON_SHOWN =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWN"); //$NON-NLS-1$
+            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWN"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane <b>will</b> be hidden.
      */
     public static final EventType<Event> ON_HIDING =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDING"); //$NON-NLS-1$
+            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_HIDING"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane is hidden.
      */
     public static final EventType<Event> ON_HIDDEN =
-            new EventType<Event>(Event.ANY, "NOTIFICATION_PANE_ON_HIDDEN"); //$NON-NLS-1$
+            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_HIDDEN"); //$NON-NLS-1$
     
     
     
@@ -240,7 +240,7 @@ public class NotificationPane extends ControlsFXControl {
      **************************************************************************/
     
     // --- content
-    private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this, "content"); //$NON-NLS-1$
+    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content"); //$NON-NLS-1$
     
     /**
      * The content property represents what is shown in the scene 
@@ -311,7 +311,7 @@ public class NotificationPane extends ControlsFXControl {
     
     
     // --- graphic
-    private ObjectProperty<Node> graphic = new SimpleObjectProperty<Node>(this, "graphic"); //$NON-NLS-1$
+    private ObjectProperty<Node> graphic = new SimpleObjectProperty<>(this, "graphic"); //$NON-NLS-1$
     
     /**
      * The graphic property represents the {@link Node} to show within the popup 
@@ -372,7 +372,7 @@ public class NotificationPane extends ControlsFXControl {
     
     // --- show from top
     private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true) { //$NON-NLS-1$
-        protected void invalidated() {
+        @Override protected void invalidated() {
 //            pseudoClassStateChanged(SHOW_FROM_TOP_PSEUDOCLASS_STATE,      isShowFromTop());
 //            pseudoClassStateChanged(SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE, ! isShowFromTop());
             

@@ -126,7 +126,7 @@ public class Wizard {
         
         validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
         
-        dialog = new Dialog<ButtonType>();
+        dialog = new Dialog<>();
         dialog.setTitle(title);
 //        hello.dialog.initOwner(owner); // TODO add initOwner API
         
@@ -163,11 +163,11 @@ public class Wizard {
     
     // --- flow
     private ObjectProperty<Flow> flow = new SimpleObjectProperty<Flow>(new LinearWizardFlow()) {
-        protected void invalidated() {
+        @Override protected void invalidated() {
             updatePage(dialog,false);
         }
         
-        public void set(Flow flow) {
+        @Override public void set(Flow flow) {
         	super.set(flow);
         	pageHistory.clear();
         	if ( flow != null ) {
@@ -205,7 +205,7 @@ public class Wizard {
      */
      public final ObservableMap<Object, Object> getProperties() {
         if (properties == null) {
-            properties = FXCollections.observableMap(new HashMap<Object, Object>());
+            properties = FXCollections.observableMap(new HashMap<>());
         }
         return properties;
     }

@@ -51,6 +51,7 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
     private final CustomTextField txUserName;
     private final CustomPasswordField txPassword;
 
+    @SuppressWarnings("deprecation")
     public LoginDialog(final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator) {
         final DialogPane dialogPane = getDialogPane();
         
@@ -88,7 +89,7 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
         loginButton.setOnAction(actionEvent -> {
             try {
                 if (authenticator != null ) {
-                    authenticator.call(new Pair<String,String>(txUserName.getText(), txPassword.getText()));
+                    authenticator.call(new Pair<>(txUserName.getText(), txPassword.getText()));
                 }
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);

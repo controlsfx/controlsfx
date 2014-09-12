@@ -56,8 +56,9 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
         }
     };
 
-    private final WeakListChangeListener<T> weakGridViewItemsListener = new WeakListChangeListener<T>(gridViewItemsListener);
+    private final WeakListChangeListener<T> weakGridViewItemsListener = new WeakListChangeListener<>(gridViewItemsListener);
 
+    @SuppressWarnings("rawtypes")
     public GridViewSkin(GridView<T> control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding>emptyList()));
         

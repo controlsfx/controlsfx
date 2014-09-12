@@ -62,7 +62,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
         this.completionTarget = completionTarget;
         this.suggestionProvider = suggestionProvider;
-        this.autoCompletionPopup = new AutoCompletePopup<T>();
+        this.autoCompletionPopup = new AutoCompletePopup<>();
         this.autoCompletionPopup.setConverter(converter);
 
         autoCompletionPopup.setOnSuggestion(sce -> {
@@ -140,7 +140,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     }
 
     protected void fireAutoCompletion(T completion){
-        Event.fireEvent(this, new AutoCompletionEvent<T>(completion));
+        Event.fireEvent(this, new AutoCompletionEvent<>(completion));
     }
 
 
@@ -289,8 +289,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
          * knowing when an auto completion has been performed.
          */
         @SuppressWarnings("rawtypes")
-        public static final EventType<AutoCompletionEvent> AUTO_COMPLETED = 
-        new EventType<AutoCompletionEvent>("AUTO_COMPLETED"); //$NON-NLS-1$
+        public static final EventType<AutoCompletionEvent> AUTO_COMPLETED = new EventType<>("AUTO_COMPLETED"); //$NON-NLS-1$
 
         private final TE completion;
 

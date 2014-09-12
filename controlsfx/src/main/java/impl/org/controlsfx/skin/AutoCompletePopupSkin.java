@@ -54,7 +54,7 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
     private void onSuggestionChoosen(T suggestion){
         if(suggestion != null) {
-            Event.fireEvent(control, new AutoCompletePopup.SuggestionEvent<T>(suggestion));
+            Event.fireEvent(control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
         }
     }
 

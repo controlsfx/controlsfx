@@ -106,14 +106,7 @@ public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
 
 		getChildren().add(borderPane);
 
-		adjuster.orientationProperty().addListener(
-				new ChangeListener<Orientation>() {
-					public void changed(
-							ObservableValue<? extends Orientation> observable,
-							Orientation oldValue, Orientation newValue) {
-						updateLayout(newValue);
-					};
-				});
+		adjuster.orientationProperty().addListener((observable, oldValue, newValue) -> updateLayout(newValue));
 	}
 
 	private void updateLayout(Orientation orientation) {

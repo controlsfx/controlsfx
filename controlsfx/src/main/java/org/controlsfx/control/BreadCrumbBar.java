@@ -72,8 +72,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
          * has changed.
          */
         @SuppressWarnings("rawtypes")
-        public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = 
-                new EventType<BreadCrumbActionEvent>("CRUMB_ACTION"); //$NON-NLS-1$
+        public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = new EventType<>("CRUMB_ACTION"); //$NON-NLS-1$
 
         private final TreeItem<TE> selectedCrumb;
 
@@ -103,7 +102,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
     public static <T> TreeItem<T> buildTreeModel(@SuppressWarnings("unchecked") T... crumbs){
         TreeItem<T> subRoot = null;
         for (T crumb : crumbs) {
-            TreeItem<T> currentNode = new TreeItem<T>(crumb);
+            TreeItem<T> currentNode = new TreeItem<>(crumb);
             if(subRoot == null){
                 subRoot = currentNode; 
             }else{
@@ -199,7 +198,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
         return selectedCrumb;
     }
     private final ObjectProperty<TreeItem<T>> selectedCrumb = 
-            new SimpleObjectProperty<TreeItem<T>>(this, "selectedCrumb"); //$NON-NLS-1$
+            new SimpleObjectProperty<>(this, "selectedCrumb"); //$NON-NLS-1$
     
     /**
      * Get the current target path
@@ -259,7 +258,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
     }
     
     private final ObjectProperty<Callback<TreeItem<T>, Button>> crumbFactory = 
-            new SimpleObjectProperty<Callback<TreeItem<T>, Button>>(this, "crumbFactory"); //$NON-NLS-1$
+            new SimpleObjectProperty<>(this, "crumbFactory"); //$NON-NLS-1$
 
     /**
      * Sets the crumb factory to create (custom) {@link BreadCrumbButton} instances.

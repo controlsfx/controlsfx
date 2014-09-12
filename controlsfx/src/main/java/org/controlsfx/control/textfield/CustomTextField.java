@@ -86,7 +86,7 @@ public class CustomTextField extends TextField {
      **************************************************************************/
     
     // --- left
-    private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this, "left"); //$NON-NLS-1$
+    private ObjectProperty<Node> left = new SimpleObjectProperty<>(this, "left"); //$NON-NLS-1$
     
     /**
      * 
@@ -117,7 +117,7 @@ public class CustomTextField extends TextField {
     
     
     // --- right
-    private ObjectProperty<Node> right = new SimpleObjectProperty<Node>(this, "right"); //$NON-NLS-1$
+    private ObjectProperty<Node> right = new SimpleObjectProperty<>(this, "right"); //$NON-NLS-1$
     
     /**
      * Property representing the {@link Node} that is placed on the right of

@@ -48,8 +48,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     @SuppressWarnings("serial")
     public static class SuggestionEvent<TE> extends Event {
         @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionEvent> SUGGESTION 
-        	= new EventType<SuggestionEvent>("SUGGESTION");
+        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<>("SUGGESTION");
 
         private final TE suggestion;
 
@@ -180,7 +179,7 @@ public class AutoCompletePopup<T> extends PopupControl{
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new AutoCompletePopupSkin<T>(this);
+        return new AutoCompletePopupSkin<>(this);
     }
 
 }

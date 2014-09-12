@@ -48,6 +48,7 @@ import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
+@Deprecated
 public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<ButtonBar>> {
     
     /**************************************************************************
@@ -248,7 +249,7 @@ public class ButtonBarSkin extends BehaviorSkinBase<ButtonBar, BehaviorBase<Butt
             String type =  getButtonType(btn); 
             List<ButtonBase> typedButtons = buttonMap.get(type);
             if ( typedButtons == null ) {
-                typedButtons = new ArrayList<ButtonBase>();
+                typedButtons = new ArrayList<>();
                 buttonMap.put(type, typedButtons);
             }
             typedButtons.add( btn );

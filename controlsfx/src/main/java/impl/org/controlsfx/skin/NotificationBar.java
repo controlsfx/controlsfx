@@ -56,6 +56,7 @@ import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 
+@SuppressWarnings("deprecation")
 public abstract class NotificationBar extends Region {
 
     private static final double MIN_HEIGHT = 40;

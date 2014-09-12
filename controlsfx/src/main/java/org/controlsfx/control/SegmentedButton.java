@@ -126,7 +126,7 @@ public class SegmentedButton extends ControlsFXControl {
      *************************************************************************/
     
     private final ObservableList<ToggleButton> buttons;
-    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<ToggleGroup>(new ToggleGroup());
+    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>(new ToggleGroup());
     
     /**************************************************************************
      * 

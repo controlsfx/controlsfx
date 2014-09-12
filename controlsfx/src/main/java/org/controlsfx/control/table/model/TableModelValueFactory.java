@@ -36,8 +36,9 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
  *
  */
 public class TableModelValueFactory<S, T> implements Callback<CellDataFeatures<TableModelRow<S>, T>, ObservableValue<T>> {
-    private JavaFXTableModel<S> _tableModel;
-    private int _columnIndex;
+    @SuppressWarnings("unused")
+    private final JavaFXTableModel<S> _tableModel;
+    private final int _columnIndex;
 
     public TableModelValueFactory(JavaFXTableModel<S> tableModel, int columnIndex) {
         _tableModel = tableModel;
@@ -48,6 +49,6 @@ public class TableModelValueFactory<S, T> implements Callback<CellDataFeatures<T
     @Override public ObservableValue<T> call(TableColumn.CellDataFeatures<TableModelRow<S>, T> cdf) {
         TableModelRow<S> row = cdf.getValue();
         T valueAt = (T) row.get(_columnIndex);
-        return valueAt instanceof ObservableValue ? ((ObservableValue<T>) valueAt) : new ReadOnlyObjectWrapper<T>(valueAt);
+        return valueAt instanceof ObservableValue ? ((ObservableValue<T>) valueAt) : new ReadOnlyObjectWrapper<>(valueAt);
     }
 }

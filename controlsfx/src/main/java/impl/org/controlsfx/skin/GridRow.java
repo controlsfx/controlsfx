@@ -68,7 +68,7 @@ class GridRow<T> extends IndexedCell<T>{
      * {@inheritDoc}
      */
     @Override protected Skin<?> createDefaultSkin() {
-        return new GridRowSkin<T>(this);
+        return new GridRowSkin<>(this);
     }
 
 

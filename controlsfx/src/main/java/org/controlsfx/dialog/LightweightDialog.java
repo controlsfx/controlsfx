@@ -295,11 +295,11 @@ class LightweightDialog extends FXDialog {
         return lightweightDialog;
     }
     
-    public double getX() {
+    @Override public double getX() {
         return lightweightDialog.getLayoutX();
     }
     
-    public void setX(double x) {
+    @Override public void setX(double x) {
         lightweightDialog.setLayoutX(x);
     }
 
@@ -435,7 +435,7 @@ class LightweightDialog extends FXDialog {
                 getChildren().add(lightweightDialog);
             }
             
-            protected void layoutChildren() {
+            @Override protected void layoutChildren() {
                 final double w = getOverlayWidth();
                 final double h = getOverlayHeight();
                 

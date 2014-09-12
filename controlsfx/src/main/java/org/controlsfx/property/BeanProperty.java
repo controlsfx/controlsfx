@@ -50,6 +50,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see PropertySheet
  * @see PropertyDescriptor
  */
+@SuppressWarnings("deprecation")
 public class BeanProperty implements PropertySheet.Item {
 
     private final Object bean;

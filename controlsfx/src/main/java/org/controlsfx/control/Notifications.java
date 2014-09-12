@@ -42,7 +42,6 @@ import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -421,15 +420,13 @@ public class Notifications {
 
             notificationBar.getStyleClass().addAll(notification.styleClass);
 
-            notificationBar.setOnMouseClicked(new EventHandler<Event>() {
-                public void handle(Event e) {
-                    if (notification.onAction != null) {
-                        ActionEvent actionEvent = new ActionEvent(notificationBar, notificationBar);
-                        notification.onAction.handle(actionEvent);
+            notificationBar.setOnMouseClicked(e -> {
+                if (notification.onAction != null) {
+                    ActionEvent actionEvent = new ActionEvent(notificationBar, notificationBar);
+                    notification.onAction.handle(actionEvent);
 
-                        // animate out the popup
-                        createHideTimeline(popup, notificationBar, p, Duration.ZERO).play();
-                    }
+                    // animate out the popup
+                    createHideTimeline(popup, notificationBar, p, Duration.ZERO).play();
                 }
             });
 

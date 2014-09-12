@@ -358,8 +358,8 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         Node n = getSkinnable().getNode();
         double imageViewWidth = n == null ? 0 : n.getBoundsInLocal().getWidth();
         double imageViewHeight = n == null ? 0 : n.getBoundsInLocal().getHeight();
-        double widthRatio = imageViewWidth / n.prefWidth(-1);
-        double heightRatio = imageViewHeight / n.prefHeight(-1);
+        double widthRatio = n == null ? 0 : imageViewWidth / n.prefWidth(-1);
+        double heightRatio = n == null ? 0 : imageViewHeight / n.prefHeight(-1);
 
         // compute the new position and size such that it is always within the image view's area
         Rectangle2D selection = getImageSelection();

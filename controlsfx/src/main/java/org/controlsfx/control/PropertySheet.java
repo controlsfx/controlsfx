@@ -297,7 +297,7 @@ public class PropertySheet extends ControlsFXControl {
 
     // --- propertyEditorFactory
     private final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory = 
-            new SimpleObjectProperty<Callback<Item, PropertyEditor<?>>>(this, "propertyEditor", new DefaultPropertyEditorFactory()); //$NON-NLS-1$
+            new SimpleObjectProperty<>(this, "propertyEditor", new DefaultPropertyEditorFactory()); //$NON-NLS-1$
     
     /**
      * The property editor factory is used by the PropertySheet to determine which

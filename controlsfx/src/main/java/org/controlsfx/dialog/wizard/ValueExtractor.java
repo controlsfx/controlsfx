@@ -101,7 +101,7 @@ public class ValueExtractor {
     public static Object getValue(Node n) {
         Object value = null;
         
-        if (value == null && valueExtractors.containsKey(n.getClass())) {
+        if (valueExtractors.containsKey(n.getClass())) {
             Callback callback = valueExtractors.get(n.getClass());
             value = callback.call(n);
         }

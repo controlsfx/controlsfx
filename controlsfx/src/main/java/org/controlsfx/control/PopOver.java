@@ -51,7 +51,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -362,16 +361,13 @@ public class PopOver extends PopupControl {
              * The user clicked somewhere into the transparent background. If
              * this is the case the hide the window (when attached).
              */
-            getScene().addEventHandler(MOUSE_CLICKED,
-                    new EventHandler<MouseEvent>() {
-                        public void handle(MouseEvent evt) {
-                            if (evt.getTarget().equals(getScene().getRoot())) {
-                                if (!isDetached()) {
-                                    hide();
-                                }
-                            }
-                        };
-                    });
+            getScene().addEventHandler(MOUSE_CLICKED, mouseEvent -> {
+                if (mouseEvent.getTarget().equals(getScene().getRoot())) {
+                    if (!isDetached()) {
+                        hide();
+                    }
+                }
+            });
 
             /*
              * Move the window so that the arrow will end up pointing at the
@@ -745,7 +741,7 @@ public class PopOver extends PopupControl {
         detachedTitleProperty().set(title);
     }
 
-    private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<PopOver.ArrowLocation>(
+    private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(
             this, "arrowLocation", ArrowLocation.LEFT_TOP); //$NON-NLS-1$
 
     /**

@@ -37,7 +37,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
@@ -121,15 +120,11 @@ public class CheckListView<T> extends ListView<T> {
             setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
         });
         
-        setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
-            public ListCell<T> call(ListView<T> listView) {
-                return new CheckBoxListCell<T>(new Callback<T, ObservableValue<Boolean>>() {
-                    @Override public ObservableValue<Boolean> call(T item) {
-                        return getItemBooleanProperty(item);
-                    }
-                });
-            };
-        });
+        setCellFactory(listView -> new CheckBoxListCell<>(new Callback<T, ObservableValue<Boolean>>() {
+            @Override public ObservableValue<Boolean> call(T item) {
+                return getItemBooleanProperty(item);
+            }
+        }));
     }
     
     

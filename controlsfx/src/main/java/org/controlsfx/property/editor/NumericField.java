@@ -81,7 +81,7 @@ class NumericField extends TextField {
     		this.field = field;
 		}
     	
-    	protected void invalidated() {
+    	@Override protected void invalidated() {
             field.setText(Double.toString(get()));
         }
 
@@ -107,7 +107,7 @@ class NumericField extends TextField {
     		this.field = field;
 		}
     	
-    	protected void invalidated() {
+    	@Override protected void invalidated() {
             field.setText(Long.toString(get()));
         }
 

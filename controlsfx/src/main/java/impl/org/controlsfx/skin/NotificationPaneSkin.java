@@ -147,26 +147,32 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         }
     }
     
+    @Override
     protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.minWidth(height);
     };
     
+    @Override
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.minHeight(width);
     };
     
+    @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.prefWidth(height);
     };
     
+    @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.prefHeight(width);
     };
     
+    @Override
     protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.maxWidth(height);
     };
     
+    @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.maxHeight(width);
     };

@@ -1030,7 +1030,7 @@ public class RangeSlider extends ControlsFXControl {
         
         private static final CssMetaData<RangeSlider,Orientation> ORIENTATION =
             new CssMetaData<RangeSlider,Orientation>("-fx-orientation", //$NON-NLS-1$
-                new EnumConverter<Orientation>(Orientation.class), 
+                new EnumConverter<>(Orientation.class), 
                 Orientation.HORIZONTAL) {
 
             @Override public Orientation getInitialValue(RangeSlider node) {
@@ -1051,7 +1051,7 @@ public class RangeSlider extends ControlsFXControl {
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = 
-                    new ArrayList<CssMetaData<? extends Styleable, ?>>(Control.getClassCssMetaData());
+                    new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(BLOCK_INCREMENT);
             styleables.add(SHOW_TICK_LABELS);
             styleables.add(SHOW_TICK_MARKS);

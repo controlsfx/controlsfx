@@ -40,7 +40,7 @@ import com.sun.javafx.scene.control.skin.CellSkinBase;
 public class GridRowSkin<T> extends CellSkinBase<GridRow<T>, BehaviorBase<GridRow<T>>> {
 
     public GridRowSkin(GridRow<T> control) {
-        super(control, new BehaviorBase<GridRow<T>>(control, Collections.<KeyBinding> emptyList()));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
 
         // Remove any children before creating cells (by default a LabeledText exist and we don't need it)
         getChildren().clear();

@@ -49,6 +49,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param validators the validators to combine
      * @return a Validator instance
      */
+    @SafeVarargs
     static <T> Validator<T> combine(Validator<T>... validators) {
         return (control, value) -> Stream.of(validators)
             .map(validator -> validator.apply(control, value))

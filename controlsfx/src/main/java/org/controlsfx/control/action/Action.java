@@ -161,7 +161,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- selected 
     private final BooleanProperty selectedProperty = new SimpleBooleanProperty(this, "selected") {
-    	public void set(boolean selected) {
+    	@Override public void set(boolean selected) {
     		if (locked) throw new UnsupportedOperationException("The action is immutable, property change suppport is disabled.");
     		super.set(selected);
     	};
@@ -197,7 +197,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- text
     private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"){ //$NON-NLS-1$
-    	public void set(String value) {
+    	@Override public void set(String value) {
     		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
     		super.set(value);
     	}
@@ -232,7 +232,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- disabled
     private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"){ //$NON-NLS-1$
-    	public void set(boolean value) {
+        @Override public void set(boolean value) {
     		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
     		super.set(value);
     	}
@@ -271,7 +271,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- longText
     private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"){ //$NON-NLS-1$
-    	public void set(String value) {
+        @Override public void set(String value) {
     		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
     		super.set(value);
 
@@ -310,7 +310,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- graphic
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"){ //$NON-NLS-1$
-    	public void set(Node value) {
+        @Override public void set(Node value) {
     		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
     		super.set(value);
 
@@ -346,7 +346,7 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- accelerator
     private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"){ //$NON-NLS-1$
-    	public void set(KeyCombination value) {
+        @Override public void set(KeyCombination value) {
     		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
     		super.set(value);
 

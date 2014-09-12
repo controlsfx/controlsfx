@@ -138,7 +138,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // Content node support.
 
-    private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this,
             "content"); //$NON-NLS-1$
 
     /**
@@ -172,7 +172,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // Top node support.
 
-    private ObjectProperty<Node> top = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> top = new SimpleObjectProperty<>(this,
             "top"); //$NON-NLS-1$
 
     /**
@@ -212,7 +212,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * 
      * @return the hidden node at the right side of the pane
      */
-    private ObjectProperty<Node> right = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> right = new SimpleObjectProperty<>(this,
             "right"); //$NON-NLS-1$
 
     /**
@@ -251,7 +251,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * 
      * @return the hidden node at the bottom side of the pane
      */
-    private ObjectProperty<Node> bottom = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> bottom = new SimpleObjectProperty<>(this,
             "bottom"); //$NON-NLS-1$
 
     /**
@@ -290,7 +290,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * 
      * @return the hidden node at the left side of the pane
      */
-    private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> left = new SimpleObjectProperty<>(this,
             "left"); //$NON-NLS-1$
 
     /**
@@ -323,7 +323,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // Pinned side support.
 
-    private ObjectProperty<Side> pinnedSide = new SimpleObjectProperty<Side>(
+    private ObjectProperty<Side> pinnedSide = new SimpleObjectProperty<>(
             this, "pinnedSide"); //$NON-NLS-1$
 
     /**
@@ -357,7 +357,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // slide in animation delay
 
-    private final ObjectProperty<Duration> animationDelay = new SimpleObjectProperty<Duration>(
+    private final ObjectProperty<Duration> animationDelay = new SimpleObjectProperty<>(
             this, "animationDelay", Duration.millis(300));
 
     /**
@@ -392,7 +392,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // slide in / slide out duration
 
-    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<Duration>(
+    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(
             this, "animationDuration", Duration.millis(200));
 
     /**

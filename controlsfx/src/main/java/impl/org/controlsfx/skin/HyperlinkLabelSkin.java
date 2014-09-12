@@ -84,7 +84,7 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
      **************************************************************************/
     
     public HyperlinkLabelSkin(HyperlinkLabel control) {
-        super(control, new BehaviorBase<HyperlinkLabel>(control, Collections.<KeyBinding> emptyList()));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
         this.textFlow = new TextFlow();
         getChildren().add(textFlow);
@@ -120,7 +120,7 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
         }
         
         // parse the text and put it into an array list
-        final List<Node> nodes = new ArrayList<Node>();
+        final List<Node> nodes = new ArrayList<>();
         
         int start = 0;
         final int textLength = text.length();

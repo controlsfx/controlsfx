@@ -35,11 +35,7 @@ import javafx.scene.control.TableView;
  */
 public class TableModelTableView<S> extends TableView<TableModelRow<S>> {
 
-    private final JavaFXTableModel<S> tableModel;
-    
     public TableModelTableView(final JavaFXTableModel<S> tableModel) {
-        this.tableModel = tableModel;
-        
         // create a dummy items list of the appropriate size, where the returned
         // value is the index of the row
         setItems(new ReadOnlyUnbackedObservableList<TableModelRow<S>>() {

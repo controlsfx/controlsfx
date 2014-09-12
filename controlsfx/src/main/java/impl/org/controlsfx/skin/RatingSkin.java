@@ -293,7 +293,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
 
             // make a copy of the buttons list so that we can reverse the order if
             // the list is vertical (as the buttons are ordered bottom to top).
-            List<Node> buttons = new ArrayList<Node>(backgroundContainer.getChildren());
+            List<Node> buttons = new ArrayList<>(backgroundContainer.getChildren());
             if (isVertical()) {
                 Collections.reverse(buttons);
             }

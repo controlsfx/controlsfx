@@ -192,7 +192,7 @@ public class ValidationSupport {
     }
 
     private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
-            new ReadOnlyObjectWrapper<ValidationResult>();
+            new ReadOnlyObjectWrapper<>();
 
 
     /**
@@ -232,7 +232,7 @@ public class ValidationSupport {
 
     private ObjectProperty<ValidationDecoration> validationDecoratorProperty =
             new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) {
-        protected void invalidated() {
+        @Override protected void invalidated() {
             // when the decorator changes, rerun the decoration to update the visuals immediately.
             redecorate();
         }

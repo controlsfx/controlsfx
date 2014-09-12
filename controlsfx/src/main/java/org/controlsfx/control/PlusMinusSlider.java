@@ -86,8 +86,8 @@ public class PlusMinusSlider extends ControlsFXControl {
 		 * because the value property of this control is "read-only".
 		 */
 		getProperties().addListener(new MapChangeListener<Object, Object>() {
-			public void onChanged(
-					MapChangeListener.Change<? extends Object, ? extends Object> change) {
+			@Override
+            public void onChanged(MapChangeListener.Change<? extends Object, ? extends Object> change) {
 				if (change.getKey().equals("plusminusslidervalue")) { //$NON-NLS-1$
 					if (change.getValueAdded() != null) {
 						Double valueAdded = (Double) change.getValueAdded();
@@ -252,7 +252,7 @@ public class PlusMinusSlider extends ControlsFXControl {
 	private static class StyleableProperties {
 
 		private static final CssMetaData<PlusMinusSlider, Orientation> ORIENTATION = new CssMetaData<PlusMinusSlider, Orientation>(
-				"-fx-orientation", new EnumConverter<Orientation>( //$NON-NLS-1$
+				"-fx-orientation", new EnumConverter<>( //$NON-NLS-1$
 						Orientation.class), Orientation.VERTICAL) {
 
 			@Override
@@ -276,8 +276,7 @@ public class PlusMinusSlider extends ControlsFXControl {
 
 		private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
 		static {
-			final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<CssMetaData<? extends Styleable, ?>>(
-					Control.getClassCssMetaData());
+			final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
 			styleables.add(ORIENTATION);
 
 			STYLEABLES = Collections.unmodifiableList(styleables);

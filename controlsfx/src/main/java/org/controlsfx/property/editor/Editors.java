@@ -24,6 +24,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.dialog.Dialogs;
 
+@SuppressWarnings("deprecation")
 public class Editors {
 
     private Editors() {

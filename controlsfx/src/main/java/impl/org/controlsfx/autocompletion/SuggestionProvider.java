@@ -19,7 +19,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest
  */
 public abstract class SuggestionProvider<T> implements Callback<ISuggestionRequest, Collection<T>>{
 
-    private final List<T> possibleSuggestions = new ArrayList<T>();
+    private final List<T> possibleSuggestions = new ArrayList<>();
     private final Object possibleSuggestionsLock = new Object();
 
 

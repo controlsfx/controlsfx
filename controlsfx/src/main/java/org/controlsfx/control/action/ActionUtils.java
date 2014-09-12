@@ -73,6 +73,7 @@ import org.controlsfx.tools.Duplicatable;
  * @see Action
  * @see ActionGroup
  */
+@SuppressWarnings("deprecation")
 public class ActionUtils {
     
     /***************************************************************************
@@ -467,7 +468,7 @@ public class ActionUtils {
     
     private static Collection<MenuItem> toMenuItems( Collection<? extends Action> actions ) {
         
-        Collection<MenuItem> items = new ArrayList<MenuItem>();
+        Collection<MenuItem> items = new ArrayList<>();
         
         for (Action action : actions) {
             
@@ -616,7 +617,7 @@ public class ActionUtils {
             this.action = action;
         }
 
-        public void onChanged(MapChangeListener.Change<?, ?> change) {
+        @Override public void onChanged(MapChangeListener.Change<?, ?> change) {
             T btn = btnWeakReference.get();
             if (btn == null) {
                 action.getProperties().removeListener(this);
@@ -637,7 +638,7 @@ public class ActionUtils {
             this.action = action;
         }
 
-        public void onChanged(MapChangeListener.Change<?, ?> change) {
+        @Override public void onChanged(MapChangeListener.Change<?, ?> change) {
             T btn = btnWeakReference.get();
             if (btn == null) {
                 action.getProperties().removeListener(this);

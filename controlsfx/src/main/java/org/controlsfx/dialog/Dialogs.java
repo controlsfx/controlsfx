@@ -542,7 +542,7 @@ public final class Dialogs {
      */
     public Dialogs styleClass(String styleClass) {
         if (styleClasses == null) {
-            styleClasses = new ArrayList<String>();
+            styleClasses = new ArrayList<>();
         }
         styleClasses.add(styleClass);
         return this;
@@ -662,14 +662,14 @@ public final class Dialogs {
         SelectionModel<T> selectionModel=null;
         if (choices.size() > 10) {
             // use ComboBox
-            ComboBox<T> comboBox = new ComboBox<T>();
+            ComboBox<T> comboBox = new ComboBox<>();
             comboBox.setMinWidth(MIN_WIDTH);
             comboBox.getItems().addAll(choices);
             selectionModel = comboBox.getSelectionModel();
             dlg.setContent(buildInputContent(comboBox));
         } else {
             // use ChoiceBox
-            ChoiceBox<T> choiceBox = new ChoiceBox<T>();
+            ChoiceBox<T> choiceBox = new ChoiceBox<>();
             choiceBox.setMinWidth(MIN_WIDTH);
             choiceBox.getItems().addAll(choices);
             selectionModel = choiceBox.getSelectionModel();
@@ -944,7 +944,7 @@ public final class Dialogs {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call(new Pair<String,String>(txUserName.getText(), txPassword.getText()));
+						authenticator.call(new Pair<>(txUserName.getText(), txPassword.getText()));
 					}
 					lbMessage.setVisible(false);
 					lbMessage.setManaged(false);
@@ -960,7 +960,7 @@ public final class Dialogs {
 				}
 			}
 
-			public String toString() {
+			@Override public String toString() {
 				return "LOGIN";
 			};
 		};
@@ -992,7 +992,7 @@ public final class Dialogs {
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
-    					new Pair<String,String>(txUserName.getText(), txPassword.getText()): 
+    					new Pair<>(txUserName.getText(), txPassword.getText()): 
     					null);
     }
     
@@ -1051,15 +1051,10 @@ public final class Dialogs {
             inputControl.setMaxWidth(Double.MAX_VALUE);
             GridPane.setHgrow(inputControl, Priority.ALWAYS);
             grid.add(inputControl, 1, 0);
+            
+            Platform.runLater(() -> inputControl.requestFocus());
         }
         
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                inputControl.requestFocus();
-            }
-        });
-
         return grid;
     }
 
@@ -1299,12 +1294,12 @@ public final class Dialogs {
         private static final Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
         
         private static List<FontStyle> getFontStyles( String fontFamily ) {
-            Set<FontStyle> set = new HashSet<FontStyle>();
+            Set<FontStyle> set = new HashSet<>();
             for (String f : Font.getFontNames(fontFamily)) {
                 set.add(new FontStyle(f.replace(fontFamily, "")));
             }
             
-            List<FontStyle> result =  new ArrayList<FontStyle>(set);
+            List<FontStyle> result =  new ArrayList<>(set);
             Collections.sort(result);
             return result;
             
@@ -1315,9 +1310,9 @@ public final class Dialogs {
         private final FilteredList<FontStyle> filteredStyleList = new FilteredList<>(FXCollections.<FontStyle>observableArrayList(), MATCH_ALL);
         private final FilteredList<Double> filteredSizeList = new FilteredList<>(FXCollections.observableArrayList(fontSizes), MATCH_ALL);
         
-        private final ListView<String> fontListView = new ListView<String>(filteredFontList);
-        private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
-        private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
+        private final ListView<String> fontListView = new ListView<>(filteredFontList);
+        private final ListView<FontStyle> styleListView = new ListView<>(filteredStyleList);
+        private final ListView<Double> sizeListView = new ListView<>(filteredSizeList);
         private final Text sample = new Text(localize(asKey("font.dlg.sample.text")));
         
         public FontPanel() {

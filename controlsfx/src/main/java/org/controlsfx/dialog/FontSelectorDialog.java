@@ -61,13 +61,10 @@ import javafx.util.Callback;
 public class FontSelectorDialog extends Dialog<Font> {
     
     private FontPanel fontPanel;
-    private Font defaultFont;
 
     public FontSelectorDialog(Font defaultFont) {
         fontPanel = new FontPanel();
         fontPanel.setFont(defaultFont);
-        
-        this.defaultFont = defaultFont;
         
         setResultConverter(dialogButton -> dialogButton == ButtonType.OK ? fontPanel.getFont() : null);
                 

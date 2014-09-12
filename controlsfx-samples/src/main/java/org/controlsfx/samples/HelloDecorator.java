@@ -28,6 +28,7 @@ package org.controlsfx.samples;
 
 import static org.controlsfx.control.decoration.Decorator.addDecoration;
 import static org.controlsfx.control.decoration.Decorator.removeAllDecorations;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -76,7 +77,9 @@ public class HelloDecorator extends ControlsFXSample {
         root.sceneProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable o) {
                 if (root.getScene() != null) {
-                    root.getScene().getStylesheets().add(HelloDecorator.class.getResource("decorations.css").toExternalForm());
+                    Platform.runLater(() -> {
+                        root.getScene().getStylesheets().add(HelloDecorator.class.getResource("decorations.css").toExternalForm());
+                    });
                 }
             }
         });

@@ -344,12 +344,11 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     /**
-     * This constructor will generate a sample Grid with {@link GridBase#getSampleGrid()
-     * } and pass it to the other constructor {@link #SpreadsheetView(org.controlsfx.control.spreadsheet.Grid)
-     * }.
+     * This constructor will generate sample Grid with 100 rows and 15 columns.
+     * All cells are typed as String (see {@link SpreadsheetCellType#STRING}).
      */
     public SpreadsheetView(){
-        this(GridBase.getSampleGrid());
+        this(getSampleGrid());
         for(SpreadsheetColumn column: getColumns()){
             column.setPrefWidth(100);
         }
@@ -1200,6 +1199,28 @@ public class SpreadsheetView extends Control {
      * * Private/Protected Implementation * *
      **************************************************************************/
 
+    /**
+     * This static method creates a sample Grid with 100 rows and 15 columns.
+     * All cells are typed as String.
+     *
+     * @return the sample Grid
+     * @see SpreadsheetCellType#STRING
+     */
+    private static Grid getSampleGrid() {
+        GridBase gridBase = new GridBase(100, 15);
+        List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+
+        for (int row = 0; row < gridBase.getRowCount(); ++row) {
+            ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
+            for (int column = 0; column < gridBase.getColumnCount(); ++column) {
+                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+            }
+            rows.add(currentRow);
+        }
+        gridBase.setRows(rows);
+        return gridBase;
+    }
+    
     private void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         rowFix = new BitSet(rows.size());

@@ -94,7 +94,7 @@ public final class SpreadsheetColumn {
      * * Constructor * *
      **************************************************************************/
     /**
-     * Creates a new SpreadsheetColumn with a minimum width of 30.
+     * Creates a new SpreadsheetColumn.
      * 
      * @param column
      * @param spreadsheetView

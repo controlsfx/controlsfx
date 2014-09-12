@@ -285,21 +285,21 @@ public class SnapshotView extends ControlsFXControl {
 
         // META
         selectionAreaBoundary = createStylableObjectProperty(
-                this, "selectionAreaBoundary", Boundary.CONTROL, StyleableProperties.SELECTION_AREA_BOUNDARY);
+                this, "selectionAreaBoundary", Boundary.CONTROL, Css.SELECTION_AREA_BOUNDARY);
         selectionActivityManaged = new SimpleBooleanProperty(this, "selectionActivityManaged", true);
         selectionMouseTransparent = new SimpleBooleanProperty(this, "selectionMouseTransparent", false);
 
         // VISUALIZATION
         unselectedAreaBoundary = createStylableObjectProperty(
-                this, "unselectedAreaBoundary", Boundary.CONTROL, StyleableProperties.UNSELECTED_AREA_BOUNDARY);
+                this, "unselectedAreaBoundary", Boundary.CONTROL, Css.UNSELECTED_AREA_BOUNDARY);
         selectionBorderPaint = createStylableObjectProperty(
-                this, "selectionBorderPaint", Color.WHITESMOKE, StyleableProperties.SELECTION_BORDER_PAINT);
+                this, "selectionBorderPaint", Color.WHITESMOKE, Css.SELECTION_BORDER_PAINT);
         selectionBorderWidth = createStylableDoubleProperty(
-                this, "selectionBorderWidth", 2.5, StyleableProperties.SELECTION_BORDER_WIDTH);
+                this, "selectionBorderWidth", 2.5, Css.SELECTION_BORDER_WIDTH);
         selectionAreaFill = createStylableObjectProperty(
-                this, "selectionAreaFill", Color.TRANSPARENT, StyleableProperties.SELECTION_AREA_FILL);
+                this, "selectionAreaFill", Color.TRANSPARENT, Css.SELECTION_AREA_FILL);
         unselectedAreaFill = createStylableObjectProperty(
-                this, "unselectedAreaFill", new Color(0, 0, 0, 0.5), StyleableProperties.UNSELECTED_AREA_FILL);
+                this, "unselectedAreaFill", new Color(0, 0, 0, 0.5), Css.UNSELECTED_AREA_FILL);
 
         addStateUpdatingListeners();
         // update selection when resizing
@@ -552,6 +552,19 @@ public class SnapshotView extends ControlsFXControl {
         return SnapshotView.class.getResource("snapshot-view.css").toExternalForm();
     }
 
+    /**
+     * Creates a {@link StyleableDoubleProperty} with the specified arguments.
+     * 
+     * @param bean
+     *            the {@link Property#getBean() bean} the created property belongs to
+     * @param name
+     *            the property's {@link Property#getName() name}
+     * @param initialValue
+     *            the property's initial value
+     * @param cssMetaData
+     *            the {@link CssMetaData} for the created property
+     * @return a {@link StyleableDoubleProperty}
+     */
     private static StyleableDoubleProperty createStylableDoubleProperty(
             Object bean, String name, double initialValue, CssMetaData<? extends Styleable, Number> cssMetaData) {
 
@@ -575,6 +588,19 @@ public class SnapshotView extends ControlsFXControl {
         };
     }
 
+    /**
+     * Creates a {@link StyleableObjectProperty} with the specified arguments.
+     * 
+     * @param bean
+     *            the {@link Property#getBean() bean} the created property belongs to
+     * @param name
+     *            the property's {@link Property#getName() name}
+     * @param initialValue
+     *            the property's initial value
+     * @param cssMetaData
+     *            the {@link CssMetaData} for the created property
+     * @return a {@link StyleableObjectProperty}
+     */
     private static <T> StyleableObjectProperty<T> createStylableObjectProperty(
             Object bean, String name, T initialValue, CssMetaData<? extends Styleable, T> cssMetaData) {
 
@@ -598,6 +624,18 @@ public class SnapshotView extends ControlsFXControl {
         };
     }
 
+    /**
+     * Creates an instance of {@link CssMetaData} with the specified arguments.
+     * 
+     * @param getProperty
+     *            a function from the {@link Styleable} which owns the styled property to the property styled by the
+     *            returned {@code CssMetaData}
+     * @param cssPropertyName
+     *            the name by which the styled property is referenced in CSS files
+     * @param styleConverter
+     *            the {@link StyleConverter} used to convert the CSS parsed value to a Java object
+     * @return an instance of {@link CssMetaData}
+     */
     private static <S extends Styleable, T> CssMetaData<S, T> createCssMetaData(
             Function<S, Property<T>> getProperty, String cssPropertyName, StyleConverter<?, T> styleConverter) {
 
@@ -617,7 +655,12 @@ public class SnapshotView extends ControlsFXControl {
         };
     }
 
-    private static class StyleableProperties {
+    /**
+     * The class which holds this control's {@link CssMetaData} for the different {@link StyleableProperty
+     * StyleableProperties}.
+     */
+    @SuppressWarnings("javadoc")
+    private static class Css {
 
         public static final CssMetaData<SnapshotView, Boundary> SELECTION_AREA_BOUNDARY =
                 createCssMetaData(
@@ -655,7 +698,11 @@ public class SnapshotView extends ControlsFXControl {
                         "-fx-unselected-area-fill",
                         PaintConverter.getInstance());
 
-        public static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        /**
+         * The {@link CssMetaData} associated with this class, which includes the {@code CssMetaData} of its super
+         * classes.
+         */
+        public static final List<CssMetaData<? extends Styleable, ?>> CSS_META_DATA;
 
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
@@ -665,7 +712,7 @@ public class SnapshotView extends ControlsFXControl {
             styleables.add(SELECTION_BORDER_WIDTH);
             styleables.add(SELECTION_AREA_FILL);
             styleables.add(UNSELECTED_AREA_FILL);
-            STYLEABLES = Collections.unmodifiableList(styleables);
+            CSS_META_DATA = Collections.unmodifiableList(styleables);
         }
     }
 
@@ -674,7 +721,7 @@ public class SnapshotView extends ControlsFXControl {
      *         classes
      */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-        return StyleableProperties.STYLEABLES;
+        return Css.CSS_META_DATA;
     }
 
     @Override

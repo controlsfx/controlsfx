@@ -36,7 +36,6 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Transifex {
     
@@ -55,10 +54,10 @@ public class Transifex {
     private static final String PASSWORD = System.getProperty("transifex.password");
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        doTransifexCheck();
+        new Transifex().doTransifexCheck();
     }
         
-    private static void doTransifexCheck() throws FileNotFoundException, UnsupportedEncodingException {
+    private void doTransifexCheck() {
         System.out.println("=== Starting Transifex Check ===");
         
         if (USERNAME == null || PASSWORD == null) {
@@ -77,63 +76,15 @@ public class Transifex {
         
         String response = transifexRequest(LIST_TRANSLATIONS);
         List<Map<String,String>> translations = JSON.parse(response);
-        List<String> completedLanguageCodes = translations
-                .stream()
+        translations.stream()
                 .map(map -> map.get("language_code"))
-                .filter(languageCode -> {
-                    // filter out any translation that does not have 100% completion and reviewed state.
-                    // Returns a Map, for example:
-                    // { 
-                    //     untranslated_entities=8, 
-                    //     last_commiter=eryzhikov, 
-                    //     translated_entities=34, 
-                    //     untranslated_words=16, 
-                    //     translated_words=57, 
-                    //     last_update=2014-09-12 08:44:33, 
-                    //     reviewed_percentage=69%, 
-                    //     reviewed=29, 
-                    //     completed=80%
-                    // }
-                    Map<String, String> map = JSON.parse(transifexRequest(TRANSLATION_STATS, languageCode));
-                    String completed = map.getOrDefault("completed", "0%");
-                    String reviewed = map.getOrDefault("reviewed_percentage", "0%");
-                    boolean isAccepted = completed.equals("100%") && reviewed.equals("100%");
-                    
-                    if (DEBUG) {
-                        System.out.println("Reviewing translation '" + languageCode + "'" + 
-                                "\tcompletion: " + completed + 
-                                ",\treviewed: " + reviewed + 
-                                "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED"));
-                    }
-                    
-//                    return isAccepted;
-                    return true;
-                })
-                .collect(Collectors.toList());
-        
-        // Now we download the translations of the completed languages
-        for (String languageCode : completedLanguageCodes) {
-            System.out.println("Downloading translation file for '" + languageCode + "'");
-            
-            Map<String,String> map = JSON.parse(transifexRequest(GET_TRANSLATION, languageCode));
-            String content = new String(map.get("content").getBytes(), "ISO-8859-1");
-            String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode);
-            PrintWriter pw = new PrintWriter(outputFile, "ISO-8859-1");
-            
-            pw.write(content);
-            
-//            String[] lines = content.split("\\n");
-//            System.out.println("line count: " + lines.length);
-//            for (String line : lines) {
-//                pw.println(line);
-//            }
-            pw.close();
-        }
+                .filter(this::filterOutIncompleteTranslations)
+                .forEach(this::downloadTranslation);
         
         System.out.println("Transifex Check Complete");
     }
     
-    private static String transifexRequest(String request, Object... args) {
+    private String transifexRequest(String request, Object... args) {
         request = String.format(request, args);
         
         URL url;
@@ -170,5 +121,58 @@ public class Transifex {
         }
         
         return "";
+    }
+    
+    private boolean filterOutIncompleteTranslations(String languageCode) {
+        // filter out any translation that does not have 100% completion and reviewed state.
+        // Returns a Map, for example:
+        // { 
+        //     untranslated_entities=8, 
+        //     last_commiter=eryzhikov, 
+        //     translated_entities=34, 
+        //     untranslated_words=16, 
+        //     translated_words=57, 
+        //     last_update=2014-09-12 08:44:33, 
+        //     reviewed_percentage=69%, 
+        //     reviewed=29, 
+        //     completed=80%
+        // }
+        Map<String, String> map = JSON.parse(transifexRequest(TRANSLATION_STATS, languageCode));
+        String completed = map.getOrDefault("completed", "0%");
+        String reviewed = map.getOrDefault("reviewed_percentage", "0%");
+        boolean isAccepted = completed.equals("100%") && reviewed.equals("100%");
+        
+        if (DEBUG) {
+            System.out.println("Reviewing translation '" + languageCode + "'" + 
+                    "\tcompletion: " + completed + 
+                    ",\treviewed: " + reviewed + 
+                    "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED"));
+        }
+        
+//        return isAccepted;
+        return true;
+    }
+    
+    private void downloadTranslation(String languageCode) {
+        // Now we download the translations of the completed languages
+        System.out.println("Downloading translation file for '" + languageCode + "'");
+        
+        try {
+            Map<String,String> map = JSON.parse(transifexRequest(GET_TRANSLATION, languageCode));
+            String content = new String(map.get("content").getBytes(), "ISO-8859-1");
+            String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode);
+            PrintWriter pw = new PrintWriter(outputFile, "ISO-8859-1");
+            
+            pw.write(content);
+            
+    //            String[] lines = content.split("\\n");
+    //            System.out.println("line count: " + lines.length);
+    //            for (String line : lines) {
+    //                pw.println(line);
+    //            }
+            pw.close();
+        } catch (UnsupportedEncodingException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

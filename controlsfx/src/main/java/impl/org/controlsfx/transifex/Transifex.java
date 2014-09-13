@@ -39,20 +39,19 @@ import java.util.Map;
 
 public class Transifex {
     
-    private static final String CHARSET = "ISO-8859-1"; //$NON-NLS-1$
-	private static final boolean DEBUG = true;
-    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = false;
-    private static final String FILE_NAME = "controlsfx_%1s.properties"; //$NON-NLS-1$
-    private static final String NEW_LINE = System.getProperty("line.separator"); //$NON-NLS-1$
+    private static final String CHARSET             = "ISO-8859-1"; //$NON-NLS-1$
+    private static final String FILE_NAME           = "controlsfx_%1s.properties"; //$NON-NLS-1$
+    private static final String NEW_LINE            = System.getProperty("line.separator"); //$NON-NLS-1$
 
-    private static final String BASE_URI = "https://www.transifex.com/api/2/"; //$NON-NLS-1$
-//    private static final String PROJECT_PATH = "project/controlsfx/resource/controlsfx-core"; // list project details
-    private static final String LIST_TRANSLATIONS  = BASE_URI + "project/controlsfx/languages/"; // list all translations //$NON-NLS-1$
-    private static final String GET_TRANSLATION = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s/"; // gets a translation for one language //$NON-NLS-1$
-    private static final String TRANSLATION_STATS = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
-    
-    private static final String USERNAME = System.getProperty("transifex.username"); //$NON-NLS-1$
-    private static final String PASSWORD = System.getProperty("transifex.password"); //$NON-NLS-1$
+    private static final String BASE_URI            = "https://www.transifex.com/api/2/"; //$NON-NLS-1$
+    private static final String PROJECT_PATH        = BASE_URI + "project/controlsfx/resource/controlsfx-core"; // list project details //$NON-NLS-1$
+    private static final String LIST_TRANSLATIONS   = BASE_URI + "project/controlsfx/languages/"; // list all translations //$NON-NLS-1$
+    private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s/"; // gets a translation for one language //$NON-NLS-1$
+    private static final String TRANSLATION_STATS   = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
+
+    private static final String USERNAME            = System.getProperty("transifex.username"); //$NON-NLS-1$
+    private static final String PASSWORD            = System.getProperty("transifex.password"); //$NON-NLS-1$
+    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "true"));
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new Transifex().doTransifexCheck();
@@ -62,8 +61,11 @@ public class Transifex {
         System.out.println("=== Starting Transifex Check ==="); //$NON-NLS-1$
         
         if (USERNAME == null || PASSWORD == null) {
-            System.out.println("transifex.username and transifex.password system properties must be specified"); //$NON-NLS-1$
+            System.out.println("  transifex.username and transifex.password system properties must be specified"); //$NON-NLS-1$
+            return;
         }
+        
+        System.out.println("  Filtering out incomplete translations: " + FILTER_INCOMPLETE_TRANSLATIONS);
         
         // get a list of all translations
         // Once parsed, returns a List of Map, e.g.
@@ -144,12 +146,10 @@ public class Transifex {
         String reviewed = map.getOrDefault("reviewed_percentage", "0%"); //$NON-NLS-1$ //$NON-NLS-2$
         boolean isAccepted = completed.equals("100%") && reviewed.equals("100%"); //$NON-NLS-1$ //$NON-NLS-2$
         
-        if (DEBUG) {
-            System.out.println("Reviewing translation '" + languageCode + "'" +  //$NON-NLS-1$ //$NON-NLS-2$
-                    "\tcompletion: " + completed +  //$NON-NLS-1$
-                    ",\treviewed: " + reviewed +  //$NON-NLS-1$
-                    "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
+        System.out.println("  Reviewing translation '" + languageCode + "'" +  //$NON-NLS-1$ //$NON-NLS-2$
+                "\tcompletion: " + completed +  //$NON-NLS-1$
+                ",\treviewed: " + reviewed +  //$NON-NLS-1$
+                "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         
         return isAccepted || !FILTER_INCOMPLETE_TRANSLATIONS;
     }
@@ -165,13 +165,9 @@ public class Transifex {
             String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
             PrintWriter pw = new PrintWriter(outputFile, CHARSET);
             
+            // interesting Transifex REST API quirk, they return \\n when we want \n
             pw.write(content.replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
             
-//                String[] lines = content.split("\\\\n");
-//                System.out.println("line count: " + lines.length);
-//                for (String line : lines) {
-//                    pw.println(line);
-//                }
             pw.close();
         } catch (UnsupportedEncodingException | FileNotFoundException e) {
             e.printStackTrace();

@@ -39,7 +39,8 @@ import java.util.Map;
 
 public class Transifex {
     
-    private static final boolean DEBUG = true;
+    private static final String CHARSET = "ISO-8859-1";
+	private static final boolean DEBUG = true;
     private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = false;
     private static final String FILE_NAME = "controlsfx_%1s.properties";
     private static final String NEW_LINE = System.getProperty("line.separator");
@@ -100,7 +101,7 @@ public class Transifex {
             // pass in username / password
             String encoded = Base64.getEncoder().encodeToString((USERNAME+":"+PASSWORD).getBytes());
             connection.setRequestProperty("Authorization", "Basic "+encoded);
-            connection.setRequestProperty("Accept-Charset", "ISO-8859-1"); 
+            connection.setRequestProperty("Accept-Charset", CHARSET); 
             
             InputStream is = connection.getInputStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
@@ -159,17 +160,18 @@ public class Transifex {
         
         try {
             Map<String,String> map = JSON.parse(transifexRequest(GET_TRANSLATION, languageCode));
-            String content = new String(map.get("content").getBytes(), "ISO-8859-1");
+            
+            String content = new String(map.get("content").getBytes(), CHARSET);
             String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode);
-            PrintWriter pw = new PrintWriter(outputFile, "ISO-8859-1");
+            PrintWriter pw = new PrintWriter(outputFile, CHARSET);
             
-            pw.write(content);
+            pw.write(content.replace("\\n", "\n"));
             
-    //            String[] lines = content.split("\\n");
-    //            System.out.println("line count: " + lines.length);
-    //            for (String line : lines) {
-    //                pw.println(line);
-    //            }
+//                String[] lines = content.split("\\\\n");
+//                System.out.println("line count: " + lines.length);
+//                for (String line : lines) {
+//                    pw.println(line);
+//                }
             pw.close();
         } catch (UnsupportedEncodingException | FileNotFoundException e) {
             e.printStackTrace();

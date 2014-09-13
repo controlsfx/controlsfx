@@ -126,7 +126,8 @@ class JSON {
         return ret;
     }
 
-    public static <T> T parse(String json) {
+    @SuppressWarnings("unchecked")
+	public static <T> T parse(String json) {
         Matcher integerMatcher = PAT_INTEGER.matcher(json);
         Matcher doubleMatcher = PAT_DOUBLE.matcher(json);
         Matcher stringMatcher = PAT_STRING.matcher(json);

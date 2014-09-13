@@ -40,7 +40,7 @@ import java.util.Map;
 public class Transifex {
     
     private static final boolean DEBUG = true;
-    
+    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = false;
     private static final String FILE_NAME = "controlsfx_%1s.properties";
     private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -73,9 +73,10 @@ public class Transifex {
         //  {language_code=nl_BE, translators=[], coordinators=[neo4010], reviewers=[]}
         // ]
         // we just care about the language code, so we extract these out into a list
-        
         String response = transifexRequest(LIST_TRANSLATIONS);
         List<Map<String,String>> translations = JSON.parse(response);
+        
+        // main loop
         translations.stream()
                 .map(map -> map.get("language_code"))
                 .filter(this::filterOutIncompleteTranslations)
@@ -149,13 +150,12 @@ public class Transifex {
                     "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED"));
         }
         
-//        return isAccepted;
-        return true;
+        return isAccepted || !FILTER_INCOMPLETE_TRANSLATIONS;
     }
     
     private void downloadTranslation(String languageCode) {
         // Now we download the translations of the completed languages
-        System.out.println("Downloading translation file for '" + languageCode + "'");
+        System.out.println("\tDownloading translation file...");
         
         try {
             Map<String,String> map = JSON.parse(transifexRequest(GET_TRANSLATION, languageCode));

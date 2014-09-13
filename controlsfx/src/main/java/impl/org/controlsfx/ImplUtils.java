@@ -62,7 +62,7 @@ public class ImplUtils {
     // The end result is that we've forced in the injectedParent node above parent.
     public static void injectPane(Parent parent, Parent injectedParent, boolean useReflection) {
         if (parent == null) {
-            throw new IllegalArgumentException("parent can not be null");
+            throw new IllegalArgumentException("parent can not be null"); //$NON-NLS-1$
         }
         
         ObservableList<Node> ownerParentChildren = getChildren(parent.getParent(), useReflection);
@@ -112,8 +112,8 @@ public class ImplUtils {
         }
         
         if (children == null) {
-            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() + 
-                                       ". useReflection is set to " + useReflection);
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() +  //$NON-NLS-1$
+                                       ". useReflection is set to " + useReflection); //$NON-NLS-1$
         }
         
         return children;
@@ -134,7 +134,7 @@ public class ImplUtils {
                 // uh oh, trouble
             }
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
-            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e); //$NON-NLS-1$
         }
         
         return children;

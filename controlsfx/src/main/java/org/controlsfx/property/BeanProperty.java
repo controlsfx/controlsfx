@@ -99,9 +99,9 @@ public class BeanProperty implements PropertySheet.Item {
                 e.printStackTrace();
             } catch (Throwable e) {
 				if (e instanceof PropertyVetoException) {
-					Dialogs.create().title(localize(asKey("bean.property.change.error.title")))
+					Dialogs.create().title(localize(asKey("bean.property.change.error.title"))) //$NON-NLS-1$
 							.message(e.getLocalizedMessage())
-							.masthead(localize(asKey("bean.property.change.error.masthead")))
+							.masthead(localize(asKey("bean.property.change.error.masthead"))) //$NON-NLS-1$
 							.showError();
 				} else {
 					throw e;
@@ -113,7 +113,7 @@ public class BeanProperty implements PropertySheet.Item {
     /** {@inheritDoc} */
     @Override public String getCategory() {
         return localize(asKey(beanPropertyDescriptor.isExpert()?
-        		   "bean.property.category.expert":"bean.property.category.basic"));
+        		   "bean.property.category.expert":"bean.property.category.basic")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 	
     /** 

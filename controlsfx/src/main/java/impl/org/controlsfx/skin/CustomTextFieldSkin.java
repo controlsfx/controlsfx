@@ -44,7 +44,7 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                CustomTextField.class.getResource("customtextfield.css").toExternalForm());
+                CustomTextField.class.getResource("customtextfield.css").toExternalForm()); //$NON-NLS-1$
     }
     
     private static final PseudoClass HAS_NO_SIDE_NODE = PseudoClass.getPseudoClass("no-side-nodes"); //$NON-NLS-1$

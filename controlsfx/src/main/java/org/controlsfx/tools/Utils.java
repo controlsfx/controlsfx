@@ -77,7 +77,7 @@ public class Utils {
      * @return a letter (like) associated with the number.
      */
     public static final String getExcelLetterFromNumber(int number) {
-        String letter = "";
+        String letter = ""; //$NON-NLS-1$
         // Repeatedly divide the number by 26 and convert the
         // remainder into the appropriate letter.
         while (number >= 0) {

@@ -32,10 +32,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class JSON {
-    private static final Pattern PAT_INTEGER = Pattern.compile("[-+]?[0-9]+|0[Xx][0-9]+");
-    private static final Pattern PAT_DOUBLE = Pattern.compile("[+-]?[0-9]+([Ee][+-]?[0-9]+)?|[+-]?[0-9]*\\.[0-9]*([Ee][+-]?[0-9]+)?");
-    private static final Pattern PAT_STRING = Pattern.compile("\"([^\\\\]+\\\\[\"'\\\\])*[^\"]*\"|'([^\\\\]+\\\\[\"'\\\\])*[^']*'");
-    private static final Pattern PAT_BOOL = Pattern.compile("(true)|(false)");
+    private static final Pattern PAT_INTEGER = Pattern.compile("[-+]?[0-9]+|0[Xx][0-9]+"); //$NON-NLS-1$
+    private static final Pattern PAT_DOUBLE = Pattern.compile("[+-]?[0-9]+([Ee][+-]?[0-9]+)?|[+-]?[0-9]*\\.[0-9]*([Ee][+-]?[0-9]+)?"); //$NON-NLS-1$
+    private static final Pattern PAT_STRING = Pattern.compile("\"([^\\\\]+\\\\[\"'\\\\])*[^\"]*\"|'([^\\\\]+\\\\[\"'\\\\])*[^']*'"); //$NON-NLS-1$
+    private static final Pattern PAT_BOOL = Pattern.compile("(true)|(false)"); //$NON-NLS-1$
 
     private static Object parse(String s, int[] start, Matcher integerMatcher, Matcher doubleMatcher, Matcher stringMatcher, Matcher booleanMatcher) {
         char[] c = s.toCharArray();
@@ -58,7 +58,7 @@ class JSON {
                 if (p == ',')
                     start[0]++;
                 else if (!crlf)
-                    throw new IllegalStateException(", or ] expected");
+                    throw new IllegalStateException(", or ] expected"); //$NON-NLS-1$
             }
         } else if (c[start[0]] == '{') {
             start[0]++;
@@ -71,7 +71,7 @@ class JSON {
                     a.put(field, parse(s, start, integerMatcher, doubleMatcher, stringMatcher, booleanMatcher));
                     crlf = skipSpace(s, start);
                 } else
-                    a.put(field, "");
+                    a.put(field, ""); //$NON-NLS-1$
                 char p = c[start[0]];
                 if (p == '}') {
                     start[0]++;
@@ -80,7 +80,7 @@ class JSON {
                 if (p == ',')
                     start[0]++;
                 else if (!crlf)
-                    throw new IllegalStateException(", or } expected at " + start[0]);
+                    throw new IllegalStateException(", or } expected at " + start[0]); //$NON-NLS-1$
             }
         }
         if (integerMatcher.find(start[0])) {
@@ -99,7 +99,7 @@ class JSON {
             String substring = match(start, s, booleanMatcher);
             if (substring != null) return Boolean.valueOf(substring);
         }
-        throw new IllegalStateException("unexpected end of data");
+        throw new IllegalStateException("unexpected end of data"); //$NON-NLS-1$
     }
 
     private static String match(int[] start, String s, Matcher matcher) {

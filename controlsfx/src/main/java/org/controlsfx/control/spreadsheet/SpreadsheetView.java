@@ -286,8 +286,8 @@ public class SpreadsheetView extends Control {
     private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(true);
     private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
 
-    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true);
-    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader", true);
+    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true); //$NON-NLS-1$
+    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader", true); //$NON-NLS-1$
 
     private BitSet rowFix; // Compute if we can fix the rows or not.
 
@@ -362,7 +362,7 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid) {
         super();
-        getStyleClass().add("SpreadsheetView");
+        getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
             @Override
@@ -1097,9 +1097,9 @@ public class SpreadsheetView extends Control {
     public ContextMenu getSpreadsheetViewContextMenu() {
         final ContextMenu contextMenu = new ContextMenu();
 
-        final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy")));
+        final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy"))); //$NON-NLS-1$
         copyItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
-                .getResourceAsStream("copySpreadsheetView.png"))));
+                .getResourceAsStream("copySpreadsheetView.png")))); //$NON-NLS-1$
         copyItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         copyItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1108,9 +1108,9 @@ public class SpreadsheetView extends Control {
             }
         });
 
-        final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste")));
+        final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste"))); //$NON-NLS-1$
         pasteItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
-                .getResourceAsStream("pasteSpreadsheetView.png"))));
+                .getResourceAsStream("pasteSpreadsheetView.png")))); //$NON-NLS-1$
         pasteItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
         pasteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1119,11 +1119,11 @@ public class SpreadsheetView extends Control {
             }
         });
         
-        final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment")));
+        final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment"))); //$NON-NLS-1$
         cornerMenu.setGraphic(new ImageView(new Image(SpreadsheetView.class
-                .getResourceAsStream("comment.png"))));
+                .getResourceAsStream("comment.png")))); //$NON-NLS-1$
 
-        final MenuItem topLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-left")));
+        final MenuItem topLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-left"))); //$NON-NLS-1$
         topLeftItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1133,7 +1133,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
             }
         });
-        final MenuItem topRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-right")));
+        final MenuItem topRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-right"))); //$NON-NLS-1$
         topRightItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1143,7 +1143,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
             }
         });
-        final MenuItem bottomRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-right")));
+        final MenuItem bottomRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-right"))); //$NON-NLS-1$
         bottomRightItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1153,7 +1153,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
             }
         });
-        final MenuItem bottomLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-left")));
+        final MenuItem bottomLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-left"))); //$NON-NLS-1$
         bottomLeftItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1237,28 +1237,28 @@ public class SpreadsheetView extends Control {
                     SpreadsheetCell currentCell = row.get(j);
                     for (int k = j + 1; k < currentCell.getColumn() + currentCell.getColumnSpan(); ++k) {
                         if (!row.get(k).equals(currentCell)) {
-                            throw new IllegalStateException("\n At row " + i + " and column " + j
-                                    + ": this cell is in the range of a columnSpan but is different. \n"
-                                    + "Every cell in a range of a ColumnSpan must be of the same instance.");
+                            throw new IllegalStateException("\n At row " + i + " and column " + j //$NON-NLS-1$ //$NON-NLS-2$
+                                    + ": this cell is in the range of a columnSpan but is different. \n" //$NON-NLS-1$
+                                    + "Every cell in a range of a ColumnSpan must be of the same instance."); //$NON-NLS-1$
                         }
                         ++count;
                         ++j;
                     }
                 } else {
-                    throw new IllegalStateException("\n At row " + i + " and column " + j
-                            + ": this cell has a negative columnSpan");
+                    throw new IllegalStateException("\n At row " + i + " and column " + j //$NON-NLS-1$ //$NON-NLS-2$
+                            + ": this cell has a negative columnSpan"); //$NON-NLS-1$
                 }
             }
             if (count != grid.getColumnCount()) {
-                throw new IllegalStateException("The row" + i
-                        + " has a number of cells different of the columnCount declared in the grid.");
+                throw new IllegalStateException("The row" + i //$NON-NLS-1$
+                        + " has a number of cells different of the columnCount declared in the grid."); //$NON-NLS-1$
             }
         }
     }
 
     private void checkFormat() {
-        if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
-            fmt = new DataFormat("SpreadsheetView");
+        if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) { //$NON-NLS-1$
+            fmt = new DataFormat("SpreadsheetView"); //$NON-NLS-1$
         }
     }
 
@@ -1288,7 +1288,7 @@ public class SpreadsheetView extends Control {
     };
 
         private String computeReason(List<? extends Integer> list) {
-        String reason = "\n A row cannot be fixed. \n";
+        String reason = "\n A row cannot be fixed. \n"; //$NON-NLS-1$
 
         for (Integer row : list) {
             //If this row is not fixable, we need to identify the maximum span
@@ -1298,7 +1298,7 @@ public class SpreadsheetView extends Control {
                 List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
                 for (SpreadsheetCell cell : gridRow) {
                     if(!list.contains(cell.getRow())){
-                        reason += "The row " + row + " is inside a row span and the starting row " + cell.getRow() + " is not fixed.\n";
+                        reason += "The row " + row + " is inside a row span and the starting row " + cell.getRow() + " is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     }
                     //We only want to consider the original cell.
                     if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
@@ -1309,8 +1309,8 @@ public class SpreadsheetView extends Control {
                 int count = row + maxSpan - 1;
                 for (int index = row + 1; index < count; ++index) {
                     if (!list.contains(index)) {
-                        reason += "One cell on the row " + row + " has a row span of " + maxSpan + ". "
-                                + "But the row " + index + " contained within that span is not fixed.\n";
+                        reason += "One cell on the row " + row + " has a row span of " + maxSpan + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                + "But the row " + index + " contained within that span is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
             }
@@ -1336,12 +1336,12 @@ public class SpreadsheetView extends Control {
         private String computeReason(SpreadsheetColumn element) {
             int indexColumn = getColumns().indexOf(element);
 
-            String reason = "\n This column cannot be fixed.";
+            String reason = "\n This column cannot be fixed."; //$NON-NLS-1$
             for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
                 int columnSpan = row.get(indexColumn).getColumnSpan();
                 if (columnSpan > 1 /*|| row.get(indexColumn).getRowSpan() > 1*/) {
-                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column "
-                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1.";
+                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column " //$NON-NLS-1$ //$NON-NLS-2$
+                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1."; //$NON-NLS-1$
                     return reason;
                 }
             }

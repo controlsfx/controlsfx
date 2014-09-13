@@ -46,7 +46,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                GridView.class.getResource("gridview.css").toExternalForm());
+                GridView.class.getResource("gridview.css").toExternalForm()); //$NON-NLS-1$
     }
 
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {

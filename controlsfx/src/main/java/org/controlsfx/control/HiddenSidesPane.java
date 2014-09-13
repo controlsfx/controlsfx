@@ -358,7 +358,7 @@ public class HiddenSidesPane extends ControlsFXControl {
     // slide in animation delay
 
     private final ObjectProperty<Duration> animationDelay = new SimpleObjectProperty<>(
-            this, "animationDelay", Duration.millis(300));
+            this, "animationDelay", Duration.millis(300)); //$NON-NLS-1$
 
     /**
      * Returns the animation delay property. The value of this property
@@ -393,7 +393,7 @@ public class HiddenSidesPane extends ControlsFXControl {
     // slide in / slide out duration
 
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(
-            this, "animationDuration", Duration.millis(200));
+            this, "animationDuration", Duration.millis(200)); //$NON-NLS-1$
 
     /**
      * Returns the animation duration property. The value of this property

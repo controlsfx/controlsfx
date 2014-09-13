@@ -58,7 +58,7 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                SnapshotView.class.getResource("snapshot-view.css").toExternalForm());
+                SnapshotView.class.getResource("snapshot-view.css").toExternalForm()); //$NON-NLS-1$
     }
 
     /*
@@ -161,22 +161,22 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         buildSceneGraph();
         initializeAreas();
         
-        registerChangeListener(snapshotView.nodeProperty(), "NODE");
-        registerChangeListener(snapshotView.selectionProperty(), "SELECTION");
-        registerChangeListener(snapshotView.widthProperty(), "WIDTH");
-        registerChangeListener(snapshotView.heightProperty(), "HEIGHT");
+        registerChangeListener(snapshotView.nodeProperty(), "NODE"); //$NON-NLS-1$
+        registerChangeListener(snapshotView.selectionProperty(), "SELECTION"); //$NON-NLS-1$
+        registerChangeListener(snapshotView.widthProperty(), "WIDTH"); //$NON-NLS-1$
+        registerChangeListener(snapshotView.heightProperty(), "HEIGHT"); //$NON-NLS-1$
     }
     
     @Override
     protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if ("NODE".equals(p)) {
+        if ("NODE".equals(p)) { //$NON-NLS-1$
             updateNode();
             updateSelection();
-        } else if ("WIDTH".equals(p) || "HEIGHT".equals(p)) {
+        } else if ("WIDTH".equals(p) || "HEIGHT".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
             updateSelection();
-        } else if ("SELECTION".equals(p)) {
+        } else if ("SELECTION".equals(p)) { //$NON-NLS-1$
             updateSelection();
         }
     }

@@ -147,7 +147,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
     public CommandLinksDialog(List<CommandLinksButtonType> links) {
         this.grid.setHgap(gapSize);
         this.grid.setVgap(gapSize);
-        this.grid.getStyleClass().add("container");
+        this.grid.getStyleClass().add("container"); //$NON-NLS-1$
         
         final DialogPane dialogPane = new DialogPane() {
             @Override protected Node createButtonBar() {
@@ -160,10 +160,10 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         }; 
         setDialogPane(dialogPane);
         
-        setTitle(DialogResources.getString("Dialog.info.title"));
-        dialogPane.getStyleClass().add("command-links-dialog");
-        dialogPane.getStylesheets().add(getClass().getResource("dialogs.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource("commandlink.css").toExternalForm());
+        setTitle(DialogResources.getString("Dialog.info.title")); //$NON-NLS-1$
+        dialogPane.getStyleClass().add("command-links-dialog"); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(getClass().getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(getClass().getResource("commandlink.css").toExternalForm()); //$NON-NLS-1$
         
         // create a map from ButtonType -> CommandLinkButtonType.
         typeMap = links.stream()
@@ -188,7 +188,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
                 contentTextLabel.setText(contentText);
             } else {
                 contentTextLabel = new Label(getDialogPane().getContentText());
-                contentTextLabel.getStyleClass().add("command-link-message");
+                contentTextLabel.getStyleClass().add("command-link-message"); //$NON-NLS-1$
             }
             grid.add(contentTextLabel, 0, 0);
         }
@@ -225,7 +225,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         
         // put the content inside a button
         final Button button = new Button();
-        button.getStyleClass().addAll("command-link-button");
+        button.getStyleClass().addAll("command-link-button"); //$NON-NLS-1$
         button.setMaxHeight(Double.MAX_VALUE);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
@@ -244,13 +244,13 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
                 return titleLabel.getPrefWidth() + 400;
             }
         });
-        titleLabel.getStyleClass().addAll("line-1");
+        titleLabel.getStyleClass().addAll("line-1"); //$NON-NLS-1$
         titleLabel.setWrapText(true);
         titleLabel.setAlignment(Pos.TOP_LEFT);
         GridPane.setVgrow(titleLabel, Priority.NEVER);
 
         Label messageLabel = new Label(commandLink.getLongText() );
-        messageLabel.getStyleClass().addAll("line-2");
+        messageLabel.getStyleClass().addAll("line-2"); //$NON-NLS-1$
         messageLabel.setWrapText(true);
         messageLabel.setAlignment(Pos.TOP_LEFT);
         messageLabel.setMaxHeight(Double.MAX_VALUE);
@@ -258,10 +258,10 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
 
         Node commandLinkImage = commandLink.getGraphic();
         Node view = commandLinkImage == null ? 
-                new ImageView(CommandLinksDialog.class.getResource("arrow-green-right.png").toExternalForm()) : 
+                new ImageView(CommandLinksDialog.class.getResource("arrow-green-right.png").toExternalForm()) :  //$NON-NLS-1$
                 commandLinkImage;
         Pane graphicContainer = new Pane(view);
-        graphicContainer.getStyleClass().add("graphic-container");
+        graphicContainer.getStyleClass().add("graphic-container"); //$NON-NLS-1$
         GridPane.setValignment(graphicContainer, VPos.TOP);
         GridPane.setMargin(graphicContainer, new Insets(0,10,0,0));
 
@@ -269,7 +269,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         grid.minWidthProperty().bind(titleLabel.prefWidthProperty());
         grid.setMaxHeight(Double.MAX_VALUE);
         grid.setMaxWidth(Double.MAX_VALUE);
-        grid.getStyleClass().add("container");
+        grid.getStyleClass().add("container"); //$NON-NLS-1$
         grid.add(graphicContainer, 0, 0, 1, 2);
         grid.add(titleLabel, 1, 0);
         grid.add(messageLabel, 1, 1);

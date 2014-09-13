@@ -51,7 +51,7 @@ public class RectangleSelection extends Rectangle {
     public RectangleSelection(GridViewSkin skin, SpreadsheetViewSelectionModel sm) {
         this.skin = skin;
         this.sm = sm;
-        getStyleClass().add("selection-rectangle");
+        getStyleClass().add("selection-rectangle"); //$NON-NLS-1$
         setMouseTransparent(true);
 
         selectionRange = new SelectionRange();

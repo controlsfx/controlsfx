@@ -47,7 +47,7 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm());
+                SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm()); //$NON-NLS-1$
     }
     
     private static final String ONLY_BUTTON = "only-button"; //$NON-NLS-1$

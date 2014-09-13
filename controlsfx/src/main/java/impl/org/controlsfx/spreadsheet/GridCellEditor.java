@@ -189,7 +189,7 @@ public class GridCellEditor {
         
         if(handle.getGridView().getEditWithKey()){
             handle.getGridView().setEditWithKey(false);
-            spreadsheetCellEditor.startEdit("");
+            spreadsheetCellEditor.startEdit(""); //$NON-NLS-1$
         }else{
             spreadsheetCellEditor.startEdit(value);
         }

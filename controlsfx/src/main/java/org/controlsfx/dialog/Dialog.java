@@ -215,19 +215,19 @@ public class Dialog {
      * Defines a native dialog style.
      * The dialogs rendered using this style will have a native title bar.
      */
-    public static final String STYLE_CLASS_NATIVE = "native";
+    public static final String STYLE_CLASS_NATIVE = "native"; //$NON-NLS-1$
     
     /**
      * Defines a cross-platform dialog style.
      * The dialogs rendered using this style will have a cross-platform title bar.
      */
-    public static final String STYLE_CLASS_CROSS_PLATFORM = "cross-platform";
+    public static final String STYLE_CLASS_CROSS_PLATFORM = "cross-platform"; //$NON-NLS-1$
     
     /**
      * Defines a dialog style with no decorations.
      * The dialogs rendered using this style will not have a title bar.
      */
-    public static final String STYLE_CLASS_UNDECORATED = "undecorated";
+    public static final String STYLE_CLASS_UNDECORATED = "undecorated"; //$NON-NLS-1$
     
     
     

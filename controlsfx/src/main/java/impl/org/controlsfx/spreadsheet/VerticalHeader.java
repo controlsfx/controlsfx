@@ -67,9 +67,9 @@ public class VerticalHeader extends StackPane {
 
     public static final int PICKER_SIZE = 16;
     private static final int DRAG_RECT_HEIGHT = 5;
-    private static final String TABLE_ROW_KEY = "TableRow";
-    private static final String PICKER_INDEX = "PickerIndex";
-    private static final String TABLE_LABEL_KEY = "Label";
+    private static final String TABLE_ROW_KEY = "TableRow"; //$NON-NLS-1$
+    private static final String PICKER_INDEX = "PickerIndex"; //$NON-NLS-1$
+    private static final String TABLE_LABEL_KEY = "Label"; //$NON-NLS-1$
 
     /**
      * *************************************************************************
@@ -227,7 +227,7 @@ public class VerticalHeader extends StackPane {
             // First one blank and on top (z-order) of the others
             if (spreadsheetView.showColumnHeaderProperty().get()) {
                 label = getLabel(rowCount++);
-                label.setText("");
+                label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), horizontalHeaderHeight);
                 label.layoutYProperty().unbind();
                 label.setLayoutY(0);
@@ -242,7 +242,7 @@ public class VerticalHeader extends StackPane {
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
                 label = getLabel(rowCount++);
-                label.setText("");
+                label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), hbar.getHeight());
                 label.layoutYProperty().unbind();
                 label.relocate(snappedLeftInset(), getHeight() - hbar.getHeight());
@@ -282,11 +282,11 @@ public class VerticalHeader extends StackPane {
                 }
                 final ObservableList<String> css = label.getStyleClass();
                 if (skin.getSelectedRows().contains(rowIndex)) {
-                    css.addAll("selected");
+                    css.addAll("selected"); //$NON-NLS-1$
                 } else {
-                    css.removeAll("selected");
+                    css.removeAll("selected"); //$NON-NLS-1$
                 }
-                css.addAll("fixed");
+                css.addAll("fixed"); //$NON-NLS-1$
 
                 spaceUsedByFixedRows += skin.getRowHeight(rowIndex);
 
@@ -345,14 +345,14 @@ public class VerticalHeader extends StackPane {
                 // We want to highlight selected rows
                 final ObservableList<String> css = label.getStyleClass();
                 if (skin.getSelectedRows().contains(rowIndex)) {
-                    css.addAll("selected");
+                    css.addAll("selected"); //$NON-NLS-1$
                 } else {
-                    css.removeAll("selected");
+                    css.removeAll("selected"); //$NON-NLS-1$
                 }
                 if (spreadsheetView.getFixedRows().contains(rowIndex)) {
-                    css.addAll("fixed");
+                    css.addAll("fixed"); //$NON-NLS-1$
                 } else {
-                    css.removeAll("fixed");
+                    css.removeAll("fixed"); //$NON-NLS-1$
                 }
 
                 y += row.getHeight();
@@ -464,7 +464,7 @@ public class VerticalHeader extends StackPane {
         Label picker;
         if (pickerPile.isEmpty()) {
             picker = new Label();
-            picker.getStyleClass().add("picker-label");
+            picker.getStyleClass().add("picker-label"); //$NON-NLS-1$
             picker.setOnMouseClicked(pickerMouseEvent);
         } else {
             picker = pickerPile.pop();
@@ -519,19 +519,19 @@ public class VerticalHeader extends StackPane {
         if (spreadsheetView.isRowFixable(row)) {
             final ContextMenu contextMenu = new ContextMenu();
 
-            MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.verticalheader.menu.fix")));
+            MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.verticalheader.menu.fix"))); //$NON-NLS-1$
             contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
 
                 @Override
                 public void handle(WindowEvent event) {
                     if (spreadsheetView.getFixedRows().contains(row)) {
-                        fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.unfix")));
+                        fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.unfix"))); //$NON-NLS-1$
                     } else {
-                        fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.fix")));
+                        fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.fix"))); //$NON-NLS-1$
                     }
                 }
             });
-            fixItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png"))));
+            fixItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
             
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override

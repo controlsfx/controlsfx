@@ -62,8 +62,8 @@ public class StyleClassValidationDecoration extends AbstractValidationDecoration
      * @param warningClass class name for warning decoration
      */
     public StyleClassValidationDecoration(String errorClass, String warningClass) {
-        this.errorClass = errorClass != null? errorClass : "error";
-        this.warningClass = warningClass != null? warningClass : "warning";	
+        this.errorClass = errorClass != null? errorClass : "error"; //$NON-NLS-1$
+        this.warningClass = warningClass != null? warningClass : "warning";	 //$NON-NLS-1$
     }
 
 

@@ -75,16 +75,16 @@ public class VersionChecker {
             return;
         }
         
-        String[] splitSpecVersion = controlsFXSpecVersion.split("\\.");
+        String[] splitSpecVersion = controlsFXSpecVersion.split("\\."); //$NON-NLS-1$
         
         // javaFXVersion may contain '-' like 8.0.20-ea so replace them with '.' before splitting.
-        String[] splitJavaVersion = javaFXVersion.replace('-', '.').split("\\.");
+        String[] splitJavaVersion = javaFXVersion.replace('-', '.').split("\\."); //$NON-NLS-1$
 
 //        for (int i=0; i < 3; i++) {
 //            if (Integer.parseInt(splitJavaVersion[i]) < Integer.parseInt(splitSpecVersion[i])) {
         if ( splitSpecVersion[0].compareTo(splitJavaVersion[0])!=0 || splitSpecVersion[1].compareTo(splitJavaVersion[2])!=0 ) {
-                throw new RuntimeException("ControlsFX Error: ControlsFX " +
-                    controlsFXImpVersion + " requires at least " + controlsFXSpecTitle);
+                throw new RuntimeException("ControlsFX Error: ControlsFX " + //$NON-NLS-1$
+                    controlsFXImpVersion + " requires at least " + controlsFXSpecTitle); //$NON-NLS-1$
 //            }
         }
     }
@@ -99,7 +99,7 @@ public class VersionChecker {
         
         // try to read it from the controlsfx-build.properties if running
         // from within an IDE
-        return getPropertyValue("controlsfx_specification_title");
+        return getPropertyValue("controlsfx_specification_title"); //$NON-NLS-1$
         
         
 //        try {
@@ -130,7 +130,7 @@ public class VersionChecker {
         
         // try to read it from the controlsfx-build.properties if running
         // from within an IDE
-        return getPropertyValue("controlsfx_specification_title");
+        return getPropertyValue("controlsfx_specification_title"); //$NON-NLS-1$
         
 //        try {
 //            Properties prop = new Properties();
@@ -161,8 +161,8 @@ public class VersionChecker {
         // try to read it from the controlsfx-build.properties if running
         // from within an IDE
         
-        return getPropertyValue("controlsfx_specification_title") +
-        	   getPropertyValue("artifact_suffix");
+        return getPropertyValue("controlsfx_specification_title") + //$NON-NLS-1$
+        	   getPropertyValue("artifact_suffix"); //$NON-NLS-1$
         
         
 //        try {
@@ -186,7 +186,7 @@ public class VersionChecker {
     	
     	if ( props == null ) {
         	try {
-                File file = new File("../controlsfx-build.properties");
+                File file = new File("../controlsfx-build.properties"); //$NON-NLS-1$
                 if (file.exists()) {
                     props.load(new FileReader(file));
                 }

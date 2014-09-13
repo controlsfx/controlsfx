@@ -233,25 +233,25 @@ public class SnapshotView extends ControlsFXControl {
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
         // NODE
-        this.node = new SimpleObjectProperty<>(this, "node");
+        this.node = new SimpleObjectProperty<>(this, "node"); //$NON-NLS-1$
 
         // SELECTION
-        this.selection = new SimpleObjectProperty<>(this, "selection");
-        this.selectionValid = new SimpleBooleanProperty(this, "selectionValid", false);
-        this.selectionActive = new SimpleBooleanProperty(this, "selectionActive", false);
-        this.selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false);
+        this.selection = new SimpleObjectProperty<>(this, "selection"); //$NON-NLS-1$
+        this.selectionValid = new SimpleBooleanProperty(this, "selectionValid", false); //$NON-NLS-1$
+        this.selectionActive = new SimpleBooleanProperty(this, "selectionActive", false); //$NON-NLS-1$
+        this.selectionChanging = new SimpleBooleanProperty(this, "selectionChanging", false); //$NON-NLS-1$
 
-        this.selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixed", false);
-        this.fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatio", 1) {
+        this.selectionRatioFixed = new SimpleBooleanProperty(this, "selectionRatioFixed", false); //$NON-NLS-1$
+        this.fixedSelectionRatio = new SimpleDoubleProperty(this, "fixedSelectionRatio", 1) { //$NON-NLS-1$
             @Override public void set(double newValue) {
                 if (newValue <= 0)
-                    throw new IllegalArgumentException("The fixed selection ratio must be positive.");
+                    throw new IllegalArgumentException("The fixed selection ratio must be positive."); //$NON-NLS-1$
                 super.set(newValue);
             }
         };
 
         // META
-        this.selectionActivityExplicitlyManaged = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false);
+        this.selectionActivityExplicitlyManaged = new SimpleBooleanProperty(this, "selectionActivityExplicitlyManaged", false); //$NON-NLS-1$
 
         addStateUpdatingListeners();
     }
@@ -378,7 +378,7 @@ public class SnapshotView extends ControlsFXControl {
     /**
      * The name of the style class used in CSS for instances of this class.
      */
-    private static final String DEFAULT_STYLE_CLASS = "snapshot-view";
+    private static final String DEFAULT_STYLE_CLASS = "snapshot-view"; //$NON-NLS-1$
 
 //    /**
 //     * {@inheritDoc}

@@ -45,10 +45,10 @@ public class ExceptionDialog extends Dialog<ButtonType> {
     public ExceptionDialog(final Throwable exception) {
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(getString("exception.dlg.title"));
-        dialogPane.setHeaderText(getString("exception.dlg.header"));
-        dialogPane.getStyleClass().add("exception-dialog");
-        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm());
+        setTitle(getString("exception.dlg.title")); //$NON-NLS-1$
+        dialogPane.setHeaderText(getString("exception.dlg.header")); //$NON-NLS-1$
+        dialogPane.getStyleClass().add("exception-dialog"); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
         dialogPane.getButtonTypes().addAll(ButtonType.OK);
         
         // --- content
@@ -62,7 +62,7 @@ public class ExceptionDialog extends Dialog<ButtonType> {
         exception.printStackTrace(pw);
         String exceptionText = sw.toString();
         
-        Label label = new Label( localize(getString("exception.dlg.label")));
+        Label label = new Label( localize(getString("exception.dlg.label"))); //$NON-NLS-1$
 
         TextArea textArea = new TextArea(exceptionText);
         textArea.setEditable(false);

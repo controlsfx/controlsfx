@@ -59,7 +59,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                RangeSlider.class.getResource("rangeslider.css").toExternalForm());
+                RangeSlider.class.getResource("rangeslider.css").toExternalForm()); //$NON-NLS-1$
     }
     
     /** Track if slider is vertical/horizontal and cause re layout */

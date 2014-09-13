@@ -48,7 +48,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     @SuppressWarnings("serial")
     public static class SuggestionEvent<TE> extends Event {
         @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<>("SUGGESTION");
+        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<>("SUGGESTION"); //$NON-NLS-1$
 
         private final TE suggestion;
 
@@ -107,7 +107,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     public void show(Node node){
 
         if(node.getScene() == null || node.getScene().getWindow() == null)
-            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");
+            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window."); //$NON-NLS-1$
 
         Window parent = node.getScene().getWindow();
         this.show(
@@ -159,7 +159,7 @@ public class AutoCompletePopup<T> extends PopupControl{
 
         @Override
         public String getName() {
-            return "onSuggestion";
+            return "onSuggestion"; //$NON-NLS-1$
         }
     };
 
@@ -175,7 +175,7 @@ public class AutoCompletePopup<T> extends PopupControl{
      *                                                                         *
      **************************************************************************/
 
-    public static final String DEFAULT_STYLE_CLASS = "auto-complete-popup";
+    public static final String DEFAULT_STYLE_CLASS = "auto-complete-popup"; //$NON-NLS-1$
 
     @Override
     protected Skin<?> createDefaultSkin() {

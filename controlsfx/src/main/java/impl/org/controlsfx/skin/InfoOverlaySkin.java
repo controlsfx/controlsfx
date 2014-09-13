@@ -66,7 +66,7 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                InfoOverlay.class.getResource("info-overlay.css").toExternalForm());
+                InfoOverlay.class.getResource("info-overlay.css").toExternalForm()); //$NON-NLS-1$
     }
 
     private final ImageView EXPAND_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("expand.png").toExternalForm())); //$NON-NLS-1$

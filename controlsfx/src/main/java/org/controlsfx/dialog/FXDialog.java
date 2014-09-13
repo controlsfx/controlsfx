@@ -85,7 +85,7 @@ abstract class FXDialog {
     public static final List<String> COMMON_STYLE_CLASSES;
     static {
         COMMON_STYLE_CLASSES = Collections.unmodifiableList(
-            Arrays.asList("root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight"));
+            Arrays.asList("root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
     }
     
     
@@ -114,7 +114,7 @@ abstract class FXDialog {
     
     // shake support
     private double initialX = 0;
-    private final DoubleProperty shakeProperty = new SimpleDoubleProperty(this, "shakeProperty", 0.0) {
+    private final DoubleProperty shakeProperty = new SimpleDoubleProperty(this, "shakeProperty", 0.0) { //$NON-NLS-1$
         @Override protected void invalidated() {
             setX(initialX + shakeProperty.get() * 25);
         }
@@ -410,15 +410,15 @@ abstract class FXDialog {
             // add styling
             for (String newStyle : addedStyles) {
                 switch (newStyle) {
-                    case "cross-platform": {
+                    case "cross-platform": { //$NON-NLS-1$
                         setCrossPlatformStyleEnabled(true);
                         break;
                     }
-                    case "native": {
+                    case "native": { //$NON-NLS-1$
                         setNativeStyleEnabled(true);
                         break;
                     }
-                    case "undecorated": {
+                    case "undecorated": { //$NON-NLS-1$
                         setUndecoratedStyleEnabled(true);
                         break;
                     }

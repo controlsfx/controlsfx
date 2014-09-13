@@ -95,7 +95,7 @@ public final class TableMenuButtonAccessor {
 
     private static ContextMenu getContextMenu(TableHeaderRow headerRow) {
         try {
-            Field privateContextMenuField = TableHeaderRow.class.getDeclaredField("columnPopupMenu");
+            Field privateContextMenuField = TableHeaderRow.class.getDeclaredField("columnPopupMenu"); //$NON-NLS-1$
             privateContextMenuField.setAccessible(true);
             ContextMenu contextMenu = (ContextMenu) privateContextMenuField.get(headerRow);
             return contextMenu;

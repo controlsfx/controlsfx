@@ -237,19 +237,19 @@ public final class SpreadsheetColumn {
         if (isColumnFixable()) {
             final ContextMenu contextMenu = new ContextMenu();
 
-            this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix")));
+            this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
             contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
 
                 @Override
                 public void handle(WindowEvent event) {
                     if (!isFixed()) {
-                        fixItem.setText(localize(asKey("spreadsheet.column.menu.fix")));
+                        fixItem.setText(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
                     } else {
-                        fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix")));
+                        fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix"))); //$NON-NLS-1$
                     }
                 }
             });
-            fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png"))));
+            fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {

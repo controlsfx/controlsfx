@@ -89,7 +89,7 @@ class SimpleValidationMessage implements ValidationMessage {
     }
 
     @Override public String toString() {
-        return String.format("%s(%s)", severity, text);
+        return String.format("%s(%s)", severity, text); //$NON-NLS-1$
     }
 
 }

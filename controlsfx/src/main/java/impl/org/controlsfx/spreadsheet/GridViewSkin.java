@@ -81,7 +81,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm());
+                SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm()); //$NON-NLS-1$
     }
     
     

@@ -287,7 +287,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
             case SOUTHWEST_EDGE:   return Cursor.SW_RESIZE;
             case WEST_EDGE:        return Cursor.W_RESIZE;
             case NORTHWEST_EDGE:   return Cursor.NW_RESIZE;
-            default: throw new IllegalArgumentException("The position " + position + " is not fully implemented.");
+            default: throw new IllegalArgumentException("The position " + position + " is not fully implemented."); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -333,7 +333,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         case NORTHWEST_EDGE:
             return new ToNorthwestChangeStrategy(getSelection(), isSelectionRatioFixed(), getSelectionRatio());
         default:
-            throw new IllegalArgumentException("The position " + position + " is not fully implemented.");
+            throw new IllegalArgumentException("The position " + position + " is not fully implemented."); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 

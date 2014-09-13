@@ -44,17 +44,17 @@ public class TableModelRow<S> {
     }
 
     @Override public String toString() {
-        String text = "Row " + row + ": [ ";
+        String text = "Row " + row + ": [ "; //$NON-NLS-1$ //$NON-NLS-2$
         
         for (int col = 0; col < columnCount; col++) {
             text += get(col);
             
             if (col < (columnCount - 1)) {
-                text += ", ";
+                text += ", "; //$NON-NLS-1$
             }
         }
         
-        text += " ]";
+        text += " ]"; //$NON-NLS-1$
         return text;
     }
 }

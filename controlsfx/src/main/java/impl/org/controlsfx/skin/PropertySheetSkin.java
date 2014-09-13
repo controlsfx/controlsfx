@@ -74,7 +74,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                PropertySheet.class.getResource("propertysheet.css").toExternalForm());
+                PropertySheet.class.getResource("propertysheet.css").toExternalForm()); //$NON-NLS-1$
     }
 
     /**************************************************************************
@@ -120,7 +120,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         toolbar.getItems().add(modeButton);
         
         // property sheet search
-        searchField.setPromptText( localize(asKey("property.sheet.search.field.prompt")));
+        searchField.setPromptText( localize(asKey("property.sheet.search.field.prompt"))); //$NON-NLS-1$
         searchField.setMinWidth(0);
         HBox.setHgrow(searchField, Priority.SOMETIMES);
         searchField.managedProperty().bind(searchField.visibleProperty());
@@ -133,12 +133,12 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
               
         
         // setup listeners
-        registerChangeListener(control.modeProperty(), "MODE");
-        registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY");
-        registerChangeListener(control.titleFilter(), "FILTER");
-        registerChangeListener(searchField.textProperty(), "FILTER-UI");
-        registerChangeListener(control.modeSwitcherVisibleProperty(), "TOOLBAR-MODE");
-        registerChangeListener(control.searchBoxVisibleProperty(), "TOOLBAR-SEARCH");
+        registerChangeListener(control.modeProperty(), "MODE"); //$NON-NLS-1$
+        registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY"); //$NON-NLS-1$
+        registerChangeListener(control.titleFilter(), "FILTER"); //$NON-NLS-1$
+        registerChangeListener(searchField.textProperty(), "FILTER-UI"); //$NON-NLS-1$
+        registerChangeListener(control.modeSwitcherVisibleProperty(), "TOOLBAR-MODE"); //$NON-NLS-1$
+        registerChangeListener(control.searchBoxVisibleProperty(), "TOOLBAR-SEARCH"); //$NON-NLS-1$
         
         control.getItems().addListener( new ListChangeListener<Item>() {
             @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
@@ -163,13 +163,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") {
+        if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             refreshProperties();
-        } else if (p == "FILTER-UI") {
+        } else if (p == "FILTER-UI") { //$NON-NLS-1$
             getSkinnable().setTitleFilter(searchField.getText());
-        } else if (p == "TOOLBAR-MODE") {
+        } else if (p == "TOOLBAR-MODE") { //$NON-NLS-1$
             updateToolbar();
-        } else if (p == "TOOLBAR-SEARCH") {
+        } else if (p == "TOOLBAR-SEARCH") { //$NON-NLS-1$
             updateToolbar();
         }
     }
@@ -245,21 +245,21 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class ActionChangeMode extends Action {
         
-    	private final Image CATEGORY_IMAGE = new Image("/org/controlsfx/control/format-indent-more.png");
-    	private final Image NAME_IMAGE = new Image("/org/controlsfx/control/format-line-spacing-triple.png");
+    	private final Image CATEGORY_IMAGE = new Image("/org/controlsfx/control/format-indent-more.png"); //$NON-NLS-1$
+    	private final Image NAME_IMAGE = new Image("/org/controlsfx/control/format-line-spacing-triple.png"); //$NON-NLS-1$
     	
         public ActionChangeMode(PropertySheet.Mode mode) {
-            super("");
+            super(""); //$NON-NLS-1$
             setEventHandler(ae -> getSkinnable().modeProperty().set(mode));
             
             if (mode == Mode.CATEGORY) {
                 setGraphic( new ImageView(CATEGORY_IMAGE));
-                setLongText(localize(asKey("property.sheet.group.mode.bycategory")));
+                setLongText(localize(asKey("property.sheet.group.mode.bycategory"))); //$NON-NLS-1$
             } else if (mode == Mode.NAME) {
                 setGraphic(new ImageView(NAME_IMAGE));
-                setLongText(localize(asKey("property.sheet.group.mode.byname")));
+                setLongText(localize(asKey("property.sheet.group.mode.byname"))); //$NON-NLS-1$
             } else {
-                setText("???");
+                setText("???"); //$NON-NLS-1$
             }
         }
 
@@ -276,7 +276,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             setVgap(5);
             setHgap(5);
             setPadding(new Insets(5, 15, 5, 15 + nestingLevel*10 ));
-            getStyleClass().add("property-pane");
+            getStyleClass().add("property-pane"); //$NON-NLS-1$
             setItems(properties);
 //            setGridLinesVisible(true);
         }
@@ -285,7 +285,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
             getChildren().clear();
             
             String filter = getSkinnable().titleFilter().get();
-            filter = filter == null? "": filter.trim().toLowerCase();
+            filter = filter == null? "": filter.trim().toLowerCase(); //$NON-NLS-1$
 
             int row = 0;
             
@@ -348,7 +348,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                      * {@inheritDoc}
                      */
                     @Override public void setValue(Object value) {
-                        getEditor().setText(value == null? "": value.toString());
+                        getEditor().setText(value == null? "": value.toString()); //$NON-NLS-1$
                     }
                 };
             } else if (! item.isEditable()) {

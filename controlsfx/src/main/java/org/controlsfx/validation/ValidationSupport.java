@@ -133,7 +133,7 @@ public class ValidationSupport {
         //addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
     }
 
-    private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$";
+    private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$"; //$NON-NLS-1$
     
     /**
      * Set control's required flag
@@ -231,7 +231,7 @@ public class ValidationSupport {
 
 
     private ObjectProperty<ValidationDecoration> validationDecoratorProperty =
-            new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) {
+            new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) { //$NON-NLS-1$
         @Override protected void invalidated() {
             // when the decorator changes, rerun the decoration to update the visuals immediately.
             redecorate();

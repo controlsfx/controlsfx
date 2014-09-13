@@ -48,10 +48,10 @@ public class ProgressDialog extends Dialog<Void> {
                 
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(getString("progress.dlg.title"));
-        dialogPane.setHeaderText(getString("progress.dlg.header"));
-        dialogPane.getStyleClass().add("progress-dialog");
-        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm());
+        setTitle(getString("progress.dlg.title")); //$NON-NLS-1$
+        dialogPane.setHeaderText(getString("progress.dlg.header")); //$NON-NLS-1$
+        dialogPane.getStyleClass().add("progress-dialog"); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
         
         final Label progressMessage = new Label();
         progressMessage.textProperty().bind(worker.messageProperty());

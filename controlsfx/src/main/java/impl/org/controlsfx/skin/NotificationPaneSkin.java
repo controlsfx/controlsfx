@@ -44,7 +44,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
-                NotificationPane.class.getResource("notificationpane.css").toExternalForm());
+                NotificationPane.class.getResource("notificationpane.css").toExternalForm()); //$NON-NLS-1$
     }
     
     private NotificationBar notificationBar;

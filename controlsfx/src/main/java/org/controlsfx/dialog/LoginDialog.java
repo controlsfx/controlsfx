@@ -55,10 +55,10 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
     public LoginDialog(final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator) {
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle(getString("login.dlg.title"));
-        dialogPane.setHeaderText(getString("login.dlg.header"));
-        dialogPane.getStyleClass().add("login-dialog");
-        dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
+        setTitle(getString("login.dlg.title")); //$NON-NLS-1$
+        dialogPane.setHeaderText(getString("login.dlg.header")); //$NON-NLS-1$
+        dialogPane.getStyleClass().add("login-dialog"); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
         
         
@@ -66,13 +66,13 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
         
         
         txUserName = (CustomTextField) TextFields.createClearableTextField();
-        txUserName.setLeft(new ImageView(DialogResources.getImage("login.user.icon")));
+        txUserName.setLeft(new ImageView(DialogResources.getImage("login.user.icon"))); //$NON-NLS-1$
         
         txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
-        txPassword.setLeft(new ImageView(DialogResources.getImage("login.password.icon")));
+        txPassword.setLeft(new ImageView(DialogResources.getImage("login.password.icon"))); //$NON-NLS-1$
         
-        Label lbMessage= new Label(""); 
-        lbMessage.getStyleClass().addAll("message-banner");
+        Label lbMessage= new Label("");  //$NON-NLS-1$
+        lbMessage.getStyleClass().addAll("message-banner"); //$NON-NLS-1$
         lbMessage.setVisible(false);
         lbMessage.setManaged(false);
         
@@ -83,7 +83,7 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
         
         dialogPane.setContent(content);
         
-        loginButtonType = new javafx.scene.control.ButtonType(getString("login.dlg.login.button"), ButtonData.OK_DONE);
+        loginButtonType = new javafx.scene.control.ButtonType(getString("login.dlg.login.button"), ButtonData.OK_DONE); //$NON-NLS-1$
         dialogPane.getButtonTypes().addAll(loginButtonType);
         Button loginButton = (Button) dialogPane.lookupButton(loginButtonType);
         loginButton.setOnAction(actionEvent -> {
@@ -114,16 +114,16 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
 //            dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
 //        }
 //        dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
-        String userNameCation = getString("login.dlg.user.caption");
-        String passwordCaption = getString("login.dlg.pswd.caption");
+        String userNameCation = getString("login.dlg.user.caption"); //$NON-NLS-1$
+        String passwordCaption = getString("login.dlg.pswd.caption"); //$NON-NLS-1$
         txUserName.setPromptText(userNameCation);
-        txUserName.setText(initialUserInfo == null ? "" : initialUserInfo.getKey());
+        txUserName.setText(initialUserInfo == null ? "" : initialUserInfo.getKey()); //$NON-NLS-1$
         txPassword.setPromptText(passwordCaption);
-        txPassword.setText(new String(initialUserInfo == null ? "" : initialUserInfo.getValue()));
+        txPassword.setText(new String(initialUserInfo == null ? "" : initialUserInfo.getValue())); //$NON-NLS-1$
 
         ValidationSupport validationSupport = new ValidationSupport();
         Platform.runLater( () -> {
-            String requiredFormat = "'%s' is required";
+            String requiredFormat = "'%s' is required"; //$NON-NLS-1$
             validationSupport.registerValidator(txUserName, Validator.createEmptyValidator( String.format( requiredFormat, userNameCation )));
             validationSupport.registerValidator(txPassword, Validator.createEmptyValidator(String.format( requiredFormat, passwordCaption )));
 //            loginButton.disabledProperty().bind(validationSupport.invalidProperty());

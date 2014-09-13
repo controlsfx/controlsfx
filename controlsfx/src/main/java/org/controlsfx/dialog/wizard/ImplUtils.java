@@ -80,13 +80,13 @@ public class ImplUtils {
                     // uh oh, trouble
                 }
             } catch (ReflectiveOperationException | IllegalArgumentException e) {
-                throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
+                throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e); //$NON-NLS-1$
             }
         }
         
         if (useReflection && children == null) {
-            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() + 
-                                       ". useReflection is set to true");
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() +  //$NON-NLS-1$
+                                       ". useReflection is set to true"); //$NON-NLS-1$
         }
         
         return children == null ? FXCollections.emptyObservableList() : children;

@@ -99,8 +99,8 @@ public class DecorationPane extends StackPane {
             for (Node decorationNode : decorationNodes) {
                 boolean success = getChildren().remove(decorationNode);
                 if (! success) {
-                    throw new IllegalStateException("Could not remove decoration " + 
-                            decorationNode + " from decoration pane children list: " + 
+                    throw new IllegalStateException("Could not remove decoration " +  //$NON-NLS-1$
+                            decorationNode + " from decoration pane children list: " +  //$NON-NLS-1$
                             getChildren());
                 }
             }

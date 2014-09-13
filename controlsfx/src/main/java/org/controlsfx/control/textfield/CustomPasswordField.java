@@ -66,7 +66,7 @@ public class CustomPasswordField extends PasswordField {
      * Instantiates a default CustomPasswordField.
      */
     public CustomPasswordField() {
-        getStyleClass().addAll("custom-text-field", "custom-password-field"); //$NON-NLS-1$
+        getStyleClass().addAll("custom-text-field", "custom-password-field"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     

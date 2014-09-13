@@ -140,7 +140,7 @@ import javafx.util.StringConverter;
 public abstract class SpreadsheetCellEditor {
     private static final double MAX_EDITOR_HEIGHT = 50.0;
     
-    public static final DecimalFormat decimalFormat=new DecimalFormat("#.##########");
+    public static final DecimalFormat decimalFormat=new DecimalFormat("#.##########"); //$NON-NLS-1$
     SpreadsheetView view;
 
     /***************************************************************************
@@ -437,7 +437,7 @@ public abstract class SpreadsheetCellEditor {
                     if (keyEvent.getCode() == KeyCode.ENTER) {
                         if (keyEvent.isShiftDown()) {
                             //if shift is down, we insert a new line.
-                            textArea.replaceSelection("\n");
+                            textArea.replaceSelection("\n"); //$NON-NLS-1$
                         } else {
                             endEdit(true);
                         }

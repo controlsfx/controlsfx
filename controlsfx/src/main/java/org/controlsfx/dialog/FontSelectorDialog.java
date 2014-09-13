@@ -26,6 +26,9 @@
  */
 package org.controlsfx.dialog;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -70,10 +73,10 @@ public class FontSelectorDialog extends Dialog<Font> {
                 
         final DialogPane dialogPane = getDialogPane();
         
-        setTitle("Select Font");
-        dialogPane.setHeaderText("Select Font");
-        dialogPane.getStyleClass().add("font-selector-dialog");
-        dialogPane.getStylesheets().add(FontSelectorDialog.class.getResource("dialogs.css").toExternalForm());
+        setTitle(localize(asKey("font.dlg.title"))); //$NON-NLS-1$
+        dialogPane.setHeaderText(localize(asKey("font.dlg.header"))); //$NON-NLS-1$
+        dialogPane.getStyleClass().add("font-selector-dialog"); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(FontSelectorDialog.class.getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialogPane.setContent(fontPanel);
     }
@@ -107,7 +110,7 @@ public class FontSelectorDialog extends Dialog<Font> {
 
         public FontStyle(String styles) {
             this();
-            String[] fontStyles = (styles == null? "": styles.trim().toUpperCase()).split(" ");
+            String[] fontStyles = (styles == null? "": styles.trim().toUpperCase()).split(" "); //$NON-NLS-1$ //$NON-NLS-2$
             for ( String style: fontStyles) {
                 FontWeight w = FontWeight.findByName(style);
                 if ( w != null ) {
@@ -156,16 +159,16 @@ public class FontSelectorDialog extends Dialog<Font> {
         }
 
         private static String makePretty(Object o) {
-            String s = o == null? "": o.toString();
+            String s = o == null? "": o.toString(); //$NON-NLS-1$
             if ( !s.isEmpty()) { 
-                s = s.replace("_", " ");
+                s = s.replace("_", " "); //$NON-NLS-1$ //$NON-NLS-2$
                 s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
             }
             return s;
         }
 
         @Override public String toString() {
-            return String.format("%s %s", makePretty(weight), makePretty(posture) ).trim();
+            return String.format("%s %s", makePretty(weight), makePretty(posture) ).trim(); //$NON-NLS-1$
         }
 
         private <T extends Enum<T>> int compareEnums( T e1, T e2) {
@@ -198,7 +201,7 @@ public class FontSelectorDialog extends Dialog<Font> {
         private static List<FontStyle> getFontStyles( String fontFamily ) {
             Set<FontStyle> set = new HashSet<>();
             for (String f : Font.getFontNames(fontFamily)) {
-                set.add(new FontStyle(f.replace(fontFamily, "")));
+                set.add(new FontStyle(f.replace(fontFamily, ""))); //$NON-NLS-1$
             }
 
             List<FontStyle> result =  new ArrayList<>(set);
@@ -215,7 +218,7 @@ public class FontSelectorDialog extends Dialog<Font> {
         private final ListView<String> fontListView = new ListView<>(filteredFontList);
         private final ListView<FontStyle> styleListView = new ListView<>(filteredStyleList);
         private final ListView<Double> sizeListView = new ListView<>(filteredSizeList);
-        private final Text sample = new Text("Sample");
+        private final Text sample = new Text(localize(asKey("font.dlg.sample.text"))); //$NON-NLS-1$
 
         public FontPanel() {
             setHgap(HGAP);
@@ -244,7 +247,7 @@ public class FontSelectorDialog extends Dialog<Font> {
             getRowConstraints().addAll(r0, r1, r2, r3);
 
             // layout hello.dialog
-            add(new Label("Font"), 0, 0);
+            add(new Label(localize(asKey("font.dlg.font.label"))), 0, 0); //$NON-NLS-1$
             //            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
             //            add( fontSearch, 0, 1);
             add(fontListView, 0, 1);
@@ -280,13 +283,13 @@ public class FontSelectorDialog extends Dialog<Font> {
                     refreshSample();
                 }});
 
-            add( new Label("Style"), 1, 0);
+            add( new Label(localize(asKey("font.dlg.style.label"))), 1, 0); //$NON-NLS-1$
             //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
             //            add( postureSearch, 1, 1);
             add(styleListView, 1, 1);
             styleListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
 
-            add( new Label("Size"), 2, 0);
+            add( new Label(localize(asKey("font.dlg.size.label"))), 2, 0); //$NON-NLS-1$
             //            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
             //            add( sizeSearch, 2, 1);
             add(sizeListView, 2, 1);
@@ -345,7 +348,6 @@ public class FontSelectorDialog extends Dialog<Font> {
         }
 
         private void refreshSample() {
-            System.out.println(getFont());
             sample.setFont(getFont());
         }
 

@@ -26,6 +26,9 @@
  */
 package org.controlsfx.dialog.wizard;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -77,14 +80,14 @@ public class Wizard {
     private final ValidationSupport validationSupport = new ValidationSupport();
     
 //    
-    private final ButtonType BUTTON_PREVIOUS = new ButtonType("< Previous", ButtonData.BACK_PREVIOUS);
+    private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
         currentPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.pop() );
         updatePage(dialog,false);
     };
     
-    private final ButtonType BUTTON_NEXT = new ButtonType("Next >", ButtonData.NEXT_FORWARD);
+    private final ButtonType BUTTON_NEXT = new ButtonType(localize(asKey("wizard.next.button")), ButtonData.NEXT_FORWARD); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_NEXT_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
         currentPage.ifPresent(page->pageHistory.push(page));
@@ -112,7 +115,7 @@ public class Wizard {
      * @param owner
      */
     private Wizard(Object owner) {
-        this(owner, "");
+        this(owner, ""); //$NON-NLS-1$
     }
     
     /**
@@ -386,7 +389,7 @@ public class Wizard {
             
             // but if the id is not set, we will use a generic naming scheme
             if (settingName == null || settingName.isEmpty()) {
-                settingName = "page_" /*+ previousPageIndex*/ + ".setting_" + settingCounter; 
+                settingName = "page_" /*+ previousPageIndex*/ + ".setting_" + settingCounter;  //$NON-NLS-1$ //$NON-NLS-2$
             }
             
             getSettings().put(settingName, setting);
@@ -413,7 +416,7 @@ public class Wizard {
         
         public WizardPane() {
             // TODO extract to CSS
-            setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png")));
+            setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png"))); //$NON-NLS-1$
         }
 
         // TODO we want to change this to an event-based API eventually

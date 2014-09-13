@@ -1,10 +1,5 @@
 
 dependencies {
-    compile localGroovy()
-    compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-        exclude group: 'org.codehaus.groovy', module: 'groovy'
-    }
     compile 'org.controlsfx:openjfx-dialogs:1.0.1'
     try {
         jdk files(jfxrtJar)
@@ -64,7 +59,7 @@ task downloadTranslations << {
     } else {
         javaexec {
             main = 'impl.org.controlsfx.transifex.Transifex'
-            classpath = sourceSets.main.runtimeClasspath + files('build/classes/groovy')
+            classpath = sourceSets.main.runtimeClasspath
             systemProperty 'transifex.username', transifex_username
             systemProperty 'transifex.password', transifex_password
         }

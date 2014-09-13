@@ -179,8 +179,8 @@ public class Action implements EventHandler<ActionEvent> {
     }
     
     /**
-     * Selected state of the Action
-     * @return
+     * Selected state of the Action.
+     * @return The selected state of this action.
      */
     public final boolean isSelected() {
     	return selectedProperty.get();

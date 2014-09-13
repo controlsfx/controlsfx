@@ -201,7 +201,6 @@ import org.controlsfx.tools.Utils;
  * 
  * @see Dialogs
  * @see Action
- * @see Actions
  */
 @Deprecated
 public class Dialog {

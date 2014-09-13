@@ -39,7 +39,7 @@ import org.controlsfx.control.action.Action;
 /**
  * A specialized dialog {@link Action} that knows how to properly return the
  * result back to the owner {@link Dialog} such that it can be returned via
- * {@link Dialog#show()). To be even more useful, DialogAction instances can
+ * {@link Dialog#show()}. To be even more useful, DialogAction instances can
  * be 
  * 
  * <p>To better understand how to use actions, and where they fit within the

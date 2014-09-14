@@ -52,7 +52,7 @@ public class Transifex {
 
     private static final String USERNAME            = System.getProperty("transifex.username"); //$NON-NLS-1$
     private static final String PASSWORD            = System.getProperty("transifex.password"); //$NON-NLS-1$
-    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = false; //Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "true"));
+    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "true"));
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new Transifex().doTransifexCheck();
@@ -81,7 +81,7 @@ public class Transifex {
         List<Map<String,String>> translations = JSON.parse(response);
         
         // main loop
-        translations.stream()
+        translations.parallelStream()
                 .map(map -> map.get("language_code")) //$NON-NLS-1$
                 .filter(this::filterOutIncompleteTranslations)
                 .forEach(this::downloadTranslation);

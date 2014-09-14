@@ -277,6 +277,22 @@ public class ValidationSupport {
      */
     @SuppressWarnings("unchecked")
     public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
+    	
+    	
+    	Optional.ofNullable(c).ifPresent( ctrl -> {
+    		ctrl.getProperties().addListener( new MapChangeListener<Object,Object>(){
+
+				@Override
+				public void onChanged(
+						javafx.collections.MapChangeListener.Change<? extends Object, ? extends Object> change) {
+					
+					if ( CTRL_REQUIRED_FLAG.equals(change.getKey())) {
+						redecorate();
+					}
+				}
+
+    		});
+    	});
 
         return getExtractor(c).map( e -> {
 

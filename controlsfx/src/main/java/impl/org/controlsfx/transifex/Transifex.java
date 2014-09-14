@@ -27,9 +27,10 @@
 package impl.org.controlsfx.transifex;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -51,7 +52,7 @@ public class Transifex {
 
     private static final String USERNAME            = System.getProperty("transifex.username"); //$NON-NLS-1$
     private static final String PASSWORD            = System.getProperty("transifex.password"); //$NON-NLS-1$
-    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "true"));
+    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = false; //Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "true"));
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new Transifex().doTransifexCheck();
@@ -162,14 +163,15 @@ public class Transifex {
             Map<String,String> map = JSON.parse(transifexRequest(GET_TRANSLATION, languageCode));
             
             String content = new String(map.get("content").getBytes(), CHARSET); //$NON-NLS-1$
-            String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
-            PrintWriter pw = new PrintWriter(outputFile, CHARSET);
             
             // interesting Transifex REST API quirk, they return \\n when we want \n
-            pw.write(content.replace("\\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+            content = content.replace("\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
             
-            pw.close();
-        } catch (UnsupportedEncodingException | FileNotFoundException e) {
+            String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
+            FileOutputStream fos = new FileOutputStream(outputFile);  
+            fos.write(content.getBytes(CHARSET));
+            fos.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

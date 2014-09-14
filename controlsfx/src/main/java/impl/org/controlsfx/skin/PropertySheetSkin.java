@@ -113,6 +113,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         scroller.setFitToWidth(true);
         
         toolbar.managedProperty().bind(toolbar.visibleProperty());
+        toolbar.setFocusTraversable(true);
         
         // property sheet mode
         modeButton.managedProperty().bind(modeButton.visibleProperty());

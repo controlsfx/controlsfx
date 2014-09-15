@@ -30,7 +30,6 @@ import com.sun.javafx.event.EventHandlerManager;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -112,28 +111,6 @@ public class GridBase implements Grid, EventTarget {
      * 
      **************************************************************************/
 
-    /**
-     * This static method creates a sample Grid with 100 rows and 15 columns.
-     * All cells are typed as String.
-     *
-     * @return the sample Grid
-     * @see SpreadsheetCellType#STRING
-     */
-    public static Grid getSampleGrid() {
-        GridBase gridBase = new GridBase(100, 15);
-        List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
-
-        for (int row = 0; row < gridBase.getRowCount(); ++row) {
-            ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
-            for (int column = 0; column < gridBase.getColumnCount(); ++column) {
-                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, "")); //$NON-NLS-1$
-            }
-            rows.add(currentRow);
-        }
-        gridBase.setRows(rows);
-        return gridBase;
-    }
-    
     /**
      * Creates a grid with a fixed number of rows and columns.
      * 

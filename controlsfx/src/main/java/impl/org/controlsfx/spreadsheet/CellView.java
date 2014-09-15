@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import java.util.Objects;
 import java.util.Optional;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -51,6 +52,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -224,21 +226,35 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // We reset the settings
         textProperty().bind(cell.textProperty());
         setCellGraphic(cell);
+
+        Optional<String> tooltipText = cell.getTooltip();
+        String trimTooltip = tooltipText.isPresent() ? tooltipText.get().trim() : null;
         
-        Optional<String> tooltip = cell.getTooltip();
-        if(tooltip.isPresent() && !tooltip.get().trim().isEmpty()){
+        if (trimTooltip != null && !trimTooltip.isEmpty()) {
             /**
-            * Ensure that modification of ToolTip are set on the JFX thread
-            * because an exception can be thrown otherwise. 
-            */
-            getValue(()->{
-                       Tooltip toolTip = new Tooltip(tooltip.get());
-                       toolTip.setWrapText(true);
-                       toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                       setTooltip(toolTip);
-               }
-            );
-        }else{
+             * Here we check if the Tooltip has not been created in order NOT TO
+             * re-create it for nothing as it is a really time-consuming
+             * operation.
+             */
+            Tooltip tooltip = getTooltip();
+            if (tooltip != null) {
+                if (!Objects.equals(tooltip.getText(), trimTooltip)) {
+                    getTooltip().setText(trimTooltip);
+                }
+            } else {
+                /**
+                 * Ensure that modification of ToolTip are set on the JFX thread
+                 * because an exception can be thrown otherwise.
+                 */
+                getValue(() -> {
+                    Tooltip newTooltip = new Tooltip(tooltipText.get());
+                    newTooltip.setWrapText(true);
+                    newTooltip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                    setTooltip(newTooltip);
+                }
+                );
+            }
+        } else {
             setTooltip(null);
         }
         // We want the text to wrap onto another line
@@ -261,7 +277,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (isEditing()) {
             return;
         }
-        if (item.getGraphic() != null) {
+        Node graphic = item.getGraphic();
+        if (graphic != null) {
             /**
              * This workaround is added for the first row containing a graphic
              * because for an unknown reason, the graphic is translated to a
@@ -270,15 +287,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * value (the right one) if the new value goes out of bounds.
              */
             if (item.getRow() == 0) {
-                item.getGraphic().layoutXProperty().removeListener(firstRowLayoutXListener);
-                item.getGraphic().layoutXProperty().addListener(firstRowLayoutXListener);
+                graphic.layoutXProperty().removeListener(firstRowLayoutXListener);
+                graphic.layoutXProperty().addListener(firstRowLayoutXListener);
 
-                item.getGraphic().layoutYProperty().removeListener(firstRowLayoutYListener);
-                item.getGraphic().layoutYProperty().addListener(firstRowLayoutYListener);
+                graphic.layoutYProperty().removeListener(firstRowLayoutYListener);
+                graphic.layoutYProperty().addListener(firstRowLayoutYListener);
             }
             
-            if (item.getGraphic() instanceof ImageView) {
-                ImageView image = (ImageView) item.getGraphic();
+            if (graphic instanceof ImageView) {
+                ImageView image = (ImageView) graphic;
                 image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
@@ -290,18 +307,21 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                         new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
                                 image.getImage().getWidth()).otherwise(widthProperty()));
                 }
-                setGraphic(image);
-            } else if (item.getGraphic() instanceof Node) {
-                setGraphic(item.getGraphic());
+            //If we have a Region and no text, we force it to take full space.    
+            } else if (graphic instanceof Region && item.getItem() == null) {
+                Region region = (Region) graphic;
+                region.prefHeightProperty().bind(heightProperty());
+                region.prefWidthProperty().bind(widthProperty());
             }
+            setGraphic(graphic);
             /**
              * In case of a resize of the column, we have new cells that steal
              * the image from the original TableCell. So we check here if we are
              * not in that case so that the Graphic of the SpreadsheetCell will
              * always be on the latest tableView and therefore fully visible.
              */
-            if (!getChildren().contains(item.getGraphic())) {
-                getChildren().add(item.getGraphic());
+            if (!getChildren().contains(graphic)) {
+                getChildren().add(graphic);
             }
         } else {
             setGraphic(null);

@@ -50,7 +50,7 @@ task downloadTranslations << {
         logger.warn "----------------------------------------------------------"
     } else {
         javaexec {
-            main = 'impl.org.controlsfx.bld.transifex.Transifex'
+            main = 'impl.build.transifex.Transifex'
             classpath = sourceSets.main.runtimeClasspath
             systemProperty 'transifex.username', transifex_username
             systemProperty 'transifex.password', transifex_password
@@ -104,7 +104,7 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
-    exclude '**/impl/org/controlsfx/bld/**'
+    exclude '**/impl/build/**'
 
     manifest { // the manifest of the default jar is of type OsgiManifest
         attributes (\

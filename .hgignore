@@ -2,7 +2,9 @@ syntax: glob
 *.class
 *.iml
 .DS_Store
-build/*
+controlsfx/build/*
+controlsfx-samples/build/*
+fxsampler/build/*
 .idea/*
 .gradle/*
 .nb-gradle/*

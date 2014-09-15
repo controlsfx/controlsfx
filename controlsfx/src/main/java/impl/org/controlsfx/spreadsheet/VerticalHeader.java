@@ -70,6 +70,7 @@ public class VerticalHeader extends StackPane {
     private static final String TABLE_ROW_KEY = "TableRow"; //$NON-NLS-1$
     private static final String PICKER_INDEX = "PickerIndex"; //$NON-NLS-1$
     private static final String TABLE_LABEL_KEY = "Label"; //$NON-NLS-1$
+    private static final Image pinImage = new Image(SpreadsheetView.class.getResource("pinSpreadsheetView.png").toExternalForm()); //$NON-NLS-1$
 
     /**
      * *************************************************************************
@@ -528,7 +529,7 @@ public class VerticalHeader extends StackPane {
                     }
                 }
             });
-            fixItem.setGraphic(new ImageView(new Image(SpreadsheetView.class.getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
+            fixItem.setGraphic(new ImageView(pinImage));
             
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override

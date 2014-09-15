@@ -28,6 +28,7 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Stack;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
@@ -75,6 +76,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private static final int TOOLTIP_MAX_WIDTH = 400;
     private static final Duration FADE_DURATION = Duration.millis(200);
 
+    private static final Stack<Tooltip> tooltipStack = new Stack<>();
+    
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
     }
@@ -236,7 +239,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * re-create it for nothing as it is a really time-consuming
              * operation.
              */
-            Tooltip tooltip = getTooltip();
+            Tooltip tooltip = getAvailableTooltip();
             if (tooltip != null) {
                 if (!Objects.equals(tooltip.getText(), trimTooltip)) {
                     getTooltip().setText(trimTooltip);
@@ -255,6 +258,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 );
             }
         } else {
+            //We save that tooltip
+            if(getTooltip() != null){
+                tooltipStack.push(getTooltip());
+            }
             setTooltip(null);
         }
         // We want the text to wrap onto another line
@@ -272,6 +279,24 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * * Private Methods * *
      **************************************************************************/
 
+    /**
+     * See if a tootlip is available (either on the TableCell already, or in the
+     * Stack). And then set it to the TableCell.
+     *
+     * @return
+     */
+    private Tooltip getAvailableTooltip(){
+        if(getTooltip() != null){
+            return getTooltip();
+        }
+        if(!tooltipStack.isEmpty()){
+            Tooltip tooltip = tooltipStack.pop();
+            setTooltip(tooltip);
+            return tooltip;
+        }
+        return null;
+    }
+    
     private void setCellGraphic(SpreadsheetCell item) {
 
         if (isEditing()) {

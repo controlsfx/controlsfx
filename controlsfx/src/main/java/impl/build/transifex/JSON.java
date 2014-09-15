@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-// gsgsgsgs   
+ 
 class JSON {
     private static final Pattern PAT_INTEGER = Pattern.compile("[-+]?[0-9]+|0[Xx][0-9]+"); //$NON-NLS-1$
     private static final Pattern PAT_DOUBLE = Pattern.compile("[+-]?[0-9]+([Ee][+-]?[0-9]+)?|[+-]?[0-9]*\\.[0-9]*([Ee][+-]?[0-9]+)?"); //$NON-NLS-1$
@@ -79,8 +79,10 @@ class JSON {
                 }
                 if (p == ',')
                     start[0]++;
-                else if (!crlf)
-                    throw new IllegalStateException(", or } expected at " + start[0]); //$NON-NLS-1$
+                else if (!crlf) {
+                    start[0]++;
+//                    throw new IllegalStateException(", or } expected at " + start[0]); //$NON-NLS-1$
+                }
             }
         }
         if (integerMatcher.find(start[0])) {
@@ -99,7 +101,8 @@ class JSON {
             String substring = match(start, s, booleanMatcher);
             if (substring != null) return Boolean.valueOf(substring);
         }
-        throw new IllegalStateException("unexpected end of data"); //$NON-NLS-1$
+//        throw new IllegalStateException("unexpected end of data"); //$NON-NLS-1$
+        return null;
     }
 
     private static String match(int[] start, String s, Matcher matcher) {
@@ -132,7 +135,6 @@ class JSON {
         Matcher doubleMatcher = PAT_DOUBLE.matcher(json);
         Matcher stringMatcher = PAT_STRING.matcher(json);
         Matcher booleanMatcher = PAT_BOOL.matcher(json);
-        //noinspection unchecked
         return (T) parse(json, new int[]{0}, integerMatcher, doubleMatcher, stringMatcher, booleanMatcher);
     }
 }

@@ -45,7 +45,8 @@ public class Transifex {
     private static final String NEW_LINE            = System.getProperty("line.separator"); //$NON-NLS-1$
 
     private static final String BASE_URI            = "https://www.transifex.com/api/2/"; //$NON-NLS-1$
-    private static final String PROJECT_PATH        = BASE_URI + "project/controlsfx/resource/controlsfx-core"; // list project details //$NON-NLS-1$
+    private static final String PROJECT_PATH        = BASE_URI + "project/controlsfx/resource/controlsfx-core"; // list simple project details //$NON-NLS-1$
+    private static final String PROJECT_DETAILS     = BASE_URI + "project/controlsfx/resource/controlsfx-core?details"; // list all project details //$NON-NLS-1$
     private static final String LIST_TRANSLATIONS   = BASE_URI + "project/controlsfx/languages/"; // list all translations //$NON-NLS-1$
     private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s/"; // gets a translation for one language //$NON-NLS-1$
     private static final String TRANSLATION_STATS   = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
@@ -61,28 +62,19 @@ public class Transifex {
     private void doTransifexCheck() {
         System.out.println("=== Starting Transifex Check ==="); //$NON-NLS-1$
         
-        if (USERNAME == null || PASSWORD == null) {
+        if (USERNAME == null || PASSWORD == null || USERNAME.isEmpty() || PASSWORD.isEmpty()) {
             System.out.println("  transifex.username and transifex.password system properties must be specified"); //$NON-NLS-1$
             return;
         }
         
         System.out.println("  Filtering out incomplete translations: " + FILTER_INCOMPLETE_TRANSLATIONS);
         
-        // get a list of all translations
-        // Once parsed, returns a List of Map, e.g.
-        // [
-        //  {language_code=ar, translators=[], coordinators=[Mazenization], reviewers=[]}, 
-        //  {language_code=ca, translators=[], coordinators=[ManelSanchezRuiz], reviewers=[]}, 
-        //  {language_code=zh_CN, translators=[], coordinators=[happyfeet], reviewers=[]}, 
-        //  {language_code=nl_BE, translators=[], coordinators=[neo4010], reviewers=[]}
-        // ]
-        // we just care about the language code, so we extract these out into a list
-        String response = transifexRequest(LIST_TRANSLATIONS);
-        List<Map<String,String>> translations = JSON.parse(response);
+        Map<String,Object> projectDetails = JSON.parse(transifexRequest(PROJECT_DETAILS));
+        List<Map<String, String>> availableLanguages = (List<Map<String, String>>) projectDetails.get("available_languages");
         
         // main loop
-        translations.parallelStream()
-                .map(map -> map.get("language_code")) //$NON-NLS-1$
+        availableLanguages.parallelStream()
+                .map(map -> map.get("code")) //$NON-NLS-1$
                 .filter(this::filterOutIncompleteTranslations)
                 .forEach(this::downloadTranslation);
         

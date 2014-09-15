@@ -13,14 +13,6 @@ dependencies {
 //}
 
 
-test {
-    testLogging {
-        // Show that tests are run in the command-line output
-        events 'started', 'passed'
-    }
-}
-
-
 ext {
     transifex_username = ""
     transifex_password = ""
@@ -58,7 +50,7 @@ task downloadTranslations << {
         logger.warn "----------------------------------------------------------"
     } else {
         javaexec {
-            main = 'impl.org.controlsfx.transifex.Transifex'
+            main = 'impl.org.controlsfx.bld.transifex.Transifex'
             classpath = sourceSets.main.runtimeClasspath
             systemProperty 'transifex.username', transifex_username
             systemProperty 'transifex.password', transifex_password
@@ -83,10 +75,6 @@ task compileCSS << {
 }
 
 processResources.finalizedBy(compileCSS)
-
-compileGroovy {
-    destinationDir = file('build/classes/groovy')
-}
 
 javadoc {
     exclude 'impl/*'
@@ -116,6 +104,7 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
+    exclude '**/impl/org/controlsfx/bld/**'
 
     manifest { // the manifest of the default jar is of type OsgiManifest
         attributes (\

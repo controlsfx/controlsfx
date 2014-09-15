@@ -3,7 +3,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'groovy'
     apply plugin: 'osgi'
     apply plugin: 'maven'
     apply from  : '../mavenPublish.gradle'

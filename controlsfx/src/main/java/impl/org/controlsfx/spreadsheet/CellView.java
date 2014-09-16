@@ -76,8 +76,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private static final int TOOLTIP_MAX_WIDTH = 400;
     private static final Duration FADE_DURATION = Duration.millis(200);
 
-    private static final Stack<Tooltip> tooltipStack = new Stack<>();
-    
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
     }
@@ -260,6 +258,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else {
             //We save that tooltip
             if(getTooltip() != null){
+                final Stack<Tooltip> tooltipStack = handle.getCellsViewSkin().getTooltipStack();
                 tooltipStack.push(getTooltip());
             }
             setTooltip(null);
@@ -289,6 +288,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if(getTooltip() != null){
             return getTooltip();
         }
+        final Stack<Tooltip> tooltipStack = handle.getCellsViewSkin().getTooltipStack();
         if(!tooltipStack.isEmpty()){
             Tooltip tooltip = tooltipStack.pop();
             setTooltip(tooltip);

@@ -26,7 +26,12 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import impl.org.controlsfx.i18n.Localization;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.util.List;
 import javafx.beans.value.ChangeListener;
@@ -37,6 +42,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -140,7 +146,7 @@ import javafx.util.StringConverter;
 public abstract class SpreadsheetCellEditor {
     private static final double MAX_EDITOR_HEIGHT = 50.0;
     
-    public static final DecimalFormat decimalFormat=new DecimalFormat("#.##########"); //$NON-NLS-1$
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.##########"); //$NON-NLS-1$
     SpreadsheetView view;
 
     /***************************************************************************
@@ -448,6 +454,7 @@ public abstract class SpreadsheetCellEditor {
             });
         }
     }
+    
     /**
      * A {@link SpreadsheetCellEditor} for
      * {@link SpreadsheetCellType.DoubleType} typed cells. It displays a
@@ -472,7 +479,31 @@ public abstract class SpreadsheetCellEditor {
          */
         public DoubleEditor(SpreadsheetView view) {
             super(view);
-            tf = new TextField();
+            tf = new TextField() {
+                
+                @Override
+                public void insertText(int index, String text) {
+                    String fixedText = fixText(text);
+                    super.insertText(index, fixedText);
+                }
+
+                @Override
+                public void replaceText(int start, int end, String text) {
+                    String fixedText = fixText(text);
+                    super.replaceText(start, end, fixedText);
+                }
+
+                @Override
+                public void replaceText(IndexRange range, String text) {
+                    replaceText(range.getStart(), range.getEnd(), text);
+                }
+
+                private String fixText(String text) {
+                    DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Localization.getLocale());
+                    text = text.replace(' ', '\u00a0');//$NON-NLS-1$
+                    return text.replaceAll("\\.", Character.toString(symbols.getDecimalSeparator()));//$NON-NLS-1$
+                }
+            };
         }
 
         /***************************************************************************
@@ -482,6 +513,8 @@ public abstract class SpreadsheetCellEditor {
         @Override
         public void startEdit(Object value) {
             if (value instanceof Double) {
+                //We want to set the text in its proper form regarding the Locale.
+                decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Localization.getLocale()));
                 tf.setText(((Double) value).isNaN() ? "" : decimalFormat.format(value)); //$NON-NLS-1$
             } else {
                 tf.setText(null);
@@ -509,6 +542,11 @@ public abstract class SpreadsheetCellEditor {
         /** {@inheritDoc} */
         @Override
         public String getControlValue() {
+            NumberFormat format = NumberFormat.getInstance(Localization.getLocale());
+            ParsePosition parsePosition = new ParsePosition(0);
+            if (tf.getText() != null) {
+                return String.valueOf(format.parse(tf.getText(), parsePosition).doubleValue());
+            }
             return tf.getText();
         }
 
@@ -525,7 +563,7 @@ public abstract class SpreadsheetCellEditor {
                             if (tf.getText().equals("")) { //$NON-NLS-1$
                                 endEdit(true);
                             } else {
-                                Double.parseDouble(tf.getText());
+                                tryParsing();
                                 endEdit(true);
                             }
                         } catch (Exception e) {
@@ -536,6 +574,7 @@ public abstract class SpreadsheetCellEditor {
                     }
                 }
             });
+            
             tf.setOnKeyReleased(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent t) {
@@ -543,7 +582,7 @@ public abstract class SpreadsheetCellEditor {
                         if (tf.getText().equals("")) { //$NON-NLS-1$
                             tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
                         } else {
-                            Double.parseDouble(tf.getText());
+                            tryParsing();
                             tf.getStyleClass().removeAll("error"); //$NON-NLS-1$
                         }
                     } catch (Exception e) {
@@ -552,7 +591,15 @@ public abstract class SpreadsheetCellEditor {
                 }
             });
         }
-
+        
+        private void tryParsing() throws ParseException {
+            NumberFormat format = NumberFormat.getNumberInstance(Localization.getLocale());
+            ParsePosition parsePosition = new ParsePosition(0);
+            format.parse(tf.getText(), parsePosition);
+            if (parsePosition.getIndex() != tf.getText().length()) {
+                throw new ParseException("Invalid input", parsePosition.getIndex());
+            }
+        }
     }
 
     /**

@@ -407,8 +407,8 @@ public class SpreadsheetView extends Control {
         cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                // Go to the next row
-                if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
+                // Go to the next row only if we're not editing
+                if (getEditingCell() == null && !keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();

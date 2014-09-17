@@ -26,7 +26,6 @@ dependencies {
     }
 }
 
-
 jar {
     manifest {
         attributes 'Implementation-Title': 'ControlsFX-Samples', 'Implementation-Version': project.version
@@ -40,7 +39,7 @@ task enumerateSamples() {
         def samplesList = []
         sourceSets.main.java.visit {
             // could be improved:  we could load the class and check the hierarchy
-            if (!it.directory && it.file.text.contains(' extends SampleBase ') && it.path.contains("samples")) {
+            if (!it.directory && it.file.text.contains(' extends ControlsFXSample ') && it.path.contains("samples")) {
                 samplesList += it.path
             }
         }

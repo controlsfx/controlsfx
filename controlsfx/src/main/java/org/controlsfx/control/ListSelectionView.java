@@ -35,8 +35,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 
-import com.sun.javafx.css.StyleManager;
-
 /**
  * A control used to perform a multi-selection via the help of two list views.
  * Items can be moved from one list (source) to the other (target). This can be
@@ -61,12 +59,6 @@ import com.sun.javafx.css.StyleManager;
  *            the type of the list items
  */
 public class ListSelectionView<T> extends ControlsFXControl {
-
-    static {
-        StyleManager.getInstance().addUserAgentStylesheet(
-                ListSelectionView.class
-                        .getResource("listselectionview.css").toExternalForm()); //$NON-NLS-1$
-    }
 
     private static final String DEFAULT_STYLECLASS = "list-selection-view";
 

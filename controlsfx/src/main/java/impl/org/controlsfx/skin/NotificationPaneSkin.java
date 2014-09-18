@@ -30,6 +30,7 @@ import java.util.Collections;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
@@ -49,6 +50,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
     
     private NotificationBar notificationBar;
     private Node content;
+    private Rectangle clip = new Rectangle();
     
     public NotificationPaneSkin(final NotificationPane control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
@@ -91,6 +93,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             }
         };
         
+        control.setClip(clip);
         updateContent();
         
         registerChangeListener(control.contentProperty(), "CONTENT"); //$NON-NLS-1$
@@ -145,6 +148,13 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         if (content != null) {
             content.resizeRelocate(x, y, w, h);
         }
+        
+        // and update the clip so that the notification bar does not draw outside
+        // the bounds of the notification pane
+        clip.setX(x);
+        clip.setY(y);
+        clip.setWidth(w);
+        clip.setHeight(h);
     }
     
     @Override

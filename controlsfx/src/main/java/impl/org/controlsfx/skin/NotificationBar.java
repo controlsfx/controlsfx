@@ -97,15 +97,15 @@ public abstract class NotificationBar extends Region {
     public abstract double getContainerHeight();
     public abstract void relocateInParent(double x, double y);
     
-    
-
     public NotificationBar() {
         getStyleClass().add("notification-bar"); //$NON-NLS-1$
+        setManaged(false);
+        
+        setVisible(isShowing());
         
         pane = new GridPane();
         pane.getStyleClass().add("pane"); //$NON-NLS-1$
         pane.setAlignment(Pos.BASELINE_LEFT);
-        pane.setVisible(isShowing());
         getChildren().setAll(pane);
         
         // initialise title area, if one is set
@@ -193,7 +193,7 @@ public abstract class NotificationBar extends Region {
         if (isShowFromTop()) {
             // place at top of area
             pane.resize(w, h);
-            relocateInParent(0, 0 - (1 - transition.get()) * notificationMinHeight);
+            relocateInParent(0, (transition.get() - 1) * notificationMinHeight);
         } else {
             // place at bottom of area
             pane.resize(w, notificationBarHeight);
@@ -253,8 +253,8 @@ public abstract class NotificationBar extends Region {
                     new EventHandler<ActionEvent>() {
                         @Override public void handle(ActionEvent event) {
                             // start expand
-                            pane.setCache(true);
-                            pane.setVisible(true);
+                            setCache(true);
+                            setVisible(true);
 
                             pane.fireEvent(new Event(NotificationPane.ON_SHOWING));
                         }
@@ -294,8 +294,8 @@ public abstract class NotificationBar extends Region {
                     new EventHandler<ActionEvent>() {
                         @Override public void handle(ActionEvent event) {
                             // end collapse
-                            pane.setCache(false);
-                            pane.setVisible(false);
+                            setCache(false);
+                            setVisible(false);
 
                             pane.fireEvent(new Event(NotificationPane.ON_HIDDEN));
                         }

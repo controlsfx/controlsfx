@@ -39,7 +39,7 @@ public class Translation implements Comparable<Translation> {
         this.localeString = locale;
         this.path = path;
         
-        String[] split = localeString.split("_");
+        String[] split = localeString.split("_"); //$NON-NLS-1$
         if (split.length == 1) {
             this.locale = new Locale(localeString);
         } else if (split.length == 2) {
@@ -47,7 +47,7 @@ public class Translation implements Comparable<Translation> {
         } else if (split.length == 3) {
             this.locale = new Locale(split[0], split[1], split[2]);
         } else {
-            throw new IllegalArgumentException("Unknown locale string '" + locale + "'");
+            throw new IllegalArgumentException("Unknown locale string '" + locale + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
     

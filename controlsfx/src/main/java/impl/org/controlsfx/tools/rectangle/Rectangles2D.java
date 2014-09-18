@@ -73,8 +73,8 @@ public class Rectangles2D {
      * @return the {@link Rectangle2D} which is defined by the two corners
      */
     public static Rectangle2D forDiagonalCorners(Point2D oneCorner, Point2D diagonalCorner) {
-        Objects.requireNonNull(oneCorner, "The specified corner must not be null.");
-        Objects.requireNonNull(diagonalCorner, "The specified diagonal corner must not be null.");
+        Objects.requireNonNull(oneCorner, "The specified corner must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(diagonalCorner, "The specified diagonal corner must not be null."); //$NON-NLS-1$
 
         double minX = Math.min(oneCorner.getX(), diagonalCorner.getX());
         double minY = Math.min(oneCorner.getY(), diagonalCorner.getY());
@@ -124,10 +124,10 @@ public class Rectangles2D {
      *         {@code diagonalCorner} and the {@code ratio}
      */
     public static Rectangle2D forDiagonalCornersAndRatio(Point2D fixedCorner, Point2D diagonalCorner, double ratio) {
-        Objects.requireNonNull(fixedCorner, "The specified fixed corner must not be null.");
-        Objects.requireNonNull(diagonalCorner, "The specified diagonal corner must not be null.");
+        Objects.requireNonNull(fixedCorner, "The specified fixed corner must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(diagonalCorner, "The specified diagonal corner must not be null."); //$NON-NLS-1$
         if (ratio < 0)
-            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         // the coordinate differences - note that they can be negative
         double xDifference = diagonalCorner.getX() - fixedCorner.getX();
@@ -206,7 +206,7 @@ public class Rectangles2D {
      * @return a rectangle with the specified center and size
      */
     public static Rectangle2D forCenterAndSize(Point2D centerPoint, double width, double height) {
-        Objects.requireNonNull(centerPoint, "The specified center point must not be null.");
+        Objects.requireNonNull(centerPoint, "The specified center point must not be null."); //$NON-NLS-1$
 
         double absoluteWidth = Math.abs(width);
         double absoluteHeight = Math.abs(height);
@@ -234,9 +234,9 @@ public class Rectangles2D {
      *             if the {@code original} rectangle is null
      */
     public static Rectangle2D fixRatio(Rectangle2D original, double ratio) {
-        Objects.requireNonNull(original, "The specified original rectangle must not be null.");
+        Objects.requireNonNull(original, "The specified original rectangle must not be null."); //$NON-NLS-1$
         if (ratio < 0)
-            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         return createWithFixedRatioWithinBounds(original, ratio, null);
     }
@@ -260,10 +260,10 @@ public class Rectangles2D {
      *             if the {@code original} rectangle's center point is out of the bounds
      */
     public static Rectangle2D fixRatioWithinBounds(Rectangle2D original, double ratio, Rectangle2D bounds) {
-        Objects.requireNonNull(original, "The specified original rectangle must not be null.");
-        Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null.");
+        Objects.requireNonNull(original, "The specified original rectangle must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null."); //$NON-NLS-1$
         if (ratio < 0)
-            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         return createWithFixedRatioWithinBounds(original, ratio, bounds);
     }
@@ -291,8 +291,8 @@ public class Rectangles2D {
 
         boolean centerPointInBounds = bounds == null || bounds.contains(centerPoint);
         if (!centerPointInBounds)
-            throw new IllegalArgumentException("The center point " + centerPoint
-                    + " of the original rectangle is out of the specified bounds.");
+            throw new IllegalArgumentException("The center point " + centerPoint //$NON-NLS-1$
+                    + " of the original rectangle is out of the specified bounds."); //$NON-NLS-1$
 
         double area = original.getWidth() * original.getHeight();
 
@@ -317,11 +317,11 @@ public class Rectangles2D {
      *             if the {@code centerPoint} is out of the {@code bounds}
      */
     public static Rectangle2D forCenterAndAreaAndRatio(Point2D centerPoint, double area, double ratio) {
-        Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null.");
+        Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null."); //$NON-NLS-1$
         if (area < 0)
-            throw new IllegalArgumentException("The specified area " + area + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified area " + area + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
         if (ratio < 0)
-            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         return createForCenterAreaAndRatioWithinBounds(centerPoint, area, ratio, null);
     }
@@ -347,16 +347,16 @@ public class Rectangles2D {
     public static Rectangle2D forCenterAndAreaAndRatioWithinBounds(
             Point2D centerPoint, double area, double ratio, Rectangle2D bounds) {
 
-        Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null.");
-        Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null.");
+        Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null."); //$NON-NLS-1$
         boolean centerPointInBounds = bounds.contains(centerPoint);
         if (!centerPointInBounds)
-            throw new IllegalArgumentException("The center point " + centerPoint
-                    + " of the original rectangle is out of the specified bounds.");
+            throw new IllegalArgumentException("The center point " + centerPoint //$NON-NLS-1$
+                    + " of the original rectangle is out of the specified bounds."); //$NON-NLS-1$
         if (area < 0)
-            throw new IllegalArgumentException("The specified area " + area + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified area " + area + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
         if (ratio < 0)
-            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         return createForCenterAreaAndRatioWithinBounds(centerPoint, area, ratio, bounds);
     }
@@ -416,16 +416,16 @@ public class Rectangles2D {
     private static double lengthReductionToStayWithinBounds(
             Point2D centerPoint, double width, double height, Rectangle2D bounds) {
 
-        Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null.");
-        Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null.");
+        Objects.requireNonNull(centerPoint, "The specified center point of the new rectangle must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(bounds, "The specified bounds for the new rectangle must not be null."); //$NON-NLS-1$
         boolean centerPointInBounds = bounds.contains(centerPoint);
         if (!centerPointInBounds)
-            throw new IllegalArgumentException("The center point " + centerPoint
-                    + " of the original rectangle is out of the specified bounds.");
+            throw new IllegalArgumentException("The center point " + centerPoint //$NON-NLS-1$
+                    + " of the original rectangle is out of the specified bounds."); //$NON-NLS-1$
         if (width < 0)
-            throw new IllegalArgumentException("The specified width " + width + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified width " + width + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
         if (height < 0)
-            throw new IllegalArgumentException("The specified height " + height + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified height " + height + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         /*
          * Compute the center point's distance to all edges. The width and height must be reduced (by the returned
@@ -475,15 +475,15 @@ public class Rectangles2D {
     public static Rectangle2D forEdgeAndOpposingPointAndRatioWithinBounds(
             Edge2D edge, Point2D point, double ratio, Rectangle2D bounds) {
 
-        Objects.requireNonNull(edge, "The specified edge must not be null.");
-        Objects.requireNonNull(point, "The specified point must not be null.");
-        Objects.requireNonNull(bounds, "The specified bounds must not be null.");
+        Objects.requireNonNull(edge, "The specified edge must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(point, "The specified point must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(bounds, "The specified bounds must not be null."); //$NON-NLS-1$
         boolean edgeInBounds = contains(bounds, edge);
         if (!edgeInBounds)
             throw new IllegalArgumentException(
-                    "The specified edge " + edge + " is not entirely contained on the specified bounds.");
+                    "The specified edge " + edge + " is not entirely contained on the specified bounds."); //$NON-NLS-1$ //$NON-NLS-2$
         if (ratio < 0)
-            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero.");
+            throw new IllegalArgumentException("The specified ratio " + ratio + " must be larger than zero."); //$NON-NLS-1$ //$NON-NLS-2$
 
         /*
          * 1. move the point into the bounds

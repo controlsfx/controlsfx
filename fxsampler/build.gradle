@@ -1,19 +1,4 @@
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'java'
-apply plugin: 'maven'
-
-apply from: 'mavenPublish.gradle'
-apply from: 'javafx.plugin'
-
-Properties commons = new Properties()
-commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
-
-group = commons.controlsfx_group
-version = commons.fxsampler_version
-
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+version = fxsampler_version
 
 configurations {
     //samples.extendsFrom mainRuntime
@@ -35,9 +20,6 @@ dependencies {
     }
 }
 
-compileJava {  
-    options.encoding = "UTF-8"
-}
 
 javadoc {
     exclude 'impl/*'
@@ -63,28 +45,3 @@ javadoc {
 jar {
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.java
-    from sourceSets.main.resources
-    classifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    dependsOn javadoc
-    from javadoc.destinationDir
-    classifier = 'javadoc'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
-}
-
-artifacts {
-    archives sourceJar
-    archives javadocJar
-    //archives jarSamples
-}
-
-javafx {
-    mainClass commons.fxsampler_mainClass
-}

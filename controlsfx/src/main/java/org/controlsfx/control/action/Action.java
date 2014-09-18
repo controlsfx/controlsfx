@@ -36,8 +36,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -83,7 +85,7 @@ public class Action implements EventHandler<ActionEvent> {
     }
     
     public Action(Consumer<ActionEvent> eventHandler) {
-        this("", eventHandler);
+        this("", eventHandler); //$NON-NLS-1$
     }
    
     /**
@@ -111,10 +113,92 @@ public class Action implements EventHandler<ActionEvent> {
      * 
      **************************************************************************/
     
+    // --- style
+    /**
+     * A string representation of the CSS style associated with this
+     * Action instance and passed to related UI controls. 
+     * This is analogous to the "style" attribute of an
+     * HTML element. Note that, like the HTML style attribute, this
+     * variable contains style properties and values and not the
+     * selector portion of a style rule.
+     * <p>
+     * Parsing this style might not be supported on some limited
+     * platforms. It is recommended to use a standalone CSS file instead.
+     *
+     * @defaultValue empty string
+     */
+    private StringProperty style;
+    public final void setStyle(String value) { styleProperty().set(value); }
+    public final String getStyle() { return style == null ? "" : style.get(); } //$NON-NLS-1$
+    public final StringProperty styleProperty() {
+        if (style == null) {
+            style = new SimpleStringProperty(this, "style") { //$NON-NLS-1$
+            	@Override
+            	public void set(String style) {
+            		if (locked) throw new UnsupportedOperationException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+            		super.set(style);
+            	}
+            };
+        }
+        return style;
+    }
+
+
+    // --- Style class
+    private final ObservableList<String> styleClass = FXCollections.observableArrayList();
+    /**
+     * A list of String identifiers which can be used to logically group
+     * Nodes, specifically for an external style engine. This variable is
+     * analogous to the "class" attribute on an HTML element and, as such,
+     * each element of the list is a style class to which this Node belongs.
+     *
+     * @see <a href="http://www.w3.org/TR/css3-selectors/#class-html">CSS3 class selectors</a>
+     */
+    public ObservableList<String> getStyleClass() {
+        return styleClass;
+    }    
+    
+    
+    // --- selected 
+    private final BooleanProperty selectedProperty = new SimpleBooleanProperty(this, "selected") { //$NON-NLS-1$
+    	@Override public void set(boolean selected) {
+    		if (locked) throw new UnsupportedOperationException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		super.set(selected);
+    	};
+    };
+    
+    /**
+     * Represents action's selected state. 
+     * Usually bound to selected state of components such as Toggle Buttons, CheckBOxes  etc
+     *
+     * @return An observable {@link BooleanProperty} that represents the current
+     *      selected state, and which can be observed for changes.
+     */
+    public final BooleanProperty selectedProperty() {
+    	return selectedProperty;
+    }
+    
+    /**
+     * Selected state of the Action.
+     * @return The selected state of this action.
+     */
+    public final boolean isSelected() {
+    	return selectedProperty.get();
+    }
+    
+    /**
+     * Sets selected state of the Action
+     * @param selected
+     */
+    public final void setSelected( boolean selected ) {
+    	selectedProperty.set(selected);
+    }
+    
+    
     // --- text
     private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"){ //$NON-NLS-1$
-    	public void set(String value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+    	@Override public void set(String value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
     		super.set(value);
     	}
     };
@@ -148,8 +232,8 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- disabled
     private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"){ //$NON-NLS-1$
-    	public void set(boolean value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+        @Override public void set(boolean value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
     		super.set(value);
     	}
     };
@@ -187,8 +271,8 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- longText
     private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"){ //$NON-NLS-1$
-    	public void set(String value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+        @Override public void set(String value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
     		super.set(value);
 
     	};
@@ -226,8 +310,8 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- graphic
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"){ //$NON-NLS-1$
-    	public void set(Node value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+        @Override public void set(Node value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
     		super.set(value);
 
     	};
@@ -262,8 +346,8 @@ public class Action implements EventHandler<ActionEvent> {
     
     // --- accelerator
     private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"){ //$NON-NLS-1$
-    	public void set(KeyCombination value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled.");
+        @Override public void set(KeyCombination value) {
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
     		super.set(value);
 
     	}

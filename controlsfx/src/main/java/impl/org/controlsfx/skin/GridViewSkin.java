@@ -26,7 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.behavior.GridViewBehavior;
+import java.util.Collections;
+
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
@@ -34,10 +35,19 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.GridView;
 
+import com.sun.javafx.css.StyleManager;
+import com.sun.javafx.scene.control.behavior.BehaviorBase;
+import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 
-public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewBehavior<T>, GridRow<T>> {
+public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorBase<GridView<T>>, GridRow<T>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                GridView.class.getResource("gridview.css").toExternalForm()); //$NON-NLS-1$
+    }
 
     private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
         @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
@@ -46,10 +56,11 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridViewB
         }
     };
 
-    private final WeakListChangeListener<T> weakGridViewItemsListener = new WeakListChangeListener<T>(gridViewItemsListener);
+    private final WeakListChangeListener<T> weakGridViewItemsListener = new WeakListChangeListener<>(gridViewItemsListener);
 
+    @SuppressWarnings("rawtypes")
     public GridViewSkin(GridView<T> control) {
-        super(control, new GridViewBehavior<>(control));
+        super(control, new BehaviorBase<>(control, Collections.<KeyBinding>emptyList()));
         
         updateGridViewItems();
 

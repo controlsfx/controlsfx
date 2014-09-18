@@ -70,11 +70,11 @@ public class Edge2D {
      *            the edge's length; must be non-negative.
      */
     public Edge2D(Point2D centerPoint, Orientation orientation, double length) {
-        Objects.requireNonNull(centerPoint, "The specified center point must not be null.");
-        Objects.requireNonNull(orientation, "The specified orientation must not be null.");
+        Objects.requireNonNull(centerPoint, "The specified center point must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(orientation, "The specified orientation must not be null."); //$NON-NLS-1$
         if (length < 0)
             throw new IllegalArgumentException(
-                    "The length must not be negative, i.e. zero or a positive value is alowed.");
+                    "The length must not be negative, i.e. zero or a positive value is alowed."); //$NON-NLS-1$
 
         this.centerPoint = centerPoint;
         this.orientation = orientation;
@@ -138,7 +138,7 @@ public class Edge2D {
      * @return the distance
      */
     public double getOrthogonalDifference(Point2D otherPoint) {
-        Objects.requireNonNull(otherPoint, "The other point must nt be null.");
+        Objects.requireNonNull(otherPoint, "The other point must nt be null."); //$NON-NLS-1$
 
         if (isHorizontal())
             // horizontal -> subtract y coordinates
@@ -242,8 +242,8 @@ public class Edge2D {
      */
     @Override
     public String toString() {
-        return "Edge2D [centerX = " + centerPoint.getX() + ", centerY = " + centerPoint.getY()
-                + ", orientation = " + orientation + ", length = " + length + "]";
+        return "Edge2D [centerX = " + centerPoint.getX() + ", centerY = " + centerPoint.getY() //$NON-NLS-1$ //$NON-NLS-2$
+                + ", orientation = " + orientation + ", length = " + length + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
 }

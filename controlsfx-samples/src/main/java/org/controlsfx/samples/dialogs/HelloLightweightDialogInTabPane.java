@@ -50,7 +50,7 @@ import org.controlsfx.samples.Utils;
 public class HelloLightweightDialogInTabPane extends ControlsFXSample {
 
     @Override public String getSampleName() {
-        return "Lightweight Dialogs";
+        return "Lightweight Dialogs (Deprecated)";
     }
     
     @Override public String getJavaDocURL() {

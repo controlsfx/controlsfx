@@ -42,7 +42,6 @@ import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -226,7 +225,7 @@ public class Notifications {
      * built-in 'warning' graphic.
      */
     public void showWarning() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-warning.png"))); //$NON-NLS-1$
+        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-warning.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -235,7 +234,7 @@ public class Notifications {
      * built-in 'information' graphic.
      */
     public void showInformation() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-information.png"))); //$NON-NLS-1$
+        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-information.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -244,7 +243,7 @@ public class Notifications {
      * built-in 'error' graphic.
      */
     public void showError() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/dialog-error.png"))); //$NON-NLS-1$
+        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-error.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -253,7 +252,7 @@ public class Notifications {
      * built-in 'confirm' graphic.
      */
     public void showConfirm() {
-        graphic(new ImageView(new Image("/impl/org/controlsfx/dialog/resources/oxygen/48/system-help.png"))); //$NON-NLS-1$
+        graphic(new ImageView(new Image("/org/controlsfx/dialog/system-help.png"))); //$NON-NLS-1$
         show();
     }
 
@@ -322,7 +321,7 @@ public class Notifications {
             // need to install our CSS
             if (owner instanceof Stage) {
                 Scene ownerScene = ((Stage) owner).getScene();
-                ownerScene.getStylesheets().add(getClass().getResource("notificationpopup.css").toExternalForm()); //$NON-NLS-1$
+                ownerScene.getStylesheets().add(Notifications.class.getResource("notificationpopup.css").toExternalForm()); //$NON-NLS-1$
             }
 
             final Popup popup = new Popup();
@@ -421,15 +420,13 @@ public class Notifications {
 
             notificationBar.getStyleClass().addAll(notification.styleClass);
 
-            notificationBar.setOnMouseClicked(new EventHandler<Event>() {
-                public void handle(Event e) {
-                    if (notification.onAction != null) {
-                        ActionEvent actionEvent = new ActionEvent(notificationBar, notificationBar);
-                        notification.onAction.handle(actionEvent);
+            notificationBar.setOnMouseClicked(e -> {
+                if (notification.onAction != null) {
+                    ActionEvent actionEvent = new ActionEvent(notificationBar, notificationBar);
+                    notification.onAction.handle(actionEvent);
 
-                        // animate out the popup
-                        createHideTimeline(popup, notificationBar, p, Duration.ZERO).play();
-                    }
+                    // animate out the popup
+                    createHideTimeline(popup, notificationBar, p, Duration.ZERO).play();
                 }
             });
 

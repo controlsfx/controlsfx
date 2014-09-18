@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.skin.StatusBarSkin;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -64,13 +66,13 @@ import javafx.scene.control.Skin;
  * statusBar.setProgress(.5);
  * </pre>
  */
-public class StatusBar extends Control {
+public class StatusBar extends ControlsFXControl {
 
     /**
      * Constructs a new status bar control.
      */
     public StatusBar() {
-        getStyleClass().add("status-bar");
+        getStyleClass().add("status-bar"); //$NON-NLS-1$
     }
 
     @Override
@@ -78,13 +80,8 @@ public class StatusBar extends Control {
         return new StatusBarSkin(this);
     }
 
-    @Override
-    protected String getUserAgentStylesheet() {
-        return StatusBar.class.getResource("statusbar.css").toExternalForm();
-    }
-
-    private final StringProperty text = new SimpleStringProperty(this, "text",
-            "OK");
+    private final StringProperty text = new SimpleStringProperty(this, "text", //$NON-NLS-1$
+            localize(asKey("statusbar.ok"))); //$NON-NLS-1$
 
     /**
      * The property used for storing the text message shown by the status bar.
@@ -114,7 +111,7 @@ public class StatusBar extends Control {
     }
 
     private final ObjectProperty<Node> graphic = new SimpleObjectProperty<>(
-            this, "graphic");
+            this, "graphic"); //$NON-NLS-1$
 
     /**
      * The property used to store a graphic node that can be displayed by the 
@@ -169,7 +166,7 @@ public class StatusBar extends Control {
     }
 
     private final DoubleProperty progress = new SimpleDoubleProperty(this,
-            "progress");
+            "progress"); //$NON-NLS-1$
 
     /**
      * The property used to store the progress, a value between 0 and 1. A negative

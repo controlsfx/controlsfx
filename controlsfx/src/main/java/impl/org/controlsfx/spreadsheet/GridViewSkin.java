@@ -28,18 +28,24 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -47,29 +53,22 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
-import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.util.Callback;
 
+import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
-import java.util.BitSet;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableMap;
-import org.controlsfx.control.spreadsheet.Grid;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -78,6 +77,14 @@ import org.controlsfx.control.spreadsheet.Grid;
  * 
  */
 public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm()); //$NON-NLS-1$
+    }
+    
+    
     /***************************************************************************
      * * STATIC FIELDS * *
      **************************************************************************/
@@ -111,6 +118,17 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         DEFAULT_CELL_HEIGHT = cell_size;
     }
 
+    /**
+     * When we add some tableCell to some topRow in order for them to be on top
+     * in term of z-order. We may end up with the situation where the row that
+     * put the cell is not in the ViewPort anymore. For example when a fixedRow
+     * has taken over the real row when scrolling down. Then, the tableCell
+     * added is still hanging out in the topRow. That tableCell has no clue that
+     * its "creator" has been destroyed or re-used since that tableCell was not
+     * technically belonging to its "creator". Therefore, we need to track those
+     * cells in order to remove them each time.
+     */
+    final Map<GridRow,Set<CellView>> deportedCells = new HashMap<>();
     /***************************************************************************
      * * PRIVATE FIELDS * *
      **************************************************************************/
@@ -167,6 +185,16 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     BitSet hBarValue;
     BitSet rowToLayout;
     
+    /**
+     * This rectangle will be used for drawing a border around the selection.
+     */
+    RectangleSelection rectangleSelection;
+    
+    /**
+     * This is the current width used by the currently fixed column on the left. 
+     */
+    double fixedColumnWidth;
+    
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -177,14 +205,13 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         gridCellEditor = new GridCellEditor(handle);
         TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
 
-        // Do nothing basically but give access to the Hover Property.
-        tableView
-                .setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
-                    @Override
-                    public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
-                        return new GridRow(handle);
-                    }
-                });
+        //Set a new row factory, useful when handling row height.
+        tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
+            @Override
+            public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
+                return new GridRow(handle);
+            }
+        });
 
         tableView.getStyleClass().add("cell-spreadsheet"); //$NON-NLS-1$
 
@@ -237,6 +264,29 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         return gridCellEditor;
     }
 
+    /**
+     * This return the GridRow which has the specified index if found. Otherwise
+     * null is returned.
+     *
+     * @param index
+     * @return
+     */
+    public GridRow getRowIndexed(int index) {
+        for (GridRow obj : (List<GridRow>) getFlow().getCells()) {
+            if (obj.getIndex() == index) {
+                return obj;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * This return the row at the specified index in the list. The index
+     * specified HAS NOTHING to do with the index of the row.
+     * @see #getRowIndexed(int) for a getting a row with its real index.
+     * @param index
+     * @return
+     */
     public GridRow getRow(int index) {
         return (GridRow) getFlow().getCells().get(index);
     }
@@ -347,6 +397,22 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     
     public void resizeRowsToDefault() {
         rowHeightMap.clear();
+        
+        /**
+         * When resizing to default, we need to go through the visible rows in
+         * order to update them directly. Because if the rowHeightMap is empty,
+         * the rows will not detect that maybe the height has changed.
+         */
+        for (GridRow row : (List<GridRow>) getFlow().getCells()) {
+            double newHeight = row.computePrefHeight(-1);
+            if(row.getPrefHeight() != newHeight){
+                row.setPrefHeight(newHeight);
+                row.requestLayout();
+            }
+        }
+        
+        //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
+        getFlow().layoutChildren();
     }
     /**
      * We want to have extra space when displaying LocalDate because they will
@@ -437,7 +503,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             widthMax = DATE_CELL_MIN_WIDTH;
         }
         if(col.isResizable()){
-//        col.setPrefWidth(widthMax);
             col.setPrefWidth(widthMax);
         }
     }
@@ -446,6 +511,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * * PRIVATE/PROTECTED METHOD * *
      **************************************************************************/
     protected final void init() {
+        rectangleSelection = new RectangleSelection(this, (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel());
         getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle);
         getChildren().add(verticalHeader);
@@ -456,33 +522,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         horizontalPickers = new HorizontalPicker((HorizontalHeader) getTableHeaderRow(), spreadsheetView);
         getChildren().add(horizontalPickers);
         getFlow().init(spreadsheetView);
-
-        /**
-         * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-         * JDK8u20
-         */
-        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.LEFT) {
-                    if (keyEvent.isShortcutDown()) {
-                        getFocusModel().focusLeftCell();
-                    } else {
-                        selectLeft();
-                    }
-                    keyEvent.consume();
-                    scrollHorizontally();
-                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
-                    if (keyEvent.isShortcutDown()) {
-                        getFocusModel().focusRightCell();
-                    } else {
-                        selectRight();
-                    }
-                    keyEvent.consume();
-                    scrollHorizontally();
-                }
-            }
-        });
     }
 
     protected final ObservableSet<Integer> getCurrentlyFixedRow() {
@@ -550,7 +589,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * MODIFIED
          *****************************************************************/
         final int row = fm.getFocusedIndex();
-        // We try to make visible the rows that may be hiden by Fixed rows
+//        // We try to make visible the rows that may be hiden by Fixed rows
         if (!getFlow().getCells().isEmpty()
                 && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
                 && !spreadsheetView.getFixedRows().contains(row)) {
@@ -574,7 +613,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * MODIFIED
          *****************************************************************/
         final int row = fm.getFocusedIndex();
-        // FIXME This is not true anymore I think
         // We try to make visible the rows that may be hidden by Fixed rows
         if (!getFlow().getCells().isEmpty()
                 && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
@@ -587,22 +625,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         /*****************************************************************
          * END OF MODIFIED
          *****************************************************************/
-    }
-
-    /**
-     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-     * JDK8u20
-     */
-    @Override
-    protected void onSelectRightCell() {
-    }
-
-    /**
-     * Workaround for https://javafx-jira.kenai.com/browse/RT-34042. FIXME
-     * JDK8u20
-     */
-    @Override
-    protected void onSelectLeftCell() {
     }
 
     @Override
@@ -619,9 +641,10 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 
     @Override
     protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
-        return new GridVirtualFlow<TableRow<ObservableList<SpreadsheetCell>>>(this);
+        return new GridVirtualFlow<>(this);
     }
 
+    @Override
     protected TableHeaderRow createTableHeaderRow() {
         return new HorizontalHeader(this);
     }
@@ -685,56 +708,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         verticalHeader.requestLayout();
     }
 
-    private GridVirtualFlow<?> getFlow() {
+    GridVirtualFlow<?> getFlow() {
         return (GridVirtualFlow<?>) flow;
-    }
-
-    /**
-     * Select the Right cell.
-     */
-    private void selectRight() {
-        TableSelectionModel sm = getSelectionModel();
-        if (sm == null)
-            return;
-
-        TableFocusModel fm = getFocusModel();
-        if (fm == null)
-            return;
-
-        TablePosition focusedCell = getFocusedCell();
-        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-        if (currentColumn == getVisibleLeafColumns().size() - 1)
-            return;
-
-        TableColumnBase tc = focusedCell.getTableColumn();
-        tc = getVisibleLeafColumn(currentColumn + 1);
-
-        int row = focusedCell.getRow();
-        sm.clearAndSelect(row, tc);
-    }
-
-    /**
-     * Select the left cell.
-     */
-    private void selectLeft() {
-        TableSelectionModel sm = getSelectionModel();
-        if (sm == null)
-            return;
-
-        TableFocusModel fm = getFocusModel();
-        if (fm == null)
-            return;
-
-        TablePosition focusedCell = getFocusedCell();
-        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
-        if (currentColumn == 0)
-            return;
-
-        TableColumnBase tc = focusedCell.getTableColumn();
-        tc = getVisibleLeafColumn(currentColumn - 1);
-
-        int row = focusedCell.getRow();
-        sm.clearAndSelect(row, tc);
     }
 
     /**
@@ -752,7 +727,8 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             }
             List<SpreadsheetCell> myRow = grid.getRows().get(row);
             for(SpreadsheetCell cell:myRow){
-                if(cell.getRowSpan()>1 || cell.getColumnSpan() >1){
+                
+                if(cell.getRowSpan()>1 /*|| cell.getColumnSpan() >1*/){
                     bitSet.set(row);
                     break;
                 }
@@ -779,26 +755,31 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         @Override
         public void onChanged(Change<? extends Integer> c) {
             hBarValue.clear();
-            while(c.next()){
-                
-                for(Integer unfixedRow:c.getRemoved()){
-                    rowToLayout.set(unfixedRow, false);
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    for (Integer fixedRow : c.getList()) {
+                        rowToLayout.set(fixedRow, true);
+                    }
+                } else {
+                    for (Integer unfixedRow : c.getRemoved()) {
+                        rowToLayout.set(unfixedRow, false);
                     //If the grid permits it, we check the spanning in order not
-                    //to remove a row that might need layout.
-                    if(spreadsheetView.getGrid().getRows().size() > unfixedRow){
-                        List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
-                        for(SpreadsheetCell cell:myRow){
-                            if(cell.getRowSpan()>1 || cell.getColumnSpan() >1){
-                                rowToLayout.set(unfixedRow, true);
-                                break;
+                        //to remove a row that might need layout.
+                        if (spreadsheetView.getGrid().getRows().size() > unfixedRow) {
+                            List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
+                            for (SpreadsheetCell cell : myRow) {
+                                if (cell.getRowSpan() > 1 || cell.getColumnSpan() > 1) {
+                                    rowToLayout.set(unfixedRow, true);
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-                
-                //We check for the newly fixedRow
-                for(Integer fixedRow:c.getAddedSubList()){
-                    rowToLayout.set(fixedRow, true);
+
+                    //We check for the newly fixedRow
+                    for (Integer fixedRow : c.getAddedSubList()) {
+                        rowToLayout.set(fixedRow, true);
+                    }
                 }
             }
             // requestLayout() not responding immediately..
@@ -824,7 +805,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     private void computeFixedRowHeight() {
         fixedRowHeight = 0;
         for (int i : getCurrentlyFixedRow()) {
-            fixedRowHeight += getRowHeight(i);// spreadsheetView.getGrid().getRowHeight(i);
+            fixedRowHeight += getRowHeight(i);
         }
     }
 
@@ -836,13 +817,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         @Override
         public void onChanged(Change<? extends SpreadsheetColumn> c) {
             hBarValue.clear();
-            if (spreadsheetView.getFixedColumns().size() > c.getList().size()) {
-                for (int i = 0; i < getFlow().getCells().size(); ++i) {
-                    ((GridRow) getFlow().getCells().get(i)).putFixedColumnToBack();
-                }
-            }
-            
-            
             // requestLayout() not responding immediately..
             getFlow().layoutTotal();
         }

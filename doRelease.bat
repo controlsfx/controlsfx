@@ -3,25 +3,14 @@ echo ControlsFX Release Tool
 echo =======================
 echo.
 
-echo Step 1: Edit the controlsfx.properties file to remove the -SNAPSHOT text.
+echo Step 1: In the root build file edit artifact_suffix to remove the -SNAPSHOT text.
 echo.
 pause
 
 echo.
 echo Step 2: Building projects...
-echo Step 2.1: Building FXSampler...
 echo.
-call gradle -b fxsampler/build.gradle clean assemble install
-
-echo.
-echo Step 2.2: Building ControlsFX...
-echo.
-call gradle -b controlsfx/build.gradle clean assemble install
-
-echo.
-echo Step 2.3: Building ControlsFX-samples...
-echo.
-call gradle -b controlsfx-samples/build.gradle clean assemble install
+call gradle -b clean assemble install
 
 echo.
 echo Success - all projects built!
@@ -60,7 +49,7 @@ echo.
 echo Step 6.2: Go to Maven Central to publish the jars (https://oss.sonatype.org, then Staging Repositories, find release, select and 'close', then 'release')
 echo.
 
-echo Step 7: Edit the controlsfx.properties file to add back in the -SNAPSHOT text.
+echo Step 7: Edit the root build file to add back in the -SNAPSHOT text.
 echo.
 pause
 
@@ -76,7 +65,7 @@ echo Step 10: Push zip file to download location
 echo.
 pause
 
-echo Step 11: Update controlsfx.properties version numbers to be the next version with -SNAPSHOT.
+echo Step 11: Update root build file with version numbers to be the next version with -SNAPSHOT.
 echo.
 pause
 

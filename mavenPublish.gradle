@@ -1,0 +1,118 @@
+apply plugin: 'signing'
+
+configurations {
+    samples { extendsFrom runtime}
+    jdk
+    maven { extendsFrom archives }
+    published { extendsFrom archives, signatures}
+}
+
+signing {
+    required = { gradle.taskGraph.hasTask(uploadPublished) && !version.endsWith("SNAPSHOT") }
+    sign configurations.archives
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'https://oss.sonatype.org/content/groups/staging' }
+    mavenCentral()
+}
+
+uploadPublished {
+
+    doFirst {
+        // configure repositories in a doFirst so we can late bind the properties
+        checkPasswords()
+        repositories {
+            mavenDeployer {
+                configurePOM(pom)
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication userName: sonatypeUsername, password: sonatypePassword
+                }
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication userName: sonatypeUsername, password: sonatypePassword
+                }
+            }
+        }
+    }
+    configuration = configurations.published
+}
+
+install {
+    doFirst {
+        configurePOM(repositories.mavenInstaller.pom)
+    }
+    configuration = configurations.published
+}
+
+//ext {
+//  pomExclusions = []
+//}
+
+private configurePOM(def pom) {
+    pom.project {
+        name 'ControlsFX'
+        description 'High quality UI controls and other tools to complement the core JavaFX distribution'
+        url 'http://www.controlsfx.org/'
+        modelVersion '4.0.0'
+        packaging 'jar'
+        scm {
+            connection 'scm:hg:https://bitbucket.org/controlsfx/controlsfx'
+            developerConnection 'scm:hg:ssh://hg@bitbucket.org/controlsfx/controlsfx'
+            url 'https://bitbucket.org/controlsfx/controlsfx'
+        }
+        developers {
+            developer {
+                name 'Jonathan Giles'
+                email 'jonathan@jonathangiles.net'
+                roles {
+                    role 'author'
+                    role 'developer'
+                }
+            }
+        }
+        licenses {
+            license {
+                name 'The 3-Clause BSD License'
+                url 'http://www.opensource.org/licenses/bsd-license.php'
+                distribution 'repo'
+            }
+        }
+        properties {
+            //project.build.sourceEncoding='UTF-8'
+            setProperty('project.build.sourceEncoding', 'UTF8')
+        }
+      //}
+      //whenConfigured{
+      //   dependencies = dependencies.findAll {dep -> !pomExclusions.contains(dep.artifactId) } 
+      //}
+
+    }
+}
+
+ext.checkPasswords =  {
+    try {
+        def check = [sonatypeUsername, sonatypePassword]
+        println "Using sonatype user $sonatypeUsername"
+    } catch (MissingPropertyException e) {
+        e.printStackTrace()
+        Console console = System.console()
+        console.printf "\n\nIn order to upload to Sonatype we need your username and password.\nEnter a blank username or password to skip upload\n\n"
+        ext.sonatypeUsername = console.readLine("Sonatype Username: ")
+        ext.sonatypePassword = new String(console.readPassword("Sonatype Password: "))
+        if (!sonatypePassword || !sonatypeUsername) {
+            console.printf("\n\nSonatype upload aborted")
+            subprojects {
+                signing {
+                    enabled = false
+                }
+                uploadPublished {
+                    enabled = false
+                }
+            }
+            throw new StopExecutionException()
+        }
+    }
+}
+

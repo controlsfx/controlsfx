@@ -34,4 +34,14 @@ abstract class ControlsFXControl extends Control {
     public ControlsFXControl() {
         VersionChecker.doVersionCheck();
     }
+    
+    /**
+     * Overridden and made final due to functional regressions in JavaFX 8u20.
+     * Bug report is at RT-38640. This should hopefully be able to be undone
+     * when we baseline on 8u40, but for now we will use static blocks in the
+     * control skin to load the user agent stylesheets for a control.
+     */
+    @Override public final String getUserAgentStylesheet() {
+        return null;
+    }
 }

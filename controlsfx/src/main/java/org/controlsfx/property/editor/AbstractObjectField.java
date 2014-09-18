@@ -3,14 +3,10 @@ package org.controlsfx.property.editor;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -25,7 +21,7 @@ abstract class AbstractObjectField<T> extends HBox {
 
     private final CustomTextField textField = new CustomTextField();
 
-    private ObjectProperty<T> objectProperty = new SimpleObjectProperty<T>();
+    private ObjectProperty<T> objectProperty = new SimpleObjectProperty<>();
 
     public AbstractObjectField() {
         super(1);
@@ -35,13 +31,11 @@ abstract class AbstractObjectField<T> extends HBox {
         StackPane button = new StackPane(new ImageView(image));
         button.setCursor(Cursor.DEFAULT);
 
-        button.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e) {
-                if ( MouseButton.PRIMARY == e.getButton() ) {
-                    final T result = edit(objectProperty.get());
-                    if (result != null) {
-                        objectProperty.set(result);
-                    }
+        button.setOnMouseReleased(e -> {
+            if ( MouseButton.PRIMARY == e.getButton() ) {
+                final T result = edit(objectProperty.get());
+                if (result != null) {
+                    objectProperty.set(result);
                 }
             }
         });
@@ -50,11 +44,7 @@ abstract class AbstractObjectField<T> extends HBox {
         getChildren().add(textField);
         HBox.setHgrow(textField, Priority.ALWAYS);
 
-        objectProperty.addListener(new ChangeListener<T>() {
-            @Override public void changed(ObservableValue<? extends T> o, T oldValue, T newValue) {
-                textProperty().set(objectToString(newValue));
-            }
-        });
+        objectProperty.addListener((o, oldValue, newValue) -> textProperty().set(objectToString(newValue)));
     }
 
     protected StringProperty textProperty() {

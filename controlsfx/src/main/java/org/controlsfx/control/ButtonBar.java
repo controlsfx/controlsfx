@@ -37,7 +37,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
@@ -47,9 +46,10 @@ import javafx.scene.layout.HBox;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.tools.Platform;
 
+import com.sun.javafx.scene.traversal.Algorithm;
 import com.sun.javafx.scene.traversal.Direction;
-import com.sun.javafx.scene.traversal.TraversalEngine;
-import com.sun.javafx.scene.traversal.TraverseListener;
+import com.sun.javafx.scene.traversal.ParentTraversalEngine;
+import com.sun.javafx.scene.traversal.TraversalContext;
 
 /**
  * A ButtonBar is essentially an {@link HBox} for controls extending
@@ -131,6 +131,7 @@ import com.sun.javafx.scene.traversal.TraverseListener;
  * buttonBar.setButtonOrder("+YN"); 
  * }</pre>
  */
+@Deprecated
 public final class ButtonBar extends ControlsFXControl {
     
     /**************************************************************************
@@ -170,6 +171,7 @@ public final class ButtonBar extends ControlsFXControl {
      * <p>For details on the button order code for each button type, refer to 
      * the javadoc comment for that type. 
      */
+    @Deprecated
     public static enum ButtonType {
         /**
          * Buttons with this style tag will statically end up on the left end of the bar.
@@ -337,8 +339,6 @@ public final class ButtonBar extends ControlsFXControl {
     
     private ObservableList<ButtonBase> buttons = FXCollections.<ButtonBase>observableArrayList();
     
-    private Direction traversalDirection;
-    
     
     
     /**************************************************************************
@@ -409,25 +409,29 @@ public final class ButtonBar extends ControlsFXControl {
             }
         });
         
-        TraversalEngine engine = new TraversalEngine(this, false) {
-            @Override public void trav(Node owner, Direction dir) {
-                traversalDirection = dir;
-                super.trav(owner, dir);
+        ParentTraversalEngine engine = new ParentTraversalEngine(this, new Algorithm() {
+            @Override public Node selectLast(TraversalContext context) {
+                return getButtons().get(0);
             }
-        };
-        engine.addTraverseListener(new TraverseListener() {
-            @Override public void onTraverse(Node n, Bounds b) {
-                if (ButtonBar.this.equals(n)) {
-                    if (traversalDirection == null || traversalDirection.equals(Direction.NEXT)) {
+            
+            @Override public Node selectFirst(TraversalContext context) {
+                return getButtons().get(getButtons().size() - 1);
+            }
+            
+            @Override public Node select(Node node, Direction direction, TraversalContext context) {
+                if (ButtonBar.this.equals(node)) {
+                    if (direction == null || direction.equals(Direction.NEXT)) {
                         // Sends the focus to the first button in the button bar
-                        getButtons().get(0).requestFocus();
-                    } else if (traversalDirection.equals(Direction.PREVIOUS)) {
+                        return getButtons().get(0);
+                    } else if (direction.equals(Direction.PREVIOUS)) {
                         // Sends the focus to the last button in the button bar
-                        getButtons().get(getButtons().size() - 1).requestFocus();
+                        return getButtons().get(getButtons().size() - 1);
                     }
                 }
+                return null;
             }
         });
+
         setImpl_traversalEngine(engine);
         // end of focus / traversal fix
     }

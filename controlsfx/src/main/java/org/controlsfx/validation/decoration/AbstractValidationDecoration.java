@@ -21,7 +21,7 @@ import org.controlsfx.validation.ValidationSupport;
  */
 public abstract class AbstractValidationDecoration implements ValidationDecoration {
 	
-	private static final String VALIDATION_DECORATION = "$org.controlsfx.decoration.vaidation$";
+	private static final String VALIDATION_DECORATION = "$org.controlsfx.decoration.vaidation$"; //$NON-NLS-1$
 	
 	private static boolean isValidationDecoration( Decoration decoration) {
         return decoration != null && decoration.getProperties().get(VALIDATION_DECORATION) == Boolean.TRUE;

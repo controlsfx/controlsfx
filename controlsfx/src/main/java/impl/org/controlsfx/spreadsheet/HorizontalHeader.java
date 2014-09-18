@@ -149,7 +149,8 @@ public class HorizontalHeader extends TableHeaderRow {
 
         if (working && gridViewSkin != null
                 && gridViewSkin.spreadsheetView != null
-                && gridViewSkin.spreadsheetView.showRowHeaderProperty().get()) {
+                && gridViewSkin.spreadsheetView.showRowHeaderProperty().get()
+                && gridViewSkin.verticalHeader != null) {
             padding += gridViewSkin.verticalHeader.getVerticalHeaderWidth();
         }
 

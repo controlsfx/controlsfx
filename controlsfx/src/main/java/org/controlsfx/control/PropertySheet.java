@@ -173,7 +173,7 @@ public class PropertySheet extends ControlsFXControl {
          * The class must have a constructor that can accept a single argument 
          * of type PropertySheet.Item
          */
-        default public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+        default public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
             return Optional.empty();
         }
         
@@ -247,12 +247,12 @@ public class PropertySheet extends ControlsFXControl {
         return new PropertySheetSkin(this);
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected String getUserAgentStylesheet() {
-        return PropertySheet.class.getResource("propertysheet.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override protected String getUserAgentStylesheet() {
+//        return PropertySheet.class.getResource("propertysheet.css").toExternalForm(); //$NON-NLS-1$
+//    }
     
     
     
@@ -297,7 +297,7 @@ public class PropertySheet extends ControlsFXControl {
 
     // --- propertyEditorFactory
     private final SimpleObjectProperty<Callback<Item, PropertyEditor<?>>> propertyEditorFactory = 
-            new SimpleObjectProperty<Callback<Item, PropertyEditor<?>>>(this, "propertyEditor", new DefaultPropertyEditorFactory()); //$NON-NLS-1$
+            new SimpleObjectProperty<>(this, "propertyEditor", new DefaultPropertyEditorFactory()); //$NON-NLS-1$
     
     /**
      * The property editor factory is used by the PropertySheet to determine which

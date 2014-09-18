@@ -48,13 +48,13 @@ public interface SpreadsheetCell {
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when the editable state of a SpreadsheetCell is changed.
      */
-    public static final EventType EDITABLE_EVENT_TYPE = new EventType("EditableEventType");
+    public static final EventType EDITABLE_EVENT_TYPE = new EventType("EditableEventType"); //$NON-NLS-1$
     
     /**
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when a corner state of a SpreadsheetCell is changed.
      */
-    public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType");
+    public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType"); //$NON-NLS-1$
 
     /**
      * This enum states the four different corner available for positioning 

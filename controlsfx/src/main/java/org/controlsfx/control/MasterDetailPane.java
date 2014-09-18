@@ -148,10 +148,10 @@ public class MasterDetailPane extends ControlsFXControl {
         return new MasterDetailPaneSkin(this);
     }
     
-    /** {@inheritDoc} */
-    @Override protected String getUserAgentStylesheet() {
-        return MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /** {@inheritDoc} */
+//    @Override protected String getUserAgentStylesheet() {
+//        return MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm(); //$NON-NLS-1$
+//    }
 
     // Detail postion support
 

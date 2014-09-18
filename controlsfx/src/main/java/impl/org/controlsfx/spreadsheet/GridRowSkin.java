@@ -26,95 +26,93 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.skin.TableRowSkin;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView.TableViewSelectionModel;
-
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
-
-
-import com.sun.javafx.scene.control.skin.TableRowSkin;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
     
     private final SpreadsheetHandle handle;
-    
+    private final SpreadsheetView spreadsheetView;
     public GridRowSkin(SpreadsheetHandle handle, GridRow gridRow) {
         super(gridRow);
         this.handle = handle;
+        spreadsheetView = handle.getView();
     }
 
     /**
      * FIXME Look into and understand the deep cause of that
      * We need to override this since B105 because it's messing up our
      * fixedRows and also our rows CSS.. (kind of flicker)
+     * EDIT: This seems not to mess up anymore in 8u20.
      */
-    @Override protected void handleControlPropertyChanged(String p) {
-        if ("ITEM".equals(p)) { //$NON-NLS-1$
-            updateCells = true;
-            getSkinnable().requestLayout();
-        } else if ("INDEX".equals(p)){ //$NON-NLS-1$
-           /* // update the index of all children cells (RT-29849)
-            final int newIndex = getSkinnable().getIndex();
-            for (int i = 0, max = cells.size(); i < max; i++) {
-                cells.get(i).updateIndex(newIndex);
-            }*/
-        } else  {
-            super.handleControlPropertyChanged(p);
-        }
-    }
+//    @Override protected void handleControlPropertyChanged(String p) {
+//        if ("ITEM".equals(p)) { //$NON-NLS-1$
+//            updateCells = true;
+//            getSkinnable().requestLayout();
+//        } else if ("INDEX".equals(p)){ //$NON-NLS-1$
+//            System.out.println("ici");
+//            // update the index of all children cells (RT-29849)
+//            final int newIndex = getSkinnable().getIndex();
+//            for (int i = 0, max = cells.size(); i < max; i++) {
+//                cells.get(i).updateIndex(newIndex);
+//            }
+//        } else  {
+//            super.handleControlPropertyChanged(p);
+//        }
+//    }
     
     @Override
     protected void layoutChildren(double x, final double y, final double w,
             final double h) {
-    	final SpreadsheetView spreadsheetView = handle.getView();
-        final SpreadsheetGridView gridView = (SpreadsheetGridView) handle.getGridView();
-        final Grid grid = spreadsheetView.getGrid();
-        /**
-         * RT-26743:TreeTableView: Vertical Line looks unfinished. We used to
-         * not do layout on cells whose row exceeded the number of items, but
-         * now we do so as to ensure we get vertical lines where expected in
-         * cases where the vertical height exceeds the number of items.
-         */
-        // I put that at the very beginning in the hope that I will not have
-        // that extra row at the bottom layouting.
-        final GridRow control = (GridRow) getSkinnable();
-        final int index = control.getIndex();
-        if (index < 0 || index >= gridView.getItems().size()) {
-            control.setOpacity(0);
+        checkState();
+        if (cellsMap.isEmpty()) return;
+        
+        final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = getVisibleLeafColumns();
+        if (visibleLeafColumns.isEmpty()) {
+            super.layoutChildren(x, y, w, h);
             return;
         }
-        control.setOpacity(1);
         
+        final GridRow control = (GridRow) getSkinnable();
+        final SpreadsheetGridView gridView = (SpreadsheetGridView) handle.getGridView();
+        final Grid grid = spreadsheetView.getGrid();
+        final int index = control.getIndex();
+        
+        // I put that at the very beginning in the hope that I will not have
+        // that extra row at the bottom layouting.
+        if (index < 0 || index >= gridView.getItems().size()) {
+            /**
+             * Investigate if the row at the bottom could be still present,
+             * because this opacity is doing trouble when doing: right, scroll
+             * down, left, unfix first, go up.
+             */
+//            control.setOpacity(0);
+            return;
+        }
+        
+        final List<SpreadsheetCell> row = grid.getRows().get(index);
+        final List<SpreadsheetColumn> columns = spreadsheetView.getColumns();
+        final ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> tableViewColumns = gridView.getColumns();
         /**
          * If we use "setGrid" on SpreadsheetView, we must be careful because we
          * set our columns after (due to threading safety). So if, by mistake,
          * we are in layout and the columns are set in SpreadsheetView, but not
          * in TableView (yet). Then just return and wait for next calling.
          */
-        if(spreadsheetView.getColumns().size() != gridView.getColumns().size()){
+        if (columns.size() != tableViewColumns.size()) {
             return;
         }
-        checkState(true);
-        if (cellsMap.isEmpty()) { return; }
-
-        final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = getVisibleLeafColumns();
-        if (visibleLeafColumns.isEmpty()) {
-            super.layoutChildren(x, y, w, h);
-            return;
-        }
-        handle.getCellsViewSkin().hBarValue.set(index, true);
-
-        // determine the width of the visible portion of the table
-        double headerWidth =  gridView.getWidth();
-        
         
         // layout the individual column cells
         double width;
@@ -124,50 +122,31 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         final double horizontalPadding = snappedLeftInset()
                 + snappedRightInset();
         final double controlHeight = getTableRowHeight(index);
+        
+        
+        handle.getCellsViewSkin().hBarValue.set(index, true);
+
+        // determine the width of the visible portion of the table
+        double headerWidth = gridView.getWidth();
 
         /**
          * FOR FIXED ROWS
          */
-        double tableCellY = 0;
-        int positionY = spreadsheetView.getFixedRows().indexOf(index);
-        
-        //FIXME Integrate if fixedCellSize is enabled
-        //Computing how much space we need to translate
-        //because each row has different space.
-        double space = 0;
-        for(int o = 0;o< positionY; ++o){
-        	space += getTableRowHeight(spreadsheetView.getFixedRows().get(o));
-        }
-        
-        //If true, this row is fixed
-        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space){
-        	//This row is a bit hidden on top so we translate then for it to be fully visible
-            tableCellY = space//positionY * GridViewSkin.DEFAULT_CELL_HEIGHT
-                    - getSkinnable().getLocalToParentTransform().getTy();
-            handle.getCellsViewSkin().getCurrentlyFixedRow().add(index);
-        }else{
-        	handle.getCellsViewSkin().getCurrentlyFixedRow().remove(index);
-        }
-        /**
-         * We want to insert the removed tableCell in their correct position
-         * because otherwise we have some glitch with the fixed columns when
-         * scrolling fast to the left. This is happening because new cells added
-         * on the left are positioned at the end of the list, therefore layout
-         * at the end. 
-         */
-        int rightPlace = 0;
+        ((GridRow)getSkinnable()).verticalShift.setValue(getFixedRowShift(index));
+
+
         double fixedColumnWidth = 0;
         List<CellView> fixedCells = new ArrayList();
         for (int column = 0; column < cells.size(); column++) {
-	
+
             final CellView tableCell = (CellView) cells.get(column);
 
             // In case the node was treated previously
-            tableCell.setOpacity(1);
+            tableCell.setManaged(true);
 
             width = snapSize(tableCell.prefWidth(-1))
                     - snapSize(horizontalPadding);
-            height = controlHeight;//Math.max(controlHeight, tableCell.prefHeight(-1));
+            height = controlHeight;
             height = snapSize(height) - snapSize(verticalPadding);
 
             /**
@@ -175,123 +154,190 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
              */
             double tableCellX = 0;
             final double hbarValue = handle.getCellsViewSkin().getHBar().getValue();
-            
-            //Virtualization of column
-            final SpreadsheetCell cellSpan = grid.getRows().get(index).get(column);
-            boolean isVisible = !isInvisible(x,width,hbarValue,headerWidth,cellSpan.getColumnSpan());
-            
-            // We translate that column by the Hbar Value if it's fixed
-            if (spreadsheetView.getColumns().get(column).isFixed()) {
-                
-                 if(hbarValue + fixedColumnWidth >x){
-                	 tableCellX = Math.abs(hbarValue - x + fixedColumnWidth); 
-//                	 tableCell.toFront();
-                	 fixedColumnWidth += tableCell.getWidth();
-                	 isVisible = true; // If in fixedColumn, it's obviously visible
-                         fixedCells.add(tableCell);
-                 }
-            }
 
-            if (isVisible) {
-                if (tableCell.getParent() == null) {
-                    getChildren().add(rightPlace,tableCell);
+            //Virtualization of column
+            final SpreadsheetCell spreadsheetCell = row.get(column);
+            boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, spreadsheetCell.getColumnSpan());
+
+            // We translate that column by the Hbar Value if it's fixed
+            if (columns.get(column).isFixed()) {
+                if (hbarValue + fixedColumnWidth > x) {
+                    tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
+//                	 tableCell.toFront();
+                    fixedColumnWidth += tableCell.getWidth();
+                    isVisible = true; // If in fixedColumn, it's obviously visible
+                    fixedCells.add(tableCell);
                 }
-                rightPlace++;
+            }
+            
+            if (isVisible) {
                 final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, column);
 
                 switch (spanType) {
-                    case ROW_SPAN_INVISIBLE :
-                    case BOTH_INVISIBLE :
-                        tableCell.setOpacity(0);
-                        tableCell.resize(width, height);
-                        tableCell.relocate(x + tableCellX, snappedTopInset()
-                                + tableCellY);
-
+                    case ROW_SPAN_INVISIBLE:
+                    case BOTH_INVISIBLE:
+                        fixedCells.remove(tableCell);
+                        getChildren().remove(tableCell);
                         x += width;
                         continue; // we don't want to fall through
-                    case COLUMN_SPAN_INVISIBLE :
-                        tableCell.setOpacity(0);
-                        tableCell.resize(width, height);
-                        tableCell.relocate(x + tableCellX, snappedTopInset()
-                                + tableCellY);
+                    case COLUMN_SPAN_INVISIBLE:
+                        fixedCells.remove(tableCell);
+                        getChildren().remove(tableCell);
                         continue; // we don't want to fall through
-                        // infact, we return to the loop here
-                    case ROW_VISIBLE :
-                        // To be sure that the text is the same
-                        // in case we modified the DataCell after that
-                        // SpreadsheetCell was created
-                        final TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView.getSelectionModel();
-                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = gridView.getColumns().get(column);
+                    case ROW_VISIBLE:
+                        final SpreadsheetViewSelectionModel sm = (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel();
+                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(column);
 
-                        // In case this cell was selected before but we scroll
-                        // up/down and it's invisible now.
-                        // It has to pass his "selected property" to the new
-                        // Cell in charge of spanning
-                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = isSelectedRange(index, col, column);
+                        /**
+                         * In case this cell was selected before but we scroll
+                         * up/down and it's invisible now. It has to pass his
+                         * "selected property" to the new Cell in charge of
+                         * spanning
+                         */
+                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, column);
                         // If the selected cell is in the same row, no need to re-select it
                         if (selectedPosition != null
-                        		//When shift selecting, all cells become ROW_VISIBLE so
-                        		//We avoid loop selecting here
-                        		&& handle.getCellsViewSkin().containsRow(index)
+                                //When shift selecting, all cells become ROW_VISIBLE so
+                                //We avoid loop selecting here
+                                && handle.getCellsViewSkin().containsRow(index)
                                 && selectedPosition.getRow() != index) {
                             sm.clearSelection(selectedPosition.getRow(),
                                     selectedPosition.getTableColumn());
                             sm.select(index, col);
                         }
-                    case NORMAL_CELL : // fall through and carry on
+                    case NORMAL_CELL: // fall through and carry on
                         tableCell.show();
+                        /**
+                         * Here we need to add the cells on the first position
+                         * because this row may contain some deported cells from
+                         * other rows in order to be on top in term of z-order.
+                         * So the cell we're currently adding must not recover
+                         * them.
+                         */
+                        if(tableCell.getParent() == null){
+                            getChildren().add(0, tableCell);
+                        }
                 }
 
-                if (cellSpan != null) {
-                    if (cellSpan.getColumnSpan() > 1) {
-                        // we need to span multiple columns, so we sum up
-                        // the width of the additional columns, adding it
-                        // to the width variable
-                        for (int i = 1, colSpan = cellSpan.getColumnSpan(), max1 = cells
-                                .size() - column; i < colSpan && i < max1; i++) {
-                            width += snapSize(spreadsheetView.getColumns().get(column+i).getWidth());//adjacentNode.maxWidth(-1));
-                        }
-                    }
-
+                if (spreadsheetCell.getColumnSpan() > 1) {
                     /**
-                     * We need to span multiple rows, so we sum up
-                     * the height of all the rows. The height of the current
-                     * row is ignored and the whole value is computed.
+                     * we need to span multiple columns, so we sum up the width
+                     * of the additional columns, adding it to the width
+                     * variable
                      */
-                    if (cellSpan.getRowSpan() > 1) {
-                    	height = 0;
-                    	final int maxRow = cellSpan.getRow()+cellSpan.getRowSpan();
-                    	for (int i = cellSpan.getRow(); i < maxRow; ++i) {
-                            height += snapSize(getTableRowHeight(i));
-                        }
+                    for (int i = 1, colSpan = spreadsheetCell.getColumnSpan(), max1 = cells
+                            .size() - column; i < colSpan && i < max1; i++) {
+                        width += snapSize(columns.get(column + i).getWidth());
+                    }
+                }
+
+                /**
+                 * We need to span multiple rows, so we sum up the height of all
+                 * the rows. The height of the current row is ignored and the
+                 * whole value is computed.
+                 */
+                if (spreadsheetCell.getRowSpan() > 1) {
+                    height = 0;
+                    final int maxRow = spreadsheetCell.getRow() + spreadsheetCell.getRowSpan();
+                    for (int i = spreadsheetCell.getRow(); i < maxRow; ++i) {
+                        height += snapSize(getTableRowHeight(i));
                     }
                 }
 
                 tableCell.resize(width, height);
-                
+
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
-                for(int p=cellSpan.getRow();p<index;++p){
-                	spaceBetweenTopAndMe+= getTableRowHeight(p);
+                for (int p = spreadsheetCell.getRow(); p < index; ++p) {
+                    spaceBetweenTopAndMe += getTableRowHeight(p);
                 }
-                		
+
                 tableCell.relocate(x + tableCellX, snappedTopInset()
-                        - spaceBetweenTopAndMe + tableCellY);
+                        - spaceBetweenTopAndMe + ((GridRow)getSkinnable()).verticalShift.get());
 
                 // Request layout is here as (partial) fix for RT-28684
-                // tableCell.requestLayout();
+//                 tableCell.requestLayout();
             }else{
-            	getChildren().remove(tableCell);
+                getChildren().remove(tableCell);
             }
-            
             x += width;
-           
         }
-        for(CellView cell:fixedCells){
-            cell.toFront();
-    }
+        handle.getCellsViewSkin().fixedColumnWidth = fixedColumnWidth;
+        handleFixedCell(fixedCells, index);
     }
 
+    /**
+     * This handles the fixed cells in column.
+     * @param fixedCells
+     * @param index 
+     */
+    private void handleFixedCell(List<CellView> fixedCells, int index) {
+        /**
+         * If we have a fixedCell (in column) and that cell may be recovered by
+         * a rowSpan, we want to put that tableCell ahead in term of z-order. So
+         * we need to put it in another row.
+         */
+        if (handle.getCellsViewSkin().rowToLayout.get(index)) {
+            GridRow gridRow = handle.getCellsViewSkin().getFlow().getTopRow();
+            if (gridRow != null) {
+                for (CellView cell : fixedCells) {
+                    final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
+                    gridRow.removeCell(cell);
+                    gridRow.addCell(cell);
+                    if (handle.getCellsViewSkin().deportedCells.containsKey(gridRow)) {
+                        handle.getCellsViewSkin().deportedCells.get(gridRow).add(cell);
+                    } else {
+                        Set<CellView> temp = new HashSet<>();
+                        temp.add(cell);
+                        handle.getCellsViewSkin().deportedCells.put(gridRow, temp);
+                    }
+                    /**
+                     * I need to have the layoutY of the original row, but also
+                     * to remove the layoutY of the row I'm adding in. Because
+                     * if the first row is fixed and is undergoing a bit of
+                     * translate in order to be visible, we need to remove that
+                     * "bit of translate".
+                     */
+                    cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
+                }
+            }
+        } else {
+            for (CellView cell : fixedCells) {
+                cell.toFront();
+            }
+        }
+    }
+    
+    /**
+     * Return the space we need to shift that row if it's fixed. Also update the {@link GridViewSkin#getCurrentlyFixedRow()
+     * } .
+     *
+     * @param index
+     * @return
+     */
+    private double getFixedRowShift(int index) {
+        double tableCellY = 0;
+        int positionY = spreadsheetView.getFixedRows().indexOf(index);
+
+        //FIXME Integrate if fixedCellSize is enabled
+        //Computing how much space we need to translate
+        //because each row has different space.
+        double space = 0;
+        for (int o = 0; o < positionY; ++o) {
+            space += getTableRowHeight(spreadsheetView.getFixedRows().get(o));
+        }
+
+        //If true, this row is fixed
+        if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space) {
+            //This row is a bit hidden on top so we translate then for it to be fully visible
+            tableCellY = space - getSkinnable().getLocalToParentTransform().getTy();
+            handle.getCellsViewSkin().getCurrentlyFixedRow().add(index);
+        } else {
+            handle.getCellsViewSkin().getCurrentlyFixedRow().remove(index);
+        }
+        return tableCellY;
+    }
+    
     /**
      * Return the height of a row.
      * @param i
@@ -301,52 +347,18 @@ public class GridRowSkin extends TableRowSkin<ObservableList<SpreadsheetCell>> {
         return handle.getCellsViewSkin().getRowHeight(i);
     }
 
-	/**
+    /**
      * Return true if the current cell is part of the sceneGraph.
-     * 
+     *
      * @param x beginning of the cell
      * @param width total width of the cell
-     * @param hbarValue 
+     * @param hbarValue
      * @param headerWidth width of the visible portion of the tableView
      * @param columnSpan
      * @return
      */
     private boolean isInvisible(double x, double width, double hbarValue,
-                    double headerWidth, int columnSpan) {
-        return (x+width <hbarValue && columnSpan == 1) || (x> hbarValue+headerWidth);
-    }
-    /**
-     * FIXME This is currently the exact copy of the method
-     * in the SpreadsheetViewSelectionModel. But since it is a private implementation
-     * we cannot get back that method. 
-     * This will evolve in the future.
-     * @param row
-     * @param column
-     * @param col
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-	public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
-		if (column == null && row >=0) {
-			return null;
-		}
-    	 
-        final SpreadsheetGridView tableView = (SpreadsheetGridView) handle.getGridView();
-    	final SpreadsheetView spreadsheetView = handle.getView();
-    	
-
-		final SpreadsheetCell cellSpan = tableView.getItems().get(row).get(col);
-		final int infRow = cellSpan.getRow();
-		final int supRow = infRow + cellSpan.getRowSpan();
-		
-		final int infCol = cellSpan.getColumn();
-		final int supCol = infCol + cellSpan.getColumnSpan();
-		
-		for (final TablePosition<ObservableList<SpreadsheetCell>, ?> tp : spreadsheetView.getSelectionModel().getSelectedCells()) {
-		    if (tp.getRow() >= infRow && tp.getRow() < supRow && tp.getColumn() >= infCol && tp.getColumn() < supCol) {
-		        return tp;
-		    }
-		}
-		return null;
+            double headerWidth, int columnSpan) {
+        return (x + width < hbarValue && columnSpan == 1) || (x > hbarValue + headerWidth);
     }
 }

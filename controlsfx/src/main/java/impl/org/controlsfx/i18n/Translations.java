@@ -48,7 +48,7 @@ public class Translations {
     static {
         // firstly try to read from the controlsfx jar
         File file = new File(Translations.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        if (file.getName().endsWith(".jar")) {
+        if (file.getName().endsWith(".jar")) { //$NON-NLS-1$
             Path jarFile = file.toPath();
             try (FileSystem fs = FileSystems.newFileSystem(jarFile, null)) {
                 fs.getRootDirectories().forEach(path -> loadFrom(path));
@@ -61,20 +61,20 @@ public class Translations {
         if (translations.isEmpty()) {
             // try to read the files from the local filesystem (good for when ControlsFX
             // is being run from within a developers IDE)
-            Path srcDir = new File("src/main/resources").toPath();
+            Path srcDir = new File("src/main/resources").toPath(); //$NON-NLS-1$
             loadFrom(srcDir);
         }
         
         // look in bin directory
         if (translations.isEmpty()) {
-            Path binDir = new File("bin").toPath();
+            Path binDir = new File("bin").toPath(); //$NON-NLS-1$
             loadFrom(binDir);
         }
         
         // look in bin directory an alternative way (good for when running 
         // controlsfx-samples)
         if (translations.isEmpty()) {
-            if (file.getAbsolutePath().endsWith("controlsfx" + File.separator + "bin")) {
+            if (file.getAbsolutePath().endsWith("controlsfx" + File.separator + "bin")) { //$NON-NLS-1$ //$NON-NLS-2$
                 loadFrom(file.toPath());
             }
         }
@@ -87,17 +87,17 @@ public class Translations {
             for (Path path : stream) {
                 String filename = path.getFileName().toString();
 
-                if (! filename.startsWith("controlsfx") && ! filename.endsWith(".properties")) {
+                if (! filename.startsWith("controlsfx") && ! filename.endsWith(".properties")) { //$NON-NLS-1$ //$NON-NLS-2$
                     continue;
                 }
 
-                if ("controlsfx.properties".equals(filename)) {
-                    translations.add(new Translation("en", path));
-                } else if (filename.contains("_")) {
-                    String locale = filename.substring(11, filename.indexOf(".properties"));
+                if ("controlsfx.properties".equals(filename)) { //$NON-NLS-1$
+                    translations.add(new Translation("en", path)); //$NON-NLS-1$
+                } else if (filename.contains("_")) { //$NON-NLS-1$
+                    String locale = filename.substring(11, filename.indexOf(".properties")); //$NON-NLS-1$
                     translations.add(new Translation(locale, path));
                 } else {
-                    throw new IllegalStateException("Unknown translation file '" + path + "'.");
+                    throw new IllegalStateException("Unknown translation file '" + path + "'."); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
             }

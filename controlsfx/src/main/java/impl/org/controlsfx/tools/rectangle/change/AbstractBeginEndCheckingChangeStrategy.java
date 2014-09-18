@@ -60,10 +60,10 @@ abstract class AbstractBeginEndCheckingChangeStrategy implements Rectangle2DChan
      */
     @Override
     public final Rectangle2D beginChange(Point2D point) {
-        Objects.requireNonNull(point, "The specified point must not be null.");
+        Objects.requireNonNull(point, "The specified point must not be null."); //$NON-NLS-1$
         if (!beforeBegin)
             throw new IllegalStateException(
-                    "The change already began, so 'beginChange' must not be called again before 'endChange' was called.");
+                    "The change already began, so 'beginChange' must not be called again before 'endChange' was called."); //$NON-NLS-1$
         beforeBegin = false;
 
         beforeBeginHook(point);
@@ -75,9 +75,9 @@ abstract class AbstractBeginEndCheckingChangeStrategy implements Rectangle2DChan
      */
     @Override
     public final Rectangle2D continueChange(Point2D point) {
-        Objects.requireNonNull(point, "The specified point must not be null.");
+        Objects.requireNonNull(point, "The specified point must not be null."); //$NON-NLS-1$
         if (beforeBegin)
-            throw new IllegalStateException("The change did not begin. Call 'beginChange' before 'continueChange'.");
+            throw new IllegalStateException("The change did not begin. Call 'beginChange' before 'continueChange'."); //$NON-NLS-1$
 
         return doContinue(point);
     }
@@ -87,9 +87,9 @@ abstract class AbstractBeginEndCheckingChangeStrategy implements Rectangle2DChan
      */
     @Override
     public final Rectangle2D endChange(Point2D point) {
-        Objects.requireNonNull(point, "The specified point must not be null.");
+        Objects.requireNonNull(point, "The specified point must not be null."); //$NON-NLS-1$
         if (beforeBegin)
-            throw new IllegalStateException("The change did not begin. Call 'beginChange' before 'endChange'.");
+            throw new IllegalStateException("The change did not begin. Call 'beginChange' before 'endChange'."); //$NON-NLS-1$
 
         Rectangle2D finalRectangle = doEnd(point);
         afterEndHook(point);

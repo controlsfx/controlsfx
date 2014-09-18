@@ -26,16 +26,16 @@
  */
 package org.controlsfx.control;
 
-import static java.util.Objects.requireNonNull;
-import static javafx.scene.control.SelectionMode.MULTIPLE;
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+
+import com.sun.javafx.css.StyleManager;
 
 /**
  * A control used to perform a multi-selection via the help of two list views.
@@ -60,27 +60,21 @@ import javafx.scene.control.Skin;
  * @param <T>
  *            the type of the list items
  */
-public class ListSelectionView<T> extends Control {
+public class ListSelectionView<T> extends ControlsFXControl {
+
+    static {
+        StyleManager.getInstance().addUserAgentStylesheet(
+                ListSelectionView.class
+                        .getResource("listselectionview.css").toExternalForm()); //$NON-NLS-1$
+    }
 
     private static final String DEFAULT_STYLECLASS = "list-selection-view";
-
-    private ListView<T> sourceListView;
-
-    private ListView<T> targetListView;
 
     /**
      * Constructs a new dual list view.
      */
     public ListSelectionView() {
         getStyleClass().add(DEFAULT_STYLECLASS);
-
-        this.sourceListView = requireNonNull(createSourceListView(),
-                "source list view can not be null");
-        this.sourceListView.setId("source-list-view");
-
-        this.targetListView = requireNonNull(createTargetListView(),
-                "target list view can not be null");
-        this.targetListView.setId("target-list-view");
 
         Label sourceHeader = new Label("Available");
         sourceHeader.getStyleClass().add("list-header-label");
@@ -96,58 +90,6 @@ public class ListSelectionView<T> extends Control {
     @Override
     protected Skin<ListSelectionView<T>> createDefaultSkin() {
         return new ListSelectionViewSkin<T>(this);
-    }
-
-    @Override
-    protected String getUserAgentStylesheet() {
-        return ListSelectionView.class.getResource("listselectionview.css")
-                .toExternalForm();
-    }
-
-    /**
-     * Returns the source list view (shown on the left-hand side).
-     *
-     * @return the source list view
-     */
-    public final ListView<T> getSourceListView() {
-        return sourceListView;
-    }
-
-    /**
-     * Returns the target list view (shown on the right-hand side).
-     *
-     * @return the target list view
-     */
-    public final ListView<T> getTargetListView() {
-        return targetListView;
-    }
-
-    /**
-     * Creates the {@link ListView} instance used on the left-hand side as the
-     * source list. This method can be overridden to provide a customized list
-     * view control.
-     *
-     * @return the source list view
-     */
-    protected ListView<T> createSourceListView() {
-        return createListView();
-    }
-
-    /**
-     * Creates the {@link ListView} instance used on the right-hand side as the
-     * target list. This method can be overridden to provide a customized list
-     * view control.
-     *
-     * @return the target list view
-     */
-    protected ListView<T> createTargetListView() {
-        return createListView();
-    }
-
-    private ListView<T> createListView() {
-        ListView<T> view = new ListView<>();
-        view.getSelectionModel().setSelectionMode(MULTIPLE);
-        return view;
     }
 
     private final ObjectProperty<Node> sourceHeader = new SimpleObjectProperty<>(
@@ -280,5 +222,77 @@ public class ListSelectionView<T> extends Control {
      */
     public final void setTargetFooter(Node node) {
         targetFooter.set(node);
+    }
+
+    private ObjectProperty<ObservableList<T>> sourceItems;
+
+    /**
+     * Sets the underlying data model for the ListView. Note that it has a
+     * generic type that must match the type of the ListView itself.
+     */
+    public final void setSourceItems(ObservableList<T> value) {
+        sourceItemsProperty().set(value);
+    }
+
+    /**
+     * Returns an {@link ObservableList} that contains the items currently being
+     * shown to the user in the source list. This may be null if
+     * {@link #setSourceItems(javafx.collections.ObservableList)} has previously
+     * been called, however, by default it is an empty ObservableList.
+     *
+     * @return An ObservableList containing the items to be shown to the user in
+     *         the source list, or null if the items have previously been set to
+     *         null.
+     */
+    public final ObservableList<T> getSourceItems() {
+        return sourceItemsProperty().get();
+    }
+
+    /**
+     * The underlying data model for the source list view. Note that it has a
+     * generic type that must match the type of the source list view itself.
+     */
+    public final ObjectProperty<ObservableList<T>> sourceItemsProperty() {
+        if (sourceItems == null) {
+            sourceItems = new SimpleObjectProperty<ObservableList<T>>(this,
+                    "sourceItems", FXCollections.observableArrayList());
+        }
+        return sourceItems;
+    }
+
+    private ObjectProperty<ObservableList<T>> targetItems;
+
+    /**
+     * Sets the underlying data model for the ListView. Note that it has a
+     * generic type that must match the type of the ListView itself.
+     */
+    public final void setTargetItems(ObservableList<T> value) {
+        targetItemsProperty().set(value);
+    }
+
+    /**
+     * Returns an {@link ObservableList} that contains the items currently being
+     * shown to the user in the target list. This may be null if
+     * {@link #setTargetItems(javafx.collections.ObservableList)} has previously
+     * been called, however, by default it is an empty ObservableList.
+     *
+     * @return An ObservableList containing the items to be shown to the user in
+     *         the target list, or null if the items have previously been set to
+     *         null.
+     */
+    public final ObservableList<T> getTargetItems() {
+        return targetItemsProperty().get();
+    }
+
+    /**
+     * The underlying data model for the target list view. Note that it has a
+     * generic type that must match the type of the source list view itself.
+     */
+    public final ObjectProperty<ObservableList<T>> targetItemsProperty() {
+        if (targetItems == null) {
+            targetItems = new SimpleObjectProperty<ObservableList<T>>(this,
+                    "targetItems", FXCollections.observableArrayList());
+        }
+        return targetItems;
     }
 }

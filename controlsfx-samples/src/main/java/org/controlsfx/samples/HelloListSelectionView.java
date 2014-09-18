@@ -44,7 +44,7 @@ public class HelloListSelectionView extends ControlsFXSample {
     @Override
     public Node getPanel(Stage stage) {
         ListSelectionView<String> view = new ListSelectionView<>();
-        view.getSourceListView().getItems()
+        view.getSourceItems()
                 .addAll("Katja", "Dirk", "Philip", "Jule", "Armin");
 
         GridPane pane = new GridPane();

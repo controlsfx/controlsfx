@@ -26,7 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
-import static javafx.scene.input.MouseButton.PRIMARY;
+import static java.util.Objects.requireNonNull;
+import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -56,9 +58,21 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private Button moveToTargetAll;
     private Button moveToSourceAll;
     private Button moveToSource;
+    private ListView<T> sourceListView;
+    private ListView<T> targetListView;
 
     public ListSelectionViewSkin(ListSelectionView<T> view) {
         super(view);
+
+        sourceListView = requireNonNull(createSourceListView(),
+                "source list view can not be null");
+        sourceListView.setId("source-list-view");
+        sourceListView.setItems(view.getSourceItems());
+
+        targetListView = requireNonNull(createTargetListView(),
+                "target list view can not be null");
+        targetListView.setId("target-list-view");
+        targetListView.setItems(view.getTargetItems());
 
         gridPane = createGridPane();
         buttonBox = createButtonBox();
@@ -74,19 +88,19 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
 
         updateView();
 
-        getSkinnable().getSourceListView().addEventHandler(
+        getSourceListView().addEventHandler(
                 MOUSE_CLICKED,
                 event -> {
-                    if (event.getButton() == PRIMARY
+                    if (event.getButton() == MouseButton.PRIMARY
                             && event.getClickCount() == 2) {
                         moveToTarget();
                     }
                 });
 
-        getSkinnable().getTargetListView().addEventHandler(
+        getTargetListView().addEventHandler(
                 MOUSE_CLICKED,
                 event -> {
-                    if (event.getButton() == PRIMARY
+                    if (event.getButton() == MouseButton.PRIMARY
                             && event.getClickCount() == 2) {
                         moveToSource();
                     }
@@ -138,13 +152,16 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         VBox box = new VBox(5);
         box.setFillWidth(true);
 
-        moveToTarget = new Button("", FontAwesome.Glyph.ANGLE_RIGHT.create());
+        FontAwesome fontAwesome = new FontAwesome();
+        moveToTarget = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_RIGHT));
         moveToTargetAll = new Button("",
-                FontAwesome.Glyph.DOUBLE_ANGLE_RIGHT.create());
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_RIGHT));
 
-        moveToSource = new Button("", FontAwesome.Glyph.ANGLE_LEFT.create());
+        moveToSource = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_LEFT));
         moveToSourceAll = new Button("",
-                FontAwesome.Glyph.DOUBLE_ANGLE_LEFT.create());
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_LEFT));
 
         moveToTarget.getStyleClass().add("move-to-target-button");
         moveToTargetAll.getStyleClass().add("move-to-target-all-button");
@@ -156,17 +173,17 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         moveToSource.setMaxWidth(Double.MAX_VALUE);
         moveToSourceAll.setMaxWidth(Double.MAX_VALUE);
 
-        getSkinnable().getSourceListView().itemsProperty()
-                .addListener(it -> bindMoveAllButtonsToDataModel());
+        getSourceListView().itemsProperty().addListener(
+                it -> bindMoveAllButtonsToDataModel());
 
-        getSkinnable().getTargetListView().itemsProperty()
-                .addListener(it -> bindMoveAllButtonsToDataModel());
+        getTargetListView().itemsProperty().addListener(
+                it -> bindMoveAllButtonsToDataModel());
 
-        getSkinnable().getSourceListView().selectionModelProperty()
-                .addListener(it -> bindMoveButtonsToSelectionModel());
+        getSourceListView().selectionModelProperty().addListener(
+                it -> bindMoveButtonsToSelectionModel());
 
-        getSkinnable().getTargetListView().selectionModelProperty()
-                .addListener(it -> bindMoveButtonsToSelectionModel());
+        getTargetListView().selectionModelProperty().addListener(
+                it -> bindMoveButtonsToSelectionModel());
 
         bindMoveButtonsToSelectionModel();
         bindMoveAllButtonsToDataModel();
@@ -186,23 +203,21 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     }
 
     private void bindMoveAllButtonsToDataModel() {
-        moveToTargetAll.disableProperty()
-                .bind(Bindings.isEmpty(getSkinnable().getSourceListView()
-                        .getItems()));
+        moveToTargetAll.disableProperty().bind(
+                Bindings.isEmpty(getSourceListView().getItems()));
 
-        moveToSourceAll.disableProperty()
-                .bind(Bindings.isEmpty(getSkinnable().getTargetListView()
-                        .getItems()));
+        moveToSourceAll.disableProperty().bind(
+                Bindings.isEmpty(getTargetListView().getItems()));
     }
 
     private void bindMoveButtonsToSelectionModel() {
         moveToTarget.disableProperty().bind(
-                Bindings.isEmpty(getSkinnable().getSourceListView()
-                        .getSelectionModel().getSelectedItems()));
+                Bindings.isEmpty(getSourceListView().getSelectionModel()
+                        .getSelectedItems()));
 
         moveToSource.disableProperty().bind(
-                Bindings.isEmpty(getSkinnable().getTargetListView()
-                        .getSelectionModel().getSelectedItems()));
+                Bindings.isEmpty(getTargetListView().getSelectionModel()
+                        .getSelectedItems()));
     }
 
     private void updateView() {
@@ -213,8 +228,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         Node sourceFooter = getSkinnable().getSourceFooter();
         Node targetFooter = getSkinnable().getTargetFooter();
 
-        ListView<T> sourceList = getSkinnable().getSourceListView();
-        ListView<T> targetList = getSkinnable().getTargetListView();
+        ListView<T> sourceList = getSourceListView();
+        ListView<T> targetList = getTargetListView();
 
         if (sourceHeader != null) {
             gridPane.add(sourceHeader, 0, 0);
@@ -248,29 +263,25 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     }
 
     private void moveToTarget() {
-        move(getSkinnable().getSourceListView(), getSkinnable()
-                .getTargetListView());
-        getSkinnable().getSourceListView().getSelectionModel().clearSelection();
+        move(getSourceListView(), getTargetListView());
+        getSourceListView().getSelectionModel().clearSelection();
     }
 
     private void moveToTargetAll() {
-        move(getSkinnable().getSourceListView(), getSkinnable()
-                .getTargetListView(), new ArrayList<>(getSkinnable()
-                .getSourceListView().getItems()));
-        getSkinnable().getSourceListView().getSelectionModel().clearSelection();
+        move(getSourceListView(), getTargetListView(), new ArrayList<>(
+                getSourceListView().getItems()));
+        getSourceListView().getSelectionModel().clearSelection();
     }
 
     private void moveToSource() {
-        move(getSkinnable().getTargetListView(), getSkinnable()
-                .getSourceListView());
-        getSkinnable().getTargetListView().getSelectionModel().clearSelection();
+        move(getTargetListView(), getSourceListView());
+        getTargetListView().getSelectionModel().clearSelection();
     }
 
     private void moveToSourceAll() {
-        move(getSkinnable().getTargetListView(), getSkinnable()
-                .getSourceListView(), new ArrayList<>(getSkinnable()
-                .getTargetListView().getItems()));
-        getSkinnable().getTargetListView().getSelectionModel().clearSelection();
+        move(getTargetListView(), getSourceListView(), new ArrayList<>(
+                getTargetListView().getItems()));
+        getTargetListView().getSelectionModel().clearSelection();
     }
 
     private void move(ListView<T> viewA, ListView<T> viewB) {
@@ -284,5 +295,51 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
             viewA.getItems().remove(item);
             viewB.getItems().add(item);
         }
+    }
+
+    /**
+     * Returns the source list view (shown on the left-hand side).
+     *
+     * @return the source list view
+     */
+    public final ListView<T> getSourceListView() {
+        return sourceListView;
+    }
+
+    /**
+     * Returns the target list view (shown on the right-hand side).
+     *
+     * @return the target list view
+     */
+    public final ListView<T> getTargetListView() {
+        return targetListView;
+    }
+
+    /**
+     * Creates the {@link ListView} instance used on the left-hand side as the
+     * source list. This method can be overridden to provide a customized list
+     * view control.
+     *
+     * @return the source list view
+     */
+    protected ListView<T> createSourceListView() {
+        return createListView();
+    }
+
+    /**
+     * Creates the {@link ListView} instance used on the right-hand side as the
+     * target list. This method can be overridden to provide a customized list
+     * view control.
+     *
+     * @return the target list view
+     */
+    protected ListView<T> createTargetListView() {
+        return createListView();
+    }
+
+    private ListView<T> createListView() {
+        ListView<T> view = new ListView<>();
+        view.getSelectionModel().setSelectionMode(MULTIPLE);
+        return view;
     }
 }

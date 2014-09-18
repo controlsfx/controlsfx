@@ -46,6 +46,7 @@ import javafx.scene.shape.StrokeType;
 
 import org.controlsfx.control.SnapshotView;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**
@@ -53,6 +54,12 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  * MouseEvents are handed over to the {@link SnapshotViewBehavior} which uses them to change the selection.
  */
 public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotViewBehavior> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                SnapshotView.class.getResource("snapshot-view.css").toExternalForm()); //$NON-NLS-1$
+    }
 
     /*
      * IMAGE:
@@ -154,22 +161,22 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         buildSceneGraph();
         initializeAreas();
         
-        registerChangeListener(snapshotView.nodeProperty(), "NODE");
-        registerChangeListener(snapshotView.selectionProperty(), "SELECTION");
-        registerChangeListener(snapshotView.widthProperty(), "WIDTH");
-        registerChangeListener(snapshotView.heightProperty(), "HEIGHT");
+        registerChangeListener(snapshotView.nodeProperty(), "NODE"); //$NON-NLS-1$
+        registerChangeListener(snapshotView.selectionProperty(), "SELECTION"); //$NON-NLS-1$
+        registerChangeListener(snapshotView.widthProperty(), "WIDTH"); //$NON-NLS-1$
+        registerChangeListener(snapshotView.heightProperty(), "HEIGHT"); //$NON-NLS-1$
     }
     
     @Override
     protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if ("NODE".equals(p)) {
+        if ("NODE".equals(p)) { //$NON-NLS-1$
             updateNode();
             updateSelection();
-        } else if ("WIDTH".equals(p) || "HEIGHT".equals(p)) {
+        } else if ("WIDTH".equals(p) || "HEIGHT".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
             updateSelection();
-        } else if ("SELECTION".equals(p)) {
+        } else if ("SELECTION".equals(p)) { //$NON-NLS-1$
             updateSelection();
         }
     }
@@ -351,8 +358,8 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         Node n = getSkinnable().getNode();
         double imageViewWidth = n == null ? 0 : n.getBoundsInLocal().getWidth();
         double imageViewHeight = n == null ? 0 : n.getBoundsInLocal().getHeight();
-        double widthRatio = imageViewWidth / n.prefWidth(-1);
-        double heightRatio = imageViewHeight / n.prefHeight(-1);
+        double widthRatio = n == null ? 0 : imageViewWidth / n.prefWidth(-1);
+        double heightRatio = n == null ? 0 : imageViewHeight / n.prefHeight(-1);
 
         // compute the new position and size such that it is always within the image view's area
         Rectangle2D selection = getImageSelection();

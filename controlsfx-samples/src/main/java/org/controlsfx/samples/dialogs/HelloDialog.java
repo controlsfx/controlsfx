@@ -85,7 +85,7 @@ public class HelloDialog extends ControlsFXSample {
 
 	@Override
 	public String getSampleName() {
-		return "Dialogs";
+		return "Dialogs (Deprecated)";
 	}
 
 	@Override

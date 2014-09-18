@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,89 +26,59 @@
  */
 package org.controlsfx.dialog;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.getString;
 import static impl.org.controlsfx.i18n.Localization.localize;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 
-import org.controlsfx.control.ButtonBar;
-import org.controlsfx.control.ButtonBar.ButtonType;
+public class ExceptionDialog extends Dialog<ButtonType> {
 
-// Not public API (class is package-protected), so no JavaDoc is required.
-class ExceptionDialog extends HeavyweightDialog {
-
-    public ExceptionDialog(Window owner, String moreDetails) {
-        super(localize(asKey("exception.dlg.title")), owner); //$NON-NLS-1$
+    public ExceptionDialog(final Throwable exception) {
+        final DialogPane dialogPane = getDialogPane();
         
-        // TODO use same style as owner window
+        setTitle(getString("exception.dlg.title")); //$NON-NLS-1$
+        dialogPane.setHeaderText(getString("exception.dlg.header")); //$NON-NLS-1$
+        dialogPane.getStyleClass().add("exception-dialog"); //$NON-NLS-1$
+        dialogPane.getStylesheets().add(ProgressDialog.class.getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
+        dialogPane.getButtonTypes().addAll(ButtonType.OK);
+        
+        // --- content
+        String contentText = getContentText();
+        dialogPane.setContent(new Label(contentText != null && ! contentText.isEmpty() ? 
+                contentText : exception.getMessage()));
+        
+        // --- expandable content
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        String exceptionText = sw.toString();
+        
+        Label label = new Label( localize(getString("exception.dlg.label"))); //$NON-NLS-1$
+
+        TextArea textArea = new TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+        
+        GridPane root = new GridPane();
+        root.setMaxWidth(Double.MAX_VALUE);
+        root.add(label, 0, 0);
+        root.add(textArea, 0, 1);
         
         
-        initComponents(moreDetails);
-    }
-
-    /*
-     * Initialize components for this dialog.
-     */
-    private void initComponents(String moreDetails) {
-        VBox contentPanel = new VBox();
-        contentPanel.getStyleClass().add("more-info-dialog"); //$NON-NLS-1$
-
-        contentPanel.setPrefSize(800, 600);
-
-        if (moreDetails != null) {
-            BorderPane labelPanel = new BorderPane();
-
-            Label label = new Label(localize(asKey("exception.dlg.label"))); //$NON-NLS-1$
-            labelPanel.setLeft(label);
-
-            contentPanel.getChildren().add(labelPanel);
-
-            TextArea text = new TextArea(moreDetails);
-            text.setEditable(false);
-            text.setWrapText(true);
-            text.setPrefWidth(60 * 8);
-            text.setPrefHeight(20 * 12);
-
-            VBox.setVgrow(text, Priority.ALWAYS);
-            contentPanel.getChildren().add(text);
-        }
-        contentPanel.getChildren().add(getBtnPanel());
-
-        setContentPane(contentPanel);
-    }
-
-    /*
-     * This panel contains right-aligned "Close" button.  It should
-     * dismiss the dialog and dispose of it.
-     */
-    private Node getBtnPanel() {
-        Button dismissBtn = new Button(localize(asKey("dlg.close.button"))); //$NON-NLS-1$
-        dismissBtn.setPrefWidth(80);
-        dismissBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                dismissAction();
-            }
-        });
-
-        dismissBtn.setDefaultButton(true);
-        
-        ButtonBar buttonBar = new ButtonBar();
-        buttonBar.addButton(dismissBtn, ButtonType.CANCEL_CLOSE);
-        return buttonBar;
-    }
-
-    /*
-     * Close this dialog and dispose of it.
-     */
-    private void dismissAction() {
-        hide();
+        dialogPane.setExpandableContent(root);
     }
 }

@@ -35,6 +35,7 @@ import java.util.ResourceBundle;
 import javafx.scene.image.Image;
 
 // Not public API (class is package-protected), so no JavaDoc is required.
+@Deprecated
 class DialogResources {
 
     // Localization strings.
@@ -45,7 +46,7 @@ class DialogResources {
     }
 
     static void reset() {
-        rbFX = ResourceBundle.getBundle("impl.org.controlsfx.dialog.resources.oxygen.dialog-resources"); //$NON-NLS-1$
+        rbFX = ResourceBundle.getBundle("org.controlsfx.dialog.dialog-resources"); //$NON-NLS-1$
     }
 
 

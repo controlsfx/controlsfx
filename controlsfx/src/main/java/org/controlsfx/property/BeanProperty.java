@@ -50,6 +50,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see PropertySheet
  * @see PropertyDescriptor
  */
+@SuppressWarnings("deprecation")
 public class BeanProperty implements PropertySheet.Item {
 
     private final Object bean;
@@ -98,9 +99,9 @@ public class BeanProperty implements PropertySheet.Item {
                 e.printStackTrace();
             } catch (Throwable e) {
 				if (e instanceof PropertyVetoException) {
-					Dialogs.create().title(localize(asKey("bean.property.change.error.title")))
+					Dialogs.create().title(localize(asKey("bean.property.change.error.title"))) //$NON-NLS-1$
 							.message(e.getLocalizedMessage())
-							.masthead(localize(asKey("bean.property.change.error.masthead")))
+							.masthead(localize(asKey("bean.property.change.error.masthead"))) //$NON-NLS-1$
 							.showError();
 				} else {
 					throw e;
@@ -112,7 +113,7 @@ public class BeanProperty implements PropertySheet.Item {
     /** {@inheritDoc} */
     @Override public String getCategory() {
         return localize(asKey(beanPropertyDescriptor.isExpert()?
-        		   "bean.property.category.expert":"bean.property.category.basic"));
+        		   "bean.property.category.expert":"bean.property.category.basic")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 	
     /** 
@@ -131,13 +132,13 @@ public class BeanProperty implements PropertySheet.Item {
     }
     
     /** {@inheritDoc} */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override public Optional<Class<? extends PropertyEditor>> getPropertyEditorClass() {
+    @SuppressWarnings({ "unchecked" })
+	@Override public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
         
         if (beanPropertyDescriptor.getPropertyEditorClass() != null && 
                 PropertyEditor.class.isAssignableFrom(beanPropertyDescriptor.getPropertyEditorClass())) {
             
-            return Optional.of((Class<PropertyEditor>)beanPropertyDescriptor.getPropertyEditorClass());
+            return Optional.of((Class<PropertyEditor<?>>)beanPropertyDescriptor.getPropertyEditorClass());
         }
         
         return Item.super.getPropertyEditorClass();

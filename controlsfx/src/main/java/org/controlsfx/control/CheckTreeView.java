@@ -27,7 +27,6 @@
 package org.controlsfx.control;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import javafx.beans.property.BooleanProperty;
@@ -35,11 +34,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.CheckBoxTreeItem.TreeModificationEvent;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
@@ -79,7 +75,7 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
  * // selected items change).
  * checkTreeView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
  *     public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
- *         System.out.println(checkListView.getCheckModel().getSelectedIndices());
+ *         System.out.println(checkTreeView.getCheckModel().getSelectedIndices());
  *     }
  * });
  * }</pre>
@@ -119,7 +115,7 @@ public class CheckTreeView<T> extends TreeView<T> {
     public CheckTreeView(final CheckBoxTreeItem<T> root) {
         super(root);
         
-        setCheckModel(new CheckTreeViewCheckModel<T>(this));
+        setCheckModel(new CheckTreeViewCheckModel<>(this));
         setCellFactory(CheckBoxTreeCell.<T>forTreeView());
     }
     
@@ -222,15 +218,13 @@ public class CheckTreeView<T> extends TreeView<T> {
         CheckTreeViewCheckModel(final CheckTreeView<T> treeView) {
             this.treeView = treeView;
             this.root = treeView.getRoot();
-            this.root.addEventHandler(CheckBoxTreeItem.<T>checkBoxSelectionChangedEvent(), new EventHandler<TreeModificationEvent<T>>() {
-                public void handle(TreeModificationEvent<T> e) {
-                    CheckBoxTreeItem<T> treeItem = e.getTreeItem();
-                    
-                    if (treeItem.isSelected()) { // && ! treeItem.isIndeterminate()) {
-                        check(treeItem);
-                    } else { 
-                        clearCheck(treeItem);
-                    }
+            this.root.addEventHandler(CheckBoxTreeItem.<T>checkBoxSelectionChangedEvent(), e -> {
+                CheckBoxTreeItem<T> treeItem = e.getTreeItem();
+                
+                if (treeItem.isSelected()) { // && ! treeItem.isIndeterminate()) {
+                    check(treeItem);
+                } else { 
+                    clearCheck(treeItem);
                 }
             });
             

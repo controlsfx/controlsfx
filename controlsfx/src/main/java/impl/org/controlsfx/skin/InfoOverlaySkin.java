@@ -56,11 +56,18 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.InfoOverlay;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<InfoOverlay>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                InfoOverlay.class.getResource("info-overlay.css").toExternalForm()); //$NON-NLS-1$
+    }
 
     private final ImageView EXPAND_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("expand.png").toExternalForm())); //$NON-NLS-1$
     private final ImageView COLLAPSE_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("collapse.png").toExternalForm())); //$NON-NLS-1$

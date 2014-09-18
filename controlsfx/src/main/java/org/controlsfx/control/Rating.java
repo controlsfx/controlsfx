@@ -168,10 +168,10 @@ public class Rating extends ControlsFXControl {
         return new RatingSkin(this);
     }
 
-    /** {@inheritDoc} */
-    @Override protected String getUserAgentStylesheet() {
-        return getClass().getResource("rating.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /** {@inheritDoc} */
+//    @Override protected String getUserAgentStylesheet() {
+//        return Rating.class.getResource("rating.css").toExternalForm(); //$NON-NLS-1$
+//    }
     
     
     
@@ -236,7 +236,7 @@ public class Rating extends ControlsFXControl {
      */
     public final ObjectProperty<Orientation> orientationProperty() {
         if (orientation == null) {
-            orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$
+            orientation = new SimpleObjectProperty<>(this, "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$
         }
         return orientation;
     }

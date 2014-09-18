@@ -21,7 +21,15 @@ import javafx.util.Duration;
 import org.controlsfx.control.PlusMinusSlider;
 import org.controlsfx.control.PlusMinusSlider.PlusMinusEvent;
 
+import com.sun.javafx.css.StyleManager;
+
 public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                PlusMinusSlider.class.getResource("plusminusslider.css").toExternalForm()); //$NON-NLS-1$
+    }
 
 	private SliderReader reader;
 
@@ -98,14 +106,7 @@ public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
 
 		getChildren().add(borderPane);
 
-		adjuster.orientationProperty().addListener(
-				new ChangeListener<Orientation>() {
-					public void changed(
-							ObservableValue<? extends Orientation> observable,
-							Orientation oldValue, Orientation newValue) {
-						updateLayout(newValue);
-					};
-				});
+		adjuster.orientationProperty().addListener((observable, oldValue, newValue) -> updateLayout(newValue));
 	}
 
 	private void updateLayout(Orientation orientation) {

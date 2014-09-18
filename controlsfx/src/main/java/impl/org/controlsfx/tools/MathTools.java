@@ -83,9 +83,9 @@ public class MathTools {
      *             if the values array is empty (i.e. has {@code length} 0)
      */
     public static double min(double... values) {
-        Objects.requireNonNull(values, "The specified value array must not be null.");
+        Objects.requireNonNull(values, "The specified value array must not be null."); //$NON-NLS-1$
         if (values.length == 0)
-            throw new IllegalArgumentException("The specified value array must contain at least one element.");
+            throw new IllegalArgumentException("The specified value array must contain at least one element."); //$NON-NLS-1$
 
         double min = Double.MAX_VALUE;
         for (double value : values)

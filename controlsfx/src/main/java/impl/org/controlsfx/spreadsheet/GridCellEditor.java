@@ -51,8 +51,6 @@ public class GridCellEditor {
     private SpreadsheetCell modelCell;
     private CellView viewCell;
 
-    // The SpreadsheetEditor in order to position the cell for edition.
-    private final SpreadsheetEditor spreadsheetEditor;
     private boolean editing = false;
     
     //The cell's editor 
@@ -71,7 +69,6 @@ public class GridCellEditor {
      */
     public GridCellEditor(SpreadsheetHandle handle) {
         this.handle = handle;
-        this.spreadsheetEditor = new SpreadsheetEditor();
     }
 
     /***************************************************************************
@@ -178,7 +175,6 @@ public class GridCellEditor {
         editing = true;
         
         handle.getGridView().addEventFilter(KeyEvent.KEY_PRESSED, enterKeyPressed);
-        spreadsheetEditor.startEdit();
 
         handle.getCellsViewSkin().getVBar().valueProperty().addListener(endEditionListener);
         handle.getCellsViewSkin().getHBar().valueProperty().addListener(endEditionListener);
@@ -193,7 +189,7 @@ public class GridCellEditor {
         
         if(handle.getGridView().getEditWithKey()){
             handle.getGridView().setEditWithKey(false);
-            spreadsheetCellEditor.startEdit("");
+            spreadsheetCellEditor.startEdit(""); //$NON-NLS-1$
         }else{
             spreadsheetCellEditor.startEdit(value);
         }
@@ -202,7 +198,6 @@ public class GridCellEditor {
     }
 
     private void end() {
-        spreadsheetEditor.end();
         spreadsheetCellEditor.getEditor().focusedProperty().removeListener(endEditionListener);
         handle.getCellsViewSkin().getVBar().valueProperty().removeListener(endEditionListener);
         handle.getCellsViewSkin().getHBar().valueProperty().removeListener(endEditionListener);
@@ -229,92 +224,4 @@ public class GridCellEditor {
             endEdit(true);
         }
     };
-     
-    /**
-     * This editor is here to ensure that the cell editor 
-     * ({@link SpreadsheetCellEditor}) will always be displayed on top of every
-     * other Node. 
-     * 
-     * To ensure this, we must be sure that our cell is added to the last row
-     * so that it will not be covered by other node.
-     */
-    private class SpreadsheetEditor {
-
-        /***********************************************************************
-         * * Private Fields * *
-         **********************************************************************/
-        private GridRow original;
-        private boolean isMoved;
-
-        /**
-         * Number of rows currently displayed.
-         * 
-         * @return
-         */
-        private int getCellCount() {
-            return handle.getCellsViewSkin().getCellsSize();
-        }
-
-        private boolean addCell(CellView cell) {
-            GridRow lastRow = handle.getCellsViewSkin().getRow(getCellCount() - 1);
-
-            /**
-             * When we scroll to the very bottom, we may have several null/blank
-             * cell beyond the rowCount. So we must iterate over the cell
-             * backward till we found the last one suiting our needs.
-             * (see RT-31503)
-             */
-            if (lastRow.getIndex() >= handle.getView().getGrid().getRowCount()) {
-                lastRow = null;
-                int i = handle.getView().getGrid().getRowCount()-1;
-                while(i> 0 && (lastRow == null || lastRow.getIndex() >= handle.getView().getGrid().getRowCount())){
-                    lastRow = handle.getCellsViewSkin().getRow(i--);
-                }
-            }
-
-            if (lastRow != null) {
-                lastRow.addCell(cell);
-                return true;
-            }
-            return false;
-        }
-
-        /***********************************************************************
-         * * Public Methods * *
-         **********************************************************************/
-
-        /**
-         * In case the cell is spanning in rows. We want the cell to be fully
-         * accessible so we need to remove it from its tableRow and add it to
-         * the last row possible. Then we translate the cell so that it's
-         * invisible for the user.
-         */
-        public void startEdit() {
-            // Case when RowSpan if larger and we're not on the last row
-            if (modelCell != null && modelCell.getRowSpan() > 1 && modelCell.getRow() != getCellCount() - 1) {
-                original = (GridRow) viewCell.getTableRow();
-
-                final double temp = viewCell.getLocalToSceneTransform().getTy();
-                isMoved = addCell(viewCell);
-                if (isMoved) {
-                    viewCell.setTranslateY(temp - viewCell.getLocalToSceneTransform().getTy());
-                    original.putFixedColumnToBack();
-                }
-            }
-        }
-
-        /**
-         * When we have finish editing. We put the cell back to its right
-         * TableRow.
-         */
-        public void end() {
-            if (modelCell != null && modelCell.getRowSpan() > 1) {
-                viewCell.setTranslateY(0);
-                if (isMoved) {
-                    original.addCell(viewCell);
-                    original.putFixedColumnToBack();
-                }
-            }
-        }
-    }
 }

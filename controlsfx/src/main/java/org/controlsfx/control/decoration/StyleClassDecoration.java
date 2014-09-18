@@ -53,7 +53,7 @@ public class StyleClassDecoration extends Decoration {
      */
     public StyleClassDecoration(String... styleClass) {
         if (styleClass == null || styleClass.length == 0) {
-            throw new IllegalArgumentException("var-arg style class array must not be null or empty");
+            throw new IllegalArgumentException("var-arg style class array must not be null or empty"); //$NON-NLS-1$
         }
         this.styleClasses = styleClass;
     }

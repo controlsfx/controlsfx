@@ -27,7 +27,6 @@
 package org.controlsfx.dialog;
 
 import impl.org.controlsfx.ImplUtils;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,7 +37,6 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,6 +51,7 @@ import javafx.stage.Window;
 import com.sun.javafx.Utils;
 import com.sun.javafx.tk.Toolkit;
 
+@Deprecated
 class LightweightDialog extends FXDialog {
 
     /**************************************************************************
@@ -296,11 +295,11 @@ class LightweightDialog extends FXDialog {
         return lightweightDialog;
     }
     
-    public double getX() {
+    @Override public double getX() {
         return lightweightDialog.getLayoutX();
     }
     
-    public void setX(double x) {
+    @Override public void setX(double x) {
         lightweightDialog.setLayoutX(x);
     }
 
@@ -436,7 +435,7 @@ class LightweightDialog extends FXDialog {
                 getChildren().add(lightweightDialog);
             }
             
-            protected void layoutChildren() {
+            @Override protected void layoutChildren() {
                 final double w = getOverlayWidth();
                 final double h = getOverlayHeight();
                 

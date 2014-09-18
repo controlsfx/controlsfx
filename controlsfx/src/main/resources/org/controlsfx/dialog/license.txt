@@ -1,0 +1,7 @@
+Some of these images are from the Oxygen icon set.
+Oxygen icons are licensed under the 
+Creative Common Attribution-ShareAlike 3.0 License
+http://creativecommons.org/licenses/by-sa/3.0/
+
+For reference, these dialog icons were taken from
+http://websvn.kde.org/trunk/KDE/kdebase/runtime/pics/oxygen/?pathrev=706996

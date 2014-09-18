@@ -1,24 +1,9 @@
 import org.apache.tools.ant.filters.*
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'java'
-apply plugin: 'maven'
 apply plugin: 'application'
-
-apply from: 'mavenPublish.gradle'
-apply from: 'javafx.plugin'
-
-
-Properties commons = new Properties()
-commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
-
-group = commons.controlsfx_group
-version = commons.controlsfx_version
+apply from: '../javafx.plugin'
 
 applicationName = 'FXSampler'
-mainClassName = commons.fxsampler_mainClass
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+mainClassName = fxsampler_mainClass
 
 configurations {
     jdk
@@ -31,8 +16,8 @@ sourceSets {
 }
 
 dependencies {
-    compile group+":fxsampler:"+commons.fxsampler_version
-    compile group+":controlsfx:"+commons.controlsfx_version
+    compile group + ':' + fxsampler_name +':'  + fxsampler_version
+    compile group + ':' + controlsfx_name + ':' + version
 
     try {
         jdk files(jfxrtJar)
@@ -41,52 +26,11 @@ dependencies {
     }
 }
 
-compileJava {  
-    options.encoding = "UTF-8"
-}
-
 jar {
     manifest {
         attributes 'Implementation-Title': 'ControlsFX-Samples', 'Implementation-Version': project.version
     }
     from sourceSets.main.allJava
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.java
-    from sourceSets.main.resources
-    classifier = 'sources'
-}
-
-artifacts {
-    archives sourceJar
-    //archives javadocJar
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
-}
-
-// enumerate the samples at build time
-task enumerateSamples() {
-    doLast {
-        def samplesList = []
-        sourceSets.main.java.visit {
-            // could be improved:  we could load the class and check the hierarchy
-            if (!it.directory && it.file.text.contains(' extends SampleBase ') && it.path.contains("samples")) {
-                samplesList += it.path
-            }
-        }
-        println samplesList
-        File outputFile = new File(sourceSets.main.output.resourcesDir, 'fxsampler/samples/samples.txt')
-        outputFile.parentFile.mkdirs()
-        outputFile.text = samplesList.join('\n')
-    }
-}
-
-processResources.dependsOn(enumerateSamples)
-gradle.taskGraph.whenReady {
-    enumerateSamples.enabled = gradle.taskGraph.hasTask(":$project.name:jfxDeploy")
 }
 
 jfxJar {
@@ -106,7 +50,7 @@ javafx {
 
     appID 'HelloControlsFX'
     appName 'Hello ControlsFX'
-    mainClass 'fxsampler.FXSampler'
+    mainClass fxsampler_mainClass
 
     javaRuntime = '<NO RUNTIME>' // for now don't bundle a VM
 

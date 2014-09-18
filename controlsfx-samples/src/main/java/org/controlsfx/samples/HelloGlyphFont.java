@@ -29,68 +29,78 @@ package org.controlsfx.samples;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
-import static org.controlsfx.glyphfont.GlyphFontRegistry.glyph;
-
-import java.util.Map;
 
 public class HelloGlyphFont extends ControlsFXSample {
 
-	private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
+    static {
+        // Register a custom default font
+        GlyphFontRegistry.register("icomoon", HelloGlyphFont.class.getResourceAsStream("icomoon.ttf") , 16);
+    }
 
-	private GlyphFont icoMoon = new GlyphFont("icomoon", 16, getClass()
-			.getResourceAsStream("icomoon.ttf")){
 
-				@Override
-				public Map<String, Character> getGlyphs() {
-					return null;
-				}};
+    private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
+    private GlyphFont icoMoon = GlyphFontRegistry.font("icomoon");
 
-//	private static char FAW_TRASH = '\uf014';
-	private static char FAW_GEAR  = '\uf013';
+    //	private static char FAW_TRASH = '\uf014';
+    private static char FAW_GEAR  = '\uf013';
 //	private static char FAW_STAR  = '\uf005';
 
-	private static char IM_BOLD        = '\ue027';
-	private static char IM_UNDERSCORED = '\ue02b';
-	private static char IM_ITALIC      = '\ue13e';
+    private static char IM_BOLD        = '\ue027';
+    private static char IM_UNDERSCORED = '\ue02b';
+    private static char IM_ITALIC      = '\ue13e';
 
-	@Override
-	public String getSampleName() {
-		return "Glyph Font";
-	}
 
-	@Override
-	public String getJavaDocURL() {
-		return Utils.JAVADOC_BASE + "org/controlsfx/glyphfont/GlyphFont.html";
-	}
 
-	@Override
-	public Node getPanel(final Stage stage) {
+    @Override
+    public String getSampleName() {
+        return "Glyph Font";
+    }
 
-		VBox root = new VBox(10);
-		
-		root.setPadding(new Insets(10, 10, 10, 10));
-		root.setMaxHeight(Double.MAX_VALUE);
-		Label title = new Label("Using FontAwesome(CDN)");
-		root.getChildren().add(title);
-		ToolBar toolbar = new ToolBar(
-				new Button("", glyph("FontAwesome|TRASH")), 
-				new Button("", glyph("FontAwesome|STAR")),
-				new Button("", FontAwesome.Glyph.ANCHOR.create()),
-				new Button("", fontAwesome.fontColor(Color.RED).create(FAW_GEAR)) 
+    @Override
+    public String getJavaDocURL() {
+        return Utils.JAVADOC_BASE + "org/controlsfx/glyphfont/GlyphFont.html";
+    }
+
+    @Override
+    public Node getPanel(final Stage stage) {
+
+        VBox root = new VBox(10);
+
+        root.setPadding(new Insets(10, 10, 10, 10));
+        root.setMaxHeight(Double.MAX_VALUE);
+        Label title = new Label("Using FontAwesome(CDN)");
+        root.getChildren().add(title);
+        ToolBar toolbar = new ToolBar(
+
+                // There are many ways how you can define a Glyph:
+
+                new Button("", new Glyph("FontAwesome", "TRASH_ALT")),              // Use the Glyph-class with a icon name
+                new Button("", new Glyph("FontAwesome", FontAwesome.Glyph.STAR)),   // Use the Glyph-class with a known enum value
+                new Button("", Glyph.create("FontAwesome|BUG")),                    // Use the static Glyph-class create protocol
+                new Button("", fontAwesome.create("REBEL")),                        // Use the font-instance with a name
+                new Button("", fontAwesome.create(FontAwesome.Glyph.SMILE_ALT)),    // Use the font-instance with a enum
+                new Button("", fontAwesome.create(FAW_GEAR).color(Color.RED))       // Use the font-instance with a unicode char
         );
-		root.getChildren().add(toolbar);
-		title = new Label("Using IcoMoon (Local)");
-		root.getChildren().add(title);
+        root.getChildren().add(toolbar);
+        title = new Label("Using IcoMoon (Local)");
+        root.getChildren().add(title);
 
         Glyph effectGlyph = icoMoon.create(IM_UNDERSCORED)
                 .color(Color.BLUE)
@@ -102,18 +112,57 @@ public class HelloGlyphFont extends ControlsFXSample {
                 .size(48)
                 .useGradientEffect().useHoverEffect();
 
-		toolbar = new ToolBar(
-				new Button("", icoMoon.fontSize(16).create(IM_BOLD)),
-				new Button("", icoMoon.fontColor(Color.GREEN).fontSize(32).create(IM_UNDERSCORED)), 
-				new Button("", icoMoon.fontSize(48).create(IM_ITALIC)),
+        toolbar = new ToolBar(
+
+                // Since we have a custom font without named characters,
+                // we have to use unicode character codes for the icons:
+
+                new Button("", icoMoon.create(IM_BOLD).size(16)),
+                new Button("", icoMoon.create(IM_UNDERSCORED).color(Color.GREEN).size(32)),
+                new Button("", icoMoon.create(IM_ITALIC).size(48)),
                 new Button("", effectGlyph),
                 new Button("", effectGlyph2));
-		root.getChildren().add(toolbar);
-		return root;
+        root.getChildren().add(toolbar);
+        
+        
+        GridPane fontDemo = new GridPane();
+        fontDemo.setHgap(5);
+        fontDemo.setVgap(5);
+        int maxColumns = 10;
+        int col = 0;
+        int row = 0;
+        
+        for ( FontAwesome.Glyph glyph:  FontAwesome.Glyph.values() ){
+        	Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
+        	Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).sizeFactor(2).color(randomColor).useGradientEffect();
+        	Button button = new Button(glyph.name(), graphic);
+        	button.setContentDisplay(ContentDisplay.TOP);
+        	button.setMaxWidth(Double.MAX_VALUE);
+        	col = col % maxColumns + 1;
+        	if ( col == 1 ) row++;
+        	fontDemo.add( button, col, row);
+        	GridPane.setFillHeight(button, true);
+        	GridPane.setFillWidth(button, true);
+        }
+        
+        ScrollPane scroller = new ScrollPane(fontDemo);
+        scroller.setFitToWidth(true);
+        
+        TabPane tabs = new TabPane();
+        Tab tab = new Tab("FontAwesome Glyph Demo");
+        tab.setContent(scroller);
+        tabs.getTabs().add(tab);
 
-	}
+        
+        root.getChildren().add(tabs);
+        VBox.setVgrow(tabs, Priority.ALWAYS);
+        
+        return root;
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+    }
+    
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

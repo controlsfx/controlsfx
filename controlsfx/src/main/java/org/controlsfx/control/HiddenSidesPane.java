@@ -34,6 +34,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
+import javafx.util.Duration;
 
 /**
  * A pane used to display a full-size content node and four initially hidden
@@ -102,7 +103,10 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     /**
      * The property that stores the distance to the pane's edges that will
-     * trigger the apperance of the hidden side nodes.
+     * trigger the appearance of the hidden side nodes.<br>
+     * Setting the property to zero or a negative value will disable this
+     * functionality, so a hidden side can only be made visible with
+     * {@link #setPinnedSide(Side)}.
      * 
      * @return the trigger distance property
      */
@@ -120,26 +124,21 @@ public class HiddenSidesPane extends ControlsFXControl {
     }
 
     /**
-     * Set the value of the trigger distance property. The value must be larger
-     * than zero.
+     * Set the value of the trigger distance property. <br>
+     * Setting the property to zero or a negative value will disable this
+     * functionality, so a hidden side can only be made visible with
+     * {@link #setPinnedSide(Side)}.
      * 
-     * @throws IllegalArgumentException
-     *             if distance is smaller than zero.
      * @param distance
      *            the new value for the trigger distance property
      */
     public final void setTriggerDistance(double distance) {
-        if (distance <= 0) {
-            throw new IllegalArgumentException(
-                    "trigger distance must be larger than 0 but was " //$NON-NLS-1$
-                            + distance);
-        }
         triggerDistance.set(distance);
     }
 
     // Content node support.
 
-    private ObjectProperty<Node> content = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> content = new SimpleObjectProperty<>(this,
             "content"); //$NON-NLS-1$
 
     /**
@@ -173,7 +172,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // Top node support.
 
-    private ObjectProperty<Node> top = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> top = new SimpleObjectProperty<>(this,
             "top"); //$NON-NLS-1$
 
     /**
@@ -213,7 +212,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * 
      * @return the hidden node at the right side of the pane
      */
-    private ObjectProperty<Node> right = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> right = new SimpleObjectProperty<>(this,
             "right"); //$NON-NLS-1$
 
     /**
@@ -252,7 +251,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * 
      * @return the hidden node at the bottom side of the pane
      */
-    private ObjectProperty<Node> bottom = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> bottom = new SimpleObjectProperty<>(this,
             "bottom"); //$NON-NLS-1$
 
     /**
@@ -291,7 +290,7 @@ public class HiddenSidesPane extends ControlsFXControl {
      * 
      * @return the hidden node at the left side of the pane
      */
-    private ObjectProperty<Node> left = new SimpleObjectProperty<Node>(this,
+    private ObjectProperty<Node> left = new SimpleObjectProperty<>(this,
             "left"); //$NON-NLS-1$
 
     /**
@@ -324,7 +323,7 @@ public class HiddenSidesPane extends ControlsFXControl {
 
     // Pinned side support.
 
-    private ObjectProperty<Side> pinnedSide = new SimpleObjectProperty<Side>(
+    private ObjectProperty<Side> pinnedSide = new SimpleObjectProperty<>(
             this, "pinnedSide"); //$NON-NLS-1$
 
     /**
@@ -354,5 +353,74 @@ public class HiddenSidesPane extends ControlsFXControl {
      */
     public final void setPinnedSide(Side side) {
         pinnedSideProperty().set(side);
+    }
+
+    // slide in animation delay
+
+    private final ObjectProperty<Duration> animationDelay = new SimpleObjectProperty<>(
+            this, "animationDelay", Duration.millis(300)); //$NON-NLS-1$
+
+    /**
+     * Returns the animation delay property. The value of this property
+     * determines the delay before the hidden side slide in / slide out
+     * animation starts to play.
+     * 
+     * @return animation delay property
+     */
+    public final ObjectProperty<Duration> animationDelayProperty() {
+        return animationDelay;
+    }
+
+    /**
+     * Returns the animation delay
+     * 
+     * @return animation delay
+     */
+    public final Duration getAnimationDelay() {
+        return animationDelay.get();
+    }
+
+    /**
+     * Set the animation delay
+     * 
+     * @param duration
+     *            slide in animation delay
+     */
+    public final void setAnimationDelay(Duration duration) {
+        animationDelay.set(duration);
+    }
+
+    // slide in / slide out duration
+
+    private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(
+            this, "animationDuration", Duration.millis(200)); //$NON-NLS-1$
+
+    /**
+     * Returns the animation duration property. The value of this property
+     * determines the fade in time for a hidden side to become visible.
+     * 
+     * @return animation delay property
+     */
+    public final ObjectProperty<Duration> animationDurationProperty() {
+        return animationDuration;
+    }
+
+    /**
+     * Returns the animation delay
+     * 
+     * @return animation delay
+     */
+    public final Duration getAnimationDuration() {
+        return animationDuration.get();
+    }
+
+    /**
+     * Set the animation delay
+     * 
+     * @param duration
+     *            animation duration
+     */
+    public final void setAnimationDuration(Duration duration) {
+        animationDuration.set(duration);
     }
 }

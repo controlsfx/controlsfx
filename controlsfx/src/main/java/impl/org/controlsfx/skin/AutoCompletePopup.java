@@ -1,6 +1,7 @@
 package impl.org.controlsfx.skin;
 
 
+import com.sun.javafx.event.EventHandlerManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.collections.FXCollections;
@@ -14,8 +15,6 @@ import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
-
-import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * The auto-complete-popup provides an list of available suggestions in order
@@ -49,8 +48,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     @SuppressWarnings("serial")
     public static class SuggestionEvent<TE> extends Event {
         @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionEvent> SUGGESTION 
-        	= new EventType<SuggestionEvent>("SUGGESTION");
+        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<>("SUGGESTION"); //$NON-NLS-1$
 
         private final TE suggestion;
 
@@ -109,7 +107,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     public void show(Node node){
 
         if(node.getScene() == null || node.getScene().getWindow() == null)
-            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window.");
+            throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window."); //$NON-NLS-1$
 
         Window parent = node.getScene().getWindow();
         this.show(
@@ -122,17 +120,19 @@ public class AutoCompletePopup<T> extends PopupControl{
     }
 
     /**
+     * Set the string converter used to turn a generic suggestion into a string
      */
     public void setConverter(StringConverter<T> converter) {
 		this.converter = converter;
 	}
     
     /**
+     * Get the string converter used to turn a generic suggestion into a string
      */
 	public StringConverter<T> getConverter() {
 		return converter;
 	}
-    
+
 
     /***************************************************************************
      *                                                                         *
@@ -147,7 +147,7 @@ public class AutoCompletePopup<T> extends PopupControl{
     public final void setOnSuggestion(EventHandler<SuggestionEvent<T>> value) { onSuggestionProperty().set(value); }
     public final EventHandler<SuggestionEvent<T>> getOnSuggestion() { return onSuggestionProperty().get(); }
     private ObjectProperty<EventHandler<SuggestionEvent<T>>> onSuggestion = new ObjectPropertyBase<EventHandler<SuggestionEvent<T>>>() {
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override protected void invalidated() {
             eventHandlerManager.setEventHandler(SuggestionEvent.SUGGESTION, (EventHandler<SuggestionEvent>)(Object)get());
         }
@@ -159,7 +159,7 @@ public class AutoCompletePopup<T> extends PopupControl{
 
         @Override
         public String getName() {
-            return "onSuggestion";
+            return "onSuggestion"; //$NON-NLS-1$
         }
     };
 
@@ -175,11 +175,11 @@ public class AutoCompletePopup<T> extends PopupControl{
      *                                                                         *
      **************************************************************************/
 
-    public static final String DEFAULT_STYLE_CLASS = "auto-complete-popup";
+    public static final String DEFAULT_STYLE_CLASS = "auto-complete-popup"; //$NON-NLS-1$
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new AutoCompletePopupSkin<T>(this);
+        return new AutoCompletePopupSkin<>(this);
     }
 
 }

@@ -34,11 +34,18 @@ import javafx.scene.Node;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                NotificationPane.class.getResource("notificationpane.css").toExternalForm()); //$NON-NLS-1$
+    }
     
     private NotificationBar notificationBar;
     private Node content;
@@ -140,26 +147,32 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         }
     }
     
+    @Override
     protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.minWidth(height);
     };
     
+    @Override
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.minHeight(width);
     };
     
+    @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.prefWidth(height);
     };
     
+    @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.prefHeight(width);
     };
     
+    @Override
     protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.maxWidth(height);
     };
     
+    @Override
     protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return content == null ? 0 : content.maxHeight(width);
     };

@@ -47,7 +47,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  */
 public class HorizontalPicker extends StackPane {
 
-    private static final String PICKER_INDEX = "PickerIndex";
+    private static final String PICKER_INDEX = "PickerIndex"; //$NON-NLS-1$
 
     private final HorizontalHeader horizontalHeader;
 
@@ -99,7 +99,7 @@ public class HorizontalPicker extends StackPane {
         Label picker;
         if (pickerPile.isEmpty()) {
             picker = new Label();
-            picker.getStyleClass().add("picker-label");
+            picker.getStyleClass().add("picker-label"); //$NON-NLS-1$
             picker.setOnMouseClicked(pickerMouseEvent);
         } else {
             picker = pickerPile.pop();

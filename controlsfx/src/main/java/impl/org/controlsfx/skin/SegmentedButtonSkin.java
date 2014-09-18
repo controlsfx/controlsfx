@@ -37,25 +37,29 @@ import javafx.scene.layout.HBox;
 
 import org.controlsfx.control.SegmentedButton;
 
+import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>> {
     
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm()); //$NON-NLS-1$
+    }
+    
     private static final String ONLY_BUTTON = "only-button"; //$NON-NLS-1$
     private static final String LEFT_PILL   = "left-pill"; //$NON-NLS-1$
     private static final String CENTER_PILL = "center-pill"; //$NON-NLS-1$
     private static final String RIGHT_PILL  = "right-pill"; //$NON-NLS-1$
 
-    private final ToggleGroup group;
-    
     private final HBox container;
 
     public SegmentedButtonSkin(SegmentedButton control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
-        group = new ToggleGroup();
         container = new HBox();
         
         getChildren().add(container);
@@ -66,6 +70,12 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
                 updateButtons();
             }
         });
+        
+        control.toggleGroupProperty().addListener((observable, oldValue, newValue) -> {
+            getButtons().forEach((button) -> {
+                button.setToggleGroup(newValue);
+            });
+        });
     }
     
     private ObservableList<ToggleButton> getButtons() {
@@ -74,12 +84,16 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
     
     private void updateButtons() {
         ObservableList<ToggleButton> buttons = getButtons();
+        ToggleGroup group = getSkinnable().getToggleGroup();
         
         container.getChildren().clear();
         
         for (int i = 0; i < getButtons().size(); i++) {
             ToggleButton t = buttons.get(i);
-            t.setToggleGroup(group);
+            
+            if (group != null) {
+                t.setToggleGroup(group);
+            }
             
             t.getStyleClass().removeAll(ONLY_BUTTON, LEFT_PILL, CENTER_PILL, RIGHT_PILL);
             container.getChildren().add(t);

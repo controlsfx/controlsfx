@@ -33,6 +33,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -62,7 +63,9 @@ import org.controlsfx.validation.decoration.ValidationDecoration;
 
 public class HelloValidation extends ControlsFXSample {
 
+    TextField textField = new TextField();
 
+	
     @Override public String getSampleName() {
         return "Component Validation";
     }
@@ -102,7 +105,6 @@ public class HelloValidation extends ControlsFXSample {
         int row = 0;
 
         // text field
-        TextField textField = new TextField();
         validationSupport.registerValidator(textField, Validator.createEmptyValidator("Text is required"));
         root.add(new Label("TextField"), 0, row);
         root.add(textField, 1, row);
@@ -227,6 +229,14 @@ public class HelloValidation extends ControlsFXSample {
         grid.add(validationDecoratorLabel, 0, row);
         grid.add(decoratorBox, 1, row);
         GridPane.setHgrow(decoratorBox, Priority.ALWAYS);
+        
+        row++;
+        Button btnToggleRequired = new Button("Toggle tetxField required status");
+        btnToggleRequired.setOnAction(e -> {
+            boolean required = ValidationSupport.isRequired(textField);
+        	ValidationSupport.setRequired(textField, !required); 
+        });
+        grid.add(btnToggleRequired, 1, row, 1, 1);
 
         return grid;
     }

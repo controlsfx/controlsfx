@@ -26,6 +26,10 @@
  */
 package org.controlsfx.dialog;
 
+import static org.controlsfx.dialog.Dialog.STYLE_CLASS_CROSS_PLATFORM;
+import static org.controlsfx.dialog.Dialog.STYLE_CLASS_NATIVE;
+import static org.controlsfx.dialog.Dialog.STYLE_CLASS_UNDECORATED;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +48,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -67,8 +70,7 @@ import javafx.util.Duration;
 
 import org.controlsfx.tools.Platform;
 
-import static org.controlsfx.dialog.Dialog.*;
-
+@Deprecated
 abstract class FXDialog {
     
     /**************************************************************************
@@ -77,13 +79,13 @@ abstract class FXDialog {
      * 
      **************************************************************************/
     
-    protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("dialogs.css"); //$NON-NLS-1$
+    protected static final URL DIALOGS_CSS_URL = FXDialog.class.getResource("old-dialogs.css"); //$NON-NLS-1$
     protected static final int HEADER_HEIGHT = 28;
     
     public static final List<String> COMMON_STYLE_CLASSES;
     static {
         COMMON_STYLE_CLASSES = Collections.unmodifiableList(
-            Arrays.asList("root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight"));
+            Arrays.asList("root", "dialog", "decorated-root", "windows" ,"heavyweight", "lightweight")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
     }
     
     
@@ -112,7 +114,7 @@ abstract class FXDialog {
     
     // shake support
     private double initialX = 0;
-    private final DoubleProperty shakeProperty = new SimpleDoubleProperty(this, "shakeProperty", 0.0) {
+    private final DoubleProperty shakeProperty = new SimpleDoubleProperty(this, "shakeProperty", 0.0) { //$NON-NLS-1$
         @Override protected void invalidated() {
             setX(initialX + shakeProperty.get() * 25);
         }
@@ -397,7 +399,7 @@ abstract class FXDialog {
         }
         
         updateLock = true;
-        ObservableList<String> styleClasses = getStyleClass();
+//        ObservableList<String> styleClasses = getStyleClass();
         
         if (removedStyles != null && ! removedStyles.isEmpty()) {
             // remove styling
@@ -408,15 +410,15 @@ abstract class FXDialog {
             // add styling
             for (String newStyle : addedStyles) {
                 switch (newStyle) {
-                    case "cross-platform": {
+                    case "cross-platform": { //$NON-NLS-1$
                         setCrossPlatformStyleEnabled(true);
                         break;
                     }
-                    case "native": {
+                    case "native": { //$NON-NLS-1$
                         setNativeStyleEnabled(true);
                         break;
                     }
-                    case "undecorated": {
+                    case "undecorated": { //$NON-NLS-1$
                         setUndecoratedStyleEnabled(true);
                         break;
                     }

@@ -52,8 +52,7 @@ public class SimpleLocalizedStringProperty extends SimpleStringProperty {
 		super(bean, name, initialValue);
 	}
 
-	public String getValue() {
+	@Override public String getValue() {
 		return Localization.localize(super.getValue());
 	}
-
 }

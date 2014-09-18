@@ -79,7 +79,7 @@ abstract class AbstractRatioRespectingChangeStrategy extends AbstractBeginEndChe
      */
     protected final double getRatio() {
         if (!ratioFixed)
-            throw new IllegalStateException("The ratio is not fixed.");
+            throw new IllegalStateException("The ratio is not fixed."); //$NON-NLS-1$
         return ratio;
     }
 

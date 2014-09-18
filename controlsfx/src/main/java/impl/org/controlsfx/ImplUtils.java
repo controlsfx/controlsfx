@@ -62,7 +62,7 @@ public class ImplUtils {
     // The end result is that we've forced in the injectedParent node above parent.
     public static void injectPane(Parent parent, Parent injectedParent, boolean useReflection) {
         if (parent == null) {
-            throw new IllegalArgumentException("parent can not be null");
+            throw new IllegalArgumentException("parent can not be null"); //$NON-NLS-1$
         }
         
         ObservableList<Node> ownerParentChildren = getChildren(parent.getParent(), useReflection);
@@ -105,28 +105,36 @@ public class ImplUtils {
         } else if (p instanceof Control) {
             Control c = (Control) p;
             Skin<?> s = c.getSkin();
-            children = s instanceof SkinBase ? ((SkinBase<?>)s).getChildren() : null;
+            children = s instanceof SkinBase ? ((SkinBase<?>)s).getChildren() : getChildrenReflectively(p);
         } else if (useReflection) {
             // we really want to avoid using this!!!!
-            try {
-                Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
-                
-                if (getChildrenMethod != null) {
-                    if (! getChildrenMethod.isAccessible()) {
-                        getChildrenMethod.setAccessible(true);
-                    }
-                    children = (ObservableList<Node>) getChildrenMethod.invoke(p);
-                } else {
-                    // uh oh, trouble
-                }
-            } catch (ReflectiveOperationException | IllegalArgumentException e) {
-            	throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e);
-            }
+            children = getChildrenReflectively(p);
         }
         
         if (children == null) {
-            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() + 
-                                       ". useReflection is set to " + useReflection);
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() +  //$NON-NLS-1$
+                                       ". useReflection is set to " + useReflection); //$NON-NLS-1$
+        }
+        
+        return children;
+    }
+    
+    public static ObservableList<Node> getChildrenReflectively(Parent p) {
+        ObservableList<Node> children = null;
+        
+        try {
+            Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
+            
+            if (getChildrenMethod != null) {
+                if (! getChildrenMethod.isAccessible()) {
+                    getChildrenMethod.setAccessible(true);
+                }
+                children = (ObservableList<Node>) getChildrenMethod.invoke(p);
+            } else {
+                // uh oh, trouble
+            }
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e); //$NON-NLS-1$
         }
         
         return children;

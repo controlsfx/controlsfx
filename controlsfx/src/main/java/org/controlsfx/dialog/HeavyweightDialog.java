@@ -36,7 +36,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -56,6 +55,7 @@ import javafx.stage.Window;
 import org.controlsfx.tools.Platform;
 
 // Not public API (class is package-protected), so no JavaDoc is required.
+@Deprecated
 class HeavyweightDialog extends FXDialog {
 
     /**************************************************************************
@@ -294,11 +294,11 @@ class HeavyweightDialog extends FXDialog {
         return stage.getScene().getRoot();
     }
     
-    public double getX() {
+    @Override public double getX() {
         return stage.getX();
     }
     
-    public void setX(double x) {
+    @Override public void setX(double x) {
         stage.setX(x);
     }
     
@@ -338,14 +338,4 @@ class HeavyweightDialog extends FXDialog {
     void setEffect(Effect e) {
         // not implemented for heavyweight dialogs
     }
-
-    
-    
-    /***************************************************************************
-     *                                                                         *
-     * Stylesheet Handling                                                     *
-     *                                                                         *
-     **************************************************************************/
-    private static final PseudoClass ACTIVE_PSEUDO_CLASS = PseudoClass.getPseudoClass("active"); //$NON-NLS-1$
-
 }

@@ -66,7 +66,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
      * We manually specify the focus traversal keys because Slider has        *
      * different usage for up/down arrow keys.                                *
      *************************************************************************/
-    private static final List<KeyBinding> RANGESLIDER_BINDINGS = new ArrayList<KeyBinding>();
+    private static final List<KeyBinding> RANGESLIDER_BINDINGS = new ArrayList<>();
     static {
         RANGESLIDER_BINDINGS.add(new KeyBinding(F4, "TraverseDebug").alt().ctrl().shift()); //$NON-NLS-1$
 

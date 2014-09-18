@@ -27,7 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridViewSkin;
-import impl.org.controlsfx.version.VersionChecker;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,12 +142,12 @@ public class GridView<T> extends ControlsFXControl {
         return new GridViewSkin<>(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override protected String getUserAgentStylesheet() {
-        return GridView.class.getResource("gridview.css").toExternalForm(); //$NON-NLS-1$
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override protected String getUserAgentStylesheet() {
+//        return GridView.class.getResource("gridview.css").toExternalForm(); //$NON-NLS-1$
+//    }
     
     
     
@@ -370,7 +369,7 @@ public class GridView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<Callback<GridView<T>, GridCell<T>>> cellFactoryProperty() {
         if (cellFactory == null) {
-            cellFactory = new SimpleObjectProperty<Callback<GridView<T>, GridCell<T>>>(this, "cellFactory"); //$NON-NLS-1$
+            cellFactory = new SimpleObjectProperty<>(this, "cellFactory"); //$NON-NLS-1$
         }
         return cellFactory;
     }
@@ -408,7 +407,7 @@ public class GridView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<ObservableList<T>> itemsProperty() {
         if (items == null) {
-            items = new SimpleObjectProperty<ObservableList<T>>(this, "items"); //$NON-NLS-1$
+            items = new SimpleObjectProperty<>(this, "items"); //$NON-NLS-1$
         }
         return items;
     }
@@ -537,7 +536,7 @@ public class GridView<T> extends ControlsFXControl {
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
         static {
             final List<CssMetaData<? extends Styleable, ?>> styleables =
-                new ArrayList<CssMetaData<? extends Styleable, ?>>(Control.getClassCssMetaData());
+                new ArrayList<>(Control.getClassCssMetaData());
             styleables.add(HORIZONTAL_CELL_SPACING);
             styleables.add(VERTICAL_CELL_SPACING);
             styleables.add(CELL_WIDTH);

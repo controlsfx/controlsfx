@@ -1,50 +1,25 @@
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'osgi'
-apply plugin: 'maven'
-
-apply from: 'mavenPublish.gradle'
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
-    compile localGroovy()
-    compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-        exclude group: 'org.codehaus.groovy', module: 'groovy'
-    }
-    testCompile 'junit:junit:[4,)'
-}
-
-test {
-    testLogging {
-        // Show that tests are run in the command-line output
-        events 'started', 'passed'
+    compile 'org.controlsfx:openjfx-dialogs:1.0.1'
+    try {
+        jdk files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        // javafx plugin will provide in this case
     }
 }
 
-Properties commons = new Properties()
-commons.load(new FileInputStream("$rootDir/../controlsfx-build.properties"))
+//ext {
+//  pomExclusions = ['http-builder']
+//}
 
-group = commons.controlsfx_group
-version = commons.controlsfx_version
 
 ext {
-    specification_version = commons.controlsfx_specification_version
-    specification_title = commons.controlsfx_specification_title
-    implementation_version = commons.controlsfx_version
     transifex_username = ""
     transifex_password = ""
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 configurations {
+
     jdk
     
     if (project.hasProperty("transifex.username")) {
@@ -61,13 +36,6 @@ sourceSets {
     }
 }
 
-dependencies {
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        // javafx plugin will provide in this case
-    }
-}
 
 task downloadTranslations << {
     description = "Download translations from Transifex"
@@ -82,8 +50,8 @@ task downloadTranslations << {
         logger.warn "----------------------------------------------------------"
     } else {
         javaexec {
-            main = 'impl.org.controlsfx.transifex.Transifex'
-            classpath = sourceSets.main.runtimeClasspath + files('build/classes/groovy')
+            main = 'impl.build.transifex.Transifex'
+            classpath = sourceSets.main.runtimeClasspath
             systemProperty 'transifex.username', transifex_username
             systemProperty 'transifex.password', transifex_password
         }
@@ -108,24 +76,16 @@ task compileCSS << {
 
 processResources.finalizedBy(compileCSS)
 
-compileGroovy {
-    destinationDir = file('build/classes/groovy')
-}
-
-compileJava {
-    options.encoding = "UTF-8"
-}
-
 javadoc {
     exclude 'impl/*'
-    failOnError = true
+    //failOnError = true
     classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
     
     options.windowTitle("ControlsFX Project ${version}")
     options.links("http://docs.oracle.com/javase/8/docs/api/");
     options.links("http://docs.oracle.com/javase/8/javafx/api/");
     options.addBooleanOption("Xdoclint:none").setValue(true);
-    options.overview("src/main/docs/overview.html");
+    options.overview("${projectDir}/src/main/docs/overview.html");
     
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
@@ -144,13 +104,14 @@ jar {
     exclude '**/64/*'
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
+    exclude '**/impl/build/**'
 
     manifest { // the manifest of the default jar is of type OsgiManifest
         attributes (\
             'Specification-Title': specification_title,\
             'Specification-Version': specification_version,\
             'Implementation-Title': 'ControlsFX',\
-            'Implementation-Version': implementation_version,\
+            'Implementation-Version': version,\
             'Bundle-Name': 'ControlsFX'
         )
         instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
@@ -160,24 +121,25 @@ jar {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.java
-    from sourceSets.main.resources
-    classifier = 'sources'
-}
+/*
+def pomExclusions = []
 
-task javadocJar(type: Jar) {
-    dependsOn javadoc
-    from javadoc.destinationDir
-    classifier = 'javadoc'
-}
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
+task writeNewPom << {
+    pom {
+        project {
+            inceptionYear '2008'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+        whenConfigured{
+           dependencies = dependencies.findAll {dep -> !pomExclusions.contains(dep.artifactId) } 
+        }
+    }.writeTo("$buildDir/newpom.xml")
 }
-
-artifacts {
-    archives sourceJar
-    archives javadocJar
-}
-
+*/

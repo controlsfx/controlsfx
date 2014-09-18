@@ -37,7 +37,15 @@ import javafx.scene.layout.Priority;
 
 import org.controlsfx.control.StatusBar;
 
+import com.sun.javafx.css.StyleManager;
+
 public class StatusBarSkin extends SkinBase<StatusBar> {
+    
+    static {
+        // refer to ControlsFXControl for why this is necessary
+        StyleManager.getInstance().addUserAgentStylesheet(
+                StatusBar.class.getResource("statusbar.css").toExternalForm()); //$NON-NLS-1$
+    }
 
     private HBox leftBox;
     private HBox rightBox;
@@ -48,10 +56,10 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
         super(statusBar);
 
         leftBox = new HBox();
-        leftBox.getStyleClass().add("left-items");
+        leftBox.getStyleClass().add("left-items"); //$NON-NLS-1$
 
         rightBox = new HBox();
-        rightBox.getStyleClass().add("right-items");
+        rightBox.getStyleClass().add("right-items"); //$NON-NLS-1$
 
         progressBar = new ProgressBar();
         progressBar.progressProperty().bind(statusBar.progressProperty());
@@ -62,7 +70,7 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         label.textProperty().bind(statusBar.textProperty());
         label.graphicProperty().bind(statusBar.graphicProperty());
-        label.getStyleClass().add("status-label");
+        label.getStyleClass().add("status-label"); //$NON-NLS-1$
 
         leftBox.getChildren().setAll(getSkinnable().getLeftItems());
 

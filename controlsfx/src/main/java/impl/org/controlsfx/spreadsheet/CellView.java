@@ -26,7 +26,9 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Stack;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
@@ -41,6 +43,7 @@ import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableView;
@@ -50,6 +53,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -70,9 +74,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     private static final String ANCHOR_PROPERTY_KEY = "table.anchor"; //$NON-NLS-1$
     private static final int TOOLTIP_MAX_WIDTH = 400;
-    private static final int WRAP_HEIGHT = 35;
-    private static final Duration FADE_DURATION = Duration.millis(500);
+    private static final Duration FADE_DURATION = Duration.millis(200);
 
+    private static final Stack<Tooltip> tooltipStack = new Stack<>();
+    
     static TablePositionBase<?> getAnchor(Control table, TablePositionBase<?> focusedCell) {
         return hasAnchor(table) ? (TablePositionBase<?>) table.getProperties().get(ANCHOR_PROPERTY_KEY) : focusedCell;
     }
@@ -81,20 +86,29 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         return table.getProperties().get(ANCHOR_PROPERTY_KEY) != null;
     }
 
+    static void setAnchor(Control table, TablePositionBase anchor) {
+        if (table != null && anchor == null) {
+            removeAnchor(table);
+        } else {
+            table.getProperties().put(ANCHOR_PROPERTY_KEY, anchor);
+        }
+    }
+    
+    static void removeAnchor(Control table) {
+        table.getProperties().remove(ANCHOR_PROPERTY_KEY);
+    }
     /***************************************************************************
      * * Constructor * *
      **************************************************************************/
     public CellView(SpreadsheetHandle handle) {
         this.handle = handle;
-        hoverProperty().addListener(hoverChangeListener);
         // When we detect a drag, we start the Full Drag so that other event
         // will be fired
         this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
-
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
         itemProperty().addListener(itemChangeListener);
-        heightProperty().addListener(wrapHeightChangeListener);
+        setWrapText(true);
     }
 
     /***************************************************************************
@@ -114,10 +128,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         final SpreadsheetView spv = handle.getView();
         final Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
+        //FIXME with the reverse algorithm in virtualFlow, is this still necessary?
         if (type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
 
             /**
-             * We may come to the situation where this methods is called two
+             * We may come to the situation where this method is called two
              * times. One time by the row inside the VirtualFlow. And another by
              * the row inside myFixedCells used by our GridVirtualFlow.
              * 
@@ -178,7 +193,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     @Override
     public void updateItem(final SpreadsheetCell item, boolean empty) {
         final boolean emptyRow = getTableView().getItems().size() < getIndex() + 1;
-
         /**
          * don't call super.updateItem() because it will trigger cancelEdit() if
          * the cell is being edited. It causes calling commitEdit() ALWAYS call
@@ -192,6 +206,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             updateSelected(false);
         }
         if (empty && emptyRow) {
+            textProperty().unbind();
             setText(null);
             // do not nullify graphic here. Let the TableRow to control cell
             // dislay
@@ -202,22 +217,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             if (item.getGraphic() == null) {
                 setGraphic(null);
             }
-
-            // Sometimes the hoverProperty is not called on exit. So the cell is
-            // affected to a new Item but
-            // the hover is still activated. So we fix it now.
-            if (isHover()) {
-                setHoverPublic(false);
-            }
         }
     }
-
-//    @Override
-//    public String toString() {
-//        //FIXME
-//        return getItem().getRow() + "/" + getItem().getColumn(); //$NON-NLS-1$
-//
-//    }
 
     /**
      * Called in the gridRowSkinBase when doing layout This allow not to
@@ -228,21 +229,39 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // We reset the settings
         textProperty().bind(cell.textProperty());
         setCellGraphic(cell);
+
+        Optional<String> tooltipText = cell.getTooltip();
+        String trimTooltip = tooltipText.isPresent() ? tooltipText.get().trim() : null;
         
-        Optional<String> tooltip = cell.getTooltip();
-        if(tooltip.isPresent() && !tooltip.get().trim().isEmpty()){
+        if (trimTooltip != null && !trimTooltip.isEmpty()) {
             /**
-            * Ensure that modification of ToolTip are set on the JFX thread
-            * because an exception can be thrown otherwise. 
-            */
-            getValue(()->{
-                       Tooltip toolTip = new Tooltip(tooltip.get());
-                       toolTip.setWrapText(true);
-                       toolTip.setMaxWidth(TOOLTIP_MAX_WIDTH);
-                       setTooltip(toolTip);
-               }
-            );
-        }else{
+             * Here we check if the Tooltip has not been created in order NOT TO
+             * re-create it for nothing as it is a really time-consuming
+             * operation.
+             */
+            Tooltip tooltip = getAvailableTooltip();
+            if (tooltip != null) {
+                if (!Objects.equals(tooltip.getText(), trimTooltip)) {
+                    getTooltip().setText(trimTooltip);
+                }
+            } else {
+                /**
+                 * Ensure that modification of ToolTip are set on the JFX thread
+                 * because an exception can be thrown otherwise.
+                 */
+                getValue(() -> {
+                    Tooltip newTooltip = new Tooltip(tooltipText.get());
+                    newTooltip.setWrapText(true);
+                    newTooltip.setMaxWidth(TOOLTIP_MAX_WIDTH);
+                    setTooltip(newTooltip);
+                }
+                );
+            }
+        } else {
+            //We save that tooltip
+            if(getTooltip() != null){
+                tooltipStack.push(getTooltip());
+            }
             setTooltip(null);
         }
         // We want the text to wrap onto another line
@@ -261,49 +280,47 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
 
     /**
-     * FIXME
-     * We got a problem right now with wrapping values because if the height of the row is
-     * too small for the text, it is not rendered. And this bug is not happening when we set
-     * the wrap property to false.
-     * 
-     * So this is a work-around in order to set the wrap property only if this has a bit of sense,
-     * aka, the height could allow a second line.
+     * See if a tootlip is available (either on the TableCell already, or in the
+     * Stack). And then set it to the TableCell.
+     *
+     * @return
      */
-     private final ChangeListener<Number> wrapHeightChangeListener = new ChangeListener<Number>() {
-
-        @Override
-        public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-            if (t1.doubleValue() > WRAP_HEIGHT) {
-                setWrapText(true);
-            } else {
-                setWrapText(false);
-            }
+    private Tooltip getAvailableTooltip(){
+        if(getTooltip() != null){
+            return getTooltip();
         }
-    };
+        if(!tooltipStack.isEmpty()){
+            Tooltip tooltip = tooltipStack.pop();
+            setTooltip(tooltip);
+            return tooltip;
+        }
+        return null;
+    }
+    
     private void setCellGraphic(SpreadsheetCell item) {
 
         if (isEditing()) {
             return;
         }
-        if (item.getGraphic() != null) {
+        Node graphic = item.getGraphic();
+        if (graphic != null) {
             /**
-             * FIXME To be removed in JDK8u20. This workaround is added for the
-             * first row containing a graphic because for an unknown reason, the
-             * graphic is translated to a negative value so it's not fully
-             * visible. So we add those listener that watch those changes, and
-             * try to get the previous value (the right one) if the new value
-             * goes out of bounds.
+             * This workaround is added for the first row containing a graphic
+             * because for an unknown reason, the graphic is translated to a
+             * negative value so it's not fully visible. So we add those
+             * listener that watch those changes, and try to get the previous
+             * value (the right one) if the new value goes out of bounds.
              */
             if (item.getRow() == 0) {
-                item.getGraphic().layoutXProperty().removeListener(new WeakChangeListener<>(firstRowLayoutXListener));
-                item.getGraphic().layoutXProperty().addListener(new WeakChangeListener<>(firstRowLayoutXListener));
+                graphic.layoutXProperty().removeListener(firstRowLayoutXListener);
+                graphic.layoutXProperty().addListener(firstRowLayoutXListener);
 
-                item.getGraphic().layoutYProperty().removeListener(firstRowLayoutYListener);
-                item.getGraphic().layoutYProperty().addListener(firstRowLayoutYListener);
+                graphic.layoutYProperty().removeListener(firstRowLayoutYListener);
+                graphic.layoutYProperty().addListener(firstRowLayoutYListener);
             }
             
-            if (item.getGraphic() instanceof ImageView) {
-                ImageView image = (ImageView) item.getGraphic();
+            if (graphic instanceof ImageView) {
+                ImageView image = (ImageView) graphic;
                 image.setCache(true);
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
@@ -315,18 +332,21 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                         new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
                                 image.getImage().getWidth()).otherwise(widthProperty()));
                 }
-                setGraphic(image);
-            } else if (item.getGraphic() instanceof Node) {
-                setGraphic(item.getGraphic());
+            //If we have a Region and no text, we force it to take full space.    
+            } else if (graphic instanceof Region && item.getItem() == null) {
+                Region region = (Region) graphic;
+                region.prefHeightProperty().bind(heightProperty());
+                region.prefWidthProperty().bind(widthProperty());
             }
+            setGraphic(graphic);
             /**
              * In case of a resize of the column, we have new cells that steal
              * the image from the original TableCell. So we check here if we are
              * not in that case so that the Graphic of the SpreadsheetCell will
              * always be on the latest tableView and therefore fully visible.
              */
-            if (!getChildren().contains(item.getGraphic())) {
-                getChildren().add(item.getGraphic());
+            if (!getChildren().contains(graphic)) {
+                getChildren().add(graphic);
             }
         } else {
             setGraphic(null);
@@ -351,19 +371,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     };
     
-    /**
-     * Set this SpreadsheetCell hoverProperty
-     * 
-     * @param hover
-     */
-    private void setHoverPublic(boolean hover) {
-        this.setHover(hover);
-        // We need to tell the SpreadsheetRow where this SpreadsheetCell is in
-        // to be in Hover
-        // Otherwise it's will not be visible
-        ((GridRow) this.getTableRow()).setHoverPublic(hover);
-    }
-
     /**
      * Return an instance of Editor specific to the Cell type We are not using
      * the build-in editor-Cell because we cannot know in advance which editor
@@ -392,55 +399,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
         }else{
             return null;
-        }
-    }
-
-    /**
-     * A SpreadsheetCell is being hovered and we need to re-route the signal.
-     * 
-     * @param cell
-     *            The DataCell needed to be hovered.
-     * @param hover
-     */
-    private void hoverGridCell(SpreadsheetCell cell) {
-        CellView gridCell;
-
-        final GridViewSkin sps = handle.getCellsViewSkin();
-        final GridRow row = sps.getRow(0);// spv.getFixedRows().size());
-
-        if (sps.getCellsSize() != 0 && row.getIndex() <= cell.getRow()) {
-            // We want to get the top of the spanned cell, so we need
-            // to access the difference between where we want to go and the
-            // first visibleRow
-            final GridRow rightRow = sps.getRow(cell.getRow() - row.getIndex());
-
-            if (rightRow != null) {// Sometime when scrolling fast it's null
-                                   // so..
-                gridCell = rightRow.getGridCell(cell.getColumn());
-            } else {
-                gridCell = row.getGridCell(cell.getColumn());
-            }
-        } else { // If it's not, then it's the firstkey
-            gridCell = row.getGridCell(cell.getColumn());
-        }
-
-        if (gridCell != null) {
-            gridCell.setHoverPublic(true);
-            GridCellEditor editor = sps.getSpreadsheetCellEditorImpl();
-            editor.setLastHover(gridCell);
-        }
-    }
-
-    /**
-     * Set Hover to false to the previous Cell we force to be hovered
-     */
-    private void unHoverGridCell() {
-        // If the top of the spanned cell is visible, then no problem
-        final GridViewSkin sps = handle.getCellsViewSkin();
-        GridCellEditor editor = sps.getSpreadsheetCellEditorImpl();
-        CellView lastHover = editor.getLastHover();
-        if (editor.getLastHover() != null) {
-            lastHover.setHoverPublic(false);
         }
     }
 
@@ -473,7 +431,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @param e
      */
     private void dragSelect(MouseEvent e) {
-
         // If the mouse event is not contained within this tableCell, then
         // we don't want to react to it.
         if (!this.contains(e.getX(), e.getY())) {
@@ -534,10 +491,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             // clear selection, but maintain the anchor
             if (!e.isShortcutDown())
                 sm.clearSelection();
-
             if (minColumn != -1 && maxColumn != -1)
                 sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,
                         tableView.getColumns().get(maxColumn));
+            setAnchor(tableView, anchor);
         }
 
     }
@@ -548,7 +505,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * 
      * @param runnable
      */
-    static void getValue(final Runnable runnable) {
+    public static void getValue(final Runnable runnable) {
         if (Platform.isFxApplicationThread()) {
             runnable.run();
         } else {
@@ -564,7 +521,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private final EventHandler<MouseEvent> startFullDragEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent arg0) {
-            startFullDrag();
+            if (handle.getGridView().getSelectionModel().getSelectionMode().equals(SelectionMode.MULTIPLE)) {
+                setAnchor(getTableView(), getTableView().getFocusModel().getFocusedCell());
+                startFullDrag();
+            }
         }
     };
     
@@ -575,24 +535,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     };
     
-    private final ChangeListener<Boolean> hoverChangeListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
-            final int row = getIndex();
-            if (getItem() == null) {
-                getTableRow().requestLayout();
-                // We only need to re-route if the rowSpan is large because
-                // it's the only case where it's not handled correctly.
-            } else if (getItem().getRowSpan() > 1) {
-                // If we are not at the top of the Spanned Cell
-                if (t1 && row != getItem().getRow()) {
-                    hoverGridCell(getItem());
-                } else if (!t1 && row != getItem().getRow()) {
-                    unHoverGridCell();
-                }
-            }
-        }
-    };
     private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
 
         @Override

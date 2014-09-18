@@ -28,7 +28,10 @@ package org.controlsfx.validation;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.scene.control.Control;
 
@@ -40,6 +43,18 @@ import javafx.scene.control.Control;
  * @param <T> type of the controls value
  */
 public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
+    
+    /**
+     * Combines the given validators into a single Validator instance. 
+     * @param validators the validators to combine
+     * @return a Validator instance
+     */
+    @SafeVarargs
+    static <T> Validator<T> combine(Validator<T>... validators) {
+        return (control, value) -> Stream.of(validators)
+            .map(validator -> validator.apply(control, value))
+            .collect(Collectors.reducing(new ValidationResult(), ValidationResult::combine));
+    }
 
     /**
      * Factory method to create a validator, which checks if value exists. 
@@ -85,6 +100,32 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
         return createEqualsValidator(message, Severity.ERROR, values);
     }
     
+    /**
+     * Factory method to create a validator, which evaluates the value validity with a given predicate.
+     * Error is created if the evaluation is <code>false</code>.
+     * @param message text of a message to be created if value is invalid
+     * @param predicate the predicate to be used for the value validity evaluation.
+     * @return new validator
+     */
+    static <T> Validator<T> createPredicateValidator(Predicate<T> predicate, String message) {
+        return createPredicateValidator(predicate, message, Severity.ERROR);
+    }
+    
+    /**
+     * Factory method to create a validator, which evaluates the value validity with a given predicate.
+     * Error is created if the evaluation is <code>false</code>.
+     * @param message text of a message to be created if value is invalid
+     * @param predicate the predicate to be used for the value validity evaluation.
+     * @param severity severity of a message to be created if value is invalid
+     * @return new validator
+     */
+    static <T> Validator<T> createPredicateValidator(Predicate<T> predicate, String message, Severity severity) {
+        return (control, value) -> ValidationResult.fromMessageIf(
+            control, message,
+            severity,
+            predicate.test(value) == false);
+    }
+
     /**
      * Factory method to create a validator, which checks the value against a given regular expression.
      * Error is created if the value is <code>null</code> or the value does not match the pattern.

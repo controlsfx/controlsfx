@@ -357,7 +357,7 @@ import org.controlsfx.validation.Validator;
  * 
  * <pre>
  * {@code 
- * if (response == Dialog.Actions.OK) {
+ * if (response == Dialog.Actions.YES) {
  *     // ... submit user input
  * } else {
  *     // ... user cancelled, reset form to default
@@ -387,6 +387,7 @@ import org.controlsfx.validation.Validator;
  * @see Action
  * @see Optional
  */
+@Deprecated
 public final class Dialogs {
 
     /**
@@ -394,7 +395,7 @@ public final class Dialogs {
      * to specify that the default text for the dialog should be used, where the default text is
      * specific to the type of dialog being shown.
      */
-    public static final String USE_DEFAULT = "$$$";
+    public static final String USE_DEFAULT = "$$$"; //$NON-NLS-1$
 
     private Object owner;
     private String title = USE_DEFAULT;
@@ -541,7 +542,7 @@ public final class Dialogs {
      */
     public Dialogs styleClass(String styleClass) {
         if (styleClasses == null) {
-            styleClasses = new ArrayList<String>();
+            styleClasses = new ArrayList<>();
         }
         styleClasses.add(styleClass);
         return this;
@@ -608,12 +609,12 @@ public final class Dialogs {
         
         dlg.getActions().clear();
         
-        Action openExceptionAction = new Action(localize(asKey("exception.button.label")), ae -> {
+        Action openExceptionAction = new Action(localize(asKey("exception.button.label")), ae -> { //$NON-NLS-1$
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             exception.printStackTrace(pw);
             String moreDetails = sw.toString();
-            new ExceptionDialog((Window)owner, moreDetails).show();
+            new ExceptionDialogImpl((Window)owner, moreDetails).show();
         });
         ButtonBar.setType(openExceptionAction, ButtonType.HELP_2);
         dlg.getActions().add(openExceptionAction);
@@ -643,7 +644,7 @@ public final class Dialogs {
      * @return Optional of text from input field or Optional.EMPTY if dialog is cancelled 
      */
     public Optional<String> showTextInput() {
-        return showTextInput("");
+        return showTextInput(""); //$NON-NLS-1$
     }
 
     /**
@@ -661,14 +662,14 @@ public final class Dialogs {
         SelectionModel<T> selectionModel=null;
         if (choices.size() > 10) {
             // use ComboBox
-            ComboBox<T> comboBox = new ComboBox<T>();
+            ComboBox<T> comboBox = new ComboBox<>();
             comboBox.setMinWidth(MIN_WIDTH);
             comboBox.getItems().addAll(choices);
             selectionModel = comboBox.getSelectionModel();
             dlg.setContent(buildInputContent(comboBox));
         } else {
             // use ChoiceBox
-            ChoiceBox<T> choiceBox = new ChoiceBox<T>();
+            ChoiceBox<T> choiceBox = new ChoiceBox<>();
             choiceBox.setMinWidth(MIN_WIDTH);
             choiceBox.getItems().addAll(choices);
             selectionModel = choiceBox.getSelectionModel();
@@ -714,7 +715,7 @@ public final class Dialogs {
         dlg.setContent(message);
         
         Node messageNode = dlg.getContent();
-        messageNode.getStyleClass().add("command-link-message");
+        messageNode.getStyleClass().add("command-link-message"); //$NON-NLS-1$
         
         final int gapSize = 10;
         final List<Button> buttons = new ArrayList<>(links.size());
@@ -918,13 +919,13 @@ public final class Dialogs {
     public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {
     	
     	CustomTextField txUserName = (CustomTextField) TextFields.createClearableTextField();
-    	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) );
+    	txUserName.setLeft(new ImageView( DialogResources.getImage("login.user.icon")) ); //$NON-NLS-1$
     	
     	CustomPasswordField txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
-    	txPassword.setLeft(new ImageView( DialogResources.getImage("login.password.icon")));
+    	txPassword.setLeft(new ImageView( DialogResources.getImage("login.password.icon"))); //$NON-NLS-1$
 		
-		Label lbMessage= new Label(""); 
-		lbMessage.getStyleClass().addAll("message-banner");
+		Label lbMessage= new Label("");  //$NON-NLS-1$
+		lbMessage.getStyleClass().addAll("message-banner"); //$NON-NLS-1$
 		lbMessage.setVisible(false);
 		lbMessage.setManaged(false);
 		
@@ -933,7 +934,7 @@ public final class Dialogs {
 		content.getChildren().add(txUserName);
 		content.getChildren().add(txPassword);
 		
-		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) {
+		Action actionLogin = new DialogAction(getString("login.dlg.login.button"), null, false, false, true) { //$NON-NLS-1$
 			{
 				ButtonBar.setType(this, ButtonType.OK_DONE);
 				setEventHandler(this::handleAction);
@@ -943,7 +944,7 @@ public final class Dialogs {
 				Dialog dlg = (Dialog) ae.getSource();
 				try {
 					if ( authenticator != null ) {
-						authenticator.call(new Pair<String,String>(txUserName.getText(), txPassword.getText()));
+						authenticator.call(new Pair<>(txUserName.getText(), txPassword.getText()));
 					}
 					lbMessage.setVisible(false);
 					lbMessage.setManaged(false);
@@ -959,8 +960,8 @@ public final class Dialogs {
 				}
 			}
 
-			public String toString() {
-				return "LOGIN";
+			@Override public String toString() {
+				return "LOGIN"; //$NON-NLS-1$
 			};
 		};
 		
@@ -970,11 +971,11 @@ public final class Dialogs {
         dlg.setResizable(false);
 		dlg.setIconifiable(false);
 		if ( dlg.getGraphic() == null ) { 
-			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon")));
+			dlg.setGraphic( new ImageView( DialogResources.getImage("login.icon"))); //$NON-NLS-1$
 		}
 		dlg.getActions().setAll(actionLogin, ACTION_CANCEL);
-		String userNameCation = getString("login.dlg.user.caption");
-		String passwordCaption = getString("login.dlg.pswd.caption");
+		String userNameCation = getString("login.dlg.user.caption"); //$NON-NLS-1$
+		String passwordCaption = getString("login.dlg.pswd.caption"); //$NON-NLS-1$
 		txUserName.setPromptText(userNameCation);
 		txUserName.setText( initialUserInfo.getKey());
 		txPassword.setPromptText(passwordCaption);
@@ -982,7 +983,7 @@ public final class Dialogs {
 
 		ValidationSupport validationSupport = new ValidationSupport();
 		Platform.runLater( () -> {
-			String requiredFormat = "'%s' is required";
+			String requiredFormat = "'%s' is required"; //$NON-NLS-1$
 			validationSupport.registerValidator(txUserName, Validator.createEmptyValidator( String.format( requiredFormat, userNameCation )));
 			validationSupport.registerValidator(txPassword, Validator.createEmptyValidator(String.format( requiredFormat, passwordCaption )));
 			actionLogin.disabledProperty().bind(validationSupport.invalidProperty());
@@ -991,7 +992,7 @@ public final class Dialogs {
 
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
-    					new Pair<String,String>(txUserName.getText(), txPassword.getText()): 
+    					new Pair<>(txUserName.getText(), txPassword.getText()): 
     					null);
     }
     
@@ -1050,20 +1051,15 @@ public final class Dialogs {
             inputControl.setMaxWidth(Double.MAX_VALUE);
             GridPane.setHgrow(inputControl, Priority.ALWAYS);
             grid.add(inputControl, 1, 0);
+            
+            Platform.runLater(() -> inputControl.requestFocus());
         }
         
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                inputControl.requestFocus();
-            }
-        });
-
         return grid;
     }
 
     private Node buildExceptionDetails(Throwable exception) {
-        Label label = new Label( localize(asKey("exception.dlg.label")));
+        Label label = new Label( localize(asKey("exception.dlg.label"))); //$NON-NLS-1$
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -1089,7 +1085,7 @@ public final class Dialogs {
     private Button buildCommandLinkButton(DialogAction commandLink) {
         // put the content inside a button
         final Button button = new Button();
-        button.getStyleClass().addAll("command-link-button");
+        button.getStyleClass().addAll("command-link-button"); //$NON-NLS-1$
         button.setMaxHeight(Double.MAX_VALUE);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
@@ -1104,22 +1100,22 @@ public final class Dialogs {
                 return titleLabel.getPrefWidth() + 400;
             }
         });
-        titleLabel.getStyleClass().addAll("line-1");
+        titleLabel.getStyleClass().addAll("line-1"); //$NON-NLS-1$
         titleLabel.setWrapText(true);
         titleLabel.setAlignment(Pos.TOP_LEFT);
         GridPane.setVgrow(titleLabel, Priority.NEVER);
 
         Label messageLabel = new Label(commandLink.getLongText() );
-        messageLabel.getStyleClass().addAll("line-2");
+        messageLabel.getStyleClass().addAll("line-2"); //$NON-NLS-1$
         messageLabel.setWrapText(true);
         messageLabel.setAlignment(Pos.TOP_LEFT);
         messageLabel.setMaxHeight(Double.MAX_VALUE);
         GridPane.setVgrow(messageLabel, Priority.SOMETIMES);
         
         Node graphic = commandLink.getGraphic();
-        Node view = graphic == null? new ImageView( DialogResources.getImage("command.link.icon")) : graphic;
+        Node view = graphic == null? new ImageView( DialogResources.getImage("command.link.icon")) : graphic; //$NON-NLS-1$
         Pane graphicContainer = new Pane(view);
-        graphicContainer.getStyleClass().add("graphic-container");
+        graphicContainer.getStyleClass().add("graphic-container"); //$NON-NLS-1$
         GridPane.setValignment(graphicContainer, VPos.TOP);
         GridPane.setMargin(graphicContainer, new Insets(0,10,0,0));
         
@@ -1127,7 +1123,7 @@ public final class Dialogs {
         grid.minWidthProperty().bind(titleLabel.prefWidthProperty());
         grid.setMaxHeight(Double.MAX_VALUE);
         grid.setMaxWidth(Double.MAX_VALUE);
-        grid.getStyleClass().add("container");
+        grid.getStyleClass().add("container"); //$NON-NLS-1$
         grid.add(graphicContainer, 0, 0, 1, 2);
         grid.add(titleLabel, 1, 0);
         grid.add(messageLabel, 1, 1);
@@ -1147,14 +1143,14 @@ public final class Dialogs {
      **************************************************************************/
     
     private static enum Type {
-        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.masthead"), ACTION_OK),
-        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.masthead"), ACTION_OK),
-        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.masthead"), ACTION_OK),
-        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.masthead"), ACTION_YES, ACTION_NO, ACTION_CANCEL),
-        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
-        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.masthead"), ACTION_OK, ACTION_CANCEL),
-        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.masthead")),
-        LOGIN("login.image",          asKey("login.dlg.title"),    asKey("login.dlg.masthead"), ACTION_OK, ACTION_CANCEL);
+        ERROR("error.image",          asKey("error.dlg.title"),   asKey("error.dlg.header"), ACTION_OK), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        INFORMATION("info.image",     asKey("info.dlg.title"),    asKey("info.dlg.header"), ACTION_OK), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        WARNING("warning.image",      asKey("warning.dlg.title"), asKey("warning.dlg.header"), ACTION_OK), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        CONFIRMATION("confirm.image", asKey("confirm.dlg.title"), asKey("confirm.dlg.header"), ACTION_YES, ACTION_NO, ACTION_CANCEL), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        INPUT("confirm.image",        asKey("input.dlg.title"),   asKey("input.dlg.header"), ACTION_OK, ACTION_CANCEL), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        FONT( null,                   asKey("font.dlg.title"),    asKey("font.dlg.header"), ACTION_OK, ACTION_CANCEL), //$NON-NLS-1$ //$NON-NLS-2$
+        PROGRESS("info.image",        asKey("progress.dlg.title"), asKey("progress.dlg.header")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        LOGIN("login.icon",           asKey("login.dlg.title"),    asKey("login.dlg.header"), ACTION_OK, ACTION_CANCEL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         private final String defaultTitle;
         private final String defaultMasthead;
@@ -1210,7 +1206,7 @@ public final class Dialogs {
         
         public FontStyle(String styles) {
             this();
-            String[] fontStyles = (styles == null? "": styles.trim().toUpperCase()).split(" ");
+            String[] fontStyles = (styles == null? "": styles.trim().toUpperCase()).split(" "); //$NON-NLS-1$ //$NON-NLS-2$
             for ( String style: fontStyles) {
                 FontWeight w = FontWeight.findByName(style);
                 if ( w != null ) {
@@ -1259,16 +1255,16 @@ public final class Dialogs {
         }
         
         private static String makePretty(Object o) {
-            String s = o == null? "": o.toString();
+            String s = o == null? "": o.toString(); //$NON-NLS-1$
             if ( !s.isEmpty()) { 
-                s = s.replace("_", " ");
+                s = s.replace("_", " "); //$NON-NLS-1$ //$NON-NLS-2$
                 s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
             }
             return s;
         }
 
         @Override public String toString() {
-            return String.format("%s %s", makePretty(weight), makePretty(posture) ).trim();
+            return String.format("%s %s", makePretty(weight), makePretty(posture) ).trim(); //$NON-NLS-1$
         }
         
         private <T extends Enum<T>> int compareEnums( T e1, T e2) {
@@ -1298,12 +1294,12 @@ public final class Dialogs {
         private static final Double[] fontSizes = new Double[] {8d,9d,11d,12d,14d,16d,18d,20d,22d,24d,26d,28d,36d,48d,72d};
         
         private static List<FontStyle> getFontStyles( String fontFamily ) {
-            Set<FontStyle> set = new HashSet<FontStyle>();
+            Set<FontStyle> set = new HashSet<>();
             for (String f : Font.getFontNames(fontFamily)) {
-                set.add(new FontStyle(f.replace(fontFamily, "")));
+                set.add(new FontStyle(f.replace(fontFamily, ""))); //$NON-NLS-1$
             }
             
-            List<FontStyle> result =  new ArrayList<FontStyle>(set);
+            List<FontStyle> result =  new ArrayList<>(set);
             Collections.sort(result);
             return result;
             
@@ -1314,10 +1310,10 @@ public final class Dialogs {
         private final FilteredList<FontStyle> filteredStyleList = new FilteredList<>(FXCollections.<FontStyle>observableArrayList(), MATCH_ALL);
         private final FilteredList<Double> filteredSizeList = new FilteredList<>(FXCollections.observableArrayList(fontSizes), MATCH_ALL);
         
-        private final ListView<String> fontListView = new ListView<String>(filteredFontList);
-        private final ListView<FontStyle> styleListView = new ListView<FontStyle>(filteredStyleList);
-        private final ListView<Double> sizeListView = new ListView<Double>(filteredSizeList);
-        private final Text sample = new Text(localize(asKey("font.dlg.sample.text")));
+        private final ListView<String> fontListView = new ListView<>(filteredFontList);
+        private final ListView<FontStyle> styleListView = new ListView<>(filteredStyleList);
+        private final ListView<Double> sizeListView = new ListView<>(filteredSizeList);
+        private final Text sample = new Text(localize(asKey("font.dlg.sample.text"))); //$NON-NLS-1$
         
         public FontPanel() {
             setHgap(HGAP);
@@ -1377,7 +1373,7 @@ public final class Dialogs {
 //            });
             
             // layout dialog
-            add( new Label(localize(asKey("font.dlg.font.label"))), 0, 0);
+            add( new Label(localize(asKey("font.dlg.font.label"))), 0, 0); //$NON-NLS-1$
 //            fontSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( fontSearch, 0, 1);
             add(fontListView, 0, 1);
@@ -1413,13 +1409,13 @@ public final class Dialogs {
                     refreshSample();
                 }});
 
-            add( new Label(localize(asKey("font.dlg.style.label"))), 1, 0);
+            add( new Label(localize(asKey("font.dlg.style.label"))), 1, 0); //$NON-NLS-1$
 //            postureSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( postureSearch, 1, 1);
             add(styleListView, 1, 1);
             styleListView.selectionModelProperty().get().selectedItemProperty().addListener(sampleRefreshListener);
             
-            add( new Label(localize(asKey("font.dlg.size.label"))), 2, 0);
+            add( new Label(localize(asKey("font.dlg.size.label"))), 2, 0); //$NON-NLS-1$
 //            sizeSearch.setMinHeight(Control.USE_PREF_SIZE);
 //            add( sizeSearch, 2, 1);
             add(sizeListView, 2, 1);

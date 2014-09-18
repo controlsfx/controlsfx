@@ -133,7 +133,7 @@ public class ValidationSupport {
         //addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
     }
 
-    private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$";
+    private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$"; //$NON-NLS-1$
     
     /**
      * Set control's required flag
@@ -192,7 +192,7 @@ public class ValidationSupport {
     }
 
     private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
-            new ReadOnlyObjectWrapper<ValidationResult>();
+            new ReadOnlyObjectWrapper<>();
 
 
     /**
@@ -231,8 +231,8 @@ public class ValidationSupport {
 
 
     private ObjectProperty<ValidationDecoration> validationDecoratorProperty =
-            new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) {
-        protected void invalidated() {
+            new SimpleObjectProperty<ValidationDecoration>(this, "validationDecorator", new GraphicValidationDecoration()) { //$NON-NLS-1$
+        @Override protected void invalidated() {
             // when the decorator changes, rerun the decoration to update the visuals immediately.
             redecorate();
         }
@@ -277,6 +277,22 @@ public class ValidationSupport {
      */
     @SuppressWarnings("unchecked")
     public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
+    	
+    	
+    	Optional.ofNullable(c).ifPresent( ctrl -> {
+    		ctrl.getProperties().addListener( new MapChangeListener<Object,Object>(){
+
+				@Override
+				public void onChanged(
+						javafx.collections.MapChangeListener.Change<? extends Object, ? extends Object> change) {
+					
+					if ( CTRL_REQUIRED_FLAG.equals(change.getKey())) {
+						redecorate();
+					}
+				}
+
+    		});
+    	});
 
         return getExtractor(c).map( e -> {
 

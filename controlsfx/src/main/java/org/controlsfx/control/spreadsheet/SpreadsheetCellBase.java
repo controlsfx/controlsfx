@@ -545,7 +545,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     @SuppressWarnings("unchecked")
     private void updateText() {
         if(getItem() == null){
-            text.setValue("");
+            text.setValue(""); //$NON-NLS-1$
         }else if (!("").equals(getFormat())) { //$NON-NLS-1$
             text.setValue(type.toString(getItem(), getFormat()));
         } else {

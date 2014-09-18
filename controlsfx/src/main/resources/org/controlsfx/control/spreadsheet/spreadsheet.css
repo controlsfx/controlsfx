@@ -82,11 +82,6 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
     -fx-border-color : #FFDB6D;
 }  
 
-
-.text-field.error{
-    -fx-background-color: red;
-}
-
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
 
@@ -132,4 +127,16 @@ CellView > .text-input.text-field,
 CellView > .text-input.text-area{
     -fx-padding : 0 0 0 -0.2em;
     -fx-background-color: transparent;
+}
+
+/* We want to show a red background when the value entered is incorrect */
+CellView > .text-input.text-field.error{
+    -fx-background-insets: 0 0 0 -0.5em;
+    -fx-background-color: red;
+}
+
+.selection-rectangle{
+    -fx-fill : transparent;
+    -fx-stroke : black;
+    -fx-stroke-width : 2;
 }

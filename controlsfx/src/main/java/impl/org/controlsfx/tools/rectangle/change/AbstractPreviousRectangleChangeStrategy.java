@@ -59,7 +59,7 @@ abstract class AbstractPreviousRectangleChangeStrategy extends AbstractRatioResp
     protected AbstractPreviousRectangleChangeStrategy(Rectangle2D previous, boolean ratioFixed, double ratio) {
         super(ratioFixed, ratio);
 
-        Objects.requireNonNull(previous, "The previous rectangle must not be null.");
+        Objects.requireNonNull(previous, "The previous rectangle must not be null."); //$NON-NLS-1$
         this.previous = previous;
     }
 

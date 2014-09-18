@@ -38,7 +38,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Skin;
 
 /**
@@ -113,9 +112,9 @@ public class CheckComboBox<T> extends ControlsFXControl {
     public CheckComboBox(final ObservableList<T> items) {
         final int initialSize = items == null ? 32 : items.size();
         
-        this.itemBooleanMap = new HashMap<T, BooleanProperty>(initialSize);
+        this.itemBooleanMap = new HashMap<>(initialSize);
         this.items = items == null ? FXCollections.<T>observableArrayList() : items;
-        setCheckModel(new CheckComboBoxBitSetCheckModel<T>(this.items, itemBooleanMap));
+        setCheckModel(new CheckComboBoxBitSetCheckModel<>(this.items, itemBooleanMap));
     }
     
     

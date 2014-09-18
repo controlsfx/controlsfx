@@ -43,8 +43,6 @@ import org.controlsfx.control.decoration.Decorator;
 
 public class DecorationPane extends StackPane {
     
-    private Node root;
-
     // maps from a node to a list of its decoration nodes
     private final Map<Node, List<Node>> nodeDecorationMap = new WeakHashMap<>();
     
@@ -63,7 +61,6 @@ public class DecorationPane extends StackPane {
     }
         
     public void setRoot(Node root) {
-        this.root = root;
         getChildren().setAll(root);
     }
     
@@ -77,12 +74,12 @@ public class DecorationPane extends StackPane {
         if (decorationNode != null) {
             List<Node> decorationNodes = nodeDecorationMap.get(targetNode);
             if (decorationNodes == null) {
-                decorationNodes = new ArrayList<Node>();
+                decorationNodes = new ArrayList<>();
                 nodeDecorationMap.put(targetNode, decorationNodes);
             }
             decorationNodes.add(decorationNode);
             
-            if (decorationNode != null && !getChildren().contains(decorationNode)) {
+            if (!getChildren().contains(decorationNode)) {
                 getChildren().add(decorationNode);
                 StackPane.setAlignment(decorationNode, Pos.TOP_LEFT); // TODO support for all positions.
             }
@@ -102,8 +99,8 @@ public class DecorationPane extends StackPane {
             for (Node decorationNode : decorationNodes) {
                 boolean success = getChildren().remove(decorationNode);
                 if (! success) {
-                    throw new IllegalStateException("Could not remove decoration " + 
-                            decorationNode + " from decoration pane children list: " + 
+                    throw new IllegalStateException("Could not remove decoration " +  //$NON-NLS-1$
+                            decorationNode + " from decoration pane children list: " +  //$NON-NLS-1$
                             getChildren());
                 }
             }

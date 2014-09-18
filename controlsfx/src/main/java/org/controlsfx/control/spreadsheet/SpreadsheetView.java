@@ -110,15 +110,21 @@ import org.controlsfx.tools.Utils;
  * <br/>
  * You can fix some rows and some columns by right-clicking on their header. A
  * context menu will appear if it's possible to fix them. The label will then be
- * in italic and the background will turn to dark grey. Keep in mind that only
- * columns without any spanning cells can be fixed.
+ * in italic and the background will turn to dark grey. 
  * <br/>
- * And that and only rows without row-spanning cells can be fixed. <br/>
  * You have also the possibility to fix them manually by adding and removing
  * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
  * are strongly advised to check if it's possible to do so with
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
- * {@link #isRowFixable(int)} for the fixed rows. Calling those methods prior
+ * {@link #isRowFixable(int)} for the fixed rows. 
+ * <br/>
+ * 
+ * If you want to fix several rows together, and they have a row span inside,
+ * you can call {@link #areRowsFixable(java.util.List) } to verify if you can
+ * fix them. Be sure to add them all in once otherwise the system will detect
+ * that a span is going out of bounds and will throw an exception.
+ *
+ * Calling those methods prior
  * every move will ensure that no exception will be thrown.
  * <br/>
  * You have also the possibility to deactivate these possibilities. For example,
@@ -280,8 +286,8 @@ public class SpreadsheetView extends Control {
     private final BooleanProperty fixingRowsAllowedProperty = new SimpleBooleanProperty(true);
     private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
 
-    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true);
-    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader", true);
+    private final BooleanProperty showColumnHeader = new SimpleBooleanProperty(true, "showColumnHeader", true); //$NON-NLS-1$
+    private final BooleanProperty showRowHeader = new SimpleBooleanProperty(true, "showRowHeader", true); //$NON-NLS-1$
 
     private BitSet rowFix; // Compute if we can fix the rows or not.
 
@@ -338,22 +344,24 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     /**
-     * Creates a default SpreadsheetView control with no content and a Grid set
-     * to null.
+     * This constructor will generate sample Grid with 100 rows and 15 columns.
+     * All cells are typed as String (see {@link SpreadsheetCellType#STRING}).
      */
-//    public SpreadsheetView() {
-//        this(null);
-//    }
-
+    public SpreadsheetView(){
+        this(getSampleGrid());
+        for(SpreadsheetColumn column: getColumns()){
+            column.setPrefWidth(100);
+        }
+    }
+    
     /**
      * Creates a SpreadsheetView control with the {@link Grid} specified.
-     * 
-     * @param grid
-     *            The Grid that contains the items to be rendered
+     *
+     * @param grid The Grid that contains the items to be rendered
      */
     public SpreadsheetView(final Grid grid) {
         super();
-        getStyleClass().add("SpreadsheetView");
+        getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
             @Override
@@ -399,12 +407,6 @@ public class SpreadsheetView extends Control {
         cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                // Copy
-//                if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.C)
-//                    copyClipboard();
-//                // Paste
-//                else if (keyEvent.isShortcutDown() && keyEvent.getCode()==KeyCode.V)
-//                    pasteClipboard();
                 // Go to the next row
                 if (!keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
                     cellsView.setEditWithEnter(true);
@@ -441,7 +443,7 @@ public class SpreadsheetView extends Control {
          */
         this.contextMenuProperty().addListener(new WeakChangeListener<>(contextMenuChangeListener));
         // The contextMenu creation must be on the JFX thread
-        Platform.runLater(()->{
+        CellView.getValue(() -> {
             setContextMenu(getSpreadsheetViewContextMenu());
         });
 
@@ -557,9 +559,9 @@ public class SpreadsheetView extends Control {
          * We need to set the columns of the TableView in the JFX thread. Since
          * this method can be called from another thread, we execute the code here.
          */
-        Platform.runLater(()->{
+        CellView.getValue(() -> {
             cellsView.getColumns().clear();
-            for(SpreadsheetColumn spreadsheetColumn:columns){
+            for (SpreadsheetColumn spreadsheetColumn : columns) {
                 cellsView.getColumns().add(spreadsheetColumn.column);
             }
         });
@@ -575,13 +577,14 @@ public class SpreadsheetView extends Control {
     }
 
     /**
-     * Return an unmodifiable observableList of the {@link SpreadsheetColumn}
-     * used.
-     * 
-     * @return An unmodifiable observableList.
+     * Return an ObservableList of the {@link SpreadsheetColumn} used. This list
+     * is filled automatically by the SpreadsheetView. Adding and removing
+     * columns should be done in the model {@link Grid}.
+     *
+     * @return An ObservableList of the {@link SpreadsheetColumn}
      */
-    public ObservableList<SpreadsheetColumn> getColumns() {
-        return FXCollections.unmodifiableObservableList(columns);
+    public final ObservableList<SpreadsheetColumn> getColumns() {
+        return columns;
     }
 
     /**
@@ -622,6 +625,40 @@ public class SpreadsheetView extends Control {
      */
     public boolean isRowFixable(int row) {
         return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
+    }
+    
+    /**
+     * Indicates whether a List of rows can be fixed or not.
+     * @param list
+     * @return true if the List of row can be fixed together.
+     */
+    public boolean areRowsFixable(List<? extends Integer> list) {
+        for (Integer row : list) {
+            //If this row is not fixable, we need to identify the maximum span
+            if (!isRowFixable(row)) {
+
+                int maxSpan = 1;
+                List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
+                for (SpreadsheetCell cell : gridRow) {
+                    //If the original row is not within this range, there is not need to look deeper.
+                    if (!list.contains(cell.getRow())) {
+                        return false;
+                    }
+                    //We only want to consider the original cell.
+                    if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
+                        maxSpan = cell.getRowSpan();
+                    }
+                }
+                //Then we need to verify that all rows within that span are fixed.
+                int count = row + maxSpan - 1;
+                for (int index = row + 1; index < count; ++index) {
+                    if (!list.contains(index)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -875,7 +912,7 @@ public class SpreadsheetView extends Control {
     }
     
     /**
-     * Return the selectionModel used by the SpreadsheetView.
+     * Return the selectionModel used by the SpreadsheetView. 
      * 
      * @return {@link TableViewSelectionModel}
      */
@@ -1060,9 +1097,9 @@ public class SpreadsheetView extends Control {
     public ContextMenu getSpreadsheetViewContextMenu() {
         final ContextMenu contextMenu = new ContextMenu();
 
-        final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy")));
+        final MenuItem copyItem = new MenuItem(localize(asKey("spreadsheet.view.menu.copy"))); //$NON-NLS-1$
         copyItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
-                .getResourceAsStream("copySpreadsheetView.png"))));
+                .getResourceAsStream("copySpreadsheetView.png")))); //$NON-NLS-1$
         copyItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         copyItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1071,9 +1108,9 @@ public class SpreadsheetView extends Control {
             }
         });
 
-        final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste")));
+        final MenuItem pasteItem = new MenuItem(localize(asKey("spreadsheet.view.menu.paste"))); //$NON-NLS-1$
         pasteItem.setGraphic(new ImageView(new Image(SpreadsheetView.class
-                .getResourceAsStream("pasteSpreadsheetView.png"))));
+                .getResourceAsStream("pasteSpreadsheetView.png")))); //$NON-NLS-1$
         pasteItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN));
         pasteItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1082,11 +1119,11 @@ public class SpreadsheetView extends Control {
             }
         });
         
-        final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment")));
+        final Menu cornerMenu = new Menu(localize(asKey("spreadsheet.view.menu.comment"))); //$NON-NLS-1$
         cornerMenu.setGraphic(new ImageView(new Image(SpreadsheetView.class
-                .getResourceAsStream("comment.png"))));
+                .getResourceAsStream("comment.png")))); //$NON-NLS-1$
 
-        final MenuItem topLeftItem = new MenuItem("top-left");
+        final MenuItem topLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-left"))); //$NON-NLS-1$
         topLeftItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1096,7 +1133,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
             }
         });
-        final MenuItem topRightItem = new MenuItem("top-right");
+        final MenuItem topRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-right"))); //$NON-NLS-1$
         topRightItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1106,7 +1143,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
             }
         });
-        final MenuItem bottomRightItem = new MenuItem("bottom-right");
+        final MenuItem bottomRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-right"))); //$NON-NLS-1$
         bottomRightItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1116,7 +1153,7 @@ public class SpreadsheetView extends Control {
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
             }
         });
-        final MenuItem bottomLeftItem = new MenuItem("bottom-left");
+        final MenuItem bottomLeftItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.bottom-left"))); //$NON-NLS-1$
         bottomLeftItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -1163,6 +1200,28 @@ public class SpreadsheetView extends Control {
      * * Private/Protected Implementation * *
      **************************************************************************/
 
+    /**
+     * This static method creates a sample Grid with 100 rows and 15 columns.
+     * All cells are typed as String.
+     *
+     * @return the sample Grid
+     * @see SpreadsheetCellType#STRING
+     */
+    private static Grid getSampleGrid() {
+        GridBase gridBase = new GridBase(100, 15);
+        List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+
+        for (int row = 0; row < gridBase.getRowCount(); ++row) {
+            ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
+            for (int column = 0; column < gridBase.getColumnCount(); ++column) {
+                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+            }
+            rows.add(currentRow);
+        }
+        gridBase.setRows(rows);
+        return gridBase;
+    }
+    
     private void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         rowFix = new BitSet(rows.size());
@@ -1200,28 +1259,28 @@ public class SpreadsheetView extends Control {
                     SpreadsheetCell currentCell = row.get(j);
                     for (int k = j + 1; k < currentCell.getColumn() + currentCell.getColumnSpan(); ++k) {
                         if (!row.get(k).equals(currentCell)) {
-                            throw new IllegalStateException("\n At row " + i + " and column " + j
-                                    + ": this cell is in the range of a columnSpan but is different. \n"
-                                    + "Every cell in a range of a ColumnSpan must be of the same instance.");
+                            throw new IllegalStateException("\n At row " + i + " and column " + j //$NON-NLS-1$ //$NON-NLS-2$
+                                    + ": this cell is in the range of a columnSpan but is different. \n" //$NON-NLS-1$
+                                    + "Every cell in a range of a ColumnSpan must be of the same instance."); //$NON-NLS-1$
                         }
                         ++count;
                         ++j;
                     }
                 } else {
-                    throw new IllegalStateException("\n At row " + i + " and column " + j
-                            + ": this cell has a negative columnSpan");
+                    throw new IllegalStateException("\n At row " + i + " and column " + j //$NON-NLS-1$ //$NON-NLS-2$
+                            + ": this cell has a negative columnSpan"); //$NON-NLS-1$
                 }
             }
             if (count != grid.getColumnCount()) {
-                throw new IllegalStateException("The row" + i
-                        + " has a number of cells different of the columnCount declared in the grid.");
+                throw new IllegalStateException("The row" + i //$NON-NLS-1$
+                        + " has a number of cells different of the columnCount declared in the grid."); //$NON-NLS-1$
             }
         }
     }
 
     private void checkFormat() {
-        if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) {
-            fmt = new DataFormat("SpreadsheetView");
+        if ((fmt = DataFormat.lookupMimeType("SpreadsheetView")) == null) { //$NON-NLS-1$
+            fmt = new DataFormat("SpreadsheetView"); //$NON-NLS-1$
         }
     }
 
@@ -1235,30 +1294,51 @@ public class SpreadsheetView extends Control {
         @Override
         public void onChanged(ListChangeListener.Change<? extends Integer> c) {
             while (c.next()) {
-                if (c.wasAdded() || c.wasRemoved()) {
+                if (c.wasAdded()) {
                     List<? extends Integer> newRows = c.getAddedSubList();
-                    for (int row : newRows) {
-                        if (!isRowFixable(row)) {
-                            throw new IllegalArgumentException(computeReason(row));
-                        }
+                    if(!areRowsFixable(newRows)){
+                        throw new IllegalArgumentException(computeReason(newRows));
                     }
                     FXCollections.sort(fixedRows);
                 }
-            }
-        }
-
-        private String computeReason(Integer element) {
-            String reason = "\n This row cannot be fixed.";
-            for (SpreadsheetCell cell : getGrid().getRows().get(element)) {
-                if (cell.getRowSpan() > 1) {
-                    reason += "The cell situated at line " + cell.getRow() + " and column " + cell.getColumn()
-                            + "\n has a rowSpan of " + cell.getRowSpan() + ", it must be 1.";
-                    return reason;
+                
+                if(c.wasRemoved()){
+                    //Handle this case.
                 }
             }
-            return reason;
         }
     };
+
+        private String computeReason(List<? extends Integer> list) {
+        String reason = "\n A row cannot be fixed. \n"; //$NON-NLS-1$
+
+        for (Integer row : list) {
+            //If this row is not fixable, we need to identify the maximum span
+            if (!isRowFixable(row)) {
+
+                int maxSpan = 1;
+                List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
+                for (SpreadsheetCell cell : gridRow) {
+                    if(!list.contains(cell.getRow())){
+                        reason += "The row " + row + " is inside a row span and the starting row " + cell.getRow() + " is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    }
+                    //We only want to consider the original cell.
+                    if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
+                        maxSpan = cell.getRowSpan();
+                    }
+                }
+                //Then we need to verify that all rows within that span are fixed.
+                int count = row + maxSpan - 1;
+                for (int index = row + 1; index < count; ++index) {
+                    if (!list.contains(index)) {
+                        reason += "One cell on the row " + row + " has a row span of " + maxSpan + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                + "But the row " + index + " contained within that span is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$
+                    }
+                }
+            }
+        }
+        return reason;
+    }
 
     private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
         @Override
@@ -1278,12 +1358,12 @@ public class SpreadsheetView extends Control {
         private String computeReason(SpreadsheetColumn element) {
             int indexColumn = getColumns().indexOf(element);
 
-            String reason = "\n This column cannot be fixed.";
+            String reason = "\n This column cannot be fixed."; //$NON-NLS-1$
             for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
                 int columnSpan = row.get(indexColumn).getColumnSpan();
-                if (columnSpan > 1 || row.get(indexColumn).getRowSpan() > 1) {
-                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column "
-                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1.";
+                if (columnSpan > 1 /*|| row.get(indexColumn).getRowSpan() > 1*/) {
+                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column " //$NON-NLS-1$ //$NON-NLS-2$
+                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1."; //$NON-NLS-1$
                     return reason;
                 }
             }

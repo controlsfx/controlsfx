@@ -26,12 +26,11 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import com.sun.javafx.event.EventHandlerManager;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -42,10 +41,7 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.util.Callback;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
-
-import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * A base implementation of the {@link Grid} interface.
@@ -116,13 +112,6 @@ public class GridBase implements Grid, EventTarget {
      **************************************************************************/
 
     /**
-     * Creates grid with 'unlimited' rows and columns
-     */
-//    public GridBase() {
-//        this(Integer.MAX_VALUE, Integer.MAX_VALUE);
-//    }
-
-    /**
      * Creates a grid with a fixed number of rows and columns.
      * 
      * @param rowCount
@@ -154,11 +143,11 @@ public class GridBase implements Grid, EventTarget {
     public void setCellValue(int row, int column, Object value) {
         if (row < rowCount && column < columnCount && !isLocked()) {
             SpreadsheetCell cell = getRows().get(row).get(column);
-            Object item = cell.getItem();
+            Object previousItem = cell.getItem();
             Object convertedValue = cell.getCellType().convertValue(value);
             cell.setItem(convertedValue);
-            if (item != value && (item == null || !item.equals(cell.getItem()))) {
-                GridChange cellChange = new GridChange(row, column, item, convertedValue);
+            if (!java.util.Objects.equals(previousItem, cell.getItem())) {
+                GridChange cellChange = new GridChange(row, column, previousItem, convertedValue);
                 Event.fireEvent(this, cellChange);
             }
         }
@@ -182,26 +171,32 @@ public class GridBase implements Grid, EventTarget {
         if (row < 0 || column < 0 /* || !containsRow(spv, row) */) {
             return SpanType.NORMAL_CELL;
         }
-        final SpreadsheetCell cellSpan = ((ObservableList<SpreadsheetCell>) getRows().get(row)).get(column);
+        final SpreadsheetCell cell = ((ObservableList<SpreadsheetCell>) getRows().get(row)).get(column);
 
-        final int cellSpanColumn = cellSpan.getColumn();
-        final int cellSpanRow = cellSpan.getRow();
-        final int cellSpanRowSpan = cellSpan.getRowSpan();
-        final int cellSpanColumnSpan = cellSpan.getColumnSpan();
-        final boolean containsRowMinusOne = spv.getCellsViewSkin().containsRow(row - 1);
+        final int cellColumn = cell.getColumn();
+        final int cellRow = cell.getRow();
+        final int cellRowSpan = cell.getRowSpan();
 
-        if (cellSpanColumn == column && cellSpanRow == row && cellSpanRowSpan == 1) {
+        if (cellColumn == column && cellRow == row && cellRowSpan == 1) {
             return SpanType.NORMAL_CELL;
-        } else if (containsRowMinusOne && cellSpanColumnSpan > 1 && cellSpanColumn != column && cellSpanRowSpan > 1
-                && cellSpanRow != row) {
+        }
+
+        final int cellColumnSpan = cell.getColumnSpan();
+        /**
+         * This is a consuming operation so we place it after the normal_cell
+         * case since this is the most typical case.
+         */
+        final boolean containsRowMinusOne = spv.getCellsViewSkin().containsRow(row - 1);
+        if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != column && cellRowSpan > 1
+                && cellRow != row) {
             return SpanType.BOTH_INVISIBLE;
-        } else if (cellSpanRowSpan > 1 && cellSpanColumn == column) {
-            if ((cellSpanRow == row || !containsRowMinusOne)) {
+        } else if (cellRowSpan > 1 && cellColumn == column) {
+            if ((cellRow == row || !containsRowMinusOne)) {
                 return SpanType.ROW_VISIBLE;
             } else {
                 return SpanType.ROW_SPAN_INVISIBLE;
             }
-        } else if (cellSpanColumnSpan > 1 && cellSpanColumn != column && (cellSpanRow == row || !containsRowMinusOne)) {
+        } else if (cellColumnSpan > 1 && cellColumn != column && (cellRow == row || !containsRowMinusOne)) {
             return SpanType.COLUMN_SPAN_INVISIBLE;
         } else {
             return SpanType.NORMAL_CELL;

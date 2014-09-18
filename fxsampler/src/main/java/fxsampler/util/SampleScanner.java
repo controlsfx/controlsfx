@@ -1,9 +1,7 @@
 package fxsampler.util;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.FileSystem;
@@ -22,7 +20,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import fxsampler.FXSampler;
 import fxsampler.FXSamplerProject;
 import fxsampler.Sample;
 import fxsampler.model.EmptySample;
@@ -72,10 +69,7 @@ public class SampleScanner {
         Class<?>[] results = new Class[] { };
         
         try {
-            results = loadFromEnumeratedFile();
-            if (results == null) {
-                results = loadFromPathScanning();
-            }
+        	  results = loadFromPathScanning();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,29 +113,6 @@ public class SampleScanner {
         
         return projectsMap;
     } 
-      
-    // TODO this needs to be made generic, to look in the jar files it finds
-    private Class<?>[] loadFromEnumeratedFile() throws ClassNotFoundException, IOException {
-        ClassLoader classLoader = FXSampler.class.getClassLoader();
-
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        FXSampler.class.getResourceAsStream("samples/samples.txt")))) 
-        {
-            List<Class<?>> classes = new ArrayList<>();
-            for (String sample = br.readLine(); sample != null; sample = br.readLine()) {
-                if (sample.endsWith(".java")) {
-                    sample = sample.substring(0, sample.length() - ".java".length());
-                    classes.add(classLoader.loadClass(sample.replace("/", ".")));
-                }
-            }
-            return classes.toArray(new Class[classes.size()]);
-        } catch (NullPointerException npe) {
-            // samples.txt doesn't exist
-            return null;
-        }
-    }
-
 
     /**
      * Scans all classes.

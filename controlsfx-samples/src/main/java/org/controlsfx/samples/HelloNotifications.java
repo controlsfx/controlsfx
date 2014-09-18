@@ -98,7 +98,7 @@ public class HelloNotifications extends ControlsFXSample {
         this.stage = stage;
         
         pane = new Pane() {
-            protected void layoutChildren() {
+            @Override protected void layoutChildren() {
                 super.layoutChildren();
                 updatePane();
             }

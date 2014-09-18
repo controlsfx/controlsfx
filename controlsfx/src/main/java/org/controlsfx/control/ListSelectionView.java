@@ -53,8 +53,8 @@ import com.sun.javafx.css.StyleManager;
  *
  * <pre>
  * ListSelectionView&lt;String&gt; view = new ListSelectionView&lt;&gt;();
- * view.getSourceListView().getItems().add(&quot;One&quot;, &quot;Two&quot;, &quot;Three&quot;);
- * view.getTargetListView().getItems().add(&quot;Four&quot;, &quot;Five&quot;);
+ * view.getSourceItems().add(&quot;One&quot;, &quot;Two&quot;, &quot;Three&quot;);
+ * view.getTargetItems().add(&quot;Four&quot;, &quot;Five&quot;);
  * </pre>
  *
  * @param <T>

@@ -33,28 +33,6 @@ jar {
     from sourceSets.main.allJava
 }
 
-// enumerate the samples at build time
-task enumerateSamples() {
-    doLast {
-        def samplesList = []
-        sourceSets.main.java.visit {
-            // could be improved:  we could load the class and check the hierarchy
-            if (!it.directory && it.file.text.contains(' extends ControlsFXSample ') && it.path.contains("samples")) {
-                samplesList += it.path
-            }
-        }
-        println samplesList
-        File outputFile = new File(sourceSets.main.output.resourcesDir, 'fxsampler/samples/samples.txt')
-        outputFile.parentFile.mkdirs()
-        outputFile.text = samplesList.join('\n')
-    }
-}
-
-processResources.dependsOn(enumerateSamples)
-gradle.taskGraph.whenReady {
-    enumerateSamples.enabled = gradle.taskGraph.hasTask(":$project.name:jfxDeploy")
-}
-
 jfxJar {
     classpath = files(
             (project.sourceSets.main.compileClasspath .files

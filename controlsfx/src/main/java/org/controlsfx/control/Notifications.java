@@ -330,33 +330,27 @@ public class Notifications {
             final Pos p = notification.position;
 
             final NotificationBar notificationBar = new NotificationBar() {
-                @Override
-                public String getTitle() {
+                @Override public String getTitle() {
                     return notification.title;
                 }
 
-                @Override
-                public String getText() {
+                @Override public String getText() {
                     return notification.text;
                 }
 
-                @Override
-                public Node getGraphic() {
+                @Override public Node getGraphic() {
                     return notification.graphic;
                 }
 
-                @Override
-                public ObservableList<Action> getActions() {
+                @Override public ObservableList<Action> getActions() {
                     return notification.actions;
                 }
 
-                @Override
-                public boolean isShowing() {
+                @Override public boolean isShowing() {
                     return isShowing;
                 }
 
-                @Override
-                protected double computeMinWidth(double height) {
+                @Override protected double computeMinWidth(double height) {
                     String text = getText();
                     Node graphic = getGraphic();
                     if ((text == null || text.isEmpty()) && (graphic != null)) {
@@ -365,8 +359,7 @@ public class Notifications {
                     return 400;
                 }
 
-                @Override
-                protected double computeMinHeight(double width) {
+                @Override protected double computeMinHeight(double width) {
                     String text = getText();
                     Node graphic = getGraphic();
                     if ((text == null || text.isEmpty()) && (graphic != null)) {
@@ -375,13 +368,11 @@ public class Notifications {
                     return 100;
                 }
 
-                @Override
-                public boolean isShowFromTop() {
+                @Override public boolean isShowFromTop() {
                     return NotificationPopupHandler.this.isShowFromTop(notification.position);
                 }
 
-                @Override
-                public void hide() {
+                @Override public void hide() {
                     isShowing = false;
 
                     // this would slide the notification bar out of view,
@@ -392,18 +383,15 @@ public class Notifications {
                     createHideTimeline(popup, this, p, Duration.ZERO).play();
                 }
 
-                @Override
-                public boolean isHideCloseButton() {
+                @Override public boolean isHideCloseButton() {
                     return notification.hideCloseButton;
                 }
 
-                @Override
-                public double getContainerHeight() {
+                @Override public double getContainerHeight() {
                     return startY + screenHeight;
                 }
 
-                @Override
-                public void relocateInParent(double x, double y) {
+                @Override public void relocateInParent(double x, double y) {
                     // this allows for us to slide the notification upwards
                     switch (p) {
                     case BOTTOM_LEFT:

@@ -38,6 +38,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotResult;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderStroke;
@@ -797,20 +799,34 @@ public final class Borders {
                 private void updateTitleLabelFillFromScene(Scene s) {
                     s.snapshot(new Callback<SnapshotResult, Void>() {
                         @Override public Void call(SnapshotResult result) {
-                            // determine the bounds of the scene and the location
-                            // of the titleLabel node
-                            Bounds b = titleLabel.localToScene(titleLabel.getBoundsInLocal());
-                            int minX = (int) Math.max(0, b.getMinX());
-                            int minY = (int) Math.max(0, b.getMinY());
-                            //int maxX = (int) Math.min(s.getWidth(), b.getMaxX());
-                            //int maxY = (int) Math.max(s.getHeight(), b.getMaxY());
+                            final Image image = result.getImage();
+                            final PixelReader reader = image.getPixelReader();
+                            final int rows = (int)image.getHeight();
+                            final int columns = (int)image.getWidth();
                             
-                            // for now we just pick out one color (hoping there isn't a gradient)
-                            Color c = result.getImage().getPixelReader().getColor(minX, minY);
+                            double red = 0;
+                            double green = 0;
+                            double blue = 0;
+                            int pixels = rows * columns;
+                            
+                            // let's go through all pixels and work out an average
+                            // color to use as the background
+                            for (int row = 1; row < rows - 1; row++) {
+                                for (int column = 1; column < columns - 1; column++) {
+                                    Color color = reader.getColor(column, row);
+                                    red += color.getRed();
+                                    green += color.getGreen();
+                                    blue += color.getBlue();
+                                }
+                            }
+                            
+                            Color backgroundColor = Color.rgb((int) (red / pixels * 255), 
+                                                              (int) (green / pixels * 255), 
+                                                              (int) (blue / pixels * 255));
                             
                             // with that color we can set the background fill 
                             // of the titleLabel to perfectly blend in
-                            BackgroundFill fill = new BackgroundFill(c, null, null);
+                            BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
                             titleLabel.setBackground(new Background(fill));
                             
                             return null;

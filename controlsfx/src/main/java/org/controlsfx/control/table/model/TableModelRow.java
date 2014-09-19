@@ -28,7 +28,7 @@ package org.controlsfx.control.table.model;
 
 /**
  */
-public class TableModelRow<S> {
+class TableModelRow<S> {
     private final int columnCount;
     private final JavaFXTableModel<S> tableModel;
     private final int row;

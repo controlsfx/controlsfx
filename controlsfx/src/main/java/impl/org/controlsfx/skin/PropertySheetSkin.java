@@ -91,9 +91,9 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
     
-    private final BorderPane content = new BorderPane();
-    private final ScrollPane scroller = new ScrollPane();
-    private final ToolBar toolbar = new ToolBar();
+    private final BorderPane content;
+    private final ScrollPane scroller;
+    private final ToolBar toolbar;
     private final SegmentedButton modeButton = ActionUtils.createSegmentedButton(
         new ActionChangeMode(Mode.NAME),
         new ActionChangeMode(Mode.CATEGORY)
@@ -110,8 +110,10 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     public PropertySheetSkin(final PropertySheet control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
+        scroller = new ScrollPane();
         scroller.setFitToWidth(true);
         
+        toolbar = new ToolBar();
         toolbar.managedProperty().bind(toolbar.visibleProperty());
         toolbar.setFocusTraversable(true);
         
@@ -128,6 +130,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         toolbar.getItems().add(searchField);
         
         // layout controls
+        content = new BorderPane();
         content.setTop(toolbar);
         content.setCenter(scroller);
         getChildren().add(content);
@@ -141,17 +144,11 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(control.modeSwitcherVisibleProperty(), "TOOLBAR-MODE"); //$NON-NLS-1$
         registerChangeListener(control.searchBoxVisibleProperty(), "TOOLBAR-SEARCH"); //$NON-NLS-1$
         
-        control.getItems().addListener( new ListChangeListener<Item>() {
-            @Override public void onChanged(javafx.collections.ListChangeListener.Change<? extends Item> change) {
-                refreshProperties();
-            }
-        });
+        control.getItems().addListener((ListChangeListener<Item>) change -> refreshProperties());
         
         // initialize properly 
         refreshProperties(); 
         updateToolbar();
-        
-        
     }
 
 
@@ -200,9 +197,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private Node buildPropertySheetContainer() {
         switch( getSkinnable().modeProperty().get() ) {
-
             case CATEGORY: {
-                
                 // group by category
                 Map<String, List<Item>> categoryMap = new TreeMap<>();
                 for( Item p: getSkinnable().getItems()) {
@@ -216,20 +211,20 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 }
                 
                 // create category-based accordion
-                Accordion accordeon = new Accordion();
+                Accordion accordion = new Accordion();
                 for( String category: categoryMap.keySet() ) {
                 	PropertyPane props = new PropertyPane( categoryMap.get(category));
                 	// Only show non-empty categories 
                 	if ( props.getChildrenUnmodifiable().size() > 0 ) {
                        TitledPane pane = new TitledPane( category, props );
                        pane.setExpanded(true);
-                       accordeon.getPanes().add(pane);
+                       accordion.getPanes().add(pane);
                     }
                 }
-                if ( accordeon.getPanes().size() > 0 ) {
-                    accordeon.setExpandedPane( accordeon.getPanes().get(0));
+                if ( accordion.getPanes().size() > 0 ) {
+                    accordion.setExpandedPane(accordion.getPanes().get(0));
                 }
-                return accordeon;
+                return accordion;
             }
             
             default: return new PropertyPane(getSkinnable().getItems());

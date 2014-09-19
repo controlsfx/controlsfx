@@ -106,6 +106,11 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
                     .requestLayout());
         }
 
+        Side pinnedSide = getSkinnable().getPinnedSide();
+        if (pinnedSide != null) {
+        	show(pinnedSide);
+        }
+
         pane.pinnedSideProperty().addListener(
                 observable -> show(getSkinnable().getPinnedSide()));
 

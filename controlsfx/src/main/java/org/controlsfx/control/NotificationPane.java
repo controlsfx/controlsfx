@@ -373,9 +373,6 @@ public class NotificationPane extends ControlsFXControl {
     // --- show from top
     private BooleanProperty showFromTop = new SimpleBooleanProperty(this, "showFromTop", true) { //$NON-NLS-1$
         @Override protected void invalidated() {
-//            pseudoClassStateChanged(SHOW_FROM_TOP_PSEUDOCLASS_STATE,      isShowFromTop());
-//            pseudoClassStateChanged(SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE, ! isShowFromTop());
-            
             updateStyleClasses();
         }
     };
@@ -606,9 +603,4 @@ public class NotificationPane extends ControlsFXControl {
      **************************************************************************/
      
      private static final String DEFAULT_STYLE_CLASS = "notification-pane"; //$NON-NLS-1$
-     
-//     private static final PseudoClass SHOW_FROM_TOP_PSEUDOCLASS_STATE =
-//             PseudoClass.getPseudoClass("top");
-//     private static final PseudoClass SHOW_FROM_BOTTOM_PSEUDOCLASS_STATE =
-//             PseudoClass.getPseudoClass("bottom");
 }

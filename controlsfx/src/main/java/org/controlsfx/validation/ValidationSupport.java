@@ -141,7 +141,7 @@ public class ValidationSupport {
      * @param required flag
      */
     public static void setRequired( Control c, boolean required ) {
-        c.getProperties().put(CTRL_REQUIRED_FLAG, required );
+        c.getProperties().put(CTRL_REQUIRED_FLAG, required);
     }
 
     /**

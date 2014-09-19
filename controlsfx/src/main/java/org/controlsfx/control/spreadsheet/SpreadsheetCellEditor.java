@@ -545,7 +545,10 @@ public abstract class SpreadsheetCellEditor {
             NumberFormat format = NumberFormat.getInstance(Localization.getLocale());
             ParsePosition parsePosition = new ParsePosition(0);
             if (tf.getText() != null) {
-                return String.valueOf(format.parse(tf.getText(), parsePosition).doubleValue());
+                Number number = format.parse(tf.getText(), parsePosition);
+                if (number != null) {
+                    return String.valueOf(number.doubleValue());
+                }
             }
             return tf.getText();
         }

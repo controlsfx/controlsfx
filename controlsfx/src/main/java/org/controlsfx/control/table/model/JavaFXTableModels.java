@@ -26,22 +26,39 @@
  */
 package org.controlsfx.control.table.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.control.TableView;
+
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
  */
-public class JavaFXTableModels {
+//not public as not ready for 8.20.7
+class JavaFXTableModels {
     
     /**
      * Swing
      */
     public static <S> JavaFXTableModel<S> wrap(final TableModel tableModel) {
+        
         return new JavaFXTableModel<S>() {
+            final TableRowSorter<TableModel> sorter;
+            
+            {
+                sorter = new TableRowSorter<>(tableModel);
+            }
             
             @SuppressWarnings("unchecked")
             @Override public S getValueAt(int rowIndex, int columnIndex) {
-                return (S) tableModel.getValueAt(rowIndex, columnIndex);
+                return (S) tableModel.getValueAt(sorter.convertRowIndexToView(rowIndex), columnIndex);
             }
 
             @Override public void setValueAt(S value, int rowIndex, int columnIndex) {
@@ -58,6 +75,25 @@ public class JavaFXTableModels {
 
             @Override public String getColumnName(int columnIndex) {
                 return tableModel.getColumnName(columnIndex);
+            }
+            
+            @Override public void sort(TableView<TableModelRow<S>> table) {
+                List<SortKey> sortKeys = new ArrayList<>();
+                
+                for (TableColumn<TableModelRow<S>, ?> column : table.getSortOrder()) {
+                    final int columnIndex = table.getVisibleLeafIndex(column);
+                    final SortType sortType = column.getSortType();
+                    SortOrder sortOrder = sortType == SortType.ASCENDING ? SortOrder.ASCENDING :
+                                          sortType == SortType.DESCENDING ? SortOrder.DESCENDING :
+                                          SortOrder.UNSORTED;
+                    SortKey sortKey = new SortKey(columnIndex, sortOrder);
+                    sortKeys.add(sortKey);
+                    
+                    sorter.setComparator(columnIndex, column.getComparator());
+                }
+                
+                sorter.setSortKeys(sortKeys);
+                sorter.sort();
             }
         };
     }

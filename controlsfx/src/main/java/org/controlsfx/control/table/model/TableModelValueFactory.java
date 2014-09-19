@@ -35,7 +35,8 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 /**
  *
  */
-public class TableModelValueFactory<S, T> implements Callback<CellDataFeatures<TableModelRow<S>, T>, ObservableValue<T>> {
+//not public as not ready for 8.20.7
+class TableModelValueFactory<S, T> implements Callback<CellDataFeatures<TableModelRow<S>, T>, ObservableValue<T>> {
     @SuppressWarnings("unused")
     private final JavaFXTableModel<S> _tableModel;
     private final int _columnIndex;

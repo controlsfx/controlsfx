@@ -64,9 +64,9 @@ public class HelloSwingTableModelSample extends ControlsFXSample {
         
         TableModelTableView<String> tableView = new TableModelTableView<>(JavaFXTableModels.wrap(swingTableModel));
         
-        tableView.getSelectionModel().selectedItemProperty().addListener((o, oldRow, newRow) -> {
-            System.out.println("Old row: " + oldRow + ", new row: " + newRow);
-        });
+//        tableView.getSelectionModel().selectedItemProperty().addListener((o, oldRow, newRow) -> {
+//            System.out.println("Old row: " + oldRow + ", new row: " + newRow);
+//        });
         
         VBox root = new VBox();
         root.getChildren().add(tableView);

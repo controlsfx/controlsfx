@@ -34,47 +34,72 @@ import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeTableView;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
+import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 
 /**
- *
+ * A utility class for API revolving around the JavaFX {@link TableView} and
+ * {@link TreeTableView} controls.
  */
-public final class TableMenuButtonAccessor {
+// not public as not ready for 8.20.7
+final class TableViewUtils {
 
+    /**
+     * Call this method to be able to programatically manipulate the 
+     * {@link TableView#tableMenuButtonVisibleProperty() TableView menu button}
+     * (assuming it is visible). This allows developers to, for example, add in
+     * new {@link MenuItem}.
+     */
     public static void modifyTableMenu(final TableView<?> tableView, final Consumer<ContextMenu> consumer) {
-        if (tableView.getScene() == null) {
-            tableView.sceneProperty().addListener(new InvalidationListener() {
+        modifyTableMenu((Control)tableView, consumer);
+    }
+    
+    /**
+     * Call this method to be able to programatically manipulate the 
+     * {@link TreeTableView#tableMenuButtonVisibleProperty() TreeTableView menu button}
+     * (assuming it is visible). This allows developers to, for example, add in
+     * new {@link MenuItem}.
+     */
+    public static void modifyTableMenu(final TreeTableView<?> treeTableView, final Consumer<ContextMenu> consumer) {
+        modifyTableMenu((Control)treeTableView, consumer);
+    }
+    
+    private static void modifyTableMenu(final Control control, final Consumer<ContextMenu> consumer) {
+        if (control.getScene() == null) {
+            control.sceneProperty().addListener(new InvalidationListener() {
                 @Override public void invalidated(Observable o) {
-                    tableView.sceneProperty().removeListener(this);
-                    modifyTableMenu(tableView, consumer);
+                    control.sceneProperty().removeListener(this);
+                    modifyTableMenu(control, consumer);
                 }
             });
             
             return;
         }
         
-        Skin<?> skin = tableView.getSkin();
+        Skin<?> skin = control.getSkin();
         if (skin == null) {
-            tableView.skinProperty().addListener(new InvalidationListener() {
+            control.skinProperty().addListener(new InvalidationListener() {
                 @Override public void invalidated(Observable o) {
-                    tableView.skinProperty().removeListener(this);
-                    modifyTableMenu(tableView, consumer);
+                    control.skinProperty().removeListener(this);
+                    modifyTableMenu(control, consumer);
                 }
             });
             
             return;
         }
 
-        doModify(tableView, consumer);
+        doModify(skin, consumer);
     }
 
-    private static void doModify(TableView<?> tableView, Consumer<ContextMenu> consumer) {
-        Skin<?> skin = tableView.getSkin();
-        if (! (skin instanceof TableViewSkin)) return;
+    private static void doModify(Skin<?> skin, Consumer<ContextMenu> consumer) {
+        if (! (skin instanceof TableViewSkinBase)) return;
 
         TableViewSkin<?> tableSkin = (TableViewSkin<?>)skin;
         TableHeaderRow headerRow = getHeaderRow(tableSkin);

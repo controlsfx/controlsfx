@@ -26,10 +26,13 @@
  */
 package org.controlsfx.control.table.model;
 
+import javafx.scene.control.TableView;
+
 /**
  *
  */
-public interface JavaFXTableModel<T> {
+//not public as not ready for 8.20.7
+interface JavaFXTableModel<T> {
     public T getValueAt(int rowIndex, int columnIndex);
     
     public void setValueAt(T value, int rowIndex, int columnIndex);
@@ -39,4 +42,6 @@ public interface JavaFXTableModel<T> {
     public int getColumnCount();
     
     public String getColumnName(int columnIndex);
+    
+    public void sort(TableView<TableModelRow<T>> table);
 }

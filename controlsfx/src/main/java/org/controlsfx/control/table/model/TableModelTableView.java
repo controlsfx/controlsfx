@@ -33,7 +33,8 @@ import javafx.scene.control.TableView;
 /**
  *
  */
-public class TableModelTableView<S> extends TableView<TableModelRow<S>> {
+//not public as not ready for 8.20.7
+class TableModelTableView<S> extends TableView<TableModelRow<S>> {
 
     public TableModelTableView(final JavaFXTableModel<S> tableModel) {
         // create a dummy items list of the appropriate size, where the returned
@@ -48,6 +49,11 @@ public class TableModelTableView<S> extends TableView<TableModelRow<S>> {
             @Override public int size() {
                 return tableModel.getRowCount();
             }
+        });
+        
+        setSortPolicy(table -> {
+            tableModel.sort(table);
+            return true;
         });
         
         // create columns from the table model

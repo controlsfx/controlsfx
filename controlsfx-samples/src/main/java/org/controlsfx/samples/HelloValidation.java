@@ -46,6 +46,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
@@ -231,10 +232,12 @@ public class HelloValidation extends ControlsFXSample {
         GridPane.setHgrow(decoratorBox, Priority.ALWAYS);
         
         row++;
-        Button btnToggleRequired = new Button("Toggle tetxField required status");
+        ToggleButton btnToggleRequired = new ToggleButton("Toggle TextField required status");
+        btnToggleRequired.setSelected(ValidationSupport.isRequired(textField));
         btnToggleRequired.setOnAction(e -> {
-            boolean required = ValidationSupport.isRequired(textField);
-        	ValidationSupport.setRequired(textField, !required); 
+//            boolean required = ValidationSupport.isRequired(textField);
+            System.out.println("Is required: " + btnToggleRequired.isSelected());
+        	ValidationSupport.setRequired(textField, btnToggleRequired.isSelected()); 
         });
         grid.add(btnToggleRequired, 1, row, 1, 1);
 

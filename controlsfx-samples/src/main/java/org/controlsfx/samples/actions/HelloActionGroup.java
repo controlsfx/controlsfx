@@ -40,10 +40,9 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -109,27 +108,28 @@ public class HelloActionGroup extends ControlsFXSample {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/action/ActionGroup.html";
     }
     
-    @Override public Node getPanel(final Stage stage) {
-        
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(10, 10, 10, 10));
-        root.setMaxHeight(Double.MAX_VALUE);
-        
-        Label overview = new Label("MenuBar, ToolBar and ContextMenu presented here are effortlesly built out of the same action tree. " +
-        		"Action properties can be dynamically changed, triggering changes in all related controls");
-        overview.setWrapText(true);
-        root.getChildren().add(overview);
-        
-        HBox hbox = new HBox(10);
-        final ComboBox<Action> cbActions = new ComboBox<Action>( flatten( actions, FXCollections.<Action>observableArrayList()));
+    @Override public String getSampleDescription() {
+        return "MenuBar, ToolBar and ContextMenu presented here are effortlessly built out of the same action tree. " +
+                "Action properties can be dynamically changed, triggering changes in all related controls";
+    }
+    
+    @Override public Node getControlPanel() {
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(30, 30, 0, 30));
+
+        int row = 0;
+
+        // Dynamically enable/disable action
+        Label lblAddCrumb = new Label("Dynamically enable/disable action: ");
+        lblAddCrumb.getStyleClass().add("property");
+        grid.add(lblAddCrumb, 0, row);
+        final ComboBox<Action> cbActions = new ComboBox<>(flatten( actions, FXCollections.<Action>observableArrayList()));
         cbActions.getSelectionModel().select(0);
-        
-        hbox.getChildren().add(new Label("Dynamically enable/disable action: "));
-        hbox.getChildren().add(cbActions);
-        
+        grid.add(cbActions, 1, row);
         Action toggleAction = new Action("Enable/Disable") {
-        	
-        	{ setEventHandler(this::handleAction); }
+            { setEventHandler(this::handleAction); }
 
             private void handleAction(ActionEvent ae) {
                Action action = cbActions.getSelectionModel().getSelectedItem();
@@ -139,36 +139,36 @@ public class HelloActionGroup extends ControlsFXSample {
                }
             }
         };
+        grid.add(ActionUtils.createButton(toggleAction), 2, row++);
         
-        hbox.getChildren().add(ActionUtils.createButton(toggleAction));
-        
-        root.getChildren().add(hbox);
-        root.getChildren().add( new Separator());
-
-        VBox examplesPane = new VBox(5);
-        examplesPane.setStyle("-fx-background-color: white;-fx-border-color: gray;-fx-border-width: 2;-fx-border-style: dotted");
-        root.getChildren().add(examplesPane);
+        return grid;
+    }
+    
+    @Override public Node getPanel(final Stage stage) {
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(10, 10, 10, 10));
+        root.setMaxHeight(Double.MAX_VALUE);
         
         Insets topMargin = new Insets(7, 7, 0, 7);
         Insets margin = new Insets(0, 7, 7, 7);
         
-        addWithMargin(examplesPane, new Label("MenuBar"), topMargin ).setStyle("-fx-font-weight: bold;");
-        addWithMargin(examplesPane, ActionUtils.createMenuBar(actions), margin);
+        addWithMargin(root, new Label("MenuBar:"), topMargin ).setStyle("-fx-font-weight: bold;");
+        addWithMargin(root, ActionUtils.createMenuBar(actions), margin);
 
-        addWithMargin(examplesPane,new Label("ToolBar (with text on controls)"), topMargin).setStyle("-fx-font-weight: bold;");
-        addWithMargin(examplesPane, ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW), margin);
+        addWithMargin(root,new Label("ToolBar (with text on controls):"), topMargin).setStyle("-fx-font-weight: bold;");
+        addWithMargin(root, ActionUtils.createToolBar(actions, ActionTextBehavior.SHOW), margin);
 
-        addWithMargin(examplesPane,new Label("ToolBar (no text on controls)"), topMargin).setStyle("-fx-font-weight: bold;");
-        addWithMargin(examplesPane, ActionUtils.createToolBar(actions, ActionTextBehavior.HIDE), margin);
+        addWithMargin(root,new Label("ToolBar (no text on controls):"), topMargin).setStyle("-fx-font-weight: bold;");
+        addWithMargin(root, ActionUtils.createToolBar(actions, ActionTextBehavior.HIDE), margin);
         
-        addWithMargin(examplesPane, new Label("ContextMenu"), topMargin).setStyle("-fx-font-weight: bold;");
+        addWithMargin(root, new Label("ContextMenu:"), topMargin).setStyle("-fx-font-weight: bold;");
         Label context = new Label("Right-click to see the context menu");
-        addWithMargin(examplesPane,context, margin);
-        context.setContextMenu( ActionUtils.createContextMenu(actions)); 
+        addWithMargin(root,context, margin);
+        context.setContextMenu(ActionUtils.createContextMenu(actions)); 
         context.setStyle("-fx-background-color: #E0E0E0 ;-fx-border-color: black;-fx-border-style: dotted");
         context.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         VBox.setVgrow(context, Priority.ALWAYS);
-        VBox.setVgrow(examplesPane, Priority.ALWAYS);
+        VBox.setVgrow(root, Priority.ALWAYS);
         
         return root;
     }

@@ -65,7 +65,6 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
     }
 
     @Override public Node getPanel(final Stage stage) {
-
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
 
@@ -128,7 +127,6 @@ public class HelloBreadCrumbBar extends ControlsFXSample {
         CheckBox chkAutoNav = new CheckBox();
         chkAutoNav.selectedProperty().bindBidirectional(sampleBreadCrumbBar.autoNavigationEnabledProperty());
         grid.add(chkAutoNav, 1, row++);
-        
 
         return grid;
     }

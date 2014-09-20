@@ -90,7 +90,6 @@ public class ImplUtils {
         scene.setRoot(originalParent);        
     }
     
-    @SuppressWarnings("unchecked")
     public static ObservableList<Node> getChildren(Parent p, boolean useReflection) {
         ObservableList<Node> children = null;
         
@@ -119,7 +118,8 @@ public class ImplUtils {
         return children;
     }
     
-    public static ObservableList<Node> getChildrenReflectively(Parent p) {
+    @SuppressWarnings("unchecked")
+	public static ObservableList<Node> getChildrenReflectively(Parent p) {
         ObservableList<Node> children = null;
         
         try {

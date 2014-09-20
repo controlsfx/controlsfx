@@ -49,9 +49,13 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Window;
 
 import org.controlsfx.validation.ValidationSupport;
 
+/**
+ *
+ */
 public class Wizard {
     
     
@@ -104,24 +108,24 @@ public class Wizard {
      **************************************************************************/
     
     /**
-     * 
+     * Creates an instance of the wizard without owner
      */
     public Wizard() {
         this(null);
     }
     
     /**
-     * 
-     * @param owner
+     * Creates an instance of the wizard.
+     * @param owner, owner window is deduced from it. 
      */
     private Wizard(Object owner) {
         this(owner, ""); //$NON-NLS-1$
     }
     
     /**
-     * 
-     * @param owner
-     * @param title
+     * Creates an instance of the wizard.
+     * @param owner, owner window is deduced from it. 
+     * @param title wizard title
      */
     private Wizard(Object owner, String title) {
 //        this.owner = owner;
@@ -131,6 +135,16 @@ public class Wizard {
         
         dialog = new Dialog<>();
         dialog.setTitle(title);
+        
+        Window window = null;
+        if ( owner instanceof Window) { 
+        	window = (Window)owner;
+        } else if ( owner instanceof Node ) {
+        	window = ((Node)owner).getScene().getWindow();
+        }
+        
+        dialog.initOwner(window);
+        
 //        hello.dialog.initOwner(owner); // TODO add initOwner API
         
     }
@@ -143,15 +157,33 @@ public class Wizard {
      * 
      **************************************************************************/
     
-    public final void show() {
-        dialog.show();
-    }
+//    /**
+//     * Shows the wizard but does not wait for a user response (in other words,
+//     * this brings up a non-blocking dialog). Users of this API must either
+//     * poll the {@link #resultProperty() result property}, or else add a listener
+//     * to the result property to be informed of when it is set.
+//     */
+//    public final void show() {
+//        dialog.show();
+//    }
     
+    /**
+     * Shows the wizard and waits for the user response (in other words, brings 
+     * up a blocking dialog, with the returned value the users input).
+     * 
+     * @return An {@link Optional} that contains the {@link #resultProperty() result}.
+     *         Refer to the {@link Dialog} class documentation for more detail.
+     */
     public final Optional<ButtonType> showAndWait() {
         return dialog.showAndWait();
     }
     
     // --- settings
+    
+    /**
+     * Wizards settings is the place where all data from pages is kept once the user moves on from the page. 
+     * @return wizard settings
+     */
     public final ObservableMap<String, Object> getSettings() {
         return settings;
     }
@@ -180,14 +212,26 @@ public class Wizard {
         };
     };
     
+    /**
+     * {@link Flow} property
+     * @return property representing current wizard flow
+     */
     public final ObjectProperty<Flow> flowProperty() {
         return flow;
     }
     
+    /**
+     * Current wizard {@link Flow}
+     * @return returns current {@link Flow}
+     */
     public final Flow getFlow() {
         return flow.get();
     }
     
+    /** 
+     * Sets current {@link Flow}
+     * @param flow will become a wizard {@link Flow}.
+     */
     public final void setFlow(Flow flow) {
         this.flow.set(flow);
     }
@@ -247,7 +291,10 @@ public class Wizard {
         return getProperties().get(USER_DATA_KEY);
     }
     
-    
+    /**
+     * Returns an instance of {@link ValidationSupport}, which can be used for page validation
+     * @return {@link ValidationSupport} instance
+     */
     public ValidationSupport getValidationSupport() {
 		return validationSupport;
 	}
@@ -409,11 +456,15 @@ public class Wizard {
      **************************************************************************/
     
     /**
-     * 
+     *  Default implementation of Wizard pane.
+     *  Based on {@link DialogPane}
      */
     // TODO this should just contain a ControlsFX Form, but for now it is hand-coded
     public static class WizardPane extends DialogPane {
         
+    	/**
+    	 * Creates an instance of wizard pane.
+    	 */
         public WizardPane() {
             // TODO extract to CSS
             setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png"))); //$NON-NLS-1$
@@ -430,8 +481,25 @@ public class Wizard {
         }
     }
     
+    /**
+     * Represents the page flow of the wizard.<br/>
+     * Defines only methods required to move forward in the wizard logic. 
+     * Backward movement is automatically handled by wizard itself, using internal page history.   
+     */
     public interface Flow {
+    	
+    	/** 
+    	 * Advances wizard to the next page if possible.
+    	 * @param currentPage current wizard page
+    	 * @return {@link Optional} value the next wizard page 
+    	 */
     	Optional<WizardPane> advance(WizardPane currentPage);
+    	
+    	/**
+    	 * Check if advancing to next page is possible
+    	 * @param currentPage current wizard page
+    	 * @return true if advance is possible otherwise false
+    	 */
     	boolean canAdvance(WizardPane currentPage);
     }
     

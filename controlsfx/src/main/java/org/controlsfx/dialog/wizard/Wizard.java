@@ -54,7 +54,71 @@ import javafx.stage.Window;
 import org.controlsfx.validation.ValidationSupport;
 
 /**
+ * <p>The API for creating multi-page Wizards, based on JavaFX {@link Dialog} API.<br/> 
+ * Wizard can be setup in following few steps:<p/>
+ * <ul>
+ *    <li>Design wizard pages by inheriting them from {@link WizardPane}</li>
+ *    <li>Define wizard flow by implementing {@link Wizard.Flow}</li>
+ *    <li>Create and instance of the Wizard and assign flow to it</li>
+ *    <li>Execute the wizard using showAndWait method</li> 
+ * </ul>    
+ * <p>For simple, linear wizards {@link LinearWizardFlow} can be used. 
+ * It is a flow based on a collection of wizard pages. Here is the example:</p>
+ * 
+ *  <pre>
+ * {@code 
+ * 
+ * // Create pages. Here for simplicity we just create and instance of WizardPane
+ *     WizardPane page1 = new WizardPane(); 
+ *     WizardPane page2 = new WizardPane(); 
+ *     WizardPane page2 = new WizardPane(); 
+ *     
+ *     // create wizard
+ *     Wizard wizard = new Wizard();
+ *     
+ *     // create and assign the flow
+ *     wizard.setFlow(new LinearWizardFlow(page1, page2, page3));
+ *     
+ *     // show wizard and wait for response
+ *     wizard.showAndWait().ifPresent(result -> {
+ *         if (result == ButtonType.FINISH) {
+ *             System.out.println("Wizard finished, settings: " + wizard.getSettings());
+ *         }
+ *     });
+ * 
+ * }
+ * </pre>
+ *  
+ * <p>For more complex wizard flows we suggest to create a custom flow, describing page traversal logic. 
+ * Here is a simplified example: </p>
+ * 
+ * <pre>
+ * {@code
+ *   
+ *   Wizard.Flow branchingFlow = new Wizard.Flow() {
  *
+ *          @Override
+ *          public Optional<WizardPane> advance(WizardPane currentPage) {
+ *              return Optional.of(getNext(currentPage));
+ *          }
+ *
+ *          @Override
+ *          public boolean canAdvance(WizardPane currentPage) {
+ *              return currentPage != page3;
+ *          }
+ *          
+ *          private WizardPane getNext(WizardPane currentPage) {
+ *              if ( currentPage == null ) {
+ *                  return page1;
+ *              } else if ( currentPage == page1) {
+ *                  return page1.skipNextPage()? page3: page2;
+ *              } else {
+ *                  return page3;
+ *              }
+ *          }
+ *          
+ *      };
+ *   
  */
 public class Wizard {
     
@@ -470,12 +534,17 @@ public class Wizard {
             setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png"))); //$NON-NLS-1$
         }
 
-        // TODO we want to change this to an event-based API eventually
+        /**
+         * Called on entering a page
+         * @param wizard which page will be used on
+         */
         public void onEnteringPage(Wizard wizard) {
-            
         }
         
-        // TODO same here - replace with events
+        /**
+         * Called on existing the page
+         * @param wizard which page was used on
+         */
         public void onExitingPage(Wizard wizard) {
             
         }

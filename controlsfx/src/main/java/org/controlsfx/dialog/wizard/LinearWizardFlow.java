@@ -34,6 +34,14 @@ import java.util.Optional;
 
 import org.controlsfx.dialog.wizard.Wizard.WizardPane;
 
+/**
+ * <p>Implementation of common linear wizard page flow.  
+ * The flow simply traverses a collections of provided {@link WizardPane}s.</p>
+ * <p>For example of usage see {@link Wizard} documentation</p>
+ * 
+ * @see Wizard
+ * @see WizardPane 
+ */
 public class LinearWizardFlow implements Wizard.Flow {
 
     private final List<WizardPane> pages;

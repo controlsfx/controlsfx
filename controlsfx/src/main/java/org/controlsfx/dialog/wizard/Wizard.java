@@ -60,7 +60,8 @@ import org.controlsfx.validation.ValidationSupport;
  *    <li>Design wizard pages by inheriting them from {@link WizardPane}</li>
  *    <li>Define wizard flow by implementing {@link Wizard.Flow}</li>
  *    <li>Create and instance of the Wizard and assign flow to it</li>
- *    <li>Execute the wizard using showAndWait method</li> 
+ *    <li>Execute the wizard using showAndWait method</li>
+ *    <li>Values can be extracted from settings map by calling getSettings 
  * </ul>    
  * <p>For simple, linear wizards {@link LinearWizardFlow} can be used. 
  * It is a flow based on a collection of wizard pages. Here is the example:</p>
@@ -68,7 +69,7 @@ import org.controlsfx.validation.ValidationSupport;
  *  <pre>
  * {@code 
  * 
- * // Create pages. Here for simplicity we just create and instance of WizardPane
+ * // Create pages. Here for simplicity we just create and instance of WizardPane.
  *     WizardPane page1 = new WizardPane(); 
  *     WizardPane page2 = new WizardPane(); 
  *     WizardPane page2 = new WizardPane(); 
@@ -88,8 +89,8 @@ import org.controlsfx.validation.ValidationSupport;
  * 
  * }
  * </pre>
- *  
- * <p>For more complex wizard flows we suggest to create a custom flow, describing page traversal logic. 
+ * 
+ * <p>For more complex wizard flows we suggest to create a custom ones, describing page traversal logic. 
  * Here is a simplified example: </p>
  * 
  * <pre>
@@ -117,8 +118,10 @@ import org.controlsfx.validation.ValidationSupport;
  *              }
  *          }
  *          
- *      };
- *   
+ *   };
+ *      
+ * }
+ * </pre>
  */
 public class Wizard {
     
@@ -520,7 +523,7 @@ public class Wizard {
      **************************************************************************/
     
     /**
-     *  Default implementation of Wizard pane.
+     *  Base of all wizard pages. 
      *  Based on {@link DialogPane}
      */
     // TODO this should just contain a ControlsFX Form, but for now it is hand-coded
@@ -535,14 +538,16 @@ public class Wizard {
         }
 
         /**
-         * Called on entering a page
+         * Called on entering a page. This is a good place to read values from wizard settings 
+         * and assign them to controls on the page
          * @param wizard which page will be used on
          */
         public void onEnteringPage(Wizard wizard) {
         }
         
         /**
-         * Called on existing the page
+         * Called on existing the page. 
+         * This is a good place to read values from page controls and store them in wizard settings
          * @param wizard which page was used on
          */
         public void onExitingPage(Wizard wizard) {

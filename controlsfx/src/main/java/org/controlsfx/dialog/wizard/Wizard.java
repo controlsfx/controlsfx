@@ -47,11 +47,11 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Window;
 
 import org.controlsfx.validation.ValidationSupport;
+
+import com.sun.javafx.css.StyleManager;
 
 /**
  * <p>The API for creating multi-page Wizards, based on JavaFX {@link Dialog} API.<br/> 
@@ -131,7 +131,11 @@ public class Wizard {
      * Static fields
      * 
      **************************************************************************/
-    
+	static {
+		// refer to ControlsFXControl for why this is necessary
+		StyleManager.getInstance().addUserAgentStylesheet(
+				Wizard.class.getResource("wizard.css").toExternalForm()); //$NON-NLS-1$
+	}
     
     
     /**************************************************************************
@@ -528,13 +532,12 @@ public class Wizard {
      */
     // TODO this should just contain a ControlsFX Form, but for now it is hand-coded
     public static class WizardPane extends DialogPane {
-        
+    	
     	/**
     	 * Creates an instance of wizard pane.
     	 */
         public WizardPane() {
-            // TODO extract to CSS
-            setGraphic(new ImageView(new Image("/com/sun/javafx/scene/control/skin/modena/dialog-confirm.png"))); //$NON-NLS-1$
+        	getStyleClass().add("wizard-pane");
         }
 
         /**

@@ -124,8 +124,6 @@ public class Action implements EventHandler<ActionEvent> {
      * <p>
      * Parsing this style might not be supported on some limited
      * platforms. It is recommended to use a standalone CSS file instead.
-     *
-     * @defaultValue empty string
      */
     private StringProperty style;
     public final void setStyle(String value) { styleProperty().set(value); }

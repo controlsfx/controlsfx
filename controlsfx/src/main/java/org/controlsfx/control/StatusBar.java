@@ -38,12 +38,11 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Skin;
 
 /**
- * The status bar control is normally placed at the bottom of a window. It is
+ * The StatusBar control is normally placed at the bottom of a window. It is
  * used to display various types of application status information. This can be
  * a text message, the progress of a task, or any other kind of status (e.g. red
  * / green / yellow lights). By default the status bar contains a label for
@@ -51,12 +50,18 @@ import javafx.scene.control.Skin;
  * running tasks. Additional controls / nodes can be placed on the left and
  * right sides (see {@link #getLeftItems()} and {@link #getRightItems()}).
  * 
- * <h3>Screenshots</h3> The picture below shows the default appearance of the
- * statusbar. <center><img src="statusbar.png" /></center> <br>
- * The following picture shows the status bar reporting progress of a task.
- * <center><img src="statusbar-progress.png" /></center> <br>
- * The last picture shows the status bar with a couple of extra items added to
- * the left and right. <center><img src="statusbar-items.png" /></center>
+ * <h3>Screenshots</h3> 
+ * The picture below shows the default appearance of the StatusBar control: 
+ * <center><img src="statusbar.png" /></center> 
+ * 
+ * <br>
+ * The following picture shows the status bar reporting progress of a task:
+ * <center><img src="statusbar-progress.png" /></center> 
+ * 
+ * <br>
+ * The last picture shows the status bar reporting progress, along with a couple 
+ * of extra items added to the left and right areas of the bar: 
+ * <center><img src="statusbar-items.png" /></center>
  * 
  * <h3>Code Sample</h3>
  * 

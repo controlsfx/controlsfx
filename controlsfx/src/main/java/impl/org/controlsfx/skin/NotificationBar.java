@@ -99,7 +99,6 @@ public abstract class NotificationBar extends Region {
     
     public NotificationBar() {
         getStyleClass().add("notification-bar"); //$NON-NLS-1$
-        setManaged(false);
         
         setVisible(isShowing());
         

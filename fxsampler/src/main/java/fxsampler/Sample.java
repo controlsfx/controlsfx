@@ -82,7 +82,6 @@ public interface Sample {
     
     /**
      * A full URL to a sample source code, which is assumed to be in java.
-     * @return
      */
     public String getSampleSourceURL();
     

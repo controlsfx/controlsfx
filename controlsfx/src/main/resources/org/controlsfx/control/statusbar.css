@@ -1,9 +1,6 @@
 .status-bar {
 	-fx-padding: 4px;
 	-fx-pref-height: 30px;
-	-fx-background-color: -fx-body-color;
-	-fx-border-color: lightgray transparent transparent transparent;
-}
-
-.status-label {
+	-fx-background-color: lightgray, -fx-body-color;
+	-fx-background-insets: 0, 1
 }

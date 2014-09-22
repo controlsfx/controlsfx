@@ -27,11 +27,10 @@
 package org.controlsfx.validation;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -48,18 +47,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
+import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.decoration.GraphicValidationDecoration;
 import org.controlsfx.validation.decoration.ValidationDecoration;
 
@@ -87,51 +78,13 @@ import org.controlsfx.validation.decoration.ValidationDecoration;
  *  a {@link Predicate} to check the applicability of the control and a {@link Callback} to extract control's observable value. 
  *  Here is an sample of internal registration of such "extractor" for  a few  controls :
  *  <pre>
- *     addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
- *     addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
  *  </pre>
  *   
  */
 public class ValidationSupport {
-	
-    private static class ObservableValueExtractor {
-
-        public final Predicate<Control> applicability;
-        public final Callback<Control, ObservableValue<?>> extraction;
-
-        public ObservableValueExtractor( Predicate<Control> applicability, Callback<Control, ObservableValue<?>> extraction ) {
-            this.applicability = Objects.requireNonNull(applicability);
-            this.extraction    = Objects.requireNonNull(extraction);
-        }
-
-    }
-
-    private static List<ObservableValueExtractor> extractors = FXCollections.observableArrayList(); 
-
-    /**
-     * Add "obervable value extractor" for custom controls.
-     * @param test applicability test
-     * @param extract extraction of observable value
-     */
-    public static void addObservableValueExtractor( Predicate<Control> test, Callback<Control, ObservableValue<?>> extract ) {
-        extractors.add( new ObservableValueExtractor(test, extract));
-    }
-
-    {
-        addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
-        addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof ChoiceBox,        c -> ((ChoiceBox<?>)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof CheckBox,         c -> ((CheckBox)c).selectedProperty());
-        addObservableValueExtractor( c -> c instanceof Slider,           c -> ((Slider)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof ColorPicker,      c -> ((ColorPicker)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof DatePicker,       c -> ((DatePicker)c).valueProperty());
-
-        addObservableValueExtractor( c -> c instanceof ListView,         c -> ((ListView<?>)c).itemsProperty());
-        addObservableValueExtractor( c -> c instanceof TableView,        c -> ((TableView<?>)c).itemsProperty());
-
-        // FIXME: How to listen for TreeView changes???
-        //addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
-    }
+    
 
     private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$"; //$NON-NLS-1$
     
@@ -158,21 +111,24 @@ public class ValidationSupport {
     private ObservableMap<Control,ValidationResult> validationResults = 
             FXCollections.observableMap(new WeakHashMap<>());
 
+    
+    private AtomicBoolean dataChanged = new AtomicBoolean(false);
     /**
      * Creates validation support instance
      */
     public ValidationSupport() {
 
-        // notify validation result observers
-        validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
-        validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
-                );
-
-        // validation decoration
         validationResultProperty().addListener( (o, oldValue, validationResult) -> {
             invalidProperty.set(!validationResult.getErrors().isEmpty());
             redecorate();
         });
+    	
+        // notify validation result observers
+        validationResults.addListener( (MapChangeListener.Change<? extends Control, ? extends ValidationResult> change) ->
+        	validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
+        );
+
+        
     }
 
     /**
@@ -186,10 +142,32 @@ public class ValidationSupport {
             odecorator.ifPresent( decorator -> {
             	decorator.removeDecorations(target);
                 decorator.applyRequiredDecoration(target);
-                getHighestMessage(target).ifPresent(msg -> decorator.applyValidationDecoration(msg));
+                if ( dataChanged.get() && isErrorDecorationEnabled()) {
+                	getHighestMessage(target).ifPresent(msg -> decorator.applyValidationDecoration(msg));
+                }
             });
         }
     }
+    
+    private BooleanProperty errorDecorationEnabledProperty = new SimpleBooleanProperty(true) {
+    	protected void invalidated() {
+    		redecorate();
+    	};
+    };
+    
+    public BooleanProperty errorDecorationEnabledProperty() {
+    	return errorDecorationEnabledProperty;
+    }
+    
+    public void setErrorDecorationEnabled(boolean enabled) {
+		errorDecorationEnabledProperty.set(enabled);
+	}
+    
+    private boolean isErrorDecorationEnabled() {
+    	return errorDecorationEnabledProperty.get();
+	}
+    
+    
 
     private ReadOnlyObjectWrapper<ValidationResult> validationResultProperty = 
             new ReadOnlyObjectWrapper<>();
@@ -261,12 +239,6 @@ public class ValidationSupport {
         validationDecoratorProperty.set(decorator);
     }
 
-    private Optional<ObservableValueExtractor> getExtractor(final Control c) {
-        for( ObservableValueExtractor e: extractors ) {
-            if ( e.applicability.test(c)) return Optional.of(e);
-        }
-        return Optional.empty();
-    }
 
     /**
      * Registers {@link Validator} for specified control with additional possiblity to mark control as required or not.
@@ -277,7 +249,6 @@ public class ValidationSupport {
      */
     @SuppressWarnings("unchecked")
     public <T> boolean registerValidator( final Control c, boolean required, final Validator<T> validator  ) {
-    	
     	
     	Optional.ofNullable(c).ifPresent( ctrl -> {
     		ctrl.getProperties().addListener( new MapChangeListener<Object,Object>(){
@@ -293,11 +264,12 @@ public class ValidationSupport {
 
     		});
     	});
+    	
+        setRequired( c, required );
 
-        return getExtractor(c).map( e -> {
+        return ValueExtractor.getObservableValueExtractor(c).map( e -> {
 
-            ObservableValue<T> observable = (ObservableValue<T>) e.extraction.call(c);
-            setRequired( c, required );
+            ObservableValue<T> observable = (ObservableValue<T>) e.call(c);
 
             Consumer<T> updateResults = value -> { 
                 Platform.runLater(() -> validationResults.put(c, validator.apply(c, value)));
@@ -305,7 +277,10 @@ public class ValidationSupport {
 
             controls.add(c);
 
-            observable.addListener( (o,oldValue,newValue) -> updateResults.accept(newValue));
+            observable.addListener( (o,oldValue,newValue) -> {
+            	dataChanged.set(true);
+            	updateResults.accept(newValue);
+            });
             updateResults.accept(observable.getValue());
 
             return e;

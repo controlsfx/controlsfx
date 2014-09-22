@@ -223,18 +223,16 @@ import org.controlsfx.validation.Validator;
  * <p>
  * A dialog has one of the following styles:
  * <ul>
- * <li>{@link DialogStyle#CROSS_PLATFORM_DARK} - a dialog with a cross-platform title bar.</li>
- * <li>{@link DialogStyle#NATIVE} - a dialog with a native title bar.</li>
- * <li>{@link DialogStyle#UNDECORATED} - a dialog without a title bar.</li>
+ * <li>{@link Dialog#STYLE_CLASS_CROSS_PLATFORM} - a dialog with a cross-platform title bar.</li>
+ * <li>{@link Dialog#STYLE_CLASS_NATIVE} - a dialog with a native title bar.</li>
+ * <li>{@link Dialog#STYLE_CLASS_UNDECORATED} - a dialog without a title bar.</li>
  * </ul>
  * </p>
  * <p>If no style is specified, the dialogs will be rendered using the default
- * {@link DialogStyle#CROSS_PLATFORM_DARK} style.</p>
+ * {@link Dialog#STYLE_CLASS_CROSS_PLATFORM} style.</p>
  * 
- * To enable this in the Dialogs fluent API, simply call {@link #style(DialogStyle)}
- * when creating the dialog. If you're using the {@link Dialog} class,
- * you can specify the {@code DialogStyle} you want to use as part of the 
- * {@link Dialog#Dialog(Object, String, boolean, DialogStyle)} constructor.
+ * To enable this in the Dialogs fluent API, simply call {@link #styleClass(String)}
+ * when creating the dialog.
  * 
  * <p>Here are the screenshots of dialogs using different dialog styles:
  * 
@@ -295,9 +293,9 @@ import org.controlsfx.validation.Validator;
  * 
  * <p>One limitation of lightweight dialogs is that it is not possible to use
  * the native titlebar feature. If you call both {@link #lightweight()} and
- * {@link #style(DialogStyle)} with {@link DialogStyle#NATIVE} option,
+ * {@link #styleClass(String)} with {@link Dialog#STYLE_CLASS_NATIVE} option,
  * the call to enable lightweight takes precedence over the use of the
- * {@code DialogStyle}, so you will end up seeing what is shown in the screenshot
+ * native style, so you will end up seeing what is shown in the screenshot
  * below (that is, a cross-platform-looking dialog that is lightweight).
  * 
  * <p>To make a dialog lightweight, you simply call {@link #lightweight()} when
@@ -311,11 +309,11 @@ import org.controlsfx.validation.Validator;
  * dialog is dismissed by the user, the rest of the UI (including going to other
  * tabs) remains interactive):
  * 
- * <h4>Lightweight dialog whose style is {@link DialogStyle#CROSS_PLATFORM_DARK}</h4>
+ * <h4>Lightweight dialog whose style is {@link Dialog#STYLE_CLASS_CROSS_PLATFORM}</h4>
  * <br>
  * <center><img src="dialog-style/windows-8-lightweight-cross-platform.png"></center>
  * 
- * <h4>Lightweight dialog whose style is {@link DialogStyle#UNDECORATED}</h4>
+ * <h4>Lightweight dialog whose style is {@link Dialog#STYLE_CLASS_UNDECORATED}</h4>
  * <br>
  * <center><img src="dialog-style/windows-8-lightweight-undecorated.png"></center>
  * 
@@ -357,7 +355,7 @@ import org.controlsfx.validation.Validator;
  * 
  * <pre>
  * {@code 
- * if (response == Dialog.Actions.YES) {
+ * if (response == Dialog.ACTION_YES) {
  *     // ... submit user input
  * } else {
  *     // ... user cancelled, reset form to default
@@ -383,7 +381,6 @@ import org.controlsfx.validation.Validator;
  *
  * @see Dialog
  * @see Action
- * @see Actions
  * @see Action
  * @see Optional
  */
@@ -442,7 +439,7 @@ public final class Dialogs {
     
     /**
      * Assigns dialog's graphic
-     * @param title dialog graphic
+     * @param graphic dialog graphic
      * @return dialog instance.
      */
     public Dialogs graphic(final Node graphic) {
@@ -629,7 +626,7 @@ public final class Dialogs {
     /**
      * Shows dialog with one text field
      * @param defaultValue text field default value 
-     * @return Optional of text from input field if OK action is used otherwise Optional.EMPTY 
+     * @return Optional of text from input field if OK action is used otherwise {@link Optional#empty()} 
      */
     public Optional<String> showTextInput(String defaultValue) {
         Dialog dlg = buildDialog(Type.INPUT);
@@ -641,7 +638,7 @@ public final class Dialogs {
 
     /**
      * Shows dialog with one text field 
-     * @return Optional of text from input field or Optional.EMPTY if dialog is cancelled 
+     * @return Optional of text from input field or {@link Optional#empty()} if dialog is cancelled 
      */
     public Optional<String> showTextInput() {
         return showTextInput(""); //$NON-NLS-1$
@@ -652,7 +649,7 @@ public final class Dialogs {
      * will be set to a default value if one is provided.
      * @param defaultChoice default combobox selection 
      * @param choices dialog choices
-     * @return Optional of selected choice or Optional.EMPTY if dialog is cancelled.
+     * @return Optional of selected choice or {@link Optional#empty()} if dialog is cancelled.
      */
     public <T> Optional<T> showChoices(T defaultChoice, Collection<T> choices) {
 
@@ -697,7 +694,7 @@ public final class Dialogs {
     /**
      * Show a dialog with one combobox filled with provided choices 
      * @param choices dialog choices
-     * @return Optional of selected choice or Optional.EMPTY if dialog is cancelled
+     * @return Optional of selected choice or {@link Optional#empty()} if dialog is cancelled
      */
     public <T> Optional<T> showChoices(@SuppressWarnings("unchecked") T... choices) {
         return showChoices(Arrays.asList(choices));
@@ -913,7 +910,7 @@ public final class Dialogs {
      * authentication errors and will be shown as error message. In case of an exception the dialog will not be closed to give the user 
      * an opportunity to correct their information and try again
      * 
-     * @return optional {@link Pair} of user info. {@link Optional.EMPTY} returned in case of cancelled dialog, otherwise Optional of user info 
+     * @return optional {@link Pair} of user info. {@link Optional#empty()} returned in case of cancelled dialog, otherwise Optional of user info 
      * with provided user name and password
      */
     public Optional<Pair<String,String>> showLogin( final Pair<String,String> initialUserInfo, final Callback<Pair<String,String>, Void> authenticator ) {

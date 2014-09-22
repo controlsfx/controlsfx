@@ -16,6 +16,10 @@ sourceSets {
 }
 
 dependencies {
+
+    compile project(':controlsfx')
+    compile project(':fxsampler')
+
     compile group + ':' + fxsampler_name +':'  + fxsampler_version
     compile group + ':' + controlsfx_name + ':' + version
 

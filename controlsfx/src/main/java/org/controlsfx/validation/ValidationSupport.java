@@ -243,7 +243,7 @@ public class ValidationSupport {
 
         return ValueExtractor.getObservableValueExtractor(c).map( e -> {
 
-            ObservableValue<T> observable = (ObservableValue<T>) e.extraction.call(c);
+            ObservableValue<T> observable = (ObservableValue<T>) e.call(c);
             setRequired( c, required );
 
             Consumer<T> updateResults = value -> { 

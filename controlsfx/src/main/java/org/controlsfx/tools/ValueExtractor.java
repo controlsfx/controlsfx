@@ -53,7 +53,7 @@ import javafx.util.Callback;
 
 public class ValueExtractor {
 	
-	public static class ObservableValueExtractor {
+	private static class ObservableValueExtractor {
 
         public final Predicate<Control> applicability;
 		public final Callback<Control, ObservableValue<?>> extraction;
@@ -94,15 +94,15 @@ public class ValueExtractor {
 	
 	
 	
-    public static final Optional<ObservableValueExtractor> getObservableValueExtractor(final Control c) {
+    public static final Optional<Callback<Control, ObservableValue<?>>> getObservableValueExtractor(final Control c) {
         for( ObservableValueExtractor e: extractors ) {
-            if ( e.applicability.test(c)) return Optional.of(e);
+            if ( e.applicability.test(c)) return Optional.of(e.extraction);
         }
         return Optional.empty();
     }
     
     
-    public static class NodeValueExtractor {
+    private static class NodeValueExtractor {
 
         public final Predicate<Node> applicability;
 		public final Callback<Node, Object> extraction;

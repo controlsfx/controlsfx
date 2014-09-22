@@ -229,8 +229,7 @@ public class Wizard {
      * Shows the wizard and waits for the user response (in other words, brings 
      * up a blocking dialog, with the returned value the users input).
      * 
-     * @return An {@link Optional} that contains the {@link #resultProperty() result}.
-     *         Refer to the {@link Dialog} class documentation for more detail.
+     * @return An {@link Optional} that contains the result.
      */
     public final Optional<ButtonType> showAndWait() {
         return dialog.showAndWait();
@@ -276,10 +275,17 @@ public class Wizard {
         return flow;
     }
     
+    /**
+     * Returns the currently set {@link Flow}, which represents the flow of 
+     * pages in the wizard. 
+     */
     public final Flow getFlow() {
         return flow.get();
     }
     
+    /**
+     * Sets the {@link Flow}, which represents the flow of pages in the wizard. 
+     */
     public final void setFlow(Flow flow) {
         this.flow.set(flow);
     }

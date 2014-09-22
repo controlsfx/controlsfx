@@ -34,13 +34,11 @@ package org.controlsfx.glyphfont;
 public interface INamedCharacter {
     /**
      * Gets the name of this character
-     * @return
      */
     String name();
 
     /**
      * Gets the character value
-     * @return
      */
     char getChar();
 }

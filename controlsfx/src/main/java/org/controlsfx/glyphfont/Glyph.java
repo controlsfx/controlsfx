@@ -239,7 +239,6 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
     /**
      * Sets the font family of this glyph
      * Font size is reset to default glyph font size
-     * @param family
      */
     public void setFontFamily(String family){
         if( !getFont().getFamily().equals(family)){
@@ -253,7 +252,6 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Gets the font family of this glyph
-     * @return
      */
     public String getFontFamily(){
         return getFont().getFamily();
@@ -261,7 +259,6 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Sets the font size of this glyph
-     * @param size
      */
     public void setFontSize(double size){
         Font newFont = Font.font(getFont().getFamily(), size);
@@ -270,7 +267,6 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Gets the font size of this glyph
-     * @return
      */
     public double getFontSize(){
         return getFont().getSize();
@@ -278,7 +274,6 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
 
     /**
      * Set the Color of this Glyph
-     * @param color
      */
     public void setColor(Color color){
         setTextFill(color);
@@ -289,8 +284,6 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      *
      * This must either be a Glyph-Name (either string or enum value) known by the GlyphFontRegistry.
      * Alternatively, you can directly submit a unicode character here.
-     *
-     * @return
      */
     public Object iconProperty(){
         return icon;

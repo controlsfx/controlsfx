@@ -193,7 +193,6 @@ public class GlyphFont {
     /**
      *  Creates an instance of {@link Glyph} using a known Glyph enum value
      * @param glyph
-     * @return
      */
     public Glyph create(Enum<?> glyph) {
         return new Glyph(fontName, glyph);
@@ -203,7 +202,6 @@ public class GlyphFont {
      * Returns the character code which is mapped to this Name.
      * If no match is found, NULL is returned.
      * @param glyphName
-     * @return
      */
     public Character getCharacter(String glyphName){
         return namedGlyphs.get(glyphName.toUpperCase());

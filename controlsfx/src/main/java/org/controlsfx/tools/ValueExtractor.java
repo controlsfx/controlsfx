@@ -156,7 +156,7 @@ public class ValueExtractor {
      * Attempts to return a value for the given Node. This is done by checking
      * the map of value extractors, contained within this class. This
      * map contains value extractors for common UI controls, but more extractors
-     * can be added by calling {@link #addValueExtractor(Class, javafx.util.Callback)}.
+     * can be added by calling {@link #addObservableValueExtractor(Predicate, Callback)}.
      * 
      * @param n The node from whom a value will hopefully be extracted.
      * @return The value of the given node.

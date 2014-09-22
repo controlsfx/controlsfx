@@ -27,8 +27,6 @@
 package org.controlsfx.validation;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -48,18 +46,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 
+import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.decoration.GraphicValidationDecoration;
 import org.controlsfx.validation.decoration.ValidationDecoration;
 
@@ -87,51 +77,14 @@ import org.controlsfx.validation.decoration.ValidationDecoration;
  *  a {@link Predicate} to check the applicability of the control and a {@link Callback} to extract control's observable value. 
  *  Here is an sample of internal registration of such "extractor" for  a few  controls :
  *  <pre>
- *     addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
- *     addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
  *  </pre>
  *   
  */
 public class ValidationSupport {
 	
-    private static class ObservableValueExtractor {
-
-        public final Predicate<Control> applicability;
-        public final Callback<Control, ObservableValue<?>> extraction;
-
-        public ObservableValueExtractor( Predicate<Control> applicability, Callback<Control, ObservableValue<?>> extraction ) {
-            this.applicability = Objects.requireNonNull(applicability);
-            this.extraction    = Objects.requireNonNull(extraction);
-        }
-
-    }
-
-    private static List<ObservableValueExtractor> extractors = FXCollections.observableArrayList(); 
-
-    /**
-     * Add "obervable value extractor" for custom controls.
-     * @param test applicability test
-     * @param extract extraction of observable value
-     */
-    public static void addObservableValueExtractor( Predicate<Control> test, Callback<Control, ObservableValue<?>> extract ) {
-        extractors.add( new ObservableValueExtractor(test, extract));
-    }
-
-    {
-        addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
-        addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof ChoiceBox,        c -> ((ChoiceBox<?>)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof CheckBox,         c -> ((CheckBox)c).selectedProperty());
-        addObservableValueExtractor( c -> c instanceof Slider,           c -> ((Slider)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof ColorPicker,      c -> ((ColorPicker)c).valueProperty());
-        addObservableValueExtractor( c -> c instanceof DatePicker,       c -> ((DatePicker)c).valueProperty());
-
-        addObservableValueExtractor( c -> c instanceof ListView,         c -> ((ListView<?>)c).itemsProperty());
-        addObservableValueExtractor( c -> c instanceof TableView,        c -> ((TableView<?>)c).itemsProperty());
-
-        // FIXME: How to listen for TreeView changes???
-        //addObservableValueExtractor( c -> c instanceof TreeView,         c -> ((TreeView<?>)c).Property());
-    }
+    
 
     private static final String CTRL_REQUIRED_FLAG    = "$org.controlsfx.validation.required$"; //$NON-NLS-1$
     
@@ -261,12 +214,6 @@ public class ValidationSupport {
         validationDecoratorProperty.set(decorator);
     }
 
-    private Optional<ObservableValueExtractor> getExtractor(final Control c) {
-        for( ObservableValueExtractor e: extractors ) {
-            if ( e.applicability.test(c)) return Optional.of(e);
-        }
-        return Optional.empty();
-    }
 
     /**
      * Registers {@link Validator} for specified control with additional possiblity to mark control as required or not.
@@ -294,7 +241,7 @@ public class ValidationSupport {
     		});
     	});
 
-        return getExtractor(c).map( e -> {
+        return ValueExtractor.getObservableValueExtractor(c).map( e -> {
 
             ObservableValue<T> observable = (ObservableValue<T>) e.extraction.call(c);
             setRequired( c, required );

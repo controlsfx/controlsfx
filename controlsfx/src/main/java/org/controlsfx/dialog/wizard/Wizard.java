@@ -49,6 +49,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Window;
 
+import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.ValidationSupport;
 
 import com.sun.javafx.css.StyleManager;

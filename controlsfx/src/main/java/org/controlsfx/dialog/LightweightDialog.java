@@ -26,6 +26,8 @@
  */
 package org.controlsfx.dialog;
 
+import java.util.List;
+
 import impl.org.controlsfx.ImplUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -381,7 +383,9 @@ class LightweightDialog extends FXDialog {
         lightweightDialog.setVisible(false);
         
         // reset the scenegraph
-        ImplUtils.getChildren(owner.getParent(), false).setAll(owner);
+        List<Node> children = ImplUtils.getChildren(owner.getParent(), false);
+        children.clear();
+        children.add(owner);
         
         dialogStack = null;
     }

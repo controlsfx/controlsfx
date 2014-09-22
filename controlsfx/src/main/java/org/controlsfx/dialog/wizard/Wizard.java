@@ -28,6 +28,7 @@ package org.controlsfx.dialog.wizard;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
+import impl.org.controlsfx.ImplUtils;
 
 import java.util.HashMap;
 import java.util.List;

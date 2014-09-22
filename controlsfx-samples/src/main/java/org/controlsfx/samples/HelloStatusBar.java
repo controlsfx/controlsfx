@@ -28,20 +28,15 @@ package org.controlsfx.samples;
 
 import static javafx.geometry.Orientation.VERTICAL;
 import javafx.concurrent.Task;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -56,63 +51,35 @@ public class HelloStatusBar extends ControlsFXSample {
         launch(args);
     }
 
-    @Override
-    public String getSampleName() {
-        return "Status Bar";
+    @Override public String getSampleName() {
+        return "StatusBar";
     }
 
-    @Override
-    public String getJavaDocURL() {
+    @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/StatusBar.html";
     }
 
-    @Override
-    public Node getPanel(Stage stage) {
-
-        ColumnConstraints col = new ColumnConstraints();
-        col.setPercentWidth(100);
-        col.setFillWidth(true);
-        col.setHalignment(HPos.CENTER);
-
-        RowConstraints row = new RowConstraints();
-        row.setPercentHeight(100);
-        row.setFillHeight(false);
-        row.setValignment(VPos.CENTER);
-
-        GridPane gridPane = new GridPane();
-        gridPane.getColumnConstraints().add(col);
-        gridPane.getRowConstraints().add(row);
-
-        gridPane.setGridLinesVisible(true);
-
+    @Override public Node getPanel(Stage stage) {
         statusBar = new StatusBar();
-        statusBar.setPrefWidth(500);
-        statusBar.setStyle("-fx-border-color: gray;");
 
-        StackPane stackPane = new StackPane();
-        stackPane.getChildren().add(statusBar);
-        stackPane.setStyle("-fx-padding: 20px");
+        BorderPane borderPane = new BorderPane();
+        borderPane.setBottom(statusBar);
 
-        gridPane.add(stackPane, 0, 0);
-
-        return gridPane;
+        return borderPane;
     }
 
-    @Override
-    public String getSampleDescription() {
-        return "The status bar control can be used to display various application-specific status fields. This "
+    @Override public String getSampleDescription() {
+        return "The StatusBar control can be used to display various application-specific status fields. This "
                 + "can be plain text, the progress of a long running task, or any other type of information.";
     }
 
-    @Override
-    public Node getControlPanel() {
+    @Override public Node getControlPanel() {
         VBox box = new VBox();
         box.setSpacing(10);
 
         TextField statusTextField = new TextField();
         statusTextField.setPromptText("Status Text");
-        statusTextField.textProperty().addListener(
-                it -> statusBar.setText(statusTextField.getText()));
+        statusTextField.textProperty().bindBidirectional(statusBar.textProperty());
 
         box.getChildren().add(statusTextField);
 
@@ -163,8 +130,7 @@ public class HelloStatusBar extends ControlsFXSample {
 
     private void startTask() {
         Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
+            @Override protected Void call() throws Exception {
                 updateMessage("First we sleep ....");
 
                 Thread.sleep(2500);
@@ -180,11 +146,16 @@ public class HelloStatusBar extends ControlsFXSample {
                 return null;
             }
         };
-
+        
         statusBar.textProperty().bind(task.messageProperty());
         statusBar.progressProperty().bind(task.progressProperty());
+        
+        // remove bindings again
+        task.setOnSucceeded(event -> {
+            statusBar.textProperty().unbind();    
+            statusBar.progressProperty().unbind();
+        });
 
-        Thread thread = new Thread(task);
-        thread.start();
+        new Thread(task).start();
     }
 }

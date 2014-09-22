@@ -24,12 +24,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.dialog.wizard;
+package org.controlsfx.dialog;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.ImplUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -65,65 +68,51 @@ import com.sun.javafx.css.StyleManager;
  *    <li>Execute the wizard using showAndWait method</li>
  *    <li>Values can be extracted from settings map by calling getSettings 
  * </ul>    
- * <p>For simple, linear wizards {@link LinearWizardFlow} can be used. 
+ * <p>For simple, linear wizards, the {@link LinearFlow} can be used. 
  * It is a flow based on a collection of wizard pages. Here is the example:</p>
  * 
- *  <pre>
- * {@code 
+ * <pre>{@code // Create pages. Here for simplicity we just create and instance of WizardPane.
+ * WizardPane page1 = new WizardPane(); 
+ * WizardPane page2 = new WizardPane(); 
+ * WizardPane page2 = new WizardPane(); 
  * 
- * // Create pages. Here for simplicity we just create and instance of WizardPane.
- *     WizardPane page1 = new WizardPane(); 
- *     WizardPane page2 = new WizardPane(); 
- *     WizardPane page2 = new WizardPane(); 
- *     
- *     // create wizard
- *     Wizard wizard = new Wizard();
- *     
- *     // create and assign the flow
- *     wizard.setFlow(new LinearWizardFlow(page1, page2, page3));
- *     
- *     // show wizard and wait for response
- *     wizard.showAndWait().ifPresent(result -> {
- *         if (result == ButtonType.FINISH) {
- *             System.out.println("Wizard finished, settings: " + wizard.getSettings());
- *         }
- *     });
+ * // create wizard
+ * Wizard wizard = new Wizard();
  * 
- * }
- * </pre>
+ * // create and assign the flow
+ * wizard.setFlow(new LinearFlow(page1, page2, page3));
+ *     
+ * // show wizard and wait for response
+ * wizard.showAndWait().ifPresent(result -> {
+ *     if (result == ButtonType.FINISH) {
+ *         System.out.println("Wizard finished, settings: " + wizard.getSettings());
+ *     }
+ * });}</pre>
  * 
  * <p>For more complex wizard flows we suggest to create a custom ones, describing page traversal logic. 
  * Here is a simplified example: </p>
  * 
- * <pre>
- * {@code
- *   
- *   Wizard.Flow branchingFlow = new Wizard.Flow() {
+ * <pre>{@code Wizard.Flow branchingFlow = new Wizard.Flow() {
+ *     public Optional<WizardPane> advance(WizardPane currentPage) {
+ *         return Optional.of(getNext(currentPage));
+ *     }
  *
- *          @Override
- *          public Optional<WizardPane> advance(WizardPane currentPage) {
- *              return Optional.of(getNext(currentPage));
- *          }
- *
- *          @Override
- *          public boolean canAdvance(WizardPane currentPage) {
- *              return currentPage != page3;
- *          }
+ *     public boolean canAdvance(WizardPane currentPage) {
+ *         return currentPage != page3;
+ *     }
  *          
- *          private WizardPane getNext(WizardPane currentPage) {
- *              if ( currentPage == null ) {
- *                  return page1;
- *              } else if ( currentPage == page1) {
- *                  return page1.skipNextPage()? page3: page2;
- *              } else {
- *                  return page3;
- *              }
- *          }
- *          
- *   };
- *      
- * }
- * </pre>
+ *     private WizardPane getNext(WizardPane currentPage) {
+ *         if ( currentPage == null ) {
+ *             return page1;
+ *         } else if ( currentPage == page1) {
+ *             // skipNextPage() does not exist - this just represents that you
+ *             // can add a conditional statement here to change the page.
+ *             return page1.skipNextPage()? page3: page2;
+ *         } else {
+ *             return page3;
+ *         }
+ *     }
+ * };}</pre>
  */
 public class Wizard {
     
@@ -156,7 +145,6 @@ public class Wizard {
     
     private final ValidationSupport validationSupport = new ValidationSupport();
     
-//    
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
@@ -181,29 +169,29 @@ public class Wizard {
      **************************************************************************/
     
     /**
-     * Creates an instance of the wizard without owner
+     * Creates an instance of the wizard without an owner.
      */
     public Wizard() {
         this(null);
     }
     
     /**
-     * Creates an instance of the wizard.
-     * @param owner, owner window is deduced from it. 
+     * Creates an instance of the wizard with the given owner.
+     * @param owner The object from which the owner window is deduced (typically
+     *      this is a Node, but it may also be a Scene or a Stage). 
      */
-    private Wizard(Object owner) {
+    public Wizard(Object owner) {
         this(owner, ""); //$NON-NLS-1$
     }
     
     /**
-     * Creates an instance of the wizard.
-     * @param owner, owner window is deduced from it. 
-     * @param title wizard title
+     * Creates an instance of the wizard with the given owner and title.
+     * 
+     * @param owner The object from which the owner window is deduced (typically
+     *      this is a Node, but it may also be a Scene or a Stage). 
+     * @param title The wizard title.
      */
-    private Wizard(Object owner, String title) {
-//        this.owner = owner;
-//        this.title = title;
-        
+    public Wizard(Object owner, String title) {
         validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
         
         dialog = new Dialog<>();
@@ -217,9 +205,6 @@ public class Wizard {
         }
         
         dialog.initOwner(window);
-        
-//        hello.dialog.initOwner(owner); // TODO add initOwner API
-        
     }
     
     
@@ -251,11 +236,10 @@ public class Wizard {
         return dialog.showAndWait();
     }
     
-    // --- settings
-    
     /**
-     * Wizards settings is the place where all data from pages is kept once the user moves on from the page. 
-     * @return wizard settings
+     * The settings map is the place where all data from pages is kept once the 
+     * user moves on from the page, assuming there is a {@link ValueExtractor} 
+     * that is capable of extracting a value out of the various fields on the page. 
      */
     public final ObservableMap<String, Object> getSettings() {
         return settings;
@@ -270,7 +254,10 @@ public class Wizard {
      **************************************************************************/
     
     // --- flow
-    private ObjectProperty<Flow> flow = new SimpleObjectProperty<Flow>(new LinearWizardFlow()) {
+    /**
+     * The {@link Flow} property represents the flow of pages in the wizard. 
+     */
+    private ObjectProperty<Flow> flow = new SimpleObjectProperty<Flow>(new LinearFlow()) {
         @Override protected void invalidated() {
             updatePage(dialog,false);
         }
@@ -285,26 +272,14 @@ public class Wizard {
         };
     };
     
-    /**
-     * {@link Flow} property
-     * @return property representing current wizard flow
-     */
     public final ObjectProperty<Flow> flowProperty() {
         return flow;
     }
     
-    /**
-     * Current wizard {@link Flow}
-     * @return returns current {@link Flow}
-     */
     public final Flow getFlow() {
         return flow.get();
     }
     
-    /** 
-     * Sets current {@link Flow}
-     * @param flow will become a wizard {@link Flow}.
-     */
     public final void setFlow(Flow flow) {
         this.flow.set(flow);
     }
@@ -318,7 +293,9 @@ public class Wizard {
 
     /**
       * Returns an observable map of properties on this Wizard for use primarily
-      * by application developers.
+      * by application developers - not to be confused with the 
+      * {@link #getSettings()} map that represents the values entered by the user
+      * into the wizard.
       *
       * @return an observable map of properties on this Wizard for use primarily
       * by application developers
@@ -344,10 +321,10 @@ public class Wizard {
      * Convenience method for setting a single Object property that can be
      * retrieved at a later date. This is functionally equivalent to calling
      * the getProperties().put(Object key, Object value) method. This can later
-     * be retrieved by calling {@link helloworld.dialog.wizard.Wizard#getUserData()}.
+     * be retrieved by calling {@link #getUserData()}.
      *
      * @param value The value to be stored - this can later be retrieved by calling
-     *          {@link helloworld.dialog.wizard.Wizard#getUserData()}.
+     *          {@link #getUserData()}.
      */
     public void setUserData(Object value) {
         getProperties().put(USER_DATA_KEY, value);
@@ -355,7 +332,7 @@ public class Wizard {
 
     /**
      * Returns a previously set Object property, or null if no such property
-     * has been set using the {@link helloworld.dialog.wizard.Wizard#setUserData(Object)} method.
+     * has been set using the {@link #setUserData(Object)} method.
      *
      * @return The Object that was previously set, or null if no property
      *          has been set or if null was set.
@@ -371,6 +348,7 @@ public class Wizard {
     public ValidationSupport getValidationSupport() {
 		return validationSupport;
 	}
+    
     
     
     /**************************************************************************
@@ -529,10 +507,11 @@ public class Wizard {
      **************************************************************************/
     
     /**
-     *  Base of all wizard pages. 
-     *  Based on {@link DialogPane}
+     * WizardPane is the base class for all wizard pages. The API is essentially
+     * the {@link DialogPane}, with the addition of convenience methods related
+     * to {@link #onEnteringPage(Wizard) entering} and 
+     * {@link #onExitingPage(Wizard) exiting} the page.
      */
-    // TODO this should just contain a ControlsFX Form, but for now it is hand-coded
     public static class WizardPane extends DialogPane {
     	
     	/**
@@ -548,6 +527,7 @@ public class Wizard {
          * @param wizard which page will be used on
          */
         public void onEnteringPage(Wizard wizard) {
+            // no-op
         }
         
         /**
@@ -556,30 +536,81 @@ public class Wizard {
          * @param wizard which page was used on
          */
         public void onExitingPage(Wizard wizard) {
-            
+            // no-op
         }
     }
     
+    
+    
     /**
-     * Represents the page flow of the wizard.<br/>
-     * Defines only methods required to move forward in the wizard logic. 
-     * Backward movement is automatically handled by wizard itself, using internal page history.   
+     * Represents the page flow of the wizard. It defines only methods required 
+     * to move forward in the wizard logic, as backward movement is automatically 
+     * handled by wizard itself, using internal page history.   
      */
     public interface Flow {
     	
     	/** 
-    	 * Advances wizard to the next page if possible.
-    	 * @param currentPage current wizard page
-    	 * @return {@link Optional} value the next wizard page 
+    	 * Advances the wizard to the next page if possible.
+    	 * 
+    	 * @param currentPage The current wizard page
+    	 * @return {@link Optional} value containing the next wizard page. 
     	 */
     	Optional<WizardPane> advance(WizardPane currentPage);
     	
     	/**
-    	 * Check if advancing to next page is possible
-    	 * @param currentPage current wizard page
-    	 * @return true if advance is possible otherwise false
+    	 * Check if advancing to the next page is possible
+    	 * 
+    	 * @param currentPage The current wizard page
+    	 * @return true if it is possible to advance to the next page, false otherwise.
     	 */
     	boolean canAdvance(WizardPane currentPage);
+    }
+    
+    
+    /**
+     * LinearFlow is an implementation of the {@link Wizard.Flow} interface,
+     * designed to support the most common type of wizard flow - namely, a linear 
+     * wizard page flow (i.e. through all pages in the order that they are specified).
+     * Therefore, this {@link Flow} implementation simply traverses a collections of
+     * {@link WizardPane WizardPanes}.
+     * 
+     * <p>For example of how to use this API, please refer to the {@link Wizard} 
+     * documentation</p>
+     * 
+     * @see Wizard
+     * @see WizardPane 
+     */
+    public static class LinearFlow implements Wizard.Flow {
+
+        private final List<WizardPane> pages;
+
+        /**
+         * Creates a new LinearFlow instance that will allow for stepping through
+         * the given collection of {@link WizardPane} instances.
+         */
+        public LinearFlow( Collection<WizardPane> pages ) {
+            this.pages = new ArrayList<>(pages);
+        }
+
+        /**
+         * Creates a new LinearFlow instance that will allow for stepping through
+         * the given varargs array of {@link WizardPane} instances.
+         */
+        public LinearFlow( WizardPane... pages ) {
+            this( Arrays.asList(pages));
+        }
+
+        /** {@inheritDoc} */
+        @Override public Optional<WizardPane> advance(WizardPane currentPage) {
+            int pageIndex = pages.indexOf(currentPage);
+            return Optional.ofNullable( pages.get(++pageIndex) );
+        }
+
+        /** {@inheritDoc} */
+        @Override public boolean canAdvance(WizardPane currentPage) {
+            int pageIndex = pages.indexOf(currentPage);
+            return pages.size()-1 > pageIndex; 
+        }
     }
     
 }

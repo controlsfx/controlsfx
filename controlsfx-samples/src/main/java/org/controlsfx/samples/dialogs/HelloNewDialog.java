@@ -63,13 +63,13 @@ import javafx.stage.Window;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.dialog.CommandLinksDialog;
 import org.controlsfx.dialog.CommandLinksDialog.CommandLinksButtonType;
+import org.controlsfx.dialog.Wizard.WizardPane;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.FontSelectorDialog;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.dialog.ProgressDialog;
-import org.controlsfx.dialog.wizard.LinearWizardFlow;
-import org.controlsfx.dialog.wizard.Wizard;
-import org.controlsfx.dialog.wizard.Wizard.WizardPane;
+import org.controlsfx.dialog.Wizard;
+import org.controlsfx.dialog.Wizard.LinearFlow;
 
 public class HelloNewDialog extends ControlsFXSample {
     
@@ -548,7 +548,7 @@ public class HelloNewDialog extends ControlsFXSample {
                 
 
         // create wizard
-        wizard.setFlow(new LinearWizardFlow(page1, page2, page3));
+        wizard.setFlow(new LinearFlow(page1, page2, page3));
         
         System.out.println("page1: " + page1);
         System.out.println("page2: " + page2);

@@ -33,7 +33,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -222,7 +221,7 @@ public class HelloValidation extends ControlsFXSample {
         decoratorBox.setCellFactory(cellFactory);
         decoratorBox.setButtonCell(cellFactory.call(null));
         decoratorBox.getSelectionModel().selectedItemProperty().addListener((o,old,decorator) ->
-        validationSupport.setValidationDecorator(decorator));
+        	validationSupport.setValidationDecorator(decorator));
         decoratorBox.getSelectionModel().select(0);
 
         Label validationDecoratorLabel = new Label("Validation Decorator: ");

@@ -69,10 +69,6 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.Stack;
-import javafx.scene.control.Tooltip;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -149,8 +145,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     protected SpreadsheetView spreadsheetView;
     protected VerticalHeader verticalHeader;
     protected HorizontalPicker horizontalPickers;
-    
-    protected Reference<Stack<Tooltip>> tooltipStack = null;
     
     /**
      * The currently fixedRow. This handles an Integer's set of rows being
@@ -243,19 +237,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         computeFixedRowHeight();
     }
 
-    /**
-     * Return the Tooltip Stack.
-     * @return 
-     */
-    Stack<Tooltip> getTooltipStack() {
-        Stack<Tooltip> stack = tooltipStack == null? null : tooltipStack.get();
-        if (stack == null) {
-            stack = new Stack<>();
-            tooltipStack = new WeakReference<>(stack);
-        }
-        return stack;
-    }
-    
     /**
      * Compute the height of a particular row.
      * 

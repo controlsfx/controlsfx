@@ -28,7 +28,6 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Stack;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
@@ -68,6 +67,12 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  */
 public class CellView extends TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
     private final SpreadsheetHandle handle;
+    /**
+     * Because we don't want to recreate Tooltip each time the TableCell is
+     * re-used. We save it properly here so we avoid recreating it each time
+     * since it's really time-consuming.
+     */
+    private Tooltip tooltip;
 
     /***************************************************************************
      * * Static Fields * *
@@ -237,9 +242,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * re-create it for nothing as it is a really time-consuming
              * operation.
              */
-            Tooltip tooltip = getAvailableTooltip();
-            if (tooltip != null) {
-                if (!Objects.equals(tooltip.getText(), trimTooltip)) {
+            Tooltip localTooltip = getAvailableTooltip();
+            if (localTooltip != null) {
+                if (!Objects.equals(localTooltip.getText(), trimTooltip)) {
                     getTooltip().setText(trimTooltip);
                 }
             } else {
@@ -258,8 +263,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else {
             //We save that tooltip
             if(getTooltip() != null){
-                final Stack<Tooltip> tooltipStack = handle.getCellsViewSkin().getTooltipStack();
-                tooltipStack.push(getTooltip());
+                tooltip = getTooltip();
             }
             setTooltip(null);
         }
@@ -288,9 +292,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if(getTooltip() != null){
             return getTooltip();
         }
-        final Stack<Tooltip> tooltipStack = handle.getCellsViewSkin().getTooltipStack();
-        if(!tooltipStack.isEmpty()){
-            Tooltip tooltip = tooltipStack.pop();
+        if(tooltip != null){
             setTooltip(tooltip);
             return tooltip;
         }

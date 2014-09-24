@@ -68,6 +68,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Tab;
@@ -987,6 +988,7 @@ public final class Dialogs {
 			txUserName.requestFocus();
 	    } );
 
+		dlg.sizeToScene();
     	return Optional.ofNullable( 
     			dlg.show() == actionLogin? 
     					new Pair<>(txUserName.getText(), txPassword.getText()): 

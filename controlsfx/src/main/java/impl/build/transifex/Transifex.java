@@ -29,26 +29,29 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.Normalizer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class Transifex {
     
     private static final String CHARSET             = "ISO-8859-1"; //$NON-NLS-1$
-    private static final String FILE_NAME           = "controlsfx_%1s.properties"; //$NON-NLS-1$
+    private static final String FILE_NAME           = "controlsfx_%1s.utf8"; //$NON-NLS-1$
     private static final String NEW_LINE            = System.getProperty("line.separator"); //$NON-NLS-1$
 
     private static final String BASE_URI            = "https://www.transifex.com/api/2/"; //$NON-NLS-1$
     private static final String PROJECT_PATH        = BASE_URI + "project/controlsfx/resource/controlsfx-core"; // list simple project details //$NON-NLS-1$
     private static final String PROJECT_DETAILS     = BASE_URI + "project/controlsfx/resource/controlsfx-core?details"; // list all project details //$NON-NLS-1$
     private static final String LIST_TRANSLATIONS   = BASE_URI + "project/controlsfx/languages/"; // list all translations //$NON-NLS-1$
-    private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s/"; // gets a translation for one language //$NON-NLS-1$
+    private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s?file"; // gets a translation for one language //$NON-NLS-1$
     private static final String TRANSLATION_STATS   = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
 
     private static final String USERNAME            = System.getProperty("transifex.username"); //$NON-NLS-1$
@@ -59,6 +62,7 @@ public class Transifex {
         new Transifex().doTransifexCheck();
     }
         
+    @SuppressWarnings("unchecked")
     private void doTransifexCheck() {
         System.out.println("=== Starting Transifex Check ==="); //$NON-NLS-1$
         
@@ -82,6 +86,24 @@ public class Transifex {
     }
     
     private String transifexRequest(String request, Object... args) {
+        Function<InputStream, String> consumer = inputStream -> {
+            StringBuilder response = new StringBuilder(); 
+            try(BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream)) ) {
+                String line;
+                while((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append(NEW_LINE);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } 
+
+            return response.toString();
+        };
+        return performTransifexTask(consumer, request, args);
+    }
+    
+    private static <T> T performTransifexTask(Function<InputStream, T> consumer, String request, Object... args) {
         request = String.format(request, args);
         
         URL url;
@@ -98,25 +120,16 @@ public class Transifex {
             connection.setRequestProperty("Authorization", "Basic "+encoded); //$NON-NLS-1$ //$NON-NLS-2$
             connection.setRequestProperty("Accept-Charset", CHARSET);  //$NON-NLS-1$
             
-            StringBuilder response = new StringBuilder(); 
-            try( BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream())) ) {
-	            String line;
-	            while((line = rd.readLine()) != null) {
-	                response.append(line);
-	                response.append(NEW_LINE);
-	            }
-            } 
-            
-            return response.toString();
+            return consumer.apply(connection.getInputStream());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(connection != null) {
-                connection.disconnect(); 
+            if (connection != null) {
+                connection.disconnect();
             }
         }
         
-        return ""; //$NON-NLS-1$
+        return null;
     }
     
     private boolean filterOutIncompleteTranslations(String languageCode) {
@@ -150,21 +163,17 @@ public class Transifex {
         // Now we download the translations of the completed languages
         System.out.println("\tDownloading translation file..."); //$NON-NLS-1$
         
-        try {
-            Map<String,String> map = JSON.parse(transifexRequest(GET_TRANSLATION, languageCode));
+        Function<InputStream, Void> consumer = inputStream -> {
+            final String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
             
-            String content = new String(map.get("content").getBytes(), CHARSET); //$NON-NLS-1$
-            content = Normalizer.normalize(content, Normalizer.Form.NFKD);
-            
-            // interesting Transifex REST API quirk, they return \\n when we want \n
-            content = content.replace("\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-            
-            String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
-            try( FileOutputStream fos = new FileOutputStream(outputFile)) {  
-            	fos.write(content.getBytes()/*CHARSET)*/);
+            ReadableByteChannel rbc = Channels.newChannel(inputStream);
+            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            return null;
+        };
+        performTransifexTask(consumer, GET_TRANSLATION, languageCode);
     }
 }

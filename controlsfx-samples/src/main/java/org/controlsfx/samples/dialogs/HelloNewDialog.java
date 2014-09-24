@@ -497,6 +497,7 @@ public class HelloNewDialog extends ControlsFXSample {
         // define pages to show
 
         Wizard wizard = new Wizard();
+        wizard.setTitle("Linear Wizard");
         
         // --- page 1
         int row = 0;
@@ -592,6 +593,7 @@ public class HelloNewDialog extends ControlsFXSample {
 
         // create wizard
         Wizard wizard = new Wizard();
+        wizard.setTitle("Branching Wizard");
         Wizard.Flow branchingFlow = new Wizard.Flow() {
 
             @Override

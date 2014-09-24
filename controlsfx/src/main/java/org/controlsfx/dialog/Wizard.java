@@ -41,6 +41,8 @@ import java.util.function.BooleanSupplier;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
@@ -160,6 +162,7 @@ public class Wizard {
         updatePage(dialog,true);
     };
     
+    private final StringProperty titleProperty = new SimpleStringProperty(); 
     
     
     /**************************************************************************
@@ -192,10 +195,12 @@ public class Wizard {
      * @param title The wizard title.
      */
     public Wizard(Object owner, String title) {
+    	
         validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
         
         dialog = new Dialog<>();
-        dialog.setTitle(title);
+        dialog.titleProperty().bind(this.titleProperty);
+        setTitle(title);
         
         Window window = null;
         if ( owner instanceof Window) { 
@@ -251,6 +256,30 @@ public class Wizard {
      * Properties
      * 
      **************************************************************************/
+    
+    // --- title
+    
+    /**
+     * Return the titleProperty of the wizard.
+     */
+    public final StringProperty titleProperty() {
+        return titleProperty;
+    }  
+    
+    /**
+     * Return the title of the wizard.
+     */
+    public final String getTitle() {
+    	return titleProperty.get();
+    }
+    
+    /**
+     * Change the Title of the wizard.
+     * @param title
+     */
+    public final void setTitle( String title ) {
+    	titleProperty.set(title);
+    }
     
     // --- flow
     /**

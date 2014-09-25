@@ -132,5 +132,6 @@ task deleteUtf8Files(type: Delete) {
     delete fileTree(dir: "$buildDir/resources/main", include: "**/controlsfx_*.utf8")
 }
 
+deleteUtf8Files.mustRunAfter(native2ascii)
 jar.dependsOn(native2ascii)
-jar.finalizedBy(deleteUtf8Files)
+jar.dependsOn(deleteUtf8Files)

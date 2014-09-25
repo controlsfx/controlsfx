@@ -394,7 +394,7 @@ public class HelloNewDialog extends ControlsFXSample {
         }
         
         if (cbCustomGraphic.isSelected()) {
-            dlg.getDialogPane().setGraphic(new ImageView(new Image(getClass().getResource("tick.png").toExternalForm())));
+            dlg.getDialogPane().setGraphic(new ImageView(new Image(getClass().getResource("../controlsfx-logo.png").toExternalForm())));
         }
         
         dlg.initStyle(styleCombobox.getValue());

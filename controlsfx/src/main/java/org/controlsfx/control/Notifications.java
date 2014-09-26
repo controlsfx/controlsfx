@@ -252,7 +252,7 @@ public class Notifications {
      * built-in 'confirm' graphic.
      */
     public void showConfirm() {
-        graphic(new ImageView(new Image("/org/controlsfx/dialog/system-help.png"))); //$NON-NLS-1$
+        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-confirm.png"))); //$NON-NLS-1$
         show();
     }
 

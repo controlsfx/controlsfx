@@ -28,6 +28,8 @@ package impl.org.controlsfx.spreadsheet;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.TablePosition;
@@ -145,7 +147,6 @@ public class GridCellEditor {
                         if(nextRow < handle.getView().getGrid().getRowCount()){
                             handle.getGridView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
                         }
-                        
                     }
                 }
             }
@@ -197,11 +198,11 @@ public class GridCellEditor {
             spreadsheetCellEditor.startEdit(value);
         }
         
-        spreadsheetCellEditor.getEditor().focusedProperty().addListener(endEditionListener);
+        spreadsheetCellEditor.getFocusProperty().addListener(focusListener);
     }
 
     private void end() {
-        spreadsheetCellEditor.getEditor().focusedProperty().removeListener(endEditionListener);
+        spreadsheetCellEditor.getFocusProperty().removeListener(focusListener);
         handle.getCellsViewSkin().getVBar().valueProperty().removeListener(endEditionListener);
         handle.getCellsViewSkin().getHBar().valueProperty().removeListener(endEditionListener);
         
@@ -218,6 +219,15 @@ public class GridCellEditor {
         @Override
         public void handle(KeyEvent t) {
             lastKeyPressed = t.getCode();
+        }
+    };
+    
+    private final ChangeListener<Boolean> focusListener = new ChangeListener<Boolean>() {
+        @Override
+        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean isFocus) {
+            if (!isFocus) {
+                endEdit(true);
+            }
         }
     };
     

@@ -161,7 +161,7 @@ public class RectangleSelection extends Rectangle {
     private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow, int rowSpan) {
         double height = 0;
         for (int i = maxRow; i <= maxRow + (rowSpan - 1); ++i) {
-            height += skin.getRowHeight(maxRow);
+            height += skin.getRowHeight(i);
         }
 
         /**
@@ -203,10 +203,13 @@ public class RectangleSelection extends Rectangle {
     private void handleHorizontalPositioning(int minColumn, int maxColumn, int columnSpan) {
         double x = 0;
 
+        final List<SpreadsheetColumn> columns = skin.spreadsheetView.getColumns();
         //We first compute the total space between the left edge and our first column
         for (int i = 0; i < minColumn; ++i) {
-            x += skin.spreadsheetView.getColumns().get(i).getWidth();
+            //Here we use Ceil because we want to "snapSize" otherwise we may end up with a weird shift.
+            x += snapSize(columns.get(i).getWidth());
         }
+        
 
         /**
          * We then substract the value of the Hbar in order to place it properly
@@ -218,7 +221,7 @@ public class RectangleSelection extends Rectangle {
         //Then we compute the width by adding the space between the min and max column
         double width = 0;
         for (int i = minColumn; i <= maxColumn + (columnSpan - 1); ++i) {
-            width += skin.spreadsheetView.getColumns().get(i).getWidth();
+            width += snapSize(columns.get(i).getWidth());
         }
 
         //FIXED COLUMNS
@@ -228,7 +231,7 @@ public class RectangleSelection extends Rectangle {
          * translate the starting point in because the rectangle must also be
          * hidden by the fixed column.
          */
-        if (!skin.spreadsheetView.getFixedColumns().contains(skin.spreadsheetView.getColumns().get(minColumn))) {
+        if (!skin.spreadsheetView.getFixedColumns().contains(columns.get(minColumn))) {
             if (x < skin.fixedColumnWidth) {
                 //Since I translate the starting point, I must reduce the width by the value I'm translating.
                 width -= skin.fixedColumnWidth - x;
@@ -251,12 +254,12 @@ public class RectangleSelection extends Rectangle {
                 x = 0;
                 width = 0;
                 for (SpreadsheetColumn column : skin.spreadsheetView.getFixedColumns()) {
-                    int indexColumn = skin.spreadsheetView.getColumns().indexOf(column);
+                    int indexColumn = columns.indexOf(column);
                     if (indexColumn < minColumn && indexColumn != minColumn) {
-                        x += column.getWidth();
+                        x += snapSize(column.getWidth());
                     }
                     if (indexColumn >= minColumn && indexColumn <= maxColumn) {
-                        width += column.getWidth();
+                        width += snapSize(column.getWidth());
                     }
                 }
                 /**
@@ -267,9 +270,9 @@ public class RectangleSelection extends Rectangle {
             } else if (x < skin.fixedColumnWidth) {
                 double tempX = 0;
                 for (SpreadsheetColumn column : skin.spreadsheetView.getFixedColumns()) {
-                    int indexColumn = skin.spreadsheetView.getColumns().indexOf(column);
+                    int indexColumn = columns.indexOf(column);
                     if (indexColumn < minColumn && indexColumn != minColumn) {
-                        tempX += column.getWidth();
+                        tempX += snapSize(column.getWidth());
                     }
                 }
                 width -= tempX - x;
@@ -280,6 +283,16 @@ public class RectangleSelection extends Rectangle {
         setWidth(width);
     }
 
+    /**
+     * Returns a value ceiled to the nearest pixel.
+     *
+     * @param value the size value to be snapped
+     * @return value ceiled to nearest pixel
+     */
+    private double snapSize(double value) {
+        return Math.ceil(value);
+    }
+    
     /**
      * Utility class to transform a list of selected cells into a union of
      * ranges.

@@ -412,8 +412,12 @@ public class SpreadsheetView extends Control {
                     cellsView.setEditWithEnter(true);
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
                             .getFocusModel().getFocusedCell();
+                    
                     if (position != null) {
-                        cellsView.getSelectionModel().clearAndSelect(FocusModelListener.getNextRowNumber(position, getCellsView()), position.getTableColumn());
+                        int nextRow = FocusModelListener.getNextRowNumber(position, getCellsView());
+                        if(nextRow < grid.getRowCount()){
+                            cellsView.getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
+                        }
                     }
                    /* // Go to next cell
                 } else if (keyEvent.getCode().compareTo(KeyCode.TAB) == 0) {

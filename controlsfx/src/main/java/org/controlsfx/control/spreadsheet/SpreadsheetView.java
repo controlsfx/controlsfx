@@ -471,6 +471,9 @@ public class SpreadsheetView extends Control {
      * @param grid the new Grid
      */
     public final void setGrid(Grid grid) {
+        if(grid == null){
+            return;
+        }
         // Reactivate that after
 //        verifyGrid(grid);
         gridProperty.set(grid);
@@ -535,6 +538,9 @@ public class SpreadsheetView extends Control {
                     @Override
                     public ObservableValue<SpreadsheetCell> call(
                             TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
+                        if(col >= p.getValue().size()){
+                            return null;
+                        }
                         return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
                     }
                 });
@@ -547,7 +553,7 @@ public class SpreadsheetView extends Control {
                         return new CellView(handle);
                     }
                 });
-                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
+                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i, grid);
                 if(widthColumns.size() > i){
                     spreadsheetColumn.setPrefWidth(widthColumns.get(i));
                 }
@@ -628,7 +634,7 @@ public class SpreadsheetView extends Control {
      * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row) {
-        return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
+        return row >= 0 && row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
     }
     
     /**
@@ -637,12 +643,20 @@ public class SpreadsheetView extends Control {
      * @return true if the List of row can be fixed together.
      */
     public boolean areRowsFixable(List<? extends Integer> list) {
+        if(list == null || list.isEmpty() || !isFixingRowsAllowed()){
+            return false;
+        }
+        final Grid grid = getGrid();
+        final int rowCount = grid.getRowCount();
+        final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         for (Integer row : list) {
+            if (row == null || row < 0 || row > rowCount) {
+                return false;
+            }
             //If this row is not fixable, we need to identify the maximum span
             if (!isRowFixable(row)) {
-
                 int maxSpan = 1;
-                List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
+                List<SpreadsheetCell> gridRow = rows.get(row);
                 for (SpreadsheetCell cell : gridRow) {
                     //If the original row is not within this range, there is not need to look deeper.
                     if (!list.contains(cell.getRow())) {
@@ -933,6 +947,9 @@ public class SpreadsheetView extends Control {
      * @return the editor associated with the CellType.
      */
     public final Optional<SpreadsheetCellEditor> getEditor(SpreadsheetCellType<?> cellType) {
+        if(cellType == null){
+            return Optional.empty();
+        }
         SpreadsheetCellEditor cellEditor = editors.get(cellType);
         if (cellEditor == null) {
             cellEditor = cellType.createEditor(this);

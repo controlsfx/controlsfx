@@ -187,7 +187,14 @@ public class SpreadsheetViewSelectionModel extends
 
         cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));
 
-        selectedCellsMap = new SelectedCellsMap<>(new WeakListChangeListener<>(listChangeListener));
+        //Code for 8u40
+//        selectedCellsMap = new SelectedCellsMap<TablePosition<ObservableList<SpreadsheetCell>, ?>>(c -> handleSelectedCellsListChangeEvent(c)) {
+//            @Override
+//            public boolean isCellSelectionEnabled() {
+//                return SpreadsheetViewSelectionModel.this.isCellSelectionEnabled();
+//            }
+//        };
+         selectedCellsMap = new SelectedCellsMap<>(new WeakListChangeListener<>(listChangeListener));
 
         selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
             @Override
@@ -539,11 +546,15 @@ public class SpreadsheetViewSelectionModel extends
      * ********************************************************************
      */
     private void addSelectedRowsAndColumns(TablePosition<?, ?> position) {
+        GridViewSkin skin = getSpreadsheetViewSkin();
+        if(skin == null){
+            return;
+        }
         final SpreadsheetCell cell = cellsView.getItems().get(position.getRow()).get(position.getColumn());
         for (int i = cell.getRow(); i < cell.getRowSpan() + cell.getRow(); ++i) {
-            getSpreadsheetViewSkin().getSelectedRows().add(i);
+            skin.getSelectedRows().add(i);
             for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
-                getSpreadsheetViewSkin().getSelectedColumns().add(j);
+                skin.getSelectedColumns().add(j);
             }
         }
     }

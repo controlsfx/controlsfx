@@ -126,7 +126,10 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     };
     
     private void setRowHeight(double height) {
-        setHeight(height);
+        CellView.getValue(() -> {
+            setHeight(height);
+        });
+        
         setPrefHeight(height);
     }
 }

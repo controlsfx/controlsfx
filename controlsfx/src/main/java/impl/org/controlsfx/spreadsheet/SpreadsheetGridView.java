@@ -30,7 +30,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
 	private final SpreadsheetHandle handle;

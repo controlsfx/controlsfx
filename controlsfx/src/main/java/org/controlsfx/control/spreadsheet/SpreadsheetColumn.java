@@ -101,12 +101,12 @@ public final class SpreadsheetColumn {
      * @param indexColumn
      */
     SpreadsheetColumn(final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column,
-            final SpreadsheetView spreadsheetView, final Integer indexColumn) {
+            final SpreadsheetView spreadsheetView, final Integer indexColumn, Grid grid) {
         this.spreadsheetView = spreadsheetView;
         this.column = column;
         column.setMinWidth(0);
         this.indexColumn = indexColumn;
-        canFix = initCanFix();
+        canFix = initCanFix(grid);
 
         // The contextMenu creation must be on the JFX thread
         CellView.getValue(() -> {
@@ -120,7 +120,7 @@ public final class SpreadsheetColumn {
         spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
 
         // When ColumnsHeaders are changing, we update the text
-        spreadsheetView.getGrid().getColumnHeaders().addListener(new InvalidationListener() {
+        grid.getColumnHeaders().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable arg0) {
                 List<String> columnsHeader = spreadsheetView.getGrid().getColumnHeaders();
@@ -133,10 +133,10 @@ public final class SpreadsheetColumn {
         });
 
         // When changing rows, we re-calculate if this columns can be fixed.
-        spreadsheetView.getGrid().getRows().addListener(new InvalidationListener() {
+        grid.getRows().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable arg0) {
-                initCanFix();
+                initCanFix(grid);
             }
         });
     }
@@ -273,8 +273,8 @@ public final class SpreadsheetColumn {
      * 
      * @return if it's fixable.
      */
-    private boolean initCanFix() {
-        for (ObservableList<SpreadsheetCell> row : spreadsheetView.getGrid().getRows()) {
+    private boolean initCanFix(Grid grid) {
+        for (ObservableList<SpreadsheetCell> row : grid.getRows()) {
             int columnSpan = row.get(indexColumn).getColumnSpan();
             if (columnSpan > 1) {
                 return false;

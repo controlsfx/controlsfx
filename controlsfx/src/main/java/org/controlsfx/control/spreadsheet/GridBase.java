@@ -124,6 +124,7 @@ public class GridBase implements Grid, EventTarget {
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
         rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<>());
+        rows = FXCollections.observableArrayList();
     }
 
     /***************************************************************************
@@ -168,10 +169,11 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
-        if (row < 0 || column < 0 /* || !containsRow(spv, row) */) {
+        if (row < 0 || column < 0 || row >= rowCount || column >= columnCount/* || !containsRow(spv, row) */) {
             return SpanType.NORMAL_CELL;
         }
-        final SpreadsheetCell cell = ((ObservableList<SpreadsheetCell>) getRows().get(row)).get(column);
+        
+        final SpreadsheetCell cell =  getRows().get(row).get(column);
 
         final int cellColumn = cell.getColumn();
         final int cellRow = cell.getRow();

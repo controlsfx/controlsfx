@@ -45,6 +45,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -220,6 +221,7 @@ public class PopOver extends PopupControl {
             yListener);
 
     private Window ownerWindow;
+    private final EventHandler<WindowEvent> closePopOverOnOwnerWindowClose = event -> hide(Duration.ZERO);
 
     /**
      * Shows the pop over in a position relative to the edges of the given owner
@@ -388,7 +390,7 @@ public class PopOver extends PopupControl {
         fadeIn.play();
         
         // Bug fix - close popup when owner window is closing
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event -> hide(Duration.millis(0)));
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, new WeakEventHandler<>(closePopOverOnOwnerWindowClose));
     }
 
     /**

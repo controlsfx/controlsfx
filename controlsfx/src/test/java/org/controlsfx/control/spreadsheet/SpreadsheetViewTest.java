@@ -1,7 +1,5 @@
-package org.controlsfx.control.spreadsheet;
-
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +24,8 @@ package org.controlsfx.control.spreadsheet;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+package org.controlsfx.control.spreadsheet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +62,7 @@ public class SpreadsheetViewTest {
 
     @BeforeClass
     public static void setUpClass() {
+         new JFXPanel();
     }
 
     @AfterClass
@@ -70,7 +71,6 @@ public class SpreadsheetViewTest {
 
     @Before
     public void setUp() {
-        new JFXPanel();
         //100 rows and 15 columns
         spv = new SpreadsheetView();
     }

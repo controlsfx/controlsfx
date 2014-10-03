@@ -81,6 +81,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
 
 /**
@@ -570,10 +571,16 @@ public class SpreadsheetView extends Control {
          * this method can be called from another thread, we execute the code here.
          */
         CellView.getValue(() -> {
+            List<Pair<Integer,Integer>> selectedCells = new ArrayList<>();
+            for(TablePosition position: getSelectionModel().getSelectedCells()){
+                selectedCells.add(new Pair<>(position.getRow(), position.getColumn()));
+            }
+            
             cellsView.getColumns().clear();
             for (SpreadsheetColumn spreadsheetColumn : columns) {
                 cellsView.getColumns().add(spreadsheetColumn.column);
             }
+            ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
         });
     }
 

@@ -60,19 +60,25 @@ public class GridBaseTest {
     public static void tearDownClass() {
     }
 
-    @Before
-    public void setUp() {
-        grid = new GridBase(15, 15);
+    public GridBase buildGrid() {
+        GridBase tempGrid;
+        tempGrid = new GridBase(15, 15);
         List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
-        for (int row = 0; row < grid.getRowCount(); ++row) {
+        for (int row = 0; row < tempGrid.getRowCount(); ++row) {
             ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
-            for (int column = 0; column < grid.getColumnCount(); ++column) {
+            for (int column = 0; column < tempGrid.getColumnCount(); ++column) {
                 currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
             }
             rows.add(currentRow);
         }
-        grid.setRows(rows);
+        tempGrid.setRows(rows);
+        return tempGrid;
+    }
+
+    @Before
+    public void setUp() {
+        grid = buildGrid();
     }
 
     @After

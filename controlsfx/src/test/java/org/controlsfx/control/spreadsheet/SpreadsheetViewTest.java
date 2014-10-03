@@ -33,7 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javafx.embed.swing.JFXPanel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
@@ -62,7 +65,6 @@ public class SpreadsheetViewTest {
 
     @BeforeClass
     public static void setUpClass() {
-         new JFXPanel();
     }
 
     @AfterClass
@@ -79,6 +81,21 @@ public class SpreadsheetViewTest {
     public void tearDown() {
     }
 
+    public GridBase buildGrid() {
+        GridBase tempGrid;
+        tempGrid = new GridBase(15, 15);
+        List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+
+        for (int row = 0; row < tempGrid.getRowCount(); ++row) {
+            ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
+            for (int column = 0; column < tempGrid.getColumnCount(); ++column) {
+                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+            }
+            rows.add(currentRow);
+        }
+        tempGrid.setRows(rows);
+        return tempGrid;
+    }
     /**
      * Test of setGrid method, of class SpreadsheetView.
      */
@@ -90,6 +107,35 @@ public class SpreadsheetViewTest {
         instance.setGrid(grid);
     }
 
+    /**
+     * Try to select a cell, then set a new grid, and verify that the
+     * selectedCells are well updated because we have modified the TableColumn
+     * so the TablePosition are normally wrong.
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void testSelectionModel()  throws InterruptedException{
+        while (spv.getSelectionModel().getTableView().getColumns().isEmpty()) {
+            Thread.sleep(50);
+        }
+
+        spv.getSelectionModel().select(10, spv.getSelectionModel().getTableView().getColumns().get(10));
+        TableColumn column = spv.getSelectionModel().getTableView().getColumns().get(10);
+        spv.setGrid(buildGrid());
+
+        while (column == spv.getSelectionModel().getTableView().getColumns().get(10)) {
+            Thread.sleep(50);
+        }
+
+        if (spv.getSelectionModel().getSelectedCells().size() != 1) {
+            fail();
+        }
+
+        TablePosition position = spv.getSelectionModel().getSelectedCells().get(0);
+        assertEquals(10, position.getRow());
+        assertEquals(10, position.getColumn());
+    }
     /**
      * Test of isRowFixable method, of class SpreadsheetView.
      */
@@ -380,7 +426,7 @@ public class SpreadsheetViewTest {
         assertEquals(value, spv.getGrid().getRows().get(0).get(0).getItem());
 
         while(spv.getSelectionModel().getTableView().getColumns().isEmpty()){
-            Thread.sleep(500);
+            Thread.sleep(50);
         }
         
         spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));

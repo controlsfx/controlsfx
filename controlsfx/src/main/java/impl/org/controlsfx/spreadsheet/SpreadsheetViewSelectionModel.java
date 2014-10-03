@@ -50,6 +50,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -195,6 +196,7 @@ public class SpreadsheetViewSelectionModel extends
 //            }
 //        };
          selectedCellsMap = new SelectedCellsMap<>(new WeakListChangeListener<>(listChangeListener));
+         
 
         selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
             @Override
@@ -366,6 +368,60 @@ public class SpreadsheetViewSelectionModel extends
         }
     }
 
+    /**
+     * When we set a new grid, we need to update the selected Cells because
+     * otherwise we will end up with TablePosition which have "-1" as their
+     * column number. So we need to verify that the old selected cells are still
+     * selectable and select them.
+     *
+     * @param selectedCells
+     */
+    public void verifySelectedCells(List<Pair<Integer,Integer>> selectedCells){
+        List<TablePosition<ObservableList<SpreadsheetCell>, ?>> newList = new ArrayList<>();
+        quietClearSelection();
+
+        final int itemCount = getItemCount();
+        final int columnSize = getTableView().getColumns().size();
+        final HashSet<Integer> selectedRows = new HashSet<>();
+        final HashSet<Integer> selectedColumns = new HashSet<>();
+        TablePosition<ObservableList<SpreadsheetCell>, ?> pos = null;
+        for (Pair<Integer,Integer> position : selectedCells) {
+            if (position.getKey()< 0 
+                    || position.getKey() >= itemCount 
+                    || position.getValue()< 0 
+                    || position.getValue() > columnSize) {
+                continue;
+            }
+            final TableColumn<ObservableList<SpreadsheetCell>, ?> column = getTableView().getVisibleLeafColumn(position.getValue());
+
+            pos = getVisibleCell(position.getKey(), column, position.getValue());
+
+            // We store all the selectedColumn and Rows, we will update
+            // just once at the end
+            final SpreadsheetCell cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
+            for (int i = cell.getRow(); i < cell.getRowSpan() + cell.getRow(); ++i) {
+                selectedColumns.add(i);
+                for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+                    selectedRows.add(j);
+                }
+            }
+            newList.add(pos);
+        }
+        selectedCellsMap.setAll(newList);
+
+        // Then we update visuals just once
+        GridViewSkin skin = getSpreadsheetViewSkin();
+        if(skin != null){
+            skin.getSelectedRows().addAll(selectedColumns);
+            skin.getSelectedColumns().addAll(selectedRows);
+        }
+
+        if (pos != null) {
+            select(pos.getRow(), pos.getTableColumn());
+            getTableView().getFocusModel().focus(pos.getRow(), pos.getTableColumn());
+        }
+    }
+    
     @Override
     public void selectRange(int minRow, TableColumnBase<ObservableList<SpreadsheetCell>, ?> minColumn, int maxRow,
             TableColumnBase<ObservableList<SpreadsheetCell>, ?> maxColumn) {
@@ -679,8 +735,11 @@ public class SpreadsheetViewSelectionModel extends
 
     private void quietClearSelection() {
         selectedCellsMap.clear();
-        getSpreadsheetViewSkin().getSelectedRows().clear();
-        getSpreadsheetViewSkin().getSelectedColumns().clear();
+        GridViewSkin skin = getSpreadsheetViewSkin();
+        if (skin != null) {
+            skin.getSelectedRows().clear();
+            skin.getSelectedColumns().clear();
+        }
     }
 
     @SuppressWarnings("unchecked")

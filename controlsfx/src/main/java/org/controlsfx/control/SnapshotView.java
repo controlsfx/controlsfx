@@ -49,6 +49,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.css.CssMetaData;
 import javafx.css.StyleConverter;
 import javafx.css.Styleable;
@@ -151,6 +153,13 @@ public class SnapshotView extends ControlsFXControl {
      */
     public static final double MAX_SELECTION_RATIO_DIVERGENCE = 1e-6;
 
+    /**
+     * The key of the {@link #getProperties() property} which is used to update {@link #selectionChangingProperty()
+     * selectionChanging}.
+     */
+    public static final String SELECTION_CHANGING_PROPERTY_KEY =
+            SnapshotView.class.getCanonicalName() + ".selection_changing"; //$NON-NLS-1$
+
     /* ************************************************************************
      *                                                                         * 
      * Attributes & Properties                                                 * 
@@ -242,7 +251,7 @@ public class SnapshotView extends ControlsFXControl {
 
     /* ************************************************************************
      *                                                                         * 
-     * Constructors                                                            * 
+     * Construction                                                            * 
      *                                                                         * 
      **************************************************************************/
 
@@ -325,6 +334,53 @@ public class SnapshotView extends ControlsFXControl {
                 fixSelectionRatio();
             }
         });
+
+        // set selection changing according to the values set in the property map
+        listenToProperty(
+                getProperties(), SELECTION_CHANGING_PROPERTY_KEY, (Boolean value) -> selectionChanging.set(value));
+    }
+
+    /**
+     * Listens to the specified properties. When a pair with the specified key is added, it is processed. If the value
+     * has the correct type, it is given to the specified consumer. Even if the type does not match, it is removed from
+     * the map.
+     * 
+     * @param properties
+     *            the {@link ObservableMap} which contains the properties; typically {@link Control#getProperties()}
+     * @param key
+     *            the key for whose value is listened
+     * @param processValue
+     *            the {@link Consumer} for the new value
+     */
+    private static <T> void listenToProperty(
+            ObservableMap<Object, Object> properties, Object key, Consumer<T> processValue) {
+
+        Objects.requireNonNull(properties, "The argument 'properties' must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(key, "The argument 'key' must not be null."); //$NON-NLS-1$
+        Objects.requireNonNull(processValue, "The argument 'processValue' must not be null."); //$NON-NLS-1$
+
+        @SuppressWarnings("unchecked")
+        MapChangeListener<Object, Object> listener = change -> {
+            boolean addedForKey =
+                    change.wasAdded() && Objects.equals(key, change.getKey());
+            if (addedForKey) {
+                // give the value to the consumer if it has the correct type
+                try {
+                    // note that this cast does nothing except to calm the compiler
+                    // (hence the warning which had to be suppressed)
+                    T newValue = (T) change.getValueAdded();
+                    // this is where the actual exception is created
+                    processValue.accept(newValue);
+                } catch (ClassCastException e) {
+                    // the value was of the wrong type so it can't be processed by the consumer
+                    // -> do nothing
+                }
+                // remove the value from the properties map
+                properties.remove(key);
+            }
+        };
+
+        properties.addListener(listener);
     }
 
     /**
@@ -727,38 +783,32 @@ public class SnapshotView extends ControlsFXControl {
 
         public static final CssMetaData<SnapshotView, Boundary> SELECTION_AREA_BOUNDARY =
                 createCssMetaData(
-                        snapshotView -> snapshotView.selectionAreaBoundary,
-                        "-fx-selection-area-boundary", //$NON-NLS-1$
+                        snapshotView -> snapshotView.selectionAreaBoundary, "-fx-selection-area-boundary", //$NON-NLS-1$
                         new EnumConverter<>(Boundary.class));
 
         public static final CssMetaData<SnapshotView, Boundary> UNSELECTED_AREA_BOUNDARY =
                 createCssMetaData(
-                        snapshotView -> snapshotView.unselectedAreaBoundary,
-                        "-fx-unselected-area-boundary", //$NON-NLS-1$
+                        snapshotView -> snapshotView.unselectedAreaBoundary, "-fx-unselected-area-boundary", //$NON-NLS-1$
                         new EnumConverter<>(Boundary.class));
 
         public static final CssMetaData<SnapshotView, Paint> SELECTION_BORDER_PAINT =
                 createCssMetaData(
-                        snapshotView -> snapshotView.selectionBorderPaint,
-                        "-fx-selection-border-paint", //$NON-NLS-1$
+                        snapshotView -> snapshotView.selectionBorderPaint, "-fx-selection-border-paint", //$NON-NLS-1$
                         PaintConverter.getInstance());
 
         public static final CssMetaData<SnapshotView, Number> SELECTION_BORDER_WIDTH =
                 createCssMetaData(
-                        snapshotView -> snapshotView.selectionBorderWidth,
-                        "-fx-selection-border-width", //$NON-NLS-1$
+                        snapshotView -> snapshotView.selectionBorderWidth, "-fx-selection-border-width", //$NON-NLS-1$
                         SizeConverter.getInstance());
 
         public static final CssMetaData<SnapshotView, Paint> SELECTION_AREA_FILL =
                 createCssMetaData(
-                        snapshotView -> snapshotView.selectionAreaFill,
-                        "-fx-selection-area-fill", //$NON-NLS-1$
+                        snapshotView -> snapshotView.selectionAreaFill, "-fx-selection-area-fill", //$NON-NLS-1$
                         PaintConverter.getInstance());
 
         public static final CssMetaData<SnapshotView, Paint> UNSELECTED_AREA_FILL =
                 createCssMetaData(
-                        snapshotView -> snapshotView.unselectedAreaFill,
-                        "-fx-unselected-area-fill", //$NON-NLS-1$
+                        snapshotView -> snapshotView.unselectedAreaFill, "-fx-unselected-area-fill", //$NON-NLS-1$
                         PaintConverter.getInstance());
 
         /**
@@ -794,8 +844,7 @@ public class SnapshotView extends ControlsFXControl {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        Consumer<Boolean> setSelectionChanging = changing -> selectionChanging.set(changing);
-        return new SnapshotViewSkin(this, setSelectionChanging);
+        return new SnapshotViewSkin(this);
     }
 
     /* ************************************************************************

@@ -100,13 +100,19 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * 
      * @param snapshotView
      *            the control which this behavior will control
-     * @param setSelectionChanging
-     *            a function which sets the {@link SnapshotView#selectionChangingProperty() selectionChanging} property
-     *            to the given value
      */
-    public SnapshotViewBehavior(SnapshotView snapshotView, Consumer<Boolean> setSelectionChanging) {
+    public SnapshotViewBehavior(SnapshotView snapshotView) {
         super(snapshotView, new ArrayList<KeyBinding>());
-        this.setSelectionChanging = setSelectionChanging;
+        this.setSelectionChanging = createSetSelectionChanging();
+    }
+
+    /**
+     * Creates a function which sets the applied boolean to {@link SnapshotView#selectionChangingProperty()}.
+     * 
+     * @return a Boolean {@link Consumer}
+     */
+    private Consumer<Boolean> createSetSelectionChanging() {
+        return changing -> getControl().getProperties().put(SnapshotView.SELECTION_CHANGING_PROPERTY_KEY, changing);
     }
 
     /* ************************************************************************

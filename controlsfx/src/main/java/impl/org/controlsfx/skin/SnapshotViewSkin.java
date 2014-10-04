@@ -27,9 +27,6 @@
 package impl.org.controlsfx.skin;
 
 import impl.org.controlsfx.behavior.SnapshotViewBehavior;
-
-import java.util.function.Consumer;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -57,7 +54,7 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  * are handed over to the {@link SnapshotViewBehavior} which uses them to change the selection.
  */
 public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotViewBehavior> {
-    
+
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
@@ -108,13 +105,10 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
      * 
      * @param snapshotView
      *            the {@link SnapshotView} this skin will display
-     * @param setSelectionChanging
-     *            a function which sets the {@link SnapshotView#selectionChangingProperty() selectionChanging} property
-     *            to the given value
      */
-    public SnapshotViewSkin(SnapshotView snapshotView, Consumer<Boolean> setSelectionChanging) {
+    public SnapshotViewSkin(SnapshotView snapshotView) {
 
-        super(snapshotView, new SnapshotViewBehavior(snapshotView, setSelectionChanging));
+        super(snapshotView, new SnapshotViewBehavior(snapshotView));
 
         this.gridPane = createGridPane();
         this.selectedArea = new Rectangle();

@@ -32,9 +32,9 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
 /**
- * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy} which computed their rectangle by spanning it
- * from a fixed edge to the parallel edge defined by the point given to {@link Rectangle2DChangeStrategy#continueChange(Point2D)
- * continueChange}. <br>
+ * Abstract superclass to those implementations of {@link Rectangle2DChangeStrategy} which compute their rectangle by
+ * spanning it from a fixed edge to the parallel edge defined by the point given to
+ * {@link Rectangle2DChangeStrategy#continueChange(Point2D) continueChange}. <br>
  * The edge is fixed during the change but can be changed in between changes. Implemented such that a ratio is respected
  * if specified.
  */
@@ -43,7 +43,7 @@ abstract class AbstractFixedEdgeChangeStrategy extends AbstractRatioRespectingCh
     // ATTRIBUTES
 
     /**
-     * A rectangle which defines the bounds within which the previous rectangle can be moved.
+     * A rectangle which defines the bounds within which the new rectangle must be contained.
      */
     private final Rectangle2D bounds;
 
@@ -64,7 +64,7 @@ abstract class AbstractFixedEdgeChangeStrategy extends AbstractRatioRespectingCh
      * @param ratio
      *            defines the fixed ratio
      * @param bounds
-     *            the bounds within which the rectangle can be resized
+     *            the bounds within which the new rectangle must be contained
      */
     protected AbstractFixedEdgeChangeStrategy(boolean ratioFixed, double ratio, Rectangle2D bounds) {
         super(ratioFixed, ratio);
@@ -83,18 +83,22 @@ abstract class AbstractFixedEdgeChangeStrategy extends AbstractRatioRespectingCh
     // IMPLEMENTATION OF 'do...'
 
     /**
-     * Creates a new rectangle from the two edges defined by {@link #fixedEdge} and its parallel through the
-     * specified point.
+     * Creates a new rectangle from the two edges defined by {@link #fixedEdge} and its parallel through the specified
+     * point.
      * 
      * @param point
      *            the point defining the parallel edge
      * @return the rectangle defined the two edges
      */
     private final Rectangle2D createFromEdges(Point2D point) {
-        if (isRatioFixed())
-            return Rectangles2D.forEdgeAndOpposingPointAndRatioWithinBounds(fixedEdge, point, getRatio(), bounds);
-        else
-            return Rectangles2D.forEdgeAndOpposingPoint(fixedEdge, point);
+        Point2D pointInBounds = Rectangles2D.inRectangle(bounds, point);
+
+        if (isRatioFixed()) {
+            return Rectangles2D.forEdgeAndOpposingPointAndRatioWithinBounds(
+                    fixedEdge, pointInBounds, getRatio(), bounds);
+        } else {
+            return Rectangles2D.forEdgeAndOpposingPoint(fixedEdge, pointInBounds);
+        }
     }
 
     /**
@@ -102,6 +106,12 @@ abstract class AbstractFixedEdgeChangeStrategy extends AbstractRatioRespectingCh
      */
     @Override
     protected final Rectangle2D doBegin(Point2D point) {
+        boolean startPointNotInBounds = !bounds.contains(point);
+        if (startPointNotInBounds) {
+            throw new IllegalArgumentException(
+                    "The change's start point (" + point + ") must lie within the bounds (" + bounds + ")."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
+
         fixedEdge = getFixedEdge();
         return createFromEdges(point);
     }

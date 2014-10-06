@@ -141,8 +141,11 @@ public class GridCellEditor {
                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
                             getFocusModel().getFocusedCell();
                     if (position != null) {
+                        int nextRow = FocusModelListener.getNextRowNumber(position, handle.getGridView());
+                        if(nextRow < handle.getView().getGrid().getRowCount()){
+                            handle.getGridView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
+                        }
                         
-                        handle.getGridView().getSelectionModel().clearAndSelect(FocusModelListener.getNextRowNumber(position,handle.getGridView()), position.getTableColumn());
                     }
                 }
             }

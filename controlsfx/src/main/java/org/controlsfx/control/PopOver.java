@@ -388,9 +388,7 @@ public class PopOver extends PopupControl {
         fadeIn.play();
         
         // Bug fix - close popup when owner window is closing
-        ownerWindow.setOnCloseRequest(event -> {
-            hide(Duration.millis(0));
-        });
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event -> hide(Duration.millis(0)));
     }
 
     /**

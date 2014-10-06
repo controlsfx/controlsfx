@@ -1036,7 +1036,7 @@ public class SpreadsheetView extends Control {
             SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
             // Using SpreadsheetCell change to stock the information
             // FIXME a dedicated class should be used
-            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getItem().toString()));
+            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getItem() == null ? null : cell.getItem().toString()));
         }
 
         final ClipboardContent content = new ClipboardContent();

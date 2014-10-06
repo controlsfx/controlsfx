@@ -92,6 +92,20 @@ public class SpreadsheetViewTest {
 
         spv.copyClipboard();
     }
+    
+    /**
+     * We test that a null item does not throw exception in copyClipboard.
+     */
+    @Test public void testCopyClipBoardNull() {
+        spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));
+
+        Grid grid = spv.getGrid();
+        SpreadsheetCell cell = new SpreadsheetCellBase(0, 0, 1, 1, SpreadsheetCellType.OBJECT);
+        cell.setItem(null);
+        grid.getRows().get(0).set(0, cell);
+
+        spv.copyClipboard();
+    }
     /**
      * Try to select a cell, then set a new grid, and verify that the
      * selectedCells are well updated because we have modified the TableColumn

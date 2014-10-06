@@ -31,7 +31,6 @@ import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -127,12 +126,8 @@ public class GridBase implements Grid, EventTarget {
         locked = new SimpleBooleanProperty(false);
         rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<>());
         rows = FXCollections.observableArrayList();
-        rows.addListener(new InvalidationListener() {
-
-            @Override
-            public void invalidated(Observable observable) {
-                setRowCount(rows.size());
-            }
+        rows.addListener((Observable observable) -> {
+            setRowCount(rows.size());
         });
     }
 

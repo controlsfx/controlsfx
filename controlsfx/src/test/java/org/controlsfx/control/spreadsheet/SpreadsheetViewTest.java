@@ -35,40 +35,21 @@ import java.util.Map;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import org.controlsfx.control.spreadsheet.Grid;
-import org.controlsfx.control.spreadsheet.GridBase;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
+import org.junit.Rule;
 
-/**
- *
- * @author samir.hadzic
- */
 public class SpreadsheetViewTest {
-
+    @Rule public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
+    
     private SpreadsheetView spv;
 
     public SpreadsheetViewTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
     }
 
     @Before
@@ -77,11 +58,7 @@ public class SpreadsheetViewTest {
         spv = new SpreadsheetView();
     }
 
-    @After
-    public void tearDown() {
-    }
-
-    public GridBase buildGrid() {
+    private GridBase buildGrid() {
         GridBase tempGrid;
         tempGrid = new GridBase(15, 15);
         List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
@@ -96,17 +73,25 @@ public class SpreadsheetViewTest {
         tempGrid.setRows(rows);
         return tempGrid;
     }
-    /**
-     * Test of setGrid method, of class SpreadsheetView.
-     */
-    @Test
-    public void testSetGrid() {
-        System.out.println("setGrid");
-        Grid grid = null;
-        SpreadsheetView instance = new SpreadsheetView();
-        instance.setGrid(grid);
+    
+    private static class NonSerializableClass{
+        
     }
+    
+    /**
+     * We test that a non-serializable item can be put into the Grid, and then
+     * try to copy without throwing an exception.
+     */
+    @Test public void testCopyClipBoard() {
+        spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));
 
+        Grid grid = spv.getGrid();
+        SpreadsheetCell cell = new SpreadsheetCellBase(0, 0, 1, 1, SpreadsheetCellType.OBJECT);
+        cell.setItem(new NonSerializableClass());
+        grid.getRows().get(0).set(0, cell);
+
+        spv.copyClipboard();
+    }
     /**
      * Try to select a cell, then set a new grid, and verify that the
      * selectedCells are well updated because we have modified the TableColumn
@@ -114,19 +99,9 @@ public class SpreadsheetViewTest {
      *
      * @throws InterruptedException
      */
-    @Test
-    public void testSelectionModel()  throws InterruptedException{
-        while (spv.getSelectionModel().getTableView().getColumns().isEmpty()) {
-            Thread.sleep(50);
-        }
-
+    @Test public void testSelectionModel()  throws InterruptedException{
         spv.getSelectionModel().select(10, spv.getSelectionModel().getTableView().getColumns().get(10));
-        TableColumn column = spv.getSelectionModel().getTableView().getColumns().get(10);
         spv.setGrid(buildGrid());
-
-        while (column == spv.getSelectionModel().getTableView().getColumns().get(10)) {
-            Thread.sleep(50);
-        }
 
         if (spv.getSelectionModel().getSelectedCells().size() != 1) {
             fail();
@@ -139,10 +114,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of isRowFixable method, of class SpreadsheetView.
      */
-    @Test
-    public void testIsRowFixable() {
-        System.out.println("isRowFixable");
-
+    @Test public void testIsRowFixable() {
         Grid grid = spv.getGrid();
         //Normal
         int row = 0;
@@ -172,10 +144,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of areRowsFixable method, of class SpreadsheetView.
      */
-    @Test
-    public void testAreRowsFixable() {
-        System.out.println("areRowsFixable");
-
+    @Test public void testAreRowsFixable() {
         Grid grid = spv.getGrid();
         List<Integer> list = new ArrayList<>();
 
@@ -217,10 +186,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of isFixingRowsAllowed method, of class SpreadsheetView.
      */
-    @Test
-    public void testIsFixingRowsAllowed() {
-        System.out.println("isFixingRowsAllowed");
-
+    @Test public void testIsFixingRowsAllowed() {
         spv.setFixingRowsAllowed(true);
         Assert.assertTrue(spv.isFixingRowsAllowed());
 
@@ -231,10 +197,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of setFixingRowsAllowed method, of class SpreadsheetView.
      */
-    @Test
-    public void testSetFixingRowsAllowed() {
-        System.out.println("setFixingRowsAllowed");
-
+    @Test public void testSetFixingRowsAllowed() {
         spv.setFixingRowsAllowed(true);
         Assert.assertTrue(spv.isFixingRowsAllowed());
 
@@ -254,7 +217,7 @@ public class SpreadsheetViewTest {
     @Test
     @Ignore
     public void testIsColumnFixable() {
-        System.out.println("isColumnFixable");
+//        System.out.println("isColumnFixable");
 //        int columnIndex = 0;
 //        SpreadsheetView instance = new SpreadsheetView();
 //        boolean expResult = false;
@@ -265,9 +228,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of isFixingColumnsAllowed method, of class SpreadsheetView.
      */
-    @Test
-    public void testIsFixingColumnsAllowed() {
-        System.out.println("isFixingColumnsAllowed");
+    @Test public void testIsFixingColumnsAllowed() {
         spv.setFixingColumnsAllowed(true);
         Assert.assertTrue(spv.isFixingColumnsAllowed());
 
@@ -278,9 +239,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of setFixingColumnsAllowed method, of class SpreadsheetView.
      */
-    @Test
-    public void testSetFixingColumnsAllowed() {
-        System.out.println("setFixingColumnsAllowed");
+    @Test public void testSetFixingColumnsAllowed() {
 
         spv.setFixingColumnsAllowed(true);
         Assert.assertTrue(spv.isFixingColumnsAllowed());
@@ -294,10 +253,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of setShowColumnHeader method, of class SpreadsheetView.
      */
-    @Test
-    public void testSetShowColumnHeader() {
-        System.out.println("setShowColumnHeader");
-
+    @Test public void testSetShowColumnHeader() {
         spv.setShowColumnHeader(false);
         Assert.assertFalse(spv.isShowColumnHeader());
 
@@ -308,10 +264,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of isShowColumnHeader method, of class SpreadsheetView.
      */
-    @Test
-    public void testIsShowColumnHeader() {
-        System.out.println("isShowColumnHeader");
-
+    @Test public void testIsShowColumnHeader() {
         spv.setShowColumnHeader(false);
         Assert.assertFalse(spv.isShowColumnHeader());
 
@@ -322,10 +275,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of setShowRowHeader method, of class SpreadsheetView.
      */
-    @Test
-    public void testSetShowRowHeader() {
-        System.out.println("setShowRowHeader");
-
+    @Test public void testSetShowRowHeader() {
         spv.setShowRowHeader(false);
         Assert.assertFalse(spv.isShowRowHeader());
 
@@ -336,10 +286,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of isShowRowHeader method, of class SpreadsheetView.
      */
-    @Test
-    public void testIsShowRowHeader() {
-        System.out.println("isShowRowHeader");
-
+    @Test public void testIsShowRowHeader() {
         spv.setShowRowHeader(false);
         Assert.assertFalse(spv.isShowRowHeader());
 
@@ -350,8 +297,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of getRowHeight method, of class SpreadsheetView.
      */
-    @Test
-    public void testGetRowHeight() {
+    @Test public void testGetRowHeight() {
         System.out.println("getRowHeight");
 
         Map<Integer, Double> rowHeight = new HashMap<>();
@@ -371,8 +317,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of getEditor method, of class SpreadsheetView.
      */
-    @Test
-    public void testGetEditor() {
+    @Test public void testGetEditor() {
         System.out.println("getEditor");
         
         SpreadsheetCellType cellType = null;
@@ -390,8 +335,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of setEditable method, of class SpreadsheetView.
      */
-    @Test
-    public void testSetEditable() {
+    @Test public void testSetEditable() {
         System.out.println("setEditable");
       
         spv.setEditable(false);
@@ -415,8 +359,7 @@ public class SpreadsheetViewTest {
      * Test of deleteSelectedCells method, of class SpreadsheetView.
      * @throws java.lang.InterruptedException
      */
-    @Test
-    public void testDeleteSelectedCells() throws InterruptedException {
+    @Test public void testDeleteSelectedCells() throws InterruptedException {
         System.out.println("deleteSelectedCells");
         
         spv.setEditable(true);
@@ -425,10 +368,6 @@ public class SpreadsheetViewTest {
         
         assertEquals(value, spv.getGrid().getRows().get(0).get(0).getItem());
 
-        while(spv.getSelectionModel().getTableView().getColumns().isEmpty()){
-            Thread.sleep(50);
-        }
-        
         spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));
         spv.deleteSelectedCells();
         
@@ -438,10 +377,7 @@ public class SpreadsheetViewTest {
     /**
      * Test of getSpanType method, of class SpreadsheetView.
      */
-    @Test
-    public void testGetSpanType() {
-        System.out.println("getSpanType");
-      
+    @Test public void testGetSpanType() {
         int row = 0;
         int column = 0;
         Grid grid = spv.getGrid();

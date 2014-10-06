@@ -34,14 +34,11 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.util.List;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -219,18 +216,6 @@ public abstract class SpreadsheetCellEditor {
      */
     public abstract void end();
 
-    /**
-     * In the case of a simple control like a TextField, the {@link Control#focusedProperty()
-     * } is far than enough. But if your control is more complex, you may want
-     * to create your own {@link BooleanExpression}.
-     *
-     * @return {@link BooleanExpression} that represents the focusProperty of
-     * your editor.
-     */
-    public BooleanExpression getFocusProperty(){
-        return getEditor().focusedProperty();
-    }
-    
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
@@ -450,23 +435,6 @@ public abstract class SpreadsheetCellEditor {
             return 500;
         }
         
-        @Override
-        public BooleanExpression getFocusProperty() {
-            /**
-             * The textArea is composed of a scrollPane and a "textArea". So we
-             * want to keep the focus and stay in edition even if the user is
-             * playing around with the scrollBar. Thus this particular binding.
-             */
-            return Bindings.createBooleanBinding(() -> {
-                for (Node n = view.getScene().getFocusOwner(); n != null; n = n.getParent()) {
-                    if (n == textArea) {
-                        return true;
-                    }
-                }
-                return false;
-            }, view.getScene().focusOwnerProperty());
-            
-        }
         /**
          * *************************************************************************
          * * Private Methods * *

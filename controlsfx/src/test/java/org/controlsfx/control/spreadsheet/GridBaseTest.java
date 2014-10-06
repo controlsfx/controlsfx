@@ -31,36 +31,21 @@ import java.util.List;
 import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Rule;
 
-/**
- *
- * @author samir.hadzic
- */
 public class GridBaseTest {
-
+    @Rule public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
+    
     private GridBase grid;
 
     public GridBaseTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-        new JFXPanel();
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    public GridBase buildGrid() {
+    private GridBase buildGrid() {
         GridBase tempGrid;
         tempGrid = new GridBase(15, 15);
         List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
@@ -81,17 +66,10 @@ public class GridBaseTest {
         grid = buildGrid();
     }
 
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of setCellValue method, of class GridBase.
      */
-    @Test
-    public void testSetCellValue() {
-        System.out.println("setCellValue");
-
+    @Test public void testSetCellValue() {
         String value = "The cake is a lie";
         grid.setCellValue(0, 0, value);
         assertEquals(value, grid.getRows().get(0).get(0).getItem());
@@ -100,11 +78,7 @@ public class GridBaseTest {
     /**
      * Test of getRowCount method, of class GridBase.
      */
-    @Test
-    public void testGetRowCount() {
-        System.out.println("getRowCount");
-        assertEquals(15, grid.getRowCount());
-        
+    @Test public void testGetRowCount() {
         ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
         grid.getRows().add(list);
 
@@ -112,21 +86,9 @@ public class GridBaseTest {
     }
 
     /**
-     * Test of getColumnCount method, of class GridBase.
-     */
-    @Test
-    public void testGetColumnCount() {
-        System.out.println("getColumnCount");
-
-        assertEquals(15, grid.getRowCount());
-    }
-
-    /**
      * Test of getSpanType method, of class GridBase.
      */
-    @Test
-    public void testGetSpanType() {
-        System.out.println("getSpanType");
+    @Test public void testGetSpanType() {
         SpreadsheetView spv = new SpreadsheetView(grid);
         SpreadsheetView.SpanType type = SpanType.NORMAL_CELL;
 
@@ -158,9 +120,7 @@ public class GridBaseTest {
     /**
      * Test of getRowHeight method, of class GridBase.
      */
-    @Test
-    public void testGetRowHeight() {
-        System.out.println("getRowHeight");
+    @Test public void testGetRowHeight() {
         Map<Integer, Double> rowHeight = new HashMap<>();
         rowHeight.put(1, 100.0);
         rowHeight.put(5, 12.0);
@@ -177,10 +137,7 @@ public class GridBaseTest {
     /**
      * Test of setLocked method, of class GridBase.
      */
-    @Test
-    public void testSetLocked() {
-        System.out.println("setLocked");
-
+    @Test public void testSetLocked() {
         assertFalse(grid.isLocked());
 
         grid.setLocked(true);
@@ -194,10 +151,7 @@ public class GridBaseTest {
     /**
      * Test of spanRow method, of class GridBase.
      */
-    @Test
-    public void testSpanRow() {
-        System.out.println("spanRow");
-
+    @Test public void testSpanRow() {
         grid.spanRow(0, 0, 0);
         assertEquals(1, grid.getRows().get(0).get(0).getRowSpan());
 
@@ -224,8 +178,7 @@ public class GridBaseTest {
     /**
      * Test of mixed Span.
      */
-    @Test
-    public void testSpanBoth() {
+    @Test public void testSpanBoth() {
         grid.spanRow(4, 0, 0);
         grid.spanColumn(5, 0, 0);
         SpreadsheetCell cell = grid.getRows().get(0).get(0);
@@ -239,8 +192,7 @@ public class GridBaseTest {
     /**
      * Test of mixed Span.
      */
-    @Test
-    public void testSpanBoth2() {
+    @Test  public void testSpanBoth2() {
         grid.spanColumn(5, 0, 0);
         grid.spanRow(4, 0, 0);
         SpreadsheetCell cell = grid.getRows().get(0).get(0);
@@ -254,9 +206,7 @@ public class GridBaseTest {
     /**
      * Test of spanColumn method, of class GridBase.
      */
-    @Test
-    public void testSpanColumn() {
-        System.out.println("spanColumn");
+    @Test public void testSpanColumn() {
         grid.spanColumn(0, 0, 0);
         assertEquals(1, grid.getRows().get(0).get(0).getColumnSpan());
 

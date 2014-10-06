@@ -28,11 +28,16 @@ package impl.org.controlsfx.spreadsheet;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.TablePosition;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -52,6 +57,7 @@ public class GridCellEditor {
     // cell being edited.
     private SpreadsheetCell modelCell;
     private CellView viewCell;
+    private BooleanExpression focusProperty;
 
     private boolean editing = false;
     
@@ -198,11 +204,14 @@ public class GridCellEditor {
             spreadsheetCellEditor.startEdit(value);
         }
         
-        spreadsheetCellEditor.getFocusProperty().addListener(focusListener);
+       focusProperty = getFocusProperty(spreadsheetCellEditor.getEditor());
+        
+        focusProperty.addListener(focusListener);
     }
 
     private void end() {
-        spreadsheetCellEditor.getFocusProperty().removeListener(focusListener);
+        focusProperty.removeListener(focusListener);
+        focusProperty = null;
         handle.getCellsViewSkin().getVBar().valueProperty().removeListener(endEditionListener);
         handle.getCellsViewSkin().getHBar().valueProperty().removeListener(endEditionListener);
         
@@ -212,6 +221,29 @@ public class GridCellEditor {
         this.viewCell = null;
     }
 
+    /**
+     * If we have a TextArea, we need to return a custom BooleanExpression
+     * because we want to let the editor in place even if the user is touching
+     * the scrollBars inside the textArea.
+     *
+     * @param control
+     * @return
+     */
+    private BooleanExpression getFocusProperty(Control control) {
+        if (control instanceof TextArea) {
+            return Bindings.createBooleanBinding(() -> {
+                for (Node n = handle.getView().getScene().getFocusOwner(); n != null; n = n.getParent()) {
+                    if (n == control) {
+                        return true;
+                    }
+                }
+                return false;
+            }, handle.getView().getScene().focusOwnerProperty());
+        } else {
+            return control.focusedProperty();
+        }
+    }
+     
     /**
      * When we stop editing a cell, if enter was pressed, we want to go to the next line.
      */

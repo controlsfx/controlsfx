@@ -86,8 +86,9 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
         double fixedColumnWidth = 0;
         double x = snappedLeftInset();
-
-        for (int j = 0, max = getColumnHeaders().size(); j < max; j++) {
+        int max = getColumnHeaders().size();
+        max = max > spreadsheetView.getColumns().size() ? spreadsheetView.getColumns().size() : max;
+        for (int j = 0 ; j < max; j++) {
             final TableColumnHeader n = getColumnHeaders().get(j);
             final double prefWidth = snapSize(n.prefWidth(-1));
             n.setPrefHeight(24.0);

@@ -14,19 +14,14 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 
 import org.controlsfx.control.TaskProgressView;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.Glyph;
 
 import com.sun.javafx.css.StyleManager;
 
@@ -37,8 +32,6 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
                 TaskProgressView.class
                         .getResource("taskmonitor.css").toExternalForm()); //$NON-NLS-1$
     }
-
-    private static FontAwesome fontAwesome = new FontAwesome();
 
     public TaskProgressViewSkin(TaskProgressView monitor) {
         super(monitor);
@@ -107,7 +100,7 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
     }
 
     class TaskCell extends ListCell<Task<?>> {
-        private ProgressIndicator progressIndicator;
+        private ProgressBar progressBar;
         private Label titleText;
         private Label messageText;
         private Button cancelButton;
@@ -117,19 +110,17 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
 
         public TaskCell() {
             titleText = new Label();
-            titleText.setFont(Font.font("Helvetica", FontWeight.BOLD, 12));
+            titleText.getStyleClass().add("task-title");
 
             messageText = new Label();
-            messageText.setFont(Font.font("Helvetica", FontWeight.NORMAL, 12));
+            messageText.getStyleClass().add("task-message");
 
-            progressIndicator = new ProgressIndicator();
+            progressBar = new ProgressBar();
+            progressBar.setMaxWidth(Double.MAX_VALUE);
+            progressBar.setMaxHeight(8);
 
-            cancelButton = new Button();
-            Glyph glyph = fontAwesome.create(FontAwesome.Glyph.STOP)
-                    .color(Color.RED);
-            cancelButton.setGraphic(glyph);
+            cancelButton = new Button("Cancel");
             cancelButton.getStyleClass().add("task-cancel-button");
-            cancelButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             cancelButton.setTooltip(new Tooltip("Cancel Task"));
             cancelButton.setOnAction(evt -> {
                 if (task != null) {
@@ -138,18 +129,17 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
             });
 
             VBox vbox = new VBox();
-            vbox.setSpacing(10);
+            vbox.setSpacing(4);
             vbox.getChildren().add(titleText);
+            vbox.getChildren().add(progressBar);
             vbox.getChildren().add(messageText);
 
+            BorderPane.setAlignment(cancelButton, Pos.CENTER);
+            BorderPane.setMargin(cancelButton, new Insets(0, 0, 0, 4));
+
             borderPane = new BorderPane();
-            borderPane.setLeft(progressIndicator);
             borderPane.setCenter(vbox);
             borderPane.setRight(cancelButton);
-
-            BorderPane.setMargin(progressIndicator, new Insets(5));
-            BorderPane.setMargin(cancelButton, new Insets(5));
-            BorderPane.setMargin(vbox, new Insets(5));
 
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }
@@ -171,12 +161,13 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
         @Override
         protected void updateItem(Task<?> task, boolean empty) {
             this.task = task;
+
             if (empty || task == null) {
                 getStyleClass().setAll("task-list-cell-empty");
                 setGraphic(null);
             } else if (task != null) {
                 getStyleClass().setAll("task-list-cell");
-                progressIndicator.progressProperty().bind(
+                progressBar.progressProperty().bind(
                         task.progressProperty());
                 titleText.textProperty().bind(task.titleProperty());
                 messageText.textProperty().bind(task.messageProperty());

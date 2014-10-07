@@ -139,9 +139,11 @@ public class HelloTaskProgressView extends ControlsFXSample {
 
         @Override
         protected Void call() throws Exception {
-            updateMessage("First we sleep ....");
 
-            Thread.sleep(2500);
+            if (Math.random() < .3) {
+                updateMessage("First we sleep ....");
+                Thread.sleep(2500);
+            }
 
             int max = 10000000;
             for (int i = 0; i < max; i++) {

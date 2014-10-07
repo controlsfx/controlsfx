@@ -15,8 +15,26 @@
  	-fx-background-color: transparent;
 }
 
+.task-title {
+	-fx-font-weight: bold;
+}
+
+.progress-bar .bar {
+	-fx-padding: 6px;
+	-fx-background-radius: 0;
+	-fx-border-radius: 0;
+}
+
+.progress-bar .track {
+	-fx-background-radius: 0;
+}
+
+.task-message {
+}
+
 .task-list-cell {
     -fx-background-color: transparent;
+    -fx-padding: 4 0 8 0;
     -fx-border-color: transparent transparent linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, transparent, rgba(0.0,0.0,0.0,0.2), transparent) transparent;
 }
 
@@ -25,11 +43,13 @@
     -fx-border-color: transparent;
 }
 
-.task-cancel-button,
-.task-cancel-button:pressed,
-.task-cancel-button:armed,
-.task-cancel-button:hover {
-	-fx-background-color: transparent;
+.task-cancel-button {
+	-fx-base-color: red;
+	-fx-font-size: .75em;
+	-fx-font-weight: bold;
+	-fx-padding: 4px;
+	-fx-border-radius: 0;
+	-fx-background-radius: 0;
 }
 
 .task-progress-view > * > * > .cancel-all-button {

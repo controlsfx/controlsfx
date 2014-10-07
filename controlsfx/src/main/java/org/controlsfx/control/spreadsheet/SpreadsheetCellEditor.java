@@ -216,6 +216,9 @@ public abstract class SpreadsheetCellEditor {
      */
     public abstract void end();
 
+    /***************************************************************************
+     * * Public Methods * *
+     **************************************************************************/
     /**
      * Return the maximum height of the editor. 
      * @return 50 by default.
@@ -431,12 +434,14 @@ public abstract class SpreadsheetCellEditor {
         public double getMaxHeight() {
             return 500;
         }
+        
         /**
          * *************************************************************************
          * * Private Methods * *
          * ************************************************************************
          */
         private void attachEnterEscapeEventHandler() {
+            
             textArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent keyEvent) {

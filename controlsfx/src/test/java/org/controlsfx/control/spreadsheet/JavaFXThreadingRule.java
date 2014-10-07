@@ -1,0 +1,116 @@
+/**
+ * Copyright (c) 2014, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.controlsfx.control.spreadsheet;
+
+import java.util.concurrent.CountDownLatch;
+
+import javax.swing.SwingUtilities;
+
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
+/**
+ * A JUnit {@link Rule} for running tests on the JavaFX thread and performing
+ * JavaFX initialisation. To include in your test case, add the following code:
+ * 
+* <pre>
+ * {@literal @}Rule
+ * public JavaFXThreadingRule jfxRule = new JavaFXThreadingRule();
+ * </pre>
+ * 
+ * 
+*/
+public class JavaFXThreadingRule implements TestRule {
+
+    /**
+     * Flag for setting up the JavaFX, we only need to do this once for all
+     * tests.
+     */
+    private static boolean jfxIsSetup;
+
+    @Override
+    public Statement apply(Statement statement, Description description) {
+        return new OnJFXThreadStatement(statement);
+    }
+
+    private static class OnJFXThreadStatement extends Statement {
+
+        private final Statement statement;
+
+        public OnJFXThreadStatement(Statement aStatement) {
+            statement = aStatement;
+        }
+
+        private Throwable rethrownException = null;
+
+        @Override
+        public void evaluate() throws Throwable {
+            if (!jfxIsSetup) {
+                setupJavaFX();
+                jfxIsSetup = true;
+            }
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        statement.evaluate();
+                    } catch (Throwable e) {
+                        rethrownException = e;
+                    }
+                    countDownLatch.countDown();
+                }
+            });
+            countDownLatch.await();
+// if an exception was thrown by the statement during evaluation,
+// then re-throw it to fail the test
+            if (rethrownException != null) {
+                throw rethrownException;
+            }
+        }
+
+        protected void setupJavaFX() throws InterruptedException {
+            long timeMillis = System.currentTimeMillis();
+            final CountDownLatch latch = new CountDownLatch(1);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+// initializes JavaFX environment
+                    new JFXPanel();
+                    latch.countDown();
+                }
+            });
+            System.out.println("javafx initialising...");
+            latch.await();
+            System.out.println("javafx is initialised in " + (System.currentTimeMillis() - timeMillis) + "ms");
+        }
+    }
+}

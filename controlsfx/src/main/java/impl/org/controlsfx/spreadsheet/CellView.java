@@ -120,6 +120,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     @Override
     public void startEdit() {
         if (!isEditable()) {
+            getTableView().edit(-1, null);
             return;
         } else if (handle.getGridView().getEditWithEnter()) {
             handle.getGridView().setEditWithEnter(false);

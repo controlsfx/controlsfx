@@ -31,6 +31,7 @@ import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -95,7 +96,7 @@ public class GridBase implements Grid, EventTarget {
      * Private Fields
      * 
      **************************************************************************/
-    private ObservableList<ObservableList<SpreadsheetCell>> rows;
+    private final ObservableList<ObservableList<SpreadsheetCell>> rows;
 
     private int rowCount;
     private int columnCount;
@@ -124,6 +125,10 @@ public class GridBase implements Grid, EventTarget {
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
         rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<>());
+        rows = FXCollections.observableArrayList();
+        rows.addListener((Observable observable) -> {
+            setRowCount(rows.size());
+        });
     }
 
     /***************************************************************************
@@ -168,10 +173,11 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
-        if (row < 0 || column < 0 /* || !containsRow(spv, row) */) {
+        if (row < 0 || column < 0 || row >= rowCount || column >= columnCount) {
             return SpanType.NORMAL_CELL;
         }
-        final SpreadsheetCell cell = ((ObservableList<SpreadsheetCell>) getRows().get(row)).get(column);
+        
+        final SpreadsheetCell cell =  getRows().get(row).get(column);
 
         final int cellColumn = cell.getColumn();
         final int cellRow = cell.getRow();
@@ -186,7 +192,8 @@ public class GridBase implements Grid, EventTarget {
          * This is a consuming operation so we place it after the normal_cell
          * case since this is the most typical case.
          */
-        final boolean containsRowMinusOne = spv.getCellsViewSkin().containsRow(row - 1);
+        final GridViewSkin skin = spv.getCellsViewSkin();
+        final boolean containsRowMinusOne = skin == null ? true : skin.containsRow(row - 1);
         if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != column && cellRowSpan > 1
                 && cellRow != row) {
             return SpanType.BOTH_INVISIBLE;
@@ -270,6 +277,9 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void spanRow(int count, int rowIndex, int colIndex) {
+        if (count <= 0 || count >= rowCount || rowIndex >= rowCount || colIndex >= columnCount) {
+            return;
+        }
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = cell.getColumnSpan();
         final int rowSpan = count;
@@ -286,6 +296,9 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void spanColumn(int count, int rowIndex, int colIndex) {
+        if (count <= 0 || count >= columnCount || rowIndex >= rowCount || colIndex >= columnCount) {
+            return;
+        }
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = count;
         final int rowSpan = cell.getRowSpan();
@@ -302,11 +315,8 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void setRows(Collection<ObservableList<SpreadsheetCell>> rows) {
-        if (rows instanceof ObservableList) {
-            this.rows = (ObservableList<ObservableList<SpreadsheetCell>>) rows;
-        } else {
-            this.rows = FXCollections.observableArrayList(rows);
-        }
+        this.rows.clear();
+        this.rows.addAll(rows);
 
         setRowCount(rows.size());
         setColumnCount(rowCount == 0 ? 0 : this.rows.get(0).size());

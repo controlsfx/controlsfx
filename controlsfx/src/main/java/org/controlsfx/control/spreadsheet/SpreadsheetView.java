@@ -40,6 +40,10 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -81,6 +85,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
 
 /**
@@ -471,6 +476,9 @@ public class SpreadsheetView extends Control {
      * @param grid the new Grid
      */
     public final void setGrid(Grid grid) {
+        if(grid == null){
+            return;
+        }
         // Reactivate that after
 //        verifyGrid(grid);
         gridProperty.set(grid);
@@ -535,6 +543,9 @@ public class SpreadsheetView extends Control {
                     @Override
                     public ObservableValue<SpreadsheetCell> call(
                             TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
+                        if(col >= p.getValue().size()){
+                            return null;
+                        }
                         return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
                     }
                 });
@@ -547,7 +558,7 @@ public class SpreadsheetView extends Control {
                         return new CellView(handle);
                     }
                 });
-                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i);
+                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i, grid);
                 if(widthColumns.size() > i){
                     spreadsheetColumn.setPrefWidth(widthColumns.get(i));
                 }
@@ -559,16 +570,36 @@ public class SpreadsheetView extends Control {
                 }
             }
         }
+        
+        List<Pair<Integer, Integer>> selectedCells = new ArrayList<>();
+        for (TablePosition position : getSelectionModel().getSelectedCells()) {
+            selectedCells.add(new Pair<>(position.getRow(), position.getColumn()));
+        }
         /**
-         * We need to set the columns of the TableView in the JFX thread. Since
-         * this method can be called from another thread, we execute the code here.
+         * Since the TableView is added to the sceneGraph, it's not possible to
+         * modify the columns in another thread. We normally should call
+         * Platform.runLater() and exit. But in this particular case, we need to
+         * add the tableColumn right now. So that when we exit this "setGrid"
+         * method, we are sure we can manipulate all the elements.
          */
-        CellView.getValue(() -> {
+        Runnable runnable = () -> {
             cellsView.getColumns().clear();
             for (SpreadsheetColumn spreadsheetColumn : columns) {
                 cellsView.getColumns().add(spreadsheetColumn.column);
             }
-        });
+            ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
+        };
+        if (Platform.isFxApplicationThread()) {
+            runnable.run();
+        } else {
+            try {
+                FutureTask future = new FutureTask(runnable, null);
+                Platform.runLater(future);
+                future.get();
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(SpreadsheetView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
@@ -628,7 +659,7 @@ public class SpreadsheetView extends Control {
      * @return true if the row can be fixed.
      */
     public boolean isRowFixable(int row) {
-        return row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
+        return row >= 0 && row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
     }
     
     /**
@@ -637,12 +668,20 @@ public class SpreadsheetView extends Control {
      * @return true if the List of row can be fixed together.
      */
     public boolean areRowsFixable(List<? extends Integer> list) {
+        if(list == null || list.isEmpty() || !isFixingRowsAllowed()){
+            return false;
+        }
+        final Grid grid = getGrid();
+        final int rowCount = grid.getRowCount();
+        final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         for (Integer row : list) {
+            if (row == null || row < 0 || row > rowCount) {
+                return false;
+            }
             //If this row is not fixable, we need to identify the maximum span
             if (!isRowFixable(row)) {
-
                 int maxSpan = 1;
-                List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
+                List<SpreadsheetCell> gridRow = rows.get(row);
                 for (SpreadsheetCell cell : gridRow) {
                     //If the original row is not within this range, there is not need to look deeper.
                     if (!list.contains(cell.getRow())) {
@@ -933,6 +972,9 @@ public class SpreadsheetView extends Control {
      * @return the editor associated with the CellType.
      */
     public final Optional<SpreadsheetCellEditor> getEditor(SpreadsheetCellType<?> cellType) {
+        if(cellType == null){
+            return Optional.empty();
+        }
         SpreadsheetCellEditor cellEditor = editors.get(cellType);
         if (cellEditor == null) {
             cellEditor = cellType.createEditor(this);
@@ -994,7 +1036,7 @@ public class SpreadsheetView extends Control {
             SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
             // Using SpreadsheetCell change to stock the information
             // FIXME a dedicated class should be used
-            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getItem()));
+            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getItem() == null ? null : cell.getItem().toString()));
         }
 
         final ClipboardContent content = new ClipboardContent();

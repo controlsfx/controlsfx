@@ -220,6 +220,7 @@ public class PopOver extends PopupControl {
             yListener);
 
     private Window ownerWindow;
+    private final EventHandler<WindowEvent> closePopOverOnOwnerWindowClose = event -> ownerWindowClosing();
 
     /**
      * Shows the pop over in a position relative to the edges of the given owner
@@ -388,7 +389,16 @@ public class PopOver extends PopupControl {
         fadeIn.play();
         
         // Bug fix - close popup when owner window is closing
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event -> hide(Duration.millis(0)));
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowClose);
+    }
+    
+    private void ownerWindowClosing()
+    {
+        hide(Duration.ZERO);
+        if(ownerWindow != null) // just to be sure
+        {
+            ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowClose);
+        }
     }
 
     /**

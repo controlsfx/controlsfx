@@ -31,7 +31,10 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'ControlsFX-Samples', 'Implementation-Version': project.version
+        attributes  'Implementation-Title':     'ControlsFX-Samples',
+                    'Implementation-Version':   project.version,
+                    'Class-Path':               configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class':               fxsampler_mainClass
     }
     from sourceSets.main.allJava
 }

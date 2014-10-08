@@ -65,6 +65,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
     private final ListCell<T> buttonCell;
     
     // data
+    private final CheckComboBox<T> control;
     private final ObservableList<T> items;
     private final ReadOnlyUnbackedObservableList<Integer> selectedIndices;
     private final ReadOnlyUnbackedObservableList<T> selectedItems;
@@ -80,6 +81,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
     public CheckComboBoxSkin(final CheckComboBox<T> control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         
+        this.control = control;
         this.items = control.getItems();
         
         selectedIndices = (ReadOnlyUnbackedObservableList<Integer>) control.getCheckModel().getCheckedIndices();
@@ -99,7 +101,9 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             @Override public ListCell<T> call(ListView<T> listView) {
-                return new CheckBoxListCell<>(item -> control.getItemBooleanProperty(item));
+                CheckBoxListCell<T> result = new CheckBoxListCell<>(item -> control.getItemBooleanProperty(item));
+                result.converterProperty().bind(control.converterProperty());
+                return result;
             };
         });
         
@@ -163,7 +167,12 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
     private String buildString() {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0, max = selectedItems.size(); i < max; i++) {
-            sb.append(selectedItems.get(i));
+            T item = selectedItems.get(i);
+            if (control.getConverter() == null) {
+                sb.append(item);
+            } else {
+                sb.append(control.getConverter().toString(item));
+            }
             if (i < max - 1) {
                 sb.append(", "); //$NON-NLS-1$
             }

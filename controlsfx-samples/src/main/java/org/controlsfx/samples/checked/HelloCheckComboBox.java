@@ -26,6 +26,11 @@
  */
 package org.controlsfx.samples.checked;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -38,6 +43,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckComboBox;
@@ -103,6 +109,20 @@ public class HelloCheckComboBox extends ControlsFXSample {
         grid.add(new Label("CheckComboBox: "), 0, row);
         grid.add(checkComboBox, 1, row++);
         
+        CheckComboBox<Person> checkComboBox2 = new CheckComboBox<Person>(Person.createDemoList());
+        checkComboBox2.setConverter(new StringConverter<Person>() {
+            @Override
+            public String toString(Person object) {
+                return object.getFullName();
+            }
+            @Override
+            public Person fromString(String string) {
+                return null;
+            }
+        });
+        grid.add(new Label("CheckComboBox with data objects: "), 0, row);
+        grid.add(checkComboBox2, 1, row++);
+        
         return grid;
     }
     
@@ -159,4 +179,61 @@ public class HelloCheckComboBox extends ControlsFXSample {
         launch(args);
     }
     
+}
+
+class Person {
+    private StringProperty firstname = new SimpleStringProperty();
+    private StringProperty lastname = new SimpleStringProperty();
+    private ReadOnlyStringWrapper fullName = new ReadOnlyStringWrapper();
+    
+    public Person(String firstname, String lastname) {
+        this.firstname.set(firstname);
+        this.lastname.set(lastname);
+        fullName.bind(Bindings.concat(firstname, " ", lastname));
+    }
+    
+    public static final ObservableList<Person> createDemoList() {
+        final ObservableList<Person> result = FXCollections.observableArrayList();
+        result.add(new Person("Paul", "McCartney"));
+        result.add(new Person("Andrew Lloyd", "Webber"));
+        result.add(new Person("Herb", "Alpert"));
+        result.add(new Person("Emilio", "Estefan"));
+        result.add(new Person("Bernie", "Taupin"));
+        result.add(new Person("Elton", "John"));
+        result.add(new Person("Mick", "Jagger"));
+        result.add(new Person("Keith", "Richerds"));
+        return result;
+    }
+
+    public final StringProperty firstnameProperty() {
+        return this.firstname;
+    }
+
+    public final java.lang.String getFirstname() {
+        return this.firstnameProperty().get();
+    }
+
+    public final void setFirstname(final String firstname) {
+        this.firstnameProperty().set(firstname);
+    }
+
+    public final StringProperty lastnameProperty() {
+        return this.lastname;
+    }
+
+    public final String getLastname() {
+        return this.lastnameProperty().get();
+    }
+
+    public final void setLastname(final String lastname) {
+        this.lastnameProperty().set(lastname);
+    }
+
+    public final ReadOnlyStringProperty fullNameProperty() {
+        return this.fullName.getReadOnlyProperty();
+    }
+
+    public final String getFullName() {
+        return this.fullNameProperty().get();
+    }
 }

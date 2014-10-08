@@ -39,6 +39,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Skin;
+import javafx.util.StringConverter;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within
@@ -194,6 +195,35 @@ public class CheckComboBox<T> extends ControlsFXControl {
      */
     public final ObjectProperty<IndexedCheckModel<T>> checkModelProperty() {
         return checkModel;
+    }
+    
+    // --- converter
+    private ObjectProperty<StringConverter<T>> converter = 
+            new SimpleObjectProperty<StringConverter<T>>(this, "converter");
+    
+    /**
+     * A {@link StringConverter} that, given an object of type T, will 
+     * return a String that can be used to represent the object visually.
+     */
+    public final ObjectProperty<StringConverter<T>> converterProperty() { 
+        return converter; 
+    }
+    
+    /** 
+     * Sets the {@link StringConverter} to be used in the control.
+     * @param value A {@link StringConverter} that, given an object of type T, will 
+     * return a String that can be used to represent the object visually.
+     */
+    public final void setConverter(StringConverter<T> value) { 
+        converterProperty().set(value); 
+    }
+    
+    /**
+     * A {@link StringConverter} that, given an object of type T, will 
+     * return a String that can be used to represent the object visually.
+     */
+    public final StringConverter<T> getConverter() { 
+        return converterProperty().get(); 
     }
     
     

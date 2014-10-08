@@ -91,33 +91,35 @@ class HeavyweightDialog extends FXDialog {
                 Window owner = getOwner();
                 if (owner != null) {
                     Scene scene = owner.getScene();
-                    
-                    // scene.getY() seems to represent the y-offset from the top of the titlebar to the
-                    // start point of the scene, so it is the titlebar height
-                    final double titleBarHeight = scene.getY();
-                    
-                    // because Stage does not seem to centre itself over its owner, we
-                    // do it here.
-                    double x, y;
-                    
-                    final double dialogWidth = root.prefWidth(-1);
-                    final double dialogHeight = root.prefHeight(-1);
-                    
-                    if (owner.getX() < 0 || owner.getY() < 0) {
-                        // Fix for #165
-                        Screen screen = Screen.getPrimary(); // todo something more sensible
-                        double maxW = screen.getVisualBounds().getWidth();
-                        double maxH = screen.getVisualBounds().getHeight();
+
+                    if (scene != null) {
+                        // scene.getY() seems to represent the y-offset from the top of the titlebar to the
+                        // start point of the scene, so it is the titlebar height
+                        final double titleBarHeight = scene.getY();
                         
-                        x = maxW / 2.0 - dialogWidth / 2.0;
-                        y = maxH / 2.0 - dialogHeight / 2.0 + titleBarHeight;
-                    } else {
-                        x = owner.getX() + (scene.getWidth() / 2.0) - (dialogWidth / 2.0);
-                        y = owner.getY() +  titleBarHeight + (scene.getHeight() / 2.0) - (dialogHeight / 2.0);
+                        // because Stage does not seem to centre itself over its owner, we
+                        // do it here.
+                        double x, y;
+                        
+                        final double dialogWidth = root.prefWidth(-1);
+                        final double dialogHeight = root.prefHeight(-1);
+                        
+                        if (owner.getX() < 0 || owner.getY() < 0) {
+                            // Fix for #165
+                            Screen screen = Screen.getPrimary(); // todo something more sensible
+                            double maxW = screen.getVisualBounds().getWidth();
+                            double maxH = screen.getVisualBounds().getHeight();
+                            
+                            x = maxW / 2.0 - dialogWidth / 2.0;
+                            y = maxH / 2.0 - dialogHeight / 2.0 + titleBarHeight;
+                        } else {
+                            x = owner.getX() + (scene.getWidth() / 2.0) - (dialogWidth / 2.0);
+                            y = owner.getY() +  titleBarHeight + (scene.getHeight() / 2.0) - (dialogHeight / 2.0);
+                        }
+                        
+                        setX(x);
+                        setY(y);
                     }
-                    
-                    setX(x);
-                    setY(y);
                 }
             }
         };

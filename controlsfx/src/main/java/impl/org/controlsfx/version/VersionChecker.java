@@ -82,7 +82,7 @@ public class VersionChecker {
 
 //        for (int i=0; i < 3; i++) {
 //            if (Integer.parseInt(splitJavaVersion[i]) < Integer.parseInt(splitSpecVersion[i])) {
-        if ( splitSpecVersion[0].compareTo(splitJavaVersion[0])!=0 || splitSpecVersion[1].compareTo(splitJavaVersion[2])!=0 ) {
+        if ( splitSpecVersion[0].compareTo(splitJavaVersion[0])!=0 || splitSpecVersion[1].compareTo(splitJavaVersion[2])>0 ) {
                 throw new RuntimeException("ControlsFX Error: ControlsFX " + //$NON-NLS-1$
                     controlsFXImpVersion + " requires at least " + controlsFXSpecTitle); //$NON-NLS-1$
 //            }

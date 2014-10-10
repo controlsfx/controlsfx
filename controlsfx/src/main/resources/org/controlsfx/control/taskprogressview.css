@@ -1,0 +1,53 @@
+
+.task-progress-view  {
+ 	-fx-background-color: white;
+}
+
+.task-progress-view > * > .label {
+ 	-fx-text-fill: gray;
+ 	-fx-font-size: 18.0;
+ 	-fx-alignment: center;
+ 	-fx-padding: 10.0 0.0 5.0 0.0;
+}
+
+.task-progress-view > * > .list-view  {
+ 	-fx-border-color: transparent;
+ 	-fx-background-color: transparent;
+}
+
+.task-title {
+	-fx-font-weight: bold;
+}
+
+.task-progress-bar .bar {
+	-fx-padding: 6px;
+	-fx-background-radius: 0;
+	-fx-border-radius: 0;
+}
+
+.task-progress-bar .track {
+	-fx-background-radius: 0;
+}
+
+.task-message {
+}
+
+.task-list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 4 10 8 10;
+    -fx-border-color: transparent transparent linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, transparent, rgba(0.0,0.0,0.0,0.2), transparent) transparent;
+}
+
+.task-list-cell-empty {
+	-fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.task-cancel-button {
+	-fx-base-color: red;
+	-fx-font-size: .75em;
+	-fx-font-weight: bold;
+	-fx-padding: 4px;
+	-fx-border-radius: 0;
+	-fx-background-radius: 0;
+}

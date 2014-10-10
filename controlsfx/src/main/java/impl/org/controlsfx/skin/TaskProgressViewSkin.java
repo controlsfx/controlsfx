@@ -1,14 +1,36 @@
+/**
+ * Copyright (c) 2014, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package impl.org.controlsfx.skin;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -19,93 +41,47 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
+import javafx.util.Callback;
 
 import org.controlsfx.control.TaskProgressView;
 
 import com.sun.javafx.css.StyleManager;
 
-public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
+public class TaskProgressViewSkin<T extends Task<?>> extends
+        SkinBase<TaskProgressView<T>> {
 
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
                 TaskProgressView.class
-                        .getResource("taskmonitor.css").toExternalForm()); //$NON-NLS-1$
+                        .getResource("taskprogressview.css").toExternalForm()); //$NON-NLS-1$
     }
 
-    public TaskProgressViewSkin(TaskProgressView monitor) {
+    public TaskProgressViewSkin(TaskProgressView<T> monitor) {
         super(monitor);
 
         BorderPane borderPane = new BorderPane();
         borderPane.getStyleClass().add("box");
 
         // list view
-        ListView<Task<?>> listView = new ListView<>();
+        ListView<T> listView = new ListView<>();
         listView.setPrefSize(500, 400);
         listView.setPlaceholder(new Label("No tasks running"));
         listView.setCellFactory(param -> new TaskCell());
         listView.setFocusTraversable(false);
-        // listView.setStyle("-fx-background-color: transparent");
 
         Bindings.bindContent(listView.getItems(), monitor.getTasks());
         borderPane.setCenter(listView);
 
-        // title
-        Label title = new Label();
-        title.textProperty().bind(monitor.titleProperty());
-        title.visibleProperty().bind(monitor.showTitleProperty());
-        title.setTextAlignment(TextAlignment.CENTER);
-        title.setMaxWidth(Double.MAX_VALUE);
-        borderPane.setTop(title);
-
-        // cancel all button
-        Button cancelButton = new Button("Cancel All");
-        cancelButton.getStyleClass().add("cancel-all-button");
-        BorderPane.setAlignment(cancelButton, Pos.CENTER_RIGHT);
-        BorderPane.setMargin(cancelButton, new Insets(10));
-        cancelButton.visibleProperty().bind(
-                monitor.showCancelAllButtonProperty());
-        cancelButton.setOnAction(evt -> {
-            List<Task<?>> copy = new ArrayList<>(monitor.getTasks());
-            for (Task<?> task : copy) {
-                task.cancel();
-            }
-        });
-
-        BorderPane footerPane = new BorderPane();
-        footerPane.visibleProperty().bind(
-                Bindings.or(monitor.showCancelAllButtonProperty(),
-                        monitor.showTaskCountProperty()));
-        footerPane.setRight(cancelButton);
-
-        final Label countLabel = new Label();
-        countLabel.visibleProperty().bind(
-                Bindings.and(monitor.showTaskCountProperty(),
-                        Bindings.isNotEmpty(monitor.getTasks())));
-
-        BorderPane.setMargin(countLabel, new Insets(10, 10, 10, 30));
-        monitor.getTasks().addListener(
-                (Observable it) -> {
-
-                    int size = monitor.getTasks().size();
-                    countLabel.setText(MessageFormat.format(
-                            "Number of tasks: {0}", size));
-                });
-
-        footerPane.setLeft(countLabel);
-
-        borderPane.setBottom(footerPane);
-
-        getChildren().add(borderPane);
+        getChildren().add(listView);
     }
 
-    class TaskCell extends ListCell<Task<?>> {
+    class TaskCell extends ListCell<T> {
         private ProgressBar progressBar;
         private Label titleText;
         private Label messageText;
         private Button cancelButton;
 
-        private Task<?> task;
+        private T task;
         private BorderPane borderPane;
 
         public TaskCell() {
@@ -118,6 +94,7 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
             progressBar = new ProgressBar();
             progressBar.setMaxWidth(Double.MAX_VALUE);
             progressBar.setMaxHeight(8);
+            progressBar.getStyleClass().add("task-progress-bar");
 
             cancelButton = new Button("Cancel");
             cancelButton.getStyleClass().add("task-cancel-button");
@@ -140,7 +117,6 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
             borderPane = new BorderPane();
             borderPane.setCenter(vbox);
             borderPane.setRight(cancelButton);
-
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }
 
@@ -159,7 +135,9 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
         }
 
         @Override
-        protected void updateItem(Task<?> task, boolean empty) {
+        protected void updateItem(T task, boolean empty) {
+            super.updateItem(task, empty);
+
             this.task = task;
 
             if (empty || task == null) {
@@ -167,12 +145,28 @@ public class TaskProgressViewSkin extends SkinBase<TaskProgressView> {
                 setGraphic(null);
             } else if (task != null) {
                 getStyleClass().setAll("task-list-cell");
-                progressBar.progressProperty().bind(
-                        task.progressProperty());
+                progressBar.progressProperty().bind(task.progressProperty());
                 titleText.textProperty().bind(task.titleProperty());
                 messageText.textProperty().bind(task.messageProperty());
                 cancelButton.disableProperty().bind(
                         Bindings.not(task.runningProperty()));
+
+                Callback<T, Node> factory = getSkinnable().getGraphicFactory();
+                if (factory != null) {
+                    Node graphic = factory.call(task);
+                    if (graphic != null) {
+                        BorderPane.setAlignment(graphic, Pos.CENTER);
+                        BorderPane.setMargin(graphic, new Insets(0, 4, 0, 0));
+                        borderPane.setLeft(graphic);
+                    }
+                } else {
+                	/*
+                	 * Really needed. The application might have used a graphic
+                	 * factory before and then disabled it. In this case the border
+                	 * pane might still have an old graphic in the left position.
+                	 */
+                	borderPane.setLeft(null);
+                }
 
                 setGraphic(borderPane);
             }

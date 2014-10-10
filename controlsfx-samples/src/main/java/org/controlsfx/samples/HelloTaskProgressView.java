@@ -26,6 +26,7 @@
  */
 package org.controlsfx.samples;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,19 +35,27 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.TaskProgressView;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
 
 public class HelloTaskProgressView extends ControlsFXSample {
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private TaskProgressView taskProgressView;
+    private TaskProgressView<MyTask> taskProgressView;
+
+    private FontAwesome fontAwesome = new FontAwesome();
+
+    private Callback<MyTask, Node> factory;
 
     public static void main(String[] args) {
         launch(args);
@@ -65,7 +74,40 @@ public class HelloTaskProgressView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        taskProgressView = new TaskProgressView();
+        taskProgressView = new TaskProgressView<MyTask>();
+
+        factory = task -> {
+
+            org.controlsfx.glyphfont.Glyph result = null;
+            switch (task.getType()) {
+            case TYPE1:
+                result = fontAwesome.create(Glyph.MOBILE_PHONE).size(24)
+                        .color(Color.RED);
+                break;
+            case TYPE2:
+                result = fontAwesome.create(Glyph.COMPASS).size(24)
+                        .color(Color.GREEN);
+                break;
+            case TYPE3:
+                result = fontAwesome.create(Glyph.APPLE).size(24)
+                        .color(Color.BLUE);
+                break;
+            default:
+            }
+
+            if (result != null) {
+                result.setEffect(new DropShadow(8, Color.GRAY));
+                result.setAlignment(Pos.CENTER);
+
+                /*
+                 * We have to make sure all glyps have the same size. Otherwise
+                 * the progress cells will not be aligned properly.
+                 */
+                result.setPrefSize(24, 24);
+            }
+
+            return result;
+        };
 
         StackPane stackPane = new StackPane();
         stackPane.setStyle("-fx-border-color: black; -fx-border-insets: 40;");
@@ -86,33 +128,24 @@ public class HelloTaskProgressView extends ControlsFXSample {
         VBox box = new VBox();
         box.setSpacing(10);
 
-        TextField titleField = new TextField();
-        titleField.setPromptText("Status Text");
-        titleField.textProperty().bindBidirectional(
-                taskProgressView.titleProperty());
-        box.getChildren().add(titleField);
-
-        CheckBox showTitleButton = new CheckBox("Show Title");
-        showTitleButton.setSelected(true);
-        taskProgressView.showTitleProperty().bind(
-                showTitleButton.selectedProperty());
-        box.getChildren().add(showTitleButton);
-
-        CheckBox showCancelAllButton = new CheckBox("Show Cancel All");
-        showCancelAllButton.setSelected(true);
-        taskProgressView.showCancelAllButtonProperty().bind(
-                showCancelAllButton.selectedProperty());
-        box.getChildren().add(showCancelAllButton);
-
-        CheckBox showTaskCount = new CheckBox("Show Task Count");
-        showTaskCount.setSelected(true);
-        taskProgressView.showTaskCountProperty().bind(
-                showTaskCount.selectedProperty());
-        box.getChildren().add(showTaskCount);
-
         Button startTask = new Button("Start Task");
         startTask.setOnAction(evt -> startTask());
         box.getChildren().add(startTask);
+
+        CheckBox useFactory = new CheckBox("Use Grahics Factory");
+        useFactory.setOnAction(evt -> {
+            /*
+             * Cancel all tasks before changing the factory.
+             */
+            (new ArrayList<>(taskProgressView.getTasks())).forEach(task -> task.cancel());
+            if (useFactory.isSelected()) {
+                taskProgressView.setGraphicFactory(factory);
+            } else {
+                taskProgressView.setGraphicFactory(null);
+            }
+        });
+
+        box.getChildren().add(useFactory);
 
         return box;
     }
@@ -131,10 +164,21 @@ public class HelloTaskProgressView extends ControlsFXSample {
         executorService.submit(task);
     }
 
+    enum TaskType {
+        TYPE1, TYPE2, TYPE3;
+    }
+
     class MyTask extends Task<Void> {
+        private TaskType type;
 
         public MyTask(String title) {
             updateTitle(title);
+
+            type = TaskType.values()[(int) (Math.random() * 3)];
+        }
+
+        public TaskType getType() {
+            return type;
         }
 
         @Override

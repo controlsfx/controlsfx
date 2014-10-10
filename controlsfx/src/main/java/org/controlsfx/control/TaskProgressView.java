@@ -1,21 +1,72 @@
+/**
+ * Copyright (c) 2014, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.TaskProgressViewSkin;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.util.Callback;
 
-public class TaskProgressView extends Control {
+/**
+ * The task progress view is used to visualize the progress of long running
+ * tasks. These tasks are created via the {@link Task} class. This view
+ * manages a list of such tasks and displays each one of them with their
+ * name, progress, and update messages.<p>
+ * An optional graphic factory can be set to place a graphic in each row.
+ * This allows the user to more easily distinguish between different types
+ * of tasks.
+ *
+ * <h3>Screenshots</h3>
+ * The picture below shows the default appearance of the task progress view
+ * control:
+ * <center><img src="task-monitor.png" /></center>
+ *
+ * <h3>Code Sample</h3>
+ *
+ * <pre>
+ * TaskProgressView&lt;MyTask&gt; view = new TaskProgressView&lt;&gt;();
+ * view.setGraphicFactory(task -> return new ImageView("db-access.png"));
+ * view.getTasks().add(new MyTask());
+ * </pre>
+ */
+public class TaskProgressView<T extends Task<?>> extends Control {
 
+    /**
+     * Constructs a new task progress view.
+     */
     public TaskProgressView() {
         getStyleClass().add("task-progress-view");
 
@@ -52,73 +103,53 @@ public class TaskProgressView extends Control {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new TaskProgressViewSkin(this);
+        return new TaskProgressViewSkin<>(this);
     }
 
-    private final ObservableList<Task<?>> tasks = FXCollections
+    private final ObservableList<T> tasks = FXCollections
             .observableArrayList();
 
-    public final ObservableList<Task<?>> getTasks() {
+    /**
+     * Returns the list of tasks currently monitored by this view.
+     *
+     * @return the monitored tasks
+     */
+    public final ObservableList<T> getTasks() {
         return tasks;
     }
 
-    private final StringProperty title = new SimpleStringProperty(this,
-            "title", "Tasks");
+    private ObjectProperty<Callback<T, Node>> graphicFactory;
 
-    public final StringProperty titleProperty() {
-        return title;
+    /**
+     * Returns the property used to store an optional callback for creating
+     * custom graphics for each task.
+     *
+     * @return the graphic factory property
+     */
+    public final ObjectProperty<Callback<T, Node>> graphicFactoryProperty() {
+        if (graphicFactory == null) {
+            graphicFactory = new SimpleObjectProperty<Callback<T, Node>>(
+                    this, "graphicFactory");
+        }
+
+        return graphicFactory;
     }
 
-    public final void setTitle(String title) {
-        titleProperty().set(title);
+    /**
+     * Returns the value of {@link #graphicFactoryProperty()}.
+     *
+     * @return the optional graphic factory
+     */
+    public final Callback<T, Node> getGraphicFactory() {
+        return graphicFactory == null ? null : graphicFactory.get();
     }
 
-    public final String getTitle() {
-        return titleProperty().get();
-    }
-
-    private final BooleanProperty showTitle = new SimpleBooleanProperty(this,
-            "showTitle", true);
-
-    public final BooleanProperty showTitleProperty() {
-        return showTitle;
-    }
-
-    public final void setShowTitle(boolean show) {
-        showTitleProperty().set(show);
-    }
-
-    public final boolean isShowTitle() {
-        return showTitleProperty().get();
-    }
-
-    private final BooleanProperty showCancelAllButton = new SimpleBooleanProperty(
-            this, "showCancelAllButton", true);
-
-    public final BooleanProperty showCancelAllButtonProperty() {
-        return showCancelAllButton;
-    }
-
-    public final void setShowCancelAllButton(boolean show) {
-        showCancelAllButtonProperty().set(show);
-    }
-
-    public final boolean isShowCancelAllButton() {
-        return showCancelAllButtonProperty().get();
-    }
-
-    private final BooleanProperty showTaskCount = new SimpleBooleanProperty(
-            this, "showTaskCount", true);
-
-    public final BooleanProperty showTaskCountProperty() {
-        return showTaskCount;
-    }
-
-    public final void setShowTaskCount(boolean show) {
-        showTaskCountProperty().set(show);
-    }
-
-    public final boolean isShowTaskCount() {
-        return showTaskCountProperty().get();
+    /**
+     * Sets the value of {@link #graphicFactoryProperty()}.
+     *
+     * @param factory an optional graphic factory
+     */
+    public final void setGraphicFactory(Callback<T, Node> factory) {
+        graphicFactoryProperty().set(factory);
     }
 }

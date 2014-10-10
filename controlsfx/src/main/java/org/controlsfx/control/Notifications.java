@@ -225,7 +225,7 @@ public class Notifications {
      * built-in 'warning' graphic.
      */
     public void showWarning() {
-        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-warning.png"))); //$NON-NLS-1$
+        graphic(new ImageView(Notifications.class.getResource("/org/controlsfx/dialog/dialog-warning.png").toExternalForm())); //$NON-NLS-1$
         show();
     }
 
@@ -234,7 +234,7 @@ public class Notifications {
      * built-in 'information' graphic.
      */
     public void showInformation() {
-        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-information.png"))); //$NON-NLS-1$
+        graphic(new ImageView(Notifications.class.getResource("/org/controlsfx/dialog/dialog-information.png").toExternalForm())); //$NON-NLS-1$
         show();
     }
 
@@ -243,7 +243,7 @@ public class Notifications {
      * built-in 'error' graphic.
      */
     public void showError() {
-        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-error.png"))); //$NON-NLS-1$
+        graphic(new ImageView(Notifications.class.getResource("/org/controlsfx/dialog/dialog-error.png").toExternalForm())); //$NON-NLS-1$
         show();
     }
 
@@ -252,7 +252,7 @@ public class Notifications {
      * built-in 'confirm' graphic.
      */
     public void showConfirm() {
-        graphic(new ImageView(new Image("/org/controlsfx/dialog/dialog-confirm.png"))); //$NON-NLS-1$
+        graphic(new ImageView(Notifications.class.getResource("/org/controlsfx/dialog/dialog-confirm.png").toExternalForm())); //$NON-NLS-1$
         show();
     }
 
@@ -608,3 +608,4 @@ public class Notifications {
         }
     }
 }
+

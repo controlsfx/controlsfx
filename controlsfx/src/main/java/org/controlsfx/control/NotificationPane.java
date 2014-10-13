@@ -479,7 +479,7 @@ public class NotificationPane extends ControlsFXControl {
      * 
      * @param value 
      */
-    public final void sethideCloseButton(boolean value) {
+    public final void setHideCloseButton(boolean value) {
         this.hideCloseButton.set(value);
     }
     

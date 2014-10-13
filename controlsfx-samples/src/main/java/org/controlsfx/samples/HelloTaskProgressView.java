@@ -132,7 +132,7 @@ public class HelloTaskProgressView extends ControlsFXSample {
         startTask.setOnAction(evt -> startTask());
         box.getChildren().add(startTask);
 
-        CheckBox useFactory = new CheckBox("Use Grahics Factory");
+        CheckBox useFactory = new CheckBox("Use Graphics Factory");
         useFactory.setOnAction(evt -> {
             /*
              * Cancel all tasks before changing the factory.

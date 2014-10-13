@@ -84,6 +84,10 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
                 control.hide();
             }
             
+            @Override public boolean isHideCloseButton() {
+                    return control.isHideCloseButton();
+            }
+
             @Override public double getContainerHeight() {
                 return control.getHeight();
             }

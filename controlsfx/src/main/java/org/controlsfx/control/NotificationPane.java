@@ -461,7 +461,34 @@ public class NotificationPane extends ControlsFXControl {
         }
     };
     
+    // --- hide close button
+    private BooleanProperty hideCloseButton = new SimpleBooleanProperty(this, "hideCloseButton", false); //$NON-NLS-1$
+        
+    /**
+     * A property representing whether the {@code NotificationPane} should hide the close button or not.
+     * By default it will appear but this can be changed by setting this property to true.
+     * 
+     * @return A property representing whether the {@code NotificationPane} should hide the close button.
+     */
+    public final BooleanProperty hideCloseButtonProperty() {
+        return hideCloseButton;
+    }
     
+    /**
+     * Sets whether the {@code NotificationPane} should hide the close button.
+     * 
+     * @param value 
+     */
+    public final void sethideCloseButton(boolean value) {
+        this.hideCloseButton.set(value);
+    }
+    
+    /**
+     * @return whether the close button in {@code NotificationPane} is hidden.
+     */
+    public final boolean isHideCloseButton() {
+        return hideCloseButton.get();
+    }
     
     /***************************************************************************
      * 

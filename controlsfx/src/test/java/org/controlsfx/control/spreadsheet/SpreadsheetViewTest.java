@@ -106,14 +106,14 @@ public class SpreadsheetViewTest {
 
         spv.copyClipboard();
     }
+
     /**
      * Try to select a cell, then set a new grid, and verify that the
      * selectedCells are well updated because we have modified the TableColumn
      * so the TablePosition are normally wrong.
      *
-     * @throws InterruptedException
      */
-    @Test public void testSelectionModel()  throws InterruptedException{
+    @Test public void testSelectionModel(){
         spv.getSelectionModel().select(10, spv.getSelectionModel().getTableView().getColumns().get(10));
         spv.setGrid(buildGrid());
 

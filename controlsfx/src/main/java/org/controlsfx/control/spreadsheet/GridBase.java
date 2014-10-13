@@ -277,7 +277,7 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void spanRow(int count, int rowIndex, int colIndex) {
-        if (count <= 0 || count >= rowCount || rowIndex >= rowCount || colIndex >= columnCount) {
+        if (count <= 0 || count > rowCount || rowIndex >= rowCount || colIndex >= columnCount) {
             return;
         }
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
@@ -296,7 +296,7 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void spanColumn(int count, int rowIndex, int colIndex) {
-        if (count <= 0 || count >= columnCount || rowIndex >= rowCount || colIndex >= columnCount) {
+        if (count <= 0 || count > columnCount || rowIndex >= rowCount || colIndex >= columnCount) {
             return;
         }
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);

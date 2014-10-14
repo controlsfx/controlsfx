@@ -116,15 +116,14 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         final Grid grid = spreadsheetView.getGrid();
         final int index = control.getIndex();
 
-        // I put that at the very beginning in the hope that I will not have
-        // that extra row at the bottom layouting.
+        /**
+         * If this row is out of bounds, this means that the row is displayed
+         * either at the top or at the bottom. In any case, this row is not
+         * meant to be seen so we clear its children list in order not to show
+         * previous TableCell that could be there.
+         */
         if (index < 0 || index >= gridView.getItems().size()) {
-            /**
-             * Investigate if the row at the bottom could be still present,
-             * because this opacity is doing trouble when doing: right, scroll
-             * down, left, unfix first, go up.
-             */
-//            control.setOpacity(0);
+            getChildren().clear();
             return;
         }
 
@@ -377,20 +376,20 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      *
      * @return
      */
-    private HashMap<TableColumnBase, CellView> getCellsMap(){
-        if(cellsMap == null || cellsMap.get() == null){
+    private HashMap<TableColumnBase, CellView> getCellsMap() {
+        if (cellsMap == null || cellsMap.get() == null) {
             HashMap<TableColumnBase, CellView> map = new HashMap<>();
             cellsMap = new WeakReference<>(map);
             return map;
         }
         return cellsMap.get();
     }
-    
+
     /**
      * This will put all current displayed cell into the cache.
      */
     private void putCellsInCache() {
-        for(CellView cell : cells){
+        for (CellView cell : cells) {
             getCellsMap().put(cell.getTableColumn(), cell);
         }
         cells.clear();

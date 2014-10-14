@@ -47,7 +47,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
@@ -576,6 +575,9 @@ public class Notifications {
             for (int i = popups.size() - 1; i >= 0; i--) {
                 final Popup _popup = popups.get(i);
                 final double anchorYTarget = targetAnchors[i];
+                if(anchorYTarget < 0){
+                    _popup.hide();
+                }
                 final double oldAnchorY = _popup.getAnchorY();
                 final double distance = anchorYTarget - oldAnchorY;
 

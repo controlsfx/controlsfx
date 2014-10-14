@@ -105,6 +105,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         registerChangeListener(control.graphicProperty(), "GRAPHIC"); //$NON-NLS-1$
         registerChangeListener(control.showingProperty(), "SHOWING"); //$NON-NLS-1$
         registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP"); //$NON-NLS-1$
+        registerChangeListener(control.hideCloseButtonProperty(), "HIDE_CLOSE_BUTTON"); //$NON-NLS-1$
     }
     
     @Override protected void handleControlPropertyChanged(String p) {
@@ -126,6 +127,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             if (getSkinnable().isShowing()) {
                 getSkinnable().requestLayout();
             }
+        } else if ("HIDE_CLOSE_BUTTON".equals(p)) { //$NON-NLS-1$
+            notificationBar.updatePane();
         }
     }
     

@@ -39,7 +39,9 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BooleanSupplier;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -144,8 +146,8 @@ public class Wizard {
     private final Stack<WizardPane> pageHistory = new Stack<>(); 
     
     private Optional<WizardPane> currentPage = Optional.empty();
-    
-    private final ValidationSupport validationSupport = new ValidationSupport();
+
+    private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
     
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
@@ -196,7 +198,7 @@ public class Wizard {
      */
     public Wizard(Object owner, String title) {
     	
-        validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
+        invalidProperty.addListener( (o, ov, nv) -> validateActionState());
         
         dialog = new Dialog<>();
         dialog.titleProperty().bind(this.titleProperty);
@@ -377,12 +379,12 @@ public class Wizard {
     }
     
     /**
-     * Returns an instance of {@link ValidationSupport}, which can be used for page validation
-     * @return {@link ValidationSupport} instance
+     * Validation state property 
+     * @return validation state property
      */
-    public ValidationSupport getValidationSupport() {
-		return validationSupport;
-	}
+    public BooleanProperty invalidProperty() {
+        return invalidProperty;
+    }
     
     
     
@@ -463,7 +465,7 @@ public class Wizard {
         }
 
         validateButton( BUTTON_PREVIOUS, () -> pageHistory.isEmpty());
-        validateButton( BUTTON_NEXT,     () -> validationSupport.isInvalid());
+        validateButton( BUTTON_NEXT,     () -> invalidProperty.get());
 
     }
     

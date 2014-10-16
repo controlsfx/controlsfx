@@ -83,8 +83,8 @@ public abstract class NotificationBar extends Region {
         return ""; //$NON-NLS-1$
     }
     
-    public boolean isHideCloseButton() {
-        return false;
+    public boolean isCloseButtonVisible() {
+        return true;
     }
     
     public abstract String getText();
@@ -175,7 +175,7 @@ public abstract class NotificationBar extends Region {
         pane.add(label, 0, row);
         pane.add(actionsBar, 1, row);
         
-        if (!isHideCloseButton()) {
+        if (isCloseButtonVisible()) {
             pane.add(closeBtn, 2, 0, 1, row+1);
         }
     }

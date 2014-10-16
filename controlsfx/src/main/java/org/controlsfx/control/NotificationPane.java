@@ -461,33 +461,33 @@ public class NotificationPane extends ControlsFXControl {
         }
     };
     
-    // --- hide close button
-    private BooleanProperty hideCloseButton = new SimpleBooleanProperty(this, "hideCloseButton", false); //$NON-NLS-1$
+    // --- close button visibility
+    private BooleanProperty closeButtonVisible = new SimpleBooleanProperty(this, "closeButtonVisible", true); //$NON-NLS-1$
         
     /**
-     * A property representing whether the {@code NotificationPane} should hide the close button or not.
-     * By default it will appear but this can be changed by setting this property to true.
+     * A property representing whether the close button in the {@code NotificationPane} should be visible or not.
+     * By default it will appear but this can be changed by setting this property to false.
      * 
-     * @return A property representing whether the {@code NotificationPane} should hide the close button.
+     * @return A property representing whether the close button in the {@code NotificationPane} should be visible.
      */
-    public final BooleanProperty hideCloseButtonProperty() {
-        return hideCloseButton;
+    public final BooleanProperty closeButtonVisibleProperty() {
+        return closeButtonVisible;
     }
     
     /**
-     * Sets whether the {@code NotificationPane} should hide the close button.
+     * Sets whether the close button in {@code NotificationPane} should be visible.
      * 
      * @param value 
      */
-    public final void setHideCloseButton(boolean value) {
-        this.hideCloseButton.set(value);
+    public final void setCloseButtonVisible(boolean value) {
+        this.closeButtonVisible.set(value);
     }
     
     /**
-     * @return whether the close button in {@code NotificationPane} is hidden.
+     * @return whether the close button in {@code NotificationPane} is visible.
      */
-    public final boolean isHideCloseButton() {
-        return hideCloseButton.get();
+    public final boolean isCloseButtonVisible() {
+        return closeButtonVisible.get();
     }
     
     /***************************************************************************

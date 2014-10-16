@@ -107,7 +107,7 @@ public class HelloNotificationPane extends ControlsFXSample {
         cbHideCloseBtn.setSelected(false);
         cbHideCloseBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent arg0) {
-                notificationPane.setHideCloseButton(cbHideCloseBtn.isSelected());
+                notificationPane.setCloseButtonVisible(!cbHideCloseBtn.isSelected());
             }
         });
         

@@ -212,7 +212,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 if (hbarValue + fixedColumnWidth > x) {
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();
-                    fixedColumnWidth += tableCell.getWidth();
+                    fixedColumnWidth += width;
 //                    isVisible = true; // If in fixedColumn, it's obviously visible
                     fixedCells.add(tableCell);
                 }

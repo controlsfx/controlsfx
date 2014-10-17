@@ -97,6 +97,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         // issue highlighted in RT-33602, where the table cell had the correct
         // item whilst the row had the old item.
         final int newIndex = getSkinnable().getIndex();
+        /**
+         * When the index is changing, we need to clear out all the children
+         * because we may end up with useless cell in the row.
+         */
+        getChildren().clear();
         for (int i = 0, max = cells.size(); i < max; i++) {
             cells.get(i).updateIndex(newIndex);
         }
@@ -140,6 +145,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             return;
         }
 
+        getSkinnable().setVisible(true);
         // layout the individual column cells
         double width;
         double height;

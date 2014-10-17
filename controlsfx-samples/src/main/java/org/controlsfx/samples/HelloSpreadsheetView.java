@@ -54,9 +54,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.spreadsheet.GridBase;
+import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
@@ -161,72 +161,79 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      * information.
      */
     private void generatePickers() {
-        spreadSheetView.getRowPickers().addAll(0, 1, 2, 3, 4, 5, 6);
-        spreadSheetView.setRowPickerCallback(new Callback<Integer, Void>() {
+        spreadSheetView.getRowPickers().put(0, new Picker() {
 
             @Override
-            public Void call(Integer p) {
-                String message;
-                switch (p) {
-                    case 0:
-                        message = "This row contains several fictive companies. "
-                                + "The cells are not editable.\n"
-                                + "A custom tooltip is applied for the first cell.";
-                        break;
-                    case 1:
-                        message = "This row contains cells that can only show a list.";
-                        break;
-                    case 2:
-                        message = "This row contains cells that display some dates.";
-                        break;
-                    case 3:
-                        message = "This row contains some Images displaying logos of the companies.";
-                        break;
-                    case 4:
-                        message = "This row contains Double editable cells. "
-                                + "Except for ControlsFX compagny where it's a String.";
-                        break;
-                    case 5:
-                        message = "This row contains Double editable cells with "
-                                + "a special format (%). Some cells also have "
-                                + "a little icon next to their value.";
-                        break;
-
-                    case 6:
-                        message = "This row contains Integer editable cells.";
-                        break;
-                    default:
-                        message = "You clicked on row " + (p + 1);
-                }
-
+            public void onClick() {
                 Dialogs.create()
-                        .title("You clicked on row " + (p + 1))
-                        .message(message)
+                        .message("This row contains several fictive companies. "
+                                + "The cells are not editable.\n"
+                                + "A custom tooltip is applied for the first cell.")
                         .showInformation();
-                return null;
             }
         });
-        spreadSheetView.getColumnPickers().addAll(0);
-        spreadSheetView.setColumnPickerCallback(new Callback<Integer, Void>() {
+        
+        spreadSheetView.getRowPickers().put(1, new Picker() {
 
             @Override
-            public Void call(Integer p) {
-                String message;
-                switch (p) {
-                    case 0:
-                        message = "Each cell of this column (except for the "
-                                + "separator in the middle) has a particular css "
-                                + "class for changing its color.\n";
-                        break;
-                    default:
-                        message = "You clicked on column " + (p + 1);
-                }
-
+            public void onClick() {
                 Dialogs.create()
-                        .title("You clicked on column " + (p + 1))
-                        .message(message)
+                        .message("This row contains cells that can only show a list.")
                         .showInformation();
-                return null;
+            }
+        });
+        
+        spreadSheetView.getRowPickers().put(2, new Picker() {
+
+            @Override
+            public void onClick() {
+                Dialogs.create()
+                        .message("This row contains cells that display some dates.")
+                        .showInformation();
+            }
+        });
+        
+        spreadSheetView.getRowPickers().put(3, new Picker() {
+
+            @Override
+            public void onClick() {
+                Dialogs.create()
+                        .message("This row contains some Images displaying logos of the companies.")
+                        .showInformation();
+            }
+        });
+        
+        spreadSheetView.getRowPickers().put(4, new Picker() {
+
+            @Override
+            public void onClick() {
+                Dialogs.create()
+                        .message("This row contains Double editable cells. "
+                                + "Except for ControlsFX compagny where it's a String.")
+                        .showInformation();
+            }
+        });
+        spreadSheetView.getRowPickers().put(5, new Picker("picker-label","picker-label-exclamation") {
+
+            @Override
+            public void onClick() {
+                Dialogs.create()
+                        .message("This row contains Double editable cells with "
+                                + "a special format (%). Some cells also have "
+                                + "a little icon next to their value.")
+                        .showInformation();
+            }
+        });
+                
+        spreadSheetView.getColumnPickers().put(0, new Picker("picker-label","picker-label-security") {
+
+            @Override
+            public void onClick() {
+                Dialogs.create()
+                        .message("Each cell of this column (except for the "
+                                + "separator in the middle) has a particular css "
+                                + "class for changing its color.\n")
+                        .showInformation();
             }
         });
     }

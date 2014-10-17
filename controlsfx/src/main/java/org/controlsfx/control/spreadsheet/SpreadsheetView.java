@@ -59,6 +59,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
@@ -153,25 +154,14 @@ import org.controlsfx.tools.Utils;
  * "picker" because they were used originally for picking a row or a column to 
  * insert in the SpreadsheetView.
  * <br/>
- * But you can do anything you want with it. Simply add a row or a column index in 
- * {@link #getRowPickers() } and {@link #getColumnPickers() }. Then you can provide 
- * a custom CallBack with {@link #setRowPickerCallback(javafx.util.Callback) } and 
- * {@link #setColumnPickerCallback(javafx.util.Callback) } in order to react when 
- * the user click on the picker. The Callback gives you the index of the picker.
+ * But you can do anything you want with it. Simply put a row or a column index
+ * in {@link #getRowPickers() } and {@link #getColumnPickers() } along with an
+ * instance of {@link Picker}. You can override the {@link Picker#onClick() }
+ * method in order to react when the user click on the picker.
  * <br/>
  * The pickers will appear on the top of the column's header and on the left of 
  * the row's header.
  * <br/>
- * You can also override the default graphic of the picker by overriding its css,
- * example:
- * <br/>
- * <pre>
- * .picker-label{
- *   -fx-graphic: url("add.png"); 
- *   -fx-background-color: transparent;
- *   -fx-padding: 0 0 0 0;
- * }
- * </pre>
  * 
  * <h3>Copy pasting</h3> You can copy any cell you want and paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
@@ -220,6 +210,7 @@ import org.controlsfx.tools.Utils;
  * @see SpreadsheetColumn
  * @see Grid
  * @see GridBase
+ * @see Picker
  */
 public class SpreadsheetView extends Control {
 
@@ -296,11 +287,9 @@ public class SpreadsheetView extends Control {
 
     private BitSet rowFix; // Compute if we can fix the rows or not.
 
-    private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
-    private Callback<Integer, Void> rowPickerCallback = DEFAULT_CALLBACK;
+    private final ObservableMap<Integer, Picker> rowPickers = FXCollections.observableHashMap();
 
-    private final ObservableList<Integer> columnPickers = FXCollections.observableArrayList();
-    private Callback<Integer, Void> columnPickerCallback = DEFAULT_CALLBACK;
+    private final ObservableMap<Integer, Picker> columnPickers = FXCollections.observableHashMap();
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -869,51 +858,21 @@ public class SpreadsheetView extends Control {
     }
     
     /**
-     * @return An ObservableList of row indexes that display a picker.
+     * @return An ObservableMap with the row index as key and the Picker as a
+     * value.
      */
-    public ObservableList<Integer> getRowPickers() {
+    public ObservableMap<Integer, Picker> getRowPickers() {
         return rowPickers;
     }
 
     /**
-     * Set a custom callback for the Row picker. Row number is given to you in 
-     * the callback.
-     * @param callback 
+     * @return An ObservableMap with the column index as key and the Picker as a
+     * value.
      */
-    public void setRowPickerCallback(Callback<Integer, Void> callback) {
-        this.rowPickerCallback = callback;
-    }
-
-    /**
-     * @return the row Picker Callback.
-     */
-    public Callback<Integer, Void> getRowPickerCallback() {
-        return rowPickerCallback;
-    }
-
-    /**
-     * @return An ObservableList of column indexes that display a picker.
-     */
-    public ObservableList<Integer> getColumnPickers() {
+    public ObservableMap<Integer, Picker> getColumnPickers() {
         return columnPickers;
     }
 
-     /**
-     * Set a custom callback for the Column picker. Column number is given to you in 
-     * the callback.
-     * @param callback 
-     */
-    public void setColumnPickerCallback(Callback<Integer, Void> callback) {
-        this.columnPickerCallback = callback;
-    }
-
-    /**
-     * @return the columnPicker Callback.
-     */
-    public Callback<Integer, Void> getColumnPickerCallback() {
-        return columnPickerCallback;
-    }
-    
     /**
      * This method will compute the best height for each line. That is to say
      * a height where each content of each cell could be fully visible.\n

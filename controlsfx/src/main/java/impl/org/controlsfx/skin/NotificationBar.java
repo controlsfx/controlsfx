@@ -83,8 +83,8 @@ public abstract class NotificationBar extends Region {
         return ""; //$NON-NLS-1$
     }
     
-    public boolean isHideCloseButton() {
-        return false;
+    public boolean isCloseButtonVisible() {
+        return true;
     }
     
     public abstract String getText();
@@ -137,32 +137,30 @@ public abstract class NotificationBar extends Region {
         });
 
         // initialise close button area
-        if (! isHideCloseButton()) {
-            closeBtn = new Button();
-            closeBtn.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent arg0) {
-                    hide();
-                }
-            });
-            closeBtn.getStyleClass().setAll("close-button"); //$NON-NLS-1$
-            StackPane graphic = new StackPane();
-            graphic.getStyleClass().setAll("graphic"); //$NON-NLS-1$
-            closeBtn.setGraphic(graphic);
-            closeBtn.setMinSize(17, 17);
-            closeBtn.setPrefSize(17, 17);
-            closeBtn.opacityProperty().bind(transition);
-            GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
-            
-            // position the close button in the best place, depending on the height
-            double minHeight = minHeight(-1);
-            GridPane.setValignment(closeBtn, minHeight == MIN_HEIGHT ? VPos.CENTER : VPos.TOP);
-        }
-
+        closeBtn = new Button();
+        closeBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent arg0) {
+                hide();
+            }
+        });
+        closeBtn.getStyleClass().setAll("close-button"); //$NON-NLS-1$
+        StackPane graphic = new StackPane();
+        graphic.getStyleClass().setAll("graphic"); //$NON-NLS-1$
+        closeBtn.setGraphic(graphic);
+        closeBtn.setMinSize(17, 17);
+        closeBtn.setPrefSize(17, 17);
+        closeBtn.opacityProperty().bind(transition);
+        GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
+        
+        // position the close button in the best place, depending on the height
+        double minHeight = minHeight(-1);
+        GridPane.setValignment(closeBtn, minHeight == MIN_HEIGHT ? VPos.CENTER : VPos.TOP);
+        
         // put it all together
         updatePane();
     }
 
-    private void updatePane() {
+    void updatePane() {
         actionsBar = ActionUtils.createButtonBar(getActions());
         actionsBar.opacityProperty().bind(transition);
         GridPane.setHgrow(actionsBar, Priority.SOMETIMES);
@@ -177,7 +175,7 @@ public abstract class NotificationBar extends Region {
         pane.add(label, 0, row);
         pane.add(actionsBar, 1, row);
         
-        if (closeBtn != null) {
+        if (isCloseButtonVisible()) {
             pane.add(closeBtn, 2, 0, 1, row+1);
         }
     }
@@ -307,3 +305,4 @@ public abstract class NotificationBar extends Region {
         timeline.play();
     }
 }
+

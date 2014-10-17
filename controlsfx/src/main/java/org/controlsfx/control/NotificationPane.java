@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -461,7 +461,34 @@ public class NotificationPane extends ControlsFXControl {
         }
     };
     
+    // --- close button visibility
+    private BooleanProperty closeButtonVisible = new SimpleBooleanProperty(this, "closeButtonVisible", true); //$NON-NLS-1$
+        
+    /**
+     * A property representing whether the close button in the {@code NotificationPane} should be visible or not.
+     * By default it will appear but this can be changed by setting this property to false.
+     * 
+     * @return A property representing whether the close button in the {@code NotificationPane} should be visible.
+     */
+    public final BooleanProperty closeButtonVisibleProperty() {
+        return closeButtonVisible;
+    }
     
+    /**
+     * Sets whether the close button in {@code NotificationPane} should be visible.
+     * 
+     * @param value 
+     */
+    public final void setCloseButtonVisible(boolean value) {
+        this.closeButtonVisible.set(value);
+    }
+    
+    /**
+     * @return whether the close button in {@code NotificationPane} is visible.
+     */
+    public final boolean isCloseButtonVisible() {
+        return closeButtonVisible.get();
+    }
     
     /***************************************************************************
      * 

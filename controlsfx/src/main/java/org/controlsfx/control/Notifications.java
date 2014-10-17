@@ -382,8 +382,8 @@ public class Notifications {
                     createHideTimeline(popup, this, p, Duration.ZERO).play();
                 }
 
-                @Override public boolean isHideCloseButton() {
-                    return notification.hideCloseButton;
+                @Override public boolean isCloseButtonVisible() {
+                    return !notification.hideCloseButton;
                 }
 
                 @Override public double getContainerHeight() {

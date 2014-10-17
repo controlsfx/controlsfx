@@ -35,6 +35,7 @@ import javafx.scene.input.MouseEvent;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
+import javafx.beans.Observable;
 
 /**
  * A cell column header.
@@ -44,6 +45,12 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     public HorizontalHeaderColumn(
             TableViewSkinBase<?, ?, ?, ?, ?, ?> skin, TableColumnBase<?, ?> tc) {
         super(skin, tc);
+        /**
+         * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395
+         */
+        widthProperty().addListener((Observable observable) -> {
+            ((GridViewSkin)skin).hBarValue.clear();
+        });
     }
 
     @Override

@@ -29,7 +29,6 @@ package impl.org.controlsfx.spreadsheet;
 import com.sun.javafx.collections.MappingChange;
 import com.sun.javafx.collections.NonIterableChange;
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
-import com.sun.javafx.scene.control.SelectedCellsMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +74,7 @@ public class SpreadsheetViewSelectionModel extends
     // the only 'proper' internal data structure, selectedItems and
     // selectedIndices
     // are both 'read-only and unbacked'.
-    private final SelectedCellsMap<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCellsMap;
+    private final SelectedCellsMapTemp<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCellsMap;
 
     // we create a ReadOnlyUnbackedObservableList of selectedCells here so
     // that we can fire custom list change events.
@@ -195,8 +194,7 @@ public class SpreadsheetViewSelectionModel extends
 //                return SpreadsheetViewSelectionModel.this.isCellSelectionEnabled();
 //            }
 //        };
-         selectedCellsMap = new SelectedCellsMap<>(new WeakListChangeListener<>(listChangeListener));
-         
+         selectedCellsMap = new SelectedCellsMapTemp<>(new WeakListChangeListener<>(listChangeListener));
 
         selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
             @Override
@@ -431,6 +429,8 @@ public class SpreadsheetViewSelectionModel extends
             select(maxRow, maxColumn);
             return;
         }
+        SpreadsheetCell cell;
+        
         makeAtomic = true;
 
         final int itemCount = getItemCount();
@@ -469,14 +469,25 @@ public class SpreadsheetViewSelectionModel extends
 
                 // We store all the selectedColumn and Rows, we will update
                 // just once at the end
-                final SpreadsheetCell cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
+               cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
                 for (int i = cell.getRow(); i < cell.getRowSpan() + cell.getRow(); ++i) {
                     selectedColumns.add(i);
                     for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
                         selectedRows.add(j);
                     }
                 }
+                /**
+                 * If we are on a spanning cells, we deactivate the makeAtomic
+                 * since it can lead to non-visual confirmation of the selected
+                 * cells as described in
+                 * https://javafx-jira.kenai.com/browse/RT-38306
+                 */
+                if (cell.getColumnSpan() > 1 || cell.getColumnSpan() > 1) {
+                    makeAtomic = false;
+                }
+
                 selectedCellsMap.add(pos);
+                makeAtomic = true;
 
                 // end copy/paste
             }

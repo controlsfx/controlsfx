@@ -551,7 +551,7 @@ public abstract class SpreadsheetCellEditor {
             ParsePosition parsePosition = new ParsePosition(0);
             if (tf.getText() != null) {
                 Number number = format.parse(tf.getText(), parsePosition);
-                if (number != null) {
+                if (number != null && parsePosition.getIndex() == tf.getText().length()) {
                     return String.valueOf(number.doubleValue());
                 }
             }

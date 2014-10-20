@@ -189,29 +189,35 @@ public class GridCellEditor {
         handle.getCellsViewSkin().getVBar().valueProperty().addListener(endEditionListener);
         handle.getCellsViewSkin().getHBar().valueProperty().addListener(endEditionListener);
         
-        viewCell.setGraphic(spreadsheetCellEditor.getEditor());
+        Control editor = spreadsheetCellEditor.getEditor();
 
         // Then we call the user editor in order for it to be ready
         Object value = modelCell.getItem();
         Double maxHeight = Math.max(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), spreadsheetCellEditor.getMaxHeight());
-        spreadsheetCellEditor.getEditor().setMaxHeight(maxHeight);
-        spreadsheetCellEditor.getEditor().setPrefWidth(viewCell.getWidth());
         
-        if(handle.getGridView().getEditWithKey()){
+        if (editor != null) {
+            viewCell.setGraphic(editor);
+            editor.setMaxHeight(maxHeight);
+            editor.setPrefWidth(viewCell.getWidth());
+        }
+
+        if (handle.getGridView().getEditWithKey()) {
             handle.getGridView().setEditWithKey(false);
             spreadsheetCellEditor.startEdit(""); //$NON-NLS-1$
-        }else{
+        } else {
             spreadsheetCellEditor.startEdit(value);
         }
-        
-       focusProperty = getFocusProperty(spreadsheetCellEditor.getEditor());
-        
-        focusProperty.addListener(focusListener);
+        if (editor != null) {
+            focusProperty = getFocusProperty(editor);
+            focusProperty.addListener(focusListener);
+        }
     }
 
     private void end() {
-        focusProperty.removeListener(focusListener);
-        focusProperty = null;
+        if(focusProperty != null){
+            focusProperty.removeListener(focusListener);
+            focusProperty = null;
+        }
         handle.getCellsViewSkin().getVBar().valueProperty().removeListener(endEditionListener);
         handle.getCellsViewSkin().getHBar().valueProperty().removeListener(endEditionListener);
         

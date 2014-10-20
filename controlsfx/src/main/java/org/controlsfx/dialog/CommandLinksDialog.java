@@ -27,6 +27,7 @@
 package org.controlsfx.dialog;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -165,15 +166,14 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         dialogPane.getStylesheets().add(getClass().getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
         dialogPane.getStylesheets().add(getClass().getResource("commandlink.css").toExternalForm()); //$NON-NLS-1$
         
-        // create a map from ButtonType -> CommandLinkButtonType.
-        typeMap = links.stream()
-             .collect(Collectors.toMap(
-                     commandLinkButtonType -> commandLinkButtonType.getButtonType(), 
-                     commandLinkButtonType -> commandLinkButtonType));
+        // create a map from ButtonType -> CommandLinkButtonType, and put the 
+        // ButtonType values into the dialog pane
+        typeMap = new HashMap<>();
+        for (CommandLinksButtonType link : links) { 
+            typeMap.put(link.getButtonType(), link); 
+            dialogPane.getButtonTypes().add(link.getButtonType()); 
+        }
         
-        // put the ButtonType values into the dialog pane
-        dialogPane.getButtonTypes().addAll(typeMap.keySet());
-
         updateGrid();
         dialogPane.getButtonTypes().addListener((ListChangeListener<? super ButtonType>)c -> updateGrid());
         

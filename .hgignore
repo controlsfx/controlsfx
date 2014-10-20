@@ -11,4 +11,4 @@ fxsampler/build/*
 bin/*
 doc/*
 .settings/*
-
+build/*

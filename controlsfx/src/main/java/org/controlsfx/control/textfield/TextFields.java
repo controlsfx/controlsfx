@@ -73,6 +73,7 @@ public class TextFields {
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
         clearButtonPane.setOnMouseReleased(e -> inputField.clear());
+        clearButtonPane.disableProperty().bind(inputField.editableProperty().not());
 
         rightProperty.set(clearButtonPane);
 

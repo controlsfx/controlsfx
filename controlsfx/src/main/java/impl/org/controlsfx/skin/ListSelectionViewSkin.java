@@ -83,6 +83,9 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         targetListView.setId("target-list-view");
         targetListView.setItems(view.getTargetItems());
 
+        sourceListView.cellFactoryProperty().bind(view.cellFactoryProperty());
+        targetListView.cellFactoryProperty().bind(view.cellFactoryProperty());
+
         gridPane = createGridPane();
         buttonBox = createButtonBox();
 

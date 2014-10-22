@@ -28,13 +28,20 @@ package org.controlsfx.samples;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ListSelectionView;
 
 public class HelloListSelectionView extends ControlsFXSample {
+
+    private ListSelectionView<String> view;
 
     @Override
     public String getSampleName() {
@@ -43,7 +50,7 @@ public class HelloListSelectionView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        ListSelectionView<String> view = new ListSelectionView<>();
+        view = new ListSelectionView<>();
         view.getSourceItems()
                 .addAll("Katja", "Dirk", "Philip", "Jule", "Armin");
 
@@ -52,6 +59,37 @@ public class HelloListSelectionView extends ControlsFXSample {
         pane.setAlignment(Pos.CENTER);
 
         return pane;
+    }
+
+    @Override
+    public Node getControlPanel() {
+        CheckBox useCellFactory = new CheckBox("Use cell factory");
+        useCellFactory.setOnAction(evt -> {
+            if (useCellFactory.isSelected()) {
+                view.setCellFactory(view -> {
+                    ListCell<String> cell = new ListCell<String>() {
+                        @Override
+                        public void updateItem(String item, boolean empty) {
+                            super.updateItem(item, empty);
+
+                            if (empty) {
+                                setText(null);
+                                setGraphic(null);
+                            } else {
+                                setText(item == null ? "null" : item.toString());
+                                setGraphic(null);
+                            }
+                        }
+                    };
+                    cell.setFont(Font.font("Arial", FontWeight.BOLD,
+                            FontPosture.ITALIC, 18));
+                    return cell;
+                });
+            } else {
+                view.setCellFactory(null);
+            }
+        });
+        return useCellFactory;
     }
 
     @Override

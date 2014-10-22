@@ -32,8 +32,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Cell;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.util.Callback;
 
 /**
  * A control used to perform a multi-selection via the help of two list views.
@@ -286,5 +290,43 @@ public class ListSelectionView<T> extends ControlsFXControl {
                     "targetItems", FXCollections.observableArrayList());
         }
         return targetItems;
+    }
+
+    // --- Cell Factory
+    private ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactory;
+
+    /**
+     * Sets a new cell factory to use by both list views. This forces all old
+     * {@link ListCell}'s to be thrown away, and new ListCell's created with the
+     * new cell factory.
+     */
+    public final void setCellFactory(Callback<ListView<T>, ListCell<T>> value) {
+        cellFactoryProperty().set(value);
+    }
+
+    /**
+     * Returns the current cell factory.
+     */
+    public final Callback<ListView<T>, ListCell<T>> getCellFactory() {
+        return cellFactory == null ? null : cellFactory.get();
+    }
+
+    /**
+     * <p>
+     * Setting a custom cell factory has the effect of deferring all cell
+     * creation, allowing for total customization of the cell. Internally, the
+     * ListView is responsible for reusing ListCells - all that is necessary is
+     * for the custom cell factory to return from this function a ListCell which
+     * might be usable for representing any item in the ListView.
+     *
+     * <p>
+     * Refer to the {@link Cell} class documentation for more detail.
+     */
+    public final ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
+        if (cellFactory == null) {
+            cellFactory = new SimpleObjectProperty<Callback<ListView<T>, ListCell<T>>>(
+                    this, "cellFactory");
+        }
+        return cellFactory;
     }
 }

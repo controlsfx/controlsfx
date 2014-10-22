@@ -32,6 +32,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -82,8 +83,19 @@ public class HelloTextFields extends ControlsFXSample {
         
         // Clearable*Field
         grid.add(new Label("Clearable*Field: "), 0, row);
-        grid.add(TextFields.createClearableTextField(), 1, row);
-        grid.add(TextFields.createClearablePasswordField(), 2, row++);
+        TextField clearableTextField = TextFields.createClearableTextField();
+        PasswordField clearablePasswordField = TextFields.createClearablePasswordField();
+		ToggleButton btToggle = new ToggleButton("Enable/Disable");
+		ToggleButton btEditable = new ToggleButton("Toggle Editable");
+		clearableTextField.disableProperty().bind(btToggle.selectedProperty());
+		clearablePasswordField.disableProperty().bind(btToggle.selectedProperty());
+		clearableTextField.editableProperty().bindBidirectional(btEditable.selectedProperty());
+		clearablePasswordField.editableProperty().bindBidirectional(btEditable.selectedProperty());
+		btEditable.setSelected(true);
+		grid.add(clearableTextField, 1, row);
+		grid.add(clearablePasswordField, 2, row);
+		grid.add(btEditable, 3, row);
+		grid.add(btToggle, 4, row++);
         
         // Custom*Field
         grid.add(new Label("Custom*Field (no additional nodes): "), 0, row);

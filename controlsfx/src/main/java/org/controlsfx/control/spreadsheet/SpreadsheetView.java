@@ -664,7 +664,7 @@ public class SpreadsheetView extends Control {
         final int rowCount = grid.getRowCount();
         final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         for (Integer row : list) {
-            if (row == null || row < 0 || row > rowCount) {
+            if (row == null || row < 0 || row >= rowCount) {
                 return false;
             }
             //If this row is not fixable, we need to identify the maximum span

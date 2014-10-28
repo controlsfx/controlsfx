@@ -31,6 +31,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Label;
@@ -290,6 +291,34 @@ public class ListSelectionView<T> extends ControlsFXControl {
                     "targetItems", FXCollections.observableArrayList());
         }
         return targetItems;
+    }
+
+    // --- Orientation
+    private ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, 
+        "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$;
+
+    /**
+     * The {@link Orientation} of the {@code ListSelectionView} - this can either be 
+     * horizontal or vertical.
+     */
+    public final ObjectProperty<Orientation> orientationProperty() {
+        return orientation;
+    }
+    
+    /**
+     * Sets the {@link Orientation} of the {@code ListSelectionView} - this can either be 
+     * horizontal or vertical.
+     */
+    public final void setOrientation(Orientation value) {
+        orientationProperty().set(value);
+    };
+    
+    /**
+     * Returns the {@link Orientation} of the {@code ListSelectionView} - this can either 
+     * be horizontal or vertical.
+     */
+    public final Orientation getOrientation() {
+        return orientation.get();
     }
 
     // --- Cell Factory

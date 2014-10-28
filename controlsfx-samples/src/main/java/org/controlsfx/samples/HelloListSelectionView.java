@@ -26,11 +26,17 @@
  */
 package org.controlsfx.samples;
 
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -63,6 +69,9 @@ public class HelloListSelectionView extends ControlsFXSample {
 
     @Override
     public Node getControlPanel() {
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30, 30, 30, 30));
+        
         CheckBox useCellFactory = new CheckBox("Use cell factory");
         useCellFactory.setOnAction(evt -> {
             if (useCellFactory.isSelected()) {
@@ -89,7 +98,16 @@ public class HelloListSelectionView extends ControlsFXSample {
                 view.setCellFactory(null);
             }
         });
-        return useCellFactory;
+
+        ChoiceBox<Orientation> orientation = new ChoiceBox<>(FXCollections.observableArrayList(Orientation.values()));
+        orientation.setTooltip(new Tooltip("The orientation of ListSelectionView"));
+        
+        orientation.getSelectionModel().select(Orientation.HORIZONTAL);
+        view.orientationProperty().bind(orientation.getSelectionModel().selectedItemProperty());
+        
+        root.getChildren().addAll(useCellFactory, orientation);
+        
+        return root;
     }
 
     @Override

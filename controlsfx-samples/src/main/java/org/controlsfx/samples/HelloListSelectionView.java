@@ -75,7 +75,7 @@ public class HelloListSelectionView extends ControlsFXSample {
         CheckBox useCellFactory = new CheckBox("Use cell factory");
         useCellFactory.setOnAction(evt -> {
             if (useCellFactory.isSelected()) {
-                view.setCellFactory(view -> {
+                view.setCellFactory(listView -> {
                     ListCell<String> cell = new ListCell<String>() {
                         @Override
                         public void updateItem(String item, boolean empty) {
@@ -85,7 +85,7 @@ public class HelloListSelectionView extends ControlsFXSample {
                                 setText(null);
                                 setGraphic(null);
                             } else {
-                                setText(item == null ? "null" : item.toString());
+                                setText(item == null ? "null" : item);
                                 setGraphic(null);
                             }
                         }

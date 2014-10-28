@@ -86,7 +86,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
 
     @Override
     protected Skin<ListSelectionView<T>> createDefaultSkin() {
-        return new ListSelectionViewSkin<T>(this);
+        return new ListSelectionViewSkin<>(this);
     }
 
     private final ObjectProperty<Node> sourceHeader = new SimpleObjectProperty<>(
@@ -251,7 +251,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<ObservableList<T>> sourceItemsProperty() {
         if (sourceItems == null) {
-            sourceItems = new SimpleObjectProperty<ObservableList<T>>(this,
+            sourceItems = new SimpleObjectProperty<>(this,
                     "sourceItems", FXCollections.observableArrayList());
         }
         return sourceItems;
@@ -287,14 +287,14 @@ public class ListSelectionView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<ObservableList<T>> targetItemsProperty() {
         if (targetItems == null) {
-            targetItems = new SimpleObjectProperty<ObservableList<T>>(this,
+            targetItems = new SimpleObjectProperty<>(this,
                     "targetItems", FXCollections.observableArrayList());
         }
         return targetItems;
     }
 
     // --- Orientation
-    private ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, 
+    private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, 
         "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$;
 
     /**
@@ -353,7 +353,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
         if (cellFactory == null) {
-            cellFactory = new SimpleObjectProperty<Callback<ListView<T>, ListCell<T>>>(
+            cellFactory = new SimpleObjectProperty<>(
                     this, "cellFactory");
         }
         return cellFactory;

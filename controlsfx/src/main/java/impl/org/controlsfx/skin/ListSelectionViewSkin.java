@@ -66,8 +66,8 @@ public class ListSelectionViewSkin<T> extends BehaviorSkinBase<ListSelectionView
     }
 
     private GridPane gridPane;
-    private HBox horizontalButtonBox;
-    private VBox verticalButtonBox;
+    private final HBox horizontalButtonBox;
+    private final VBox verticalButtonBox;
     private Button moveToTarget;
     private Button moveToTargetAll;
     private Button moveToSourceAll;
@@ -432,7 +432,7 @@ public class ListSelectionViewSkin<T> extends BehaviorSkinBase<ListSelectionView
     }
 
     private void move(ListView<T> viewA, ListView<T> viewB) {
-        List<T> selectedItems = new ArrayList<T>(viewA.getSelectionModel()
+        List<T> selectedItems = new ArrayList<>(viewA.getSelectionModel()
                 .getSelectedItems());
         move(viewA, viewB, selectedItems);
     }

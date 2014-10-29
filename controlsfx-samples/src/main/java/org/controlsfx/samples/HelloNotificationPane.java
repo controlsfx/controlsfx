@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ public class HelloNotificationPane extends ControlsFXSample {
     
     private NotificationPane notificationPane;
     private CheckBox cbUseDarkTheme;
+    private CheckBox cbHideCloseBtn;
     private TextField textField;
     
     public static void main(String[] args) {
@@ -102,6 +103,14 @@ public class HelloNotificationPane extends ControlsFXSample {
             }
         });
         
+        cbHideCloseBtn = new CheckBox("Hide close button");
+        cbHideCloseBtn.setSelected(false);
+        cbHideCloseBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent arg0) {
+                notificationPane.setCloseButtonVisible(!cbHideCloseBtn.isSelected());
+            }
+        });
+        
         textField = new TextField();
         textField.setPromptText("Type text to display and press Enter");
         textField.setOnAction(new EventHandler<ActionEvent>() {
@@ -112,7 +121,7 @@ public class HelloNotificationPane extends ControlsFXSample {
         
         VBox root = new VBox(10);
         root.setPadding(new Insets(50, 0, 0, 10));
-        root.getChildren().addAll(showBtn, cbSlideFromTop, cbUseDarkTheme, textField);
+        root.getChildren().addAll(showBtn, cbSlideFromTop, cbUseDarkTheme, cbHideCloseBtn, textField);
         
         notificationPane.setContent(root);
         updateBar();

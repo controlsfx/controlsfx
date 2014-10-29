@@ -120,7 +120,9 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         comboBox.setButtonCell(buttonCell);
         comboBox.setValue((T)buildString());
         
-        selectedIndices.addListener((ListChangeListener<Integer>) c -> buttonCell.updateIndex(1));
+        // The zero is a dummy value - it just has to be legally within the bounds of the
+        // item count for the CheckComboBox items list.
+        selectedIndices.addListener((ListChangeListener<Integer>) c -> buttonCell.updateIndex(0));
         
         getChildren().add(comboBox);
     }

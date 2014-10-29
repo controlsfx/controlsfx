@@ -31,7 +31,6 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
@@ -41,6 +40,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -54,10 +54,8 @@ import org.controlsfx.control.ListSelectionView;
 import org.controlsfx.glyphfont.FontAwesome;
 
 import com.sun.javafx.css.StyleManager;
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
-public class ListSelectionViewSkin<T> extends BehaviorSkinBase<ListSelectionView<T>, BehaviorBase<ListSelectionView<T>>> {
+public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
 
     static {
         StyleManager.getInstance().addUserAgentStylesheet(
@@ -76,7 +74,7 @@ public class ListSelectionViewSkin<T> extends BehaviorSkinBase<ListSelectionView
     private ListView<T> targetListView;
 
     public ListSelectionViewSkin(ListSelectionView<T> view) {
-        super(view, new BehaviorBase<>(view, Collections.emptyList()));
+        super(view);
 
         sourceListView = requireNonNull(createSourceListView(),
                 "source list view can not be null");
@@ -123,18 +121,10 @@ public class ListSelectionViewSkin<T> extends BehaviorSkinBase<ListSelectionView
                         moveToSource();
                     }
                 });
-
-        registerChangeListener(view.orientationProperty(), "ORIENTATION");
-    }
-
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
         
-        if ("ORIENTATION".equals(p)) {
-            updateView();
-        }
+        view.orientationProperty().addListener(observable -> updateView());
     }
-    
+
     private GridPane createGridPane() {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");

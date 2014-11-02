@@ -241,8 +241,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class ActionChangeMode extends Action {
         
-    	private final Image CATEGORY_IMAGE = new Image("/org/controlsfx/control/format-indent-more.png"); //$NON-NLS-1$
-    	private final Image NAME_IMAGE = new Image("/org/controlsfx/control/format-line-spacing-triple.png"); //$NON-NLS-1$
+    	private final Image CATEGORY_IMAGE = new Image(PropertySheetSkin.class.getResource("/org/controlsfx/control/format-indent-more.png").toExternalForm()); //$NON-NLS-1$
+    	private final Image NAME_IMAGE = new Image(PropertySheetSkin.class.getResource("/org/controlsfx/control/format-line-spacing-triple.png").toExternalForm()); //$NON-NLS-1$
     	
         public ActionChangeMode(PropertySheet.Mode mode) {
             super(""); //$NON-NLS-1$

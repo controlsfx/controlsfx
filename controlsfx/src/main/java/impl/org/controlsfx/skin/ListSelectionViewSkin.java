@@ -35,6 +35,7 @@ import java.util.List;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -43,6 +44,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
@@ -62,7 +64,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     }
 
     private GridPane gridPane;
-    private VBox buttonBox;
+    private final HBox horizontalButtonBox;
+    private final VBox verticalButtonBox;
     private Button moveToTarget;
     private Button moveToTargetAll;
     private Button moveToSourceAll;
@@ -87,7 +90,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         targetListView.cellFactoryProperty().bind(view.cellFactoryProperty());
 
         gridPane = createGridPane();
-        buttonBox = createButtonBox();
+        horizontalButtonBox = createHorizontalButtonBox();
+        verticalButtonBox = createVerticalButtonBox();
 
         getChildren().add(gridPane);
 
@@ -117,12 +121,22 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                         moveToSource();
                     }
                 });
+        
+        view.orientationProperty().addListener(observable -> updateView());
     }
 
     private GridPane createGridPane() {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
 
+        return gridPane;
+    }
+
+    // Constraints used when view's orientation is HORIZONTAL
+    private void setHorizontalViewContraints() {
+        gridPane.getColumnConstraints().clear();
+        gridPane.getRowConstraints().clear();
+    
         ColumnConstraints col1 = new ColumnConstraints();
 
         col1.setFillWidth(true);
@@ -156,11 +170,58 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         row3.setVgrow(Priority.NEVER);
 
         gridPane.getRowConstraints().addAll(row1, row2, row3);
-
-        return gridPane;
     }
 
-    private VBox createButtonBox() {
+    // Constraints used when view's orientation is VERTICAL
+    private void setVerticalViewContraints() {
+        gridPane.getColumnConstraints().clear();
+        gridPane.getRowConstraints().clear();
+    
+        ColumnConstraints col1 = new ColumnConstraints();
+
+        col1.setFillWidth(true);
+        col1.setHgrow(Priority.ALWAYS);
+        col1.setMaxWidth(Double.MAX_VALUE);
+        col1.setPrefWidth(200);
+
+        gridPane.getColumnConstraints().addAll(col1);
+
+        RowConstraints row1 = new RowConstraints();
+        row1.setFillHeight(true);
+        row1.setVgrow(Priority.NEVER);
+
+        RowConstraints row2 = new RowConstraints();
+        row2.setMaxHeight(Double.MAX_VALUE);
+        row2.setPrefHeight(200);
+        row2.setVgrow(Priority.ALWAYS);
+
+        RowConstraints row3 = new RowConstraints();
+        row3.setFillHeight(true);
+        row3.setVgrow(Priority.NEVER);
+        
+        RowConstraints row4 = new RowConstraints();
+        row4.setFillHeight(true);
+        row4.setVgrow(Priority.NEVER);
+        
+        RowConstraints row5 = new RowConstraints();
+        row5.setFillHeight(true);
+        row5.setVgrow(Priority.NEVER);
+
+        RowConstraints row6 = new RowConstraints();
+        row6.setMaxHeight(Double.MAX_VALUE);
+        row6.setPrefHeight(200);
+        row6.setVgrow(Priority.ALWAYS);
+
+        RowConstraints row7 = new RowConstraints();
+        row7.setFillHeight(true);
+        row7.setVgrow(Priority.NEVER);
+        
+
+        gridPane.getRowConstraints().addAll(row1, row2, row3, row4, row5, row6, row7);
+    }
+
+    // Used when view's orientation is HORIZONTAL
+    private VBox createVerticalButtonBox() {
         VBox box = new VBox(5);
         box.setFillWidth(true);
 
@@ -175,6 +236,40 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         moveToSourceAll = new Button("",
                 fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_LEFT));
 
+        updateButtons();
+        
+        box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource,
+                moveToSourceAll);
+
+        return box;
+    }
+
+    // Used when view's orientation is VERTICAL
+    private HBox createHorizontalButtonBox() {
+        HBox box = new HBox(5);
+        box.setFillHeight(true);
+
+        FontAwesome fontAwesome = new FontAwesome();
+        moveToTarget = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOWN));
+        moveToTargetAll = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_DOWN));
+
+        moveToSource = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_UP));
+        moveToSourceAll = new Button("",
+                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_UP));
+
+        updateButtons();
+        
+        box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource,
+                moveToSourceAll);
+
+        return box;
+    }
+
+    private void updateButtons() {
+        
         moveToTarget.getStyleClass().add("move-to-target-button");
         moveToTargetAll.getStyleClass().add("move-to-target-all-button");
         moveToSource.getStyleClass().add("move-to-source-button");
@@ -207,13 +302,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         moveToSource.setOnAction(evt -> moveToSource());
 
         moveToSourceAll.setOnAction(evt -> moveToSourceAll());
-
-        box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource,
-                moveToSourceAll);
-
-        return box;
     }
-
+    
     private void bindMoveAllButtonsToDataModel() {
         moveToTargetAll.disableProperty().bind(
                 Bindings.isEmpty(getSourceListView().getItems()));
@@ -243,35 +333,70 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         ListView<T> sourceList = getSourceListView();
         ListView<T> targetList = getTargetListView();
 
-        if (sourceHeader != null) {
-            gridPane.add(sourceHeader, 0, 0);
-        }
-
-        if (targetHeader != null) {
-            gridPane.add(targetHeader, 2, 0);
-        }
-
-        if (sourceList != null) {
-            gridPane.add(sourceList, 0, 1);
-        }
-
-        if (targetList != null) {
-            gridPane.add(targetList, 2, 1);
-        }
-
-        if (sourceFooter != null) {
-            gridPane.add(sourceFooter, 0, 2);
-        }
-
-        if (targetFooter != null) {
-            gridPane.add(targetFooter, 2, 2);
-        }
-
         StackPane stackPane = new StackPane();
         stackPane.setAlignment(Pos.CENTER);
-        stackPane.getChildren().add(buttonBox);
 
-        gridPane.add(stackPane, 1, 1);
+        Orientation orientation = getSkinnable().getOrientation();
+
+        if (orientation == Orientation.HORIZONTAL) {
+            setHorizontalViewContraints();
+            
+            if (sourceHeader != null) {
+                gridPane.add(sourceHeader, 0, 0);
+            }
+
+            if (targetHeader != null) {
+                gridPane.add(targetHeader, 2, 0);
+            }
+
+            if (sourceList != null) {
+                gridPane.add(sourceList, 0, 1);
+            }
+
+            if (targetList != null) {
+                gridPane.add(targetList, 2, 1);
+            }
+
+            if (sourceFooter != null) {
+                gridPane.add(sourceFooter, 0, 2);
+            }
+
+            if (targetFooter != null) {
+                gridPane.add(targetFooter, 2, 2);
+            }
+
+            stackPane.getChildren().add(verticalButtonBox);
+            gridPane.add(stackPane, 1, 1);
+        } else {
+            setVerticalViewContraints();
+            
+            if (sourceHeader != null) {
+                gridPane.add(sourceHeader, 0, 0);
+            }
+
+            if (targetHeader != null) {
+                gridPane.add(targetHeader, 0, 4);
+            }
+
+            if (sourceList != null) {
+                gridPane.add(sourceList, 0, 1);
+            }
+
+            if (targetList != null) {
+                gridPane.add(targetList, 0, 5);
+            }
+
+            if (sourceFooter != null) {
+                gridPane.add(sourceFooter, 0, 2);
+            }
+
+            if (targetFooter != null) {
+                gridPane.add(targetFooter, 0, 6);
+            }
+
+            stackPane.getChildren().add(horizontalButtonBox);
+            gridPane.add(stackPane, 0, 3);
+        }
     }
 
     private void moveToTarget() {
@@ -297,7 +422,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     }
 
     private void move(ListView<T> viewA, ListView<T> viewB) {
-        List<T> selectedItems = new ArrayList<T>(viewA.getSelectionModel()
+        List<T> selectedItems = new ArrayList<>(viewA.getSelectionModel()
                 .getSelectedItems());
         move(viewA, viewB, selectedItems);
     }

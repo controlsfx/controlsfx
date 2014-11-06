@@ -33,7 +33,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * Private fields                                                          *
      *                                                                         *
      **************************************************************************/
-
+    private static final long AUTO_COMPLETE_DELAY = 250;
     private final Node completionTarget;
     private final AutoCompletePopup<T> autoCompletionPopup;
     private final Object suggestionsTaskLock = new Object();
@@ -244,7 +244,12 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         protected Void call() throws Exception {
             Callback<ISuggestionRequest, Collection<T>> provider = suggestionProvider;
             if(provider != null){
+            	long start_time = System.currentTimeMillis();
                 final Collection<T> fetchedSuggestions = provider.call(this);
+                long sleep_time = start_time + AUTO_COMPLETE_DELAY - System.currentTimeMillis();
+                if (sleep_time > 0 && !isCancelled()) {
+                	Thread.sleep(sleep_time);
+                }
                 if(!isCancelled()){
                     Platform.runLater(() -> {
                         if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){

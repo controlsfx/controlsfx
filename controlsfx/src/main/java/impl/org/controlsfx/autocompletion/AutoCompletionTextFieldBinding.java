@@ -120,7 +120,9 @@ public class AutoCompletionTextFieldBinding<T>  extends AutoCompletionBinding<T>
 
     private final ChangeListener<String> textChangeListener = new ChangeListener<String>() {
         @Override public void changed(ObservableValue<? extends String> obs, String oldText, String newText) {
-            setUserInput(newText);
+            if (getCompletionTarget().isFocused()) {
+                setUserInput(newText);
+            }
         }
     };
 

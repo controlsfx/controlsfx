@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,6 @@ import java.util.Collection;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.util.Callback;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
@@ -74,6 +73,11 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
  * @see SpreadsheetCell
  */
 public interface Grid {
+    /**
+     * This value may be returned from {@link #getRowHeight(int) } in order to
+     * let the system compute the best row height.
+     */
+    public static final double AUTOFIT = -1;
     
     /**
      * @return how many rows are inside the grid.
@@ -114,9 +118,9 @@ public interface Grid {
     public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
     
     /**
-     * Return the height of a row. 
-     * It will first look into the {@link Callback}provided at the
-     * initialization. If nothing's found, default height will be taken.
+     * Return the height of a row. {@link #AUTOFIT } can be returned in order to
+     * let the system compute the best row height.
+     *
      * @param row
      * @return the height of a row.
      */

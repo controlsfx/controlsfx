@@ -337,11 +337,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                         new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
                                 image.getImage().getWidth()).otherwise(widthProperty()));
                 }
-            //If we have a Region and no text, we force it to take full space.    
+                /**
+                 * If we have a Region and no text, we force it to take full
+                 * space. But we want to impact the minSize in order to let the
+                 * prefSize to be computed if necessary.
+                 */
             } else if (graphic instanceof Region && item.getItem() == null) {
                 Region region = (Region) graphic;
-                region.prefHeightProperty().bind(heightProperty());
-                region.prefWidthProperty().bind(widthProperty());
+                region.minHeightProperty().bind(heightProperty());
+                region.minWidthProperty().bind(widthProperty());
             }
             setGraphic(graphic);
             /**

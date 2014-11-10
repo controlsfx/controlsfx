@@ -140,14 +140,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
     @Override
     public void scrollTo(int index) {
-    	//If we have some fixedRows, we check if the selected row is not below them
-    	if(!getCells().isEmpty() && spreadSheetView.getFixedRows().size()>0){
-    		double offset = gridViewSkin.getFixedRowHeight();
-    		
-			while(offset >=0 && index >0){
-				index--;
-				offset-=spreadSheetView.getGrid().getRowHeight(index);
-			}
+        //If we have some fixedRows, we check if the selected row is not below them
+        if (!getCells().isEmpty() && spreadSheetView.getFixedRows().size() > 0) {
+            double offset = gridViewSkin.getFixedRowHeight();
+
+            while (offset >= 0 && index > 0) {
+                index--;
+                offset -= gridViewSkin.getRowHeight(index);
+            }
         }
         super.scrollTo(index);
 

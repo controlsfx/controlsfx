@@ -153,13 +153,19 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         final double verticalPadding = snappedTopInset() + snappedBottomInset();
         final double horizontalPadding = snappedLeftInset()
                 + snappedRightInset();
-        final double controlHeight = getTableRowHeight(index);
-
-        handle.getCellsViewSkin().hBarValue.set(index, true);
+        /**
+         * Here we make the distinction between the official controlHeight and
+         * the customHeight that we may apply.
+         */
+        double controlHeight = getTableRowHeight(index);
+        double customHeight = controlHeight == Grid.AUTOFIT ? GridViewSkin.DEFAULT_CELL_HEIGHT : controlHeight;
+        
+        final GridViewSkin skin = handle.getCellsViewSkin();
+        skin.hBarValue.set(index, true);
 
         // determine the width of the visible portion of the table
         double headerWidth = gridView.getWidth();
-        final double hbarValue = handle.getCellsViewSkin().getHBar().getValue();
+        final double hbarValue = skin.getHBar().getValue();
 
         /**
          * FOR FIXED ROWS
@@ -197,9 +203,6 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
             // In case the node was treated previously
             tableCell.setManaged(true);
-
-            height = controlHeight;
-            height = snapSize(height) - snapSize(verticalPadding);
 
             /**
              * FOR FIXED COLUMNS
@@ -249,7 +252,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         if (selectedPosition != null
                                 //When shift selecting, all cells become ROW_VISIBLE so
                                 //We avoid loop selecting here
-                                && handle.getCellsViewSkin().containsRow(index)
+                                && skin.containsRow(index)
                                 && selectedPosition.getRow() != index) {
                             sm.clearSelection(selectedPosition.getRow(),
                                     selectedPosition.getTableColumn());
@@ -286,6 +289,29 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 }
 
                 /**
+                 * If we are in autofit and the prefHeight of this cell is
+                 * superior to the default cell height. Then we will use this
+                 * new height for row's height.
+                 *
+                 * We then need to apply the value to previous cell, and also
+                 * layout the children because since we are layouting upward,
+                 * next rows needs to know that this row is bigger than usual.
+                 */
+                if (controlHeight == Grid.AUTOFIT) {
+                    double tempHeight = tableCell.prefHeight(width);
+                    if (tempHeight > customHeight) {
+                        skin.rowHeightMap.put(index, tempHeight);
+                        for (CellView cell : cells) {
+                            cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - GridViewSkin.DEFAULT_CELL_HEIGHT));
+                        }
+                        customHeight = tempHeight;
+                        skin.getFlow().layoutChildren();
+                    }
+                }
+                
+                height = customHeight;
+                height = snapSize(height) - snapSize(verticalPadding);
+                /**
                  * We need to span multiple rows, so we sum up the height of all
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.
@@ -294,7 +320,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     height = 0;
                     final int maxRow = spreadsheetCell.getRow() + spreadsheetCell.getRowSpan();
                     for (int i = spreadsheetCell.getRow(); i < maxRow; ++i) {
-                        height += snapSize(getTableRowHeight(i));
+                        height += snapSize(skin.getRowHeight(i));
                     }
                 }
 
@@ -303,7 +329,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
                 for (int p = spreadsheetCell.getRow(); p < index; ++p) {
-                    spaceBetweenTopAndMe += getTableRowHeight(p);
+                    spaceBetweenTopAndMe += skin.getRowHeight(p);
                 }
 
                 tableCell.relocate(x + tableCellX, snappedTopInset()
@@ -316,7 +342,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             }
             x += width;
         }
-        handle.getCellsViewSkin().fixedColumnWidth = fixedColumnWidth;
+        skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
         removeUselessCell();
     }
@@ -438,7 +464,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         //because each row has different space.
         double space = 0;
         for (int o = 0; o < positionY; ++o) {
-            space += getTableRowHeight(spreadsheetView.getFixedRows().get(o));
+            space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
         }
 
         //If true, this row is fixed
@@ -455,11 +481,12 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
     /**
      * Return the height of a row.
      *
-     * @param i
+     * @param row
      * @return
      */
-    private double getTableRowHeight(int i) {
-        return handle.getCellsViewSkin().getRowHeight(i);
+    private double getTableRowHeight(int row) {
+        Double rowHeightCache = handle.getCellsViewSkin().rowHeightMap.get(row);
+        return rowHeightCache == null ? handle.getView().getGrid().getRowHeight(row) : rowHeightCache;
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -210,7 +210,13 @@ public class GridBase implements Grid, EventTarget {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Return the height of a row. 
+     * It will first look into the {@link Callback}provided at the
+     * initialization. If nothing's found, {@link #AUTOFIT} will be returned.
+     * @param row
+     * @return the height of a row.
+     */
     @Override
     public double getRowHeight(int row) {
         return rowHeightFactory.call((Integer) row);
@@ -379,7 +385,7 @@ public class GridBase implements Grid, EventTarget {
         @Override
         public Double call(Integer index) {
             Double value = rowHeightMap.get(index);
-            return value == null ? GridViewSkin.DEFAULT_CELL_HEIGHT : value;
+            return value == null ? AUTOFIT : value;
         }
 
     }

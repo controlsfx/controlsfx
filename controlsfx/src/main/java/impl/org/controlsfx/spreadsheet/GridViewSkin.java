@@ -238,14 +238,20 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     /**
-     * Compute the height of a particular row.
-     * 
+     * Compute the height of a particular row. If the row is in
+     * {@link Grid#AUTOFIT}, {@link #DEFAULT_CELL_HEIGHT} is returned.
+     *
      * @param row
      * @return
      */
     public double getRowHeight(int row) {
-        Double rowHeight = rowHeightMap.get(row);
-        return rowHeight == null ? handle.getView().getGrid().getRowHeight(row) : rowHeight;
+        Double rowHeightCache = rowHeightMap.get(row);
+        if (rowHeightCache == null) {
+            double rowHeight = handle.getView().getGrid().getRowHeight(row);
+            return rowHeight == Grid.AUTOFIT ? DEFAULT_CELL_HEIGHT : rowHeight;
+        } else {
+            return rowHeightCache;
+        }
     }
 
     public double getFixedRowHeight() {
@@ -404,7 +410,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * the rows will not detect that maybe the height has changed.
          */
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double newHeight = row.computePrefHeight(-1);
+            double newHeight = row.getPrefHeight();
             if(row.getPrefHeight() != newHeight){
                 row.setPrefHeight(newHeight);
                 row.requestLayout();

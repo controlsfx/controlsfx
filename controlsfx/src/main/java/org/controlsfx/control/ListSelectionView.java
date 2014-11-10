@@ -75,12 +75,12 @@ public class ListSelectionView<T> extends ControlsFXControl {
     public ListSelectionView() {
         getStyleClass().add(DEFAULT_STYLECLASS);
 
-        Label sourceHeader = new Label(localize(asKey("list.selection.view.header.source")));
+        Label sourceHeader = new Label(localize(asKey("listSelectionView.header.source")));
         sourceHeader.getStyleClass().add("list-header-label");
         sourceHeader.setId("source-header-label");
         setSourceHeader(sourceHeader);
 
-        Label targetHeader = new Label(localize(asKey("list.selection.view.header.target")));
+        Label targetHeader = new Label(localize(asKey("listSelectionView.header.target")));
         targetHeader.getStyleClass().add("list-header-label");
         targetHeader.setId("target-header-label");
         setTargetHeader(targetHeader);

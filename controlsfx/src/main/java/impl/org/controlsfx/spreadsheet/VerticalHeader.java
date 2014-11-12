@@ -427,7 +427,9 @@ public class VerticalHeader extends StackPane {
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
-
+        
+        //When resizing a row, we need to update the Rectangle Selection as well
+        skin.rectangleSelection.updateRectangle();
         lastY = draggedY;
     }
 

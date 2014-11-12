@@ -77,25 +77,17 @@ public class RectangleSelection extends Rectangle {
         });
 
         skin.getHBar().valueProperty().addListener(layoutListener);
-        sm.getSelectedCells().addListener(new InvalidationListener() {
-
-            @Override
-            public void invalidated(Observable observable) {
-                selectionRange.fill(sm.getSelectedCells());
-                updateRectangle();
-            }
+        sm.getSelectedCells().addListener((Observable observable) -> {
+            selectionRange.fill(sm.getSelectedCells());
+            updateRectangle();
         });
     }
 
-    private final InvalidationListener layoutListener = new InvalidationListener() {
-
-        @Override
-        public void invalidated(Observable observable) {
-            updateRectangle();
-        }
+    private final InvalidationListener layoutListener = (Observable observable) -> {
+        updateRectangle();
     };
 
-    private void updateRectangle() {
+    public void updateRectangle() {
         if (sm.getSelectedCells().isEmpty()
                 || skin.getSelectedRows().isEmpty()
                 || skin.getSelectedColumns().isEmpty()

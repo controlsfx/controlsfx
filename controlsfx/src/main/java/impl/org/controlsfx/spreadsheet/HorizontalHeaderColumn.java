@@ -47,9 +47,11 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         super(skin, tc);
         /**
          * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395
+         * and https://bitbucket.org/controlsfx/controlsfx/issue/434
          */
         widthProperty().addListener((Observable observable) -> {
             ((GridViewSkin)skin).hBarValue.clear();
+            ((GridViewSkin)skin).rectangleSelection.updateRectangle();
         });
     }
 

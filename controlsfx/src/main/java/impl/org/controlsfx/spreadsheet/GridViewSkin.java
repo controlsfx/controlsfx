@@ -382,6 +382,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             }
             rowHeightMap.put(row, maxHeight + padding);
         }
+        rectangleSelection.updateRectangle();
     }
     
     public void resizeRowsToMaximum() {
@@ -399,6 +400,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         for (int row = 0; row < maxRows; row++) {
             rowHeightMap.put(row, maxHeight);
         }
+        rectangleSelection.updateRectangle();
     }
     
     public void resizeRowsToDefault() {
@@ -419,6 +421,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         
         //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
         getFlow().layoutChildren();
+        rectangleSelection.updateRectangle();
     }
     /**
      * We want to have extra space when displaying LocalDate because they will
@@ -511,6 +514,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         if(col.isResizable()){
             col.setPrefWidth(widthMax);
         }
+        rectangleSelection.updateRectangle();
     }
 
     /***************************************************************************

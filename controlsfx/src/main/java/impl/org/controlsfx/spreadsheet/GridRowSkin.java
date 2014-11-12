@@ -297,7 +297,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * layout the children because since we are layouting upward,
                  * next rows needs to know that this row is bigger than usual.
                  */
-                if (controlHeight == Grid.AUTOFIT) {
+                if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
                     double tempHeight = tableCell.prefHeight(width);
                     if (tempHeight > customHeight) {
                         skin.rowHeightMap.put(index, tempHeight);

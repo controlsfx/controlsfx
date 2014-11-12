@@ -63,7 +63,6 @@ public class GridCellEditor {
     
     //The cell's editor 
     private SpreadsheetCellEditor spreadsheetCellEditor;
-    private CellView lastHover = null;
     
     //The last key pressed in order to select cell below if it was "enter"
     private KeyCode lastKeyPressed;
@@ -107,14 +106,6 @@ public class GridCellEditor {
      */
     public void updateSpreadsheetCellEditor(final SpreadsheetCellEditor spreadsheetCellEditor) {
         this.spreadsheetCellEditor = spreadsheetCellEditor;
-    }
-
-    public CellView getLastHover() {
-        return lastHover;
-    }
-
-    public void setLastHover(CellView lastHover) {
-        this.lastHover = lastHover;
     }
 
     /**

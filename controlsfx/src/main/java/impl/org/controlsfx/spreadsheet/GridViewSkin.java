@@ -664,6 +664,11 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     @Override
+    public void scrollHorizontally(){
+        super.scrollHorizontally();
+    }
+    
+    @Override
     protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
 
         if (col == null || !col.isVisible()) {
@@ -684,8 +689,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * some fixed columns, the "left border" is not the table anymore, but
          * the right side of the last fixed columns.
          *****************************************************************/
-        // We add the fixed columns width
-        final double fixedColumnWidth = getFixedColumnWidth();
 
         final double end = start + col.getWidth();
 
@@ -831,21 +834,4 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             getFlow().layoutTotal();
         }
     };
-
-    /**
-     * Compute the width of the fixed columns in order not to select cells that
-     * are hidden by the fixed columns
-     * 
-     * @return
-     */
-    private double getFixedColumnWidth() {
-        double fixedColumnWidth = 0;
-        if (!spreadsheetView.getFixedColumns().isEmpty()) {
-            for (int i = 0, max = spreadsheetView.getFixedColumns().size(); i < max; ++i) {
-                final TableColumnBase<ObservableList<SpreadsheetCell>, ?> c = getVisibleLeafColumn(i);
-                fixedColumnWidth += c.getWidth();
-            }
-        }
-        return fixedColumnWidth;
-    }
 }

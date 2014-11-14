@@ -398,43 +398,7 @@ public class SpreadsheetView extends Control {
         /**
          * Keyboard action, maybe use an accelerator
          */
-        cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                // Go to the next row only if we're not editing
-                if (getEditingCell() == null && !keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
-                    cellsView.setEditWithEnter(true);
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
-                            .getFocusModel().getFocusedCell();
-                    
-                    if (position != null) {
-                        int nextRow = FocusModelListener.getNextRowNumber(position, getCellsView());
-                        if(nextRow < grid.getRowCount()){
-                            cellsView.getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
-                        }
-                    }
-                   /* // Go to next cell
-                } else if (keyEvent.getCode().compareTo(KeyCode.TAB) == 0) {
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
-                            .getFocusModel().getFocusedCell();
-                    if (position != null) {
-                        cellsView.getSelectionModel().clearSelection();
-                        cellsView.getSelectionModel().selectRightCell();
-                    }*/
-                    // We want to erase values when delete key is pressed.
-                } else if (keyEvent.getCode()==KeyCode.DELETE)
-                    deleteSelectedCells();
-                // We want to edit if the user is on a cell and typing
-                else if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() || keyEvent.getCode()
-                        .isKeypadKey()) && !keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
-                    @SuppressWarnings("unchecked")
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
-                            .getFocusModel().getFocusedCell();
-                    cellsView.setEditWithKey(true);
-                    cellsView.edit(position.getRow(), position.getTableColumn());
-                }
-            }
-        });
+        cellsView.setOnKeyPressed(keyPressedHandler);
 
         /**
          * ContextMenu handling.
@@ -1413,6 +1377,49 @@ public class SpreadsheetView extends Control {
                     getContextMenu().hide();
                 });
             }
+        }
+    };
+    
+    private final EventHandler<KeyEvent> keyPressedHandler = (KeyEvent keyEvent) -> {
+        TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) getCellsView()
+                    .getFocusModel().getFocusedCell();
+        // Go to the next row only if we're not editing
+        if (getEditingCell() == null && !keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
+            if (position != null) {
+                int nextRow = FocusModelListener.getNextRowNumber(position, getCellsView());
+                if (nextRow < getGrid().getRowCount()) {
+                    getCellsView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
+                }
+                //We consume the event because we don't want to go in edition
+                keyEvent.consume();
+            }
+            getCellsViewSkin().scrollHorizontally();
+            // Go to next cell
+        } else if (getEditingCell() == null && keyEvent.getCode() == KeyCode.TAB) {
+            if (position != null) {
+                int row = position.getRow();
+                int column = position.getColumn() + 1;
+                if (column >= getColumns().size()) {
+                    if (row == getGrid().getRowCount() - 1) {
+                        column--;
+                    } else {
+                        column = 0;
+                        row++;
+                    }
+                }
+                getCellsView().getSelectionModel().clearAndSelect(row, getCellsView().getColumns().get(column));
+            }
+            //We consume the event because we don't want to loose focus
+            keyEvent.consume();
+            getCellsViewSkin().scrollHorizontally();
+            // We want to erase values when delete key is pressed.
+        } else if (keyEvent.getCode() == KeyCode.DELETE) {
+            deleteSelectedCells();
+            // We want to edit if the user is on a cell and typing
+        }else if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() || keyEvent.getCode()
+                .isKeypadKey()) && !keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
+            getCellsView().setEditWithKey(true);
+            getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };
 }

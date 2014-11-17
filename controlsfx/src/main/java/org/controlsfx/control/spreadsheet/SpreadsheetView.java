@@ -70,7 +70,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -464,11 +463,10 @@ public class SpreadsheetView extends Control {
          * We try to save the width of the column as we save the height of our rows so that we preserve the state.
          */
         List<Double> widthColumns = new ArrayList<>();
-        for(SpreadsheetColumn column:columns){
+        for (SpreadsheetColumn column : columns) {
             widthColumns.add(column.getWidth());
         }
         
-        // TODO move into a property
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
                     .observableArrayList(grid.getRows());
@@ -477,48 +475,15 @@ public class SpreadsheetView extends Control {
 
             final int columnCount = grid.getColumnCount();
             columns.clear();
-            for (int i = 0; i < columnCount; ++i) {
-                final int col = i;
-
-                String columnHeader = grid.getColumnHeaders().size() > i ? grid
-                        .getColumnHeaders().get(i) : Utils.getExcelLetterFromNumber(i);
-                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
-                        columnHeader);
-
-                column.setEditable(true);
-                // We don't want to sort the column
-                column.setSortable(false);
-
-                column.impl_setReorderable(false);
-
-                // We assign a DataCell for each Cell needed (MODEL).
-                column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell>, ObservableValue<SpreadsheetCell>>() {
-                    @Override
-                    public ObservableValue<SpreadsheetCell> call(
-                            TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        if(col >= p.getValue().size()){
-                            return null;
-                        }
-                        return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
-                    }
-                });
-                // We create a SpreadsheetCell for each DataCell in order to
-                // specify how to represent the DataCell(VIEW)
-                column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
-                    @Override
-                    public TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> call(
-                            TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new CellView(handle);
-                    }
-                });
-                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i, grid);
-                if(widthColumns.size() > i){
-                    spreadsheetColumn.setPrefWidth(widthColumns.get(i));
+            for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex) {
+                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(getTableColumn(grid, columnIndex), this, columnIndex, grid);
+                if(widthColumns.size() > columnIndex){
+                    spreadsheetColumn.setPrefWidth(widthColumns.get(columnIndex));
                 }
                 columns.add(spreadsheetColumn);
                 // We verify if this column was fixed before and try to re-fix
                 // it.
-                if (columnsFixed.contains((Integer) i) && spreadsheetColumn.isColumnFixable()) {
+                if (columnsFixed.contains((Integer) columnIndex) && spreadsheetColumn.isColumnFixable()) {
                     spreadsheetColumn.setFixed(true);
                 }
             }
@@ -534,14 +499,22 @@ public class SpreadsheetView extends Control {
          * Platform.runLater() and exit. But in this particular case, we need to
          * add the tableColumn right now. So that when we exit this "setGrid"
          * method, we are sure we can manipulate all the elements.
+         *
+         * We also try to be smart here when we already have some columns in
+         * order to re-use them and minimize the time used to add/remove
+         * columns.
          */
         Runnable runnable = () -> {
-            cellsView.getColumns().clear();
-            for (SpreadsheetColumn spreadsheetColumn : columns) {
-                cellsView.getColumns().add(spreadsheetColumn.column);
+            if (cellsView.getColumns().size() > grid.getColumnCount()) {
+                cellsView.getColumns().remove(grid.getColumnCount(), cellsView.getColumns().size());
+            } else if (cellsView.getColumns().size() < grid.getColumnCount()) {
+                for (int i = cellsView.getColumns().size(); i < grid.getColumnCount(); ++i) {
+                    cellsView.getColumns().add(columns.get(i).column);
+                }
             }
             ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
         };
+        
         if (Platform.isFxApplicationThread()) {
             runnable.run();
         } else {
@@ -1169,6 +1142,50 @@ public class SpreadsheetView extends Control {
      * * Private/Protected Implementation * *
      **************************************************************************/
 
+    /**
+     * This is called when setting a Grid. The main idea is to re-use
+     * TableColumn if possible. Because we can have a great amount of time spent
+     * in com.sun.javafx.css.StyleManager.forget when removing lots of columns
+     * and adding new ones. So if we already have some, we can just re-use them
+     * so we avoid doign all the fuss with the TableColumns.
+     *
+     * @param grid
+     * @param columnIndex
+     * @return
+     */
+    private TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> getTableColumn(Grid grid, int columnIndex) {
+
+        TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
+
+        String columnHeader = grid.getColumnHeaders().size() > columnIndex ? grid
+                .getColumnHeaders().get(columnIndex) : Utils.getExcelLetterFromNumber(columnIndex);
+
+        if (columnIndex < cellsView.getColumns().size()) {
+            column = (TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>) cellsView.getColumns().get(columnIndex);
+            column.setText(columnHeader);
+        } else {
+            column = new TableColumn<>(columnHeader);
+
+            column.setEditable(true);
+            // We don't want to sort the column
+            column.setSortable(false);
+
+            column.impl_setReorderable(false);
+
+            // We assign a DataCell for each Cell needed (MODEL).
+            column.setCellValueFactory((TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) -> {
+                if (columnIndex >= p.getValue().size()) {
+                    return null;
+                }
+                return new ReadOnlyObjectWrapper<>(p.getValue().get(columnIndex));
+            });
+            // We create a SpreadsheetCell for each DataCell in order to
+            // specify how to represent the DataCell(VIEW)
+            column.setCellFactory((TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) -> new CellView(handle));
+        }
+        return column;
+    }
+    
     /**
      * This static method creates a sample Grid with 100 rows and 15 columns.
      * All cells are typed as String.

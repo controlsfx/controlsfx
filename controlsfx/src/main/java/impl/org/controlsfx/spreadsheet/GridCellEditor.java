@@ -229,6 +229,9 @@ public class GridCellEditor {
     private BooleanExpression getFocusProperty(Control control) {
         if (control instanceof TextArea) {
             return Bindings.createBooleanBinding(() -> {
+                if(handle.getView().getScene() == null){
+                    return false;
+                }
                 for (Node n = handle.getView().getScene().getFocusOwner(); n != null; n = n.getParent()) {
                     if (n == control) {
                         return true;

@@ -48,7 +48,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -229,7 +229,7 @@ public class VerticalHeader extends StackPane {
 //            }
             // First one blank and on top (z-order) of the others
             if (spreadsheetView.showColumnHeaderProperty().get()) {
-                label = getLabel(rowCount++);
+                label = getLabel(rowCount++, null);
                 label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), horizontalHeaderHeight);
                 label.layoutYProperty().unbind();
@@ -244,7 +244,7 @@ public class VerticalHeader extends StackPane {
             //FIXME handle height.
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
-                label = getLabel(rowCount++);
+                label = getLabel(rowCount++, null);
                 label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), hbar.getHeight());
                 label.layoutYProperty().unbind();
@@ -283,7 +283,7 @@ public class VerticalHeader extends StackPane {
                     getChildren().add(picker);
                 }
                 if (spreadsheetView.isShowRowHeader()) {
-                    label = getLabel(rowCount++);
+                    label = getLabel(rowCount++, rowIndex);
 
                     label.setText(getRowHeader(rowIndex));
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
@@ -348,7 +348,7 @@ public class VerticalHeader extends StackPane {
             }
 
             if (spreadsheetView.isShowRowHeader()) {
-                label = getLabel(rowCount++);
+                label = getLabel(rowCount++, rowIndex);
 
                 label.setText(getRowHeader(rowIndex));
                 label.resize(spreadsheetView.getRowHeaderWidth(), height);
@@ -449,30 +449,31 @@ public class VerticalHeader extends StackPane {
      * @param rowNumber
      * @return
      */
-    private Label getLabel(int rowNumber) {
+    private Label getLabel(int rowNumber, Integer row) {
+        Label label;
         if (labelList.isEmpty() || labelList.size() <= rowNumber) {
-            final Label label = new Label();
+            label = new Label();
             labelList.add(label);
 
-            // We want to select when clicking on header
-            label.setOnMousePressed((MouseEvent event) -> {
-                if (event.isPrimaryButtonDown()) {
-                    try {
-                        int row = Integer.parseInt(label.getText().substring(0, label.getText().length() - 1));
-                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
-                                .getSelectionModel();
-                        TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView()
-                                .getFocusModel();
-                        sm.clearAndSelect(row - 1, fm.getFocusedCell().getTableColumn());
-                    } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
-
-                    }
-                }
-            });
-            return label;
+//            return label;
         } else {
-            return (Label) labelList.get(rowNumber);
+            label = labelList.get(rowNumber);
         }
+        // We want to select the whole row when clicking on a header.
+        label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
+            if (event.isPrimaryButtonDown()) {
+                try {
+                    TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
+                            .getSelectionModel();
+                    ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
+                    sm.clearSelection();
+                    sm.selectRange(row, columns.get(0),row,columns.get(columns.size()-1));
+                } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
+
+                }
+            }
+        });
+        return label;
     }
 
     private Label getPicker(Picker picker) {

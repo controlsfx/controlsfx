@@ -38,7 +38,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.event.WeakEventHandler;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -104,7 +103,7 @@ public class HorizontalHeader extends TableHeaderRow {
                         sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
                     }
                 };
-                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(new WeakEventHandler<>(mouseEventHandler));
+                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
             }
         });
         

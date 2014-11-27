@@ -38,8 +38,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.event.WeakEventHandler;
-import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -95,21 +93,17 @@ public class HorizontalHeader extends TableHeaderRow {
             }
             requestLayout();
             /**
-             * Clicking on header select the cell situated in that column.
-             * This may be replaced by selecting the entire Column/Row.
+             * Clicking on header select the whole column.
              */
-            for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-                EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent arg0) {
-                        if (arg0.isPrimaryButtonDown()) {
-                            TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
-                            TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = gridViewSkin.handle.getGridView().getFocusModel();
-                            sm.clearAndSelect(fm.getFocusedCell().getRow(), i.getTableColumn());
-                        }
+            for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
+                EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
+                    if (mouseEvent.isPrimaryButtonDown()) {
+                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+                        sm.clearSelection();
+                        sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
                     }
                 };
-                i.getChildrenUnmodifiable().get(0).setOnMousePressed(new WeakEventHandler<>(mouseEventHandler));
+                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
             }
         });
         
@@ -119,14 +113,11 @@ public class HorizontalHeader extends TableHeaderRow {
          * those changes in order to re-apply our css style class. Otherwise
          * we'll end up with fixedColumns but no graphic confirmation.
          */
-        getRootHeader().getColumnHeaders().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable o) {
-               for (SpreadsheetColumn fixItem : spv.getFixedColumns()) {
-                   fixColumn(fixItem);
-               }
-               updateHighlightSelection();
+        getRootHeader().getColumnHeaders().addListener((Observable o) -> {
+            for (SpreadsheetColumn fixItem : spv.getFixedColumns()) {
+                fixColumn(fixItem);
             }
+            updateHighlightSelection();
         });
         
     }

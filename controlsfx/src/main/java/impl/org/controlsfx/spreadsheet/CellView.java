@@ -122,12 +122,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (!isEditable()) {
             getTableView().edit(-1, null);
             return;
-        } else if (handle.getGridView().getEditWithEnter()) {
-            handle.getGridView().setEditWithEnter(false);
-            //The TableView keep that editing cell so we need to inform that we cancelled the edition.
-            getTableView().edit(-1, null);
-            return;
-        }
+        } 
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         // We start to edit only if the Cell is a normal Cell (aka visible).

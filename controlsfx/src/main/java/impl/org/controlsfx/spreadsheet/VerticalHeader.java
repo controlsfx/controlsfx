@@ -231,10 +231,10 @@ public class VerticalHeader extends StackPane {
             if (spreadsheetView.showColumnHeaderProperty().get()) {
                 label = getLabel(rowCount++, null);
                 label.setText(""); //$NON-NLS-1$
-                label.resize(getVerticalHeaderWidth(), horizontalHeaderHeight);
+                label.resize(spreadsheetView.getRowHeaderWidth(), horizontalHeaderHeight);
                 label.layoutYProperty().unbind();
                 label.setLayoutY(0);
-                label.setLayoutX(0);
+                label.setLayoutX(x);
                 label.getStyleClass().clear();
                 label.setContextMenu(blankContextMenu);
                 getChildren().add(label);
@@ -331,6 +331,7 @@ public class VerticalHeader extends StackPane {
         GridRow row = skin.getRow(i);
 
         double fixedRowHeight = skin.getFixedRowHeight();
+        double rowHeaderWidth = spreadsheetView.getRowHeaderWidth();
         double height;
 
         // We iterate over the visibleRows
@@ -351,7 +352,7 @@ public class VerticalHeader extends StackPane {
                 label = getLabel(rowCount++, rowIndex);
 
                 label.setText(getRowHeader(rowIndex));
-                label.resize(spreadsheetView.getRowHeaderWidth(), height);
+                label.resize(rowHeaderWidth, height);
                 label.setLayoutX(x);
                 label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 label.setContextMenu(getRowContextMenu(rowIndex));

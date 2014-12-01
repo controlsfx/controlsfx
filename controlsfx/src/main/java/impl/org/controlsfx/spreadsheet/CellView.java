@@ -150,6 +150,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 super.startEdit();
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 editor.startEdit();
+            }else{
+                getTableView().edit(-1, null);
             }
         }
     }

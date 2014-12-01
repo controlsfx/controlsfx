@@ -60,7 +60,6 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 public class SpreadsheetViewSelectionModel extends
         TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
 
-//    private boolean ctrl = false; // Register state of 'ctrl' key
     private boolean shift = false; // Register state of 'shift' key
     private boolean key = false; // Register if we last touch the keyboard
     // or the mouse
@@ -85,28 +84,25 @@ public class SpreadsheetViewSelectionModel extends
      */
     private final Timeline timer;
 
-    EventHandler<ActionEvent> timerEventHandler = new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent event) {
-            GridViewSkin skin = (GridViewSkin) getCellsViewSkin();
-            if (mouseEvent != null && !cellsView.contains(mouseEvent.getX(), mouseEvent.getY())) {
-                double sceneX = mouseEvent.getSceneX();
-                double sceneY = mouseEvent.getSceneY();
-                double layoutX = cellsView.getLayoutX();
-                double layoutY = cellsView.getLayoutY();
-                double layoutXMax = layoutX + cellsView.getWidth();
-                double layoutYMax = layoutY + cellsView.getHeight();
-
-                if (sceneX > layoutXMax) {
-                    skin.getHBar().increment();
-                } else if (sceneX < layoutX) {
-                    skin.getHBar().decrement();
-                }
-                if (sceneY > layoutYMax) {
-                    skin.getVBar().increment();
-                } else if (sceneY < layoutY) {
-                    skin.getVBar().decrement();
-                }
+    private  final EventHandler<ActionEvent> timerEventHandler = (ActionEvent event) -> {
+        GridViewSkin skin = (GridViewSkin) getCellsViewSkin();
+        if (mouseEvent != null && !cellsView.contains(mouseEvent.getX(), mouseEvent.getY())) {
+            double sceneX = mouseEvent.getSceneX();
+            double sceneY = mouseEvent.getSceneY();
+            double layoutX = cellsView.getLayoutX();
+            double layoutY = cellsView.getLayoutY();
+            double layoutXMax = layoutX + cellsView.getWidth();
+            double layoutYMax = layoutY + cellsView.getHeight();
+            
+            if (sceneX > layoutXMax) {
+                skin.getHBar().increment();
+            } else if (sceneX < layoutX) {
+                skin.getHBar().decrement();
+            }
+            if (sceneY > layoutYMax) {
+                skin.getVBar().increment();
+            } else if (sceneY < layoutY) {
+                skin.getVBar().decrement();
             }
         }
     };
@@ -122,21 +118,14 @@ public class SpreadsheetViewSelectionModel extends
         }
     };
 
-    private final EventHandler<KeyEvent> keyPressedEventHandler = new EventHandler<KeyEvent>() {
-        @Override
-        public void handle(KeyEvent keyEvent) {
-            key = true;
-//            ctrl = keyEvent.isControlDown();
-            shift = keyEvent.isShiftDown();
-        }
+    private final EventHandler<KeyEvent> keyPressedEventHandler = (KeyEvent keyEvent) -> {
+        key = true;
+        shift = keyEvent.isShiftDown();
     };
-    private final EventHandler<MouseEvent> mousePressedEventHandler = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            key = false;
-//            ctrl = mouseEvent.isControlDown();
-            shift = mouseEvent.isShiftDown();
-        }
+    
+    private final EventHandler<MouseEvent> mousePressedEventHandler = (MouseEvent mouseEvent1) -> {
+        key = false;
+        shift = mouseEvent1.isShiftDown();
     };
 
     private final EventHandler<MouseEvent> onDragDetectedEventHandler = new EventHandler<MouseEvent>() {
@@ -148,19 +137,12 @@ public class SpreadsheetViewSelectionModel extends
             timer.play();
         }
     };
-    private final EventHandler<MouseEvent> onMouseDragEventHandler = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent e) {
-            mouseEvent = e;
-        }
+    
+    private final EventHandler<MouseEvent> onMouseDragEventHandler = (MouseEvent e) -> {
+        mouseEvent = e;
     };
-    private final ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>> listChangeListener = new ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
-        @Override
-        public void onChanged(
-                final ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
-            handleSelectedCellsListChangeEvent(c);
-        }
-    };
+    
+    private final ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>> listChangeListener = this::handleSelectedCellsListChangeEvent;
 
     /**
      * *********************************************************************
@@ -482,7 +464,7 @@ public class SpreadsheetViewSelectionModel extends
                  * cells as described in
                  * https://javafx-jira.kenai.com/browse/RT-38306
                  */
-                if (cell.getColumnSpan() > 1 || cell.getColumnSpan() > 1) {
+                if (cell.getColumnSpan() > 1 || cell.getRowSpan()> 1) {
                     makeAtomic = false;
                 }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -269,7 +270,10 @@ public class CheckTreeView<T> extends TreeView<T> {
         }
 
         @Override public void clearChecks() {
-            checkedItems.stream().forEach(this::clearCheck);
+            List<TreeItem<T>> items = new ArrayList<>(checkedItems);
+            for(TreeItem<T> item : items){
+                clearCheck(item);
+            }
         }
 
         @Override public boolean isEmpty() {

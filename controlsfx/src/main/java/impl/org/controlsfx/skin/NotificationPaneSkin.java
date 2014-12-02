@@ -99,7 +99,8 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         
         control.setClip(clip);
         updateContent();
-        
+
+        registerChangeListener(control.heightProperty(), "HEIGHT"); //$NON-NLS-1$
         registerChangeListener(control.contentProperty(), "CONTENT"); //$NON-NLS-1$
         registerChangeListener(control.textProperty(), "TEXT"); //$NON-NLS-1$
         registerChangeListener(control.graphicProperty(), "GRAPHIC"); //$NON-NLS-1$
@@ -129,6 +130,11 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             }
         } else if ("CLOSE_BUTTON_VISIBLE".equals(p)) { //$NON-NLS-1$
             notificationBar.updatePane();
+        }else if ( "HEIGHT".equals(p)){
+            // For resolving https://bitbucket.org/controlsfx/controlsfx/issue/409
+            if (getSkinnable().isShowing() && !getSkinnable().isShowFromTop()) {
+                notificationBar.requestLayout();
+            }
         }
     }
     

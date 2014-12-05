@@ -230,6 +230,9 @@ public class VerticalHeader extends StackPane {
             // First one blank and on top (z-order) of the others
             if (spreadsheetView.showColumnHeaderProperty().get()) {
                 label = getLabel(rowCount++, null);
+                label.setOnMousePressed((MouseEvent event) -> {
+                    spreadsheetView.getSelectionModel().selectAll();
+                });
                 label.setText(""); //$NON-NLS-1$
                 label.resize(spreadsheetView.getRowHeaderWidth(), horizontalHeaderHeight);
                 label.layoutYProperty().unbind();

@@ -2,6 +2,7 @@ syntax: glob
 *.class
 *.iml
 .DS_Store
+.nb-gradle-properties
 controlsfx/build/*
 controlsfx-samples/build/*
 fxsampler/build/*

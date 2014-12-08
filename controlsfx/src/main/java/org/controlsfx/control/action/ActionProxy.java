@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -125,4 +125,11 @@ public @interface ActionProxy {
      * shortcut desired for this action.
      */
     String accelerator() default "";
+    
+    /**
+     * The full class-name of a class that implements {@link AnnotatedActionFactory}. {@link ActionMap} will
+     * use this class to instantiate the {@link AnnotatedAction} associated with this method, rather than
+     * using its own action factory.
+     */
+    String factory() default "";
 }

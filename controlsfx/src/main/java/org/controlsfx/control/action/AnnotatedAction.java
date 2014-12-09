@@ -26,8 +26,9 @@
  */
 package org.controlsfx.control.action;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import javafx.event.ActionEvent;
 
 
@@ -35,45 +36,62 @@ import javafx.event.ActionEvent;
 /**
  * An action that invokes a method that has been annotated with {@link ActionProxy}. These actions are created via
  * {@link ActionMap#register(java.lang.Object)}, which delegates the actual instantiation to an {@link AnnotatedActionFactory}.
+ * 
+ * Note that this class maintains a WeakReference to the supplied target object, so the existence of an 
+ * AnnotatedAction instance will not prevent the target from being garbage-collected.
  */
 public class AnnotatedAction extends Action {
 
     private final Method method;
-    private final Object target;
+    private final WeakReference<Object> target;
 
     /**
      * Instantiates an action that will call the specified method on the specified target.
      */
     public AnnotatedAction(String text, Method method, Object target) {
         super(text);
+        Objects.requireNonNull( method );
+        Objects.requireNonNull( target );
         
         setEventHandler(this::handleAction);
         
         this.method = method;
         this.method.setAccessible(true);
-        this.target = target;
+        this.target = new WeakReference( target );
     }
     
     /**
      * Returns the target object (the object on which the annotated method will be called).
+     * 
+     * @return The target object, or null if the target object has been garbage-collected.
      */
     public Object getTarget() {
-        return target;
+        return target.get();
     }
 
     /**
-     * Handle the action-event by invoking the annotated method on the target object.
+     * Handle the action-event by invoking the annotated method on the target object. If an exception is
+     * thrown, then the default implementation of this method will call handleActionException().
      */
     protected void handleAction(ActionEvent ae) {
         try {
+            Object actionTarget = getTarget();
+            if (actionTarget == null) {
+                throw new IllegalStateException( "Action target object is no longer reachable" );
+            }
+            
             int paramCount =  method.getParameterCount(); 
             if ( paramCount == 0 ) {
-                method.invoke(target);
-            } else if ( paramCount == 1 && method.getParameterTypes()[0] == ActionEvent.class ) {
-                method.invoke(target, ae);
+                method.invoke(actionTarget);
+                
+            } else if ( paramCount == 1) {
+                method.invoke(actionTarget, ae);
+                
+            } else if ( paramCount == 2) {
+                method.invoke(actionTarget, ae, this);
             }
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            handleActionException( e );
+        } catch (Throwable e) {
+            handleActionException( ae, e );
         }
     }
     
@@ -82,7 +100,7 @@ public class AnnotatedAction extends Action {
      * Called if the annotated method throws an exception when invoked. The default implementation of this method simply prints
      * the stack trace of the specified exception.
      */
-    protected void handleActionException( Throwable ex ) {
+    protected void handleActionException( ActionEvent ae, Throwable ex ) {
         ex.printStackTrace();
     }
     

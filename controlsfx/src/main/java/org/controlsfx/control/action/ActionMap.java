@@ -94,35 +94,55 @@ public class ActionMap {
     
     /**
      * Attempts to convert target's methods annotated with {@link ActionProxy} to {@link Action}s.
-     * Only two types of methods are currently converted: parameter-less methods and 
-     * methods with one parameter of type {@link ActionEvent}.
+     * Three types of methods are currently converted: parameter-less methods, 
+     * methods with one parameter of type {@link ActionEvent}, and methods with two parameters
+     * ({@link ActionEvent}, {@link Action}).
+     * 
+     * Note that this method supports safe re-registration of a given instance or of another instance of the
+     * same class that has already been registered. If another instance of the same class is registered, then
+     * those actions will now be associated with the new instance. The first instance is implicitly unregistered.
      * 
      * Actions are registered with their id or method name if id is not defined.
-     * @throws IllegalArgumentException on duplicate action id
+     * 
      * @param target object to work on
+     * @throws IllegalStateException if a method with unsupported parameters is annotated with {@link ActionProxy}.
      */
-    public static void register(final Object target) {
+    public static void register(Object target) {
 
-        for (final Method method : target.getClass().getDeclaredMethods()) {
-            
-            // process only methods with no parameters or one parameter of type ActionEvent
-            int paramCount = method.getParameterCount();
-            if ( paramCount > 1 || (paramCount == 1 && method.getParameterTypes()[0] != ActionEvent.class )){
+        for (Method method : target.getClass().getDeclaredMethods()) {
+            // Only process methods that have the ActionProxy annotation
+            Annotation[] annotations = method.getAnnotationsByType(ActionProxy.class);
+            if (annotations.length == 0) {
                 continue;
             }
             
-            Annotation[] annotations = method.getAnnotationsByType(ActionProxy.class);
-            if (annotations.length > 0) {
-                ActionProxy annotation = (ActionProxy) annotations[0];
-                String id = annotation.id().isEmpty()? method.getName(): annotation.id();
-                if ( actions.containsKey(id)) {
-                    throw new IllegalArgumentException( String.format("Action proxy with key = '%s' already exists", id)); //$NON-NLS-1$
-                }
-                
-                AnnotatedActionFactory factory = determineActionFactory( annotation );
-                AnnotatedAction action = factory.createAction( annotation, method, target );
-                actions.put(id, action);
+            // Only process methods that have
+            // a) no parameters OR 
+            // b) one parameter of type ActionEvent OR
+            // c) two parameters (ActionEvent, Action)
+            int paramCount = method.getParameterCount();
+            Class[] paramTypes = method.getParameterTypes();
+            
+            if (paramCount > 2) {
+                throw new IllegalArgumentException( String.format( "Method %s has too many parameters", method.getName() ) );
             }
+            
+            if (paramCount == 1 && !ActionEvent.class.isAssignableFrom( paramTypes[0] )) {
+                throw new IllegalArgumentException( String.format( "Method %s -- single parameter must be of type ActionEvent", method.getName() ) );
+            }
+            
+            if (paramCount == 2 && (!ActionEvent.class.isAssignableFrom( paramTypes[0] ) || 
+                                    !Action.class.isAssignableFrom( paramTypes[1] ))) {
+                throw new IllegalArgumentException( String.format( "Method %s -- parameters must be of types (ActionEvent, Action)", method.getName() ) );
+            }
+            
+            ActionProxy annotation = (ActionProxy) annotations[0];
+
+            AnnotatedActionFactory factory = determineActionFactory( annotation );
+            AnnotatedAction action = factory.createAction( annotation, method, target );
+
+            String id = annotation.id().isEmpty() ? method.getName() : annotation.id();
+            actions.put( id, action );
         }
     }
     
@@ -157,12 +177,15 @@ public class ActionMap {
      * Removes all the actions associated with target object from the action map
      * @param target object to work on
      */
-    public static void unregister(final Object target) {
+    public static void unregister(Object target) {
         if ( target != null ) {
             Iterator<Map.Entry<String, AnnotatedAction>> entryIter = actions.entrySet().iterator();
             while (entryIter.hasNext()) {
                 Map.Entry<String, AnnotatedAction> entry = entryIter.next();
-                if (entry.getValue().getTarget() == target) {
+                
+                Object actionTarget = entry.getValue().getTarget();
+                
+                if (actionTarget == null || actionTarget == target) {
                     entryIter.remove();
                 }
             }
@@ -172,7 +195,7 @@ public class ActionMap {
     /**
      * Returns action by it's id
      * @param id action id
-     * @return action or null if id was found
+     * @return action or null if id was not found
      */
     public static Action action(String id) {
         return actions.get(id);

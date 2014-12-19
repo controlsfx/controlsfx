@@ -238,14 +238,20 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     /**
-     * Compute the height of a particular row.
-     * 
+     * Compute the height of a particular row. If the row is in
+     * {@link Grid#AUTOFIT}, {@link #DEFAULT_CELL_HEIGHT} is returned.
+     *
      * @param row
      * @return
      */
     public double getRowHeight(int row) {
-        Double rowHeight = rowHeightMap.get(row);
-        return rowHeight == null ? handle.getView().getGrid().getRowHeight(row) : rowHeight;
+        Double rowHeightCache = rowHeightMap.get(row);
+        if (rowHeightCache == null) {
+            double rowHeight = handle.getView().getGrid().getRowHeight(row);
+            return rowHeight == Grid.AUTOFIT ? DEFAULT_CELL_HEIGHT : rowHeight;
+        } else {
+            return rowHeightCache;
+        }
     }
 
     public double getFixedRowHeight() {
@@ -376,6 +382,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             }
             rowHeightMap.put(row, maxHeight + padding);
         }
+        rectangleSelection.updateRectangle();
     }
     
     public void resizeRowsToMaximum() {
@@ -393,6 +400,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         for (int row = 0; row < maxRows; row++) {
             rowHeightMap.put(row, maxHeight);
         }
+        rectangleSelection.updateRectangle();
     }
     
     public void resizeRowsToDefault() {
@@ -404,7 +412,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * the rows will not detect that maybe the height has changed.
          */
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double newHeight = row.computePrefHeight(-1);
+            double newHeight = row.getPrefHeight();
             if(row.getPrefHeight() != newHeight){
                 row.setPrefHeight(newHeight);
                 row.requestLayout();
@@ -413,6 +421,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         
         //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
         getFlow().layoutChildren();
+        rectangleSelection.updateRectangle();
     }
     /**
      * We want to have extra space when displaying LocalDate because they will
@@ -505,6 +514,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         if(col.isResizable()){
             col.setPrefWidth(widthMax);
         }
+        rectangleSelection.updateRectangle();
     }
 
     /***************************************************************************
@@ -654,6 +664,11 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     }
 
     @Override
+    public void scrollHorizontally(){
+        super.scrollHorizontally();
+    }
+    
+    @Override
     protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
 
         if (col == null || !col.isVisible()) {
@@ -674,8 +689,6 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
          * some fixed columns, the "left border" is not the table anymore, but
          * the right side of the last fixed columns.
          *****************************************************************/
-        // We add the fixed columns width
-        final double fixedColumnWidth = getFixedColumnWidth();
 
         final double end = start + col.getWidth();
 
@@ -821,21 +834,4 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
             getFlow().layoutTotal();
         }
     };
-
-    /**
-     * Compute the width of the fixed columns in order not to select cells that
-     * are hidden by the fixed columns
-     * 
-     * @return
-     */
-    private double getFixedColumnWidth() {
-        double fixedColumnWidth = 0;
-        if (!spreadsheetView.getFixedColumns().isEmpty()) {
-            for (int i = 0, max = spreadsheetView.getFixedColumns().size(); i < max; ++i) {
-                final TableColumnBase<ObservableList<SpreadsheetCell>, ?> c = getVisibleLeafColumn(i);
-                fixedColumnWidth += c.getWidth();
-            }
-        }
-        return fixedColumnWidth;
-    }
 }

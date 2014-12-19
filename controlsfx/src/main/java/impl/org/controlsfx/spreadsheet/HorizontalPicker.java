@@ -36,14 +36,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  *
- * This class will display all the available pickers. It is a StackPane clipped which
- * contain a inner Region that display the picker. In that way, we don't need to re-layout
- * every time but just "slide" the inner Region inside this class so that the pickers
- * are sliding along with the TableColumnHeaders.
+ * This class will display all the available pickers. It is a StackPane clipped
+ * which contain a inner Region that display the picker. In that way, we don't
+ * need to re-layout every time but just "slide" the inner Region inside this
+ * class so that the pickers are sliding along with the TableColumnHeaders.
  */
 public class HorizontalPicker extends StackPane {
 
@@ -72,14 +73,9 @@ public class HorizontalPicker extends StackPane {
         setClip(clip);
 
         getChildren().add(innerPicker);
-        
-        horizontalHeader.getRootHeader().getColumnHeaders().addListener(new InvalidationListener() {
 
-            @Override
-            public void invalidated(Observable o) {
-                innerPicker.requestLayout();
-            }
-        });
+        horizontalHeader.getRootHeader().getColumnHeaders().addListener(layoutListener);
+        spv.getColumnPickers().addListener(layoutListener);
     }
 
     @Override
@@ -95,28 +91,25 @@ public class HorizontalPicker extends StackPane {
         requestLayout();
     }
 
-    private Label getPicker(int columnNumber) {
-        Label picker;
+    private Label getPicker(Picker picker) {
+        Label pickerLabel;
         if (pickerPile.isEmpty()) {
-            picker = new Label();
-            picker.getStyleClass().add("picker-label"); //$NON-NLS-1$
-            picker.setOnMouseClicked(pickerMouseEvent);
+            pickerLabel = new Label();
+            pickerLabel.getStyleClass().addListener(layoutListener);
+            pickerLabel.setOnMouseClicked(pickerMouseEvent);
         } else {
-            picker = pickerPile.pop();
+            pickerLabel = pickerPile.pop();
         }
-        pickerUsed.push(picker);
-        picker.getProperties().put(PICKER_INDEX, columnNumber);
-        return picker;
+        pickerUsed.push(pickerLabel);
+        pickerLabel.getStyleClass().setAll(picker.getStyleClass());
+        pickerLabel.getProperties().put(PICKER_INDEX, picker);
+        return pickerLabel;
     }
 
-    private final EventHandler<MouseEvent> pickerMouseEvent = new EventHandler<MouseEvent>() {
+    private final EventHandler<MouseEvent> pickerMouseEvent = (MouseEvent mouseEvent) -> {
+        Label picker = (Label) mouseEvent.getSource();
 
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            Label picker = (Label) mouseEvent.getSource();
-
-           spv.getColumnPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
-        }
+        ((Picker) picker.getProperties().get(PICKER_INDEX)).onClick();
     };
 
     /**
@@ -130,17 +123,21 @@ public class HorizontalPicker extends StackPane {
             pickerUsed.clear();
 
             getChildren().clear();
-            double x = 0;
-            for (int index = 0; index < horizontalHeader.getRootHeader().getColumnHeaders().size(); ++index) {
-                TableColumnHeader column = horizontalHeader.getRootHeader().getColumnHeaders().get(index);
-                if (spv.getColumnPickers().contains(index)) {
-                    Label label = getPicker(index);
+            int index = 0;
+            for (TableColumnHeader column : horizontalHeader.getRootHeader().getColumnHeaders()) {
+                if (spv.getColumnPickers().containsKey(index)) {
+                    Label label = getPicker(spv.getColumnPickers().get(index));
                     label.resize(column.getWidth(), VerticalHeader.PICKER_SIZE);
-                    label.setLayoutX(x);
-                    getChildren().add(label);
+                    label.layoutXProperty().bind(column.layoutXProperty());
+
+                    getChildren().add(0, label);
                 }
-                x += column.getWidth();
+                index++;
             }
         }
     }
+
+    private final InvalidationListener layoutListener = (Observable arg0) -> {
+        innerPicker.requestLayout();
+    };
 }

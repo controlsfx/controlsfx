@@ -285,7 +285,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * This must either be a Glyph-Name (either string or enum value) known by the GlyphFontRegistry.
      * Alternatively, you can directly submit a unicode character here.
      */
-    public Object iconProperty(){
+    public ObjectProperty<Object> iconProperty(){
         return icon;
     }
 

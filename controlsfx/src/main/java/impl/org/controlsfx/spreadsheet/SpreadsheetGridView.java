@@ -33,14 +33,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
 	private final SpreadsheetHandle handle;
-	/**
-	 * We want to go to the next row when enter is pressed.
-	 * But the tableView wants to go in edition. 
-	 * So this flag will be set to true when that happens
-	 * in order for the TableCell not to go in edition.
-	 * SEE RT-34753
-	 */
-	private boolean editWithEnter = false;
+
         /**
          * We don't want to show the current value in the TextField when we are
          * editing by typing a key. We want directly to take those typed letters
@@ -65,14 +58,6 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 	
 	public GridViewSkin getGridViewSkin() {
 		return handle.getCellsViewSkin();
-	}
-	
-	public boolean getEditWithEnter(){
-	    return editWithEnter;
-	}
-	
-	public void setEditWithEnter(boolean b){
-	    editWithEnter = b;
 	}
         
         public void setEditWithKey(boolean b){

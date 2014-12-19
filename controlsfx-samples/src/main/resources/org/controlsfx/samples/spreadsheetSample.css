@@ -93,12 +93,21 @@
 /* PICKERS */
 .picker-label{
     -fx-graphic: url("information.png"); 
+    -fx-background-color: white;
+    -fx-padding: 0 0 0 0;
+    -fx-alignment: center;
+}
+
+.picker-label-exclamation{
+    -fx-graphic: url("exclamation.png"); 
     -fx-background-color: transparent;
     -fx-padding: 0 0 0 0;
     -fx-alignment: center;
 }
 
-.picker-label:hover{
-    -fx-effect:dropshadow(gaussian, black, 10, 0.1, 0, 0);
-    -fx-cursor:hand;
+.picker-label-security{
+    -fx-graphic: url("security-low.png"); 
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+    -fx-alignment: center;
 }

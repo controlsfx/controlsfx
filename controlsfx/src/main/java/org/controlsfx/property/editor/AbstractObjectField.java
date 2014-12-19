@@ -17,7 +17,7 @@ import org.controlsfx.control.textfield.CustomTextField;
 abstract class AbstractObjectField<T> extends HBox {
 
     //TODO: Replace with CSS
-    private static final Image image = new Image("/org/controlsfx/control/open-editor.png"); //$NON-NLS-1$
+    private static final Image image = new Image(AbstractObjectField.class.getResource("/org/controlsfx/control/open-editor.png").toExternalForm()); //$NON-NLS-1$
 
     private final CustomTextField textField = new CustomTextField();
 

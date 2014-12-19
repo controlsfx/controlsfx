@@ -32,6 +32,7 @@ import static impl.org.controlsfx.i18n.Localization.localize;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -47,7 +48,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -56,6 +57,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.WindowEvent;
+import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -164,7 +166,7 @@ public class VerticalHeader extends StackPane {
 
         // In case we resize the view in any manners
         spreadsheetView.heightProperty().addListener(layout);
-        
+
         //When rowPickers is changing
         spreadsheetView.getRowPickers().addListener(layout);
 
@@ -206,7 +208,7 @@ public class VerticalHeader extends StackPane {
             if (!spreadsheetView.getRowPickers().isEmpty()) {
                 innerVerticalHeaderWidth.setValue(PICKER_SIZE);
                 x += PICKER_SIZE;
-            }else{
+            } else {
                 innerVerticalHeaderWidth.setValue(0);
             }
             if (spreadsheetView.isShowRowHeader()) {
@@ -222,17 +224,20 @@ public class VerticalHeader extends StackPane {
 
             rowCount = addVisibleRows(rowCount, x, cellSize);
 
-            if (spreadsheetView.isShowRowHeader()) {
-                rowCount = addFixedRows(rowCount, cellSize);
-            }
+//            if (spreadsheetView.isShowRowHeader()) {
+                rowCount = addFixedRows(rowCount, x, cellSize);
+//            }
             // First one blank and on top (z-order) of the others
             if (spreadsheetView.showColumnHeaderProperty().get()) {
-                label = getLabel(rowCount++);
+                label = getLabel(rowCount++, null);
+                label.setOnMousePressed((MouseEvent event) -> {
+                    spreadsheetView.getSelectionModel().selectAll();
+                });
                 label.setText(""); //$NON-NLS-1$
-                label.resize(getVerticalHeaderWidth(), horizontalHeaderHeight);
+                label.resize(spreadsheetView.getRowHeaderWidth(), horizontalHeaderHeight);
                 label.layoutYProperty().unbind();
                 label.setLayoutY(0);
-                label.setLayoutX(0);
+                label.setLayoutX(x);
                 label.getStyleClass().clear();
                 label.setContextMenu(blankContextMenu);
                 getChildren().add(label);
@@ -242,7 +247,7 @@ public class VerticalHeader extends StackPane {
             //FIXME handle height.
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
-                label = getLabel(rowCount++);
+                label = getLabel(rowCount++, null);
                 label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), hbar.getHeight());
                 label.layoutYProperty().unbind();
@@ -256,42 +261,50 @@ public class VerticalHeader extends StackPane {
         }
     }
 
-    private int addFixedRows(int rowCount, int cellSize) {
+    private int addFixedRows(int rowCount, double x, int cellSize) {
         double spaceUsedByFixedRows = 0;
         int rowIndex;
         Label label;
-
+        final Set<Integer> currentlyFixedRow = handle.getCellsViewSkin().getCurrentlyFixedRow();
         // Then we iterate over the FixedRows if any
         if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
             for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
+
                 rowIndex = spreadsheetView.getFixedRows().get(j);
-                if (!handle.getCellsViewSkin().getCurrentlyFixedRow()
-                        .contains(rowIndex)) {
+                if (!currentlyFixedRow.contains(rowIndex)) {
                     break;
                 }
-                label = getLabel(rowCount++);
-
-                label.setText(getRowHeader(rowIndex));
-                label.resize(getVerticalHeaderWidth(), skin.getRowHeight(rowIndex));
-                label.setContextMenu(getRowContextMenu(rowIndex));
-                label.layoutYProperty().unbind();
-                // If the columnHeader is here, we need to translate a bit
-                if (spreadsheetView.showColumnHeaderProperty().get()) {
-                    label.relocate(snappedLeftInset(), snappedTopInset() + horizontalHeaderHeight + spaceUsedByFixedRows);
-                } else {
-                    label.relocate(snappedLeftInset(), snappedTopInset() + spaceUsedByFixedRows);
+                double rowHeight = skin.getRowHeight(rowIndex);
+                double y = spreadsheetView.showColumnHeaderProperty().get() ? snappedTopInset() + horizontalHeaderHeight + spaceUsedByFixedRows
+                        : snappedTopInset() + spaceUsedByFixedRows;
+                
+                if (spreadsheetView.getRowPickers().containsKey(rowIndex)) {
+                    Label picker = getPicker(spreadsheetView.getRowPickers().get(rowIndex));
+                    picker.resize(PICKER_SIZE, rowHeight);
+                    picker.layoutYProperty().unbind();
+                    picker.setLayoutY(y);
+                    getChildren().add(picker);
                 }
-                final ObservableList<String> css = label.getStyleClass();
-                if (skin.getSelectedRows().contains(rowIndex)) {
-                    css.addAll("selected"); //$NON-NLS-1$
-                } else {
-                    css.removeAll("selected"); //$NON-NLS-1$
-                }
-                css.addAll("fixed"); //$NON-NLS-1$
+                if (spreadsheetView.isShowRowHeader()) {
+                    label = getLabel(rowCount++, rowIndex);
 
+                    label.setText(getRowHeader(rowIndex));
+                    label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
+                    label.setContextMenu(getRowContextMenu(rowIndex));
+                    label.layoutYProperty().unbind();
+                    label.relocate(x, y);
+                    final ObservableList<String> css = label.getStyleClass();
+                    if (skin.getSelectedRows().contains(rowIndex)) {
+                        css.addAll("selected"); //$NON-NLS-1$
+                    } else {
+                        css.removeAll("selected"); //$NON-NLS-1$
+                    }
+                    css.addAll("fixed"); //$NON-NLS-1$
+                    getChildren().add(label);
+                }
                 spaceUsedByFixedRows += skin.getRowHeight(rowIndex);
 
-                getChildren().add(label);
+                
             }
         }
         return rowCount;
@@ -320,24 +333,29 @@ public class VerticalHeader extends StackPane {
 
         GridRow row = skin.getRow(i);
 
+        double fixedRowHeight = skin.getFixedRowHeight();
+        double rowHeaderWidth = spreadsheetView.getRowHeaderWidth();
+        double height;
+
         // We iterate over the visibleRows
         while (cellSize != 0 && row != null && row.getIndex() < modelRowCount) {
             rowIndex = row.getIndex();
+            height = row.getHeight();
             /**
              * Picker
              */
-            if (spreadsheetView.getRowPickers().contains(rowIndex)) {
-                Label picker = getPicker(rowIndex);
-                picker.resize(PICKER_SIZE, row.getHeight());
+            if (row.getLayoutY() >= fixedRowHeight && spreadsheetView.getRowPickers().containsKey(rowIndex)) {
+                Label picker = getPicker(spreadsheetView.getRowPickers().get(rowIndex));
+                picker.resize(PICKER_SIZE, height);
                 picker.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 getChildren().add(picker);
             }
 
             if (spreadsheetView.isShowRowHeader()) {
-                label = getLabel(rowCount++);
+                label = getLabel(rowCount++, rowIndex);
 
                 label.setText(getRowHeader(rowIndex));
-                label.resize(spreadsheetView.getRowHeaderWidth(), row.getHeight());
+                label.resize(rowHeaderWidth, height);
                 label.setLayoutX(x);
                 label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 label.setContextMenu(getRowContextMenu(rowIndex));
@@ -356,7 +374,7 @@ public class VerticalHeader extends StackPane {
                     css.removeAll("fixed"); //$NON-NLS-1$
                 }
 
-                y += row.getHeight();
+                y += height;
 
                 // position drag overlay to intercept column resize requests
                 Rectangle dragRect = getDragRect(rowCount++);
@@ -406,13 +424,16 @@ public class VerticalHeader extends StackPane {
         double delta = draggedY - lastY;
 
         Double newHeight = gridRow.getHeight() + delta;
-        if(newHeight < 0)
+        if (newHeight < 0) {
             return;
+        }
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
-
+        
+        //When resizing a row, we need to update the Rectangle Selection as well
+        skin.rectangleSelection.updateRectangle();
         lastY = draggedY;
     }
 
@@ -432,44 +453,47 @@ public class VerticalHeader extends StackPane {
      * @param rowNumber
      * @return
      */
-    private Label getLabel(int rowNumber) {
+    private Label getLabel(int rowNumber, Integer row) {
+        Label label;
         if (labelList.isEmpty() || labelList.size() <= rowNumber) {
-            final Label label = new Label();
+            label = new Label();
             labelList.add(label);
 
-            // We want to select when clicking on header
-            label.setOnMousePressed((MouseEvent event) -> {
-                if (event.isPrimaryButtonDown()) {
-                    try {
-                        int row = Integer.parseInt(label.getText().substring(0, label.getText().length() - 1));
-                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
-                                .getSelectionModel();
-                        TableViewFocusModel<ObservableList<SpreadsheetCell>> fm = handle.getGridView()
-                                .getFocusModel();
-                        sm.clearAndSelect(row - 1, fm.getFocusedCell().getTableColumn());
-                    } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
-
-                    }
-                }
-            });
-            return label;
+//            return label;
         } else {
-            return (Label) labelList.get(rowNumber);
+            label = labelList.get(rowNumber);
         }
+        // We want to select the whole row when clicking on a header.
+        label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
+            if (event.isPrimaryButtonDown()) {
+                try {
+                    TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
+                            .getSelectionModel();
+                    ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
+                    sm.clearSelection();
+                    sm.selectRange(row, columns.get(0),row,columns.get(columns.size()-1));
+                } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
+
+                }
+            }
+        });
+        return label;
     }
 
-    private Label getPicker(int rowNumber) {
-        Label picker;
+    private Label getPicker(Picker picker) {
+        Label pickerLabel;
         if (pickerPile.isEmpty()) {
-            picker = new Label();
-            picker.getStyleClass().add("picker-label"); //$NON-NLS-1$
-            picker.setOnMouseClicked(pickerMouseEvent);
+            pickerLabel = new Label();
+            picker.getStyleClass().addListener(layout);
+            pickerLabel.setOnMouseClicked(pickerMouseEvent);
         } else {
-            picker = pickerPile.pop();
+            pickerLabel = pickerPile.pop();
         }
-        pickerUsed.push(picker);
-        picker.getProperties().put(PICKER_INDEX, rowNumber);
-        return picker;
+        pickerUsed.push(pickerLabel);
+
+        pickerLabel.getStyleClass().setAll(picker.getStyleClass());
+        pickerLabel.getProperties().put(PICKER_INDEX, picker);
+        return pickerLabel;
     }
 
     private final EventHandler<MouseEvent> pickerMouseEvent = new EventHandler<MouseEvent>() {
@@ -478,7 +502,7 @@ public class VerticalHeader extends StackPane {
         public void handle(MouseEvent mouseEvent) {
             Label picker = (Label) mouseEvent.getSource();
 
-            spreadsheetView.getRowPickerCallback().call((Integer) picker.getProperties().get(PICKER_INDEX));
+            ((Picker) picker.getProperties().get(PICKER_INDEX)).onClick();
         }
     };
 
@@ -530,7 +554,7 @@ public class VerticalHeader extends StackPane {
                 }
             });
             fixItem.setGraphic(new ImageView(pinImage));
-            
+
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
@@ -565,10 +589,7 @@ public class VerticalHeader extends StackPane {
      * * Listeners * *
      * ************************************************************************
      */
-    private final InvalidationListener layout = new InvalidationListener() {
-        @Override
-        public void invalidated(Observable arg0) {
-            requestLayout();
-        }
+    private final InvalidationListener layout = (Observable arg0) -> {
+        requestLayout();
     };
 }

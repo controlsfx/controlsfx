@@ -112,13 +112,13 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected{
 /* PICKERS */
 .picker-label{
     -fx-graphic: url("picker.png"); 
-    -fx-background-color: transparent;
+    -fx-background-color: white;
     -fx-padding: 0 0 0 0;
     -fx-alignment: center;
 }
 
 .picker-label:hover{
-    -fx-effect:dropshadow(gaussian, black, 10, 0.1, 0, 0);
+    /*-fx-effect:dropshadow(gaussian, black, 10, 0.1, 0, 0);*/
     -fx-cursor:hand;
 }
 

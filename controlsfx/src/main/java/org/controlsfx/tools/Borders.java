@@ -27,7 +27,9 @@
 package org.controlsfx.tools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -797,37 +799,56 @@ public final class Borders {
                 
                 private void updateTitleLabelFillFromScene(Scene s) {
                     s.snapshot(new Callback<SnapshotResult, Void>() {
-                        @Override public Void call(SnapshotResult result) {
+                        @Override
+                        public Void call(SnapshotResult result) {
                             final Image image = result.getImage();
                             final PixelReader reader = image.getPixelReader();
-                            final int rows = (int)image.getHeight();
-                            final int columns = (int)image.getWidth();
-                            
-                            double red = 0;
-                            double green = 0;
-                            double blue = 0;
-                            int pixels = rows * columns;
-                            
+//                            final int rows = (int)image.getHeight();
+//                            final int columns = (int)image.getWidth();
+
+//                            double red = 0;
+//                            double green = 0;
+//                            double blue = 0;
                             // let's go through all pixels and work out an average
                             // color to use as the background
-                            for (int row = 1; row < rows - 1; row++) {
-                                for (int column = 1; column < columns - 1; column++) {
+                            int start = (int) titleLabel.getLocalToSceneTransform().getTx();
+                            int finish = (int) (start + titleLabel.getWidth());
+
+                            int startY = (int) titleLabel.getLocalToSceneTransform().getTy();
+                            int finishY = (int) (startY + titleLabel.getHeight());
+
+//                            int pixels = (finish-start) * (finishY-startY);
+                            Map<Color, Integer> map = new HashMap<>();
+                            for (int row = startY; row < finishY; row++) {
+                                for (int column = start; column < finish; column++) {
                                     Color color = reader.getColor(column, row);
-                                    red += color.getRed();
-                                    green += color.getGreen();
-                                    blue += color.getBlue();
+                                    if (map.containsKey(color)) {
+                                        map.put(color, map.get(color) + 1);
+                                    } else {
+                                        map.put(color, 1);
+                                    }
+//                                    red += color.getRed();
+//                                    green += color.getGreen();
+//                                    blue += color.getBlue();
                                 }
                             }
-                            
-                            Color backgroundColor = Color.rgb((int) (red / pixels * 255), 
-                                                              (int) (green / pixels * 255), 
-                                                              (int) (blue / pixels * 255));
-                            
+                            double max = 0;
+                            Color color = null;
+                            for (Color colorTemp : map.keySet()) {
+                                if (map.get(colorTemp) > max) {
+                                    color = colorTemp;
+                                    max = map.get(colorTemp);
+                                }
+                            }
+//                            Color backgroundColor = Color.rgb((int) (red / pixels * 255), 
+//                                                              (int) (green / pixels * 255), 
+//                                                              (int) (blue / pixels * 255));
+
                             // with that color we can set the background fill 
                             // of the titleLabel to perfectly blend in
-                            BackgroundFill fill = new BackgroundFill(backgroundColor, null, null);
+                            BackgroundFill fill = new BackgroundFill(color, null, null);
                             titleLabel.setBackground(new Background(fill));
-                            
+
                             return null;
                         }
                     }, null);

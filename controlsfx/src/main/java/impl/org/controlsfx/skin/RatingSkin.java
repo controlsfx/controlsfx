@@ -83,42 +83,38 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     private double rating = -1;
 
     private Rectangle forgroundClipRect;
-    
-    private Point2D lastMouseLocation = new Point2D(0, 0);
-    
+        
     private final EventHandler<MouseEvent> mouseMoveHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent event) {
-            lastMouseLocation = new Point2D(event.getSceneX(), event.getSceneY());
-            
-            // if we support partial ratings, we will use the partial rating value
-            // directly. If we don't, but we support updateOnHover, then we will
-            // ceil it. Otherwise, the rest of this method is a no op
-            double newRating = partialRating || updateOnHover ?
-                    calculateRating() : -1;
-            
-            if (partialRating && updateOnHover) {
-                updateClip();
-            }
-            
-            if (updateOnHover && newRating > -1) {
-                updateRating(newRating);
+
+        	// if we support updateOnHover, calculate the intended rating based on the mouse 
+        	// location and update the control property with it.
+        	
+            if (updateOnHover) {
+            	updateRatingFromMouseEvent(event);
             }
         }
     };
     
     private final EventHandler<MouseEvent> mouseClickHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent event) {
-            if (updateOnHover) return;
-            
-            if (partialRating) {
-                updateClip();
+
+        	// if we are not updating on hover, calculate the intended rating based on the mouse 
+        	// location and update the control property with it.
+        	
+            if (! updateOnHover) {
+            	updateRatingFromMouseEvent(event);
             }
-            
-            updateRating(calculateRating());
         }
     };
     
-    
+    private void updateRatingFromMouseEvent(MouseEvent event) {
+    	Rating control = getSkinnable();
+    	if (! control.ratingProperty().isBound()) {
+        	Point2D mouseLocation = new Point2D(event.getSceneX(), event.getSceneY());
+    		control.setRating(calculateRating(mouseLocation));
+    	}
+    }
 
     /***************************************************************************
      * 
@@ -134,7 +130,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         
         // init
         recreateButtons();
-        updateRating(getSkinnable().getRating());
+        updateRating();
         // -- end init
         
         registerChangeListener(control.ratingProperty(), "RATING"); //$NON-NLS-1$
@@ -142,6 +138,8 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         registerChangeListener(control.orientationProperty(), "ORIENTATION"); //$NON-NLS-1$
         registerChangeListener(control.updateOnHoverProperty(), "UPDATE_ON_HOVER"); //$NON-NLS-1$
         registerChangeListener(control.partialRatingProperty(), "PARTIAL_RATING"); //$NON-NLS-1$
+        // added to ensure clip is correctly calculated when control is first shown:
+        registerChangeListener(control.boundsInLocalProperty(), "BOUNDS"); //$NON-NLS-1$
     }
 
     
@@ -167,6 +165,10 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         } else if (p == "UPDATE_ON_HOVER") { //$NON-NLS-1$
             this.updateOnHover = getSkinnable().isUpdateOnHover();
             recreateButtons();
+        } else if (p == "BOUNDS") { //$NON-NLS-1$
+        	if (this.partialRating) {
+        		updateClip();
+        	}
         }
     }
     
@@ -186,6 +188,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
             
             forgroundClipRect = new Rectangle();
             foregroundContainer.setClip(forgroundClipRect);
+            
         }
         
         for (int index = 0; index <= getSkinnable().getMax(); index++) {
@@ -215,8 +218,11 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         updateRating();
     }
     
-    private double calculateRating() {
-        final Point2D b = backgroundContainer.sceneToLocal(lastMouseLocation.getX(), lastMouseLocation.getY());
+    // Calculate the rating based on a mouse position (in Scene coordinates).
+    // If we support partial ratings, the value is calculated directly.
+    // Otherwise the ceil of the value is computed.
+    private double calculateRating(Point2D sceneLocation) {
+        final Point2D b = backgroundContainer.sceneToLocal(sceneLocation);
         
         final double x = b.getX();
         final double y = b.getY();
@@ -243,20 +249,21 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     }
     
     private void updateClip() {
-        final Point2D b = backgroundContainer.sceneToLocal(lastMouseLocation.getX(), lastMouseLocation.getY());
         final Rating control = getSkinnable();
-        final double x = b.getX();
-        final double y = b.getY();
         final double h = control.getHeight() - (snappedTopInset() + snappedBottomInset());
+        final double w = control.getWidth() - (snappedLeftInset() + snappedRightInset());
         
         if (isVertical()) {
-            forgroundClipRect.relocate(0, y);
+        	final double y = h * rating / control.getMax() ;
+            forgroundClipRect.relocate(0, h - y);
             forgroundClipRect.setWidth(control.getWidth());
-            forgroundClipRect.setHeight(h - y);
+            forgroundClipRect.setHeight(y);
         } else {
+        	final double x = w * rating / control.getMax();        	
             forgroundClipRect.setWidth(x);
             forgroundClipRect.setHeight(control.getHeight());
         }
+    	
     }
     
 //    private double getSpacing() {
@@ -274,46 +281,50 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         return btn;
     }
     
-    private void updateRating() {
-        updateRating(getSkinnable().getRating());
-    }
+    // Update the skin based on a new value for the rating.
+    // If we support partial ratings, updates the clip.
+    // Otherwise, updates the style classes for the buttons.
     
-    private void updateRating(double newRating) {
+    private void updateRating() {
+    	
+    	double newRating = getSkinnable().getRating();
+    	    	
         if (newRating == rating) return;
         
         rating = Utils.clamp(0, newRating, getSkinnable().getMax());
-        
-        if (! getSkinnable().ratingProperty().isBound()) {
-            getSkinnable().setRating(rating);
-        }
-        
-        // if we immediately change the rating, then we don't need the following
-        if (! partialRating) {
-            final int max = getSkinnable().getMax();
 
-            // make a copy of the buttons list so that we can reverse the order if
-            // the list is vertical (as the buttons are ordered bottom to top).
-            List<Node> buttons = new ArrayList<>(backgroundContainer.getChildren());
-            if (isVertical()) {
-                Collections.reverse(buttons);
-            }
-            
-            for (int i = 0; i < max; i++) {
-                Node button = buttons.get(i);
-    
-                final List<String> styleClass = button.getStyleClass();
-                final boolean containsStrong = styleClass.contains(STRONG);
-                
-                if (i < rating) {
-                    if (! containsStrong) {
-                        styleClass.add(STRONG);
-                    }
-                } else if (containsStrong) {
-                    styleClass.remove(STRONG);
-                }
-            }
+        if (partialRating) {
+        	updateClip();
+        } else {
+            updateButtonStyles();
         }
     }
+
+	private void updateButtonStyles() {
+		final int max = getSkinnable().getMax();
+
+		// make a copy of the buttons list so that we can reverse the order if
+		// the list is vertical (as the buttons are ordered bottom to top).
+		List<Node> buttons = new ArrayList<>(backgroundContainer.getChildren());
+		if (isVertical()) {
+		    Collections.reverse(buttons);
+		}
+		
+		for (int i = 0; i < max; i++) {
+		    Node button = buttons.get(i);
+   
+		    final List<String> styleClass = button.getStyleClass();
+		    final boolean containsStrong = styleClass.contains(STRONG);
+		    
+		    if (i < rating) {
+		        if (! containsStrong) {
+		            styleClass.add(STRONG);
+		        }
+		    } else if (containsStrong) {
+		        styleClass.remove(STRONG);
+		    }
+		}
+	}
     
     private boolean isVertical() {
         return getSkinnable().getOrientation() == Orientation.VERTICAL;

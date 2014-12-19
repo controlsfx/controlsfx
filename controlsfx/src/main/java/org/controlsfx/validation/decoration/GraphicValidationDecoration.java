@@ -58,9 +58,9 @@ public class GraphicValidationDecoration extends AbstractValidationDecoration {
 
     // TODO we shouldn't hardcode this - defer to CSS eventually
 	
-    private static final Image ERROR_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-error.png"); //$NON-NLS-1$
-    private static final Image WARNING_IMAGE = new Image("/impl/org/controlsfx/control/validation/decoration-warning.png"); //$NON-NLS-1$
-    private static final Image REQUIRED_IMAGE = new Image("/impl/org/controlsfx/control/validation/required-indicator.png"); //$NON-NLS-1$
+    private static final Image ERROR_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/decoration-error.png").toExternalForm()); //$NON-NLS-1$
+    private static final Image WARNING_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/decoration-warning.png").toExternalForm()); //$NON-NLS-1$
+    private static final Image REQUIRED_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/required-indicator.png").toExternalForm()); //$NON-NLS-1$
 
     private static final String SHADOW_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);"; //$NON-NLS-1$
     private static final String POPUP_SHADOW_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 5);"; //$NON-NLS-1$

@@ -59,6 +59,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
@@ -69,7 +70,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -153,25 +153,14 @@ import org.controlsfx.tools.Utils;
  * "picker" because they were used originally for picking a row or a column to 
  * insert in the SpreadsheetView.
  * <br/>
- * But you can do anything you want with it. Simply add a row or a column index in 
- * {@link #getRowPickers() } and {@link #getColumnPickers() }. Then you can provide 
- * a custom CallBack with {@link #setRowPickerCallback(javafx.util.Callback) } and 
- * {@link #setColumnPickerCallback(javafx.util.Callback) } in order to react when 
- * the user click on the picker. The Callback gives you the index of the picker.
+ * But you can do anything you want with it. Simply put a row or a column index
+ * in {@link #getRowPickers() } and {@link #getColumnPickers() } along with an
+ * instance of {@link Picker}. You can override the {@link Picker#onClick() }
+ * method in order to react when the user click on the picker.
  * <br/>
  * The pickers will appear on the top of the column's header and on the left of 
  * the row's header.
  * <br/>
- * You can also override the default graphic of the picker by overriding its css,
- * example:
- * <br/>
- * <pre>
- * .picker-label{
- *   -fx-graphic: url("add.png"); 
- *   -fx-background-color: transparent;
- *   -fx-padding: 0 0 0 0;
- * }
- * </pre>
  * 
  * <h3>Copy pasting</h3> You can copy any cell you want and paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
@@ -220,6 +209,7 @@ import org.controlsfx.tools.Utils;
  * @see SpreadsheetColumn
  * @see Grid
  * @see GridBase
+ * @see Picker
  */
 public class SpreadsheetView extends Control {
 
@@ -296,11 +286,9 @@ public class SpreadsheetView extends Control {
 
     private BitSet rowFix; // Compute if we can fix the rows or not.
 
-    private final ObservableList<Integer> rowPickers = FXCollections.observableArrayList();
-    private Callback<Integer, Void> rowPickerCallback = DEFAULT_CALLBACK;
+    private final ObservableMap<Integer, Picker> rowPickers = FXCollections.observableHashMap();
 
-    private final ObservableList<Integer> columnPickers = FXCollections.observableArrayList();
-    private Callback<Integer, Void> columnPickerCallback = DEFAULT_CALLBACK;
+    private final ObservableMap<Integer, Picker> columnPickers = FXCollections.observableHashMap();
 
     // Properties needed by the SpreadsheetView and managed by the skin (source
     // is the VirtualFlow)
@@ -409,43 +397,7 @@ public class SpreadsheetView extends Control {
         /**
          * Keyboard action, maybe use an accelerator
          */
-        cellsView.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                // Go to the next row only if we're not editing
-                if (getEditingCell() == null && !keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
-                    cellsView.setEditWithEnter(true);
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
-                            .getFocusModel().getFocusedCell();
-                    
-                    if (position != null) {
-                        int nextRow = FocusModelListener.getNextRowNumber(position, getCellsView());
-                        if(nextRow < grid.getRowCount()){
-                            cellsView.getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
-                        }
-                    }
-                   /* // Go to next cell
-                } else if (keyEvent.getCode().compareTo(KeyCode.TAB) == 0) {
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
-                            .getFocusModel().getFocusedCell();
-                    if (position != null) {
-                        cellsView.getSelectionModel().clearSelection();
-                        cellsView.getSelectionModel().selectRightCell();
-                    }*/
-                    // We want to erase values when delete key is pressed.
-                } else if (keyEvent.getCode()==KeyCode.DELETE)
-                    deleteSelectedCells();
-                // We want to edit if the user is on a cell and typing
-                else if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() || keyEvent.getCode()
-                        .isKeypadKey()) && !keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
-                    @SuppressWarnings("unchecked")
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) cellsView
-                            .getFocusModel().getFocusedCell();
-                    cellsView.setEditWithKey(true);
-                    cellsView.edit(position.getRow(), position.getTableColumn());
-                }
-            }
-        });
+        cellsView.setOnKeyPressed(keyPressedHandler);
 
         /**
          * ContextMenu handling.
@@ -511,11 +463,10 @@ public class SpreadsheetView extends Control {
          * We try to save the width of the column as we save the height of our rows so that we preserve the state.
          */
         List<Double> widthColumns = new ArrayList<>();
-        for(SpreadsheetColumn column:columns){
+        for (SpreadsheetColumn column : columns) {
             widthColumns.add(column.getWidth());
         }
         
-        // TODO move into a property
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
                     .observableArrayList(grid.getRows());
@@ -524,48 +475,15 @@ public class SpreadsheetView extends Control {
 
             final int columnCount = grid.getColumnCount();
             columns.clear();
-            for (int i = 0; i < columnCount; ++i) {
-                final int col = i;
-
-                String columnHeader = grid.getColumnHeaders().size() > i ? grid
-                        .getColumnHeaders().get(i) : Utils.getExcelLetterFromNumber(i);
-                final TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column = new TableColumn<>(
-                        columnHeader);
-
-                column.setEditable(true);
-                // We don't want to sort the column
-                column.setSortable(false);
-
-                column.impl_setReorderable(false);
-
-                // We assign a DataCell for each Cell needed (MODEL).
-                column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell>, ObservableValue<SpreadsheetCell>>() {
-                    @Override
-                    public ObservableValue<SpreadsheetCell> call(
-                            TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        if(col >= p.getValue().size()){
-                            return null;
-                        }
-                        return new ReadOnlyObjectWrapper<>(p.getValue().get(col));
-                    }
-                });
-                // We create a SpreadsheetCell for each DataCell in order to
-                // specify how to represent the DataCell(VIEW)
-                column.setCellFactory(new Callback<TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>, TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>>() {
-                    @Override
-                    public TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> call(
-                            TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) {
-                        return new CellView(handle);
-                    }
-                });
-                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(column, this, i, grid);
-                if(widthColumns.size() > i){
-                    spreadsheetColumn.setPrefWidth(widthColumns.get(i));
+            for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex) {
+                final SpreadsheetColumn spreadsheetColumn = new SpreadsheetColumn(getTableColumn(grid, columnIndex), this, columnIndex, grid);
+                if(widthColumns.size() > columnIndex){
+                    spreadsheetColumn.setPrefWidth(widthColumns.get(columnIndex));
                 }
                 columns.add(spreadsheetColumn);
                 // We verify if this column was fixed before and try to re-fix
                 // it.
-                if (columnsFixed.contains((Integer) i) && spreadsheetColumn.isColumnFixable()) {
+                if (columnsFixed.contains((Integer) columnIndex) && spreadsheetColumn.isColumnFixable()) {
                     spreadsheetColumn.setFixed(true);
                 }
             }
@@ -581,14 +499,22 @@ public class SpreadsheetView extends Control {
          * Platform.runLater() and exit. But in this particular case, we need to
          * add the tableColumn right now. So that when we exit this "setGrid"
          * method, we are sure we can manipulate all the elements.
+         *
+         * We also try to be smart here when we already have some columns in
+         * order to re-use them and minimize the time used to add/remove
+         * columns.
          */
         Runnable runnable = () -> {
-            cellsView.getColumns().clear();
-            for (SpreadsheetColumn spreadsheetColumn : columns) {
-                cellsView.getColumns().add(spreadsheetColumn.column);
+            if (cellsView.getColumns().size() > grid.getColumnCount()) {
+                cellsView.getColumns().remove(grid.getColumnCount(), cellsView.getColumns().size());
+            } else if (cellsView.getColumns().size() < grid.getColumnCount()) {
+                for (int i = cellsView.getColumns().size(); i < grid.getColumnCount(); ++i) {
+                    cellsView.getColumns().add(columns.get(i).column);
+                }
             }
             ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
         };
+        
         if (Platform.isFxApplicationThread()) {
             runnable.run();
         } else {
@@ -675,7 +601,7 @@ public class SpreadsheetView extends Control {
         final int rowCount = grid.getRowCount();
         final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         for (Integer row : list) {
-            if (row == null || row < 0 || row > rowCount) {
+            if (row == null || row < 0 || row >= rowCount) {
                 return false;
             }
             //If this row is not fixable, we need to identify the maximum span
@@ -869,51 +795,21 @@ public class SpreadsheetView extends Control {
     }
     
     /**
-     * @return An ObservableList of row indexes that display a picker.
+     * @return An ObservableMap with the row index as key and the Picker as a
+     * value.
      */
-    public ObservableList<Integer> getRowPickers() {
+    public ObservableMap<Integer, Picker> getRowPickers() {
         return rowPickers;
     }
 
     /**
-     * Set a custom callback for the Row picker. Row number is given to you in 
-     * the callback.
-     * @param callback 
+     * @return An ObservableMap with the column index as key and the Picker as a
+     * value.
      */
-    public void setRowPickerCallback(Callback<Integer, Void> callback) {
-        this.rowPickerCallback = callback;
-    }
-
-    /**
-     * @return the row Picker Callback.
-     */
-    public Callback<Integer, Void> getRowPickerCallback() {
-        return rowPickerCallback;
-    }
-
-    /**
-     * @return An ObservableList of column indexes that display a picker.
-     */
-    public ObservableList<Integer> getColumnPickers() {
+    public ObservableMap<Integer, Picker> getColumnPickers() {
         return columnPickers;
     }
 
-     /**
-     * Set a custom callback for the Column picker. Column number is given to you in 
-     * the callback.
-     * @param callback 
-     */
-    public void setColumnPickerCallback(Callback<Integer, Void> callback) {
-        this.columnPickerCallback = callback;
-    }
-
-    /**
-     * @return the columnPicker Callback.
-     */
-    public Callback<Integer, Void> getColumnPickerCallback() {
-        return columnPickerCallback;
-    }
-    
     /**
      * This method will compute the best height for each line. That is to say
      * a height where each content of each cell could be fully visible.\n
@@ -1247,6 +1143,50 @@ public class SpreadsheetView extends Control {
      **************************************************************************/
 
     /**
+     * This is called when setting a Grid. The main idea is to re-use
+     * TableColumn if possible. Because we can have a great amount of time spent
+     * in com.sun.javafx.css.StyleManager.forget when removing lots of columns
+     * and adding new ones. So if we already have some, we can just re-use them
+     * so we avoid doign all the fuss with the TableColumns.
+     *
+     * @param grid
+     * @param columnIndex
+     * @return
+     */
+    private TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> getTableColumn(Grid grid, int columnIndex) {
+
+        TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> column;
+
+        String columnHeader = grid.getColumnHeaders().size() > columnIndex ? grid
+                .getColumnHeaders().get(columnIndex) : Utils.getExcelLetterFromNumber(columnIndex);
+
+        if (columnIndex < cellsView.getColumns().size()) {
+            column = (TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell>) cellsView.getColumns().get(columnIndex);
+            column.setText(columnHeader);
+        } else {
+            column = new TableColumn<>(columnHeader);
+
+            column.setEditable(true);
+            // We don't want to sort the column
+            column.setSortable(false);
+
+            column.impl_setReorderable(false);
+
+            // We assign a DataCell for each Cell needed (MODEL).
+            column.setCellValueFactory((TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) -> {
+                if (columnIndex >= p.getValue().size()) {
+                    return null;
+                }
+                return new ReadOnlyObjectWrapper<>(p.getValue().get(columnIndex));
+            });
+            // We create a SpreadsheetCell for each DataCell in order to
+            // specify how to represent the DataCell(VIEW)
+            column.setCellFactory((TableColumn<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) -> new CellView(handle));
+        }
+        return column;
+    }
+    
+    /**
      * This static method creates a sample Grid with 100 rows and 15 columns.
      * All cells are typed as String.
      *
@@ -1454,6 +1394,49 @@ public class SpreadsheetView extends Control {
                     getContextMenu().hide();
                 });
             }
+        }
+    };
+    
+    private final EventHandler<KeyEvent> keyPressedHandler = (KeyEvent keyEvent) -> {
+        TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) getCellsView()
+                    .getFocusModel().getFocusedCell();
+        // Go to the next row only if we're not editing
+        if (getEditingCell() == null && !keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
+            if (position != null) {
+                int nextRow = FocusModelListener.getNextRowNumber(position, getCellsView());
+                if (nextRow < getGrid().getRowCount()) {
+                    getCellsView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
+                }
+                //We consume the event because we don't want to go in edition
+                keyEvent.consume();
+            }
+            getCellsViewSkin().scrollHorizontally();
+            // Go to next cell
+        } else if (getEditingCell() == null && keyEvent.getCode() == KeyCode.TAB) {
+            if (position != null) {
+                int row = position.getRow();
+                int column = position.getColumn() + 1;
+                if (column >= getColumns().size()) {
+                    if (row == getGrid().getRowCount() - 1) {
+                        column--;
+                    } else {
+                        column = 0;
+                        row++;
+                    }
+                }
+                getCellsView().getSelectionModel().clearAndSelect(row, getCellsView().getColumns().get(column));
+            }
+            //We consume the event because we don't want to loose focus
+            keyEvent.consume();
+            getCellsViewSkin().scrollHorizontally();
+            // We want to erase values when delete key is pressed.
+        } else if (keyEvent.getCode() == KeyCode.DELETE) {
+            deleteSelectedCells();
+            // We want to edit if the user is on a cell and typing
+        }else if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() || keyEvent.getCode()
+                .isKeypadKey()) && !keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
+            getCellsView().setEditWithKey(true);
+            getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };
 }

@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -118,27 +118,17 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         
         getChildren().add(gridViewSkin.rectangleSelection);
         
-        spv.getFixedRows().addListener(new ListChangeListener<Integer>(){
-			@Override
-			public void onChanged(javafx.collections.ListChangeListener.Change<? extends Integer> change) {
-				while(change.next()){
-					if(change.wasRemoved()){
-						List<? extends Integer> list = change.getRemoved();
-						for(Integer i:list){
-							for(T cell:myFixedCells){
-								if(cell.getIndex() == i){
-									cell.setManaged(false);
-									cell.setVisible(false);
-//                                                                        sheetChildren.remove(cell);
-									myFixedCells.remove(cell);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		});
+        spv.getFixedRows().addListener((Observable observable) -> {
+            List<T> toRemove = new ArrayList<>();
+            for (T cell : myFixedCells) {
+                if (!spv.getFixedRows().contains(cell.getIndex())) {
+                    cell.setManaged(false);
+                    cell.setVisible(false);
+                    toRemove.add(cell);
+                }
+            }
+            myFixedCells.removeAll(toRemove);
+        });
     }
 
     @Override
@@ -150,14 +140,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
     @Override
     public void scrollTo(int index) {
-    	//If we have some fixedRows, we check if the selected row is not below them
-    	if(!getCells().isEmpty() && spreadSheetView.getFixedRows().size()>0){
-    		double offset = gridViewSkin.getFixedRowHeight();
-    		
-			while(offset >=0 && index >0){
-				index--;
-				offset-=spreadSheetView.getGrid().getRowHeight(index);
-			}
+        //If we have some fixedRows, we check if the selected row is not below them
+        if (!getCells().isEmpty() && spreadSheetView.getFixedRows().size() > 0) {
+            double offset = gridViewSkin.getFixedRowHeight();
+
+            while (offset >= 0 && index > 0) {
+                index--;
+                offset -= gridViewSkin.getRowHeight(index);
+            }
         }
         super.scrollTo(index);
 

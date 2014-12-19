@@ -33,6 +33,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -69,7 +70,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         super(tableCell);
         tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
         if (tableCell.getItem() != null) {
-            tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+            tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, new WeakEventHandler<>(triangleEventHandler));
         }
     }
 
@@ -187,10 +188,10 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
                 SpreadsheetCell newCell) {
             if (oldCell != null) {
-                oldCell.removeEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+//                oldCell.removeEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
             }
             if (newCell != null) {
-                newCell.addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+//                newCell.addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
             }
             if (getSkinnable().getItem() != null) {
                 layoutTriangle();

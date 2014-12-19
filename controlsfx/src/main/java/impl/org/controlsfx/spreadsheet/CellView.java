@@ -122,12 +122,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (!isEditable()) {
             getTableView().edit(-1, null);
             return;
-        } else if (handle.getGridView().getEditWithEnter()) {
-            handle.getGridView().setEditWithEnter(false);
-            //The TableView keep that editing cell so we need to inform that we cancelled the edition.
-            getTableView().edit(-1, null);
-            return;
-        }
+        } 
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         // We start to edit only if the Cell is a normal Cell (aka visible).
@@ -155,6 +150,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 super.startEdit();
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 editor.startEdit();
+            }else{
+                getTableView().edit(-1, null);
             }
         }
     }
@@ -337,11 +334,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                         new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
                                 image.getImage().getWidth()).otherwise(widthProperty()));
                 }
-            //If we have a Region and no text, we force it to take full space.    
+                /**
+                 * If we have a Region and no text, we force it to take full
+                 * space. But we want to impact the minSize in order to let the
+                 * prefSize to be computed if necessary.
+                 */
             } else if (graphic instanceof Region && item.getItem() == null) {
                 Region region = (Region) graphic;
-                region.prefHeightProperty().bind(heightProperty());
-                region.prefWidthProperty().bind(widthProperty());
+                region.minHeightProperty().bind(heightProperty());
+                region.minWidthProperty().bind(widthProperty());
             }
             setGraphic(graphic);
             /**

@@ -35,6 +35,7 @@ import javafx.scene.input.MouseEvent;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
+import javafx.beans.Observable;
 
 /**
  * A cell column header.
@@ -44,6 +45,14 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     public HorizontalHeaderColumn(
             TableViewSkinBase<?, ?, ?, ?, ?, ?> skin, TableColumnBase<?, ?> tc) {
         super(skin, tc);
+        /**
+         * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395
+         * and https://bitbucket.org/controlsfx/controlsfx/issue/434
+         */
+        widthProperty().addListener((Observable observable) -> {
+            ((GridViewSkin)skin).hBarValue.clear();
+            ((GridViewSkin)skin).rectangleSelection.updateRectangle();
+        });
     }
 
     @Override
@@ -78,7 +87,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     public void layoutFixedColumns() {
         SpreadsheetHandle handle = ((GridViewSkin) (Object) getTableViewSkin()).handle;
         final SpreadsheetView spreadsheetView = handle.getView();
-        if (handle.getCellsViewSkin() == null) {
+        if (handle.getCellsViewSkin() == null || getChildren().isEmpty()) {
             return;
         }
         double hbarValue = handle.getCellsViewSkin().getHBar().getValue();

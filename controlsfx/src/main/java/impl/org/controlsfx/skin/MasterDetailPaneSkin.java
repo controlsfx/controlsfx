@@ -66,6 +66,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     private boolean changing = false;
     private SplitPane splitPane;
     private final Timeline timeline = new Timeline();
+    private BooleanProperty showDetailForTimeline = new SimpleBooleanProperty();
 
     public MasterDetailPaneSkin(MasterDetailPane pane) {
         super(pane);
@@ -349,7 +350,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         }
 
         timeline.setOnFinished(evt -> {
-            if (!showDetail.get()) {
+            if (!showDetailForTimeline.get()) {
                 unbindDividerPosition();
                 splitPane.getItems().remove(
                         getSkinnable().getDetailNode());
@@ -408,8 +409,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
         }
 
         updateMinAndMaxSizes();
-        showDetail.set(true);
-        maybeAnimatePositionChange(getSkinnable().getDividerPosition());
+        maybeAnimatePositionChange(getSkinnable().getDividerPosition(), true);
     }
 
     private void close() {
@@ -430,17 +430,17 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                     break;
             }
 
-            showDetail.set(false);
-            maybeAnimatePositionChange(targetLocation);
+            maybeAnimatePositionChange(targetLocation, false);
         }
     }
 
-    private BooleanProperty showDetail = new SimpleBooleanProperty();
+    private void maybeAnimatePositionChange(final double position,
+            final boolean showDetail) {
+        showDetailForTimeline.set(showDetail);
 
-    private void maybeAnimatePositionChange(final double position) {
         Divider divider = splitPane.getDividers().get(0);
 
-        if (showDetail.get()) {
+        if (showDetailForTimeline.get()) {
             unbindDividerPosition();
             bindDividerPosition();
         }
@@ -449,7 +449,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
             KeyValue positionKeyValue = new KeyValue(
                     divider.positionProperty(), position);
             KeyValue opacityKeyValue = new KeyValue(getSkinnable()
-                    .getDetailNode().opacityProperty(), showDetail.get() ? 1 : 0);
+                    .getDetailNode().opacityProperty(), showDetailForTimeline.get() ? 1 : 0);
 
             KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), "endAnimation", positionKeyValue, opacityKeyValue);
 
@@ -461,7 +461,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
             getSkinnable().getDetailNode().setOpacity(1);
             divider.setPosition(position);
 
-            if (!showDetail.get()) {
+            if (!showDetailForTimeline.get()) {
                 unbindDividerPosition();
                 splitPane.getItems().remove(getSkinnable().getDetailNode());
             }

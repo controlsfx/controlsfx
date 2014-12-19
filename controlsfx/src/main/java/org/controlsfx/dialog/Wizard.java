@@ -53,15 +53,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
-import org.controlsfx.validation.ValidationSupport;
 
 import com.sun.javafx.css.StyleManager;
 

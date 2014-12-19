@@ -58,6 +58,7 @@ import javafx.scene.control.DialogPane;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
+import org.controlsfx.validation.ValidationSupport;
 
 import com.sun.javafx.css.StyleManager;
 
@@ -378,7 +379,7 @@ public class Wizard {
     }
     
     /**
-     * Sets the value of the property invalid.
+     * Sets the value of the property {@code invalid}.
      * 
      * @param invalid The new validation state
      * @see {@link #invalidProperty()}
@@ -388,7 +389,7 @@ public class Wizard {
     }
     
     /**
-     * Gets the value of the property invalid.
+     * Gets the value of the property {@code invalid}.
      * 
      * @return The validation state
      * @see {@link #invalidProperty()}
@@ -401,7 +402,13 @@ public class Wizard {
      * Property for overriding the individual validation state of this {@link Wizard}.
      * Setting {@code invalid} to true will disable the next/finish Button and the user
      * will not be able to advance to the next page of the {@link Wizard}. Setting
-     * {@code invalid} to false will enable the next/finish Button.
+     * {@code invalid} to false will enable the next/finish Button. <br>
+     * <br>
+     * For example you can use the {@link ValidationSupport#invalidProperty()} of a
+     * page and bind it to the {@code invalid} property: <br>
+     * {@code
+     * wizard.invalidProperty().bind(page.validationSupport.invalidProperty());
+     * }
      * 
      * @return The validation state property
      */

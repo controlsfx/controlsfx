@@ -53,8 +53,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -379,10 +382,34 @@ public class Wizard {
     }
     
     /**
-     * Validation state property 
-     * @return validation state property
+     * Sets the value of the property invalid.
+     * 
+     * @param invalid The new validation state
+     * @see {@link #invalidProperty()}
      */
-    public BooleanProperty invalidProperty() {
+    public final void setInvalid(boolean invalid) {
+        invalidProperty.set(invalid);
+    }
+    
+    /**
+     * Gets the value of the property invalid.
+     * 
+     * @return The validation state
+     * @see {@link #invalidProperty()}
+     */
+    public final boolean isInvalid() {
+        return invalidProperty.get();
+    }
+    
+    /**
+     * Property for overriding the individual validation state of this {@link Wizard}.
+     * Setting {@code invalid} to true will disable the next/finish Button and the user
+     * will not be able to advance to the next page of the {@link Wizard}. Setting
+     * {@code invalid} to false will enable the next/finish Button.
+     * 
+     * @return The validation state property
+     */
+    public final BooleanProperty invalidProperty() {
         return invalidProperty;
     }
     

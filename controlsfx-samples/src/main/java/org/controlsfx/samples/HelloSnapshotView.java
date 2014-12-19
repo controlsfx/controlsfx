@@ -1,5 +1,3 @@
-package org.controlsfx.samples;
-
 /**
  * Copyright (c) 2014, ControlsFX
  * All rights reserved.
@@ -26,10 +24,13 @@ package org.controlsfx.samples;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.controlsfx.samples;
+
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Random;
 
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.animation.RotateTransition;
 import javafx.application.Application;
@@ -53,14 +54,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -69,8 +68,6 @@ import javafx.util.StringConverter;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SnapshotView;
 import org.controlsfx.control.SnapshotView.Boundary;
-
-import com.sun.javafx.css.StyleManager;
 
 /**
  * Demonstrates the {@link SnapshotView}.
@@ -159,8 +156,8 @@ public class HelloSnapshotView extends ControlsFXSample {
      * @return an array of {@link Image image}s
      */
     private Image[] loadImages() {
-        Image controlsFX = new Image(getClass().getResource("ControlsFX.png").toExternalForm());
-        Image duke = new Image(getClass().getResource("duke_wave.png").toExternalForm());
+        Image controlsFX = new Image(HelloSnapshotView.class.getResource("ControlsFX.png").toExternalForm());
+        Image duke = new Image(HelloSnapshotView.class.getResource("duke_wave.png").toExternalForm());
         return new Image[] { controlsFX, duke, null };
     }
 
@@ -197,7 +194,7 @@ public class HelloSnapshotView extends ControlsFXSample {
         RotateTransition rotator = new RotateTransition(Duration.seconds(3), rotatingRect);
         rotator.setAutoReverse(true);
         rotator.setByAngle(360);
-        rotator.setCycleCount(Integer.MAX_VALUE);
+        rotator.setCycleCount(Animation.INDEFINITE);
         rotator.play();
 
         return new Node[] {
@@ -528,7 +525,8 @@ public class HelloSnapshotView extends ControlsFXSample {
 
     @Override
     public String getJavaDocURL() {
-        return "org/controlsfx/control/SnapshotView.html";
+        return Utils.JAVADOC_BASE
+                + "org/controlsfx/control/SnapshotView.html";
     }
 
     @Override

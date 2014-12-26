@@ -109,6 +109,10 @@ public class AutoCompletePopup<T> extends PopupControl{
         if(node.getScene() == null || node.getScene().getWindow() == null)
             throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window."); //$NON-NLS-1$
 
+        if(isShowing()){
+            return;
+        }
+        
         Window parent = node.getScene().getWindow();
         this.show(
                 parent,

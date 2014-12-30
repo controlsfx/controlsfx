@@ -53,10 +53,10 @@ public final class FilterPanel<T> extends Pane {
 				.map(v -> new FilterItem(v)).collect(Collectors.toList()));
 		
 		VBox vBox = new VBox();
-		vBox.paddingProperty().set(new Insets(3));
+		vBox.setPadding(new Insets(3));
 		
 		vBox.getChildren().add(searchBox);
-		searchBox.paddingProperty().set(new Insets(0,0,2,0));
+		searchBox.paddingProperty().set(new Insets(0,0,10,0));
 		vBox.getChildren().add(listView);
 		this.getChildren().add(vBox);
 	}

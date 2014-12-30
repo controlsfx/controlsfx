@@ -46,14 +46,14 @@ import javafx.scene.layout.VBox;
 public final class FilterPanel<T> extends Pane {
 	
 	private final ColumnFilter<T> columnFilter;
-	private final ListView<FilterItem> listView = new ListView<>();
+	private final ListView<FilterItem<T>> listView = new ListView<>();
 	private final TextField searchBox = new TextField("Search...");
 	
 	FilterPanel(ColumnFilter<T> tableFilter) { 
 		this.columnFilter = tableFilter;
 		
 		listView.itemsProperty().get().setAll(columnFilter.getAllVals().stream()
-				.map(v -> new FilterItem(v, columnFilter)).collect(Collectors.toList()));
+				.map(v -> new FilterItem<T>(v, columnFilter)).collect(Collectors.toList()));
 		
 		VBox vBox = new VBox();
 		vBox.setPadding(new Insets(3));

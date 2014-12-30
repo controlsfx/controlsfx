@@ -41,19 +41,34 @@ public final class TableFilter<T> {
 	
 	private final TableView<T> tableView;
 	private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
-	private final Callback<TableView<T>, TableRow<T>> rowFactory;
-	
+	//private final Callback<TableView<T>, TableRow<T>> rowFactory;
+	private static final String HIDE_ROW_CSS = TableFilter.class.getResource("CSS_HIDE_ROW").toExternalForm();
+
 	private final Predicate<T> filterPredicate = v -> columnFilters.stream().filter(f -> f.isSelected(v) == false)
 			.findAny().isPresent() == false;
 	
 	private TableFilter(TableView<T> tableView) { 
 		this.tableView = tableView;
-		this.rowFactory = tableView.getRowFactory();
-		/*
-		tableView.setRowFactory(t -> { 
-			TableRow<T> tableRow = rowFactory.call(t); 
-			return tableRow;
-		});*/
+		
+		this.tableView.setRowFactory(new Callback<TableView<T>, TableRow<T>>() {
+		        @Override
+		        public TableRow<T> call(TableView<T> tableView) {
+		            final TableRow<T> row = new TableRow<T>() {
+		                @Override
+		                protected void updateItem(T row, boolean empty) {
+		                    super.updateItem(row, empty);
+		                    if (! filterPredicate.test(row)) {
+		                    	this.getStylesheets().add(HIDE_ROW_CSS);
+		                    }
+		                    else { 
+		                    	
+		                    	this.getStylesheets().remove(HIDE_ROW_CSS);
+		                    }
+		                }
+		            };
+		            return row;
+		        }
+		    });
 	}
 	public static <B> TableFilter<B> forTable(TableView<B> tableView) { 
 		TableFilter<B> tableFilter = new TableFilter<B>(tableView);
@@ -66,6 +81,8 @@ public final class TableFilter<T> {
 				.map(c -> ColumnFilter.getInstance(tableView, c)).collect(Collectors.toList()));
 	}
 	public void executeFilter() { 
+		
+		
 		//FilteredList<T> filteredList = new FilteredList<T>();
 		
 		// SortedList<T> sortedData = new SortedList<>(filteredList);

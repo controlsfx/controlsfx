@@ -28,6 +28,9 @@ package org.controlsfx.control.table.filter;
 
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CustomMenuItem;
@@ -50,28 +53,54 @@ public final class FilterPanel<T> extends Pane {
 		this.columnFilter = tableFilter;
 		
 		listView.itemsProperty().get().setAll(columnFilter.getAllVals().stream()
-				.map(v -> new FilterItem(v)).collect(Collectors.toList()));
+				.map(v -> new FilterItem(v, columnFilter)).collect(Collectors.toList()));
 		
 		VBox vBox = new VBox();
 		vBox.setPadding(new Insets(3));
 		
 		vBox.getChildren().add(searchBox);
-		searchBox.paddingProperty().set(new Insets(0,0,10,0));
+		searchBox.setPadding(new Insets(0,0,10,0));
 		vBox.getChildren().add(listView);
 		this.getChildren().add(vBox);
 	}
 	
-	private static class FilterItem extends Pane { 
+	private static class FilterItem<T> extends Pane { 
 		private final CheckBox checkBox = new CheckBox();
 		private final Label label = new Label();
+		private final Object value;
+		private final ColumnFilter<?> columnFilter;
 		
-		FilterItem(Object value) { 
+		FilterItem(Object value,  ColumnFilter<?> columnFilter) { 
+			this.columnFilter = columnFilter;
+			this.value = value;
+			
 			HBox hBox = new HBox();
 			hBox.getChildren().add(checkBox);
+			
 			label.setText(value.toString());
+			
 			hBox.getChildren().add(label);
 			this.getChildren().add(hBox);
 			
+			checkBox.setSelected(columnFilter.getSelectedVals().contains(value));
+			
+			attachListeners();
+			
+		}
+		
+		private void attachListeners() { 
+			
+			checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			    @Override
+			    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+			       if (oldValue.equals(Boolean.TRUE) && newValue.equals(Boolean.FALSE)) { 
+			    	   columnFilter.getSelectedVals().remove(value);
+			       }
+			       else if (oldValue.equals(Boolean.FALSE) && newValue.equals(Boolean.TRUE)) { 
+			    	   columnFilter.getSelectedVals().add(value);
+			       }
+			    }
+			});
 		}
 	}
 	

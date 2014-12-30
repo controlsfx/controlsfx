@@ -28,19 +28,23 @@ package org.controlsfx.control.table.filter;
 
 import java.util.stream.Collectors;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 
 public final class FilterPanel<T> extends Pane {
 	
 	private final ColumnFilter<T> columnFilter;
 	private final ListView<FilterItem> listView = new ListView<>();
+	private final TextField searchBox = new TextField("Search...");
 	
 	FilterPanel(ColumnFilter<T> tableFilter) { 
 		this.columnFilter = tableFilter;
@@ -48,7 +52,13 @@ public final class FilterPanel<T> extends Pane {
 		listView.itemsProperty().get().setAll(columnFilter.getAllVals().stream()
 				.map(v -> new FilterItem(v)).collect(Collectors.toList()));
 		
-		this.getChildren().add(listView);
+		VBox vBox = new VBox();
+		vBox.paddingProperty().set(new Insets(3));
+		
+		vBox.getChildren().add(searchBox);
+		searchBox.paddingProperty().set(new Insets(0,0,2,0));
+		vBox.getChildren().add(listView);
+		this.getChildren().add(vBox);
 	}
 	
 	private static class FilterItem extends Pane { 

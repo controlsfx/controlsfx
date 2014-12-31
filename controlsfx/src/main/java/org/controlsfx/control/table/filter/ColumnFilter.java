@@ -26,27 +26,37 @@
  */
 package org.controlsfx.control.table.filter;
 
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 
 final class ColumnFilter<T> {
-	private final TableView<T> tableView;
+	private final TableFilter<T> tableFilter;
 	private final TableColumn<T,?> tableColumn;
 	
 	private final ObservableList<Object> allVals = FXCollections.observableArrayList();
 	private final ObservableList<Object> selectedVals = FXCollections.observableArrayList();
 	
 	private final ListChangeListener<T> listListener = c -> rebuildAllVals();
+	private final ObservableList<ListChangeListener<Object>> selectionChangeListeners = FXCollections.observableArrayList();
 	
-	private ColumnFilter(TableView<T> tableView, TableColumn<T,?> tableColumn) { 
-		this.tableView = tableView;
+	private ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
+		this.tableFilter = tableFilter;
 		this.tableColumn = tableColumn;
+		
+		tableFilter.getTableView().itemsProperty().get().addListener(new ListChangeListener<Object>() {
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends Object> c) {
+				rebuildAllVals();
+			} 
+		});
 	}
 	
 	public ObservableList<Object> getAllVals() { 
@@ -63,6 +73,9 @@ final class ColumnFilter<T> {
 	}
 	public TableColumn<T,?> getTableColumn() { 
 		return tableColumn;
+	}
+	public TableFilter<T> getTableFilter() { 
+		return tableFilter;
 	}
 	
 	public boolean selectVal(Object selectedVal) { 
@@ -82,15 +95,20 @@ final class ColumnFilter<T> {
 			return false;
 		}
 	}
-	
+
 	private void rebuildAllVals() { 
+		List<Object> unselectedVals = allVals.stream().filter(v -> selectedVals.contains(v) == false).collect(Collectors.toList());
+		
 		allVals.clear();
-		tableView.itemsProperty().get().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
+		tableFilter.getTableView().itemsProperty().get().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
 		.forEach(val -> allVals.add(val));
+		selectedVals.setAll(allVals);
+		
+		selectedVals.removeAll(unselectedVals);
 	}
 	
 	private void connectListener() { 
-		tableView.itemsProperty().get().addListener(listListener);
+		tableFilter.getTableView().itemsProperty().get().addListener(listListener);
 	}
 	private void initializeData() { 
 		rebuildAllVals();
@@ -101,8 +119,8 @@ final class ColumnFilter<T> {
 		contextMenu.getItems().add(FilterPanel.getInMenuItem(this));
 		tableColumn.setContextMenu(contextMenu);
 	}
-	static <T> ColumnFilter<T> getInstance(TableView<T> tableView, TableColumn<T,?> tableColumn) { 
-		final ColumnFilter<T> columnFilter = new ColumnFilter<T>(tableView, tableColumn);
+	static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
+		final ColumnFilter<T> columnFilter = new ColumnFilter<T>(tableFilter, tableColumn);
 		
 		columnFilter.connectListener();
 		columnFilter.initializeData();

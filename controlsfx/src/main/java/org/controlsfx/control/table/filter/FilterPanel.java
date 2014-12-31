@@ -28,9 +28,9 @@ package org.controlsfx.control.table.filter;
 
 import java.util.stream.Collectors;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CustomMenuItem;
@@ -52,8 +52,15 @@ public final class FilterPanel<T> extends Pane {
 	FilterPanel(ColumnFilter<T> tableFilter) { 
 		this.columnFilter = tableFilter;
 		
-		listView.itemsProperty().get().setAll(columnFilter.getAllVals().stream()
-				.map(v -> new FilterItem<T>(v, columnFilter)).collect(Collectors.toList()));
+		buildCheckList();
+		
+		columnFilter.getSelectedVals().addListener(new ListChangeListener<Object>() {
+			@Override
+			public void onChanged(
+					javafx.collections.ListChangeListener.Change<? extends Object> c) {
+				buildCheckList();
+			} 
+		});
 		
 		VBox vBox = new VBox();
 		vBox.setPadding(new Insets(3));
@@ -63,7 +70,10 @@ public final class FilterPanel<T> extends Pane {
 		vBox.getChildren().add(listView);
 		this.getChildren().add(vBox);
 	}
-	
+	private void buildCheckList() { 
+		listView.itemsProperty().get().setAll(columnFilter.getAllVals().stream()
+				.map(v -> new FilterItem<T>(v, columnFilter)).collect(Collectors.toList()));
+	}
 	private static class FilterItem<T> extends Pane { 
 		private final CheckBox checkBox = new CheckBox();
 		private final Label label = new Label();
@@ -95,9 +105,11 @@ public final class FilterPanel<T> extends Pane {
 			    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 			       if (oldValue.equals(Boolean.TRUE) && newValue.equals(Boolean.FALSE)) { 
 			    	   columnFilter.getSelectedVals().remove(value);
+			    	   columnFilter.getTableFilter().executeFilter();
 			       }
 			       else if (oldValue.equals(Boolean.FALSE) && newValue.equals(Boolean.TRUE)) { 
 			    	   columnFilter.getSelectedVals().add(value);
+			    	   columnFilter.getTableFilter().executeFilter();
 			       }
 			    }
 			});

@@ -77,11 +77,13 @@ public final class TableFilter<T> {
 	}
 	
 	private void applyForAllColumns() { 
-		columnFilters.setAll(tableView.getColumns().stream()
-				.map(c -> ColumnFilter.getInstance(tableView, c)).collect(Collectors.toList()));
+		columnFilters.setAll(this.tableView.getColumns().stream()
+				.map(c -> ColumnFilter.getInstance(this, c)).collect(Collectors.toList()));
 	}
 	public void executeFilter() { 
-		
+		TableColumn<T,?> column = tableView.getColumns().get(tableView.getColumns().size() -1);
+		tableView.getColumns().remove(column);
+		tableView.getColumns().add(column);
 		
 		//FilteredList<T> filteredList = new FilteredList<T>();
 		

@@ -100,8 +100,6 @@ final class ColumnFilter<T> {
 		final ListChangeListener<T> dataListener = c -> rebuildAllVals();
 		tableFilter.getTableView().itemsProperty().get().addListener(dataListener);
 		
-		final ListChangeListener<Object> selectedItemsListener = l -> rebuildAllVals();
-		tableFilter.getTableView().itemsProperty().get().addListener(selectedItemsListener);
 	}
 	private void initializeData() { 
 		rebuildAllVals();

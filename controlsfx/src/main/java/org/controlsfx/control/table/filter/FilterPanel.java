@@ -108,11 +108,9 @@ public final class FilterPanel<T> extends Pane {
 			    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 			       if (oldValue.equals(Boolean.TRUE) && newValue.equals(Boolean.FALSE)) { 
 			    	   filterPanel.columnFilter.getSelectedVals().remove(value);
-			    	   filterPanel.columnFilter.getTableFilter().executeFilter();
 			       }
 			       else if (oldValue.equals(Boolean.FALSE) && newValue.equals(Boolean.TRUE)) { 
 			    	   filterPanel.columnFilter.getSelectedVals().add(value);
-			    	   filterPanel.columnFilter.getTableFilter().executeFilter();
 			       }
 			    }
 			});

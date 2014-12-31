@@ -43,20 +43,9 @@ final class ColumnFilter<T> {
 	private final ObservableList<Object> allVals = FXCollections.observableArrayList();
 	private final ObservableList<Object> selectedVals = FXCollections.observableArrayList();
 	
-	private final ListChangeListener<T> listListener = c -> rebuildAllVals();
-	private final ObservableList<ListChangeListener<Object>> selectionChangeListeners = FXCollections.observableArrayList();
-	
 	private ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
 		this.tableFilter = tableFilter;
 		this.tableColumn = tableColumn;
-		
-		tableFilter.getTableView().itemsProperty().get().addListener(new ListChangeListener<Object>() {
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends Object> c) {
-				rebuildAllVals();
-			} 
-		});
 	}
 	
 	public ObservableList<Object> getAllVals() { 
@@ -97,7 +86,7 @@ final class ColumnFilter<T> {
 	}
 
 	private void rebuildAllVals() { 
-		List<Object> unselectedVals = allVals.stream().filter(v -> selectedVals.contains(v) == false).collect(Collectors.toList());
+		final List<Object> unselectedVals = allVals.stream().filter(v -> selectedVals.contains(v) == false).collect(Collectors.toList());
 		
 		allVals.clear();
 		tableFilter.getTableView().itemsProperty().get().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
@@ -107,8 +96,12 @@ final class ColumnFilter<T> {
 		selectedVals.removeAll(unselectedVals);
 	}
 	
-	private void connectListener() { 
-		tableFilter.getTableView().itemsProperty().get().addListener(listListener);
+	private void connectListeners() { 
+		final ListChangeListener<T> dataListener = c -> rebuildAllVals();
+		tableFilter.getTableView().itemsProperty().get().addListener(dataListener);
+		
+		final ListChangeListener<Object> selectedItemsListener = l -> rebuildAllVals();
+		tableFilter.getTableView().itemsProperty().get().addListener(selectedItemsListener);
 	}
 	private void initializeData() { 
 		rebuildAllVals();
@@ -122,9 +115,10 @@ final class ColumnFilter<T> {
 	static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
 		final ColumnFilter<T> columnFilter = new ColumnFilter<T>(tableFilter, tableColumn);
 		
-		columnFilter.connectListener();
 		columnFilter.initializeData();
+		columnFilter.connectListeners();
 		columnFilter.attachContextMenu();
+		
 		return columnFilter;
 	}
 }

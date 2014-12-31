@@ -28,19 +28,27 @@ package org.controlsfx.control.table.filter;
 
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 
 
 public final class FilterPanel<T> extends Pane {
@@ -49,18 +57,10 @@ public final class FilterPanel<T> extends Pane {
 	private final ListView<FilterItem<T>> listView = new ListView<>();
 	private final TextField searchBox = new TextField("Search...");
 	
-	FilterPanel(ColumnFilter<T> tableFilter) { 
-		this.columnFilter = tableFilter;
+	FilterPanel(ColumnFilter<T> columnFilter) { 
+		this.columnFilter = columnFilter;
 		
 		buildCheckList();
-		
-		columnFilter.getSelectedVals().addListener(new ListChangeListener<Object>() {
-			@Override
-			public void onChanged(
-					javafx.collections.ListChangeListener.Change<? extends Object> c) {
-				buildCheckList();
-			} 
-		});
 		
 		VBox vBox = new VBox();
 		vBox.setPadding(new Insets(3));
@@ -72,16 +72,16 @@ public final class FilterPanel<T> extends Pane {
 	}
 	private void buildCheckList() { 
 		listView.itemsProperty().get().setAll(columnFilter.getAllVals().stream()
-				.map(v -> new FilterItem<T>(v, columnFilter)).collect(Collectors.toList()));
+				.map(v -> new FilterItem<T>(v, this)).collect(Collectors.toList()));
 	}
 	private static class FilterItem<T> extends Pane { 
 		private final CheckBox checkBox = new CheckBox();
 		private final Label label = new Label();
 		private final Object value;
-		private final ColumnFilter<?> columnFilter;
+		private final FilterPanel<?> filterPanel;
 		
-		FilterItem(Object value,  ColumnFilter<?> columnFilter) { 
-			this.columnFilter = columnFilter;
+		FilterItem(Object value,  FilterPanel<?> filterPanel) { 
+			this.filterPanel = filterPanel;
 			this.value = value;
 			
 			HBox hBox = new HBox();
@@ -92,7 +92,7 @@ public final class FilterPanel<T> extends Pane {
 			hBox.getChildren().add(label);
 			this.getChildren().add(hBox);
 			
-			checkBox.setSelected(columnFilter.getSelectedVals().contains(value));
+			checkBox.setSelected(filterPanel.columnFilter.getSelectedVals().contains(value));
 			
 			attachListeners();
 			
@@ -100,16 +100,19 @@ public final class FilterPanel<T> extends Pane {
 		
 		private void attachListeners() { 
 			
+			final ListChangeListener<Object> selectionListener = l -> filterPanel.buildCheckList();
+			filterPanel.columnFilter.getSelectedVals().addListener(selectionListener);
+			
 			checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			    @Override
 			    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 			       if (oldValue.equals(Boolean.TRUE) && newValue.equals(Boolean.FALSE)) { 
-			    	   columnFilter.getSelectedVals().remove(value);
-			    	   columnFilter.getTableFilter().executeFilter();
+			    	   filterPanel.columnFilter.getSelectedVals().remove(value);
+			    	   filterPanel.columnFilter.getTableFilter().executeFilter();
 			       }
 			       else if (oldValue.equals(Boolean.FALSE) && newValue.equals(Boolean.TRUE)) { 
-			    	   columnFilter.getSelectedVals().add(value);
-			    	   columnFilter.getTableFilter().executeFilter();
+			    	   filterPanel.columnFilter.getSelectedVals().add(value);
+			    	   filterPanel.columnFilter.getTableFilter().executeFilter();
 			       }
 			    }
 			});
@@ -119,6 +122,56 @@ public final class FilterPanel<T> extends Pane {
 	public static <T> MenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
 		CustomMenuItem menuItem = new CustomMenuItem();
 		menuItem.contentProperty().set(new FilterPanel<T>(columnFilter));
+		
+		columnFilter.getTableFilter().getTableView().skinProperty().addListener((w, o, n) -> {
+		    if (n instanceof TableViewSkin) {
+		        TableViewSkin<?> skin = (TableViewSkin<?>) n;
+		            checkChangeContextMenu(skin, columnFilter.getTableColumn());
+		    }
+		});
+		
 		return menuItem;
+	}
+	
+	/* Methods below helps will anchor the context menu under the column */
+	private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column) {
+	    NestedTableColumnHeader header = skin.getTableHeaderRow()
+	            .getRootHeader();
+	    header.getColumnHeaders().addListener((Observable obs) -> changeContextMenu(header,column));
+	    changeContextMenu(header, column);
+	}
+
+	private static void changeContextMenu(NestedTableColumnHeader header, TableColumn<?, ?> column) {
+	    TableColumnHeader headerSkin = scan(column, header);
+	    if (headerSkin != null) {
+	        headerSkin.setOnContextMenuRequested(ev -> {
+	            ContextMenu cMenu = column.getContextMenu();
+	            if (cMenu != null) {
+	                cMenu.show(headerSkin, Side.BOTTOM, 5, 5);
+	            }
+	            ev.consume();
+	        });
+	    }
+	}
+
+	private static TableColumnHeader scan(TableColumn<?, ?> search,
+	        TableColumnHeader header) {
+	    // firstly test that the parent isn't what we are looking for
+	    if (search.equals(header.getTableColumn())) {
+	        return header;
+	    }
+
+	    if (header instanceof NestedTableColumnHeader) {
+	        NestedTableColumnHeader parent = (NestedTableColumnHeader) header;
+	        for (int i = 0; i < parent.getColumnHeaders().size(); i++) {
+	            TableColumnHeader result = scan(search, parent
+	                    .getColumnHeaders().get(i));
+	            if (result != null) {
+	                return result;
+	            }
+	        }
+	    }
+
+	    return null;
 	}
 }

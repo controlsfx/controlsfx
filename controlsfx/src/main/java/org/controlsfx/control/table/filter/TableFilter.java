@@ -82,8 +82,7 @@ public final class TableFilter<T> {
 	}
 	public void executeFilter() { 
 		TableColumn<T,?> column = tableView.getColumns().get(tableView.getColumns().size() -1);
-		tableView.getColumns().remove(column);
-		tableView.getColumns().add(column);
+		
 		
 		//FilteredList<T> filteredList = new FilteredList<T>();
 		
@@ -102,4 +101,6 @@ public final class TableFilter<T> {
 	public Optional<ColumnFilter<T>> getColumnFilter(TableColumn<T,?> tableColumn) { 
 		return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
 	}
+	
+	
 }

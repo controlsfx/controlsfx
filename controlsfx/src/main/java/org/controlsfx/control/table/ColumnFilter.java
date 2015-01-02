@@ -57,13 +57,18 @@ final class ColumnFilter<T> {
         return selectedVals;
     }
     public boolean isSelected(T value) { 
-        return getPredicate().test(value);
+        final boolean result = getPredicate().test(value);
+        return result;
     }
     public TableColumn<T,?> getColumn() { 
         return tableColumn;
     }
     public Predicate<T> getPredicate() { 
-        return item -> selectedVals.contains(tableColumn.getCellObservableValue(item).getValue());
+        return item -> {
+            Object value = tableColumn.getCellObservableValue(item).getValue();
+            boolean result = selectedVals.contains(value);
+            return result;
+        };
     }
     public TableColumn<T,?> getTableColumn() { 
         return tableColumn;

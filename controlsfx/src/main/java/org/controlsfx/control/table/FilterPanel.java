@@ -35,7 +35,6 @@ import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -68,9 +67,8 @@ public final class FilterPanel<T> extends Pane {
         
         filterList = new FilteredList<Object>(new SortedList<Object>(columnFilter.getDistinctValues()), t -> true);
         checkListView.setItems(filterList);
+        checkListView.selectionModelProperty().get().selectAll();
         
-        checkListView.getSelectionModel().selectRange(0, checkListView.getItems().size() - 1);
-      
         vBox.getChildren().add(checkListView);
         
         Button applyBttn = new Button("APPLY");
@@ -116,8 +114,11 @@ public final class FilterPanel<T> extends Pane {
         }
     }
     private void initializeListeners() { 
-        searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> val.toString().contains(searchBox.getText())));
+        searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
         
+        final ListChangeListener<Object> selectionChangeListener = l ->  columnFilter.getSelectedDistinctValues().setAll(checkListView.getSelectionModel().getSelectedItems());
+        checkListView.getSelectionModel().getSelectedItems().addListener(selectionChangeListener);
+    
         columnFilter.getTableColumn().setOnEditCommit(e -> columnFilter.rebuildAllVals());
     }
     

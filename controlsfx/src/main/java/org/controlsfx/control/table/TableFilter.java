@@ -27,7 +27,6 @@
 package org.controlsfx.control.table;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
@@ -67,9 +66,6 @@ public final class TableFilter<T> {
     private void applyForAllColumns() { 
         columnFilters.setAll(this.tableView.getColumns().stream()
                 .map(c -> ColumnFilter.getInstance(this, c)).collect(Collectors.toList()));
-    }
-    public void resetSearchFilter() { 
-        this.filteredList.setPredicate(t -> true);
     }
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream().filter(f -> f.isSelected(v) == false)

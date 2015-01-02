@@ -66,13 +66,20 @@ public final class FilterPanel<T> extends Pane {
         vBox.getChildren().add(searchBox);
         searchBox.setPadding(new Insets(0,0,10,0)); 
         
-        filterList = new FilteredList<Object>(new SortedList<Object>(columnFilter.getDistinctValues()));
+        filterList = new FilteredList<Object>(new SortedList<Object>(columnFilter.getDistinctValues()), t -> true);
         checkListView.setItems(filterList);
         
+        checkListView.getSelectionModel().selectRange(0, checkListView.getItems().size() - 1);
+      
         vBox.getChildren().add(checkListView);
         
         Button applyBttn = new Button("APPLY");
-        applyBttn.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
+        
+        applyBttn.setOnAction(e -> { 
+            columnFilter.getTableFilter().executeFilter(); 
+            searchBox.clear(); 
+        });
+        
         vBox.getChildren().add(applyBttn);
         
         this.getChildren().add(vBox);
@@ -83,18 +90,9 @@ public final class FilterPanel<T> extends Pane {
     public static <T> FilterMenuItem<T> getInMenuItem(ColumnFilter<T> columnFilter) { 
         
         FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
-        
         FilterMenuItem<T> menuItem = new FilterMenuItem<T>(filterPanel);
         
-        ListChangeListener<Object> checkListListener = l -> columnFilter.getSelectedDistinctValues().setAll(filterPanel.checkListView.getSelectionModel().getSelectedItems());
-   
-        
-        filterPanel.checkListView.getSelectionModel().getSelectedItems().addListener(checkListListener);
         filterPanel.initializeListeners();
-        
-        columnFilter.getTableColumn().setOnEditCommit(e -> { 
-            columnFilter.rebuildAllVals(); 
-        });
         
         menuItem.contentProperty().set(filterPanel);
         
@@ -105,7 +103,7 @@ public final class FilterPanel<T> extends Pane {
             }
         });
         menuItem.setHideOnClick(false);
-      
+        
         return menuItem;
     }
     public static class FilterMenuItem<T> extends CustomMenuItem { 
@@ -119,6 +117,8 @@ public final class FilterPanel<T> extends Pane {
     }
     private void initializeListeners() { 
         searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> val.toString().contains(searchBox.getText())));
+        
+        columnFilter.getTableColumn().setOnEditCommit(e -> columnFilter.rebuildAllVals());
     }
     
     /* Methods below helps will anchor the context menu under the column */

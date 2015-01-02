@@ -94,7 +94,7 @@ final class ColumnFilter<T> {
         final List<Object> unselectedVals = allVals.stream().filter(v -> selectedVals.contains(v) == false).collect(Collectors.toList());
         
         allVals.clear();
-        tableFilter.getTableView().itemsProperty().get().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
+        tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
         .forEach(val -> allVals.add(val));
         selectedVals.setAll(allVals);
         
@@ -103,7 +103,7 @@ final class ColumnFilter<T> {
     
     private void connectListeners() { 
         final ListChangeListener<T> dataListener = c -> rebuildAllVals();
-        tableFilter.getTableView().itemsProperty().get().addListener(dataListener);
+        tableFilter.getBackingList().addListener(dataListener);
         tableColumn.onEditCommitProperty().addListener(e -> rebuildAllVals());
         
     }
@@ -115,6 +115,8 @@ final class ColumnFilter<T> {
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);
+        
+        contextMenu.setOnHiding(e -> item.getFilterPanel().resetSearchFilter());
     }
     static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
         final ColumnFilter<T> columnFilter = new ColumnFilter<T>(tableFilter, tableColumn);

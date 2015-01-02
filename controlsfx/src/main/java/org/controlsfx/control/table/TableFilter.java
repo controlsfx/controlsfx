@@ -44,10 +44,7 @@ public final class TableFilter<T> {
     private final FilteredList<T> filteredList;
     
     private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
-    
-    private final Predicate<T> filterPredicate = v -> columnFilters.stream().filter(f -> f.isSelected(v) == false)
-            .findAny().isPresent() == false;
-    
+ 
     private TableFilter(TableView<T> tableView) { 
         this.tableView = tableView;
         this.backingList = tableView.getItems();
@@ -60,6 +57,12 @@ public final class TableFilter<T> {
         tableFilter.applyForAllColumns();
         return tableFilter;
     }
+    public ObservableList<T> getBackingList() { 
+        return backingList;
+    }
+    public FilteredList<T> getFilteredList() { 
+        return filteredList;
+    }
     
     private void applyForAllColumns() { 
         columnFilters.setAll(this.tableView.getColumns().stream()
@@ -69,7 +72,8 @@ public final class TableFilter<T> {
         this.filteredList.setPredicate(t -> true);
     }
     public void executeFilter() { 
-        filteredList.setPredicate(filterPredicate);
+        filteredList.setPredicate(v -> columnFilters.stream().filter(f -> f.isSelected(v) == false)
+                .findAny().isPresent() == false);
     }
     public TableView<T> getTableView() { 
         return tableView;

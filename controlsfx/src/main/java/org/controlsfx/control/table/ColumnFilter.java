@@ -39,89 +39,89 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 
 final class ColumnFilter<T> {
-	private final TableFilter<T> tableFilter;
-	private final TableColumn<T,?> tableColumn;
-	
-	private final ObservableList<Object> allVals = FXCollections.observableArrayList();
-	private final ObservableList<Object> selectedVals = FXCollections.observableArrayList();
-	
-	private ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
-		this.tableFilter = tableFilter;
-		this.tableColumn = tableColumn;
-	}
-	
-	ObservableList<Object> getDistinctValues() { 
-		return allVals;
-	}
-	ObservableList<Object> getSelectedDistinctValues() { 
-		return selectedVals;
-	}
-	public boolean isSelected(T value) { 
-		return getPredicate().test(value);
-	}
-	public TableColumn<T,?> getColumn() { 
-		return tableColumn;
-	}
-	public Predicate<T> getPredicate() { 
-		return item -> selectedVals.contains(tableColumn.getCellObservableValue(item).getValue());
-	}
-	public TableColumn<T,?> getTableColumn() { 
-		return tableColumn;
-	}
-	public TableFilter<T> getTableFilter() { 
-		return tableFilter;
-	}
-	
-	public boolean selectVal(Object selectedVal) { 
-		if (! selectedVals.contains(selectedVal)) { 
-			selectedVals.add(selectedVal);
-			return true;
-		} else { 
-			return false;
-		}
-	}
-	
-	public boolean deselectVal(Object deselectedVal) { 
-		if (selectedVals.contains(deselectedVal)) { 
-			selectedVals.remove(deselectedVal);
-			return true;
-		} else { 
-			return false;
-		}
-	}
+    private final TableFilter<T> tableFilter;
+    private final TableColumn<T,?> tableColumn;
+    
+    private final ObservableList<Object> allVals = FXCollections.observableArrayList();
+    private final ObservableList<Object> selectedVals = FXCollections.observableArrayList();
+    
+    private ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
+        this.tableFilter = tableFilter;
+        this.tableColumn = tableColumn;
+    }
+    
+    ObservableList<Object> getDistinctValues() { 
+        return allVals;
+    }
+    ObservableList<Object> getSelectedDistinctValues() { 
+        return selectedVals;
+    }
+    public boolean isSelected(T value) { 
+        return getPredicate().test(value);
+    }
+    public TableColumn<T,?> getColumn() { 
+        return tableColumn;
+    }
+    public Predicate<T> getPredicate() { 
+        return item -> selectedVals.contains(tableColumn.getCellObservableValue(item).getValue());
+    }
+    public TableColumn<T,?> getTableColumn() { 
+        return tableColumn;
+    }
+    public TableFilter<T> getTableFilter() { 
+        return tableFilter;
+    }
+    
+    public boolean selectVal(Object selectedVal) { 
+        if (! selectedVals.contains(selectedVal)) { 
+            selectedVals.add(selectedVal);
+            return true;
+        } else { 
+            return false;
+        }
+    }
+    
+    public boolean deselectVal(Object deselectedVal) { 
+        if (selectedVals.contains(deselectedVal)) { 
+            selectedVals.remove(deselectedVal);
+            return true;
+        } else { 
+            return false;
+        }
+    }
 
-	public void rebuildAllVals() { 
-		final List<Object> unselectedVals = allVals.stream().filter(v -> selectedVals.contains(v) == false).collect(Collectors.toList());
-		
-		allVals.clear();
-		tableFilter.getTableView().itemsProperty().get().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
-		.forEach(val -> allVals.add(val));
-		selectedVals.setAll(allVals);
-		
-		selectedVals.removeAll(unselectedVals);
-	}
-	
-	private void connectListeners() { 
-		final ListChangeListener<T> dataListener = c -> rebuildAllVals();
-		tableFilter.getTableView().itemsProperty().get().addListener(dataListener);
-		tableColumn.onEditCommitProperty().addListener(e -> rebuildAllVals());
-		
-	}
-	private void initializeData() { 
-		rebuildAllVals();
-	}
-	private void attachContextMenu() { 
-		ContextMenu contextMenu = new ContextMenu();
-		contextMenu.getItems().add(FilterPanel.getInMenuItem(this));
-		tableColumn.setContextMenu(contextMenu);
-	}
-	static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
-		final ColumnFilter<T> columnFilter = new ColumnFilter<T>(tableFilter, tableColumn);
-		
-		columnFilter.initializeData();
-		columnFilter.connectListeners();
-		columnFilter.attachContextMenu();
-		
-		return columnFilter;
-	}
+    public void rebuildAllVals() { 
+        final List<Object> unselectedVals = allVals.stream().filter(v -> selectedVals.contains(v) == false).collect(Collectors.toList());
+        
+        allVals.clear();
+        tableFilter.getTableView().itemsProperty().get().stream().map(item -> tableColumn.getCellObservableValue(item).getValue()).distinct()
+        .forEach(val -> allVals.add(val));
+        selectedVals.setAll(allVals);
+        
+        selectedVals.removeAll(unselectedVals);
+    }
+    
+    private void connectListeners() { 
+        final ListChangeListener<T> dataListener = c -> rebuildAllVals();
+        tableFilter.getTableView().itemsProperty().get().addListener(dataListener);
+        tableColumn.onEditCommitProperty().addListener(e -> rebuildAllVals());
+        
+    }
+    private void initializeData() { 
+        rebuildAllVals();
+    }
+    private void attachContextMenu() { 
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(FilterPanel.getInMenuItem(this));
+        tableColumn.setContextMenu(contextMenu);
+    }
+    static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
+        final ColumnFilter<T> columnFilter = new ColumnFilter<T>(tableFilter, tableColumn);
+        
+        columnFilter.initializeData();
+        columnFilter.connectListeners();
+        columnFilter.attachContextMenu();
+        
+        return columnFilter;
+    }
 }

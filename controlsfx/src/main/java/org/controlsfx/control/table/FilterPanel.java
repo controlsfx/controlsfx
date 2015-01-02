@@ -50,101 +50,101 @@ import com.sun.javafx.scene.control.skin.TableViewSkin;
 
 
 public final class FilterPanel<T> extends Pane {
-	
-	private final ColumnFilter<T> columnFilter;
-	private final CheckListView<Object> checkListView = new CheckListView<>();
-	private final TextField searchBox = new TextField("Search...");
-	
-	FilterPanel(ColumnFilter<T> columnFilter) { 
-		this.columnFilter = columnFilter;
-		
-		VBox vBox = new VBox();
-		vBox.setPadding(new Insets(3));
-		
-		vBox.getChildren().add(searchBox);
-		searchBox.setPadding(new Insets(0,0,10,0));		
-		
-		vBox.getChildren().add(checkListView);
-		
-		Button applyBttn = new Button("APPLY");
-		applyBttn.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
-		vBox.getChildren().add(applyBttn);
-		
-		this.getChildren().add(vBox);
-	}
-	
-	private void buildCheckList() { 
-		checkListView.itemsProperty().get().clear();
-		checkListView.itemsProperty().get().addAll(columnFilter.getDistinctValues());
-	}
+    
+    private final ColumnFilter<T> columnFilter;
+    private final CheckListView<Object> checkListView = new CheckListView<>();
+    private final TextField searchBox = new TextField("Search...");
+    
+    FilterPanel(ColumnFilter<T> columnFilter) { 
+        this.columnFilter = columnFilter;
+        
+        VBox vBox = new VBox();
+        vBox.setPadding(new Insets(3));
+        
+        vBox.getChildren().add(searchBox);
+        searchBox.setPadding(new Insets(0,0,10,0));        
+        
+        vBox.getChildren().add(checkListView);
+        
+        Button applyBttn = new Button("APPLY");
+        applyBttn.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
+        vBox.getChildren().add(applyBttn);
+        
+        this.getChildren().add(vBox);
+    }
+    
+    private void buildCheckList() { 
+        checkListView.itemsProperty().get().clear();
+        checkListView.itemsProperty().get().addAll(columnFilter.getDistinctValues());
+    }
 
-	public static <T> MenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
-		CustomMenuItem menuItem = new CustomMenuItem();
-		FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
-		
-		filterPanel.buildCheckList();
-		
-		ListChangeListener<Object> checkListListener = l -> columnFilter.getSelectedDistinctValues().setAll(filterPanel.checkListView.getSelectionModel().getSelectedItems());
-		ListChangeListener<T> dataChangeListener = l -> filterPanel.buildCheckList();
-		
-		filterPanel.checkListView.getSelectionModel().getSelectedItems().addListener(checkListListener);
-		columnFilter.getTableFilter().getTableView().getItems().addListener(dataChangeListener);
-		columnFilter.getTableColumn().setOnEditCommit(e -> { 
-			columnFilter.rebuildAllVals(); 
-			filterPanel.buildCheckList();
-		});
-		
-		menuItem.contentProperty().set(filterPanel);
-		
-		columnFilter.getTableFilter().getTableView().skinProperty().addListener((w, o, n) -> {
-		    if (n instanceof TableViewSkin) {
-		        TableViewSkin<?> skin = (TableViewSkin<?>) n;
-		            checkChangeContextMenu(skin, columnFilter.getTableColumn());
-		    }
-		});
-		
-		return menuItem;
-	}
-	
-	/* Methods below helps will anchor the context menu under the column */
-	private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column) {
-	    NestedTableColumnHeader header = skin.getTableHeaderRow()
-	            .getRootHeader();
-	    header.getColumnHeaders().addListener((Observable obs) -> changeContextMenu(header,column));
-	    changeContextMenu(header, column);
-	}
+    public static <T> MenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
+        CustomMenuItem menuItem = new CustomMenuItem();
+        FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
+        
+        filterPanel.buildCheckList();
+        
+        ListChangeListener<Object> checkListListener = l -> columnFilter.getSelectedDistinctValues().setAll(filterPanel.checkListView.getSelectionModel().getSelectedItems());
+        ListChangeListener<T> dataChangeListener = l -> filterPanel.buildCheckList();
+        
+        filterPanel.checkListView.getSelectionModel().getSelectedItems().addListener(checkListListener);
+        columnFilter.getTableFilter().getTableView().getItems().addListener(dataChangeListener);
+        columnFilter.getTableColumn().setOnEditCommit(e -> { 
+            columnFilter.rebuildAllVals(); 
+            filterPanel.buildCheckList();
+        });
+        
+        menuItem.contentProperty().set(filterPanel);
+        
+        columnFilter.getTableFilter().getTableView().skinProperty().addListener((w, o, n) -> {
+            if (n instanceof TableViewSkin) {
+                TableViewSkin<?> skin = (TableViewSkin<?>) n;
+                    checkChangeContextMenu(skin, columnFilter.getTableColumn());
+            }
+        });
+        
+        return menuItem;
+    }
+    
+    /* Methods below helps will anchor the context menu under the column */
+    private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column) {
+        NestedTableColumnHeader header = skin.getTableHeaderRow()
+                .getRootHeader();
+        header.getColumnHeaders().addListener((Observable obs) -> changeContextMenu(header,column));
+        changeContextMenu(header, column);
+    }
 
-	private static void changeContextMenu(NestedTableColumnHeader header, TableColumn<?, ?> column) {
-	    TableColumnHeader headerSkin = scan(column, header);
-	    if (headerSkin != null) {
-	        headerSkin.setOnContextMenuRequested(ev -> {
-	            ContextMenu cMenu = column.getContextMenu();
-	            if (cMenu != null) {
-	                cMenu.show(headerSkin, Side.BOTTOM, 5, 5);
-	            }
-	            ev.consume();
-	        });
-	    }
-	}
+    private static void changeContextMenu(NestedTableColumnHeader header, TableColumn<?, ?> column) {
+        TableColumnHeader headerSkin = scan(column, header);
+        if (headerSkin != null) {
+            headerSkin.setOnContextMenuRequested(ev -> {
+                ContextMenu cMenu = column.getContextMenu();
+                if (cMenu != null) {
+                    cMenu.show(headerSkin, Side.BOTTOM, 5, 5);
+                }
+                ev.consume();
+            });
+        }
+    }
 
-	private static TableColumnHeader scan(TableColumn<?, ?> search,
-	        TableColumnHeader header) {
-	    // firstly test that the parent isn't what we are looking for
-	    if (search.equals(header.getTableColumn())) {
-	        return header;
-	    }
+    private static TableColumnHeader scan(TableColumn<?, ?> search,
+            TableColumnHeader header) {
+        // firstly test that the parent isn't what we are looking for
+        if (search.equals(header.getTableColumn())) {
+            return header;
+        }
 
-	    if (header instanceof NestedTableColumnHeader) {
-	        NestedTableColumnHeader parent = (NestedTableColumnHeader) header;
-	        for (int i = 0; i < parent.getColumnHeaders().size(); i++) {
-	            TableColumnHeader result = scan(search, parent
-	                    .getColumnHeaders().get(i));
-	            if (result != null) {
-	                return result;
-	            }
-	        }
-	    }
+        if (header instanceof NestedTableColumnHeader) {
+            NestedTableColumnHeader parent = (NestedTableColumnHeader) header;
+            for (int i = 0; i < parent.getColumnHeaders().size(); i++) {
+                TableColumnHeader result = scan(search, parent
+                        .getColumnHeaders().get(i));
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
 
-	    return null;
-	}
+        return null;
+    }
 }

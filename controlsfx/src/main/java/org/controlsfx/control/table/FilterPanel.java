@@ -28,7 +28,8 @@ package org.controlsfx.control.table;
 
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
-import javafx.event.EventHandler;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -37,8 +38,6 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
-import javafx.scene.input.InputEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -53,7 +52,9 @@ public final class FilterPanel<T> extends Pane {
     
     private final ColumnFilter<T> columnFilter;
     private final CheckListView<Object> checkListView = new CheckListView<>();
-    private final TextField searchBox = new TextField("Search...");
+    private final FilteredList<Object> filterList;
+    private static final String promptText = "Search...";
+    private final TextField searchBox = new TextField();
     
     FilterPanel(ColumnFilter<T> columnFilter) { 
         this.columnFilter = columnFilter;
@@ -61,8 +62,12 @@ public final class FilterPanel<T> extends Pane {
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(3));
         
+        searchBox.setPromptText(promptText);
         vBox.getChildren().add(searchBox);
-        searchBox.setPadding(new Insets(0,0,10,0));        
+        searchBox.setPadding(new Insets(0,0,10,0)); 
+        
+        filterList = new FilteredList<Object>(new SortedList<Object>(columnFilter.getDistinctValues()));
+        checkListView.setItems(filterList);
         
         vBox.getChildren().add(checkListView);
         
@@ -72,26 +77,23 @@ public final class FilterPanel<T> extends Pane {
         
         this.getChildren().add(vBox);
     }
-    
-    private void buildCheckList() { 
-        checkListView.itemsProperty().get().clear();
-        checkListView.itemsProperty().get().addAll(columnFilter.getDistinctValues());
+    public void resetSearchFilter() {
+        this.filterList.setPredicate(t -> true);
     }
-
-    public static <T> MenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
-        CustomMenuItem menuItem = new CustomMenuItem();
+    public static <T> FilterMenuItem<T> getInMenuItem(ColumnFilter<T> columnFilter) { 
+        
         FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
         
-        filterPanel.buildCheckList();
+        FilterMenuItem<T> menuItem = new FilterMenuItem<T>(filterPanel);
         
         ListChangeListener<Object> checkListListener = l -> columnFilter.getSelectedDistinctValues().setAll(filterPanel.checkListView.getSelectionModel().getSelectedItems());
-        ListChangeListener<T> dataChangeListener = l -> filterPanel.buildCheckList();
+   
         
         filterPanel.checkListView.getSelectionModel().getSelectedItems().addListener(checkListListener);
-        columnFilter.getTableFilter().getTableView().getItems().addListener(dataChangeListener);
+        filterPanel.initializeListeners();
+        
         columnFilter.getTableColumn().setOnEditCommit(e -> { 
             columnFilter.rebuildAllVals(); 
-            filterPanel.buildCheckList();
         });
         
         menuItem.contentProperty().set(filterPanel);
@@ -102,8 +104,21 @@ public final class FilterPanel<T> extends Pane {
                     checkChangeContextMenu(skin, columnFilter.getTableColumn());
             }
         });
-        
+        menuItem.setHideOnClick(false);
+      
         return menuItem;
+    }
+    public static class FilterMenuItem<T> extends CustomMenuItem { 
+        private final FilterPanel<T> filterPanel;
+        private FilterMenuItem(FilterPanel<T> filterPanel) { 
+            this.filterPanel = filterPanel;
+        }
+        public FilterPanel<T> getFilterPanel() {
+            return filterPanel;
+        }
+    }
+    private void initializeListeners() { 
+        searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> val.toString().contains(searchBox.getText())));
     }
     
     /* Methods below helps will anchor the context menu under the column */

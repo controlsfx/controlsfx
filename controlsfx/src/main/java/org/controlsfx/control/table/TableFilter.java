@@ -33,12 +33,14 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 public final class TableFilter<T> {
     
     private final TableView<T> tableView;
+    private final ObservableList<T> backingList;
     private final FilteredList<T> filteredList;
     
     private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
@@ -48,13 +50,14 @@ public final class TableFilter<T> {
     
     private TableFilter(TableView<T> tableView) { 
         this.tableView = tableView;
-        this.filteredList = new FilteredList<T>(tableView.getItems());
+        this.backingList = tableView.getItems();
+        this.filteredList = new FilteredList<T>(new SortedList<T>(backingList));
         this.filteredList.setPredicate(v -> true);
+        tableView.setItems(filteredList);
     }
     public static <B> TableFilter<B> forTable(TableView<B> tableView) { 
         TableFilter<B> tableFilter = new TableFilter<B>(tableView);
         tableFilter.applyForAllColumns();
-        tableFilter.setFilterList();
         return tableFilter;
     }
     
@@ -62,8 +65,8 @@ public final class TableFilter<T> {
         columnFilters.setAll(this.tableView.getColumns().stream()
                 .map(c -> ColumnFilter.getInstance(this, c)).collect(Collectors.toList()));
     }
-    private void setFilterList() { 
-        tableView.setItems(filteredList);
+    public void resetSearchFilter() { 
+        this.filteredList.setPredicate(t -> true);
     }
     public void executeFilter() { 
         filteredList.setPredicate(filterPredicate);

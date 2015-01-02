@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.swing.event.DocumentEvent.EventType;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
+
+import org.controlsfx.control.table.FilterPanel.FilterMenuItem;
 
 final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
@@ -111,8 +111,9 @@ final class ColumnFilter<T> {
         rebuildAllVals();
     }
     private void attachContextMenu() { 
+        FilterMenuItem<T> item = FilterPanel.getInMenuItem(this);
         ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(FilterPanel.getInMenuItem(this));
+        contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);
     }
     static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1433,9 +1433,7 @@ public class SpreadsheetView extends Control {
         } else if (keyEvent.getCode() == KeyCode.DELETE) {
             deleteSelectedCells();
             // We want to edit if the user is on a cell and typing
-        }else if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() || keyEvent.getCode()
-                .isKeypadKey()) && !keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
-            getCellsView().setEditWithKey(true);
+        }else if (!keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };

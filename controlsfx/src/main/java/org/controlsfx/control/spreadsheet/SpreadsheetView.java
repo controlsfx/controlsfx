@@ -1433,7 +1433,7 @@ public class SpreadsheetView extends Control {
         } else if (keyEvent.getCode() == KeyCode.DELETE) {
             deleteSelectedCells();
             // We want to edit if the user is on a cell and typing
-        }else if (!keyEvent.isShortcutDown() && !keyEvent.getCode().isArrowKey()) {
+        }else if (!keyEvent.isShortcutDown() && !keyEvent.isShiftDown() && !keyEvent.getCode().isArrowKey()) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };

@@ -57,7 +57,8 @@ public class DecorationPane extends StackPane {
     };
 
     public DecorationPane() {
-        // no-op
+        // Make DecorationPane transparent
+        setBackground(null);
     }
         
     public void setRoot(Node root) {

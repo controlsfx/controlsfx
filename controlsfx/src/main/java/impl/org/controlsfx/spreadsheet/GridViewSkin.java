@@ -796,7 +796,7 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                 }
             }
             // requestLayout() not responding immediately..
-            getFlow().layoutTotal();
+            getFlow().requestLayout();
         }
     };
 
@@ -830,8 +830,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         @Override
         public void onChanged(Change<? extends SpreadsheetColumn> c) {
             hBarValue.clear();
+            getFlow().requestLayout();
             // requestLayout() not responding immediately..
-            getFlow().layoutTotal();
+//            getFlow().layoutTotal();
         }
     };
 }

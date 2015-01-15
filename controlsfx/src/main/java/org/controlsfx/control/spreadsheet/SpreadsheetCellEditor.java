@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -529,7 +529,7 @@ public abstract class SpreadsheetCellEditor {
             attachEnterEscapeEventHandler();
 
             tf.requestFocus();
-            tf.end();
+            tf.selectAll();
         }
 
         /** {@inheritDoc} */
@@ -653,7 +653,7 @@ public abstract class SpreadsheetCellEditor {
             attachEnterEscapeEventHandler();
 
             tf.requestFocus();
-            tf.end();
+            tf.selectAll();
         }
 
         /** {@inheritDoc} */

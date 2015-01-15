@@ -39,7 +39,9 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BooleanSupplier;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -144,8 +146,8 @@ public class Wizard {
     private final Stack<WizardPane> pageHistory = new Stack<>(); 
     
     private Optional<WizardPane> currentPage = Optional.empty();
-    
-    private final ValidationSupport validationSupport = new ValidationSupport();
+
+    private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
     
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
@@ -196,7 +198,7 @@ public class Wizard {
      */
     public Wizard(Object owner, String title) {
     	
-        validationSupport.validationResultProperty().addListener( (o, ov, nv) -> validateActionState());
+        invalidProperty.addListener( (o, ov, nv) -> validateActionState());
         
         dialog = new Dialog<>();
         dialog.titleProperty().bind(this.titleProperty);
@@ -377,12 +379,42 @@ public class Wizard {
     }
     
     /**
-     * Returns an instance of {@link ValidationSupport}, which can be used for page validation
-     * @return {@link ValidationSupport} instance
+     * Sets the value of the property {@code invalid}.
+     * 
+     * @param invalid The new validation state
+     * @see {@link #invalidProperty()}
      */
-    public ValidationSupport getValidationSupport() {
-		return validationSupport;
-	}
+    public final void setInvalid(boolean invalid) {
+        invalidProperty.set(invalid);
+    }
+    
+    /**
+     * Gets the value of the property {@code invalid}.
+     * 
+     * @return The validation state
+     * @see {@link #invalidProperty()}
+     */
+    public final boolean isInvalid() {
+        return invalidProperty.get();
+    }
+    
+    /**
+     * Property for overriding the individual validation state of this {@link Wizard}.
+     * Setting {@code invalid} to true will disable the next/finish Button and the user
+     * will not be able to advance to the next page of the {@link Wizard}. Setting
+     * {@code invalid} to false will enable the next/finish Button. <br>
+     * <br>
+     * For example you can use the {@link ValidationSupport#invalidProperty()} of a
+     * page and bind it to the {@code invalid} property: <br>
+     * {@code
+     * wizard.invalidProperty().bind(page.validationSupport.invalidProperty());
+     * }
+     * 
+     * @return The validation state property
+     */
+    public final BooleanProperty invalidProperty() {
+        return invalidProperty;
+    }
     
     
     
@@ -463,7 +495,7 @@ public class Wizard {
         }
 
         validateButton( BUTTON_PREVIOUS, () -> pageHistory.isEmpty());
-        validateButton( BUTTON_NEXT,     () -> validationSupport.isInvalid());
+        validateButton( BUTTON_NEXT,     () -> invalidProperty.get());
 
     }
     

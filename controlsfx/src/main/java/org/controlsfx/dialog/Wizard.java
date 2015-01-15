@@ -258,6 +258,19 @@ public class Wizard {
      * Properties
      * 
      **************************************************************************/
+
+    // --- dialog
+    
+    /**
+     * @return The {@link Dialog} representing this {@link Wizard}. <br>
+     *         This is actually only for {@link Dialog} reading-purposes, e.g.
+     *         unit testing the {@link DialogPane} content. <br>
+     *         Be careful with changing the {@link Dialog}! This maybe interfere
+     *         with {@link Wizard} operations!
+     */
+    public Dialog<ButtonType> getDialog() {
+            return dialog;
+    }
     
     // --- title
     

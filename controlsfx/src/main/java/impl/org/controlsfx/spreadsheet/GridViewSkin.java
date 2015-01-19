@@ -779,11 +779,23 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         final double max = getFlow().getHorizontalBar().getMax();
         double newPos;
 
+        /**
+         * If the starting position of our column if inferior to the left egde
+         * (of tableView or fixed columns), then we need to scroll.
+         */
         if (start < pos + fixedColumnWidth && start >= 0 && start >= fixedColumnWidth) {
             newPos = start - fixedColumnWidth < 0 ? start : start - fixedColumnWidth;
-        } else {
+        //If the starting point is not visible on the right.    
+        } else if(start > pos + headerWidth){
             final double delta = start < 0 || end > headerWidth ? start - pos - fixedColumnWidth : 0;
             newPos = pos + delta > max ? max : pos + delta;
+        }else{
+            /**
+             * In all other cases, it means the cell is visible so no scroll
+             * needed, because otherwise we may end up with a continous scroll
+             * that always place the selected cell in the center of the screen.
+             */
+            return;
         }
 
         // FIXME we should add API in VirtualFlow so we don't end up going

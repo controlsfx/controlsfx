@@ -746,36 +746,42 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     
     @Override
     protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
-
         if (col == null || !col.isVisible()) {
             return;
         }
-
-        // work out where this column header is, and it's width (start -> end)
+        /**
+         * We modified this function so that we ensure that any selected cells
+         * will not be below a fixed column. Because when there's some fixed
+         * columns, the "left border" is not the table anymore, but the right
+         * side of the last fixed columns.
+         *
+         * Moreover, we need to re-compute the fixedColumnWidth because the
+         * layout of the rows hasn't been done yet and the value is not right.
+         * So we might end up below a fixedColumns.
+         */
+        
+        fixedColumnWidth = 0;
+        final double pos = getFlow().getHorizontalBar().getValue();
+        int index = getColumns().indexOf(col);
         double start = 0;// scrollX;
-        for (TableColumnBase<?, ?> c : getVisibleLeafColumns()) {
-            if (c.equals(col))
-                break;
-            start += c.getWidth();
-        }
 
-        /*****************************************************************
-         * MODIFIED : We modified this function so that we ensure that any
-         * selected cells will not be below a fixed column. Because when there's
-         * some fixed columns, the "left border" is not the table anymore, but
-         * the right side of the last fixed columns.
-         *****************************************************************/
+        for (int i = 0; i < index; ++i) {
+            SpreadsheetColumn column = spreadsheetView.getColumns().get(i);
+            if (column.isFixed()) {
+                fixedColumnWidth += column.getWidth();
+            }
+            start += column.getWidth();
+        }
 
         final double end = start + col.getWidth();
 
         // determine the visible width of the table
-        final double headerWidth = getSkinnable().getWidth() - snappedLeftInset() - snappedRightInset();
+        final double headerWidth = handle.getView().getWidth() - snappedLeftInset() - snappedRightInset() - verticalHeader.getVerticalHeaderWidth();
 
         // determine by how much we need to translate the table to ensure that
         // the start position of this column lines up with the left edge of the
         // tableview, and also that the columns don't become detached from the
         // right edge of the table
-        final double pos = getFlow().getHorizontalBar().getValue();
         final double max = getFlow().getHorizontalBar().getMax();
         double newPos;
 
@@ -785,24 +791,18 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          */
         if (start < pos + fixedColumnWidth && start >= 0 && start >= fixedColumnWidth) {
             newPos = start - fixedColumnWidth < 0 ? start : start - fixedColumnWidth;
+            getFlow().getHorizontalBar().setValue(newPos);
         //If the starting point is not visible on the right.    
         } else if(start > pos + headerWidth){
             final double delta = start < 0 || end > headerWidth ? start - pos - fixedColumnWidth : 0;
             newPos = pos + delta > max ? max : pos + delta;
-        }else{
-            /**
-             * In all other cases, it means the cell is visible so no scroll
-             * needed, because otherwise we may end up with a continous scroll
-             * that always place the selected cell in the center of the screen.
-             */
-            return;
+            getFlow().getHorizontalBar().setValue(newPos);
         }
-
-        // FIXME we should add API in VirtualFlow so we don't end up going
-        // direct to the hbar.
-        // actually shift the flow - this will result in the header moving
-        // as well
-        getFlow().getHorizontalBar().setValue(newPos);
+        /**
+         * In all other cases, it means the cell is visible so no scroll needed,
+         * because otherwise we may end up with a continous scroll that always
+         * place the selected cell in the center of the screen.
+         */
     }
 
     private void verticalScroll() {

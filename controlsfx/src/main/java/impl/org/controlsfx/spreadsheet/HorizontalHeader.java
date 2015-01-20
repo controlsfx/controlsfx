@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -101,6 +102,8 @@ public class HorizontalHeader extends TableHeaderRow {
                         TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
                         sm.clearSelection();
                         sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
+                        //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
+                        sm.getTableView().getFocusModel().focus(0, (TableColumn<ObservableList<SpreadsheetCell>, ?>) columnHeader.getTableColumn());
                     }
                 };
                 columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);

@@ -330,6 +330,9 @@ public class SpreadsheetViewSelectionModel extends
 
         final TablePosition<ObservableList<SpreadsheetCell>, ?> tp = new TablePosition<>(getTableView(), row,
                 column);
+        if (tp.getRow() < 0 || tp.getColumn() < 0) {
+            return;
+        }
         TablePosition<ObservableList<SpreadsheetCell>, ?> position;
         if ((position = isSelectedRange(row, column, tp.getColumn())) != null) {
             selectedCellsMap.remove(position);
@@ -565,11 +568,10 @@ public class SpreadsheetViewSelectionModel extends
      * @param col
      * @return
      */
-    @SuppressWarnings("unchecked")
     public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row,
             TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
 
-        if (column == null && row >= 0) {
+        if (col < 0 || row < 0) {
             return null;
         }
 

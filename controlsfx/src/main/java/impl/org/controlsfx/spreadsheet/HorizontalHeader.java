@@ -121,6 +121,21 @@ public class HorizontalHeader extends TableHeaderRow {
                 fixColumn(fixItem);
             }
             updateHighlightSelection();
+            /**
+             * Clicking on header select the whole column.
+             */
+            for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
+                EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
+                    if (mouseEvent.isPrimaryButtonDown()) {
+                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+                        sm.clearSelection();
+                        sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
+                        //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
+                        sm.getTableView().getFocusModel().focus(0, (TableColumn<ObservableList<SpreadsheetCell>, ?>) columnHeader.getTableColumn());
+                    }
+                };
+                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
+            }
         });
         
     }

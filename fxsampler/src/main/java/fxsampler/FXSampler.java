@@ -284,11 +284,6 @@ public class FXSampler extends Application {
         }
     }
     
-    /*==================================
-        Made this method protected to help
-        enable SubClassing, and loader Services
-        in the background.
-    */
     protected void changeSample() {
         if (selectedSample == null) {
             return;
@@ -432,11 +427,6 @@ public class FXSampler extends Application {
         return grid;
     }
 
-    /*==================================
-        These should be accessible to the End User
-        In the event they do not with to display,
-        there is not an Empty tab wasting away.
-    */
     public final TabPane getTabPane() {
         return tabPane;
     }

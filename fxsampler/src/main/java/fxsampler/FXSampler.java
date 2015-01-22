@@ -283,8 +283,13 @@ public class FXSampler extends Application {
             return ! treeItem.getChildren().isEmpty();
         }
     }
-
-    private void changeSample() {
+    
+    /*==================================
+        Made this method protected to help
+        enable SubClassing, and loader Services
+        in the background.
+    */
+    protected void changeSample() {
         if (selectedSample == null) {
             return;
         }
@@ -420,5 +425,43 @@ public class FXSampler extends Application {
         WelcomePage wPage = new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
         return wPage;
     }
+
+    
+    
+    public final GridPane getGrid() {
+        return grid;
+    }
+
+    /*==================================
+        These should be accessible to the End User
+        In the event they do not with to display,
+        there is not an Empty tab wasting away.
+    */
+    public final TabPane getTabPane() {
+        return tabPane;
+    }
+    // should never be null
+    public final Tab getWelcomeTab() {
+        return welcomeTab;
+    }
+
+    public final Tab getSampleTab() {
+        return sampleTab != null ? sampleTab : null;
+    }
+
+    public final Tab getJavaDocTab() {
+        return javaDocTab != null ? javaDocTab : null;
+    }
+
+    public final Tab getSourceTab() {
+        return sourceTab != null ? sourceTab : null;
+    }
+
+    public final Tab getCssTab() {
+        return cssTab != null ? cssTab : null;
+    }
+    
+    
 }
+
 

@@ -436,19 +436,19 @@ public class FXSampler extends Application {
     }
 
     public final Tab getSampleTab() {
-        return sampleTab != null ? sampleTab : null;
+        return sampleTab;
     }
 
     public final Tab getJavaDocTab() {
-        return javaDocTab != null ? javaDocTab : null;
+        return javaDocTab;
     }
 
     public final Tab getSourceTab() {
-        return sourceTab != null ? sourceTab : null;
+        return sourceTab;
     }
 
     public final Tab getCssTab() {
-        return cssTab != null ? cssTab : null;
+        return cssTab;
     }
     
     

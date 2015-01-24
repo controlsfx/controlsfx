@@ -37,6 +37,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -71,6 +72,7 @@ public final class FilterPanel<T> extends Pane {
         
         vBox.getChildren().add(checkListView);
         
+        HBox bttnBox = new HBox();
         Button applyBttn = new Button("APPLY");
         
         applyBttn.setOnAction(e -> { 
@@ -78,8 +80,18 @@ public final class FilterPanel<T> extends Pane {
             searchBox.clear(); 
         });
         
-        vBox.getChildren().add(applyBttn);
+        bttnBox.getChildren().add(applyBttn);
         
+        Button clearButton = new Button("CLEAR");
+        
+        clearButton.setOnAction(e -> { 
+            columnFilter.getTableFilter().getFilteredList().setPredicate(t -> true);
+            searchBox.clear(); 
+        });
+        
+        bttnBox.getChildren().add(clearButton);
+        
+        vBox.getChildren().add(bttnBox);
         this.getChildren().add(vBox);
     }
     public void resetSearchFilter() {

@@ -54,6 +54,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;

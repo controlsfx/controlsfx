@@ -55,6 +55,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -263,9 +264,12 @@ public class Wizard {
     
     /**
      * @return The {@link Dialog} representing this {@link Wizard}. <br>
-     *         This is actually only for {@link Dialog} reading-purposes, e.g.
+     *         This is actually for {@link Dialog} reading-purposes, e.g.
      *         unit testing the {@link DialogPane} content. <br>
-     *         Be careful with changing the {@link Dialog}! This maybe interfere
+     *         But you can also change the properties of the {@link Dialog} directly,
+     *         e.g. change the children of the contained {@link DialogPane} or
+     *         change the icon of the {@link Stage} of the {@link Wizard} etc.
+     *         But be careful with changing the {@link Dialog}! This maybe interfere
      *         with {@link Wizard} operations!
      */
     public Dialog<ButtonType> getDialog() {

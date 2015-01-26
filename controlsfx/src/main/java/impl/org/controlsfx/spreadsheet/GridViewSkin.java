@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,18 +65,29 @@ import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import com.sun.javafx.css.StyleManager;
+import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
+import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
+import javafx.beans.property.ObjectProperty;
+import javafx.event.EventHandler;
+import javafx.scene.control.ResizeFeaturesBase;
+import javafx.scene.control.TablePositionBase;
+import javafx.scene.control.TableSelectionModel;
+import javafx.scene.input.MouseEvent;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
  * contained within the SpreadsheetView. The skin for the SpreadsheetView itself
  * currently resides inside the SpreadsheetView constructor!
- * 
+ *
+ * We need to extends directly from TableViewSkinBase in order to work-around
+ * https://javafx-jira.kenai.com/browse/RT-34753 if we want to set a custom
+ * TableViewBehavior.
+ *
  */
-public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>> {
+public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>,ObservableList<SpreadsheetCell>,TableView<ObservableList<SpreadsheetCell>>,TableViewBehavior<ObservableList<SpreadsheetCell>>,TableRow<ObservableList<SpreadsheetCell>>,TableColumn<ObservableList<SpreadsheetCell>,?>> {
     
     static {
         // refer to ControlsFXControl for why this is necessary
@@ -199,7 +210,9 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
      * * CONSTRUCTOR * *
      **************************************************************************/
     public GridViewSkin(final SpreadsheetHandle handle) {
-        super(handle.getGridView());
+        super(handle.getGridView(), new GridViewBehavior(handle.getGridView()));
+        super.init(handle.getGridView());
+        
         this.handle = handle;
         this.spreadsheetView = handle.getView();
         gridCellEditor = new GridCellEditor(handle);
@@ -235,6 +248,61 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
         rowToLayout = initRowToLayoutBitSet();
         // Because fixedRow Listener is not reacting first time.
         computeFixedRowHeight();
+        
+        
+        EventHandler<MouseEvent> ml = (MouseEvent event) -> {
+            // RT-15127: cancel editing on scroll. This is a bit extreme
+            // (we are cancelling editing on touching the scrollbars).
+            // This can be improved at a later date.
+            if (tableView.getEditingCell() != null) {
+                tableView.edit(-1, null); 
+            }
+            
+            // This ensures that the table maintains the focus, even when the vbar
+            // and hbar controls inside the flow are clicked. Without this, the
+            // focus border will not be shown when the user interacts with the
+            // scrollbars, and more importantly, keyboard navigation won't be
+            // available to the user.
+            tableView.requestFocus();
+        };
+        
+        getFlow().getVerticalBar().addEventFilter(MouseEvent.MOUSE_PRESSED, ml);
+        getFlow().getHorizontalBar().addEventFilter(MouseEvent.MOUSE_PRESSED, ml);
+
+        // init the behavior 'closures'
+        TableViewBehavior<ObservableList<SpreadsheetCell>> behavior = getBehavior();
+        behavior.setOnFocusPreviousRow(new Runnable() {
+            @Override public void run() { onFocusPreviousCell(); }
+        });
+        behavior.setOnFocusNextRow(new Runnable() {
+            @Override public void run() { onFocusNextCell(); }
+        });
+        behavior.setOnMoveToFirstCell(new Runnable() {
+            @Override public void run() { onMoveToFirstCell(); }
+        });
+        behavior.setOnMoveToLastCell(new Runnable() {
+            @Override public void run() { onMoveToLastCell(); }
+        });
+        behavior.setOnScrollPageDown(new Callback<Boolean, Integer>() {
+            @Override public Integer call(Boolean isFocusDriven) { return onScrollPageDown(isFocusDriven); }
+        });
+        behavior.setOnScrollPageUp(new Callback<Boolean, Integer>() {
+            @Override public Integer call(Boolean isFocusDriven) { return onScrollPageUp(isFocusDriven); }
+        });
+        behavior.setOnSelectPreviousRow(new Runnable() {
+            @Override public void run() { onSelectPreviousCell(); }
+        });
+        behavior.setOnSelectNextRow(new Runnable() {
+            @Override public void run() { onSelectNextCell(); }
+        });
+        behavior.setOnSelectLeftCell(new Runnable() {
+            @Override public void run() { onSelectLeftCell(); }
+        });
+        behavior.setOnSelectRightCell(new Runnable() {
+            @Override public void run() { onSelectRightCell(); }
+        });
+
+        registerChangeListener(tableView.fixedCellSizeProperty(), "FIXED_CELL_SIZE");
     }
 
     /**
@@ -483,13 +551,21 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
                 
                 /**
                  * If the cell is spanning in column, we need to take the other
-                 * columns into account in the calculation of the with. So we
+                 * columns into account in the calculation of the width. So we
                  * compute the width needed by the cell and we substract the
                  * remaining columns width in order not to have a huge width for
                  * the considered column.
+                 *
+                 * Also if the cell considered is not in the column, then we can
+                 * directly continue because we don't want to take its width
+                 * into account for the current column.
                  */
                 SpreadsheetCell spc = gridRows.get(row).get(indexColumn);
-                if (spc.getColumnSpan() > 1 && spc.getColumn() == indexColumn) {
+                if(spc.getColumn() != indexColumn){
+                    getChildren().remove(cell);
+                    continue;
+                }
+                if (spc.getColumnSpan() > 1) {
                     for (int i = 1; i < spc.getColumnSpan(); ++i) {
                         width -= spreadsheetView.getColumns().get(indexColumn + i).getWidth();
                     }
@@ -670,51 +746,63 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
     
     @Override
     protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
-
         if (col == null || !col.isVisible()) {
             return;
         }
-
-        // work out where this column header is, and it's width (start -> end)
+        /**
+         * We modified this function so that we ensure that any selected cells
+         * will not be below a fixed column. Because when there's some fixed
+         * columns, the "left border" is not the table anymore, but the right
+         * side of the last fixed columns.
+         *
+         * Moreover, we need to re-compute the fixedColumnWidth because the
+         * layout of the rows hasn't been done yet and the value is not right.
+         * So we might end up below a fixedColumns.
+         */
+        
+        fixedColumnWidth = 0;
+        final double pos = getFlow().getHorizontalBar().getValue();
+        int index = getColumns().indexOf(col);
         double start = 0;// scrollX;
-        for (TableColumnBase<?, ?> c : getVisibleLeafColumns()) {
-            if (c.equals(col))
-                break;
-            start += c.getWidth();
-        }
 
-        /*****************************************************************
-         * MODIFIED : We modified this function so that we ensure that any
-         * selected cells will not be below a fixed column. Because when there's
-         * some fixed columns, the "left border" is not the table anymore, but
-         * the right side of the last fixed columns.
-         *****************************************************************/
+        for (int i = 0; i < index; ++i) {
+            SpreadsheetColumn column = spreadsheetView.getColumns().get(i);
+            if (column.isFixed()) {
+                fixedColumnWidth += column.getWidth();
+            }
+            start += column.getWidth();
+        }
 
         final double end = start + col.getWidth();
 
         // determine the visible width of the table
-        final double headerWidth = getSkinnable().getWidth() - snappedLeftInset() - snappedRightInset();
+        final double headerWidth = handle.getView().getWidth() - snappedLeftInset() - snappedRightInset() - verticalHeader.getVerticalHeaderWidth();
 
         // determine by how much we need to translate the table to ensure that
         // the start position of this column lines up with the left edge of the
         // tableview, and also that the columns don't become detached from the
         // right edge of the table
-        final double pos = getFlow().getHorizontalBar().getValue();
         final double max = getFlow().getHorizontalBar().getMax();
         double newPos;
 
+        /**
+         * If the starting position of our column if inferior to the left egde
+         * (of tableView or fixed columns), then we need to scroll.
+         */
         if (start < pos + fixedColumnWidth && start >= 0 && start >= fixedColumnWidth) {
             newPos = start - fixedColumnWidth < 0 ? start : start - fixedColumnWidth;
-        } else {
+            getFlow().getHorizontalBar().setValue(newPos);
+        //If the starting point is not visible on the right.    
+        } else if(start > pos + headerWidth){
             final double delta = start < 0 || end > headerWidth ? start - pos - fixedColumnWidth : 0;
             newPos = pos + delta > max ? max : pos + delta;
+            getFlow().getHorizontalBar().setValue(newPos);
         }
-
-        // FIXME we should add API in VirtualFlow so we don't end up going
-        // direct to the hbar.
-        // actually shift the flow - this will result in the header moving
-        // as well
-        getFlow().getHorizontalBar().setValue(newPos);
+        /**
+         * In all other cases, it means the cell is visible so no scroll needed,
+         * because otherwise we may end up with a continous scroll that always
+         * place the selected cell in the center of the screen.
+         */
     }
 
     private void verticalScroll() {
@@ -835,4 +923,98 @@ public class GridViewSkin extends TableViewSkin<ObservableList<SpreadsheetCell>>
 //            getFlow().layoutTotal();
         }
     };
+
+    @Override
+    protected TableSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
+        return getSkinnable().getSelectionModel();
+    }
+
+    @Override
+    protected TableFocusModel<ObservableList<SpreadsheetCell>, TableColumn<ObservableList<SpreadsheetCell>, ?>> getFocusModel() {
+        return getSkinnable().getFocusModel();
+    }
+
+    @Override
+    protected TablePositionBase<? extends TableColumn<ObservableList<SpreadsheetCell>, ?>> getFocusedCell() {
+        return getSkinnable().getFocusModel().getFocusedCell();
+    }
+
+    @Override
+    protected ObservableList<? extends TableColumn<ObservableList<SpreadsheetCell>, ?>> getVisibleLeafColumns() {
+        return getSkinnable().getVisibleLeafColumns();
+    }
+
+    @Override
+    protected int getVisibleLeafIndex(TableColumn<ObservableList<SpreadsheetCell>, ?> tc) {
+        return getSkinnable().getVisibleLeafIndex(tc);
+    }
+
+    @Override
+    protected TableColumn<ObservableList<SpreadsheetCell>, ?> getVisibleLeafColumn(int col) {
+        return getSkinnable().getVisibleLeafColumn(col);
+    }
+
+    @Override
+    protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getColumns() {
+        return getSkinnable().getColumns();
+    }
+
+    @Override
+    protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getSortOrder() {
+        return getSkinnable().getSortOrder();
+    }
+
+    @Override
+    protected ObjectProperty<ObservableList<ObservableList<SpreadsheetCell>>> itemsProperty() {
+        return getSkinnable().itemsProperty();
+    }
+
+    @Override
+    protected ObjectProperty<Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>> rowFactoryProperty() {
+        return getSkinnable().rowFactoryProperty();
+    }
+
+    @Override
+    protected ObjectProperty<Node> placeholderProperty() {
+        return getSkinnable().placeholderProperty();
+    }
+
+    @Override
+    protected BooleanProperty tableMenuButtonVisibleProperty() {
+        return getSkinnable().tableMenuButtonVisibleProperty();
+    }
+
+    @Override
+    protected ObjectProperty<Callback<ResizeFeaturesBase, Boolean>> columnResizePolicyProperty() {
+        return (ObjectProperty<Callback<ResizeFeaturesBase, Boolean>>) (Object)getSkinnable().columnResizePolicyProperty();
+    }
+
+    @Override
+    protected boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
+         return getSkinnable().resizeColumn(tc, delta);
+    }
+
+    @Override
+    protected void edit(int index, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
+        getSkinnable().edit(index, column);
+    }
+
+    @Override
+    public TableRow<ObservableList<SpreadsheetCell>> createCell() {
+        TableRow<ObservableList<SpreadsheetCell>> cell;
+
+        if (getSkinnable().getRowFactory() != null) {
+            cell = getSkinnable().getRowFactory().call(getSkinnable());
+        } else {
+            cell = new TableRow<>();
+        }
+
+        cell.updateTableView(getSkinnable());
+        return cell;
+    }
+
+    @Override
+    public int getItemCount() {
+        return getSkinnable().getItems() == null ? 0 : getSkinnable().getItems().size();
+    }
 }

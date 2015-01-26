@@ -1432,8 +1432,14 @@ public class SpreadsheetView extends Control {
             // We want to erase values when delete key is pressed.
         } else if (keyEvent.getCode() == KeyCode.DELETE) {
             deleteSelectedCells();
-            // We want to edit if the user is on a cell and typing
-        }else if (!keyEvent.isShortcutDown() && !keyEvent.isShiftDown() && !keyEvent.getCode().isArrowKey()) {
+            /**
+             * We want NOT to go in edition if we're pressing SHIFT and if we're
+             * using the navigation keys. But we still want the user to go in
+             * edition with SHIFT and some letters for example if he wants a
+             * capital letter.
+             */
+        }else if (keyEvent.getCode() != KeyCode.SHIFT && !keyEvent.isShortcutDown() 
+                && !keyEvent.getCode().isNavigationKey()) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };

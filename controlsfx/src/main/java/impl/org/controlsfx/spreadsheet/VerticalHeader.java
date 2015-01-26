@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -458,23 +458,19 @@ public class VerticalHeader extends StackPane {
         if (labelList.isEmpty() || labelList.size() <= rowNumber) {
             label = new Label();
             labelList.add(label);
-
-//            return label;
         } else {
             label = labelList.get(rowNumber);
         }
         // We want to select the whole row when clicking on a header.
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
-                try {
-                    TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
-                            .getSelectionModel();
-                    ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
-                    sm.clearSelection();
-                    sm.selectRange(row, columns.get(0),row,columns.get(columns.size()-1));
-                } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
-
-                }
+                TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
+                        .getSelectionModel();
+                ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
+                sm.clearSelection();
+                sm.selectRange(row, columns.get(0), row, columns.get(columns.size() - 1));
+                //And we want to have the focus on the first cell in order to be able to copy/paste between rows.
+                sm.getTableView().getFocusModel().focus(row, sm.getTableView().getColumns().get(0));
             }
         });
         return label;

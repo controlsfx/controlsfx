@@ -283,8 +283,8 @@ public class FXSampler extends Application {
             return ! treeItem.getChildren().isEmpty();
         }
     }
-
-    private void changeSample() {
+    
+    protected void changeSample() {
         if (selectedSample == null) {
             return;
         }
@@ -420,5 +420,38 @@ public class FXSampler extends Application {
         WelcomePage wPage = new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
         return wPage;
     }
+
+    
+    
+    public final GridPane getGrid() {
+        return grid;
+    }
+
+    public final TabPane getTabPane() {
+        return tabPane;
+    }
+    // should never be null
+    public final Tab getWelcomeTab() {
+        return welcomeTab;
+    }
+
+    public final Tab getSampleTab() {
+        return sampleTab;
+    }
+
+    public final Tab getJavaDocTab() {
+        return javaDocTab;
+    }
+
+    public final Tab getSourceTab() {
+        return sourceTab;
+    }
+
+    public final Tab getCssTab() {
+        return cssTab;
+    }
+    
+    
 }
+
 

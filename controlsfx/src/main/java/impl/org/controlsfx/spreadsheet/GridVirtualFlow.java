@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javafx.beans.Observable;
+import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -112,8 +113,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
        
         //We clip the rectangle selection with a rectangle, inception style.
         Rectangle rec = new Rectangle();
-        rec.widthProperty().bind(widthProperty().subtract(getVbar().widthProperty()));
-        rec.heightProperty().bind(heightProperty().subtract(getHbar().heightProperty()));
+        rec.widthProperty().bind(widthProperty().subtract(new When(getVbar().visibleProperty()).then(getVbar().widthProperty()).otherwise(0)));
+        rec.heightProperty().bind(heightProperty().subtract(new When(getHbar().visibleProperty()).then(getHbar().heightProperty()).otherwise(0)));
         gridViewSkin.rectangleSelection.setClip(rec);
         
         getChildren().add(gridViewSkin.rectangleSelection);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -157,7 +157,12 @@ public final class SpreadsheetColumn {
     /**
      * Fix this column to the left if possible, although it is recommended that
      * you call {@link #isColumnFixable()} before trying to fix a column.
-     * 
+     *
+     * If you want to fix several columns (because of a span for example), add
+     * all the columns directly in {@link SpreadsheetView#getFixedColumns() }.
+     * Always use {@link SpreadsheetView#areSpreadsheetColumnsFixable(java.util.List)
+     * } before.
+     *
      * @param fixed
      */
     public void setFixed(boolean fixed) {

@@ -124,10 +124,12 @@ import org.controlsfx.tools.Utils;
  * {@link #isRowFixable(int)} for the fixed rows. 
  * <br/>
  * 
- * If you want to fix several rows together, and they have a row span inside,
- * you can call {@link #areRowsFixable(java.util.List) } to verify if you can
- * fix them. Be sure to add them all in once otherwise the system will detect
- * that a span is going out of bounds and will throw an exception.
+ * If you want to fix several rows or columns together, and they have a span
+ * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
+ * }
+ * to verify if you can fix them. Be sure to add them all in once otherwise the
+ * system will detect that a span is going out of bounds and will throw an
+ * exception.
  *
  * Calling those methods prior
  * every move will ensure that no exception will be thrown.
@@ -684,6 +686,68 @@ public class SpreadsheetView extends Control {
                 ? getColumns().get(columnIndex).isColumnFixable() : null;
     }
 
+    /**
+     * Indicates whether a List of {@link SpreadsheetColumn} can be fixed or
+     * not.
+     *
+     * @param list
+     * @return true if the List of columns can be fixed together.
+     */
+    public boolean areSpreadsheetColumnsFixable(List<? extends SpreadsheetColumn> list) {
+        List<Integer> newList = new ArrayList<>();
+        for (SpreadsheetColumn column : list) {
+            if (column != null) {
+                newList.add(columns.indexOf(column));
+            }
+        }
+        return areColumnsFixable(newList);
+    }
+
+    /**
+     * This method is the same as {@link #areSpreadsheetColumnsFixable(java.util.List)
+     * } but is using a List of {@link SpreadsheetColumn} indexes.
+     *
+     * @param list
+     * @return true if the List of columns can be fixed together.
+     */
+    public boolean areColumnsFixable(List<? extends Integer> list) {
+        if (list == null || list.isEmpty() || !isFixingRowsAllowed()) {
+            return false;
+        }
+        final Grid grid = getGrid();
+        final int columnCount = grid.getColumnCount();
+        final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
+        for (Integer columnIndex : list) {
+            if (columnIndex == null || columnIndex < 0 || columnIndex > columnCount) {
+                return false;
+            }
+            //If this row is not fixable, we need to identify the maximum span
+            if (!isColumnFixable(columnIndex)) {
+                int maxSpan = 1;
+                SpreadsheetCell cell;
+                for (List<SpreadsheetCell> row : rows) {
+                    cell = row.get(columnIndex);
+                    //If the original column is not within this range, there is not need to look deeper.
+                    if (!list.contains(cell.getColumn())) {
+                        return false;
+                    }
+                    //We only want to consider the original cell.
+                    if (cell.getColumnSpan() > maxSpan && cell.getColumn() == columnIndex) {
+                        maxSpan = cell.getColumnSpan();
+                    }
+                }
+                //Then we need to verify that all columns within that span are fixed.
+                int count = columnIndex + maxSpan - 1;
+                for (int index = columnIndex + 1; index < count; ++index) {
+                    if (!list.contains(index)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
     /**
      * Return whether change to Fixed columns are allowed.
      *
@@ -1332,25 +1396,47 @@ public class SpreadsheetView extends Control {
             while (c.next()) {
                 if (c.wasAdded()) {
                     List<? extends SpreadsheetColumn> newColumns = c.getAddedSubList();
-                    for (SpreadsheetColumn column : newColumns) {
-                        if (!column.isColumnFixable()) {
-                            throw new IllegalArgumentException(computeReason(column));
+                    if (!areSpreadsheetColumnsFixable(newColumns)) {
+                        List<Integer> newList = new ArrayList<>();
+                        for (SpreadsheetColumn column : newColumns) {
+                            if (column != null) {
+                                newList.add(columns.indexOf(column));
+                            }
                         }
+                        throw new IllegalArgumentException(computeReason(newList));
                     }
                 }
             }
         }
 
-        private String computeReason(SpreadsheetColumn element) {
-            int indexColumn = getColumns().indexOf(element);
+        private String computeReason(List<Integer> list) {
 
             String reason = "\n This column cannot be fixed."; //$NON-NLS-1$
-            for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
-                int columnSpan = row.get(indexColumn).getColumnSpan();
-                if (columnSpan > 1 /*|| row.get(indexColumn).getRowSpan() > 1*/) {
-                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column " //$NON-NLS-1$ //$NON-NLS-2$
-                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1."; //$NON-NLS-1$
-                    return reason;
+            final ObservableList<ObservableList<SpreadsheetCell>> rows = getGrid().getRows();
+            for (Integer columnIndex : list) {
+                //If this row is not fixable, we need to identify the maximum span
+                if (!isColumnFixable(columnIndex)) {
+                    int maxSpan = 1;
+                    SpreadsheetCell cell;
+                    for (List<SpreadsheetCell> row : rows) {
+                        cell = row.get(columnIndex);
+                        //If the original column is not within this range, there is not need to look deeper.
+                        if (!list.contains(cell.getColumn())) {
+                            reason += "The column " + columnIndex + " is inside a column span and the starting column " + cell.getColumn() + " is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        }
+                        //We only want to consider the original cell.
+                        if (cell.getColumnSpan() > maxSpan && cell.getColumn() == columnIndex) {
+                            maxSpan = cell.getColumnSpan();
+                        }
+                    }
+                    //Then we need to verify that all columns within that span are fixed.
+                    int count = columnIndex + maxSpan - 1;
+                    for (int index = columnIndex + 1; index < count; ++index) {
+                        if (!list.contains(index)) {
+                            reason += "One cell on the column " + columnIndex + " has a column span of " + maxSpan + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                    + "But the column " + index + " contained within that span is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$
+                        }
+                    }
                 }
             }
             return reason;

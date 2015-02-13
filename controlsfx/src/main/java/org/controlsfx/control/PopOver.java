@@ -123,6 +123,18 @@ public class PopOver extends PopupControl {
         arrowLocation.addListener(repositionListener);
         arrowIndent.addListener(repositionListener);
 
+        /*
+         * A detached popover should of course not automatically hide
+         * itself.
+         */
+        detached.addListener(it -> {
+            if (isDetached()) {
+                setAutoHide(false);
+            } else {
+                setAutoHide(true);
+            }
+        });
+
         setAutoHide(true);
     }
 
@@ -363,7 +375,7 @@ public class PopOver extends PopupControl {
 
             /*
              * The user clicked somewhere into the transparent background. If
-             * this is the case the hide the window (when attached).
+             * this is the case then hide the window (when attached).
              */
             getScene().addEventHandler(MOUSE_CLICKED, mouseEvent -> {
                 if (mouseEvent.getTarget().equals(getScene().getRoot())) {
@@ -432,7 +444,8 @@ public class PopOver extends PopupControl {
             // Fade Out
             Node skinNode = getSkin().getNode();
 
-            FadeTransition fadeOut = new FadeTransition(fadeOutDuration, skinNode);
+            FadeTransition fadeOut = new FadeTransition(fadeOutDuration,
+                    skinNode);
             fadeOut.setFromValue(skinNode.getOpacity());
             fadeOut.setToValue(0);
             fadeOut.setOnFinished(evt -> super.hide());

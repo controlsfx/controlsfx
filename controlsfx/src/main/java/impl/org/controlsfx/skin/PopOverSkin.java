@@ -231,6 +231,10 @@ public class PopOverSkin implements Skin<PopOver> {
         stackPane.getChildren().add(path);
         stackPane.getChildren().add(content);
 
+        stackPane.heightProperty().addListener(it -> {
+            popOver.getScene().getWindow().sizeToScene();
+        });
+
         stackPane.setClip(clip);
     }
 

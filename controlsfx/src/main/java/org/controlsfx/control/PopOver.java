@@ -122,6 +122,8 @@ public class PopOver extends PopupControl {
         cornerRadius.addListener(repositionListener);
         arrowLocation.addListener(repositionListener);
         arrowIndent.addListener(repositionListener);
+
+        setAutoHide(true);
     }
 
     /**

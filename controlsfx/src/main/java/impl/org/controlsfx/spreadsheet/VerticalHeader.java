@@ -287,12 +287,12 @@ public class VerticalHeader extends StackPane {
                 }
                 if (spreadsheetView.isShowRowHeader()) {
                     label = getLabel(rowCount++, rowIndex);
-
+                    GridRow row = skin.getRowIndexed(rowIndex);
                     label.setText(getRowHeader(rowIndex));
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
-                    label.layoutYProperty().unbind();
-                    label.relocate(x, y);
+                    label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
+                    label.setLayoutX(x);
                     final ObservableList<String> css = label.getStyleClass();
                     if (skin.getSelectedRows().contains(rowIndex)) {
                         css.addAll("selected"); //$NON-NLS-1$
@@ -301,6 +301,15 @@ public class VerticalHeader extends StackPane {
                     }
                     css.addAll("fixed"); //$NON-NLS-1$
                     getChildren().add(label);
+                    // position drag overlay to intercept row resize requests if authorized by the grid.
+                    if (spreadsheetView.getGrid().isRowResizable(rowIndex)) {
+                        Rectangle dragRect = getDragRect(rowCount++);
+                        dragRect.getProperties().put(TABLE_ROW_KEY, row);
+                        dragRect.getProperties().put(TABLE_LABEL_KEY, label);
+                        dragRect.setWidth(label.getWidth());
+                        dragRect.relocate(snappedLeftInset() + x, y + rowHeight - DRAG_RECT_HEIGHT);
+                        getChildren().add(dragRect);
+                    }
                 }
                 spaceUsedByFixedRows += skin.getRowHeight(rowIndex);
 
@@ -376,13 +385,15 @@ public class VerticalHeader extends StackPane {
 
                 y += height;
 
-                // position drag overlay to intercept column resize requests
-                Rectangle dragRect = getDragRect(rowCount++);
-                dragRect.getProperties().put(TABLE_ROW_KEY, row);
-                dragRect.getProperties().put(TABLE_LABEL_KEY, label);
-                dragRect.setWidth(label.getWidth());
-                dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
-                getChildren().add(dragRect);
+                // position drag overlay to intercept row resize requests if authorized by the grid.
+                if (spreadsheetView.getGrid().isRowResizable(rowIndex)) {
+                    Rectangle dragRect = getDragRect(rowCount++);
+                    dragRect.getProperties().put(TABLE_ROW_KEY, row);
+                    dragRect.getProperties().put(TABLE_LABEL_KEY, label);
+                    dragRect.setWidth(label.getWidth());
+                    dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
+                    getChildren().add(dragRect);
+                }
             }
             row = skin.getRow(++i);
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -125,7 +125,13 @@ public interface Grid {
      * @return the height of a row.
      */
     public double getRowHeight(int row);
-    
+
+    /**
+     * Return true if the specified row is resizable.
+     * @param row
+     * @return true if the specified row is resizable.
+     */
+    public boolean isRowResizable(int row);
     
     /**
      * Returns an ObservableList of string to display in the row headers.

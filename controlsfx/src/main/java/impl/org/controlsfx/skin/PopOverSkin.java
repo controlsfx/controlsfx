@@ -29,6 +29,7 @@ package impl.org.controlsfx.skin;
 import static java.lang.Double.MAX_VALUE;
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
+import static javafx.scene.paint.Color.YELLOW;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_CENTER;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_LEFT;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_RIGHT;
@@ -59,7 +60,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.Line;
@@ -178,7 +178,12 @@ public class PopOverSkin implements Skin<PopOver> {
         path.setManaged(false);
 
         clip = new Path();
-        clip.setFill(Color.YELLOW);
+
+        /*
+         * The clip is a path and the path has to be filled with a color.
+         * Otherwise clipping will not work.
+         */
+        clip.setFill(YELLOW);
 
         createPathElements();
         updatePath();

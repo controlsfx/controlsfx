@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.EventHandler;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -91,15 +92,22 @@ public class RectangleSelection extends Rectangle {
         if (sm.getSelectedCells().isEmpty()
                 || skin.getSelectedRows().isEmpty()
                 || skin.getSelectedColumns().isEmpty()
-                || selectionRange.range == null
-                || skin.getFlow().getTopRow() == null) {
+                || selectionRange.range == null) {
             setVisible(false);
             return;
         }
 
+        IndexedCell topRowCell = skin.getFlow().getTopRow();
+        if(topRowCell == null){
+            return;
+        }
         //We fetch the first and last row currently displayed
-        int topRow = skin.getFlow().getTopRow().getIndex();
-        int bottomRow = skin.getFlow().getCells().get(skin.getFlow().getCells().size() - 1).getIndex();
+        int topRow = topRowCell.getIndex();
+        IndexedCell bottomRowCell = skin.getFlow().getCells().get(skin.getFlow().getCells().size() - 1);
+        if(bottomRowCell == null){
+            return;
+        }
+        int bottomRow = bottomRowCell.getIndex();
 
         int minRow = selectionRange.range.getTop();
         if (minRow > bottomRow) {

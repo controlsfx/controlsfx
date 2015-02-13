@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -345,6 +345,9 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
         removeUselessCell();
+        if(handle.getCellsViewSkin().lastRowLayout.get() == true){
+            handle.getCellsViewSkin().lastRowLayout.setValue(false);
+        }
     }
 
     /**

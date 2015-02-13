@@ -71,6 +71,7 @@ import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.scene.control.ResizeFeaturesBase;
 import javafx.scene.control.TablePositionBase;
@@ -206,6 +207,14 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     double fixedColumnWidth;
     
+    /**
+     * When we try to select cells after a setGrid, we end up with the cell
+     * selected but no visual confirmation. In order to prevent that, we need to
+     * warn the selectionModel when the layout is starting and then the
+     * selectionModel will do the appropriate actions in order to force the
+     * visual to come.
+     */
+    BooleanProperty lastRowLayout = new SimpleBooleanProperty(true);
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/

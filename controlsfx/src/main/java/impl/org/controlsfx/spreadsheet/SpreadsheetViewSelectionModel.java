@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,9 @@ import java.util.HashSet;
 import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
 import javafx.beans.NamedArg;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
@@ -58,7 +60,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  * The Selection Model adapted for the SpreadsheetView regarding span.
  */
 public class SpreadsheetViewSelectionModel extends
-        TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
+        TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>>{
 
     private boolean shift = false; // Register state of 'shift' key
     private boolean key = false; // Register if we last touch the keyboard
@@ -361,7 +363,7 @@ public class SpreadsheetViewSelectionModel extends
      */
     public void verifySelectedCells(List<Pair<Integer, Integer>> selectedCells) {
         List<TablePosition<ObservableList<SpreadsheetCell>, ?>> newList = new ArrayList<>();
-        quietClearSelection();
+        clearSelection();
 
         final int itemCount = getItemCount();
         final int columnSize = getTableView().getColumns().size();
@@ -375,10 +377,10 @@ public class SpreadsheetViewSelectionModel extends
                     || position.getValue() > columnSize) {
                 continue;
             }
+            
             final TableColumn<ObservableList<SpreadsheetCell>, ?> column = getTableView().getVisibleLeafColumn(position.getValue());
 
             pos = getVisibleCell(position.getKey(), column, position.getValue());
-
             // We store all the selectedColumn and Rows, we will update
             // just once at the end
             final SpreadsheetCell cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
@@ -399,9 +401,22 @@ public class SpreadsheetViewSelectionModel extends
             skin.getSelectedColumns().addAll(selectedRows);
         }
 
-        if (pos != null) {
-            select(pos.getRow(), pos.getTableColumn());
-            getTableView().getFocusModel().focus(pos.getRow(), pos.getTableColumn());
+        /**
+         * If we made some selection, we need to force the visual selected
+         * confirmation to come when the layout is starting. Doing it before
+         * will result in a selected cell with no css applied to it.
+         */
+        if (pos != null && getCellsViewSkin() != null) {
+            getCellsViewSkin().lastRowLayout.set(true);
+            getCellsViewSkin().lastRowLayout.addListener(new InvalidationListener() {
+
+                @Override
+                public void invalidated(Observable observable) {
+                    handleSelectedCellsListChangeEvent(new NonIterableChange.SimpleAddChange<>(0,
+                            selectedCellsMap.size(), selectedCellsSeq));
+                    getCellsViewSkin().lastRowLayout.removeListener(this);
+                }
+            });
         }
     }
 
@@ -825,5 +840,6 @@ public class SpreadsheetViewSelectionModel extends
     private int getTableColumnSpanInt(final TablePosition<?, ?> t) {
         return t.getColumn() + cellsView.getItems().get(t.getRow()).get(t.getColumn()).getColumnSpan();
     }
+
 
 }

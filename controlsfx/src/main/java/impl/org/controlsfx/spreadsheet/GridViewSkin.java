@@ -73,6 +73,7 @@ import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ResizeFeaturesBase;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableSelectionModel;
@@ -355,9 +356,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public GridRow getRowIndexed(int index) {
-        for (GridRow obj : (List<GridRow>) getFlow().getCells()) {
-            if (obj.getIndex() == index) {
-                return obj;
+        List<? extends IndexedCell> cells = getFlow().getCells();
+        if (!cells.isEmpty()) {
+            IndexedCell cell = cells.get(0);
+            if (index >= cell.getIndex() && index - cell.getIndex() < cells.size()) {
+                return (GridRow) cells.get(index - cell.getIndex());
+            }
+        }
+        for (IndexedCell cell : getFlow().getFixedCells()) {
+            if (cell.getIndex() == index) {
+                return (GridRow) cell;
             }
         }
         return null;

@@ -291,7 +291,9 @@ public class VerticalHeader extends StackPane {
                     label.setText(getRowHeader(rowIndex));
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
-                    label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
+                    if(row != null){
+                        label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight).add(row.verticalShift.get()));
+                    }
                     label.setLayoutX(x);
                     final ObservableList<String> css = label.getStyleClass();
                     if (skin.getSelectedRows().contains(rowIndex)) {
@@ -421,7 +423,9 @@ public class VerticalHeader extends StackPane {
             Rectangle rect = (Rectangle) me.getSource();
             GridRow row = (GridRow) rect.getProperties().get(TABLE_ROW_KEY);
             Label label = (Label) rect.getProperties().get(TABLE_LABEL_KEY);
-            rowResizing(row, label, me);
+            if (row != null) {
+                rowResizing(row, label, me);
+            }
             me.consume();
         }
     };

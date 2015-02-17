@@ -56,7 +56,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * <br/>
      *
      * The only problem is for the fixed column but the {@link #getTopRow(int) }
-     * now returns the very first row and allow us to put some priviledge
+     * now returns the very first row and allow us to put some privileged
      * TableCell in it if they feel the need to be on top in term of z-order.
      *
      * FIXME The best would be to put a TreeList of something like that in order
@@ -166,6 +166,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         return returnValue;
     }
     
+    List<T> getFixedCells(){
+        return myFixedCells;
+    }
     /***************************************************************************
      * * Protected Methods * *
      **************************************************************************/

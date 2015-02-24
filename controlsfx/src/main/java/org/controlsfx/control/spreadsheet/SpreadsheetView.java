@@ -31,6 +31,8 @@ import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import impl.org.controlsfx.spreadsheet.RectangleSelection.GridRange;
+import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.SpreadsheetViewSelectionModel;
@@ -721,7 +723,7 @@ public class SpreadsheetView extends Control {
             if (columnIndex == null || columnIndex < 0 || columnIndex > columnCount) {
                 return false;
             }
-            //If this row is not fixable, we need to identify the maximum span
+            //If this column is not fixable, we need to identify the maximum span
             if (!isColumnFixable(columnIndex)) {
                 int maxSpan = 1;
                 SpreadsheetCell cell;
@@ -1005,6 +1007,141 @@ public class SpreadsheetView extends Control {
     }
 
     /**
+     * Paste one value from the clipboard over the whole selection.
+     * @param change 
+     */
+    private void pasteOneValue(GridChange change) {
+        for (TablePosition position : getSelectionModel().getSelectedCells()) {
+            tryPasteCell(position.getRow(), position.getColumn(), change.getNewValue());
+        }
+    }
+
+    /**
+     * Try to paste the given value into the given position.
+     * @param row
+     * @param column
+     * @param value 
+     */
+    private void tryPasteCell(int row, int column, Object value) {
+        final SpanType type = getSpanType(row, column);
+        if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
+            SpreadsheetCell cell = getGrid().getRows().get(row).get(column);
+            boolean succeed = cell.getCellType().match(value);
+            if (succeed) {
+                getGrid().setCellValue(cell.getRow(), cell.getColumn(),
+                        cell.getCellType().convertValue(value));
+            }
+        }
+    }
+
+    /**
+     * Try to paste the values given into the selection. If both selection are
+     * rectangles and the number of rows of the source is equal of the numbers
+     * of rows of the target AND number of columns of the target is a multiple
+     * of the number of columns of the source, then we can paste.
+     *
+     * Same goes if we invert the rows and columns.
+     * @param list
+     */
+    private void pasteMixedValues(ArrayList<GridChange> list) {
+        SelectionRange sourceSelectionRange = new SelectionRange();
+        sourceSelectionRange.fillGridRange(list);
+
+        //It means we have a rectangle.
+        if (sourceSelectionRange.getRange() != null) {
+            SelectionRange targetSelectionRange = new SelectionRange();
+            targetSelectionRange.fill(cellsView.getSelectionModel().getSelectedCells());
+            if (targetSelectionRange.getRange() != null) {
+                //If both selection are rectangle
+                GridRange sourceRange = sourceSelectionRange.getRange();
+                GridRange targetRange = targetSelectionRange.getRange();
+                int sourceRowGap = sourceRange.getBottom() - sourceRange.getTop() + 1;
+                int targetRowGap = targetRange.getBottom() - targetRange.getTop() + 1;
+
+                int sourceColumnGap = sourceRange.getRight() - sourceRange.getLeft() + 1;
+                int targetColumnGap = targetRange.getRight() - targetRange.getLeft() + 1;
+
+                final int offsetRow = targetRange.getTop() - sourceRange.getTop();
+                final int offsetCol = targetRange.getLeft() - sourceRange.getLeft();
+
+                //If the numbers of rows are the same and the targetColumnGap is a multiple of sourceColumnGap
+                if (sourceRowGap == targetRowGap && (targetColumnGap % sourceColumnGap) == 0) {
+                    for (final GridChange change : list) {
+                        int row = change.getRow() + offsetRow;
+                        int column = change.getColumn() + offsetCol;
+                        do {
+                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                                    && row >= 0 && column >= 0) {
+                                tryPasteCell(row, column, change.getNewValue());
+                            }
+                        } while ((column = column + sourceColumnGap) <= targetRange.getRight());
+                    }
+                    //If the numbers of columns are the same and the targetRowGap is a multiple of sourceRowGap
+                } else if (sourceColumnGap == targetColumnGap && (targetRowGap % sourceRowGap) == 0) {
+                    for (final GridChange change : list) {
+
+                        int row = change.getRow() + offsetRow;
+                        int column = change.getColumn() + offsetCol;
+                        do {
+                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                                    && row >= 0 && column >= 0) {
+                                tryPasteCell(row, column, change.getNewValue());
+                            }
+                        } while ((row = row + sourceRowGap) <= targetRange.getBottom());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * If we have several source values to paste into one cell, we do it.
+     *
+     * @param list
+     */
+    private void pasteSeveralValues(ArrayList<GridChange> list) {
+        // TODO algorithm very bad
+        int minRow = getGrid().getRowCount();
+        int minCol = getGrid().getColumnCount();
+        int maxRow = 0;
+        int maxCol = 0;
+        for (final GridChange p : list) {
+            final int tempcol = p.getColumn();
+            final int temprow = p.getRow();
+            if (tempcol < minCol) {
+                minCol = tempcol;
+            }
+            if (tempcol > maxCol) {
+                maxCol = tempcol;
+            }
+            if (temprow < minRow) {
+                minRow = temprow;
+            }
+            if (temprow > maxRow) {
+                maxRow = temprow;
+            }
+        }
+
+        final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
+
+        final int offsetRow = p.getRow() - minRow;
+        final int offsetCol = p.getColumn() - minCol;
+        final int rowCount = getGrid().getRowCount();
+        final int columnCount = getGrid().getColumnCount();
+        int row;
+        int column;
+
+        for (final GridChange change : list) {
+            row = change.getRow() + offsetRow;
+            column = change.getColumn() + offsetCol;
+            if (row < rowCount && column < columnCount
+                    && row >= 0 && column >= 0) {
+                tryPasteCell(row, column, change.getNewValue());
+            }
+        }
+    }
+    
+    /**
      * Try to paste the clipBoard to the specified position. Try to paste the
      * current selection into the Grid. If the two contents are not matchable,
      * then it's not pasted. This can be overridden by developers for custom
@@ -1012,8 +1149,10 @@ public class SpreadsheetView extends Control {
      */
     public void pasteClipboard() {
         // FIXME Maybe move editableProperty to the model..
-        if (!isEditable())
+        List<TablePosition> selectedCells = cellsView.getSelectionModel().getSelectedCells();
+        if (!isEditable() || selectedCells.isEmpty()) {
             return;
+        }
 
         checkFormat();
         final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -1021,65 +1160,12 @@ public class SpreadsheetView extends Control {
 
             @SuppressWarnings("unchecked")
             final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
-            if(list.size() == 1){
-                GridChange change = list.get(0);
-                for(TablePosition position:getSelectionModel().getSelectedCells()){
-                    final SpanType type = getSpanType(position.getRow(), position.getColumn());
-                    if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
-                        SpreadsheetCell cell = getGrid().getRows().get(position.getRow()).get(position.getColumn());
-                        boolean succeed = cell.getCellType().match(change.getNewValue());
-                        if (succeed) {
-                            getGrid().setCellValue(cell.getRow(), cell.getColumn(),
-                                    cell.getCellType().convertValue(change.getNewValue()));
-                        }
-                    }
-                }
-            }else{
-                // TODO algorithm very bad
-                int minRow = getGrid().getRowCount();
-                int minCol = getGrid().getColumnCount();
-                int maxRow = 0;
-                int maxCol = 0;
-                for (final GridChange p : list) {
-                    final int tempcol = p.getColumn();
-                    final int temprow = p.getRow();
-                    if (tempcol < minCol) {
-                        minCol = tempcol;
-                    }
-                    if (tempcol > maxCol) {
-                        maxCol = tempcol;
-                    }
-                    if (temprow < minRow) {
-                        minRow = temprow;
-                    }
-                    if (temprow > maxRow) {
-                        maxRow = temprow;
-                    }
-                }
-
-                final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
-
-                final int offsetRow = p.getRow() - minRow;
-                final int offsetCol = p.getColumn() - minCol;
-                int row;
-                int column;
-
-                for (final GridChange change : list) {
-                    row = change.getRow();
-                    column = change.getColumn();
-                    if (row + offsetRow < getGrid().getRowCount() && column + offsetCol < getGrid().getColumnCount()
-                            && row + offsetRow >= 0 && column + offsetCol >= 0) {
-                        final SpanType type = getSpanType(row + offsetRow, column + offsetCol);
-                        if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
-                            SpreadsheetCell cell = getGrid().getRows().get(row + offsetRow).get(column + offsetCol);
-                            boolean succeed = cell.getCellType().match(change.getNewValue());
-                            if (succeed) {
-                                getGrid().setCellValue(cell.getRow(), cell.getColumn(),
-                                        cell.getCellType().convertValue(change.getNewValue()));
-                            }
-                        }
-                    }
-                }
+            if (list.size() == 1) {
+                pasteOneValue(list.get(0));
+            } else if (selectedCells.size() > 1) {
+                pasteMixedValues(list);
+            } else {
+                pasteSeveralValues(list);
             }
             // To be improved
         } else if (clipboard.hasString()) {

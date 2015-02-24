@@ -35,6 +35,7 @@ import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
+import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 
@@ -298,7 +299,7 @@ public class RectangleSelection extends Rectangle {
      * Utility class to transform a list of selected cells into a union of
      * ranges.
      */
-    private class SelectionRange {
+    public static class SelectionRange {
 
         private final TreeSet<Long> set = new TreeSet<>();
         private GridRange range;
@@ -319,7 +320,18 @@ public class RectangleSelection extends Rectangle {
             }
             computeRange();
         }
+        
+        public void fillGridRange(List<GridChange> list) {
+            set.clear();
+            for (GridChange pos : list) {
+                set.add(key(pos.getRow(), pos.getColumn()));
+            }
+            computeRange();
+        }
 
+        public GridRange getRange(){
+            return range;
+        }
         private Long key(int row, int column) {
             return (((long) row) << 32) | column;
         }
@@ -380,7 +392,7 @@ public class RectangleSelection extends Rectangle {
         }
     }
 
-    private class GridRange {
+    public static class GridRange {
 
         private final int top;
         private final int bottom;

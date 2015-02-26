@@ -232,13 +232,13 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
      **************************************************************************/
 
     /**
-    * Constructs a SpreadsheetCell with the given configuration.
-    * Use the {@link SpreadsheetCellType#OBJECT} type.
-    * @param row
-    * @param column
-    * @param rowSpan
-    * @param columnSpan 
-    */
+     * Constructs a SpreadsheetCell with the given configuration.
+     * Use the {@link SpreadsheetCellType#OBJECT} type.
+     * @param row
+     * @param column
+     * @param rowSpan
+     * @param columnSpan
+     */
     public SpreadsheetCellBase(final int row, final int column, final int rowSpan, final int columnSpan) {
         this(row, column, rowSpan, columnSpan, SpreadsheetCellType.OBJECT);
     }
@@ -452,7 +452,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     @Override
     public void deactivateCorner(CornerPosition position) {
         if(setMask(false, getCornerBitNumber(position))){
-             Event.fireEvent(this, new Event(EDITABLE_EVENT_TYPE));
+             Event.fireEvent(this, new Event(CORNER_EVENT_TYPE));
         }
     }
 

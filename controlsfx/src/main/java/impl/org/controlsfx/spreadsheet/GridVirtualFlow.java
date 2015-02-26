@@ -115,7 +115,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                getHbar().setBlockIncrement(newValue.doubleValue()/3);
+                //We want to go page by page.
+                getHbar().setBlockIncrement(getWidth());
                 getHbar().setUnitIncrement(newValue.doubleValue()/20);
             }
         });

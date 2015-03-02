@@ -470,6 +470,14 @@ public class SpreadsheetView extends Control {
         for (SpreadsheetColumn column : columns) {
             widthColumns.add(column.getWidth());
         }
+        //We need to update the focused cell afterwards
+        Pair<Integer, Integer> focusedPair = null;
+        TablePosition focusedCell = cellsView.getFocusModel().getFocusedCell();
+        if (focusedCell != null && focusedCell.getRow() != -1 && focusedCell.getColumn() != -1) {
+            focusedPair = new Pair(focusedCell.getRow(), focusedCell.getColumn());
+        }
+
+        final Pair<Integer, Integer> finalPair = focusedPair;
         
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
@@ -497,6 +505,8 @@ public class SpreadsheetView extends Control {
         for (TablePosition position : getSelectionModel().getSelectedCells()) {
             selectedCells.add(new Pair<>(position.getRow(), position.getColumn()));
         }
+        
+        
         /**
          * Since the TableView is added to the sceneGraph, it's not possible to
          * modify the columns in another thread. We normally should call
@@ -517,6 +527,10 @@ public class SpreadsheetView extends Control {
                 }
             }
             ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
+            //Just like the selected cell we update the focused cell.
+            if(finalPair != null && finalPair.getKey() < getGrid().getRowCount() && finalPair.getValue() < getGrid().getColumnCount()){
+                cellsView.getFocusModel().focus(finalPair.getKey(), cellsView.getColumns().get(finalPair.getValue()));
+            }
         };
         
         if (Platform.isFxApplicationThread()) {
@@ -624,7 +638,7 @@ public class SpreadsheetView extends Control {
                 }
                 //Then we need to verify that all rows within that span are fixed.
                 int count = row + maxSpan - 1;
-                for (int index = row + 1; index < count; ++index) {
+                for (int index = row + 1; index <= count; ++index) {
                     if (!list.contains(index)) {
                         return false;
                     }
@@ -740,7 +754,7 @@ public class SpreadsheetView extends Control {
                 }
                 //Then we need to verify that all columns within that span are fixed.
                 int count = columnIndex + maxSpan - 1;
-                for (int index = columnIndex + 1; index < count; ++index) {
+                for (int index = columnIndex + 1; index <= count; ++index) {
                     if (!list.contains(index)) {
                         return false;
                     }

@@ -625,6 +625,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         horizontalPickers = new HorizontalPicker((HorizontalHeader) getTableHeaderRow(), spreadsheetView);
         getChildren().add(horizontalPickers);
         getFlow().init(spreadsheetView);
+        ((GridViewBehavior)getBehavior()).setGridViewSkin(this);
     }
 
     protected final ObservableSet<Integer> getCurrentlyFixedRow() {
@@ -684,37 +685,24 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
     @Override
     protected void onFocusPreviousCell() {
-        final TableFocusModel<?, ?> fm = getFocusModel();
-        if (fm == null) {
-            return;
-        }
-        /*****************************************************************
-         * MODIFIED
-         *****************************************************************/
-        final int row = fm.getFocusedIndex();
-//        // We try to make visible the rows that may be hiden by Fixed rows
-        if (!getFlow().getCells().isEmpty()
-                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
-                && !spreadsheetView.getFixedRows().contains(row)) {
-            flow.scrollTo(row);
-        } else {
-            flow.show(row);
-        }
-        scrollHorizontally();
-        /*****************************************************************
-         * END OF MODIFIED
-         *****************************************************************/
+        focusScroll();
     }
 
     @Override
     protected void onFocusNextCell() {
+        focusScroll();
+    }
+
+    void focusScroll() {
         final TableFocusModel<?, ?> fm = getFocusModel();
         if (fm == null) {
             return;
         }
-        /*****************************************************************
+        /**
+         * ***************************************************************
          * MODIFIED
-         *****************************************************************/
+         ****************************************************************
+         */
         final int row = fm.getFocusedIndex();
         // We try to make visible the rows that may be hidden by Fixed rows
         if (!getFlow().getCells().isEmpty()
@@ -725,11 +713,13 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             flow.show(row);
         }
         scrollHorizontally();
-        /*****************************************************************
+        /**
+         * ***************************************************************
          * END OF MODIFIED
-         *****************************************************************/
+         ****************************************************************
+         */
     }
-
+    
     @Override
     protected void onSelectPreviousCell() {
         super.onSelectPreviousCell();

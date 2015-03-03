@@ -74,6 +74,10 @@ public class GridCell<T> extends IndexedCell<T> {
                 final GridView<T> gridView = getGridView();
                 if (gridView == null) return;
                 
+                if(getIndex() < 0) {
+                    updateItem(null, true);
+                    return;
+                }
                 T item = gridView.getItems().get(getIndex());
                 
 //                updateIndex(getIndex());

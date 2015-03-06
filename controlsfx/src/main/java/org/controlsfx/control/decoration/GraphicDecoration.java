@@ -29,6 +29,8 @@ package org.controlsfx.control.decoration;
 import impl.org.controlsfx.ImplUtils;
 
 import java.util.List;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -139,6 +141,23 @@ public class GraphicDecoration extends Decoration {
             targetHeight = targetNode.prefHeight(-1);
         }
 
+        /**
+         * If both targetWidth and targetHeight are equal to 0, this means the
+         * targetNode has not been laid out so we can put a listener in order to
+         * catch when the layout will be updated, and then we will place our
+         * decorationNode to the proper position.
+         */
+        if (targetWidth <= 0 && targetHeight <= 0) {
+            targetNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                    targetNode.layoutBoundsProperty().removeListener(this);
+                    updateGraphicPosition(targetNode);
+                }
+            });
+        }
+        
         // x
         switch (pos.getHpos()) {
         	case CENTER: 

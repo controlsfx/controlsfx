@@ -71,7 +71,9 @@ import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ResizeFeaturesBase;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableSelectionModel;
@@ -206,6 +208,14 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     double fixedColumnWidth;
     
+    /**
+     * When we try to select cells after a setGrid, we end up with the cell
+     * selected but no visual confirmation. In order to prevent that, we need to
+     * warn the selectionModel when the layout is starting and then the
+     * selectionModel will do the appropriate actions in order to force the
+     * visual to come.
+     */
+    BooleanProperty lastRowLayout = new SimpleBooleanProperty(true);
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -346,9 +356,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public GridRow getRowIndexed(int index) {
-        for (GridRow obj : (List<GridRow>) getFlow().getCells()) {
-            if (obj.getIndex() == index) {
-                return obj;
+        List<? extends IndexedCell> cells = getFlow().getCells();
+        if (!cells.isEmpty()) {
+            IndexedCell cell = cells.get(0);
+            if (index >= cell.getIndex() && index - cell.getIndex() < cells.size()) {
+                return (GridRow) cells.get(index - cell.getIndex());
+            }
+        }
+        for (IndexedCell cell : getFlow().getFixedCells()) {
+            if (cell.getIndex() == index) {
+                return (GridRow) cell;
             }
         }
         return null;
@@ -608,6 +625,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         horizontalPickers = new HorizontalPicker((HorizontalHeader) getTableHeaderRow(), spreadsheetView);
         getChildren().add(horizontalPickers);
         getFlow().init(spreadsheetView);
+        ((GridViewBehavior)getBehavior()).setGridViewSkin(this);
     }
 
     protected final ObservableSet<Integer> getCurrentlyFixedRow() {
@@ -667,37 +685,24 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
     @Override
     protected void onFocusPreviousCell() {
-        final TableFocusModel<?, ?> fm = getFocusModel();
-        if (fm == null) {
-            return;
-        }
-        /*****************************************************************
-         * MODIFIED
-         *****************************************************************/
-        final int row = fm.getFocusedIndex();
-//        // We try to make visible the rows that may be hiden by Fixed rows
-        if (!getFlow().getCells().isEmpty()
-                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
-                && !spreadsheetView.getFixedRows().contains(row)) {
-            flow.scrollTo(row);
-        } else {
-            flow.show(row);
-        }
-        scrollHorizontally();
-        /*****************************************************************
-         * END OF MODIFIED
-         *****************************************************************/
+        focusScroll();
     }
 
     @Override
     protected void onFocusNextCell() {
+        focusScroll();
+    }
+
+    void focusScroll() {
         final TableFocusModel<?, ?> fm = getFocusModel();
         if (fm == null) {
             return;
         }
-        /*****************************************************************
+        /**
+         * ***************************************************************
          * MODIFIED
-         *****************************************************************/
+         ****************************************************************
+         */
         final int row = fm.getFocusedIndex();
         // We try to make visible the rows that may be hidden by Fixed rows
         if (!getFlow().getCells().isEmpty()
@@ -708,11 +713,13 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             flow.show(row);
         }
         scrollHorizontally();
-        /*****************************************************************
+        /**
+         * ***************************************************************
          * END OF MODIFIED
-         *****************************************************************/
+         ****************************************************************
+         */
     }
-
+    
     @Override
     protected void onSelectPreviousCell() {
         super.onSelectPreviousCell();

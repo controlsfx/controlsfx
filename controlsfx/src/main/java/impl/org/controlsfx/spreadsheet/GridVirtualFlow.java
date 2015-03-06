@@ -56,7 +56,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * <br/>
      *
      * The only problem is for the fixed column but the {@link #getTopRow(int) }
-     * now returns the very first row and allow us to put some priviledge
+     * now returns the very first row and allow us to put some privileged
      * TableCell in it if they feel the need to be on top in term of z-order.
      *
      * FIXME The best would be to put a TreeList of something like that in order
@@ -81,7 +81,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     private final ArrayList<T> myFixedCells = new ArrayList<>();
     public final List<Node> sheetChildren;
-    
+
     /***************************************************************************
      * * Constructor * *
      **************************************************************************/
@@ -98,10 +98,6 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         getHbar().valueProperty().addListener(hBarValueChangeListener);
         widthProperty().addListener(hBarValueChangeListener);
         
-
-        // FIXME Until https://javafx-jira.kenai.com/browse/RT-31777 is resolved
-        getHbar().setUnitIncrement(10);
-        
         sheetChildren = findSheetChildren();
     }
 
@@ -109,6 +105,22 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      * * Public Methods * *
      **************************************************************************/
     public void init(SpreadsheetView spv) {
+        /**
+         * The idea is to work-around
+         * https://javafx-jira.kenai.com/browse/RT-36396 in order to have the
+         * same behavior between the vertical scrollBar and the horizontal
+         * scrollBar.
+         */
+        getHbar().maxProperty().addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //We want to go page by page.
+                getHbar().setBlockIncrement(getWidth());
+                getHbar().setUnitIncrement(newValue.doubleValue()/20);
+            }
+        });
+
         this.spreadSheetView = spv;
        
         //We clip the rectangle selection with a rectangle, inception style.
@@ -166,6 +178,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         return returnValue;
     }
     
+    List<T> getFixedCells(){
+        return myFixedCells;
+    }
     /***************************************************************************
      * * Protected Methods * *
      **************************************************************************/

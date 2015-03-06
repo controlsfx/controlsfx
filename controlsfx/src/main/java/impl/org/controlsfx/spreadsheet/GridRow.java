@@ -122,6 +122,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         @Override
         public void invalidated(Observable o) {
             setRowHeight(computePrefHeight(-1));
+            
         }
     };
     
@@ -131,5 +132,6 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         });
         
         setPrefHeight(height);
+        handle.getCellsViewSkin().rectangleSelection.updateRectangle();
     }
 }

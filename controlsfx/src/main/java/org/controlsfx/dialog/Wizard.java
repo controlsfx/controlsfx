@@ -149,6 +149,9 @@ public class Wizard {
     private Optional<WizardPane> currentPage = Optional.empty();
 
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
+
+    // Read settings activated by default for backward compatibility
+    private final BooleanProperty readSettingsProperty = new SimpleBooleanProperty(true);
     
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
@@ -433,6 +436,38 @@ public class Wizard {
         return invalidProperty;
     }
     
+    /**
+     * Sets the value of the property {@code readSettings}.
+     * 
+     * @param readSettings The new read-settings state
+     * @see {@link #readSettingsProperty()}
+     */
+    public final void setReadSettings(boolean readSettings) {
+        readSettingsProperty.set(readSettings);
+    }
+    
+    /**
+     * Gets the value of the property {@code readSettings}.
+     * 
+     * @return The read-settings state
+     * @see {@link #readSettingsProperty()}
+     */
+    public final boolean isReadSettings() {
+        return readSettingsProperty.get();
+    }
+    
+    /**
+    * Property for overriding the individual read-settings state of this {@link Wizard}.
+    * Setting {@code readSettings} to true will enable the value extraction for this
+    * {@link Wizard}. Setting {@code readSettings} to false will disable the value
+    * extraction for this {@link Wizard}.
+    *
+    * @return The readSettings state property
+    */
+    public final BooleanProperty readSettingsProperty() {
+        return readSettingsProperty;
+    }
+    
     
     
     /**************************************************************************
@@ -452,7 +487,8 @@ public class Wizard {
 	        // if we are going forward in the wizard, we read in the settings 
 	        // from the page and store them in the settings map.
 	        // If we are going backwards, we do nothing
-	        if (advancing) {
+                // This is only performed if readSettings is true.
+	        if (advancing && isReadSettings()) {
 	        	readSettings(page);
 	        }
 	        

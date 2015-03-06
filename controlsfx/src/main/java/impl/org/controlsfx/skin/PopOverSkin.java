@@ -29,6 +29,7 @@ package impl.org.controlsfx.skin;
 import static java.lang.Double.MAX_VALUE;
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
+import static javafx.scene.paint.Color.YELLOW;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_CENTER;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_LEFT;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_RIGHT;
@@ -86,6 +87,8 @@ public class PopOverSkin implements Skin<PopOver> {
     private Label closeIcon;
 
     private Path path;
+    private Path clip;
+
     private BorderPane content;
     private StackPane titlePane;
     private StackPane stackPane;
@@ -152,24 +155,35 @@ public class PopOverSkin implements Skin<PopOver> {
         getPopupWindow().xProperty().addListener(updatePathListener);
         getPopupWindow().yProperty().addListener(updatePathListener);
         popOver.arrowLocationProperty().addListener(updatePathListener);
-        popOver.contentNodeProperty().addListener((value, oldContent, newContent) -> content.setCenter(newContent));
-        popOver.detachedProperty().addListener((value, oldDetached, newDetached) -> {
-            updatePath();
+        popOver.contentNodeProperty().addListener(
+                (value, oldContent, newContent) -> content
+                        .setCenter(newContent));
+        popOver.detachedProperty().addListener(
+                (value, oldDetached, newDetached) -> {
+                    updatePath();
 
-            if (newDetached) {
-                popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
-                content.getStyleClass().add(DETACHED_STYLE_CLASS);
-                content.setTop(titlePane);
-            } else {
-                popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
-                content.getStyleClass().remove(DETACHED_STYLE_CLASS);
-                content.setTop(null);
-            }
-        });
+                    if (newDetached) {
+                        popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
+                        content.getStyleClass().add(DETACHED_STYLE_CLASS);
+                        content.setTop(titlePane);
+                    } else {
+                        popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
+                        content.getStyleClass().remove(DETACHED_STYLE_CLASS);
+                        content.setTop(null);
+                    }
+                });
 
         path = new Path();
         path.getStyleClass().add("border"); //$NON-NLS-1$
         path.setManaged(false);
+
+        clip = new Path();
+
+        /*
+         * The clip is a path and the path has to be filled with a color.
+         * Otherwise clipping will not work.
+         */
+        clip.setFill(YELLOW);
 
         createPathElements();
         updatePath();
@@ -221,6 +235,12 @@ public class PopOverSkin implements Skin<PopOver> {
 
         stackPane.getChildren().add(path);
         stackPane.getChildren().add(content);
+
+        stackPane.heightProperty().addListener(it -> {
+            popOver.getScene().getWindow().sizeToScene();
+        });
+
+        stackPane.setClip(clip);
     }
 
     @Override
@@ -663,5 +683,6 @@ public class PopOverSkin implements Skin<PopOver> {
         elements.add(topCurveTo);
 
         path.getElements().setAll(elements);
+        clip.getElements().setAll(elements);
     }
 }

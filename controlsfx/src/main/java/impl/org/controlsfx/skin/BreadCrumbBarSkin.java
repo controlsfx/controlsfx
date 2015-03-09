@@ -85,7 +85,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     private void updateSelectedPath(TreeItem<T> newTarget, TreeItem<T> oldTarget) {
         if(oldTarget != null){
             // remove old listener
-            newTarget.removeEventHandler(
+            oldTarget.removeEventHandler(
                     TreeItem.childrenModificationEvent(), treeChildrenModifiedHandler);
         }
         if(newTarget != null){

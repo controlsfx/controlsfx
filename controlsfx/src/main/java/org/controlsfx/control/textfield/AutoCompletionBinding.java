@@ -209,8 +209,6 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * @param userText
      */
     private final void onUserInputChanged(final String userText){
-        autoCompletionPopup.getSuggestions().clear();
-
         synchronized (suggestionsTaskLock) {
             if(suggestionsTask != null && suggestionsTask.isRunning()){
                 // cancel the current running task
@@ -292,7 +290,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
                 if(!isCancelled()){
                     Platform.runLater(() -> {
                         if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
-                            autoCompletionPopup.getSuggestions().addAll(fetchedSuggestions);
+                            autoCompletionPopup.getSuggestions().setAll(fetchedSuggestions);
                             showPopup();
                         }else{
                             // No suggestions found, so hide the popup

@@ -85,6 +85,15 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      *                                                                         *
      **************************************************************************/
 
+    /**
+     * Specifies whether the PopupWindow should be hidden when an unhandled
+     * escape key is pressed while the popup has focus.
+     *
+     * @param value
+     */
+    public void setHideOnEscape(boolean value) {
+        autoCompletionPopup.setHideOnEscape(value);
+    }
 
     /**
      * Set the current text the user has entered

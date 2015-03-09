@@ -145,6 +145,23 @@ public class GridCellEditor {
                             handle.getGridView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
                         }
                     }
+                } else if (lastKeyPressed == KeyCode.TAB) {
+                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
+                            getFocusModel().getFocusedCell();
+                    if (position != null) {
+                        int row = position.getRow();
+                        int column = position.getColumn() + 1;
+                        if (column >= handle.getView().getColumns().size()) {
+                            if (row == handle.getView().getGrid().getRowCount() - 1) {
+                                column--;
+                            } else {
+                                column = 0;
+                                row++;
+                            }
+                        }
+                        handle.getGridView().getSelectionModel().clearAndSelect(row, handle.getGridView().getColumns().get(column));
+                    }
+                    handle.getCellsViewSkin().scrollHorizontally();
                 }
             }
         }

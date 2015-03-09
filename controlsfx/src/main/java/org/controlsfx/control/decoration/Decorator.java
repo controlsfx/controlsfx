@@ -29,8 +29,7 @@ package org.controlsfx.control.decoration;
 import impl.org.controlsfx.ImplUtils;
 import impl.org.controlsfx.skin.DecorationPane;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 import javafx.beans.InvalidationListener;
@@ -167,6 +166,7 @@ public class Decorator {
     }
     
     private static List<Scene> currentlyInstallingScenes = new ArrayList<>();
+    private static Map<Scene, List<Consumer<DecorationPane>>> pendingTasksByScene = new HashMap<>();
     
     private static void getDecorationPane(Node target, Consumer<DecorationPane> task) {
         // find a DecorationPane parent and notify it that a node has updated
@@ -182,6 +182,12 @@ public class Decorator {
             // install decoration pane
             final Consumer<Scene> sceneConsumer = scene -> {
                 if (currentlyInstallingScenes.contains(scene)) {
+                    List<Consumer<DecorationPane>> pendingTasks = pendingTasksByScene.get(scene);
+                    if (pendingTasks == null) {
+                        pendingTasks = new LinkedList<>();
+                        pendingTasksByScene.put(scene, pendingTasks);
+                    }
+                    pendingTasks.add(task);
                     return;
                 }
                 
@@ -196,6 +202,12 @@ public class Decorator {
                 }
                 
                 task.accept(_pane);
+                final List<Consumer<DecorationPane>> pendingTasks = pendingTasksByScene.remove(scene);
+                if (pendingTasks != null) {
+                    for (Consumer<DecorationPane> pendingTask : pendingTasks) {
+                        pendingTask.accept(_pane);
+                    }
+                }
             };
             
             Scene scene = target.getScene();
@@ -206,8 +218,8 @@ public class Decorator {
                 InvalidationListener sceneListener = new InvalidationListener() {
                     @Override public void invalidated(Observable o) {
                         if (target.getScene() != null) {
-                            sceneConsumer.accept(target.getScene());
                             target.sceneProperty().removeListener(this);
+                            sceneConsumer.accept(target.getScene());
                         }
                     }
                 };

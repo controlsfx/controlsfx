@@ -47,12 +47,16 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         suggestionList.setOnKeyPressed(ke -> {
             switch (ke.getCode()) {
-            case ENTER:
-                onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
-                break;
-
-            default:
-                break;
+                case ENTER:
+                    onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
+                    break;
+                case ESCAPE:
+                    if (control.isHideOnEscape()) {
+                        control.hide();
+                    }
+                    break;
+                default:
+                    break;
             }
         });
     }

@@ -85,7 +85,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
     private void updateSelectedPath(TreeItem<T> newTarget, TreeItem<T> oldTarget) {
         if(oldTarget != null){
             // remove old listener
-            newTarget.removeEventHandler(
+            oldTarget.removeEventHandler(
                     TreeItem.childrenModificationEvent(), treeChildrenModifiedHandler);
         }
         if(newTarget != null){
@@ -112,7 +112,7 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
 
             for (int i=0; i < crumbs.size(); i++) {
                 Button crumb = createCrumb(factory, crumbs.get(i));
-                
+                crumb.setMnemonicParsing(false);
                 if (i == 0) {
                     if (! crumb.getStyleClass().contains(STYLE_CLASS_FIRST)) {
                         crumb.getStyleClass().add(STYLE_CLASS_FIRST);

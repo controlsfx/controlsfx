@@ -262,22 +262,6 @@ public class Wizard {
      * Properties
      * 
      **************************************************************************/
-
-    // --- dialog
-    
-    /**
-     * @return The {@link Dialog} representing this {@link Wizard}. <br>
-     *         This is actually for {@link Dialog} reading-purposes, e.g.
-     *         unit testing the {@link DialogPane} content. <br>
-     *         But you can also change the properties of the {@link Dialog} directly,
-     *         e.g. change the children of the contained {@link DialogPane} or
-     *         change the icon of the {@link Stage} of the {@link Wizard} etc.
-     *         But be careful with changing the {@link Dialog}! This maybe interfere
-     *         with {@link Wizard} operations!
-     */
-    public Dialog<ButtonType> getDialog() {
-            return dialog;
-    }
     
     // --- title
     
@@ -696,6 +680,23 @@ public class Wizard {
             int pageIndex = pages.indexOf(currentPage);
             return pages.size()-1 > pageIndex; 
         }
+    }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Methods for the sake of unit tests
+     * 
+     **************************************************************************/
+    
+    /**
+     * @return The {@link Dialog} representing this {@link Wizard}. <br>
+     *         This is actually for {@link Dialog} reading-purposes, e.g.
+     *         unit testing the {@link DialogPane} content.
+     */
+    Dialog<ButtonType> getDialog() {
+        return dialog;
     }
     
 }

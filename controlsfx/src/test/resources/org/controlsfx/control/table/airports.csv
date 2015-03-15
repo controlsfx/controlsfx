@@ -2488,7 +2488,7 @@
 2605,Porto Nacional,Porto Nacional,Brazil,PNB,SBPN,-10.719417,-48.399736,870,-3,S,America/Fortaleza
 2606,Ponta Pora,Ponta Pora,Brazil,PMG,SBPP,-22.549639,-55.702614,2156,-4,S,America/Campo_Grande
 2607,Governador Jorge Teixeira De Oliveira,Porto Velho,Brazil,PVH,SBPV,-8.709294,-63.902281,294,-4,S,America/Boa_Vista
-2609,Pl?â?ícido de Castro,Rio Branco,Brazil,RBR,SBRB,-9.583,-67.4836,633,-5,S,America/Rio_Branco
+2609,Pl?ï¿½?ï¿½cido de Castro,Rio Branco,Brazil,RBR,SBRB,-9.583,-67.4836,633,-5,S,America/Rio_Branco
 2610,Guararapes Gilberto Freyre Intl,Recife,Brazil,REC,SBRF,-8.126794,-34.923039,33,-3,S,America/Fortaleza
 2611,Rio Grande,Rio Grande,Brazil,RIG,SBRG,-32.082617,-52.166542,27,-3,S,America/Sao_Paulo
 2612,Santos Dumont,Rio De Janeiro,Brazil,SDU,SBRJ,-22.910461,-43.163133,11,-3,S,America/Sao_Paulo
@@ -3792,7 +3792,6 @@
 3987,Kapadokya,Nevsehir,Turkey,NAV,LTAZ,38.771867,34.53455,3100,2,E,Europe/Istanbul
 3988,Ministro Pistarini,Buenos Aires,Argentina,EZE,SAEZ,-34.822222,-58.535833,67,-3,N,America/Cordoba
 3989,Erbil Intl,Erbil,Iraq,EBL,ORER,36.237611,43.963158,1341,3,U,Asia/Baghdad
-3990,Emerald,Emerald,Australia,EMD,YEML,-23.5675,148.179167,624,10,O,Australia/Brisbane
 3991,Ellinikon International Airport,Athens,Greece,,LGAT,37.5354,23.4346,68,2,E,Europe/Athens
 3992,Kansai,Osaka,Japan,KIX,RJBB,34.4347222,135.244167,49,9,U,Asia/Tokyo
 3993,Wall Street Heliport,New York,United States,JRB,KJRB,40.701214,-74.009028,7,-5,A,America/New_York
@@ -4225,7 +4224,7 @@
 5447,Sisimiut Airport,Sisimiut,Greenland,JHS,BGSS,66.9513,-53.7293,33,-3,E,America/Godthab
 5448,Upernavik Airport,Upernavik,Greenland,JUV,BGUK,72.7902,-56.1306,414,-3,E,America/Godthab
 5449,Qaarsut Airport,Uummannaq,Greenland,JQA,BGUQ,70.7342,-52.6962,289,-3,E,America/Godthab
-5450,Gr?¡msey Airport,Gr?¡msey,Iceland,GRY,BIGR,66.5547,-18.0175,66,0,N,Atlantic/Reykjavik
+5450,Gr?ï¿½msey Airport,Gr?ï¿½msey,Iceland,GRY,BIGR,66.5547,-18.0175,66,0,N,Atlantic/Reykjavik
 5452,Thorshofn Airport,Thorshofn,Iceland,THO,BITN,66.2185,-15.3356,65,0,N,Atlantic/Reykjavik
 5453,Vopnafj??r??ur Airport,Vopnafj??r??ur,Iceland,VPN,BIVO,65.7206,-14.8506,0,0,N,Atlantic/Reykjavik
 5454,Caye Caulker Airport,Caye Caulker,Belize,CUK,,17.7347,-88.0325,1,-6,U,America/Belize
@@ -4237,7 +4236,7 @@
 5460,Port Hope Simpson Airport,Port Hope Simpson,Canada,YHA,CCP4,52.5281,-56.2861,347,-3.5,A,America/St_Johns
 5461,Rigolet Airport,Rigolet,Canada,YRG,CCZ2,54.1797,-58.4575,180,-4,A,America/Halifax
 5462,Colville Lake Airport,Colville Lake,Canada,YCK,CEB3,67.0333,-126.083,850,-7,A,America/Edmonton
-5463,What?¼ Airport,What?¼,Canada,YLE,CEM3,63.1317,-117.246,882,-7,A,America/Edmonton
+5463,What?ï¿½ Airport,What?ï¿½,Canada,YLE,CEM3,63.1317,-117.246,882,-7,A,America/Edmonton
 5464,Summer Beaver Airport,Summer Beaver,Canada,SUR,CJV7,52.7086,-88.5419,832,-5,A,America/Toronto
 5465,Wapekeka Airport,Angling Lake,Canada,YAX,CKB6,53.8492,-89.5794,712,-6,A,America/Winnipeg
 5466,Wunnumin Lake Airport,Wunnumin Lake,Canada,WNN,CKL3,52.8939,-89.2892,819,-5,A,America/Toronto
@@ -4247,11 +4246,11 @@
 5470,Ogoki Post Airport,Ogoki Post,Canada,YOG,CNT3,51.6586,-85.9017,594,-5,A,America/Toronto
 5471,Poplar Hill Airport,Poplar Hill,Canada,YHP,CPV7,52.1133,-94.2556,1095,-6,A,America/Winnipeg
 5472,Chisasibi Airport,Chisasibi,Canada,YKU,CSU2,53.8056,-78.9169,43,-5,A,America/Toronto
-5473,T?¬te-?á-la-Baleine Airport,T?¬te-?á-la-Baleine,Canada,ZTB,CTB6,50.6744,-59.3836,107,-4,A,America/Blanc-Sablon
-5474,La Tabati?¿re Airport,La Tabati?¿re,Canada,ZLT,CTU5,50.8308,-58.9756,102,-4,A,America/Blanc-Sablon
+5473,T?ï¿½te-?ï¿½-la-Baleine Airport,T?ï¿½te-?ï¿½-la-Baleine,Canada,ZTB,CTB6,50.6744,-59.3836,107,-4,A,America/Blanc-Sablon
+5474,La Tabati?ï¿½re Airport,La Tabati?ï¿½re,Canada,ZLT,CTU5,50.8308,-58.9756,102,-4,A,America/Blanc-Sablon
 5475,Nantong Airport,Nantong,China,NTG,,32.0708,120.976,0,8,U,Asia/Chongqing
 5476,Apartad?? Airport,Apartad??,Colombia,APO,,7.033,-77.2,0,-5,U,America/Bogota
-5477,Tarapac?í Airport,Tarapac?í,Colombia,TCD,,-2.867,-69.733,0,-5,U,America/Bogota
+5477,Tarapac?ï¿½ Airport,Tarapac?ï¿½,Colombia,TCD,,-2.867,-69.733,0,-5,U,America/Bogota
 5478,Cat Lake Airport,Cat Lake,Canada,YAC,CYAC,51.7272,-91.8244,1344,-6,A,America/Winnipeg
 5479,Fort Frances Municipal Airport,Fort Frances,Canada,YAG,CYAG,48.6542,-93.4397,1125,-6,A,America/Winnipeg
 5480,Kasabonika Airport,Kasabonika,Canada,XKS,CYAQ,53.5247,-88.6428,672,-5,A,America/Toronto
@@ -4300,7 +4299,7 @@
 5523,Powell River Airport,Powell River,Canada,YPW,CYPW,49.8342,-124.5,425,-8,A,America/Vancouver
 5524,The Pas Airport,The Pas,Canada,YQD,CYQD,53.9714,-101.091,887,-6,A,America/Winnipeg
 5525,Nakina Airport,Nakina,Canada,YQN,CYQN,50.182777,-86.696388,1057,-5,A,America/Toronto
-5526,Rae Lakes Airport,Gam?¿t?¼,Canada,YRA,CYRA,64.1161,-117.31,723,-7,A,America/Edmonton
+5526,Rae Lakes Airport,Gam?ï¿½t?ï¿½,Canada,YRA,CYRA,64.1161,-117.31,723,-7,A,America/Edmonton
 5527,Red Lake Airport,Red Lake,Canada,YRL,CYRL,51.0669,-93.7931,1265,-6,A,America/Winnipeg
 5528,Stony Rapids Airport,Stony Rapids,Canada,YSF,CYSF,59.2503,-105.841,805,-6,N,America/Regina
 5529,Sanikiluaq Airport,Sanikiluaq,Canada,YSK,CYSK,56.5378,-79.2467,104,-5,A,\N
@@ -4334,9 +4333,8 @@
 5557,Heringsdorf Airport,Heringsdorf,Germany,HDF,EDAH,53.878706,14.152347,93,1,E,Europe/Berlin
 5558,Heide-B??sum Airport,B??sum,Germany,HEI,EDXB,54.1533,8.90167,7,1,E,Europe/Berlin
 5559,Helgoland-D??ne Airport,Helgoland,Germany,HGL,EDXH,54.1853,7.91583,7,1,E,\N
-5560,Sein?ñjoki Airport,Sein?ñjoki / Ilmajoki,Finland,SJY,EFSI,62.6921,22.8323,302,2,E,Europe/Helsinki
+5560,Sein?ï¿½joki Airport,Sein?ï¿½joki / Ilmajoki,Finland,SJY,EFSI,62.6921,22.8323,302,2,E,Europe/Helsinki
 5561,Nottingham Airport,Nottingham,United Kingdom,NQT,EGBN,52.92,-1.079167,138,0,E,Europe/London
-5562,Robin Hood Doncaster Sheffield Airport,"Doncaster, Sheffield",United Kingdom,DSA,EGCN,53.474722,-1.004444,55,0,E,Europe/London
 5563,Campbeltown Airport,Campbeltown,United Kingdom,CAL,EGEC,55.4372,-5.68639,42,0,E,Europe/London
 5564,Eday Airport,Eday,United Kingdom,EOI,EGED,59.1906,-2.77222,10,0,E,Europe/London
 5565,Fair Isle Airport,Fair Isle,United Kingdom,FIE,EGEF,59.5358,-1.62806,223,0,E,Europe/London
@@ -4360,17 +4358,17 @@
 5584,R??st Airport,R??st,Norway,RET,ENRS,67.5278,12.1033,7,1,E,Europe/Oslo
 5585,Anda Airport,Sandane,Norway,SDN,ENSD,61.83,6.10583,196,1,E,Europe/Oslo
 5586,Sogndal Airport,Sogndal,Norway,SOG,ENSG,61.1561,7.13778,0,1,E,Europe/Oslo
-5587,Svolv?ªr Helle Airport,Svolv?ªr,Norway,SVJ,ENSH,68.2433,14.6692,27,1,E,Europe/Oslo
+5587,Svolv?ï¿½r Helle Airport,Svolv?ï¿½r,Norway,SVJ,ENSH,68.2433,14.6692,27,1,E,Europe/Oslo
 5588,Sorkjosen Airport,Sorkjosen,Norway,SOJ,ENSR,69.7868,20.9594,16,1,E,Europe/Oslo
 5589,Svartnes Airport,Vard??,Norway,VAW,ENSS,70.355392,31.044889,42,1,E,Europe/Oslo
-5590,V?ªr??y Heliport,V?ªr??y,Norway,VRY,ENVR,67.6667,12.6833,36,1,E,Europe/Oslo
+5590,V?ï¿½r??y Heliport,V?ï¿½r??y,Norway,VRY,ENVR,67.6667,12.6833,36,1,E,Europe/Oslo
 5591,Bydgoszcz Ignacy Jan Paderewski Airport,Bydgoszcz,Poland,BZG,EPBY,53.0968,17.9777,235,1,E,Europe/Warsaw
-5592,?ü??d?? W?éadys?éaw Reymont Airport,Lodz,Poland,LCJ,EPLL,51.721881,19.398133,604,1,E,Europe/Warsaw
-5593,?ûstersund Airport,?ûstersund,Sweden,OSD,ESNZ,63.1944,14.5003,1233,1,E,Europe/Stockholm
+5592,?ï¿½??d?? W?ï¿½adys?ï¿½aw Reymont Airport,Lodz,Poland,LCJ,EPLL,51.721881,19.398133,604,1,E,Europe/Warsaw
+5593,?ï¿½stersund Airport,?ï¿½stersund,Sweden,OSD,ESNZ,63.1944,14.5003,1233,1,E,Europe/Stockholm
 5594,Hagfors Airport,Hagfors,Sweden,HFS,ESOH,60.020064,13.578908,474,1,E,Europe/Stockholm
 5595,Karlstad Airport,Karlstad,Sweden,KSD,ESOK,59.4447,13.3374,352,1,E,Europe/Stockholm
 5596,Torsby Airport,Torsby,Sweden,TYF,ESST,60.157622,12.991269,393,1,E,Europe/Stockholm
-5597,?ängelholm-Helsingborg Airport,?ängelholm,Sweden,AGH,ESTA,56.2961,12.8471,68,1,E,Europe/Stockholm
+5597,?ï¿½ngelholm-Helsingborg Airport,?ï¿½ngelholm,Sweden,AGH,ESTA,56.2961,12.8471,68,1,E,Europe/Stockholm
 5598,Storuman Airport,Mohed,Sweden,SQO,ESUD,64.960894,17.696583,915,1,E,Europe/Stockholm
 5599,Hemavan Airport,Hemavan,Sweden,HMV,ESUT,65.806111,15.082778,1503,1,E,Europe/Stockholm
 5600,Shilavo Airport,Shilavo,Ethiopia,HIL,,6.08333,44.7667,1296,3,U,Africa/Addis_Ababa
@@ -4447,7 +4445,6 @@
 5671,Mogador Airport,Essadouira,Morocco,ESU,GMMI,31.3975,-9.681667,384,0,N,Africa/Casablanca
 5672,Hassan I Airport,El Aai??n,Western Sahara,EUN,GMML,27.1517,-13.2192,207,0,N,Africa/El_Aaiun
 5673,El Aroui Airport,El Aroui,Morocco,NDR,GMMW,34.9888,-3.02821,574,0,N,Africa/Casablanca
-5674,Praia International Airport,"Praia, Santiago Island",Cape Verde,RAI,GVNP,14.9245,-23.4935,230,-1,U,Atlantic/Cape_Verde
 5675,Sao Filipe Airport,"Sao Filipe, Fogo Island",Cape Verde,SFL,GVSF,14.885,-24.48,617,-1,U,Atlantic/Cape_Verde
 5676,Baco Airport,Baco,Ethiopia,BCO,HABC,5.78287,36.562,0,3,U,Africa/Addis_Ababa
 5677,Beica Airport,Beica,Ethiopia,BEI,HABE,9.38639,34.5219,5410,3,U,Africa/Addis_Ababa
@@ -4555,13 +4552,13 @@
 5779,Yakima Air Terminal McAllister Field,Yakima,United States,YKM,KYKM,46.5682,-120.544,1095,-8,A,America/Los_Angeles
 5780,Ercan International Airport,Nicosia,Cyprus,ECN,LCEN,35.1547,33.4961,404,2,E,Asia/Nicosia
 5781,Logro??o-Agoncillo Airport,Logro??o-Agoncillo,Spain,RJL,LELO,42.4542,-2.32083,1161,1,E,Europe/Madrid
-5782,?Äle d'Yeu Airport,?Äle d'Yeu,France,IDY,LFEY,46.718611,-2.391111,79,1,E,Europe/Paris
+5782,?ï¿½le d'Yeu Airport,?ï¿½le d'Yeu,France,IDY,LFEY,46.718611,-2.391111,79,1,E,Europe/Paris
 5783,Angers-Loire Airport,Angers/Marc??,France,ANE,LFJR,47.5603,-0.312222,194,1,E,Europe/Paris
 5786,La M??le Airport,La M??le,France,LTT,LFTZ,43.2054,6.482,59,1,E,Europe/Paris
 5787,Syros Airport,Syros Island,Greece,JSY,LGSO,37.422792,24.950936,236,2,E,Europe/Athens
-5788,P??cs-Pog?íny Airport,P??cs-Pog?íny,Hungary,PEV,LHPP,45.990928,18.240983,1000,1,N,Europe/Budapest
-5789,Gy?ær-P??r International Airport,Gy?ær,Hungary,QGY,LHPR,47.627097,17.808347,424,1,N,Europe/Budapest
-5790,S?írmell??k International Airport,S?írmell??k,Hungary,SOB,LHSM,46.686389,17.159056,408,1,N,Europe/Budapest
+5788,P??cs-Pog?ï¿½ny Airport,P??cs-Pog?ï¿½ny,Hungary,PEV,LHPP,45.990928,18.240983,1000,1,N,Europe/Budapest
+5789,Gy?ï¿½r-P??r International Airport,Gy?ï¿½r,Hungary,QGY,LHPR,47.627097,17.808347,424,1,N,Europe/Budapest
+5790,S?ï¿½rmell??k International Airport,S?ï¿½rmell??k,Hungary,SOB,LHSM,46.686389,17.159056,408,1,N,Europe/Budapest
 5791,Aosta Airport,Aosta,Italy,AOT,LIMW,45.738456,7.368719,1791,1,E,Europe/Rome
 5792,Salerno Pontecagnano Airport,Salerno,Italy,QSR,LIRI,40.6204,14.911294,123,1,E,Europe/Rome
 5793,Corvo Airport,Corvo,Portugal,CVU,LPCR,39.6715,-31.1136,0,-1,E,Atlantic/Azores
@@ -4574,14 +4571,14 @@
 5800,Adiyaman Airport,Adiyaman,Turkey,ADF,LTCP,37.7314,38.4689,2216,2,E,Europe/Istanbul
 5801,Isparta S??leyman Demirel Airport,Isparta,Turkey,ISE,LTFC,37.8554,30.3684,2835,2,E,Europe/Istanbul
 5802,Balikesir Korfez Airport,Balikesir Korfez,Turkey,EDO,LTFD,39.5546,27.0138,50,2,E,Europe/Istanbul
-5803,Samsun-?çar?ƒamba Airport,Samsun,Turkey,SZF,LTFH,41.2545,36.5671,18,2,E,Europe/Istanbul
+5803,Samsun-?ï¿½ar?ï¿½amba Airport,Samsun,Turkey,SZF,LTFH,41.2545,36.5671,18,2,E,Europe/Istanbul
 5804,Misratah Airport,Misratah,Libya,MRA,,32.325,15.061,60,2,N,Africa/Tripoli
 5805,Ubari Airport,Ubari,Libya,QUB,,26.5675,12.8231,1387,2,N,Africa/Tripoli
 5806,??ilina Airport,??ilina,Slovakia,ILZ,LZZI,49.231528,18.6135,1020,1,E,Europe/Bratislava
 5807,JAGS McCartney International Airport,Cockburn Town,Turks and Caicos Islands,GDT,MBGT,21.4445,-71.1423,13,-5,U,America/Grand_Turk
 5808,Middle Caicos Airport,Middle Caicos,Turks and Caicos Islands,MDS,MBMC,21.833,-71.817,9,-5,U,America/Grand_Turk
 5809,Salt Cay Airport,Salt Cay,Turks and Caicos Islands,SLX,MBSY,21.333,-71.2,3,-5,U,America/Grand_Turk
-5810,Saman?í El Catey International Airport,Samana,Dominican Republic,AZS,MDCY,19.267,-69.742,30,-4,U,America/Santo_Domingo
+5810,Saman?ï¿½ El Catey International Airport,Samana,Dominican Republic,AZS,MDCY,19.267,-69.742,30,-4,U,America/Santo_Domingo
 5811,Dr Joaquin Balaguer International Airport,La Isabela,Dominican Republic,JBQ,MDJB,18.5725,-69.9856,98,-4,U,America/Santo_Domingo
 5812,Puerto Barrios Airport,Puerto Barrios,Guatemala,PBR,MGPB,15.730878,-88.583767,33,-6,U,America/Guatemala
 5813,Quezaltenango Airport,Quezaltenango,Guatemala,AAZ,MGQZ,14.8656,-91.502,7779,-6,U,America/Guatemala
@@ -4651,7 +4648,6 @@
 5878,Savusavu Airport,Savusavu,Fiji,SVU,NFNS,-16.8028,179.341,17,12,U,Pacific/Fiji
 5879,Kaufana Airport,Eua Island,Tonga,EUA,NFTE,-21.3783,-174.958,325,13,U,Pacific/Tongatapu
 5880,Lifuka Island Airport,Lifuka,Tonga,HPA,NFTL,-19.777,-174.341,31,13,U,Pacific/Tongatapu
-5881,Mata'aho Airport,"Angaha, Niuafo'ou Island",Tonga,NFO,NFTO,-15.5708,-175.633,160,13,U,Pacific/Tongatapu
 5882,Kuini Lavenia Airport,Niuatoputapu,Tonga,NTT,NFTP,-15.9767,-173.755,0,13,U,Pacific/Tongatapu
 5883,Vanua Balavu Airport,Vanua Balavu,Fiji,VBV,NFVB,-17.269,-178.976,76,12,U,Pacific/Fiji
 5884,Niue International Airport,Alofi,Niue,IUE,NIUE,-19.080028,-169.925639,209,-11,U,Pacific/Niue
@@ -4691,7 +4687,7 @@
 5918,Ipota Airport,Ipota,Vanuatu,IPA,NVVI,-18.8783,169.308,23,11,U,Pacific/Efate
 5919,Tiga Airport,Tiga,New Caledonia,TGJ,NWWA,-21.0961,167.804,128,11,U,Pacific/Noumea
 5920,Belep Islands Airport,Waala,New Caledonia,BMY,NWWC,-19.7206,163.661,306,11,U,Pacific/Noumea
-5921,?Äle des Pins Airport,?Äle des Pins,New Caledonia,ILP,NWWE,-22.5889,167.456,315,11,U,Pacific/Noumea
+5921,?ï¿½le des Pins Airport,?ï¿½le des Pins,New Caledonia,ILP,NWWE,-22.5889,167.456,315,11,U,Pacific/Noumea
 5922,Faizabad Airport,Faizabad,Afghanistan,FBD,OAFZ,37.1211,70.5181,3872,4.5,U,Asia/Kabul
 5924,Dawadmi Domestic Airport,Dawadmi,Saudi Arabia,DWD,OEDW,24.5,44.4,3429,3,U,Asia/Riyadh
 5925,Al-Jawf Domestic Airport,Al-Jawf,Saudi Arabia,AJF,OESK,29.785133,40.100006,2261,3,U,Asia/Riyadh
@@ -4727,7 +4723,7 @@
 5955,Bahia Pi??a Airport,Bahia Pi??a,Panama,BFQ,,7.583,-78.2,14,-5,U,America/Panama
 5956,EL Real Airport,El Real,Panama,ELE,,8.133,-77.7,57,-5,U,America/Panama
 5957,Contadora Airport,Contadora Island,Panama,OTD,,8.62876,-79.0347,14,-5,U,America/Panama
-5958,Sambu Airport,Boca de S?íbalo,Panama,SAX,,8.017,-78.2,32,-5,U,America/Panama
+5958,Sambu Airport,Boca de S?ï¿½balo,Panama,SAX,,8.017,-78.2,32,-5,U,America/Panama
 5959,Adak Airport,Adak Island,United States,ADK,PADK,51.878,-176.646,18,-9,A,America/Anchorage
 5960,Gustavus Airport,Gustavus,United States,GST,PAGS,58.4253,-135.707,34,-9,A,America/Anchorage
 5961,Skagway Airport,Skagway,United States,SGY,PAGY,59.4601,-135.316,44,-9,A,America/Anchorage
@@ -4803,13 +4799,13 @@
 6032,Santa Teresita Airport,Santa Teresita,Argentina,SST,SAZL,-36.542317,-56.721756,9,-3,N,America/Cordoba
 6033,Necochea Airport,Necochea,Argentina,NEC,SAZO,-38.483056,-58.817222,72,-3,N,America/Cordoba
 6034,Orlando Bezerra de Menezes Airport,Juazeiro Do Norte,Brazil,JDO,SBJU,-7.218958,-39.2701,1392,-3,S,America/Fortaleza
-6036,Chapada Diamantina Airport,Len?º??is,Brazil,LEC,SBLE,-12.4823,-41.277,1676,-3,S,America/Fortaleza
+6036,Chapada Diamantina Airport,Len?ï¿½??is,Brazil,LEC,SBLE,-12.4823,-41.277,1676,-3,S,America/Fortaleza
 6037,Maca?? Airport,Maca??,Brazil,MEA,SBME,-22.343,-41.766,8,-3,S,America/Sao_Paulo
-6038,Mar?¡lia Airport,Mar?¡lia,Brazil,MII,SBML,-22.196892,-49.9264,2122,-3,S,America/Sao_Paulo
+6038,Mar?ï¿½lia Airport,Mar?ï¿½lia,Brazil,MII,SBML,-22.196892,-49.9264,2122,-3,S,America/Sao_Paulo
 6039,Vit??ria da Conquista Airport,Vit??ria Da Conquista,Brazil,VDC,SBQV,-14.862761,-40.863106,2998,-3,S,America/Fortaleza
 6040,Santa Maria Airport,Santa Maria,Brazil,RIA,SBSM,-29.711358,-53.688153,287,-3,S,America/Sao_Paulo
 6041,Toledo Airport,Toledo,Brazil,TOW,SBTD,-24.6863,-53.6975,1843,-3,S,America/Sao_Paulo
-6042,Ricardo Garc?¡a Posada Airport,El Salvador,Chile,ESR,SCES,-26.3111,-69.7652,5240,-4,S,America/Santiago
+6042,Ricardo Garc?ï¿½a Posada Airport,El Salvador,Chile,ESR,SCES,-26.3111,-69.7652,5240,-4,S,America/Santiago
 6043,Puc??n Airport,Pucon,Chile,ZPC,SCPC,-39.2928,-71.9159,853,-4,S,America/Santiago
 6044,Sorocaba Airport,Sorocaba,Brazil,SOD,SDCO,-23.478,-47.49,2077,-3,S,America/Sao_Paulo
 6045,San Crist??bal Airport,San Crist??bal,Ecuador,SCY,SEST,-0.910206,-89.61745,62,-6,U,Pacific/Galapagos
@@ -4818,33 +4814,33 @@
 6048,Stanley Airport,Stanley,Falkland Islands,PSY,SFAL,-51.685672,-57.777644,75,-3,U,Atlantic/Stanley
 6049,Santa Ana Airport,Cartago,Colombia,CRC,SKGO,4.758181,-75.955753,2979,-5,U,America/Bogota
 6050,La Jagua Airport,Garz??n,Colombia,GLJ,SKGZ,2.17,-75.67,2620,-5,U,America/Bogota
-6051,Caucaya Airport,Puerto Legu?¡zamo,Colombia,LQM,SKLG,-0.18,-74.77,573,-5,U,America/Bogota
+6051,Caucaya Airport,Puerto Legu?ï¿½zamo,Colombia,LQM,SKLG,-0.18,-74.77,573,-5,U,America/Bogota
 6052,La Pedrera Airport,La Pedrera,Colombia,LPD,SKLP,-1.33,-69.58,590,-5,U,America/Bogota
-6053,Reyes Murillo Airport,Nuqu?¡,Colombia,NQU,SKNQ,5.7,-77.28,12,-5,U,America/Bogota
-6054,Obando Airport,Puerto In?¡rida,Colombia,PDA,SKPD,3.85,-67.91,460,-5,U,America/Bogota
-6055,El Alcarav?ín Airport,Yopal,Colombia,EYP,SKYP,5.319114,-72.383975,1028,-5,U,America/Bogota
-6056,Capit?ín de Av. Emilio Beltr?ín Airport,Guayaramer?¡n,Bolivia,GYA,SLGY,-10.8206,-65.3456,557,-4,U,America/La_Paz
+6053,Reyes Murillo Airport,Nuqu?ï¿½,Colombia,NQU,SKNQ,5.7,-77.28,12,-5,U,America/Bogota
+6054,Obando Airport,Puerto In?ï¿½rida,Colombia,PDA,SKPD,3.85,-67.91,460,-5,U,America/Bogota
+6055,El Alcarav?ï¿½n Airport,Yopal,Colombia,EYP,SKYP,5.319114,-72.383975,1028,-5,U,America/Bogota
+6056,Capit?ï¿½n de Av. Emilio Beltr?ï¿½n Airport,Guayaramer?ï¿½n,Bolivia,GYA,SLGY,-10.8206,-65.3456,557,-4,U,America/La_Paz
 6057,Puerto Rico Airport,Puerto Rico/Manuripi,Bolivia,PUR,SLPR,-11.1077,-67.5512,597,-4,U,America/La_Paz
-6058,Capit?ín Av. Selin Zeitun Lopez Airport,Riberalta,Bolivia,RIB,SLRI,-11,-66,462,-4,U,America/La_Paz
+6058,Capit?ï¿½n Av. Selin Zeitun Lopez Airport,Riberalta,Bolivia,RIB,SLRI,-11,-66,462,-4,U,America/La_Paz
 6059,Reyes Airport,Reyes,Bolivia,REY,SLRY,-14.3044,-67.3534,935,-4,U,America/La_Paz
-6060,Capit?ín Av. German Quiroga G. Airport,San Borja,Bolivia,SRJ,SLSB,-14.8592,-66.7375,633,-4,U,America/La_Paz
+6060,Capit?ï¿½n Av. German Quiroga G. Airport,San Borja,Bolivia,SRJ,SLSB,-14.8592,-66.7375,633,-4,U,America/La_Paz
 6061,Zorg en Hoop Airport,Paramaribo,Suriname,ORG,SMZO,5.81108,-55.1907,10,-3,U,America/Paramaribo
 6062,Mucuri Airport,Mucuri,Brazil,MVS,SNMU,-18.0489,-39.8642,276,-3,S,America/Fortaleza
 6063,Boorama Airport,Boorama,Somalia,BXX,,9.933,43.15,0,3,U,Africa/Mogadishu
 6064,Gatokae Airport,Gatokae,Solomon Islands,GTA,,-8.75,158.2,0,11,U,Pacific/Guadalcanal
 6065,Caballococha Airport,Caballococha,Peru,LHC,SPBC,-3.916858,-70.508225,328,-5,U,America/Lima
 6066,Mayor General FAP Armando Revoredo Iglesias Airport,Cajamarca,Peru,CJA,SPJR,-7.139183,-78.4894,8781,-5,U,America/Lima
-6067,Alferez Fap David Figueroa Fernandini Airport,Hu?ínuco,Peru,HUU,SPNC,-9.878811,-76.204797,6070,-5,U,America/Lima
+6067,Alferez Fap David Figueroa Fernandini Airport,Hu?ï¿½nuco,Peru,HUU,SPNC,-9.878811,-76.204797,6070,-5,U,America/Lima
 6068,Maria Reiche Neuman Airport,Nazca,Peru,NZA,SPZA,-14.854192,-74.961811,1860,-5,U,America/Lima
 6069,Santa Rosa Airport,Santa Rosa,Brazil,SRA,SSZR,-27.9067,-54.5204,984,-3,S,America/Sao_Paulo
 6070,El Jaguel / Punta del Este Airport,Maldonado,Uruguay,MDO,SUPE,-34.917,-54.917,66,-3,S,America/Montevideo
 6071,Escuela Mariscal Sucre Airport,Maracay,Venezuela,MYC,SVBS,10.249978,-67.649419,1338,-4.5,U,America/Caracas
-6072,Juan Pablo P??rez Alfonso Airport,El Vig?¡a,Venezuela,VIG,SVVG,8.6241,-71.672819,250,-4.5,U,America/Caracas
-6073,Ji-Paran?í Airport,Ji-Paran?í,Brazil,JPR,SWJI,-10.8708,-61.8465,598,-4,S,America/Boa_Vista
+6072,Juan Pablo P??rez Alfonso Airport,El Vig?ï¿½a,Venezuela,VIG,SVVG,8.6241,-71.672819,250,-4.5,U,America/Caracas
+6073,Ji-Paran?ï¿½ Airport,Ji-Paran?ï¿½,Brazil,JPR,SWJI,-10.8708,-61.8465,598,-4,S,America/Boa_Vista
 6074,Codrington Airport,Codrington,Antigua and Barbuda,BBQ,TAPH,17.6358,-61.8286,15,-4,U,America/Antigua
 6075,La D??sirade Airport,Grande Anse,Guadeloupe,DSD,TFFA,16.2969,-61.0844,10,-4,U,America/Guadeloupe
 6076,Baillif Airport,Basse Terre,Guadeloupe,BBR,TFFB,16.0133,-61.7422,59,-4,U,America/Guadeloupe
-6077,St-Fran?ºois Airport,St-Fran?ºois,Guadeloupe,SFC,TFFC,16.2578,-61.2625,10,-4,U,America/Guadeloupe
+6077,St-Fran?ï¿½ois Airport,St-Fran?ï¿½ois,Guadeloupe,SFC,TFFC,16.2578,-61.2625,10,-4,U,America/Guadeloupe
 6078,Les Bases Airport,Grand Bourg,Guadeloupe,GBJ,TFFM,15.86875,-61.270022,16,-4,U,America/Guadeloupe
 6079,Vance Winkworth Amory International Airport,Charlestown,Saint Kitts and Nevis,NEV,TKPN,17.205678,-62.589869,14,-4,U,America/St_Kitts
 6080,Virgin Gorda Airport,Spanish Town,British Virgin Islands,VIJ,TUPW,18.4464,-64.4275,9,-4,U,America/Tortola
@@ -4957,7 +4953,7 @@
 6188,Cat Bi International Airport,Haiphong,Vietnam,HPH,VVCI,20.819386,106.724989,6,7,U,Asia/Saigon
 6189,Cam Ranh Airport,Nha Trang,Vietnam,CXR,VVCR,11.998153,109.219372,40,7,U,Asia/Saigon
 6190,Co Ong Airport,Conson,Vietnam,VCS,VVCS,8.731831,106.632589,20,7,U,Asia/Saigon
-6191,Tr?á N??c Airport,Can Tho,Vietnam,VCA,VVCT,10.085119,105.711922,9,7,U,Asia/Saigon
+6191,Tr?ï¿½ N??c Airport,Can Tho,Vietnam,VCA,VVCT,10.085119,105.711922,9,7,U,Asia/Saigon
 6192,Dien Bien Phu Airport,Dienbienphu,Vietnam,DIN,VVDB,21.397481,103.007831,1611,7,U,Asia/Saigon
 6193,Phu Cat Airport,Phucat,Vietnam,UIH,VVPC,13.954986,109.042267,80,7,U,Asia/Saigon
 6194,Pleiku Airport,Pleiku,Vietnam,PXU,VVPK,14.004522,108.017158,2434,7,U,Asia/Saigon
@@ -5358,7 +5354,7 @@
 6781,Canakkale Airport,Canakkale,Turkey,CKZ,LTBH,40.137722,26.426777,23,2,E,Europe/Istanbul
 6782,Mus Airport,Mus,Turkey,MSR,LTCK,38.747769,41.661236,4157,2,E,Europe/Istanbul
 6783,Sinop Airport,Sinop,Turkey,SIC,LTCM,42.0158,35.0664,20,2,E,Europe/Istanbul
-6784,Tekirda?ƒ ?çorlu Airport,?çorlu,Turkey,TEQ,LTBU,41.13825,27.919094,574,2,E,Europe/Istanbul
+6784,Tekirda?ï¿½ ?ï¿½orlu Airport,?ï¿½orlu,Turkey,TEQ,LTBU,41.13825,27.919094,574,2,E,Europe/Istanbul
 6785,Yenisehir Airport,Yenisehir,Turkey,YEI,LTBR,40.255208,29.562569,764,2,E,Europe/Istanbul
 6786,Terre-de-Haut Airport,Les Saintes,Guadeloupe,LSS,TFFS,15.8644,-61.5806,46,-4,U,America/Guadeloupe
 6787,Kalay Airport,Kalemyo,Myanmar,KMV,VYKL,23.188811,94.051094,499,6.5,U,Asia/Rangoon
@@ -8009,7 +8005,7 @@
 9443,Sunnyvale Station,Sunnyvale,United States,,\N,37.3786106,-122.0308333,15,-8,A,America/Los_Angeles
 9444,Millbrae Intermodal Terminal,San Mateo,United States,,\N,37.6002772,-122.3866667,15,-8,A,America/Los_Angeles
 9445,Cleveland Greyhound Station,Cleveland,United States,,\N,41.5034,-81.6822,679,-5,A,America/New_York
-9446,Issyk-Kul International Airport,Tamchy,Kyrgyzstan,?ÿ?Ü?ú,UCFL,42.3527,76.4278,5426,6,N,Asia/Bishkek
+9446,Issyk-Kul International Airport,Tamchy,Kyrgyzstan,?ï¿½?ï¿½?ï¿½,UCFL,42.3527,76.4278,5426,6,N,Asia/Bishkek
 9447,Crystal Airport,Crystal,United States,MIC,KMIC,45.0343,-93.2114,869,-6,A,America/Chicago
 9448,Clarke CO,Quitman,United States,23M,K23M,32.0517,-88.4434,320,-6,A,America/Chicago
 9449,Ellaidhoo,Ellaidhoo,Maldives,,\N,4.005694444,72.94861111,0,5,N,Indian/Maldives

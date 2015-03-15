@@ -1,9 +1,12 @@
 package org.controlsfx.control.table;
 import javafx.application.Application;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -30,6 +33,9 @@ public class TableFilterTest extends Application {
         stage.setWidth(450);
         stage.setHeight(550);
 
+        table.setItems(data);
+
+        TableColumn<Airport,IntegerProperty> col1 = new TableColumn<>();
 
         TableFilter.forTable(table);
 
@@ -40,20 +46,22 @@ public class TableFilterTest extends Application {
 
     private static final ObservableList<Airport> buildAirports()  {
         try {
-            final File file = new File("airports.csv");
+            final File file = new File("C:\\Users\\Thomas\\Documents\\Development\\sourcetree\\ControlsFX\\controlsfx\\src\\test\\resources\\org\\controlsfx\\control\\table\\airports.csv");
             final ObservableList<Airport> airports = FXCollections.observableArrayList();
-            new BufferedReader(new FileReader(file)).lines().map(l -> new Airport(l))
+            new BufferedReader(new FileReader(file)).lines()
+                    .filter(l -> {try { new Airport(l); return true; } catch (Exception e) { System.out.println(l); return false; }}).map(l -> new Airport(l))
                     .forEach(a -> airports.add(a));
 
             return airports;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Data initialization failed!");
         }
 
     }
 
     private static final class Airport {
-        private final int airPortId;
+        private final IntegerProperty airPortId;
         private final String name;
         private final String city;
         private final String country;
@@ -62,13 +70,13 @@ public class TableFilterTest extends Application {
         private final BigDecimal latitude;
         private final BigDecimal longitude;
         private final BigDecimal altitude;
-        private final int timezone;
+        private final double timezone;
         private final String dst;
         private final String tzDbTimezone;
 
         public Airport(String csvLine) {
             String[] prop = csvLine.split(",");
-            airPortId = Integer.valueOf(prop[0]).intValue();
+            airPortId = new SimpleIntegerProperty(Integer.valueOf(prop[0]).intValue());
             name = prop[1];
             city = prop[2];
             country = prop[3];
@@ -77,7 +85,7 @@ public class TableFilterTest extends Application {
             latitude = new BigDecimal(prop[6]);
             longitude = new BigDecimal(prop[7]);
             altitude = new BigDecimal(prop[8]);
-            timezone = Integer.valueOf(prop[9]).intValue();
+            timezone = Double.valueOf(prop[9]).doubleValue();
             dst = prop[10];
             tzDbTimezone = prop[11];
         }

@@ -59,6 +59,7 @@ public final class FilterPanel<T> extends Pane {
     FilterPanel(ColumnFilter<T> columnFilter) { 
         this.columnFilter = columnFilter;
         
+        //initialize search box
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(3));
         
@@ -66,12 +67,15 @@ public final class FilterPanel<T> extends Pane {
         vBox.getChildren().add(searchBox);
         searchBox.setPadding(new Insets(0,0,10,0)); 
         
+        
+        //initialize checklist view
         filterList = new FilteredList<Object>(new SortedList<Object>(columnFilter.getDistinctValues()), t -> true);
         checkListView.setItems(filterList);
         checkListView.selectionModelProperty().get().selectAll();
         
         vBox.getChildren().add(checkListView);
         
+        //initialize apply button
         HBox bttnBox = new HBox();
         Button applyBttn = new Button("APPLY");
         
@@ -82,6 +86,8 @@ public final class FilterPanel<T> extends Pane {
         
         bttnBox.getChildren().add(applyBttn);
         
+        
+        //initialize clear button
         Button clearButton = new Button("CLEAR");
         
         clearButton.setOnAction(e -> { 

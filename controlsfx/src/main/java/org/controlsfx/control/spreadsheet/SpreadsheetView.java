@@ -1079,7 +1079,7 @@ public class SpreadsheetView extends Control {
                 final int offsetCol = targetRange.getLeft() - sourceRange.getLeft();
 
                 //If the numbers of rows are the same and the targetColumnGap is a multiple of sourceColumnGap
-                if (sourceRowGap == targetRowGap && (targetColumnGap % sourceColumnGap) == 0) {
+                if ((sourceRowGap == targetRowGap || targetRowGap == 1) && (targetColumnGap % sourceColumnGap) == 0) {
                     for (final GridChange change : list) {
                         int row = change.getRow() + offsetRow;
                         int column = change.getColumn() + offsetCol;
@@ -1091,7 +1091,7 @@ public class SpreadsheetView extends Control {
                         } while ((column = column + sourceColumnGap) <= targetRange.getRight());
                     }
                     //If the numbers of columns are the same and the targetRowGap is a multiple of sourceRowGap
-                } else if (sourceColumnGap == targetColumnGap && (targetRowGap % sourceRowGap) == 0) {
+                } else if ((sourceColumnGap == targetColumnGap || targetColumnGap == 1) && (targetRowGap % sourceRowGap) == 0) {
                     for (final GridChange change : list) {
 
                         int row = change.getRow() + offsetRow;

@@ -286,19 +286,24 @@ public class SpreadsheetViewSelectionModel extends
         if (getSelectionMode() == SelectionMode.SINGLE) {
             quietClearSelection();
         }
+        SpreadsheetCell cell = cellsView.getItems().get(old.getRow()).get(old.getColumn());
+        for (int i = cell.getRow(); i < cell.getRowSpan() + cell.getRow(); ++i) {
+            for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+                posFinal = new TablePosition<>(getTableView(), i, getTableView().getVisibleLeafColumn(j));
+                selectedCellsMap.add(posFinal);
+            }
+        }
 
-        selectedCellsMap.add(posFinal);
+        updateScroll(old);
+        addSelectedRowsAndColumns(old);
 
-        updateScroll(posFinal);
-        addSelectedRowsAndColumns(posFinal);
-
-        setSelectedIndex(posFinal.getRow());
-        setSelectedItem(getModelItem(posFinal.getRow()));
+        setSelectedIndex(old.getRow());
+        setSelectedItem(getModelItem(old.getRow()));
         if (getTableView().getFocusModel() == null) {
             return;
         }
 
-        getTableView().getFocusModel().focus(posFinal.getRow(), posFinal.getTableColumn());
+        getTableView().getFocusModel().focus(old.getRow(), old.getTableColumn());
     }
 
     /**
@@ -377,7 +382,7 @@ public class SpreadsheetViewSelectionModel extends
                     || position.getValue() > columnSize) {
                 continue;
             }
-            
+
             final TableColumn<ObservableList<SpreadsheetCell>, ?> column = getTableView().getVisibleLeafColumn(position.getValue());
 
             pos = getVisibleCell(position.getKey(), column, position.getValue());
@@ -466,10 +471,7 @@ public class SpreadsheetViewSelectionModel extends
                     continue;
                 }
 
-                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = new TablePosition<>(getTableView(), _row,
-                        column);
-
-                pos = getVisibleCell(_row, column, pos.getColumn());
+                TablePosition<ObservableList<SpreadsheetCell>, ?> pos = getVisibleCell(_row, column, _col);
 
                 // We store all the selectedColumn and Rows, we will update
                 // just once at the end
@@ -478,20 +480,12 @@ public class SpreadsheetViewSelectionModel extends
                     selectedColumns.add(i);
                     for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
                         selectedRows.add(j);
+                        pos = new TablePosition<>(getTableView(), i,getTableView().getVisibleLeafColumn(j));
+                        selectedCellsMap.add(pos);
                     }
                 }
-                /**
-                 * If we are on a spanning cells, we deactivate the makeAtomic
-                 * since it can lead to non-visual confirmation of the selected
-                 * cells as described in
-                 * https://javafx-jira.kenai.com/browse/RT-38306
-                 */
-                if (cell.getColumnSpan() > 1 || cell.getRowSpan() > 1) {
-                    makeAtomic = false;
-                }
 
-                selectedCellsMap.add(pos);
-                makeAtomic = true;
+//                makeAtomic = true;
 
                 // end copy/paste
             }
@@ -509,13 +503,20 @@ public class SpreadsheetViewSelectionModel extends
             return;
         }
 
+        //FIXME Focus is wrong, and endIndex also..
         getTableView().getFocusModel().focus(maxRow, (TableColumn<ObservableList<SpreadsheetCell>, ?>) maxColumn);
 
+        /**
+         * If we end up on a spanned cell, there is not reliable way to
+         * determine which is the last index, certainly not the maxRow and
+         * maxColumn. So right now we need to take this extreme measure in order
+         * to be sure that the cells will be highlighted correctly.
+         */
         final int startChangeIndex = selectedCellsMap.indexOf(new TablePosition<>(getTableView(), minRow,
                 (TableColumn<ObservableList<SpreadsheetCell>, ?>) minColumn));
-        final int endChangeIndex = selectedCellsMap.indexOf(new TablePosition<>(getTableView(), maxRow,
-                (TableColumn<ObservableList<SpreadsheetCell>, ?>) maxColumn));
-        
+        final int endChangeIndex = selectedCellsMap.getSelectedCells().size()-1;//indexOf(new TablePosition<>(getTableView(), maxRow,
+//                (TableColumn<ObservableList<SpreadsheetCell>, ?>) maxColumn));
+
         if (startChangeIndex > -1 && endChangeIndex > -1) {
             final int startIndex = Math.min(startChangeIndex, endChangeIndex);
             final int endIndex = Math.max(startChangeIndex, endChangeIndex);

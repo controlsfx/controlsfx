@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.*;
@@ -223,8 +224,12 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      */
     @Override public Glyph duplicate() {
         Paint color = getTextFill();
+        Object icon = getIcon();
+        ObservableList<String> classes = getStyleClass();
         return new Glyph(){{
+            setIcon(icon);
             setTextFill(color);
+            getStyleClass().addAll(classes);
         }}
                 .fontFamily(getFontFamily())
                 .size(getFontSize());

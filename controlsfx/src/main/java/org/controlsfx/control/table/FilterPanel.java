@@ -35,7 +35,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -50,16 +49,7 @@ public final class FilterPanel<T> extends Pane {
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
 
-
-    private static final class FilterItemCell extends CheckBoxListCell<ColumnFilter.FilterValue<?>> {
-       private FilterItemCell() {}
-        @Override
-        public void updateItem(ColumnFilter.FilterValue<?> item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(item == null ? "" : item.getValueProperty().getValue().toString());
-        }
-    }
-    FilterPanel(ColumnFilter<T> columnFilter) { 
+    FilterPanel(ColumnFilter<T> columnFilter) {
         this.columnFilter = columnFilter;
 
         //initialize search box
@@ -74,8 +64,16 @@ public final class FilterPanel<T> extends Pane {
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         checkListView.setItems(filterList);
 
-       filterList.stream().forEach(item -> checkListView.getItemBooleanProperty(item).bindBidirectional(item.getSelectedProperty()));
-
+        filterList.stream().forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
+        filterList.forEach(item -> item.getSelectedProperty().setValue(true));
+        /*
+        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
+            public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
+                checkListView.getItems().forEach(item -> item.getSelectedProperty().setValue(false));
+                checkListView.getCheckModel().getCheckedItems().forEach(ci -> ci.getSelectedProperty().setValue(true));
+            }
+        });
+        */
         vBox.getChildren().add(checkListView);
         
         //initialize apply button
@@ -83,8 +81,7 @@ public final class FilterPanel<T> extends Pane {
         Button applyBttn = new Button("APPLY");
         
         applyBttn.setOnAction(e -> { 
-            columnFilter.getTableFilter().executeFilter(); 
-            searchBox.clear(); 
+            columnFilter.getTableFilter().executeFilter();
         });
         
         bttnBox.getChildren().add(applyBttn);
@@ -95,7 +92,7 @@ public final class FilterPanel<T> extends Pane {
         
         clearButton.setOnAction(e -> { 
             columnFilter.getTableFilter().getFilteredList().setPredicate(t -> true);
-            searchBox.clear(); 
+            //searchBox.clear();
         });
         
         bttnBox.getChildren().add(clearButton);
@@ -135,7 +132,7 @@ public final class FilterPanel<T> extends Pane {
         }
     }
     private void initializeListeners() { 
-        searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
+        //searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
 
 
     }

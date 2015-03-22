@@ -57,6 +57,7 @@ final class ColumnFilter<T> {
 
         private FilterValue(ObservableValue<V> value) {
             this.value = value;
+            isSelected.addListener(c -> System.out.println("FilterValue " + value + " set to " + isSelected.getValue()));
         }
         public ObservableValue<V> getValueProperty() {
             return value;
@@ -99,9 +100,10 @@ final class ColumnFilter<T> {
         tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item))
                 .filter(ov -> distinctMap.putIfAbsent(ov.getValue(), Boolean.TRUE) == null)
                 .forEach(v -> filterValues.add(new FilterValue<>(v)));
-
+/*
         filterValues.stream().filter(f -> unSelectedValues.stream().filter(uv -> uv.getValueProperty().getValue().equals(f.getValueProperty().getValue())).findAny().isPresent())
                 .forEach(v -> v.isSelected.setValue(false));
+                */
     }
 
     private void attachContextMenu() { 

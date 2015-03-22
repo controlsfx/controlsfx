@@ -26,15 +26,15 @@
  */
 package org.controlsfx.control.table;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class TableFilter<T> {
     
@@ -47,7 +47,7 @@ public final class TableFilter<T> {
     private TableFilter(TableView<T> tableView) { 
         this.tableView = tableView;
         this.backingList = tableView.getItems();
-        this.filteredList = new FilteredList<T>(new SortedList<T>(backingList));
+        this.filteredList = new FilteredList<>(new SortedList<>(backingList));
         this.filteredList.setPredicate(v -> true);
         tableView.setItems(filteredList);
     }

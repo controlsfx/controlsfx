@@ -89,13 +89,21 @@ public final class FilterPanel<T> extends Pane {
         
         //initialize clear button
         Button clearButton = new Button("CLEAR");
-        
+
         clearButton.setOnAction(e -> { 
-            columnFilter.getTableFilter().getFilteredList().setPredicate(t -> true);
-            //searchBox.clear();
+            columnFilter.getFilterValues().forEach(fv -> fv.getSelectedProperty().setValue(true));
+            columnFilter.getTableFilter().executeFilter();
         });
-        
+
         bttnBox.getChildren().add(clearButton);
+
+        Button clearAllButton = new Button("CLEAR ALL");
+        clearAllButton.setOnAction(e -> {
+            columnFilter.getTableFilter().getColumnFilters().forEach(cf -> cf.getFilterValues().forEach(fv -> fv.getSelectedProperty().setValue(true)));
+            columnFilter.getTableFilter().executeFilter();
+        });
+        bttnBox.getChildren().add(clearAllButton);
+
         
         vBox.getChildren().add(bttnBox);
         this.getChildren().add(vBox);

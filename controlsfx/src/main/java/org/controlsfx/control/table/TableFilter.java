@@ -52,7 +52,7 @@ public final class TableFilter<T> {
         tableView.setItems(filteredList);
     }
     public static <B> TableFilter<B> forTable(TableView<B> tableView) { 
-        TableFilter<B> tableFilter = new TableFilter<B>(tableView);
+        TableFilter<B> tableFilter = new TableFilter<>(tableView);
         tableFilter.applyForAllColumns();
         return tableFilter;
     }
@@ -68,10 +68,11 @@ public final class TableFilter<T> {
                 .map(c -> ColumnFilter.getInstance(this, c)).collect(Collectors.toList()));
     }
     public void executeFilter() { 
-        filteredList.setPredicate(v -> columnFilters.stream().filter(f -> f.isSelected(v) == false)
+        filteredList.setPredicate(v -> columnFilters.stream()
+                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).getSelectedProperty().getValue() == false)
                 .findAny().isPresent() == false);
     }
-    public TableView<T> getTableView() { 
+    public TableView<T> getTableView() {
         return tableView;
     }
     public ObservableList<ColumnFilter<T>> getColumnFilters() { 

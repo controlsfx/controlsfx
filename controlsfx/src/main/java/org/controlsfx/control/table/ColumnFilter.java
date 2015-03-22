@@ -27,17 +27,16 @@
 package org.controlsfx.control.table;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.FilterPanel.FilterMenuItem;
 
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 final class ColumnFilter<T> {
@@ -53,11 +52,22 @@ final class ColumnFilter<T> {
 
     public static final class FilterValue<V> {
 
-        private final ObjectProperty<V> value;
+        private final ObservableValue<V> value;
         private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
 
-        private FilterValue(ObjectProperty<V> value) {
+        private FilterValue(ObservableValue<V> value) {
             this.value = value;
+        }
+        public ObservableValue<V> getValueProperty() {
+            return value;
+        }
+        public BooleanProperty getSelectedProperty() {
+            return isSelected;
+        }
+
+        @Override
+        public String toString() {
+            return value.getValue().toString();
         }
     }
     public ObservableList<FilterValue<?>> getFilterValues() {
@@ -71,18 +81,29 @@ final class ColumnFilter<T> {
         return tableFilter;
     }
 
+    public FilterValue<?> getFilterValue(ObservableValue<?> value) {
+        return filterValues.stream().filter(fv -> fv.value.getValue().equals(value.getValue())).findAny()
+                .orElseThrow(() ->
+                        new RuntimeException("Value " + value.getValue() +
+                                " is not in the filterValues for column "
+                                + this.tableColumn.getText()));
+    }
     public void rebuildAllVals() {
-        filterValues.clear();
-        return tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item)).forEach(v -> filterValues.add(new FilterValue(v)));
 
+        final List<FilterValue<?>> unSelectedValues = filterValues.stream()
+                .filter(v -> !v.isSelected.getValue()).collect(Collectors.toList());
+
+        final ConcurrentHashMap<Object,Boolean> distinctMap = new ConcurrentHashMap<>();
+
+        filterValues.clear();
+        tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item))
+                .filter(ov -> distinctMap.putIfAbsent(ov.getValue(), Boolean.TRUE) == null)
+                .forEach(v -> filterValues.add(new FilterValue<>(v)));
+
+        filterValues.stream().filter(f -> unSelectedValues.stream().filter(uv -> uv.getValueProperty().getValue().equals(f.getValueProperty().getValue())).findAny().isPresent())
+                .forEach(v -> v.isSelected.setValue(false));
     }
-    
-    private void connectListeners() { 
-        final ListChangeListener<T> dataListener = c -> rebuildAllVals();
-        tableFilter.getBackingList().addListener(dataListener);
-        tableColumn.onEditCommitProperty().addListener(e -> rebuildAllVals());
-        
-    }
+
     private void attachContextMenu() { 
         FilterMenuItem<T> item = FilterPanel.getInMenuItem(this);
         ContextMenu contextMenu = new ContextMenu();
@@ -93,9 +114,8 @@ final class ColumnFilter<T> {
     }
     static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
         final ColumnFilter<T> columnFilter = new ColumnFilter<>(tableFilter, tableColumn);
-        
-        columnFilter.initializeData();
-        columnFilter.connectListeners();
+        columnFilter.rebuildAllVals();
+
         columnFilter.attachContextMenu();
         
         return columnFilter;

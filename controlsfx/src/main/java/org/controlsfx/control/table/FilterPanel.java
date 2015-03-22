@@ -26,53 +26,56 @@
  */
 package org.controlsfx.control.table;
 
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.beans.Observable;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-
 import org.controlsfx.control.CheckListView;
-
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
 
 
 public final class FilterPanel<T> extends Pane {
     
     private final ColumnFilter<T> columnFilter;
-    private final CheckListView<Object> checkListView = new CheckListView<>();
-    private final FilteredList<Object> filterList;
+    private final CheckListView<ColumnFilter.FilterValue<?>> checkListView = new CheckListView<>();
+    private final FilteredList<ColumnFilter.FilterValue<?>> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
-    
+
+
+    private static final class FilterItemCell extends CheckBoxListCell<ColumnFilter.FilterValue<?>> {
+       private FilterItemCell() {}
+        @Override
+        public void updateItem(ColumnFilter.FilterValue<?> item, boolean empty) {
+            super.updateItem(item, empty);
+            setText(item == null ? "" : item.getValueProperty().getValue().toString());
+        }
+    }
     FilterPanel(ColumnFilter<T> columnFilter) { 
         this.columnFilter = columnFilter;
-        
+
         //initialize search box
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
         vBox.getChildren().add(searchBox);
-        searchBox.setPadding(new Insets(0,0,10,0)); 
-        
-        
-        //initialize checklist view
-        filterList = new FilteredList<Object>(new SortedList<Object>(columnFilter.getDistinctValues()), t -> true);
+        searchBox.setPadding(new Insets(0,0,10,0));
+
+
+        filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         checkListView.setItems(filterList);
-        checkListView.selectionModelProperty().get().selectAll();
-        
+
+       filterList.stream().forEach(item -> checkListView.getItemBooleanProperty(item).bindBidirectional(item.getSelectedProperty()));
+
         vBox.getChildren().add(checkListView);
         
         //initialize apply button
@@ -133,11 +136,8 @@ public final class FilterPanel<T> extends Pane {
     }
     private void initializeListeners() { 
         searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
-        
-        final ListChangeListener<Object> selectionChangeListener = l ->  columnFilter.getSelectedDistinctValues().setAll(checkListView.getSelectionModel().getSelectedItems());
-        checkListView.getSelectionModel().getSelectedItems().addListener(selectionChangeListener);
-    
-        columnFilter.getTableColumn().setOnEditCommit(e -> columnFilter.rebuildAllVals());
+
+
     }
     
     /* Methods below helps will anchor the context menu under the column */

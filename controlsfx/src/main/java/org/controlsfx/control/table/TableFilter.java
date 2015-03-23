@@ -27,6 +27,7 @@
 package org.controlsfx.control.table;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -54,6 +55,7 @@ public final class TableFilter<T> {
     public static <B> TableFilter<B> forTable(TableView<B> tableView) { 
         TableFilter<B> tableFilter = new TableFilter<>(tableView);
         tableFilter.applyForAllColumns();
+        tableFilter.addListeners();
         return tableFilter;
     }
     public ObservableList<T> getBackingList() { 
@@ -72,6 +74,13 @@ public final class TableFilter<T> {
                 .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).getSelectedProperty().getValue() == false)
                 .findAny().isPresent() == false);
     }
+
+    private void addListeners() {
+        backingList.addListener((ListChangeListener<? super T>) e -> columnFilters.forEach(cf -> cf.rebuildAllVals()));
+
+        columnFilters.forEach(cf -> cf.getTableColumn().onEditCommitProperty().addListener(e -> cf.rebuildAllVals()));
+    }
+
     public TableView<T> getTableView() {
         return tableView;
     }

@@ -57,30 +57,26 @@ public final class FilterPanel<T> extends Pane {
         vBox.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
-        vBox.getChildren().add(searchBox);
         searchBox.setPadding(new Insets(0,0,10,0));
+        vBox.getChildren().add(searchBox);
 
+
+
+        //initialize checklist view
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         checkListView.setItems(filterList);
 
         filterList.stream().forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
         filterList.forEach(item -> item.getSelectedProperty().setValue(true));
-        /*
-        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
-            public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
-                checkListView.getItems().forEach(item -> item.getSelectedProperty().setValue(false));
-                checkListView.getCheckModel().getCheckedItems().forEach(ci -> ci.getSelectedProperty().setValue(true));
-            }
-        });
-        */
+
         vBox.getChildren().add(checkListView);
         
         //initialize apply button
         HBox bttnBox = new HBox();
         Button applyBttn = new Button("APPLY");
-        
-        applyBttn.setOnAction(e -> { 
+
+        applyBttn.setOnAction(e -> {
             columnFilter.getTableFilter().executeFilter();
         });
         
@@ -140,9 +136,7 @@ public final class FilterPanel<T> extends Pane {
         }
     }
     private void initializeListeners() { 
-        //searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
-
-
+        searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
     }
     
     /* Methods below helps will anchor the context menu under the column */

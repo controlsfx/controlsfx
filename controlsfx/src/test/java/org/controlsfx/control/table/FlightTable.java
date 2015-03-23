@@ -41,7 +41,7 @@ public final class FlightTable extends Application {
         Scene scene = new Scene(borderPane, 800, 600);
 
         table.setItems(flights);
-
+        table.setEditable(true);
         TableColumn<Flight, Integer> flightNumCol = new TableColumn<>("FLIGHT NUM");
         flightNumCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper(cellData.getValue().getFlightNumber()));
         table.getColumns().add(flightNumCol);
@@ -61,6 +61,18 @@ public final class FlightTable extends Application {
         TableColumn<Flight,BigDecimal> mileage =  new TableColumn<>("MILEAGE");
         mileage.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper(cellData.getValue().getMileaage()));
         table.getColumns().add(mileage);
+/*
+        TableColumn<Flight,String> gateNumber = new TableColumn<>("GATE");
+        gateNumber.setCellValueFactory(cellData -> cellData.getValue().getGateNumber());
+        gateNumber.setCellFactory(TextFieldTableCell.forTableColumn());
+        gateNumber.setEditable(true);
+        table.getColumns().add(gateNumber);
+*/
+
+        TableColumn<Flight,Boolean> cancelledInd =  new TableColumn<>("CANCELLED");
+        cancelledInd.setCellValueFactory(cellData -> cellData.getValue().getCancelledProperty());
+        cancelledInd.setEditable(true);
+        table.getColumns().add(cancelledInd);
 
         TableFilter.forTable(table);
 

@@ -515,6 +515,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     @Override
     public void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
+        
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
         List<?> items = itemsProperty().get();
         if (items == null || items.isEmpty()) {
@@ -604,9 +605,17 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (datePresent && widthMax < DATE_CELL_MIN_WIDTH) {
             widthMax = DATE_CELL_MIN_WIDTH;
         }
-        if(col.isResizable()){
-            col.setPrefWidth(widthMax);
-        }
+        /**
+         * This method is called by the system at initialisation and later by
+         * some methods that check wether the specified column is resizable. So
+         * we do not check if the column is resizable because it will be checked
+         * before. If we end up here, it either means the column is resizable,
+         * OR this is the initialisation and we haven't set a specific width so
+         * we just compute one time the correct width for that column, and once
+         * set, it will not be called again.
+         */
+        col.setPrefWidth(widthMax);
+        
         rectangleSelection.updateRectangle();
     }
 
@@ -639,7 +648,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @param tc
      */
     void resize(TableColumnBase<?, ?> tc) {
-        resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
+        if(tc.isResizable()){
+            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
+        }
     }
 
     @Override

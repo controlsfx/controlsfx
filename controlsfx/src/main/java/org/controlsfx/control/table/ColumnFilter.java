@@ -91,15 +91,16 @@ final class ColumnFilter<T> {
     }
     public void rebuildAllVals() {
 
-        final List<FilterValue<?>> unSelectedValues = filterValues.stream()
-                .filter(v -> !v.isSelected.getValue()).collect(Collectors.toList());
+        final List<FilterValue<?>> previousValues = filterValues.stream().collect(Collectors.toList());
 
         final ConcurrentHashMap<Object,Boolean> distinctMap = new ConcurrentHashMap<>();
 
         filterValues.clear();
         tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item))
                 .filter(ov -> distinctMap.putIfAbsent(ov.getValue(), Boolean.TRUE) == null)
-                .forEach(v -> filterValues.add(new FilterValue<>(v)));
+                .map(v -> new FilterValue<>(v))
+                .forEach(v -> filterValues.add(v));
+
 /*
         filterValues.stream().filter(f -> unSelectedValues.stream().filter(uv -> uv.getValueProperty().getValue().equals(f.getValueProperty().getValue())).findAny().isPresent())
                 .forEach(v -> v.isSelected.setValue(false));

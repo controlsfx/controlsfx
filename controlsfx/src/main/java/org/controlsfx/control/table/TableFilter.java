@@ -26,8 +26,8 @@
  */
 package org.controlsfx.control.table;
 
+import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -76,7 +76,7 @@ public final class TableFilter<T> {
     }
 
     private void addListeners() {
-        backingList.addListener((ListChangeListener<? super T>) e -> columnFilters.forEach(cf -> cf.rebuildAllVals()));
+        backingList.addListener((InvalidationListener) e -> columnFilters.forEach(cf -> cf.rebuildAllVals()));
 
         columnFilters.forEach(cf -> cf.getTableColumn().onEditCommitProperty().addListener(e -> cf.rebuildAllVals()));
     }

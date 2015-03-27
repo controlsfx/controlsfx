@@ -5,10 +5,13 @@ import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.math.BigDecimal;
@@ -30,6 +33,12 @@ public final class FlightTable extends Application {
             new Flight(287,"SEA","PHX", LocalDate.of(2015,5,8), 1426),
             new Flight(875,"SEA","PHX", LocalDate.of(2015,5,16), 1426),
             new Flight(4288,"SEA","PHX", LocalDate.of(2015,5,9), 1426)
+    );
+
+    private final ObservableList<Flight> hiddenFlights = FXCollections.observableArrayList(
+            new Flight(567,"BWI","MCO", LocalDate.of(2015,7,9), 898),
+            new Flight(234,"MDW","PDX", LocalDate.of(2015,7,12), 2118),
+            new Flight(411,"SAN","JFK", LocalDate.of(2015,7,19), 2077)
     );
 
     private final TableView<Flight> table = new TableView<>();
@@ -78,9 +87,34 @@ public final class FlightTable extends Application {
 
         borderPane.setCenter(table);
 
+        Button addFlightButton = new Button("APPEND");
+        addFlightButton.setOnAction(e -> {
+            if (hiddenFlights.size() > 0) {
+                flights.add(hiddenFlights.get(0));
+                hiddenFlights.remove(0);
+            }
+        });
+
+        Button removeFlightButton = new Button("REMOVE");
+        removeFlightButton.setOnAction(e -> {
+            if (flights.size() > 0) {
+                hiddenFlights.add(flights.get(0));
+                flights.remove(0);
+            }
+        });
+
+        VBox buttonPane = new VBox();
+        buttonPane.setPadding(new Insets(5));
+
+        buttonPane.getChildren().addAll(addFlightButton, removeFlightButton);
+
+        borderPane.setRight(buttonPane);
         primaryStage.setScene(scene);
 
         primaryStage.show();
+    }
+
+    private void addFlight() {
     }
 
     public static void main(String[] args) {

@@ -67,7 +67,8 @@ public final class FilterPanel<T> extends Pane {
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         checkListView.setItems(filterList);
 
-        filterList.stream().forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
+        filterList.stream().filter(item -> checkListView.getItemBooleanProperty(item) != null).forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
+
         filterList.forEach(item -> item.getSelectedProperty().setValue(true));
 
         vBox.getChildren().add(checkListView);
@@ -87,7 +88,6 @@ public final class FilterPanel<T> extends Pane {
         Button clearButton = new Button("CLEAR");
 
         clearButton.setOnAction(e -> { 
-            columnFilter.getFilterValues().forEach(fv -> fv.getSelectedProperty().setValue(true));
             columnFilter.getTableFilter().executeFilter();
         });
 

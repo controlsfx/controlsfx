@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -305,6 +305,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         if (showTickMarks) {
             if (tickLine == null) {
                 tickLine = new NumberAxis();
+                tickLine.tickLabelFormatterProperty().bind(getSkinnable().labelFormatterProperty());
                 tickLine.setAnimated(false);
                 tickLine.setAutoRanging(false);
                 tickLine.setSide(isHorizontal() ? Side.BOTTOM : Side.RIGHT);
@@ -317,10 +318,6 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                 // add 1 to the slider minor tick count since the axis draws one
                 // less minor ticks than the number given.
                 tickLine.setMinorTickCount(Math.max(rangeSlider.getMinorTickCount(),0) + 1);
-                // TODO change slider API to Integer from Number
-        //            if (slider.getLabelFormatter() != null)
-        //                tickLine.setFormatTickLabel(slider.getLabelFormatter());
-        //            tickLine.dataChanged();
                 getChildren().clear();
                 getChildren().addAll(tickLine, track, lowThumb);
             } else {

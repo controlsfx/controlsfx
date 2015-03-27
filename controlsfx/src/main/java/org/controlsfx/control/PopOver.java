@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -301,6 +301,24 @@ public class PopOver extends PopupControl {
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public final void show(Window owner){
+        super.show(owner);
+        ownerWindow = owner;
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                closePopOverOnOwnerWindowClose);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public final void show(Window ownerWindow, double anchorX, double anchorY){
+        super.show(ownerWindow, anchorX, anchorY);
+        this.ownerWindow = ownerWindow;
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                closePopOverOnOwnerWindowClose);
+    }
+    
     /**
      * Makes the pop over visible at the give location and associates it with
      * the given owner node. The x and y coordinate will be the target location

@@ -54,6 +54,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -681,6 +683,23 @@ public class Wizard {
             int pageIndex = pages.indexOf(currentPage);
             return pages.size()-1 > pageIndex; 
         }
+    }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Methods for the sake of unit tests
+     * 
+     **************************************************************************/
+    
+    /**
+     * @return The {@link Dialog} representing this {@link Wizard}. <br>
+     *         This is actually for {@link Dialog} reading-purposes, e.g.
+     *         unit testing the {@link DialogPane} content.
+     */
+    Dialog<ButtonType> getDialog() {
+        return dialog;
     }
     
 }

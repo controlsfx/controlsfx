@@ -50,8 +50,11 @@ import javafx.scene.control.TableView.TableViewFocusModel;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Grid;
@@ -270,6 +273,41 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // We want the text to wrap onto another line
 //        setWrapText(true);
         setEditable(cell.isEditable());
+        
+        if (cell.getCellType().acceptDrop()) {
+            setOnDragOver(new EventHandler<DragEvent>() {
+
+                @Override
+                public void handle(DragEvent event) {
+                    Dragboard db = event.getDragboard();
+                    if (db.hasFiles()) {
+                        event.acceptTransferModes(TransferMode.ANY);
+                    } else {
+                        event.consume();
+                    }
+                }
+            });
+            // Dropping over surface
+            setOnDragDropped(new EventHandler<DragEvent>() {
+                @Override
+                public void handle(DragEvent event) {
+                    Dragboard db = event.getDragboard();
+                    boolean success = false;
+                    if (db.hasFiles() && db.getFiles().size() == 1) {
+                        if (getItem().getCellType().match(db.getFiles().get(0))) {
+                            handle.getView().getGrid().setCellValue(getItem().getRow(), getItem().getColumn(),
+                                    getItem().getCellType().convertValue(db.getFiles().get(0)));
+                            success = true;
+                        }
+                    }
+                    event.setDropCompleted(success);
+                    event.consume();
+                }
+            });
+        } else {
+            setOnDragOver(null);
+            setOnDragDropped(null);
+        }
     }
 
     public void show() {
@@ -442,7 +480,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (!this.contains(e.getX(), e.getY())) {
             return;
         }
-
         final TableView<ObservableList<SpreadsheetCell>> tableView = getTableView();
         if (tableView == null) {
             return;

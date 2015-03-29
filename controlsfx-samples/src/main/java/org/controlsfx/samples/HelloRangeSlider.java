@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,46 +34,87 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.RangeSlider;
 
 public class HelloRangeSlider extends ControlsFXSample {
-    
+
     public static void main(String[] args) {
         launch(args);
     }
-    
+
     @Override public String getSampleName() {
         return "RangeSlider";
     }
-    
+
     @Override public String getJavaDocURL() {
         return Utils.JAVADOC_BASE + "org/controlsfx/control/RangeSlider.html";
     }
-    
+
     
     @Override
     public String getControlStylesheetURL() {
-    	return "/org/controlsfx/control/rangeslider.css";
+        return "/org/controlsfx/control/rangeslider.css";
     }
-    
+
     @Override public Node getPanel(Stage stage) {
         VBox root = new VBox(15);
-        
+
         Region horizontalRangeSlider = createHorizontalSlider();
         Region verticalRangeSlider = createVerticalSlider();
-        root.getChildren().addAll(horizontalRangeSlider, verticalRangeSlider);
-        
+        Region labelRangeSlider = createLabelSlider();
+        root.getChildren().addAll(horizontalRangeSlider, verticalRangeSlider, labelRangeSlider );
+
         return root;
     }
-    
+
     @Override public String getSampleDescription() {
         return "The Slider control in JavaFX is great for selecting a single "
                 + "value between a min and max value, but it isn't so great for "
                 + "letting users select a range - that's where RangeSlider comes in!";
     }
-    
+
+    Region createLabelSlider() {
+        final RangeSlider hSlider = new RangeSlider(0, 100, 10, 90);
+        hSlider.setShowTickMarks(true);
+        hSlider.setShowTickLabels(true);
+        hSlider.setLabelFormatter(new StringConverter<Number>() {
+
+            @Override
+            public String toString(Number object) {
+                switch (object.intValue()) {
+                    case 0:
+                        return "very low";
+                    case 25:
+                        return "low";
+                    case 50:
+                        return "middle";
+                    case 75:
+                        return "high";
+                    case 100:
+                        return "very high";
+                }
+                return object.toString();
+            }
+
+            @Override
+            public Number fromString(String string) {
+                return Double.valueOf(string);
+            }
+        });
+        hSlider.setBlockIncrement(10);
+        hSlider.setPrefWidth(300);
+
+        HBox box = new HBox(10);
+        box.getChildren().addAll(hSlider);
+        box.setPadding(new Insets(20,0,0,20));
+        box.setFillHeight(false);
+
+        return box;
+    }
+
     Region createHorizontalSlider() {
         final TextField minField = new TextField();
         minField.setPrefColumnCount(5);
@@ -105,7 +146,7 @@ public class HelloRangeSlider extends ControlsFXSample {
 
         return box;
     }
-    
+
     
     Region createVerticalSlider() {
         final TextField minField = new TextField();
@@ -139,5 +180,5 @@ public class HelloRangeSlider extends ControlsFXSample {
         box.getChildren().addAll(maxField, vSlider, minField);
         return box;
     }
-    
+
 }

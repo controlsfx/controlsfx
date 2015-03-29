@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -561,9 +561,12 @@ public class Wizard {
             // we've added the setting to the settings map and we should stop drilling deeper
             return true;
         } else {
-            // go into children of this node (if possible) and see if we can get
-            // a value from them (recursively)
-            List<Node> children = ImplUtils.getChildren(n, false);
+            /**
+             * go into children of this node (if possible) and see if we can get
+             * a value from them (recursively) We use reflection to fix
+             * https://bitbucket.org/controlsfx/controlsfx/issue/412 .
+             */
+            List<Node> children = ImplUtils.getChildren(n, true);
             
             // we're doing a depth-first search, where we stop drilling down
             // once we hit a successful read

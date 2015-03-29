@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,8 @@ import com.sun.javafx.Utils;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.util.StringConverter;
 
 /**
  * The RangeSlider control is simply a JavaFX {@link Slider} control with support
@@ -339,9 +341,30 @@ public class RangeSlider extends ControlsFXControl {
         return highValueChanging == null ? false : highValueChanging.get();
     }
     
+    private final ObjectProperty<StringConverter<Number>> tickLabelFormatter = new SimpleObjectProperty<>();
     
+    /**
+     * Gets the value of the property tickLabelFormatter.
+     * @return 
+     */
+    public final StringConverter<Number> getLabelFormatter(){
+        return tickLabelFormatter.get();
+    }
     
-    
+    /**
+     * Sets the value of the property tickLabelFormatter.
+     * @param value 
+     */
+    public final void setLabelFormatter(StringConverter<Number> value){
+        tickLabelFormatter.set(value);
+    }
+    /**
+     * StringConverter used to format tick mark labels. If null a default will be used.
+     * @return 
+     */
+    public final ObjectProperty<StringConverter<Number>> labelFormatterProperty(){
+        return tickLabelFormatter;
+    }
     
     /***************************************************************************
      *                                                                         *

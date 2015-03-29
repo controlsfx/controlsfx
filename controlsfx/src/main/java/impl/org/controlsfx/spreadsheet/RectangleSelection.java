@@ -162,7 +162,7 @@ public class RectangleSelection extends Rectangle {
      */
     private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow, int rowSpan) {
         double height = 0;
-        for (int i = maxRow; i <= maxRow + (rowSpan - 1); ++i) {
+        for (int i = maxRow; i <= maxRow /*+ (rowSpan - 1)*/; ++i) {
             height += skin.getRowHeight(i);
         }
 
@@ -222,7 +222,7 @@ public class RectangleSelection extends Rectangle {
 
         //Then we compute the width by adding the space between the min and max column
         double width = 0;
-        for (int i = minColumn; i <= maxColumn + (columnSpan - 1); ++i) {
+        for (int i = minColumn; i <= maxColumn /*+ (columnSpan - 1)*/; ++i) {
             width += snapSize(columns.get(i).getWidth());
         }
 

@@ -2,8 +2,10 @@ package impl.org.controlsfx.skin;
 
 
 import com.sun.javafx.event.EventHandlerManager;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -31,7 +33,12 @@ public class AutoCompletePopup<T> extends PopupControl{
     private final static int TITLE_HEIGHT = 28; // HACK: Hard-coded title-bar height
     private final ObservableList<T> suggestions = FXCollections.observableArrayList();
     private StringConverter<T> converter;
-
+    /**
+     * The maximum number of rows to be visible in the popup when it is
+     * showing. By default this value is 10, but this can be changed to increase
+     * or decrease the height of the popup.
+     */
+    private IntegerProperty visibleRowCount = new SimpleIntegerProperty(this, "visibleRowCount", 10);
 
     /***************************************************************************
      *                                                                         *
@@ -109,6 +116,10 @@ public class AutoCompletePopup<T> extends PopupControl{
         if(node.getScene() == null || node.getScene().getWindow() == null)
             throw new IllegalStateException("Can not show popup. The node must be attached to a scene/window."); //$NON-NLS-1$
 
+        if(isShowing()){
+            return;
+        }
+        
         Window parent = node.getScene().getWindow();
         this.show(
                 parent,
@@ -133,6 +144,17 @@ public class AutoCompletePopup<T> extends PopupControl{
 		return converter;
 	}
 
+    public final void setVisibleRowCount(int value) {
+        visibleRowCount.set(value);
+    }
+
+    public final int getVisibleRowCount() {
+        return visibleRowCount.get();
+    }
+
+    public final IntegerProperty visibleRowCountProperty() {
+        return visibleRowCount;
+    }
 
     /***************************************************************************
      *                                                                         *

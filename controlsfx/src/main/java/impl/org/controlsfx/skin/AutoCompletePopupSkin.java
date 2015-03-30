@@ -24,10 +24,15 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         suggestionList.getStylesheets().add(AutoCompletionBinding.class
         		.getResource("autocompletion.css").toExternalForm()); //$NON-NLS-1$
+        /**
+         * Here we bind the prefHeightProperty to the minimum height between the
+         * max visible rows and the current items list. We also add an arbitrary
+         * 5 number because when we have only one item we have the vertical
+         * scrollBar showing for no reason.
+         */
         suggestionList.prefHeightProperty().bind(
-                Bindings.size(suggestionList.getItems()).multiply(LIST_CELL_HEIGHT)
-                .add(15));
-        suggestionList.maxHeightProperty().bind(control.maxHeightProperty());
+                Bindings.min(control.visibleRowCountProperty(), Bindings.size(suggestionList.getItems()))
+                .multiply(LIST_CELL_HEIGHT).add(5));
         suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));               
         registerEventListener();
     }

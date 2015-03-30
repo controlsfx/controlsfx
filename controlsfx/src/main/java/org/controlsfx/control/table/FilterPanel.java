@@ -67,7 +67,7 @@ public final class FilterPanel<T> extends Pane {
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
 
         checkListView.setCheckModel(columnFilter);
-        checkListView.setItems(columnFilter.getFilterValues());
+        //checkListView.setItems(columnFilter.getFilterValues());
 
         vBox.getChildren().add(checkListView);
         

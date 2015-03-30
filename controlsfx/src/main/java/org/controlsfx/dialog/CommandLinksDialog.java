@@ -48,7 +48,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-
 import org.controlsfx.DialogResources;
 
 public class CommandLinksDialog extends Dialog<ButtonType> {
@@ -57,6 +56,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         private final ButtonType buttonType;
         private final String longText;
         private final Node graphic;
+        private boolean isHidden = false;
         
         public CommandLinksButtonType(String text, boolean isDefault ) {
             this(new ButtonType(text, buildButtonData(isDefault)), null);
@@ -86,7 +86,13 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         }
         
         private static ButtonData buildButtonData( boolean isDeafault) {
-        	return isDeafault? ButtonData.OK_DONE :ButtonData.CANCEL_CLOSE;
+        	return isDeafault? ButtonData.OK_DONE :ButtonData.OTHER;
+        }
+        
+        private static CommandLinksButtonType buildHiddenCancelLink() {
+            CommandLinksButtonType link = new CommandLinksButtonType(new ButtonType("",ButtonData.CANCEL_CLOSE));
+            link.isHidden = true;
+            return link;
         }
         
         public ButtonType getButtonType() {
@@ -168,16 +174,22 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         
         // create a map from ButtonType -> CommandLinkButtonType, and put the 
         // ButtonType values into the dialog pane
+        
         typeMap = new HashMap<>();
         for (CommandLinksButtonType link : links) { 
-            typeMap.put(link.getButtonType(), link); 
-            dialogPane.getButtonTypes().add(link.getButtonType()); 
+            addLinkToDialog(dialogPane,link);
         }
+        addLinkToDialog(dialogPane,CommandLinksButtonType.buildHiddenCancelLink());
         
         updateGrid();
         dialogPane.getButtonTypes().addListener((ListChangeListener<? super ButtonType>)c -> updateGrid());
         
         contentTextProperty().addListener(o -> updateContentText());
+    }
+    
+    private void addLinkToDialog(DialogPane dialogPane, CommandLinksButtonType link) {
+         typeMap.put(link.getButtonType(), link); 
+         dialogPane.getButtonTypes().add(link.getButtonType()); 
     }
     
     private void updateContentText() {
@@ -222,6 +234,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
     private Button createCommandLinksButton(ButtonType buttonType) {
         // look up the CommandLinkButtonType for the given ButtonType
         CommandLinksButtonType commandLink = typeMap.getOrDefault(buttonType, new CommandLinksButtonType(buttonType));
+        
         
         // put the content inside a button
         final Button button = new Button();
@@ -276,7 +289,11 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
 
         button.setGraphic(grid);
         button.minWidthProperty().bind(titleLabel.prefWidthProperty());
-
+        
+        if (commandLink.isHidden) {
+            button.setVisible(false);
+            button.setPrefHeight(1);
+        }
         return button;
     }    
 }

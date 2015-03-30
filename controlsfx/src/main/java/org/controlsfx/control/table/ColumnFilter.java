@@ -135,7 +135,7 @@ public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.Fil
         item.getSelectedProperty().setValue(true);
     }
 
-    public static final class FilterValue<V> {
+    static final class FilterValue<V> {
 
         private final ObservableValue<V> value;
         private final BooleanProperty isSelected = new SimpleBooleanProperty(true);

@@ -345,7 +345,7 @@ public class RangeSlider extends ControlsFXControl {
     
     /**
      * Gets the value of the property tickLabelFormatter.
-     * @return 
+     * @return the value of the property tickLabelFormatter.
      */
     public final StringConverter<Number> getLabelFormatter(){
         return tickLabelFormatter.get();
@@ -360,7 +360,7 @@ public class RangeSlider extends ControlsFXControl {
     }
     /**
      * StringConverter used to format tick mark labels. If null a default will be used.
-     * @return 
+     * @return a Property containing the StringConverter.
      */
     public final ObjectProperty<StringConverter<Number>> labelFormatterProperty(){
         return tickLabelFormatter;

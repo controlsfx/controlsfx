@@ -55,7 +55,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -386,7 +385,7 @@ public class Wizard {
      * Sets the value of the property {@code invalid}.
      * 
      * @param invalid The new validation state
-     * @see {@link #invalidProperty()}
+     *  {@link #invalidProperty() }
      */
     public final void setInvalid(boolean invalid) {
         invalidProperty.set(invalid);
@@ -396,7 +395,7 @@ public class Wizard {
      * Gets the value of the property {@code invalid}.
      * 
      * @return The validation state
-     * @see {@link #invalidProperty()}
+     * @see #invalidProperty() 
      */
     public final boolean isInvalid() {
         return invalidProperty.get();
@@ -424,7 +423,7 @@ public class Wizard {
      * Sets the value of the property {@code readSettings}.
      * 
      * @param readSettings The new read-settings state
-     * @see {@link #readSettingsProperty()}
+     * @see #readSettingsProperty()
      */
     public final void setReadSettings(boolean readSettings) {
         readSettingsProperty.set(readSettings);
@@ -434,7 +433,7 @@ public class Wizard {
      * Gets the value of the property {@code readSettings}.
      * 
      * @return The read-settings state
-     * @see {@link #readSettingsProperty()}
+     * @see #readSettingsProperty()
      */
     public final boolean isReadSettings() {
         return readSettingsProperty.get();

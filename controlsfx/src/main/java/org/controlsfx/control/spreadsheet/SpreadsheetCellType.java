@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -253,12 +253,11 @@ public abstract class SpreadsheetCellType<T> {
     }
 
     /**
-     * Returns true if this SpreadsheetCellType accepts Objects to be dropped on
+     *
+     * @return true if this SpreadsheetCellType accepts Objects to be dropped on
      * the {@link SpreadsheetCell}. Currently only Files can be dropped. If
      * accepted, prepare to receive them in {@link #match(java.lang.Object) }
      * and {@link #convertValue(java.lang.Object) }.
-     *
-     * @return
      */
     public boolean acceptDrop() {
         return false;

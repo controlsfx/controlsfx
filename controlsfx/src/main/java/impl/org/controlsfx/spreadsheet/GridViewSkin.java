@@ -490,22 +490,29 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     
     public void resizeRowsToDefault() {
         rowHeightMap.clear();
-        
+
         /**
          * When resizing to default, we need to go through the visible rows in
          * order to update them directly. Because if the rowHeightMap is empty,
          * the rows will not detect that maybe the height has changed.
          */
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double newHeight = row.getPrefHeight();
-            if(row.getPrefHeight() != newHeight){
-                row.setPrefHeight(newHeight);
+            double newHeight = row.computePrefHeight(-1);
+            if (row.getPrefHeight() != newHeight) {
+                row.setRowHeight(newHeight);
                 row.requestLayout();
             }
         }
-        
+
         //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
         getFlow().layoutChildren();
+
+        for (GridRow row : (List<GridRow>) getFlow().getCells()) {
+            double height = getRowHeight(row.getIndex());
+            if (row.getHeight() != height) {
+                row.setRowHeight(height);
+            }
+        }
         rectangleSelection.updateRectangle();
     }
     /**
@@ -613,8 +620,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * OR this is the initialisation and we haven't set a specific width so
          * we just compute one time the correct width for that column, and once
          * set, it will not be called again.
+         *
+         * Also, if the prefWidth has already been set but the user resized the
+         * column with his mouse, we must force the column to resize because
+         * setting the prefWidth again will not trigger the listeners.
          */
-        col.setPrefWidth(widthMax);
+        if (col.getPrefWidth() == widthMax && col.getWidth() != widthMax) {
+            col.impl_setWidth(widthMax);
+        } else {
+            col.setPrefWidth(widthMax);
+        }
         
         rectangleSelection.updateRectangle();
     }

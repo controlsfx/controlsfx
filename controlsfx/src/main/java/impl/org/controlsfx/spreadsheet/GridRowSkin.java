@@ -317,7 +317,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     if (tempHeight > customHeight) {
                         skin.rowHeightMap.put(index, tempHeight);
                         for (CellView cell : cells) {
-                            cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - GridViewSkin.DEFAULT_CELL_HEIGHT));
+                            cell.resize(cell.getWidth(), tempHeight);//cell.getHeight() + (tempHeight - GridViewSkin.DEFAULT_CELL_HEIGHT));
                         }
                         customHeight = tempHeight;
                         skin.getFlow().layoutChildren();

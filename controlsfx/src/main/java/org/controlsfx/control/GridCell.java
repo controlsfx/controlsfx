@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,6 @@ import javafx.scene.control.TableView;
  * the {@link GridView} class documentation for more details.
  *  
  * @see GridView
- * @see GridCell
  */
 public class GridCell<T> extends IndexedCell<T> {
     

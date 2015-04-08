@@ -26,9 +26,6 @@
  */
 package org.controlsfx.control;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -40,6 +37,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within
@@ -70,7 +70,7 @@ import javafx.util.Callback;
  * final CheckListView<String> checkListView = new CheckListView<>(strings);
  *       
  * // and listen to the relevant events (e.g. when the selected indices or 
- * // selected items change).
+ * // selected items change
  * checkListView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
  *     public void onChanged(ListChangeListener.Change<? extends String> c) {
  *         System.out.println(checkListView.getCheckModel().getSelectedItems());

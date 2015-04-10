@@ -393,9 +393,10 @@ public class SpreadsheetViewSelectionModel extends
                 selectedColumns.add(i);
                 for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
                     selectedRows.add(j);
+                    pos = new TablePosition<>(getTableView(), i,getTableView().getVisibleLeafColumn(j));
+                    newList.add(pos);
                 }
             }
-            newList.add(pos);
         }
         selectedCellsMap.setAll(newList);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.table;
 
+import impl.org.controlsfx.table.ColumnFilter;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,18 +46,14 @@ public final class TableFilter<T> {
     
     private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
  
-    private TableFilter(TableView<T> tableView) { 
+    public TableFilter(TableView<T> tableView) {
         this.tableView = tableView;
         this.backingList = tableView.getItems();
         this.filteredList = new FilteredList<>(new SortedList<>(backingList));
         this.filteredList.setPredicate(v -> true);
         tableView.setItems(filteredList);
-    }
-    public static <B> TableFilter<B> forTable(TableView<B> tableView) { 
-        TableFilter<B> tableFilter = new TableFilter<>(tableView);
-        tableFilter.applyForAllColumns();
-        tableFilter.addListeners();
-        return tableFilter;
+        this.applyForAllColumns();
+        this.addListeners();
     }
     public ObservableList<T> getBackingList() { 
         return backingList;
@@ -67,7 +64,7 @@ public final class TableFilter<T> {
     
     private void applyForAllColumns() { 
         columnFilters.setAll(this.tableView.getColumns().stream()
-                .map(c -> ColumnFilter.getInstance(this, c)).collect(Collectors.toList()));
+                .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream()

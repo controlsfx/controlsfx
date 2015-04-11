@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,6 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
          * editing by typing a key. We want directly to take those typed letters
          * and put them into the textfield.
          */
-        private boolean editWithKey = false;
-	
 	public SpreadsheetGridView(SpreadsheetHandle handle) {
 		this.handle = handle;
 	}
@@ -58,13 +56,5 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 	
 	public GridViewSkin getGridViewSkin() {
 		return handle.getCellsViewSkin();
-	}
-        
-        public void setEditWithKey(boolean b){
-	    editWithKey = b;
-	}
-        
-        public boolean getEditWithKey(){
-	    return editWithKey;
 	}
 };

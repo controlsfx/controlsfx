@@ -32,16 +32,17 @@ import static javafx.geometry.Orientation.VERTICAL;
 
 import java.util.List;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
@@ -55,7 +56,7 @@ import org.controlsfx.control.MasterDetailPane;
 import com.sun.javafx.css.StyleManager;
 
 public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
-    
+
     static {
         // refer to ControlsFXControl for why this is necessary
         StyleManager.getInstance().addUserAgentStylesheet(
@@ -64,12 +65,12 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
     private boolean changing = false;
     private SplitPane splitPane;
-    private Timeline timeline;
+    private final Timeline timeline = new Timeline();
+    private BooleanProperty showDetailForTimeline = new SimpleBooleanProperty();
 
     public MasterDetailPaneSkin(MasterDetailPane pane) {
         super(pane);
 
-        
         this.splitPane = new SplitPane();
         this.splitPane.setDividerPosition(0, pane.getDividerPosition());
 
@@ -91,6 +92,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                 }
             }
         });
+        
         SplitPane.setResizableWithParent(getSkinnable().getDetailNode(), false);
 
         switch (getSkinnable().getDetailSide()) {
@@ -131,11 +133,11 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                         default:
                                             throw new IllegalArgumentException(
                                                     "illegal details position " //$NON-NLS-1$
-                                                    + getSkinnable()
-                                                    .getDetailSide()
-                                                    + " for orientation " //$NON-NLS-1$
-                                                    + splitPane
-                                                    .getOrientation());
+                                                            + getSkinnable()
+                                                            .getDetailSide()
+                                                            + " for orientation " //$NON-NLS-1$
+                                                            + splitPane
+                                                            .getOrientation());
                                     }
                                     break;
                                 case VERTICAL:
@@ -149,11 +151,11 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                                         default:
                                             throw new IllegalArgumentException(
                                                     "illegal details position " //$NON-NLS-1$
-                                                    + getSkinnable()
-                                                    .getDetailSide()
-                                                    + " for orientation " //$NON-NLS-1$
-                                                    + splitPane
-                                                    .getOrientation());
+                                                            + getSkinnable()
+                                                            .getDetailSide()
+                                                            + " for orientation " //$NON-NLS-1$
+                                                            + splitPane
+                                                            .getOrientation());
                                     }
                                     break;
                             }
@@ -182,7 +184,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                         * it to show.
                         */
                         if (newNode != null && getSkinnable().isShowDetailNode()) {
-                            
+
                             /**
                              * Force the divider to take the value of the Pane,
                              * and not compute his.
@@ -247,6 +249,18 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                     public void changed(
                             ObservableValue<? extends Boolean> value,
                             Boolean oldShow, Boolean newShow) {
+                                /**
+                                 * https://bitbucket.org/controlsfx/controlsfx/issue/456/masterdetailpane-bug-of-adding-infinite
+                                 *
+                                 * Fixed bug - when close or show is still animated jump to last frame of animation
+                                 ** and fire finished event to complete the previous demand
+                                 *
+                                 */
+                                if (getSkinnable().isAnimated() && timeline.getStatus() == Animation.Status.RUNNING) {
+                                    timeline.jumpTo("endAnimation");
+                                    timeline.getOnFinished().handle(null);
+                                }
+
                                 if (newShow) {
                                     open();
                                 } else {
@@ -334,6 +348,16 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
             bindDividerPosition();
         }
+
+        timeline.setOnFinished(evt -> {
+            if (!showDetailForTimeline.get()) {
+                unbindDividerPosition();
+                splitPane.getItems().remove(
+                        getSkinnable().getDetailNode());
+                getSkinnable().getDetailNode().setOpacity(1);
+            }
+            changing = false;
+        });
     }
 
     private InvalidationListener listenersDivider = new InvalidationListener() {
@@ -412,51 +436,39 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
     private void maybeAnimatePositionChange(final double position,
             final boolean showDetail) {
+        showDetailForTimeline.set(showDetail);
+
         Divider divider = splitPane.getDividers().get(0);
 
-        if (getSkinnable().isAnimated()) {
-            if (showDetail) {
-                unbindDividerPosition();
-                bindDividerPosition();
-            }
+        if (showDetailForTimeline.get()) {
+            unbindDividerPosition();
+            bindDividerPosition();
+        }
 
+        if (getSkinnable().isAnimated()) {
             KeyValue positionKeyValue = new KeyValue(
                     divider.positionProperty(), position);
             KeyValue opacityKeyValue = new KeyValue(getSkinnable()
-                    .getDetailNode().opacityProperty(), showDetail ? 1 : 0);
-            KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1),
-                    positionKeyValue, opacityKeyValue);
-            timeline = new Timeline(keyFrame);
-            timeline.setOnFinished(new EventHandler<ActionEvent>() {
+                    .getDetailNode().opacityProperty(), showDetailForTimeline.get() ? 1 : 0);
 
-                @Override
-                public void handle(ActionEvent evt) {
-                    if (!showDetail) {
-                        unbindDividerPosition();
-                        splitPane.getItems().remove(
-                                getSkinnable().getDetailNode());
-                        getSkinnable().getDetailNode().setOpacity(1);
-                    }
-                    changing = false;
-                }
-            });
-            timeline.play();
+            KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), "endAnimation", positionKeyValue, opacityKeyValue);
+
+            timeline.getKeyFrames().clear();
+            timeline.getKeyFrames().add(keyFrame);
+
+            timeline.playFromStart();
         } else {
-            if (showDetail) {
-                unbindDividerPosition();
-                bindDividerPosition();
-            }
             getSkinnable().getDetailNode().setOpacity(1);
             divider.setPosition(position);
 
-            if (!showDetail) {
+            if (!showDetailForTimeline.get()) {
                 unbindDividerPosition();
                 splitPane.getItems().remove(getSkinnable().getDetailNode());
             }
             changing = false;
         }
     }
-    
+
     private ChangeListener<Number> updateDividerPositionListener = new ChangeListener<Number>() {
 
         @Override

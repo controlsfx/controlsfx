@@ -83,7 +83,7 @@ public final class FlightTable extends Application {
         cancelledInd.setEditable(true);
         table.getColumns().add(cancelledInd);
 
-        TableFilter.forTable(table);
+        new TableFilter(table);
 
         borderPane.setCenter(table);
 

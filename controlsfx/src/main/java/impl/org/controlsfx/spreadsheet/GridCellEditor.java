@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -192,12 +192,8 @@ public class GridCellEditor {
             editor.setPrefWidth(viewCell.getWidth());
         }
 
-        if (handle.getGridView().getEditWithKey()) {
-            handle.getGridView().setEditWithKey(false);
-            spreadsheetCellEditor.startEdit(""); //$NON-NLS-1$
-        } else {
-            spreadsheetCellEditor.startEdit(value);
-        }
+        spreadsheetCellEditor.startEdit(value);
+        
         if (editor != null) {
             focusProperty = getFocusProperty(editor);
             focusProperty.addListener(focusListener);

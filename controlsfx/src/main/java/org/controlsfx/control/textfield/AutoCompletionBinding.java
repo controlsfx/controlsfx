@@ -15,6 +15,7 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.util.Collection;
+import javafx.beans.property.IntegerProperty;
 
 /**
  * The AutoCompletionBinding is the abstract base class of all auto-completion bindings.
@@ -109,6 +110,35 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     public abstract void dispose();
 
 
+    /**
+     * Set the maximum number of rows to be visible in the popup when it is
+     * showing.
+     *
+     * @param value
+     */
+    public final void setVisibleRowCount(int value) {
+        autoCompletionPopup.setVisibleRowCount(value);
+    }
+
+    /**
+     * Return the maximum number of rows to be visible in the popup when it is
+     * showing.
+     *
+     * @return
+     */
+    public final int getVisibleRowCount() {
+        return autoCompletionPopup.getVisibleRowCount();
+    }
+
+    /**
+     * Return an property representing the maximum number of rows to be visible
+     * in the popup when it is showing.
+     *
+     * @return
+     */
+    public final IntegerProperty visibleRowCountProperty() {
+        return autoCompletionPopup.visibleRowCountProperty();
+    }
 
     /***************************************************************************
      *                                                                         *

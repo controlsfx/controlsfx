@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,12 +24,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.table;
+package impl.org.controlsfx.table;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.beans.Observable;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -57,7 +58,7 @@ public final class FilterPanel<T> extends Pane {
         vBox.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
-        searchBox.setPadding(new Insets(0,0,10,0));
+        searchBox.setPadding(new Insets(0, 0, 10, 0));
         vBox.getChildren().add(searchBox);
 
 
@@ -65,11 +66,16 @@ public final class FilterPanel<T> extends Pane {
         //initialize checklist view
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
-        checkListView.setItems(filterList);
 
-        filterList.stream().filter(item -> checkListView.getItemBooleanProperty(item) != null).forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
-
-        filterList.forEach(item -> item.getSelectedProperty().setValue(true));
+        checkListView.setItems(columnFilter.getFilterValues());
+        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
+            public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
+                while (c.next()) {
+                    c.getAddedSubList().stream().peek(v -> System.out.println(v + " ADDED")).forEach(v -> v.getSelectedProperty().setValue(true));
+                    c.getRemoved().stream().peek(v -> System.out.println(v + " REMOVED")).forEach(v -> v.getSelectedProperty().setValue(false));
+                }
+            }
+        });
 
         vBox.getChildren().add(checkListView);
         
@@ -87,9 +93,7 @@ public final class FilterPanel<T> extends Pane {
         //initialize clear button
         Button clearButton = new Button("CLEAR");
 
-        clearButton.setOnAction(e -> { 
-            columnFilter.getTableFilter().executeFilter();
-        });
+        clearButton.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
 
         bttnBox.getChildren().add(clearButton);
 

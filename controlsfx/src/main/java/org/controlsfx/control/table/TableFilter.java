@@ -64,7 +64,7 @@ public final class TableFilter<T> {
     
     private void applyForAllColumns() { 
         columnFilters.setAll(this.tableView.getColumns().stream()
-                .map(c -> ColumnFilter.getInstance(this, c)).collect(Collectors.toList()));
+                .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream()

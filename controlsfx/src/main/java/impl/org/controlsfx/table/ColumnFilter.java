@@ -53,9 +53,13 @@ public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.Fil
     private final FilteredList<FilterValue<?>> unselectedValues = new FilteredList<>(new SortedList<>(filterValues), v -> ! v.getSelectedProperty().getValue());
 
 
-    private ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
+    public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
+
+        this.rebuildAllVals();
+        this.attachContextMenu();
+
     }
 
     @Override
@@ -135,7 +139,7 @@ public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.Fil
         item.getSelectedProperty().setValue(true);
     }
 
-    static final class FilterValue<V> {
+    public static final class FilterValue<V> {
 
         private final ObservableValue<V> value;
         private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
@@ -192,20 +196,12 @@ public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.Fil
                 */
     }
 
-    private void attachContextMenu() { 
+    private void attachContextMenu() {
         FilterPanel.FilterMenuItem<T> item = FilterPanel.getInMenuItem(this);
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);
-        
-        //contextMenu.setOnHiding(e -> item.getFilterPanel().resetSearchFilter());
-    }
-    static <T> ColumnFilter<T> getInstance(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) { 
-        final ColumnFilter<T> columnFilter = new ColumnFilter<>(tableFilter, tableColumn);
-        columnFilter.rebuildAllVals();
 
-        columnFilter.attachContextMenu();
-        
-        return columnFilter;
+        //contextMenu.setOnHiding(e -> item.getFilterPanel().resetSearchFilter());
     }
 }

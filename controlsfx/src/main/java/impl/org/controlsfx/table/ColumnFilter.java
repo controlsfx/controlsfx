@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.controlsfx.control.table;
+package impl.org.controlsfx.table;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -36,7 +36,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import org.controlsfx.control.IndexedCheckModel;
-import org.controlsfx.control.table.FilterPanel.FilterMenuItem;
+import org.controlsfx.control.table.TableFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -193,7 +193,7 @@ public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.Fil
     }
 
     private void attachContextMenu() { 
-        FilterMenuItem<T> item = FilterPanel.getInMenuItem(this);
+        FilterPanel.FilterMenuItem<T> item = FilterPanel.getInMenuItem(this);
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);

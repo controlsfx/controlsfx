@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.table;
 
+import impl.org.controlsfx.table.ColumnFilter;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

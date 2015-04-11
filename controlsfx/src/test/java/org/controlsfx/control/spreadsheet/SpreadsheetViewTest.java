@@ -27,22 +27,15 @@
 
 package org.controlsfx.control.spreadsheet;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TablePosition;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+
+import java.util.*;
+
 import static org.junit.Assert.*;
-import org.junit.Ignore;
-import org.junit.Rule;
 
 public class SpreadsheetViewTest {
     @Rule public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();

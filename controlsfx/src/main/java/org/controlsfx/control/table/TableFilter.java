@@ -46,18 +46,14 @@ public final class TableFilter<T> {
     
     private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
  
-    private TableFilter(TableView<T> tableView) { 
+    public TableFilter(TableView<T> tableView) {
         this.tableView = tableView;
         this.backingList = tableView.getItems();
         this.filteredList = new FilteredList<>(new SortedList<>(backingList));
         this.filteredList.setPredicate(v -> true);
         tableView.setItems(filteredList);
-    }
-    public static <B> TableFilter<B> forTable(TableView<B> tableView) { 
-        TableFilter<B> tableFilter = new TableFilter<>(tableView);
-        tableFilter.applyForAllColumns();
-        tableFilter.addListeners();
-        return tableFilter;
+        this.applyForAllColumns();
+        this.addListeners();
     }
     public ObservableList<T> getBackingList() { 
         return backingList;

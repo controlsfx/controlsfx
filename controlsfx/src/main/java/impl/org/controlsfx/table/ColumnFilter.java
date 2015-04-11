@@ -35,16 +35,13 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
-import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.control.table.TableFilter;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.FilterValue<?>> {
+public final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
     private final TableColumn<T,?> tableColumn;
 
@@ -62,82 +59,6 @@ public final class ColumnFilter<T> implements IndexedCheckModel<ColumnFilter.Fil
 
     }
 
-    @Override
-    public FilterValue<?> getItem(int index) {
-        return filterValues.get(index);
-    }
-
-    @Override
-    public int getItemIndex(FilterValue<?> item) {
-        return IntStream.range(0,filterValues.size()).filter(i -> filterValues.get(i).equals(item)).findAny().getAsInt();
-    }
-
-    @Override
-    public ObservableList<Integer> getCheckedIndices() {
-        return FXCollections.observableArrayList(IntStream.range(0, filterValues.size()).filter(i -> filterValues.get(i).getSelectedProperty().get())
-                .mapToObj(i -> Integer.valueOf(i)).collect(Collectors.toList()));
-    }
-
-    @Override
-    public void checkIndices(int... indices) {
-        Arrays.stream(indices).forEach(i -> filterValues.get(i).getSelectedProperty().setValue(true));
-    }
-
-    @Override
-    public void clearCheck(int index) {
-        filterValues.get(index).getSelectedProperty().setValue(false);
-    }
-
-    @Override
-    public boolean isChecked(int index) {
-        return filterValues.get(index).getSelectedProperty().getValue();
-    }
-
-    @Override
-    public void check(int index) {
-        filterValues.get(index).getSelectedProperty().setValue(true);
-    }
-
-    @Override
-    public int getItemCount() {
-        return filterValues.size();
-    }
-
-
-    @Override
-    public ObservableList<FilterValue<?>> getCheckedItems() {
-        return selectedValues;
-    }
-
-    @Override
-    public void checkAll() {
-        filterValues.stream().forEach(v -> v.getSelectedProperty().setValue(true));
-    }
-
-    @Override
-    public void clearCheck(FilterValue<?> item) {
-        item.getSelectedProperty().setValue(false);
-    }
-
-    @Override
-    public void clearChecks() {
-        filterValues.stream().forEach(v -> v.getSelectedProperty().setValue(false));
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return filterValues.size() == 0;
-    }
-
-    @Override
-    public boolean isChecked(FilterValue<?> item) {
-        return item.getSelectedProperty().getValue();
-    }
-
-    @Override
-    public void check(FilterValue<?> item) {
-        item.getSelectedProperty().setValue(true);
-    }
 
     public static final class FilterValue<V> {
 

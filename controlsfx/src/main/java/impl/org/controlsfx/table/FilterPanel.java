@@ -57,7 +57,7 @@ public final class FilterPanel<T> extends Pane {
         vBox.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
-        searchBox.setPadding(new Insets(0,0,10,0));
+        searchBox.setPadding(new Insets(0, 0, 10, 0));
         vBox.getChildren().add(searchBox);
 
 
@@ -66,8 +66,7 @@ public final class FilterPanel<T> extends Pane {
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
 
-        checkListView.setCheckModel(columnFilter);
-        //checkListView.setItems(columnFilter.getFilterValues());
+        checkListView.setItems(columnFilter.getFilterValues());
 
         vBox.getChildren().add(checkListView);
         
@@ -85,9 +84,7 @@ public final class FilterPanel<T> extends Pane {
         //initialize clear button
         Button clearButton = new Button("CLEAR");
 
-        clearButton.setOnAction(e -> { 
-            columnFilter.getTableFilter().executeFilter();
-        });
+        clearButton.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
 
         bttnBox.getChildren().add(clearButton);
 

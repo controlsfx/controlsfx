@@ -37,8 +37,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.TableFilter;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class ColumnFilter<T> {
@@ -80,6 +82,20 @@ public final class ColumnFilter<T> {
         public String toString() {
             return value.getValue().toString();
         }
+        @Override
+        public int hashCode() {
+            return value.hashCode();
+        }
+        @Override
+        public boolean equals(Object other) {
+            if (other == null)
+                return false;
+            if (! (other instanceof FilterValue<?>))
+                return false;
+            if (((FilterValue<?>) other).value.getValue().getClass() != this.value.getValue().getClass())
+                return false;
+            return true;
+        }
     }
     public ObservableList<FilterValue<?>> getFilterValues() {
         return filterValues;
@@ -103,7 +119,7 @@ public final class ColumnFilter<T> {
 
         final List<FilterValue<?>> previousValues = filterValues.stream().collect(Collectors.toList());
 
-        final ConcurrentHashMap<Object,Boolean> distinctMap = new ConcurrentHashMap<>();
+        final HashMap<Object,Boolean> distinctMap = new HashMap<>();
 
         filterValues.clear();
         tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item))
@@ -111,7 +127,11 @@ public final class ColumnFilter<T> {
                 .map(v -> new FilterValue<>(v))
                 .forEach(v -> filterValues.add(v));
 
-/*
+        final Function<FilterValue<?>,Optional<FilterValue<?>>> getPreviousValueFx = fv -> previousValues.stream().filter(pv -> pv.equals(fv)).findAny();
+
+        filterValues.stream().filter(fv -> getPreviousValueFx.apply(fv).isPresent())
+                .forEach(fv -> fv.getSelectedProperty().set(getPreviousValueFx.apply(fv).get().getSelectedProperty().get()));
+        /*
         filterValues.stream().filter(f -> unSelectedValues.stream().filter(uv -> uv.getValueProperty().getValue().equals(f.getValueProperty().getValue())).findAny().isPresent())
                 .forEach(v -> v.isSelected.setValue(false));
                 */

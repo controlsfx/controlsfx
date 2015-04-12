@@ -27,7 +27,6 @@
 package org.controlsfx.control.table;
 
 import impl.org.controlsfx.table.ColumnFilter;
-import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -68,14 +67,14 @@ public final class TableFilter<T> {
     }
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream()
-                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).getSelectedProperty().getValue() == false)
+                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).map(ov -> ov.getSelectedProperty().getValue() == false).orElse(false))
                 .findAny().isPresent() == false);
     }
 
     private void addListeners() {
-        backingList.addListener((InvalidationListener) e -> columnFilters.forEach(cf -> cf.rebuildAllVals()));
+     /*   backingList.addListener((InvalidationListener) e -> columnFilters.forEach(cf -> cf.rebuildAllVals()));
 
-        columnFilters.forEach(cf -> cf.getTableColumn().onEditCommitProperty().addListener(e -> cf.rebuildAllVals()));
+        columnFilters.forEach(cf -> cf.getTableColumn().onEditCommitProperty().addListener(e -> cf.rebuildAllVals()));*/
     }
 
     public TableView<T> getTableView() {

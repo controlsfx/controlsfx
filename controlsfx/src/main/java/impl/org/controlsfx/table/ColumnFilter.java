@@ -30,9 +30,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.TableFilter;
@@ -40,7 +39,6 @@ import org.controlsfx.control.table.TableFilter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class ColumnFilter<T> {
@@ -48,16 +46,41 @@ public final class ColumnFilter<T> {
     private final TableColumn<T,?> tableColumn;
 
     private final ObservableList<FilterValue<?>> filterValues = FXCollections.observableArrayList();
-    private final FilteredList<FilterValue<?>> selectedValues = new FilteredList<>(new SortedList<>(filterValues), v -> v.getSelectedProperty().getValue());
-    private final FilteredList<FilterValue<?>> unselectedValues = new FilteredList<>(new SortedList<>(filterValues), v -> ! v.getSelectedProperty().getValue());
-
 
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
-
         this.rebuildAllVals();
         this.attachContextMenu();
+
+        tableFilter.getBackingList().addListener((ListChangeListener.Change<? extends T> c) -> {
+            while (c.next()) {
+
+               final List<FilterValue<?>> newValues = c.getAddedSubList().stream()
+                       .map(v -> new FilterValue<>(tableColumn.getCellObservableValue(v)))
+                       .distinct()
+                       .filter(v -> !filterValues.contains(v))
+                       .collect(Collectors.toList());
+
+                if (newValues.size() > 0)
+                System.out.println("COLUMN " + tableColumn.getText() + " HAD " + newValues.size() + " distinct values added");
+
+                filterValues.addAll(newValues);
+
+                final List<FilterValue<?>> removeValues = c.getRemoved().stream()
+                        .map(v -> new FilterValue<>(tableColumn.getCellObservableValue(v)))
+                        .distinct()
+                        .filter(v -> tableFilter.getTableView().getItems().stream()
+                                    .map(cv -> new FilterValue<>(tableColumn.getCellObservableValue(cv)))
+                                    .filter(cv -> cv.equals(v)).findAny().isPresent() == false)
+                        .collect(Collectors.toList());
+
+                if (removeValues.size() > 0)
+                System.out.println("COLUMN " + tableColumn.getText() + " HAD " + removeValues.size() + " distinct values removed");
+
+                filterValues.removeAll(removeValues);
+            }
+        });
 
     }
 
@@ -94,6 +117,8 @@ public final class ColumnFilter<T> {
                 return false;
             if (((FilterValue<?>) other).value.getValue().getClass() != this.value.getValue().getClass())
                 return false;
+            if (((FilterValue<?>) other).value.getValue().equals(this.value.getValue()) == false)
+                return false;
             return true;
         }
     }
@@ -108,33 +133,26 @@ public final class ColumnFilter<T> {
         return tableFilter;
     }
 
-    public FilterValue<?> getFilterValue(ObservableValue<?> value) {
-        return filterValues.stream().filter(fv -> fv.value.getValue().equals(value.getValue())).findAny()
-                .orElseThrow(() ->
-                        new RuntimeException("Value " + value.getValue() +
-                                " is not in the filterValues for column "
-                                + this.tableColumn.getText()));
+    public Optional<FilterValue<?>> getFilterValue(ObservableValue<?> value) {
+        return filterValues.stream().filter(fv -> fv.value.getValue().equals(value.getValue())).findAny();
     }
     public void rebuildAllVals() {
-
-        final List<FilterValue<?>> previousValues = filterValues.stream().collect(Collectors.toList());
-
         final HashMap<Object,Boolean> distinctMap = new HashMap<>();
 
-        filterValues.clear();
-        tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item))
+        //capture the current values and store as old values
+        final List<FilterValue<?>> oldValues = filterValues.stream().collect(Collectors.toList());
+
+        //extract new list of distinct values with freshest set of table data
+        final List<FilterValue<?>> newValues = tableFilter.getBackingList().stream().map(item -> tableColumn.getCellObservableValue(item))
                 .filter(ov -> distinctMap.putIfAbsent(ov.getValue(), Boolean.TRUE) == null)
                 .map(v -> new FilterValue<>(v))
-                .forEach(v -> filterValues.add(v));
+                .collect(Collectors.toList());
 
-        final Function<FilterValue<?>,Optional<FilterValue<?>>> getPreviousValueFx = fv -> previousValues.stream().filter(pv -> pv.equals(fv)).findAny();
+        //remove old values that no longer exist with current data set
+        oldValues.stream().filter(ov -> newValues.stream().filter(nv -> nv.equals(ov)).findAny().isPresent() == false).forEach(ov -> filterValues.remove(ov));
 
-        filterValues.stream().filter(fv -> getPreviousValueFx.apply(fv).isPresent())
-                .forEach(fv -> fv.getSelectedProperty().set(getPreviousValueFx.apply(fv).get().getSelectedProperty().get()));
-        /*
-        filterValues.stream().filter(f -> unSelectedValues.stream().filter(uv -> uv.getValueProperty().getValue().equals(f.getValueProperty().getValue())).findAny().isPresent())
-                .forEach(v -> v.isSelected.setValue(false));
-                */
+        //add new values that are in current data and not in incumbent distinct value set
+        newValues.stream().filter(nv -> oldValues.stream().filter(ov -> ov.equals(nv)).findAny().isPresent() == false).forEach(nv -> filterValues.add(nv));
     }
 
     private void attachContextMenu() {

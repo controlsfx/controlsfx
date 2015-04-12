@@ -61,21 +61,45 @@ public final class FilterPanel<T> extends Pane {
         searchBox.setPadding(new Insets(0, 0, 10, 0));
         vBox.getChildren().add(searchBox);
 
-
-
         //initialize checklist view
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
-
         checkListView.setItems(columnFilter.getFilterValues());
+
+
+        checkListView.getItems().forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
+
+        columnFilter.getFilterValues().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
+            public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
+                while (c.next()) {
+                    c.getAddedSubList().stream()
+                            .peek(newItem -> System.out.println("NEW ITEM BINDED " + newItem.getValueProperty().getValue()))
+                            .forEach(newItem -> {
+                                newItem.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(newItem));
+                                newItem.getSelectedProperty().setValue(columnFilter.getFilterValues().stream().allMatch(v -> v.getSelectedProperty().getValue()));
+                            });
+                }
+                columnFilter.getFilterValues().stream().forEach(v -> {
+                    if (v.getSelectedProperty().getValue()) {
+                        checkListView.getCheckModel().check(v);
+                    } else {
+                        checkListView.getCheckModel().clearCheck(v);
+                    }
+                });
+            }
+        });
+
+
         checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
             public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
                 while (c.next()) {
-                    c.getAddedSubList().stream().peek(v -> System.out.println(v + " ADDED")).forEach(v -> v.getSelectedProperty().setValue(true));
-                    c.getRemoved().stream().peek(v -> System.out.println(v + " REMOVED")).forEach(v -> v.getSelectedProperty().setValue(false));
+                    c.getAddedSubList().stream().peek(v -> System.out.println(v + " SELECTED")).forEach(v -> v.getSelectedProperty().setValue(true));
+                    c.getRemoved().stream().peek(v -> System.out.println(v + " UNSELECTED")).forEach(v -> v.getSelectedProperty().setValue(false));
                 }
             }
         });
+
+        checkListView.getCheckModel().checkAll();
 
         vBox.getChildren().add(checkListView);
         
@@ -91,13 +115,16 @@ public final class FilterPanel<T> extends Pane {
         
         
         //initialize clear button
-        Button clearButton = new Button("CLEAR");
+        Button clearButton = new Button("RESET");
 
-        clearButton.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
+        clearButton.setOnAction(e -> {
+            columnFilter.getFilterValues().stream().forEach(v -> v.getSelectedProperty().setValue(true));
+
+        });
 
         bttnBox.getChildren().add(clearButton);
 
-        Button clearAllButton = new Button("CLEAR ALL");
+        Button clearAllButton = new Button("RESET ALL");
         clearAllButton.setOnAction(e -> {
             columnFilter.getTableFilter().getColumnFilters().forEach(cf -> cf.getFilterValues().forEach(fv -> fv.getSelectedProperty().setValue(true)));
             columnFilter.getTableFilter().executeFilter();

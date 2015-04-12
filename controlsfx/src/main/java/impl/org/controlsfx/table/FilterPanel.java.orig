@@ -76,7 +76,7 @@ public final class FilterPanel<T> extends Pane {
                             .peek(newItem -> System.out.println("NEW ITEM BINDED " + newItem.getValueProperty().getValue()))
                             .forEach(newItem -> {
                                 newItem.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(newItem));
-                                newItem.getSelectedProperty().setValue(true);
+                                newItem.getSelectedProperty().setValue(columnFilter.getFilterValues().stream().allMatch(v -> v.getSelectedProperty().getValue()));
                             });
                 }
                 columnFilter.getFilterValues().stream().forEach(v -> {
@@ -119,7 +119,6 @@ public final class FilterPanel<T> extends Pane {
 
         clearButton.setOnAction(e -> {
             columnFilter.getFilterValues().stream().forEach(v -> v.getSelectedProperty().setValue(true));
-
         });
 
         bttnBox.getChildren().add(clearButton);

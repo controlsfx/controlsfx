@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,11 @@ import java.util.TreeSet;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.EventHandler;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
+import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 
@@ -96,9 +98,17 @@ public class RectangleSelection extends Rectangle {
             return;
         }
 
+        IndexedCell topRowCell = skin.getFlow().getTopRow();
+        if(topRowCell == null){
+            return;
+        }
         //We fetch the first and last row currently displayed
-        int topRow = skin.getFlow().getTopRow().getIndex();
-        int bottomRow = skin.getFlow().getCells().get(skin.getFlow().getCells().size() - 1).getIndex();
+        int topRow = topRowCell.getIndex();
+        IndexedCell bottomRowCell = skin.getFlow().getCells().get(skin.getFlow().getCells().size() - 1);
+        if(bottomRowCell == null){
+            return;
+        }
+        int bottomRow = bottomRowCell.getIndex();
 
         int minRow = selectionRange.range.getTop();
         if (minRow > bottomRow) {
@@ -152,7 +162,7 @@ public class RectangleSelection extends Rectangle {
      */
     private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow, int rowSpan) {
         double height = 0;
-        for (int i = maxRow; i <= maxRow + (rowSpan - 1); ++i) {
+        for (int i = maxRow; i <= maxRow /*+ (rowSpan - 1)*/; ++i) {
             height += skin.getRowHeight(i);
         }
 
@@ -212,7 +222,7 @@ public class RectangleSelection extends Rectangle {
 
         //Then we compute the width by adding the space between the min and max column
         double width = 0;
-        for (int i = minColumn; i <= maxColumn + (columnSpan - 1); ++i) {
+        for (int i = minColumn; i <= maxColumn /*+ (columnSpan - 1)*/; ++i) {
             width += snapSize(columns.get(i).getWidth());
         }
 
@@ -289,7 +299,7 @@ public class RectangleSelection extends Rectangle {
      * Utility class to transform a list of selected cells into a union of
      * ranges.
      */
-    private class SelectionRange {
+    public static class SelectionRange {
 
         private final TreeSet<Long> set = new TreeSet<>();
         private GridRange range;
@@ -310,7 +320,18 @@ public class RectangleSelection extends Rectangle {
             }
             computeRange();
         }
+        
+        public void fillGridRange(List<GridChange> list) {
+            set.clear();
+            for (GridChange pos : list) {
+                set.add(key(pos.getRow(), pos.getColumn()));
+            }
+            computeRange();
+        }
 
+        public GridRange getRange(){
+            return range;
+        }
         private Long key(int row, int column) {
             return (((long) row) << 32) | column;
         }
@@ -371,7 +392,7 @@ public class RectangleSelection extends Rectangle {
         }
     }
 
-    private class GridRange {
+    public static class GridRange {
 
         private final int top;
         private final int bottom;

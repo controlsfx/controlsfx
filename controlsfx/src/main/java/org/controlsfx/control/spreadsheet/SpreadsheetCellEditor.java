@@ -454,6 +454,14 @@ public abstract class SpreadsheetCellEditor {
                         }
                     } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
                         endEdit(false);
+                    }else if(keyEvent.getCode() == KeyCode.TAB){
+                        if (keyEvent.isShiftDown()) {
+                            //if shift is down, we insert a tab.
+                            textArea.replaceSelection("\t"); //$NON-NLS-1$
+                            keyEvent.consume();
+                        } else {
+                            endEdit(true);
+                        }
                     }
                 }
             });

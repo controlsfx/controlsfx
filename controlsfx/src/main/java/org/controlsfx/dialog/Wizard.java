@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,6 +55,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -148,6 +149,9 @@ public class Wizard {
     private Optional<WizardPane> currentPage = Optional.empty();
 
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
+
+    // Read settings activated by default for backward compatibility
+    private final BooleanProperty readSettingsProperty = new SimpleBooleanProperty(true);
     
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
@@ -416,6 +420,38 @@ public class Wizard {
         return invalidProperty;
     }
     
+    /**
+     * Sets the value of the property {@code readSettings}.
+     * 
+     * @param readSettings The new read-settings state
+     * @see {@link #readSettingsProperty()}
+     */
+    public final void setReadSettings(boolean readSettings) {
+        readSettingsProperty.set(readSettings);
+    }
+    
+    /**
+     * Gets the value of the property {@code readSettings}.
+     * 
+     * @return The read-settings state
+     * @see {@link #readSettingsProperty()}
+     */
+    public final boolean isReadSettings() {
+        return readSettingsProperty.get();
+    }
+    
+    /**
+    * Property for overriding the individual read-settings state of this {@link Wizard}.
+    * Setting {@code readSettings} to true will enable the value extraction for this
+    * {@link Wizard}. Setting {@code readSettings} to false will disable the value
+    * extraction for this {@link Wizard}.
+    *
+    * @return The readSettings state property
+    */
+    public final BooleanProperty readSettingsProperty() {
+        return readSettingsProperty;
+    }
+    
     
     
     /**************************************************************************
@@ -435,7 +471,8 @@ public class Wizard {
 	        // if we are going forward in the wizard, we read in the settings 
 	        // from the page and store them in the settings map.
 	        // If we are going backwards, we do nothing
-	        if (advancing) {
+                // This is only performed if readSettings is true.
+	        if (advancing && isReadSettings()) {
 	        	readSettings(page);
 	        }
 	        
@@ -526,9 +563,12 @@ public class Wizard {
             // we've added the setting to the settings map and we should stop drilling deeper
             return true;
         } else {
-            // go into children of this node (if possible) and see if we can get
-            // a value from them (recursively)
-            List<Node> children = ImplUtils.getChildren(n, false);
+            /**
+             * go into children of this node (if possible) and see if we can get
+             * a value from them (recursively) We use reflection to fix
+             * https://bitbucket.org/controlsfx/controlsfx/issue/412 .
+             */
+            List<Node> children = ImplUtils.getChildren(n, true);
             
             // we're doing a depth-first search, where we stop drilling down
             // once we hit a successful read
@@ -572,41 +612,6 @@ public class Wizard {
      * Support classes
      * 
      **************************************************************************/
-    
-    /**
-     * WizardPane is the base class for all wizard pages. The API is essentially
-     * the {@link DialogPane}, with the addition of convenience methods related
-     * to {@link #onEnteringPage(Wizard) entering} and 
-     * {@link #onExitingPage(Wizard) exiting} the page.
-     */
-    public static class WizardPane extends DialogPane {
-    	
-    	/**
-    	 * Creates an instance of wizard pane.
-    	 */
-        public WizardPane() {
-        	getStyleClass().add("wizard-pane");
-        }
-
-        /**
-         * Called on entering a page. This is a good place to read values from wizard settings 
-         * and assign them to controls on the page
-         * @param wizard which page will be used on
-         */
-        public void onEnteringPage(Wizard wizard) {
-            // no-op
-        }
-        
-        /**
-         * Called on existing the page. 
-         * This is a good place to read values from page controls and store them in wizard settings
-         * @param wizard which page was used on
-         */
-        public void onExitingPage(Wizard wizard) {
-            // no-op
-        }
-    }
-    
     
     
     /**
@@ -678,6 +683,23 @@ public class Wizard {
             int pageIndex = pages.indexOf(currentPage);
             return pages.size()-1 > pageIndex; 
         }
+    }
+    
+    
+    
+    /**************************************************************************
+     * 
+     * Methods for the sake of unit tests
+     * 
+     **************************************************************************/
+    
+    /**
+     * @return The {@link Dialog} representing this {@link Wizard}. <br>
+     *         This is actually for {@link Dialog} reading-purposes, e.g.
+     *         unit testing the {@link DialogPane} content.
+     */
+    Dialog<ButtonType> getDialog() {
+        return dialog;
     }
     
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -209,10 +209,21 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
              */
             double tableCellX = 0;
 
+            /**
+             * We need to update the fixedColumnWidth only on visible cell and
+             * we need to add the full width including the span.
+             *
+             * If we fail to do so, we may be in the situation where x will grow
+             * with the correct width and not fixedColumnWidth. Thus some cell
+             * that should be shifted will not because the computation based on
+             * fixedColumnWidth will be wrong.
+             */
+            boolean increaseFixedWidth = false;
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
             if (columns.get(indexColumn).isFixed()) {
-                if (hbarValue + fixedColumnWidth > x) {
+                if (hbarValue + fixedColumnWidth > x && spreadsheetCell.getColumn() == indexColumn) {
+                    increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();
                     fixedColumnWidth += width;
@@ -284,7 +295,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      */
                     for (int i = 1, colSpan = spreadsheetCell.getColumnSpan(), max1 = columns
                             .size() - indexColumn; i < colSpan && i < max1; i++) {
-                        width += snapSize(columns.get(indexColumn + i).getWidth());
+                        double tempWidth = snapSize(columns.get(indexColumn + i).getWidth());
+                        width += tempWidth;
+                        if (increaseFixedWidth) {
+                            fixedColumnWidth += tempWidth;
+                        }
                     }
                 }
 
@@ -345,6 +360,9 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
         removeUselessCell();
+        if(handle.getCellsViewSkin().lastRowLayout.get() == true){
+            handle.getCellsViewSkin().lastRowLayout.setValue(false);
+        }
     }
 
     /**

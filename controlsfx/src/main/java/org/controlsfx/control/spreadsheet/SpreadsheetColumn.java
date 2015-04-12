@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,8 @@ import impl.org.controlsfx.spreadsheet.CellView;
 import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -113,11 +115,16 @@ public final class SpreadsheetColumn {
             column.setContextMenu(getColumnContextMenu());
         });
 
-        // When changing FixedColumns, we set header in order to add "." or ":"
-        spreadsheetView.getFixedColumns().addListener(updateTextListener);
+        // When changing frozen fixed columns, we need to update the ContextMenu.
+        spreadsheetView.fixingColumnsAllowedProperty().addListener(new ChangeListener<Boolean>() {
 
-        // When changing frozen fixed columns, we need to update the header.
-        spreadsheetView.fixingColumnsAllowedProperty().addListener(updateTextListener);
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                CellView.getValue(() -> {
+                    column.setContextMenu(getColumnContextMenu());
+                });
+            }
+        });
 
         // When ColumnsHeaders are changing, we update the text
         grid.getColumnHeaders().addListener(new InvalidationListener() {
@@ -157,7 +164,12 @@ public final class SpreadsheetColumn {
     /**
      * Fix this column to the left if possible, although it is recommended that
      * you call {@link #isColumnFixable()} before trying to fix a column.
-     * 
+     *
+     * If you want to fix several columns (because of a span for example), add
+     * all the columns directly in {@link SpreadsheetView#getFixedColumns() }.
+     * Always use {@link SpreadsheetView#areSpreadsheetColumnsFixable(java.util.List)
+     * } before.
+     *
      * @param fixed
      */
     public void setFixed(boolean fixed) {
@@ -282,15 +294,4 @@ public final class SpreadsheetColumn {
         }
         return true;
     }
-
-    /**
-     * Update the text in the header. So take the text and remove/add any "." or
-     * ":" if necessary.
-     */
-    private final InvalidationListener updateTextListener = new InvalidationListener() {
-        @Override
-        public void invalidated(Observable arg0) {
-            setText(getText());
-        }
-    };
 }

@@ -31,6 +31,8 @@ import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import impl.org.controlsfx.spreadsheet.RectangleSelection.GridRange;
+import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.SpreadsheetViewSelectionModel;
@@ -124,10 +126,12 @@ import org.controlsfx.tools.Utils;
  * {@link #isRowFixable(int)} for the fixed rows. 
  * <br/>
  * 
- * If you want to fix several rows together, and they have a row span inside,
- * you can call {@link #areRowsFixable(java.util.List) } to verify if you can
- * fix them. Be sure to add them all in once otherwise the system will detect
- * that a span is going out of bounds and will throw an exception.
+ * If you want to fix several rows or columns together, and they have a span
+ * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
+ * }
+ * to verify if you can fix them. Be sure to add them all in once otherwise the
+ * system will detect that a span is going out of bounds and will throw an
+ * exception.
  *
  * Calling those methods prior
  * every move will ensure that no exception will be thrown.
@@ -466,6 +470,14 @@ public class SpreadsheetView extends Control {
         for (SpreadsheetColumn column : columns) {
             widthColumns.add(column.getWidth());
         }
+        //We need to update the focused cell afterwards
+        Pair<Integer, Integer> focusedPair = null;
+        TablePosition focusedCell = cellsView.getFocusModel().getFocusedCell();
+        if (focusedCell != null && focusedCell.getRow() != -1 && focusedCell.getColumn() != -1) {
+            focusedPair = new Pair(focusedCell.getRow(), focusedCell.getColumn());
+        }
+
+        final Pair<Integer, Integer> finalPair = focusedPair;
         
         if (grid.getRows() != null) {
             final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
@@ -493,6 +505,8 @@ public class SpreadsheetView extends Control {
         for (TablePosition position : getSelectionModel().getSelectedCells()) {
             selectedCells.add(new Pair<>(position.getRow(), position.getColumn()));
         }
+        
+        
         /**
          * Since the TableView is added to the sceneGraph, it's not possible to
          * modify the columns in another thread. We normally should call
@@ -513,6 +527,10 @@ public class SpreadsheetView extends Control {
                 }
             }
             ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
+            //Just like the selected cell we update the focused cell.
+            if(finalPair != null && finalPair.getKey() < getGrid().getRowCount() && finalPair.getValue() < getGrid().getColumnCount()){
+                cellsView.getFocusModel().focus(finalPair.getKey(), cellsView.getColumns().get(finalPair.getValue()));
+            }
         };
         
         if (Platform.isFxApplicationThread()) {
@@ -620,7 +638,7 @@ public class SpreadsheetView extends Control {
                 }
                 //Then we need to verify that all rows within that span are fixed.
                 int count = row + maxSpan - 1;
-                for (int index = row + 1; index < count; ++index) {
+                for (int index = row + 1; index <= count; ++index) {
                     if (!list.contains(index)) {
                         return false;
                     }
@@ -684,6 +702,68 @@ public class SpreadsheetView extends Control {
                 ? getColumns().get(columnIndex).isColumnFixable() : null;
     }
 
+    /**
+     * Indicates whether a List of {@link SpreadsheetColumn} can be fixed or
+     * not.
+     *
+     * @param list
+     * @return true if the List of columns can be fixed together.
+     */
+    public boolean areSpreadsheetColumnsFixable(List<? extends SpreadsheetColumn> list) {
+        List<Integer> newList = new ArrayList<>();
+        for (SpreadsheetColumn column : list) {
+            if (column != null) {
+                newList.add(columns.indexOf(column));
+            }
+        }
+        return areColumnsFixable(newList);
+    }
+
+    /**
+     * This method is the same as {@link #areSpreadsheetColumnsFixable(java.util.List)
+     * } but is using a List of {@link SpreadsheetColumn} indexes.
+     *
+     * @param list
+     * @return true if the List of columns can be fixed together.
+     */
+    public boolean areColumnsFixable(List<? extends Integer> list) {
+        if (list == null || list.isEmpty() || !isFixingRowsAllowed()) {
+            return false;
+        }
+        final Grid grid = getGrid();
+        final int columnCount = grid.getColumnCount();
+        final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
+        for (Integer columnIndex : list) {
+            if (columnIndex == null || columnIndex < 0 || columnIndex > columnCount) {
+                return false;
+            }
+            //If this column is not fixable, we need to identify the maximum span
+            if (!isColumnFixable(columnIndex)) {
+                int maxSpan = 1;
+                SpreadsheetCell cell;
+                for (List<SpreadsheetCell> row : rows) {
+                    cell = row.get(columnIndex);
+                    //If the original column is not within this range, there is not need to look deeper.
+                    if (!list.contains(cell.getColumn())) {
+                        return false;
+                    }
+                    //We only want to consider the original cell.
+                    if (cell.getColumnSpan() > maxSpan && cell.getColumn() == columnIndex) {
+                        maxSpan = cell.getColumnSpan();
+                    }
+                }
+                //Then we need to verify that all columns within that span are fixed.
+                int count = columnIndex + maxSpan - 1;
+                for (int index = columnIndex + 1; index <= count; ++index) {
+                    if (!list.contains(index)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
     /**
      * Return whether change to Fixed columns are allowed.
      *
@@ -941,6 +1021,141 @@ public class SpreadsheetView extends Control {
     }
 
     /**
+     * Paste one value from the clipboard over the whole selection.
+     * @param change 
+     */
+    private void pasteOneValue(GridChange change) {
+        for (TablePosition position : getSelectionModel().getSelectedCells()) {
+            tryPasteCell(position.getRow(), position.getColumn(), change.getNewValue());
+        }
+    }
+
+    /**
+     * Try to paste the given value into the given position.
+     * @param row
+     * @param column
+     * @param value 
+     */
+    private void tryPasteCell(int row, int column, Object value) {
+        final SpanType type = getSpanType(row, column);
+        if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
+            SpreadsheetCell cell = getGrid().getRows().get(row).get(column);
+            boolean succeed = cell.getCellType().match(value);
+            if (succeed) {
+                getGrid().setCellValue(cell.getRow(), cell.getColumn(),
+                        cell.getCellType().convertValue(value));
+            }
+        }
+    }
+
+    /**
+     * Try to paste the values given into the selection. If both selection are
+     * rectangles and the number of rows of the source is equal of the numbers
+     * of rows of the target AND number of columns of the target is a multiple
+     * of the number of columns of the source, then we can paste.
+     *
+     * Same goes if we invert the rows and columns.
+     * @param list
+     */
+    private void pasteMixedValues(ArrayList<GridChange> list) {
+        SelectionRange sourceSelectionRange = new SelectionRange();
+        sourceSelectionRange.fillGridRange(list);
+
+        //It means we have a rectangle.
+        if (sourceSelectionRange.getRange() != null) {
+            SelectionRange targetSelectionRange = new SelectionRange();
+            targetSelectionRange.fill(cellsView.getSelectionModel().getSelectedCells());
+            if (targetSelectionRange.getRange() != null) {
+                //If both selection are rectangle
+                GridRange sourceRange = sourceSelectionRange.getRange();
+                GridRange targetRange = targetSelectionRange.getRange();
+                int sourceRowGap = sourceRange.getBottom() - sourceRange.getTop() + 1;
+                int targetRowGap = targetRange.getBottom() - targetRange.getTop() + 1;
+
+                int sourceColumnGap = sourceRange.getRight() - sourceRange.getLeft() + 1;
+                int targetColumnGap = targetRange.getRight() - targetRange.getLeft() + 1;
+
+                final int offsetRow = targetRange.getTop() - sourceRange.getTop();
+                final int offsetCol = targetRange.getLeft() - sourceRange.getLeft();
+
+                //If the numbers of rows are the same and the targetColumnGap is a multiple of sourceColumnGap
+                if ((sourceRowGap == targetRowGap || targetRowGap == 1) && (targetColumnGap % sourceColumnGap) == 0) {
+                    for (final GridChange change : list) {
+                        int row = change.getRow() + offsetRow;
+                        int column = change.getColumn() + offsetCol;
+                        do {
+                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                                    && row >= 0 && column >= 0) {
+                                tryPasteCell(row, column, change.getNewValue());
+                            }
+                        } while ((column = column + sourceColumnGap) <= targetRange.getRight());
+                    }
+                    //If the numbers of columns are the same and the targetRowGap is a multiple of sourceRowGap
+                } else if ((sourceColumnGap == targetColumnGap || targetColumnGap == 1) && (targetRowGap % sourceRowGap) == 0) {
+                    for (final GridChange change : list) {
+
+                        int row = change.getRow() + offsetRow;
+                        int column = change.getColumn() + offsetCol;
+                        do {
+                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                                    && row >= 0 && column >= 0) {
+                                tryPasteCell(row, column, change.getNewValue());
+                            }
+                        } while ((row = row + sourceRowGap) <= targetRange.getBottom());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * If we have several source values to paste into one cell, we do it.
+     *
+     * @param list
+     */
+    private void pasteSeveralValues(ArrayList<GridChange> list) {
+        // TODO algorithm very bad
+        int minRow = getGrid().getRowCount();
+        int minCol = getGrid().getColumnCount();
+        int maxRow = 0;
+        int maxCol = 0;
+        for (final GridChange p : list) {
+            final int tempcol = p.getColumn();
+            final int temprow = p.getRow();
+            if (tempcol < minCol) {
+                minCol = tempcol;
+            }
+            if (tempcol > maxCol) {
+                maxCol = tempcol;
+            }
+            if (temprow < minRow) {
+                minRow = temprow;
+            }
+            if (temprow > maxRow) {
+                maxRow = temprow;
+            }
+        }
+
+        final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
+
+        final int offsetRow = p.getRow() - minRow;
+        final int offsetCol = p.getColumn() - minCol;
+        final int rowCount = getGrid().getRowCount();
+        final int columnCount = getGrid().getColumnCount();
+        int row;
+        int column;
+
+        for (final GridChange change : list) {
+            row = change.getRow() + offsetRow;
+            column = change.getColumn() + offsetCol;
+            if (row < rowCount && column < columnCount
+                    && row >= 0 && column >= 0) {
+                tryPasteCell(row, column, change.getNewValue());
+            }
+        }
+    }
+    
+    /**
      * Try to paste the clipBoard to the specified position. Try to paste the
      * current selection into the Grid. If the two contents are not matchable,
      * then it's not pasted. This can be overridden by developers for custom
@@ -948,8 +1163,10 @@ public class SpreadsheetView extends Control {
      */
     public void pasteClipboard() {
         // FIXME Maybe move editableProperty to the model..
-        if (!isEditable())
+        List<TablePosition> selectedCells = cellsView.getSelectionModel().getSelectedCells();
+        if (!isEditable() || selectedCells.isEmpty()) {
             return;
+        }
 
         checkFormat();
         final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -957,65 +1174,12 @@ public class SpreadsheetView extends Control {
 
             @SuppressWarnings("unchecked")
             final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
-            if(list.size() == 1){
-                GridChange change = list.get(0);
-                for(TablePosition position:getSelectionModel().getSelectedCells()){
-                    final SpanType type = getSpanType(position.getRow(), position.getColumn());
-                    if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
-                        SpreadsheetCell cell = getGrid().getRows().get(position.getRow()).get(position.getColumn());
-                        boolean succeed = cell.getCellType().match(change.getNewValue());
-                        if (succeed) {
-                            getGrid().setCellValue(cell.getRow(), cell.getColumn(),
-                                    cell.getCellType().convertValue(change.getNewValue()));
-                        }
-                    }
-                }
-            }else{
-                // TODO algorithm very bad
-                int minRow = getGrid().getRowCount();
-                int minCol = getGrid().getColumnCount();
-                int maxRow = 0;
-                int maxCol = 0;
-                for (final GridChange p : list) {
-                    final int tempcol = p.getColumn();
-                    final int temprow = p.getRow();
-                    if (tempcol < minCol) {
-                        minCol = tempcol;
-                    }
-                    if (tempcol > maxCol) {
-                        maxCol = tempcol;
-                    }
-                    if (temprow < minRow) {
-                        minRow = temprow;
-                    }
-                    if (temprow > maxRow) {
-                        maxRow = temprow;
-                    }
-                }
-
-                final TablePosition<?, ?> p = cellsView.getFocusModel().getFocusedCell();
-
-                final int offsetRow = p.getRow() - minRow;
-                final int offsetCol = p.getColumn() - minCol;
-                int row;
-                int column;
-
-                for (final GridChange change : list) {
-                    row = change.getRow();
-                    column = change.getColumn();
-                    if (row + offsetRow < getGrid().getRowCount() && column + offsetCol < getGrid().getColumnCount()
-                            && row + offsetRow >= 0 && column + offsetCol >= 0) {
-                        final SpanType type = getSpanType(row + offsetRow, column + offsetCol);
-                        if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
-                            SpreadsheetCell cell = getGrid().getRows().get(row + offsetRow).get(column + offsetCol);
-                            boolean succeed = cell.getCellType().match(change.getNewValue());
-                            if (succeed) {
-                                getGrid().setCellValue(cell.getRow(), cell.getColumn(),
-                                        cell.getCellType().convertValue(change.getNewValue()));
-                            }
-                        }
-                    }
-                }
+            if (list.size() == 1) {
+                pasteOneValue(list.get(0));
+            } else if (selectedCells.size() > 1) {
+                pasteMixedValues(list);
+            } else {
+                pasteSeveralValues(list);
             }
             // To be improved
         } else if (clipboard.hasString()) {
@@ -1332,25 +1496,47 @@ public class SpreadsheetView extends Control {
             while (c.next()) {
                 if (c.wasAdded()) {
                     List<? extends SpreadsheetColumn> newColumns = c.getAddedSubList();
-                    for (SpreadsheetColumn column : newColumns) {
-                        if (!column.isColumnFixable()) {
-                            throw new IllegalArgumentException(computeReason(column));
+                    if (!areSpreadsheetColumnsFixable(newColumns)) {
+                        List<Integer> newList = new ArrayList<>();
+                        for (SpreadsheetColumn column : newColumns) {
+                            if (column != null) {
+                                newList.add(columns.indexOf(column));
+                            }
                         }
+                        throw new IllegalArgumentException(computeReason(newList));
                     }
                 }
             }
         }
 
-        private String computeReason(SpreadsheetColumn element) {
-            int indexColumn = getColumns().indexOf(element);
+        private String computeReason(List<Integer> list) {
 
             String reason = "\n This column cannot be fixed."; //$NON-NLS-1$
-            for (ObservableList<SpreadsheetCell> row : getGrid().getRows()) {
-                int columnSpan = row.get(indexColumn).getColumnSpan();
-                if (columnSpan > 1 /*|| row.get(indexColumn).getRowSpan() > 1*/) {
-                    reason += "The cell situated at line " + row.get(indexColumn).getRow() + " and column " //$NON-NLS-1$ //$NON-NLS-2$
-                            + indexColumn + "\n has a rowSpan or a ColumnSpan superior to 1, it must be 1."; //$NON-NLS-1$
-                    return reason;
+            final ObservableList<ObservableList<SpreadsheetCell>> rows = getGrid().getRows();
+            for (Integer columnIndex : list) {
+                //If this row is not fixable, we need to identify the maximum span
+                if (!isColumnFixable(columnIndex)) {
+                    int maxSpan = 1;
+                    SpreadsheetCell cell;
+                    for (List<SpreadsheetCell> row : rows) {
+                        cell = row.get(columnIndex);
+                        //If the original column is not within this range, there is not need to look deeper.
+                        if (!list.contains(cell.getColumn())) {
+                            reason += "The column " + columnIndex + " is inside a column span and the starting column " + cell.getColumn() + " is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        }
+                        //We only want to consider the original cell.
+                        if (cell.getColumnSpan() > maxSpan && cell.getColumn() == columnIndex) {
+                            maxSpan = cell.getColumnSpan();
+                        }
+                    }
+                    //Then we need to verify that all columns within that span are fixed.
+                    int count = columnIndex + maxSpan - 1;
+                    for (int index = columnIndex + 1; index < count; ++index) {
+                        if (!list.contains(index)) {
+                            reason += "One cell on the column " + columnIndex + " has a column span of " + maxSpan + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                    + "But the column " + index + " contained within that span is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$
+                        }
+                    }
                 }
             }
             return reason;
@@ -1432,8 +1618,14 @@ public class SpreadsheetView extends Control {
             // We want to erase values when delete key is pressed.
         } else if (keyEvent.getCode() == KeyCode.DELETE) {
             deleteSelectedCells();
-            // We want to edit if the user is on a cell and typing
-        }else if (!keyEvent.isShortcutDown() && !keyEvent.isShiftDown() && !keyEvent.getCode().isArrowKey()) {
+            /**
+             * We want NOT to go in edition if we're pressing SHIFT and if we're
+             * using the navigation keys. But we still want the user to go in
+             * edition with SHIFT and some letters for example if he wants a
+             * capital letter.
+             */
+        }else if (keyEvent.getCode() != KeyCode.SHIFT && !keyEvent.isShortcutDown() 
+                && !keyEvent.getCode().isNavigationKey()) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };

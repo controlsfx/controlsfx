@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,12 +72,11 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
  * // Create the CheckTreeView with the data 
  * final CheckTreeView<String> checkTreeView = new CheckTreeView<>(root);
  *       
- * // and listen to the relevant events (e.g. when the selected indices or 
- * // selected items change).
- * checkTreeView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
- *     public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
- *         System.out.println(checkTreeView.getCheckModel().getSelectedIndices());
- *     }
+ * // and listen to the relevant events (e.g. when the checked items change).
+ * checkTreeView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<TreeItem<String>>() {
+ *      public void onChanged(ListChangeListener.Change<? extends TreeItem<String>> c) {
+ *          System.out.println(checkTreeView.getCheckModel().getCheckedItems());
+ *      }
  * });
  * }</pre>
  *

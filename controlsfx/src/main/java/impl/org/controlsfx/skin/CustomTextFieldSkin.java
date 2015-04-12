@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import org.controlsfx.control.textfield.CustomTextField;
 import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
 import com.sun.javafx.scene.control.skin.TextFieldSkin;
+import com.sun.javafx.scene.text.HitInfo;
 
 public abstract class CustomTextFieldSkin extends TextFieldSkin {
     
@@ -116,7 +117,7 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         final double textFieldWidth = w - snapSize(leftWidth) - snapSize(rightWidth);
         
         super.layoutChildren(textFieldStartX, 0, textFieldWidth, fullHeight);
-        
+
         if (leftPane != null) {
             final double leftStartX = 0;
             leftPane.resizeRelocate(leftStartX, 0, leftWidth, fullHeight);
@@ -126,6 +127,17 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
             final double rightStartX = rightPane == null ? 0.0 : w - rightWidth + snappedLeftInset();
             rightPane.resizeRelocate(rightStartX, 0, rightWidth, fullHeight);
         }
+    }
+    
+    @Override
+    public HitInfo getIndex(double x, double y) {
+        /**
+         * This resolves https://bitbucket.org/controlsfx/controlsfx/issue/476
+         * when we have a left Node and the click point is badly returned
+         * because we weren't considering the shift induced by the leftPane.
+         */
+        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(getSkinnable().getHeight()));
+        return super.getIndex(x - leftWidth, y);
     }
     
     @Override

@@ -125,20 +125,26 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
         // represented by this mouse event
         final RangeSlider rangeSlider = getControl();
         // If not already focused, request focus
-        if (!rangeSlider.isFocused()) rangeSlider.requestFocus();
+        if (!rangeSlider.isFocused()) {
+            rangeSlider.requestFocus();
+        }
         if (selectedValue != null) {
-            if (selectedValue.call(null) == FocusedChild.LOW_THUMB) {
-                if (rangeSlider.getOrientation().equals(Orientation.HORIZONTAL)) {
-                    rangeSlider.adjustLowValue(position * (rangeSlider.getMax() - rangeSlider.getMin()) + rangeSlider.getMin());
-                } else {
-                    rangeSlider.adjustLowValue((1-position) * (rangeSlider.getMax() - rangeSlider.getMin()) + rangeSlider.getMin());
-                }
+            double newPosition;
+            if (rangeSlider.getOrientation().equals(Orientation.HORIZONTAL)) {
+                newPosition = position * (rangeSlider.getMax() - rangeSlider.getMin()) + rangeSlider.getMin();
             } else {
-                if (rangeSlider.getOrientation().equals(Orientation.HORIZONTAL)) {
-                    rangeSlider.adjustHighValue(position * (rangeSlider.getMax() - rangeSlider.getMin()) + rangeSlider.getMin());
-                } else {
-                    rangeSlider.adjustHighValue((1-position) * (rangeSlider.getMax() - rangeSlider.getMin()) + rangeSlider.getMin());
-                }
+                newPosition = (1 - position) * (rangeSlider.getMax() - rangeSlider.getMin()) + rangeSlider.getMin();
+            }
+
+            /**
+             * If the position is inferior to the current LowValue, this means
+             * the user clicked on the track to move the low thumb. If not, then
+             * it means the user wanted to move the high thumb.
+             */
+            if (newPosition < rangeSlider.getLowValue()) {
+                rangeSlider.adjustLowValue(newPosition);
+            } else {
+                rangeSlider.adjustHighValue(newPosition);
             }
         }
     }

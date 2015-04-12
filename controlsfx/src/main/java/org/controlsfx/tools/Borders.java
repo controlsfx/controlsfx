@@ -803,12 +803,6 @@ public final class Borders {
                         public Void call(SnapshotResult result) {
                             final Image image = result.getImage();
                             final PixelReader reader = image.getPixelReader();
-//                            final int rows = (int)image.getHeight();
-//                            final int columns = (int)image.getWidth();
-
-//                            double red = 0;
-//                            double green = 0;
-//                            double blue = 0;
                             // let's go through all pixels and work out an average
                             // color to use as the background
                             int start = (int) titleLabel.getLocalToSceneTransform().getTx();
@@ -817,19 +811,20 @@ public final class Borders {
                             int startY = (int) titleLabel.getLocalToSceneTransform().getTy();
                             int finishY = (int) (startY + titleLabel.getHeight());
 
-//                            int pixels = (finish-start) * (finishY-startY);
                             Map<Color, Integer> map = new HashMap<>();
                             for (int row = startY; row < finishY; row++) {
                                 for (int column = start; column < finish; column++) {
-                                    Color color = reader.getColor(column, row);
-                                    if (map.containsKey(color)) {
-                                        map.put(color, map.get(color) + 1);
-                                    } else {
-                                        map.put(color, 1);
+                                    //It may happen that getColor throw a IndexOutOfBounds.
+                                    try {
+                                        Color color = reader.getColor(column, row);
+                                        if (map.containsKey(color)) {
+                                            map.put(color, map.get(color) + 1);
+                                        } else {
+                                            map.put(color, 1);
+                                        }
+                                    } catch (Exception ex) {
+
                                     }
-//                                    red += color.getRed();
-//                                    green += color.getGreen();
-//                                    blue += color.getBlue();
                                 }
                             }
                             double max = 0;
@@ -840,9 +835,6 @@ public final class Borders {
                                     max = map.get(colorTemp);
                                 }
                             }
-//                            Color backgroundColor = Color.rgb((int) (red / pixels * 255), 
-//                                                              (int) (green / pixels * 255), 
-//                                                              (int) (blue / pixels * 255));
 
                             // with that color we can set the background fill 
                             // of the titleLabel to perfectly blend in

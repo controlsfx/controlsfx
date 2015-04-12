@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import com.sun.javafx.event.EventHandlerManager;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,6 +106,7 @@ public class GridBase implements Grid, EventTarget {
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
     private final ObservableList<String> rowsHeader;
     private final ObservableList<String> columnsHeader;
+    private BitSet resizableRow;
 
     /***************************************************************************
      * 
@@ -129,6 +131,8 @@ public class GridBase implements Grid, EventTarget {
         rows.addListener((Observable observable) -> {
             setRowCount(rows.size());
         });
+        resizableRow = new BitSet(rowCount);
+        resizableRow.set(0, rowCount, true);
     }
 
     /***************************************************************************
@@ -328,6 +332,24 @@ public class GridBase implements Grid, EventTarget {
         setColumnCount(rowCount == 0 ? 0 : this.rows.get(0).size());
     }
 
+    /**
+     * Sets the resizable state of all rows. If a bit is set to true in the
+     * BitSet, it means the row is resizable.
+     *
+     * The {@link BitSet#length() } must be equal to the {@link #getRowCount() }
+     *
+     * @param resizableRow
+     */
+    public void setResizableRows(BitSet resizableRow) {
+        this.resizableRow = resizableRow;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean isRowResizable(int row) {
+        return resizableRow.get(row);
+    }
+    
     /** {@inheritDoc} */
     @Override
     public <E extends GridChange> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {

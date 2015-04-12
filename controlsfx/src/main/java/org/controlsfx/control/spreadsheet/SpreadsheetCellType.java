@@ -253,6 +253,18 @@ public abstract class SpreadsheetCellType<T> {
     }
 
     /**
+     * Returns true if this SpreadsheetCellType accepts Objects to be dropped on
+     * the {@link SpreadsheetCell}. Currently only Files can be dropped. If
+     * accepted, prepare to receive them in {@link #match(java.lang.Object) }
+     * and {@link #convertValue(java.lang.Object) }.
+     *
+     * @return
+     */
+    public boolean acceptDrop() {
+        return false;
+    }
+    
+    /**
      * This method will be called when a commit is happening.<br/>
      * This method will try to convert the value, be sure to call
      * {@link #match(Object)} before to see if this method will succeed.

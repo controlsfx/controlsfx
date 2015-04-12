@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -287,12 +287,14 @@ public class VerticalHeader extends StackPane {
                 }
                 if (spreadsheetView.isShowRowHeader()) {
                     label = getLabel(rowCount++, rowIndex);
-
+                    GridRow row = skin.getRowIndexed(rowIndex);
                     label.setText(getRowHeader(rowIndex));
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
-                    label.layoutYProperty().unbind();
-                    label.relocate(x, y);
+                    if(row != null){
+                        label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight).add(row.verticalShift.get()));
+                    }
+                    label.setLayoutX(x);
                     final ObservableList<String> css = label.getStyleClass();
                     if (skin.getSelectedRows().contains(rowIndex)) {
                         css.addAll("selected"); //$NON-NLS-1$
@@ -301,6 +303,15 @@ public class VerticalHeader extends StackPane {
                     }
                     css.addAll("fixed"); //$NON-NLS-1$
                     getChildren().add(label);
+                    // position drag overlay to intercept row resize requests if authorized by the grid.
+                    if (spreadsheetView.getGrid().isRowResizable(rowIndex)) {
+                        Rectangle dragRect = getDragRect(rowCount++);
+                        dragRect.getProperties().put(TABLE_ROW_KEY, row);
+                        dragRect.getProperties().put(TABLE_LABEL_KEY, label);
+                        dragRect.setWidth(label.getWidth());
+                        dragRect.relocate(snappedLeftInset() + x, y + rowHeight - DRAG_RECT_HEIGHT);
+                        getChildren().add(dragRect);
+                    }
                 }
                 spaceUsedByFixedRows += skin.getRowHeight(rowIndex);
 
@@ -376,13 +387,15 @@ public class VerticalHeader extends StackPane {
 
                 y += height;
 
-                // position drag overlay to intercept column resize requests
-                Rectangle dragRect = getDragRect(rowCount++);
-                dragRect.getProperties().put(TABLE_ROW_KEY, row);
-                dragRect.getProperties().put(TABLE_LABEL_KEY, label);
-                dragRect.setWidth(label.getWidth());
-                dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
-                getChildren().add(dragRect);
+                // position drag overlay to intercept row resize requests if authorized by the grid.
+                if (spreadsheetView.getGrid().isRowResizable(rowIndex)) {
+                    Rectangle dragRect = getDragRect(rowCount++);
+                    dragRect.getProperties().put(TABLE_ROW_KEY, row);
+                    dragRect.getProperties().put(TABLE_LABEL_KEY, label);
+                    dragRect.setWidth(label.getWidth());
+                    dragRect.relocate(snappedLeftInset() + x, y - DRAG_RECT_HEIGHT);
+                    getChildren().add(dragRect);
+                }
             }
             row = skin.getRow(++i);
         }
@@ -410,7 +423,9 @@ public class VerticalHeader extends StackPane {
             Rectangle rect = (Rectangle) me.getSource();
             GridRow row = (GridRow) rect.getProperties().get(TABLE_ROW_KEY);
             Label label = (Label) rect.getProperties().get(TABLE_LABEL_KEY);
-            rowResizing(row, label, me);
+            if (row != null) {
+                rowResizing(row, label, me);
+            }
             me.consume();
         }
     };
@@ -432,8 +447,6 @@ public class VerticalHeader extends StackPane {
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
         
-        //When resizing a row, we need to update the Rectangle Selection as well
-        skin.rectangleSelection.updateRectangle();
         lastY = draggedY;
     }
 
@@ -458,23 +471,19 @@ public class VerticalHeader extends StackPane {
         if (labelList.isEmpty() || labelList.size() <= rowNumber) {
             label = new Label();
             labelList.add(label);
-
-//            return label;
         } else {
             label = labelList.get(rowNumber);
         }
         // We want to select the whole row when clicking on a header.
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
-                try {
-                    TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
-                            .getSelectionModel();
-                    ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
-                    sm.clearSelection();
-                    sm.selectRange(row, columns.get(0),row,columns.get(columns.size()-1));
-                } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
-
-                }
+                TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
+                        .getSelectionModel();
+                ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
+                sm.clearSelection();
+                sm.selectRange(row, columns.get(0), row, columns.get(columns.size() - 1));
+                //And we want to have the focus on the first cell in order to be able to copy/paste between rows.
+                sm.getTableView().getFocusModel().focus(row, sm.getTableView().getColumns().get(0));
             }
         });
         return label;

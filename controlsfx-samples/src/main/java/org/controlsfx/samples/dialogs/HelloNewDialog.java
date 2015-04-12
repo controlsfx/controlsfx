@@ -63,7 +63,7 @@ import javafx.stage.Window;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.dialog.CommandLinksDialog;
 import org.controlsfx.dialog.CommandLinksDialog.CommandLinksButtonType;
-import org.controlsfx.dialog.Wizard.WizardPane;
+import org.controlsfx.dialog.WizardPane;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.FontSelectorDialog;
 import org.controlsfx.dialog.LoginDialog;

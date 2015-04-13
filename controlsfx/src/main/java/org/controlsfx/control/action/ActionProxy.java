@@ -46,10 +46,11 @@ import org.controlsfx.glyphfont.Glyph;
  *     System.out.println("Action 1.1 is executed");
  * }}</pre>
  * 
- * <p>The ActionProxy annotation is designed to work with two types of methods: 
+ * <p>The ActionProxy annotation is designed to work with three types of methods: 
  * <ol>
  *     <li>Methods with no parameters, 
  *     <li>Methods with one parameter of type {@link ActionEvent}.
+ *     <li>Methods that take both an {@link ActionEvent} and an {@link Action}.
  * </ol> 
  * 
  * <p>The ActionProxy annotation {@link #graphic()} property supports different node types:

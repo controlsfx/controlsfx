@@ -57,6 +57,10 @@ import java.util.*;
  * }
  * </pre>
  * 
+ * If you require more control over the creation of the Action objects, you can either set the
+ * global ActionFactory by calling ActionMap.setActionFactory() and/or you can use the factory 
+ * property on individual &#64;ActionProxy declarations to set the factory on a case-by-case basis.
+ * 
  * @see ActionProxy
  * @see Action
  */
@@ -174,7 +178,7 @@ public class ActionMap {
     
     
     /**
-     * Removes all the actions associated with target object from the action map
+     * Removes all the actions associated with target object from the action map.
      * @param target object to work on
      */
     public static void unregister(Object target) {
@@ -193,7 +197,7 @@ public class ActionMap {
     }
 
     /**
-     * Returns action by it's id
+     * Returns action by its id.
      * @param id action id
      * @return action or null if id was not found
      */

@@ -477,9 +477,10 @@ public class VerticalHeader extends StackPane {
         // We want to select the whole row when clicking on a header.
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
-                TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
+                TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = handle.getGridView()
                         .getSelectionModel();
                 ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
+                //FIXME Maybe check CTRL and SHIFT before clearing no..?
                 sm.clearSelection();
                 sm.selectRange(row, columns.get(0), row, columns.get(columns.size() - 1));
                 //And we want to have the focus on the first cell in order to be able to copy/paste between rows.

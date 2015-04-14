@@ -99,7 +99,7 @@ public class HorizontalHeader extends TableHeaderRow {
             for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
                 EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
                     if (mouseEvent.isPrimaryButtonDown()) {
-                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
                         sm.clearSelection();
                         sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
                         //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
@@ -109,7 +109,7 @@ public class HorizontalHeader extends TableHeaderRow {
                 columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
             }
         });
-        
+
         /**
          * When we are setting a new Grid (model) on the SpreadsheetView, it 
          * appears that the headers are re-created. So we need to listen to 
@@ -127,7 +127,7 @@ public class HorizontalHeader extends TableHeaderRow {
             for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
                 EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
                     if (mouseEvent.isPrimaryButtonDown()) {
-                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getView().getSelectionModel();
+                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
                         sm.clearSelection();
                         sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
                         //And we want to have the focus on the first cell in order to be able to copy/paste between columns.

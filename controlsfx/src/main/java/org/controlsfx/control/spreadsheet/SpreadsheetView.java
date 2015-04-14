@@ -35,7 +35,7 @@ import impl.org.controlsfx.spreadsheet.RectangleSelection.GridRange;
 import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
-import impl.org.controlsfx.spreadsheet.SpreadsheetViewSelectionModel;
+import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.IdentityHashMap;
@@ -75,7 +75,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -298,6 +297,7 @@ public class SpreadsheetView extends Control {
     // is the VirtualFlow)
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
+    private final SpreadsheetViewSelectionModel selectionModel;
     
     /**
      * The vertical header width, just for the Label, not the Pickers.
@@ -384,10 +384,11 @@ public class SpreadsheetView extends Control {
          * Add a listener to the selection model in order to edit the spanned
          * cells when clicked
          */
-        SpreadsheetViewSelectionModel selectionModel = new SpreadsheetViewSelectionModel(this,cellsView);
-        cellsView.setSelectionModel(selectionModel);
-        selectionModel.setCellSelectionEnabled(true);
-        selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
+        TableViewSpanSelectionModel tableViewSpanSelectionModel = new TableViewSpanSelectionModel(this,cellsView);
+        cellsView.setSelectionModel(tableViewSpanSelectionModel);
+        tableViewSpanSelectionModel.setCellSelectionEnabled(true);
+        tableViewSpanSelectionModel.setSelectionMode(SelectionMode.MULTIPLE);
+        selectionModel = new SpreadsheetViewSelectionModel(tableViewSpanSelectionModel);
 
         /**
          * Set the focus model to track keyboard change and redirect focus on
@@ -526,7 +527,7 @@ public class SpreadsheetView extends Control {
                     cellsView.getColumns().add(columns.get(i).column);
                 }
             }
-            ((SpreadsheetViewSelectionModel) getSelectionModel()).verifySelectedCells(selectedCells);
+            ((TableViewSpanSelectionModel) cellsView.getSelectionModel()).verifySelectedCells(selectedCells);
             //Just like the selected cell we update the focused cell.
             if(finalPair != null && finalPair.getKey() < getGrid().getRowCount() && finalPair.getValue() < getGrid().getColumnCount()){
                 cellsView.getFocusModel().focus(finalPair.getKey(), cellsView.getColumns().get(finalPair.getValue()));
@@ -933,10 +934,37 @@ public class SpreadsheetView extends Control {
     /**
      * Return the selectionModel used by the SpreadsheetView. 
      * 
-     * @return {@link TableViewSelectionModel}
+     * @return {@link SpreadsheetViewSelectionModel}
      */
-    public TableViewSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
-        return cellsView.getSelectionModel();
+    public SpreadsheetViewSelectionModel getSelectionModel() {
+        return selectionModel;
+    }
+    
+    /**
+     * Scrolls the SpreadsheetView so that the given row is visible.
+     * @param row 
+     */
+    public void scrollToRow(int row){
+        cellsView.scrollTo(row);
+    }
+    
+    /**
+     * Scrolls the SpreadsheetView so that the given {@link SpreadsheetColumn} is visible.
+     * @param column 
+     */
+    public void scrollToColumn(SpreadsheetColumn column){
+        cellsView.scrollToColumn(column.column);
+    }
+    
+    /**
+     *
+     * Scrolls the SpreadsheetView so that the given column index is visible.
+     *
+     * @param columnIndex
+     *
+     */
+    public void scrollToColumnIndex(int columnIndex) {
+        cellsView.scrollToColumnIndex(columnIndex);
     }
 
     /**
@@ -1599,15 +1627,29 @@ public class SpreadsheetView extends Control {
             getCellsViewSkin().scrollHorizontally();
             // Go to next cell
         } else if (getEditingCell() == null && keyEvent.getCode() == KeyCode.TAB) {
+           
             if (position != null) {
                 int row = position.getRow();
-                int column = position.getColumn() + 1;
-                if (column >= getColumns().size()) {
-                    if (row == getGrid().getRowCount() - 1) {
-                        column--;
-                    } else {
-                        column = 0;
-                        row++;
+                int column = position.getColumn();
+                if (keyEvent.isShiftDown()) {
+                    column -= 1;
+                    if (column < 0) {
+                        if (row == 0) {
+                            column++;
+                        } else {
+                            column = getGrid().getColumnCount() - 1;
+                            row--;
+                        }
+                    }
+                } else {
+                    column += 1;
+                    if (column >= getColumns().size()) {
+                        if (row == getGrid().getRowCount() - 1) {
+                            column--;
+                        } else {
+                            column = 0;
+                            row++;
+                        }
                     }
                 }
                 getCellsView().getSelectionModel().clearAndSelect(row, getCellsView().getColumns().get(column));

@@ -638,7 +638,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * * PRIVATE/PROTECTED METHOD * *
      **************************************************************************/
     protected final void init() {
-        rectangleSelection = new RectangleSelection(this, (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel());
+        rectangleSelection = new RectangleSelection(this, (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel());
         getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle);
         getChildren().add(verticalHeader);

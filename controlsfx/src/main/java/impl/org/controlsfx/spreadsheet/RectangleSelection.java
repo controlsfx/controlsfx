@@ -47,10 +47,10 @@ import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 public class RectangleSelection extends Rectangle {
 
     private final GridViewSkin skin;
-    private final SpreadsheetViewSelectionModel sm;
+    private final TableViewSpanSelectionModel sm;
     private final SelectionRange selectionRange;
 
-    public RectangleSelection(GridViewSkin skin, SpreadsheetViewSelectionModel sm) {
+    public RectangleSelection(GridViewSkin skin, TableViewSpanSelectionModel sm) {
         this.skin = skin;
         this.sm = sm;
         getStyleClass().add("selection-rectangle"); //$NON-NLS-1$

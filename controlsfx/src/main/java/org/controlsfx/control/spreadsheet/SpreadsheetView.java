@@ -388,7 +388,7 @@ public class SpreadsheetView extends Control {
         cellsView.setSelectionModel(tableViewSpanSelectionModel);
         tableViewSpanSelectionModel.setCellSelectionEnabled(true);
         tableViewSpanSelectionModel.setSelectionMode(SelectionMode.MULTIPLE);
-        selectionModel = new SpreadsheetViewSelectionModel(tableViewSpanSelectionModel);
+        selectionModel = new SpreadsheetViewSelectionModel(this, tableViewSpanSelectionModel);
 
         /**
          * Set the focus model to track keyboard change and redirect focus on
@@ -1612,59 +1612,40 @@ public class SpreadsheetView extends Control {
     };
     
     private final EventHandler<KeyEvent> keyPressedHandler = (KeyEvent keyEvent) -> {
-        TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) getCellsView()
-                    .getFocusModel().getFocusedCell();
+        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getSelectionModel().getFocusedCell();
         // Go to the next row only if we're not editing
-        if (getEditingCell() == null && !keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
+        if (getEditingCell() == null && KeyCode.ENTER.equals(keyEvent.getCode())) {
             if (position != null) {
-                int nextRow = FocusModelListener.getNextRowNumber(position, getCellsView());
-                if (nextRow < getGrid().getRowCount()) {
-                    getCellsView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
+                if(keyEvent.isShiftDown()){
+                    getSelectionModel().clearAndSelectPreviousCell();
+                }else{
+                    getSelectionModel().clearAndSelectNextCell();
                 }
                 //We consume the event because we don't want to go in edition
                 keyEvent.consume();
             }
             getCellsViewSkin().scrollHorizontally();
             // Go to next cell
-        } else if (getEditingCell() == null && keyEvent.getCode() == KeyCode.TAB) {
-           
+        } else if (getEditingCell() == null && KeyCode.TAB.equals(keyEvent.getCode())) {
             if (position != null) {
-                int row = position.getRow();
-                int column = position.getColumn();
                 if (keyEvent.isShiftDown()) {
-                    column -= 1;
-                    if (column < 0) {
-                        if (row == 0) {
-                            column++;
-                        } else {
-                            column = getGrid().getColumnCount() - 1;
-                            row--;
-                        }
-                    }
+                    getSelectionModel().clearAndSelectLeftCell();
                 } else {
-                    column += 1;
-                    if (column >= getColumns().size()) {
-                        if (row == getGrid().getRowCount() - 1) {
-                            column--;
-                        } else {
-                            column = 0;
-                            row++;
-                        }
-                    }
+                    getSelectionModel().clearAndSelectRightCell();
                 }
-                getCellsView().getSelectionModel().clearAndSelect(row, getCellsView().getColumns().get(column));
             }
             //We consume the event because we don't want to loose focus
             keyEvent.consume();
             getCellsViewSkin().scrollHorizontally();
             // We want to erase values when delete key is pressed.
-        } else if (keyEvent.getCode() == KeyCode.DELETE) {
+        } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();
             /**
              * We want NOT to go in edition if we're pressing SHIFT and if we're
              * using the navigation keys. But we still want the user to go in
              * edition with SHIFT and some letters for example if he wants a
              * capital letter.
+             * FIXME Add a test to prevent the Shift fail case.
              */
         }else if (keyEvent.getCode() != KeyCode.SHIFT && !keyEvent.isShortcutDown() 
                 && !keyEvent.getCode().isNavigationKey()) {

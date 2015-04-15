@@ -30,7 +30,6 @@ import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.beans.Observable;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -66,7 +65,7 @@ public final class FilterPanel<T> extends Pane {
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         checkListView.setItems(columnFilter.getFilterValues());
 
-
+/*
         checkListView.getItems().forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
 
         columnFilter.getFilterValues().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
@@ -98,7 +97,7 @@ public final class FilterPanel<T> extends Pane {
                 }
             }
         });
-
+*/
         checkListView.getCheckModel().checkAll();
 
         vBox.getChildren().add(checkListView);

@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Maintains a distinct ObservableList of mapped values derived from another ObservableList */
-    public final class ObservableDistinctList<P,V> extends ObservableListBase<V> {
+    final class ObservableDistinctList<P,V> extends ObservableListBase<V> {
 
         private final ObservableList<P> parentList;
         private final Function<P,V> valueExtractor;
@@ -47,6 +47,7 @@ import java.util.stream.Stream;
             this.parentList = parentList;
             this.valueExtractor = valueExtractor;
             this.values = parentList.stream().map(p -> valueExtractor.apply(p)).distinct().collect(Collectors.toList());
+            System.out.println(values);
 
             this.parentList.addListener((ListChangeListener.Change<? extends P> c) -> {
                 while (c.next()) {

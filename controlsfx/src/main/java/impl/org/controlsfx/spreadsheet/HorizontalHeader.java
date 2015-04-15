@@ -39,6 +39,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -87,8 +88,8 @@ public class HorizontalHeader extends TableHeaderRow {
         //Fixed Column listener to change style of header
         spv.getFixedColumns().addListener(fixedColumnsListener);
 
-        Platform.runLater(()->{
-             //We are doing that because some columns may be already fixed.
+        Platform.runLater(() -> {
+            //We are doing that because some columns may be already fixed.
             for (SpreadsheetColumn column : spv.getFixedColumns()) {
                 fixColumn(column);
             }
@@ -96,23 +97,12 @@ public class HorizontalHeader extends TableHeaderRow {
             /**
              * Clicking on header select the whole column.
              */
-            for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
-                EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
-                    if (mouseEvent.isPrimaryButtonDown()) {
-                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
-                        sm.clearSelection();
-                        sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
-                        //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
-                        sm.getTableView().getFocusModel().focus(0, (TableColumn<ObservableList<SpreadsheetCell>, ?>) columnHeader.getTableColumn());
-                    }
-                };
-                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
-            }
+            installHeaderMouseEvent();
         });
 
         /**
-         * When we are setting a new Grid (model) on the SpreadsheetView, it 
-         * appears that the headers are re-created. So we need to listen to 
+         * When we are setting a new Grid (model) on the SpreadsheetView, it
+         * appears that the headers are re-created. So we need to listen to
          * those changes in order to re-apply our css style class. Otherwise
          * we'll end up with fixedColumns but no graphic confirmation.
          */
@@ -121,23 +111,8 @@ public class HorizontalHeader extends TableHeaderRow {
                 fixColumn(fixItem);
             }
             updateHighlightSelection();
-            /**
-             * Clicking on header select the whole column.
-             */
-            for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
-                EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
-                    if (mouseEvent.isPrimaryButtonDown()) {
-                        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
-                        sm.clearSelection();
-                        sm.selectRange(0, columnHeader.getTableColumn(), spv.getGrid().getRowCount() - 1, columnHeader.getTableColumn());
-                        //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
-                        sm.getTableView().getFocusModel().focus(0, (TableColumn<ObservableList<SpreadsheetCell>, ?>) columnHeader.getTableColumn());
-                    }
-                };
-                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
-            }
+            installHeaderMouseEvent();
         });
-        
     }
 
     @Override
@@ -189,6 +164,45 @@ public class HorizontalHeader extends TableHeaderRow {
      * Private methods.
      * 
      **************************************************************************/
+    
+    /**
+     * When we click on header, we want to select the whole column.
+     */
+    private void installHeaderMouseEvent() {
+        for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
+            EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
+                if (mouseEvent.isPrimaryButtonDown()) {
+                    headerClicked((TableColumn) columnHeader.getTableColumn(), mouseEvent);
+                }
+            };
+            columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
+        }
+    }
+    /**
+     * If a header is clicked, we must select the whole column. If Control key of
+     * Shift key is pressed, we must not deselect the previous selection but
+     * just act like the {@link GridViewBehavior} would.
+     *
+     * @param column
+     * @param event
+     */
+    private void headerClicked(TableColumn column, MouseEvent event) {
+        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
+        int lastRow = gridViewSkin.spreadsheetView.getGrid().getRowCount() - 1;
+        TablePosition focusedPosition = sm.getTableView().getFocusModel().getFocusedCell();
+        if (event.isShortcutDown()) {
+            sm.selectRange(0, column, lastRow, column);
+        } else if (event.isShiftDown() && focusedPosition != null && focusedPosition.getTableColumn() != null) {
+            sm.clearSelection();
+            sm.selectRange(0, column, lastRow, focusedPosition.getTableColumn());
+            sm.getTableView().getFocusModel().focus(0, focusedPosition.getTableColumn());
+        } else {
+            sm.clearSelection();
+            sm.selectRange(0, column, lastRow, column);
+            //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
+            sm.getTableView().getFocusModel().focus(0, column);
+        }
+    }
     /**
      * Whether the Vertical Header is showing, we need to update the width
      * because some space on the left will be available/used.

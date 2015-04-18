@@ -173,7 +173,7 @@ public final class ColumnFilter<T> implements IndexedCheckModel {
 
         @Override
         public int hashCode() {
-            return value.hashCode();
+            return value.getValue().hashCode();
         }
 
 

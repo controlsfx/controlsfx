@@ -64,41 +64,7 @@ public final class FilterPanel<T> extends Pane {
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         checkListView.setItems(columnFilter.getFilterValues());
-
-/*
-        checkListView.getItems().forEach(item -> item.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(item)));
-
-        columnFilter.getFilterValues().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
-            public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
-                while (c.next()) {
-                    c.getAddedSubList().stream()
-                            .peek(newItem -> System.out.println("NEW ITEM BINDED " + newItem.getValueProperty().getValue()))
-                            .forEach(newItem -> {
-                                newItem.getSelectedProperty().bindBidirectional(checkListView.getItemBooleanProperty(newItem));
-                                newItem.getSelectedProperty().setValue(true);
-                            });
-                }
-                columnFilter.getFilterValues().stream().forEach(v -> {
-                    if (v.getSelectedProperty().getValue()) {
-                        checkListView.getCheckModel().check(v);
-                    } else {
-                        checkListView.getCheckModel().clearCheck(v);
-                    }
-                });
-            }
-        });
-
-
-        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<ColumnFilter.FilterValue<?>>() {
-            public void onChanged(ListChangeListener.Change<? extends ColumnFilter.FilterValue<?>> c) {
-                while (c.next()) {
-                    c.getAddedSubList().stream().peek(v -> System.out.println(v + " SELECTED")).forEach(v -> v.getSelectedProperty().setValue(true));
-                    c.getRemoved().stream().peek(v -> System.out.println(v + " UNSELECTED")).forEach(v -> v.getSelectedProperty().setValue(false));
-                }
-            }
-        });
-*/
-        checkListView.getCheckModel().checkAll();
+        checkListView.setCheckModel(columnFilter);
 
         vBox.getChildren().add(checkListView);
         

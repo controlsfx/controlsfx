@@ -116,7 +116,6 @@ public class TableViewSpanSelectionModel extends
         public void handle(MouseEvent mouseEvent) {
             drag = false;
             timer.stop();
-            setSelectionMode(SelectionMode.SINGLE);
             spreadsheetView.removeEventHandler(MouseEvent.MOUSE_RELEASED, this);
         }
     };

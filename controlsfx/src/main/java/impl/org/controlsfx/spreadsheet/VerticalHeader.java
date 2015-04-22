@@ -248,6 +248,7 @@ public class VerticalHeader extends StackPane {
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
                 label = getLabel(rowCount++, null);
+                label.getProperties().put(TABLE_ROW_KEY, null);
                 label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), hbar.getHeight());
                 label.layoutYProperty().unbind();
@@ -288,6 +289,7 @@ public class VerticalHeader extends StackPane {
                 if (spreadsheetView.isShowRowHeader()) {
                     label = getLabel(rowCount++, rowIndex);
                     GridRow row = skin.getRowIndexed(rowIndex);
+                    label.getProperties().put(TABLE_ROW_KEY, row);
                     label.setText(getRowHeader(rowIndex));
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
@@ -364,7 +366,7 @@ public class VerticalHeader extends StackPane {
 
             if (spreadsheetView.isShowRowHeader()) {
                 label = getLabel(rowCount++, rowIndex);
-
+                label.getProperties().put(TABLE_ROW_KEY, row);
                 label.setText(getRowHeader(rowIndex));
                 label.resize(rowHeaderWidth, height);
                 label.setLayoutX(x);

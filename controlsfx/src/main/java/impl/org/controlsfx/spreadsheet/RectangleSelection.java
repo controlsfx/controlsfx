@@ -206,6 +206,9 @@ public class RectangleSelection extends Rectangle {
         double x = 0;
 
         final List<SpreadsheetColumn> columns = skin.spreadsheetView.getColumns();
+        if(columns.size() <= minColumn || columns.size() <= maxColumn){
+            return;
+        }
         //We first compute the total space between the left edge and our first column
         for (int i = 0; i < minColumn; ++i) {
             //Here we use Ceil because we want to "snapSize" otherwise we may end up with a weird shift.

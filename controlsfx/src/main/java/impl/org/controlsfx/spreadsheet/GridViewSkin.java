@@ -664,7 +664,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     void resize(TableColumnBase<?, ?> tc) {
         if(tc.isResizable()){
-            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
+            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), 30);
         }
     }
 

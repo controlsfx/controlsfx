@@ -112,7 +112,7 @@ public class CheckTreeView<T> extends TreeView<T> {
      * 
      * @param root The root tree item to display in the CheckTreeView.
      */
-    public CheckTreeView(final CheckBoxTreeItem<T> root) {                
+    public CheckTreeView(final CheckBoxTreeItem<T> root) {
         super(root);
         rootProperty().addListener(o -> updateCheckModel());
 
@@ -122,8 +122,7 @@ public class CheckTreeView<T> extends TreeView<T> {
     }
     
     protected void updateCheckModel() {
-        if (getRoot() == null) {
-        } else {
+        if (getRoot() != null) {        
             setCheckModel(new CheckTreeViewCheckModel<>(this));
         }
     }

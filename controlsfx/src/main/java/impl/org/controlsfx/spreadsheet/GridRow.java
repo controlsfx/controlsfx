@@ -111,7 +111,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     protected double computeMinHeight(double width) {
         return handle.getCellsViewSkin().getRowHeight(getIndex());
     }
-
+    
     @Override
     protected Skin<?> createDefaultSkin() {
         return new GridRowSkin(handle, this);
@@ -126,7 +126,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         }
     };
     
-    private void setRowHeight(double height) {
+    public void setRowHeight(double height) {
         CellView.getValue(() -> {
             setHeight(height);
         });

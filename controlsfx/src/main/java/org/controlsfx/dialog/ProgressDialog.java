@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,12 @@ public class ProgressDialog extends Dialog<Void> {
     
 
     public ProgressDialog(final Worker<?> worker) {
+        if (worker != null
+                && (worker.getState() == State.CANCELLED
+                || worker.getState() == State.FAILED
+                || worker.getState() == State.SUCCEEDED)) {
+            return;
+        }
         setResultConverter(dialogButton -> null);
                 
         final DialogPane dialogPane = getDialogPane();
@@ -101,6 +107,7 @@ public class ProgressDialog extends Dialog<Void> {
                     case SUCCEEDED:
                         if(!dialogVisible) {
                             cancelDialogShow = true;
+                            end();
                         } else if(old == State.SCHEDULED || old == State.RUNNING) {
                             end();
                         }

@@ -89,7 +89,7 @@ public class RectangleSelection extends Rectangle {
         updateRectangle();
     };
 
-    public void updateRectangle() {
+    public final void updateRectangle() {
         if (sm.getSelectedCells().isEmpty()
                 || skin.getSelectedRows().isEmpty()
                 || skin.getSelectedColumns().isEmpty()

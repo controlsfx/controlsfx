@@ -114,11 +114,18 @@ public class CheckTreeView<T> extends TreeView<T> {
      */
     public CheckTreeView(final CheckBoxTreeItem<T> root) {
         super(root);
-        
-        setCheckModel(new CheckTreeViewCheckModel<>(this));
-        setCellFactory(CheckBoxTreeCell.<T>forTreeView());
+        rootProperty().addListener(o -> updateCheckModel());
+
+        updateCheckModel();
+
+        setCellFactory(CheckBoxTreeCell.<T> forTreeView());
     }
     
+    protected void updateCheckModel() {
+        if (getRoot() != null) {        
+            setCheckModel(new CheckTreeViewCheckModel<>(this));
+        }
+    }
     
     
     /**************************************************************************

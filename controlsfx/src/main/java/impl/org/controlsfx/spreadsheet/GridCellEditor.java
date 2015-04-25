@@ -136,7 +136,7 @@ public class GridCellEditor {
                 spreadsheetCellEditor.end();
                 
                 //We select the cell below if "enter" was typed.
-                if(lastKeyPressed == KeyCode.ENTER){
+                if(KeyCode.ENTER.equals(lastKeyPressed)){
                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
                             getFocusModel().getFocusedCell();
                     if (position != null) {
@@ -145,7 +145,7 @@ public class GridCellEditor {
                             handle.getGridView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
                         }
                     }
-                } else if (lastKeyPressed == KeyCode.TAB) {
+                } else if (KeyCode.TAB.equals(lastKeyPressed)) {
                     TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
                             getFocusModel().getFocusedCell();
                     if (position != null) {
@@ -190,6 +190,8 @@ public class GridCellEditor {
      * * Protected/Private Methods * *
      **************************************************************************/
     void startEdit() {
+        //If we do not reset this, it could false the endEdit behavior in case no key was pressed.
+        lastKeyPressed = null;
         editing = true;
         
         handle.getGridView().addEventFilter(KeyEvent.KEY_PRESSED, enterKeyPressed);

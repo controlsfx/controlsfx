@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 import java.util.Collections;
 
+import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
@@ -107,6 +108,10 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         registerChangeListener(control.showingProperty(), "SHOWING"); //$NON-NLS-1$
         registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP"); //$NON-NLS-1$
         registerChangeListener(control.closeButtonVisibleProperty(), "CLOSE_BUTTON_VISIBLE"); //$NON-NLS-1$
+
+        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
+        getSkinnable().setImpl_traversalEngine(engine);
+        engine.setOverriddenFocusTraversability(false);
     }
     
     @Override protected void handleControlPropertyChanged(String p) {

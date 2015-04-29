@@ -71,12 +71,6 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorBase<PropertySheet>> {
     
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                PropertySheet.class.getResource("propertysheet.css").toExternalForm()); //$NON-NLS-1$
-    }
-
     /**************************************************************************
      * 
      * Static fields

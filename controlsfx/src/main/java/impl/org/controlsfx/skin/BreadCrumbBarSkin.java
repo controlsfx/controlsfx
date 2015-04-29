@@ -65,13 +65,7 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  * @param <T>
  */
 public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, BehaviorBase<BreadCrumbBar<T>>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
+        
     private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 
     public BreadCrumbBarSkin(final BreadCrumbBar<T> control) {

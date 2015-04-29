@@ -41,13 +41,7 @@ import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                NotificationPane.class.getResource("notificationpane.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
+        
     private NotificationBar notificationBar;
     private Node content;
     private Rectangle clip = new Rectangle();

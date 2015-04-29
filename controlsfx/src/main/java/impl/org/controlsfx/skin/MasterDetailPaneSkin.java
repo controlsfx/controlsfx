@@ -57,12 +57,6 @@ import com.sun.javafx.css.StyleManager;
 
 public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm()); //$NON-NLS-1$
-    }
-
     private boolean changing = false;
     private SplitPane splitPane;
     private final Timeline timeline = new Timeline();

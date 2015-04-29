@@ -37,16 +37,8 @@ import javafx.scene.layout.Priority;
 
 import org.controlsfx.control.StatusBar;
 
-import com.sun.javafx.css.StyleManager;
-
 public class StatusBarSkin extends SkinBase<StatusBar> {
     
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                StatusBar.class.getResource("statusbar.css").toExternalForm()); //$NON-NLS-1$
-    }
-
     private HBox leftBox;
     private HBox rightBox;
     private Label label;

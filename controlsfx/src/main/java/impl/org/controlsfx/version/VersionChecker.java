@@ -80,12 +80,21 @@ public class VersionChecker {
         // javaFXVersion may contain '-' like 8.0.20-ea so replace them with '.' before splitting.
         String[] splitJavaVersion = javaFXVersion.replace('-', '.').split("\\."); //$NON-NLS-1$
 
-//        for (int i=0; i < 3; i++) {
-//            if (Integer.parseInt(splitJavaVersion[i]) < Integer.parseInt(splitSpecVersion[i])) {
-        if ( splitSpecVersion[0].compareTo(splitJavaVersion[0])!=0 || splitSpecVersion[1].compareTo(splitJavaVersion[2])>0 ) {
-                throw new RuntimeException("ControlsFX Error: ControlsFX " + //$NON-NLS-1$
-                    controlsFXImpVersion + " requires at least " + controlsFXSpecTitle); //$NON-NLS-1$
-//            }
+        boolean notSupportedVersion = false;
+
+        // Check Major Version
+        if (splitSpecVersion[0].compareTo(splitJavaVersion[0]) > 0) {
+            notSupportedVersion = true;
+        } else if (splitSpecVersion[0].compareTo(splitJavaVersion[0]) == 0) {
+            // Check Minor Version
+            if (splitSpecVersion[1].compareTo(splitJavaVersion[2])>0) {
+                notSupportedVersion = true;
+            }
+        }
+
+        if (notSupportedVersion) {
+            throw new RuntimeException("ControlsFX Error: ControlsFX " + //$NON-NLS-1$
+                controlsFXImpVersion + " requires at least " + controlsFXSpecTitle); //$NON-NLS-1$
         }
     }
 

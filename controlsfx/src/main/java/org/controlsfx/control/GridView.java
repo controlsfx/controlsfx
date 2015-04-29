@@ -142,14 +142,12 @@ public class GridView<T> extends ControlsFXControl {
         return new GridViewSkin<>(this);
     }
 
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override protected String getUserAgentStylesheet() {
-//        return GridView.class.getResource("gridview.css").toExternalForm(); //$NON-NLS-1$
-//    }
-    
-    
+    /**
+     * {@inheritDoc}
+     */
+    @Override public String getUserAgentStylesheet() {
+        return GridView.class.getResource("gridview.css").toExternalForm(); //$NON-NLS-1$
+    }    
     
     /**************************************************************************
      * 

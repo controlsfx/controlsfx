@@ -30,6 +30,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
 	private final SpreadsheetHandle handle;
@@ -43,11 +44,11 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 		this.handle = handle;
 	}
 
-//	@Override
-//	protected String getUserAgentStylesheet() {
-//		return SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
-//				.toExternalForm();
-//	}
+	@Override
+	public String getUserAgentStylesheet() {
+		return SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
+				.toExternalForm();
+	}
 
 	@Override
 	protected javafx.scene.control.Skin<?> createDefaultSkin() {

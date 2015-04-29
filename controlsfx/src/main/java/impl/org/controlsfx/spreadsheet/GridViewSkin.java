@@ -38,6 +38,8 @@ import java.util.Set;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -46,15 +48,21 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.IndexedCell;
+import javafx.scene.control.ResizeFeaturesBase;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
+import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.util.Callback;
@@ -64,20 +72,11 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.EventHandler;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.ResizeFeaturesBase;
-import javafx.scene.control.TablePositionBase;
-import javafx.scene.control.TableSelectionModel;
-import javafx.scene.input.MouseEvent;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -90,14 +89,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>,ObservableList<SpreadsheetCell>,TableView<ObservableList<SpreadsheetCell>>,TableViewBehavior<ObservableList<SpreadsheetCell>>,TableRow<ObservableList<SpreadsheetCell>>,TableColumn<ObservableList<SpreadsheetCell>,?>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
-    
+        
     /***************************************************************************
      * * STATIC FIELDS * *
      **************************************************************************/

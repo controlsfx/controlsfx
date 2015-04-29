@@ -28,6 +28,9 @@ package org.controlsfx.control;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
+
+import com.sun.javafx.css.StyleManager;
+
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -75,12 +78,14 @@ public class ListSelectionView<T> extends ControlsFXControl {
     public ListSelectionView() {
         getStyleClass().add(DEFAULT_STYLECLASS);
 
-        Label sourceHeader = new Label(localize(asKey("listSelectionView.header.source")));
+        Label sourceHeader = new Label(
+                localize(asKey("listSelectionView.header.source")));
         sourceHeader.getStyleClass().add("list-header-label");
         sourceHeader.setId("source-header-label");
         setSourceHeader(sourceHeader);
 
-        Label targetHeader = new Label(localize(asKey("listSelectionView.header.target")));
+        Label targetHeader = new Label(
+                localize(asKey("listSelectionView.header.target")));
         targetHeader.getStyleClass().add("list-header-label");
         targetHeader.setId("target-header-label");
         setTargetHeader(targetHeader);
@@ -89,6 +94,12 @@ public class ListSelectionView<T> extends ControlsFXControl {
     @Override
     protected Skin<ListSelectionView<T>> createDefaultSkin() {
         return new ListSelectionViewSkin<>(this);
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return ListSelectionView.class
+                .getResource("listselectionview.css").toExternalForm(); //$NON-NLS-1$
     }
 
     private final ObjectProperty<Node> sourceHeader = new SimpleObjectProperty<>(
@@ -253,8 +264,8 @@ public class ListSelectionView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<ObservableList<T>> sourceItemsProperty() {
         if (sourceItems == null) {
-            sourceItems = new SimpleObjectProperty<>(this,
-                    "sourceItems", FXCollections.observableArrayList());
+            sourceItems = new SimpleObjectProperty<>(this, "sourceItems",
+                    FXCollections.observableArrayList());
         }
         return sourceItems;
     }
@@ -289,35 +300,35 @@ public class ListSelectionView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<ObservableList<T>> targetItemsProperty() {
         if (targetItems == null) {
-            targetItems = new SimpleObjectProperty<>(this,
-                    "targetItems", FXCollections.observableArrayList());
+            targetItems = new SimpleObjectProperty<>(this, "targetItems",
+                    FXCollections.observableArrayList());
         }
         return targetItems;
     }
 
     // --- Orientation
-    private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, 
-        "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$;
+    private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(
+            this, "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$;
 
     /**
-     * The {@link Orientation} of the {@code ListSelectionView} - this can either be 
-     * horizontal or vertical.
+     * The {@link Orientation} of the {@code ListSelectionView} - this can
+     * either be horizontal or vertical.
      */
     public final ObjectProperty<Orientation> orientationProperty() {
         return orientation;
     }
-    
+
     /**
-     * Sets the {@link Orientation} of the {@code ListSelectionView} - this can either be 
-     * horizontal or vertical.
+     * Sets the {@link Orientation} of the {@code ListSelectionView} - this can
+     * either be horizontal or vertical.
      */
     public final void setOrientation(Orientation value) {
         orientationProperty().set(value);
     };
-    
+
     /**
-     * Returns the {@link Orientation} of the {@code ListSelectionView} - this can either 
-     * be horizontal or vertical.
+     * Returns the {@link Orientation} of the {@code ListSelectionView} - this
+     * can either be horizontal or vertical.
      */
     public final Orientation getOrientation() {
         return orientation.get();
@@ -355,8 +366,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      */
     public final ObjectProperty<Callback<ListView<T>, ListCell<T>>> cellFactoryProperty() {
         if (cellFactory == null) {
-            cellFactory = new SimpleObjectProperty<>(
-                    this, "cellFactory");
+            cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
         }
         return cellFactory;
     }

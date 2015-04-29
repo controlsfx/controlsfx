@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -109,6 +109,7 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP"); //$NON-NLS-1$
         registerChangeListener(control.closeButtonVisibleProperty(), "CLOSE_BUTTON_VISIBLE"); //$NON-NLS-1$
 
+        // Fix for Issue #522: Prevent NotificationPane from receiving focus
         ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
         getSkinnable().setImpl_traversalEngine(engine);
         engine.setOverriddenFocusTraversability(false);

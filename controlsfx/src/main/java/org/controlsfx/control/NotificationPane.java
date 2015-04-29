@@ -226,12 +226,10 @@ public class NotificationPane extends ControlsFXControl {
         return new NotificationPaneSkin(this);
     }
     
-//    /** {@inheritDoc} */
-//    @Override protected String getUserAgentStylesheet() {
-//        return NotificationPane.class.getResource("notificationpane.css").toExternalForm(); //$NON-NLS-1$
-//    }
-    
-    
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return NotificationPane.class.getResource("notificationpane.css").toExternalForm(); //$NON-NLS-1$
+    }    
     
     /***************************************************************************
      * 

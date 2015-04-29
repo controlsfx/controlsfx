@@ -53,13 +53,7 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  *
  */
 public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                Rating.class.getResource("rating.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
+        
     /***************************************************************************
      * 
      * Private fields

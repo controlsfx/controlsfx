@@ -53,15 +53,7 @@ import javafx.scene.layout.VBox;
 import org.controlsfx.control.ListSelectionView;
 import org.controlsfx.glyphfont.FontAwesome;
 
-import com.sun.javafx.css.StyleManager;
-
 public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
-
-    static {
-        StyleManager.getInstance().addUserAgentStylesheet(
-                ListSelectionView.class
-                        .getResource("listselectionview.css").toExternalForm()); //$NON-NLS-1$
-    }
 
     private GridPane gridPane;
     private final HBox horizontalButtonBox;

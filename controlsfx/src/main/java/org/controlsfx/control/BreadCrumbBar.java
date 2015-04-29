@@ -336,8 +336,8 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
         return new BreadCrumbBarSkin<>(this);
     }
 
-//    /** {@inheritDoc} */
-//    @Override protected String getUserAgentStylesheet() {
-//        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm(); //$NON-NLS-1$
-//    }
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm(); //$NON-NLS-1$
+    }
 }

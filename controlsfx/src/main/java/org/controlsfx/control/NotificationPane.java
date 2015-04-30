@@ -141,7 +141,6 @@ import org.controlsfx.control.action.Action;
  * }}</pre>
  * 
  * @see Action
- * @see Action
  */
 public class NotificationPane extends ControlsFXControl {
     

@@ -177,7 +177,7 @@ public class RectangleSelection extends Rectangle {
             if (gridMinRow.getLayoutY() < skin.getFixedRowHeight()) {
                 setY(skin.getFixedRowHeight());
             } else {
-                setY(gridMinRow.getLayoutY());
+                yProperty().bind(gridMinRow.layoutYProperty());
             }
             /**
              * If we are in fixedRow, we cannot trust the layoutY alone. We also

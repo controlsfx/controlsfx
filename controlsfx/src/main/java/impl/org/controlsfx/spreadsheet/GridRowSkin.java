@@ -129,6 +129,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          */
         if (index < 0 || index >= gridView.getItems().size()) {
             getChildren().clear();
+            putCellsInCache();
             return;
         }
 

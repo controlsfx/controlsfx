@@ -34,7 +34,7 @@ abstract class ControlsFXControl extends Control {
     public ControlsFXControl() {
         VersionChecker.doVersionCheck();
     }
-    
+
     private String stylesheet;
 
     /**
@@ -48,7 +48,12 @@ abstract class ControlsFXControl extends Control {
      *            the name of the user agent stylesheet
      * @return the external form of the user agent stylesheet (the path)
      */
-    protected final String getUserAgentStylesheet(Class<?> clazz, String fileName) {
+    protected final String getUserAgentStylesheet(Class<?> clazz,
+            String fileName) {
+
+        /*
+         * For more information please see RT-40658
+         */
         if (stylesheet == null) {
             stylesheet = clazz.getResource(fileName).toExternalForm();
         }

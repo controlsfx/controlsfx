@@ -338,6 +338,6 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
 
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm(); //$NON-NLS-1$
+        return getUserAgentStylesheet(BreadCrumbBar.class, "breadcrumbbar.css");
     }
 }

@@ -170,10 +170,8 @@ public class Rating extends ControlsFXControl {
 
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return Rating.class.getResource("rating.css").toExternalForm(); //$NON-NLS-1$
+        return getUserAgentStylesheet(Rating.class, "rating.css");
     }
-    
-    
     
     /***************************************************************************
      * 

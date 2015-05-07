@@ -213,7 +213,8 @@ public class InfoOverlay extends ControlsFXControl {
     
     private static final String DEFAULT_STYLE_CLASS = "info-overlay"; //$NON-NLS-1$
 
+    /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return InfoOverlay.class.getResource("info-overlay.css").toExternalForm(); //$NON-NLS-1$
+        return getUserAgentStylesheet(InfoOverlay.class, "info-overlay.css");
     }
 }

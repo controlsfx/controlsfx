@@ -43,7 +43,7 @@ abstract class ControlsFXControl extends Control {
      * resource.
      *
      * @param clazz
-     *            the clazz used for the resource lookup
+     *            the class used for the resource lookup
      * @param fileName
      *            the name of the user agent stylesheet
      * @return the external form of the user agent stylesheet (the path)

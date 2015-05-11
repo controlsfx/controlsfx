@@ -248,6 +248,7 @@ public class VerticalHeader extends StackPane {
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
                 label = getLabel(rowCount++, null);
+                label.getProperties().put(TABLE_ROW_KEY, null);
                 label.setText(""); //$NON-NLS-1$
                 label.resize(getVerticalHeaderWidth(), hbar.getHeight());
                 label.layoutYProperty().unbind();
@@ -288,6 +289,7 @@ public class VerticalHeader extends StackPane {
                 if (spreadsheetView.isShowRowHeader()) {
                     label = getLabel(rowCount++, rowIndex);
                     GridRow row = skin.getRowIndexed(rowIndex);
+                    label.getProperties().put(TABLE_ROW_KEY, row);
                     label.setText(getRowHeader(rowIndex));
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
@@ -364,7 +366,7 @@ public class VerticalHeader extends StackPane {
 
             if (spreadsheetView.isShowRowHeader()) {
                 label = getLabel(rowCount++, rowIndex);
-
+                label.getProperties().put(TABLE_ROW_KEY, row);
                 label.setText(getRowHeader(rowIndex));
                 label.resize(rowHeaderWidth, height);
                 label.setLayoutX(x);
@@ -477,18 +479,43 @@ public class VerticalHeader extends StackPane {
         // We want to select the whole row when clicking on a header.
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
-                TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = spreadsheetView
-                        .getSelectionModel();
-                ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
-                sm.clearSelection();
-                sm.selectRange(row, columns.get(0), row, columns.get(columns.size() - 1));
-                //And we want to have the focus on the first cell in order to be able to copy/paste between rows.
-                sm.getTableView().getFocusModel().focus(row, sm.getTableView().getColumns().get(0));
+                headerClicked(row, event);
             }
         });
         return label;
     }
 
+    /**
+     * If a header is clicked, we must select the whole row. If Control key of
+     * Shift key is pressed, we must not deselect the previous selection but
+     * just act like the {@link GridViewBehavior} would.
+     *
+     * @param row
+     * @param event
+     */
+    private void headerClicked(int row, MouseEvent event) {
+        TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = handle.getGridView().getSelectionModel();
+        int focusedRow = sm.getFocusedIndex();
+        int rowCount = handle.getView().getGrid().getRowCount();
+        ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
+        TableColumn<ObservableList<SpreadsheetCell>, ?> firstColumn = columns.get(0);
+        TableColumn<ObservableList<SpreadsheetCell>, ?> lastColumn = columns.get(columns.size() - 1);
+
+        if (event.isShortcutDown()) {
+            sm.selectRange(row, firstColumn, row, lastColumn);
+        } else if (event.isShiftDown() && focusedRow >= 0 && focusedRow < rowCount) {
+            sm.clearSelection();
+            sm.selectRange(focusedRow, firstColumn, row, lastColumn);
+            //We want to let the focus on the focused row.
+            sm.getTableView().getFocusModel().focus(focusedRow, firstColumn);
+        } else {
+            sm.clearSelection();
+            sm.selectRange(row, firstColumn, row, lastColumn);
+            //And we want to have the focus on the first cell in order to be able to copy/paste between rows.
+            sm.getTableView().getFocusModel().focus(row, firstColumn);
+        }
+    }
+    
     private Label getPicker(Picker picker) {
         Label pickerLabel;
         if (pickerPile.isEmpty()) {

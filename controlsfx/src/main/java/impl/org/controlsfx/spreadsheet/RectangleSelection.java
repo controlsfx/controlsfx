@@ -47,10 +47,10 @@ import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 public class RectangleSelection extends Rectangle {
 
     private final GridViewSkin skin;
-    private final SpreadsheetViewSelectionModel sm;
+    private final TableViewSpanSelectionModel sm;
     private final SelectionRange selectionRange;
 
-    public RectangleSelection(GridViewSkin skin, SpreadsheetViewSelectionModel sm) {
+    public RectangleSelection(GridViewSkin skin, TableViewSpanSelectionModel sm) {
         this.skin = skin;
         this.sm = sm;
         getStyleClass().add("selection-rectangle"); //$NON-NLS-1$
@@ -177,7 +177,7 @@ public class RectangleSelection extends Rectangle {
             if (gridMinRow.getLayoutY() < skin.getFixedRowHeight()) {
                 setY(skin.getFixedRowHeight());
             } else {
-                setY(gridMinRow.getLayoutY());
+                yProperty().bind(gridMinRow.layoutYProperty());
             }
             /**
              * If we are in fixedRow, we cannot trust the layoutY alone. We also
@@ -206,6 +206,9 @@ public class RectangleSelection extends Rectangle {
         double x = 0;
 
         final List<SpreadsheetColumn> columns = skin.spreadsheetView.getColumns();
+        if(columns.size() <= minColumn || columns.size() <= maxColumn){
+            return;
+        }
         //We first compute the total space between the left edge and our first column
         for (int i = 0; i < minColumn; ++i) {
             //Here we use Ceil because we want to "snapSize" otherwise we may end up with a weird shift.

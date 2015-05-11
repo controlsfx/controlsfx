@@ -129,6 +129,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          */
         if (index < 0 || index >= gridView.getItems().size()) {
             getChildren().clear();
+            putCellsInCache();
             return;
         }
 
@@ -249,7 +250,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 //                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
-                        final SpreadsheetViewSelectionModel sm = (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel();
+                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
                         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
 
                         /**

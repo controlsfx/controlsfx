@@ -59,7 +59,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  *
  * The Selection Model adapted for the SpreadsheetView regarding span.
  */
-public class SpreadsheetViewSelectionModel extends
+public class TableViewSpanSelectionModel extends
         TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>>{
 
     private boolean shift = false; // Register state of 'shift' key
@@ -158,7 +158,7 @@ public class SpreadsheetViewSelectionModel extends
      * @param spreadsheetView
      * @param cellsView
      */
-    public SpreadsheetViewSelectionModel(@NamedArg("spreadsheetView") SpreadsheetView spreadsheetView, @NamedArg("cellsView") SpreadsheetGridView cellsView) {
+    public TableViewSpanSelectionModel(@NamedArg("spreadsheetView") SpreadsheetView spreadsheetView, @NamedArg("cellsView") SpreadsheetGridView cellsView) {
         super(cellsView);
         this.cellsView = cellsView;
         this.spreadsheetView = spreadsheetView;

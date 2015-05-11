@@ -27,6 +27,7 @@
 package impl.org.controlsfx.tools.rectangle.change;
 
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 
 /**
  * A strategy which creates a new rectangle.
@@ -55,9 +56,11 @@ public class NewChangeStrategy extends AbstractFixedPointChangeStrategy {
      *            indicates whether the ratio will be fixed
      * @param ratio
      *            defines the fixed ratio
+     * @param bounds
+     *            the bounds within which the new rectangle must be contained
      */
-    public NewChangeStrategy(boolean ratioFixed, double ratio) {
-        super(ratioFixed, ratio);
+    public NewChangeStrategy(boolean ratioFixed, double ratio, Rectangle2D bounds) {
+        super(ratioFixed, ratio, bounds);
     }
 
     /**

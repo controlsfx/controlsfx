@@ -1,11 +1,12 @@
 package org.controlsfx;
 
-import fxsampler.FXSamplerProject;
-import fxsampler.model.WelcomePage;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import fxsampler.FXSampler;
+import fxsampler.FXSamplerProject;
+import fxsampler.model.WelcomePage;
 
 public class ControlsFXSampler implements FXSamplerProject {
 
@@ -42,5 +43,9 @@ public class ControlsFXSampler implements FXSamplerProject {
         vBox.getChildren().addAll(pane, label);
         WelcomePage wPage = new WelcomePage("Welcome to Controls FX!", vBox);
         return wPage;
+    }
+    
+    public static void main(String[] args) {
+        FXSampler.main(args);
     }
 }

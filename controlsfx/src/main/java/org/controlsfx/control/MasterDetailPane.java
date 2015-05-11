@@ -150,7 +150,7 @@ public class MasterDetailPane extends ControlsFXControl {
     
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return MasterDetailPane.class.getResource("masterdetailpane.css").toExternalForm(); //$NON-NLS-1$
+        return getUserAgentStylesheet(MasterDetailPane.class, "masterdetailpane.css");
     }
 
     // Detail postion support

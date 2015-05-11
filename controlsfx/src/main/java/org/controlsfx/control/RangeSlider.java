@@ -57,6 +57,7 @@ import com.sun.javafx.Utils;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.StringConverter;
 
@@ -180,12 +181,10 @@ public class RangeSlider extends ControlsFXControl {
         setLowValue(lowValue);
         setHighValue(highValue);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+        
+    /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return RangeSlider.class.getResource("rangeslider.css").toExternalForm(); //$NON-NLS-1$
+        return getUserAgentStylesheet(RangeSlider.class, "rangeslider.css");
     }
     
     /**

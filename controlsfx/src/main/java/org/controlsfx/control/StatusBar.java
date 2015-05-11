@@ -88,9 +88,9 @@ public class StatusBar extends ControlsFXControl {
         return new StatusBarSkin(this);
     }
 
-    @Override
-    public String getUserAgentStylesheet() {
-        return StatusBar.class.getResource("statusbar.css").toExternalForm(); //$NON-NLS-1$
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(StatusBar.class, "statusbar.css");
     }
     
     private final StringProperty text = new SimpleStringProperty(this, "text", //$NON-NLS-1$

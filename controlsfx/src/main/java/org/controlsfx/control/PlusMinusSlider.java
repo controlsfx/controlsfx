@@ -99,10 +99,10 @@ public class PlusMinusSlider extends ControlsFXControl {
 		});
 	}
 
-	@Override
-	public String getUserAgentStylesheet() {
-		return PlusMinusSlider.class.getResource("plusminusslider.css").toExternalForm(); //$NON-NLS-1$
-	}
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(PlusMinusSlider.class, "plusminusslider.css");
+    }
 
 	@Override
 	protected Skin<?> createDefaultSkin() {

@@ -213,7 +213,7 @@ public final class SpreadsheetColumn {
      */
     public void fitColumn() {
         if (column.isResizable() && spreadsheetView.getCellsViewSkin() != null) {
-            spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, -1);
+            spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, 30);
         }
     }
 

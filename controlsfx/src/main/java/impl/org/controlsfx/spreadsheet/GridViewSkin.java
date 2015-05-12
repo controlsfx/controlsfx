@@ -570,21 +570,18 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we
                  * compute the width needed by the cell and we substract the
-                 * remaining columns width in order not to have a huge width for
-                 * the considered column.
+                 * other columns width.
                  *
-                 * Also if the cell considered is not in the column, then we can
-                 * directly continue because we don't want to take its width
-                 * into account for the current column.
+                 * Also if the cell considered is not in the column, we still
+                 * have to compute because a previous column may have based its
+                 * calculation on the current width which will be modified.
                  */
                 SpreadsheetCell spc = gridRows.get(row).get(indexColumn);
-                if(spc.getColumn() != indexColumn){
-                    getChildren().remove(cell);
-                    continue;
-                }
                 if (spc.getColumnSpan() > 1) {
-                    for (int i = 1; i < spc.getColumnSpan(); ++i) {
-                        width -= spreadsheetView.getColumns().get(indexColumn + i).getWidth();
+                    for (int i = spc.getColumn(); i < spc.getColumn() + spc.getColumnSpan(); ++i) {
+                        if(i != indexColumn){
+                            width -= spreadsheetView.getColumns().get(i).getWidth();
+                        }
                     }
                 }
                 maxWidth = Math.max(maxWidth, width);
@@ -630,7 +627,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * * PRIVATE/PROTECTED METHOD * *
      **************************************************************************/
     protected final void init() {
-        rectangleSelection = new RectangleSelection(this, (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel());
+        rectangleSelection = new RectangleSelection(this, (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel());
         getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle);
         getChildren().add(verticalHeader);
@@ -656,7 +653,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     void resize(TableColumnBase<?, ?> tc) {
         if(tc.isResizable()){
-            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
+            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), 30);
         }
     }
 

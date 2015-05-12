@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,14 +27,8 @@
 package org.controlsfx.control.action;
 
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCombination;
-import org.controlsfx.glyphfont.Glyph;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -63,160 +57,168 @@ import java.util.*;
  * }
  * </pre>
  * 
+ * If you require more control over the creation of the Action objects, you can either set the
+ * global ActionFactory by calling ActionMap.setActionFactory() and/or you can use the factory 
+ * property on individual &#64;ActionProxy declarations to set the factory on a case-by-case basis.
+ * 
  * @see ActionProxy
  * @see Action
  */
 public class ActionMap {
 
-	private static Map<String, AnnotatedAction> actions = new HashMap<>();
+    private static AnnotatedActionFactory actionFactory = new DefaultActionFactory();
+    
+    private static final Map<String, AnnotatedAction> actions = new HashMap<>();
+    
 
-	private ActionMap() {
-		// no-op
-	}
-	
-	/**
-	 * Attempts to convert target's methods annotated with {@link ActionProxy} to {@link Action}s.
-	 * Only two types of methods are currently converted: parameter-less methods and 
-     * methods with one parameter of type {@link ActionEvent}.
+    private ActionMap() {
+        // no-op
+    }
+
+
+    /**
+     * Returns the action factory used by ActionMap to construct AnnotatedAction instances. By default, this
+     * is an instance of {@link DefaultActionFactory}.
+     */
+    public static AnnotatedActionFactory getActionFactory() {
+        return actionFactory;
+    }
+
+    /**
+     * Sets the action factory used by ActionMap to construct AnnotatedAction instances. This factory can be overridden on
+     * a case-by-case basis by specifying a factory class in {@link ActionProxy#factory()}
+     */
+    public static void setActionFactory( AnnotatedActionFactory factory ) {
+        Objects.requireNonNull( factory );
+        actionFactory = factory;
+    }
+    
+    
+    
+    
+    /**
+     * Attempts to convert target's methods annotated with {@link ActionProxy} to {@link Action}s.
+     * Three types of methods are currently converted: parameter-less methods, 
+     * methods with one parameter of type {@link ActionEvent}, and methods with two parameters
+     * ({@link ActionEvent}, {@link Action}).
+     * 
+     * Note that this method supports safe re-registration of a given instance or of another instance of the
+     * same class that has already been registered. If another instance of the same class is registered, then
+     * those actions will now be associated with the new instance. The first instance is implicitly unregistered.
      * 
      * Actions are registered with their id or method name if id is not defined.
-     * @throws IllegalArgumentException on duplicate action id
-	 * @param target object to work on
-	 */
-	public static void register(final Object target) {
+     * 
+     * @param target object to work on
+     * @throws IllegalStateException if a method with unsupported parameters is annotated with {@link ActionProxy}.
+     */
+    public static void register(Object target) {
 
-		for (final Method method : target.getClass().getDeclaredMethods()) {
-			
-			// process only methods with no parameters or one parameter of type ActionEvent
-			int paramCount = method.getParameterCount();
-			if ( paramCount > 1 || (paramCount == 1 && method.getParameterTypes()[0] != ActionEvent.class )){
-				continue;
-			}
-			
-			Annotation[] annotations = method.getAnnotationsByType(ActionProxy.class);
-			if (annotations.length > 0) {
-				ActionProxy annotation = (ActionProxy) annotations[0];
-				String id = annotation.id().isEmpty()? method.getName(): annotation.id();
-				if ( actions.containsKey(id)) {
-					throw new IllegalArgumentException( String.format("Action proxy with key = '%s' already exists", id)); //$NON-NLS-1$
-				}
-				actions.put(id, new AnnotatedAction( annotation, method, target));
-			}
-		}
+        for (Method method : target.getClass().getDeclaredMethods()) {
+            // Only process methods that have the ActionProxy annotation
+            Annotation[] annotations = method.getAnnotationsByType(ActionProxy.class);
+            if (annotations.length == 0) {
+                continue;
+            }
+            
+            // Only process methods that have
+            // a) no parameters OR 
+            // b) one parameter of type ActionEvent OR
+            // c) two parameters (ActionEvent, Action)
+            int paramCount = method.getParameterCount();
+            Class[] paramTypes = method.getParameterTypes();
+            
+            if (paramCount > 2) {
+                throw new IllegalArgumentException( String.format( "Method %s has too many parameters", method.getName() ) );
+            }
+            
+            if (paramCount == 1 && !ActionEvent.class.isAssignableFrom( paramTypes[0] )) {
+                throw new IllegalArgumentException( String.format( "Method %s -- single parameter must be of type ActionEvent", method.getName() ) );
+            }
+            
+            if (paramCount == 2 && (!ActionEvent.class.isAssignableFrom( paramTypes[0] ) || 
+                                    !Action.class.isAssignableFrom( paramTypes[1] ))) {
+                throw new IllegalArgumentException( String.format( "Method %s -- parameters must be of types (ActionEvent, Action)", method.getName() ) );
+            }
+            
+            ActionProxy annotation = (ActionProxy) annotations[0];
 
-	}
-	
-	/**
-	 * Removes all the actions associated with target object from the action amp
-	 * @param target object to work on
-	 */
-	public void unregister(final Object target) {
-		if ( target != null ) {
-			for ( String key: actions.keySet() ) {
-				if ( actions.get(key).getTarget() == target) {
-					actions.remove(key);
-				}
-			}
-		}
-	}
+            AnnotatedActionFactory factory = determineActionFactory( annotation );
+            AnnotatedAction action = factory.createAction( annotation, method, target );
 
-	/**
-	 * Returns action by it's id
-	 * @param id action id
-	 * @return action or null if id was found
-	 */
-	public static Action action(String id) {
-		return actions.get(id);
-	}
+            String id = annotation.id().isEmpty() ? method.getName() : annotation.id();
+            actions.put( id, action );
+        }
+    }
+    
+    
+    
+    
+    private static AnnotatedActionFactory determineActionFactory( ActionProxy annotation ) {
+        // Default to using the global action factory
+        AnnotatedActionFactory factory = actionFactory;
+        
+        // If an action-factory has been specified on this specific ActionProxy, then
+        // instantiate it and use it instead.
+        String factoryClassName = annotation.factory();
+        if (!factoryClassName.isEmpty()) {
+            try {
+                Class factoryClass = Class.forName( factoryClassName );
+                factory = (AnnotatedActionFactory) factoryClass.newInstance();
 
-	/**
-	 * Returns collection of actions by ids. Useful to create {@link ActionGroup}s.
-	 * Ids starting with "---" are converted to {@link ActionUtils#ACTION_SEPARATOR}.
-	 * Incorrect ids are ignored. 
-	 * @param ids action ids
-	 * @return collection of actions
-	 */
-	public static Collection<Action> actions(String... ids) {
-		List<Action> result = new ArrayList<>();
-		for( String id: ids ) {
-			if ( id.startsWith("---")) result.add(ActionUtils.ACTION_SEPARATOR); //$NON-NLS-1$
-			Action action = action(id);
-			if ( action != null ) result.add(action);
-		}
-		return result;
-	}
-	
-	
-}
+            } catch (ClassNotFoundException ex) {
+                throw new IllegalArgumentException( String.format( "Action proxy refers to non-existant factory class %s", factoryClassName ), ex );
 
-class AnnotatedAction extends Action {
+            } catch (InstantiationException | IllegalAccessException ex) {
+                throw new IllegalStateException( String.format( "Unable to instantiate action factory class %s", factoryClassName ), ex );
+            }
+        }
+        
+        return factory;
+    }
+    
+    
+    /**
+     * Removes all the actions associated with target object from the action map.
+     * @param target object to work on
+     */
+    public static void unregister(Object target) {
+        if ( target != null ) {
+            Iterator<Map.Entry<String, AnnotatedAction>> entryIter = actions.entrySet().iterator();
+            while (entryIter.hasNext()) {
+                Map.Entry<String, AnnotatedAction> entry = entryIter.next();
+                
+                Object actionTarget = entry.getValue().getTarget();
+                
+                if (actionTarget == null || actionTarget == target) {
+                    entryIter.remove();
+                }
+            }
+        }
+    }
 
-	private Method method;
-	private Object target;
+    /**
+     * Returns action by its id.
+     * @param id action id
+     * @return action or null if id was not found
+     */
+    public static Action action(String id) {
+        return actions.get(id);
+    }
 
-	public AnnotatedAction(ActionProxy annotation, Method method, Object target) {
-	    // set text
-		super(annotation.text());
-		setEventHandler(this::handleAction);
-		
-		// set graphic
-		Node graphic = resolveGraphic(annotation);
-		this.setGraphic(graphic);
-		
-		// set long text / tooltip
-		String longText = annotation.longText().trim();
-		if ( graphic != null ) {
-			this.setLongText(longText);
-		}
-		
-		// set accelerator
-		String acceleratorText = annotation.accelerator().trim();
-		if (acceleratorText != null && ! acceleratorText.isEmpty()) {
-		    this.setAccelerator(KeyCombination.keyCombination(acceleratorText));
-		}
-		
-		
-		this.method = method;
-		this.method.setAccessible(true);
-		this.target = target;
-	}
-	
-	private Node resolveGraphic( ActionProxy annotation ) {
-		String graphicDef = annotation.graphic().trim();
-		if ( !graphicDef.isEmpty()) {
-			
-			String[] def = graphicDef.split("\\>");  // cannot use ':' because it used in urls //$NON-NLS-1$
-			if ( def.length == 1 ) return new ImageView(new Image(def[0]));
-			switch (def[0]) {
-			   case "font"    : return Glyph.create(def[1]);   //$NON-NLS-1$
-			   case "image"   : return new ImageView(new Image(def[1])); //$NON-NLS-1$
-			   default: throw new IllegalArgumentException( String.format("Unknown ActionProxy graphic protocol: %s", def[0])); //$NON-NLS-1$
-			}
-		}
-		return null;
-	}
-	
-	public Object getTarget() {
-		return target;
-	}
-
-	private void handleAction(ActionEvent ae) {
-		try {
-			int paramCount =  method.getParameterCount(); 
-			if ( paramCount == 0 ) {
-				method.invoke(target);
-			} else if ( paramCount == 1 && method.getParameterTypes()[0] == ActionEvent.class ) {
-				method.invoke(target, ae);
-			}
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	public String toString() {
-		return getText();
-	}
-
+    /**
+     * Returns collection of actions by ids. Useful to create {@link ActionGroup}s.
+     * Ids starting with "---" are converted to {@link ActionUtils#ACTION_SEPARATOR}.
+     * Incorrect ids are ignored. 
+     * @param ids action ids
+     * @return collection of actions
+     */
+    public static Collection<Action> actions(String... ids) {
+        List<Action> result = new ArrayList<>();
+        for( String id: ids ) {
+            if ( id.startsWith("---")) result.add(ActionUtils.ACTION_SEPARATOR); //$NON-NLS-1$
+            Action action = action(id);
+            if ( action != null ) result.add(action);
+        }
+        return result;
+    }
 }

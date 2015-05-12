@@ -96,10 +96,9 @@ public class ListSelectionView<T> extends ControlsFXControl {
         return new ListSelectionViewSkin<>(this);
     }
 
-    @Override
-    public String getUserAgentStylesheet() {
-        return ListSelectionView.class
-                .getResource("listselectionview.css").toExternalForm(); //$NON-NLS-1$
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(ListSelectionView.class, "listselectionview.css");
     }
 
     private final ObjectProperty<Node> sourceHeader = new SimpleObjectProperty<>(

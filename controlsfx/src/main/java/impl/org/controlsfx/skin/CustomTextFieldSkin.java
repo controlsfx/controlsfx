@@ -131,26 +131,26 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         return super.getIndex(x - leftWidth, y);
     }
     
-    @Override
-    protected double computePrefWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
-        final double pw = super.computePrefWidth(h, topInset, rightInset, bottomInset, leftInset);
-        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
-        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
-        
-        return pw + leftWidth + rightWidth + leftInset + rightInset;
-    }
-    
-    @Override
-    protected double computePrefHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
-        final double ph = super.computePrefHeight(w, topInset, rightInset, bottomInset, leftInset);
-        final double leftHeight = leftPane == null ? 0.0 : snapSize(leftPane.prefHeight(-1));
-        final double rightHeight = rightPane == null ? 0.0 : snapSize(rightPane.prefHeight(-1));
-        
-        return Math.max(ph, Math.max(leftHeight, rightHeight));
-    }
-    
-    @Override
-    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
-    }
+//    @Override
+//    protected double computePrefWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
+//        final double pw = super.computePrefWidth(h, topInset, rightInset, bottomInset, leftInset);
+//        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
+//        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
+//    
+//        return pw + leftWidth + rightWidth + leftInset + rightInset;
+//    }
+//    
+//    @Override
+//    protected double computePrefHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
+//        final double ph = super.computePrefHeight(w, topInset, rightInset, bottomInset, leftInset);
+//        final double leftHeight = leftPane == null ? 0.0 : snapSize(leftPane.prefHeight(-1));
+//        final double rightHeight = rightPane == null ? 0.0 : snapSize(rightPane.prefHeight(-1));
+//        
+//        return Math.max(ph, Math.max(leftHeight, rightHeight));
+//    }
+//    
+//    @Override
+//    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+//        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+//}
 }

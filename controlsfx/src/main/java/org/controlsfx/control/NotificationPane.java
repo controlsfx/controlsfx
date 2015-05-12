@@ -227,8 +227,8 @@ public class NotificationPane extends ControlsFXControl {
     
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return NotificationPane.class.getResource("notificationpane.css").toExternalForm(); //$NON-NLS-1$
-    }    
+        return getUserAgentStylesheet(NotificationPane.class, "notificationpane.css");
+    }
     
     /***************************************************************************
      * 

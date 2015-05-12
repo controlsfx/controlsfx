@@ -31,9 +31,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.controlsfx.control.PrefixSelectionChoiceBox;
-import org.controlsfx.control.PrefixSelectionComboBox;
-
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ChoiceBox;
@@ -43,14 +40,49 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 
+import org.controlsfx.control.PrefixSelectionChoiceBox;
+import org.controlsfx.control.PrefixSelectionComboBox;
+
 /**
- * This utility class can be used to customize a {@link ChoiceBox} or {@link ComboBox}
- * and enable the "prefix selection" feature. This will enable the user to type letters or 
- * digits on the keyboard and die {@link ChoiceBox} or {@link ComboBox} will attempt to
- * select the first item it can find with a matching prefix.
+ * <p>This utility class can be used to customize a {@link ChoiceBox} or
+ * {@link ComboBox} and enable the "prefix selection" feature. This will enable
+ * the user to type letters or digits on the keyboard and the {@link ChoiceBox}
+ * or {@link ComboBox} will attempt to select the first item it can find with a
+ * matching prefix.
  * 
- * You can also use the preconfigured classes {@link PrefixSelectionChoiceBox} and 
- * {@link PrefixSelectionComboBox}.
+ * <p>This feature is available natively on the Windows ComboBox control, so many
+ * users have asked for it. There is a feature request to include this feature
+ * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
+ * The class is published as part of ContorlsFX to allow testing and feedback.
+ * 
+ * <h3>Example</h3>
+ * 
+ * <p>If your {@link ChoiceBox} or {@link ComboBox} offers the items ["Aaaaa",
+ * "Abbbb", "Abccc", "Abcdd", "Abcde"] and the user types in quick succession:
+ * 
+ * <ul><table>
+ *   <tr><th>Keys typed</th><th>Element selected</th></tr>
+ *   <tr><td>a</td><td>Aaaaa<td></tr>
+ *   <tr><td>aaa</td><td>Aaaaa<td></tr>
+ *   <tr><td>ab</td><td>Abbbb<td></tr>
+ *   <tr><td>abc</td><td>Abccc<td></tr>
+ *   <tr><td>xyz</td><td>-<td></tr>
+ * </table></ul>
+ * 
+ * <h3>Usage</h3>
+ * 
+ * <p>A common use case is to customize a {@link ChoiceBox} or {@link ComboBox}
+ * that has been loaded as part of an FXML. In this case you can use the utility
+ * methods {@link #customize(ChoiceBox)} or {@link #customize(ComboBox)}. This
+ * will install a {@link EventHandler} that monitors the {@link KeyEvent}
+ * events.
+ * 
+ * <p>If you are coding, you can also use the preconfigured classes
+ * {@link PrefixSelectionChoiceBox} and {@link PrefixSelectionComboBox} as a
+ * substitute for {@link ChoiceBox} and {@link ComboBox}.
+ * 
+ * @see PrefixSelectionChoiceBox
+ * @see PrefixSelectionComboBox
  */
 public class PrefixSelectionCustomizer {
     private static final String SELECTION_PREFIX_STRING = "selectionPrefixString";
@@ -122,7 +154,7 @@ public class PrefixSelectionCustomizer {
                 task.cancel(false);
             }
             task = getExecutorService().schedule(
-                    () -> control.getProperties().put(SELECTION_PREFIX_STRING, ""), 500, TimeUnit.MILLISECONDS);
+                    () -> control.getProperties().put(SELECTION_PREFIX_STRING, ""), 500, TimeUnit.MILLISECONDS); 
             control.getProperties().put(SELECTION_PREFIX_TASK, task);
 
             return result;
@@ -142,6 +174,17 @@ public class PrefixSelectionCustomizer {
 
     };
 
+    /**
+     * This will install an {@link EventHandler} that monitors the
+     * {@link KeyEvent} events to enable the "prefix selection" feature.
+     * The {@link EventHandler} will only be installed if the {@link ComboBox}
+     * is <b>not</b> editable.
+     * 
+     * @param comboBox
+     *            The {@link ComboBox} that should be customized
+     * 
+     * @see PrefixSelectionCustomizer
+     */
     public static void customize(ComboBox<?> comboBox) {
         if (!comboBox.isEditable()) {
             comboBox.addEventHandler(KeyEvent.KEY_PRESSED, handler);
@@ -155,6 +198,15 @@ public class PrefixSelectionCustomizer {
         });
     }
 
+    /**
+     * This will install an {@link EventHandler} that monitors the
+     * {@link KeyEvent} events to enable the "prefix selection" feature.
+     * 
+     * @param choiceBox
+     *            The {@link ChoiceBox} that should be customized
+     * 
+     * @see PrefixSelectionCustomizer
+     */
     public static void customize(ChoiceBox<?> choiceBox) {
         choiceBox.addEventHandler(KeyEvent.KEY_PRESSED, handler);
     }

@@ -36,20 +36,38 @@ import javafx.scene.control.ComboBox;
  * select the first item it can find with a matching prefix.
  * 
  * This will only be enabled, when the {@link ComboBox} is not editable, so
- * this class will be setup as noneditable by default.
+ * this class will be setup as non editable by default.
  *
- * This feature has been available on the Windows ComboBox control, so many
+ * <p>This feature is available natively on the Windows ComboBox control, so many
  * users have asked for it. There is a feature request to include this feature
- * into JavaFX directly. The class is published as part of ContorlsFX to
- * allow testing and feedback.
+ * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
+ * The class is published as part of ContorlsFX to allow testing and feedback.
  * 
- * See: https://javafx-jira.kenai.com/browse/RT-18064
+ * <h3>Example</h3>
  * 
- * If you want to modify an existing {@link ComboBox} you can use the
+ * <p>If the PrefixSelectionChoiceBox offers the items ["Aaaaa", "Abbbb", "Abccc", 
+ * "Abcdd", "Abcde"] and the user types in quick succession:
+ * 
+ * <ul><table>
+ *   <tr><th>Keys typed</th><th>Element selected</th></tr>
+ *   <tr><td>a</td><td>Aaaaa<td></tr>
+ *   <tr><td>aaa</td><td>Aaaaa<td></tr>
+ *   <tr><td>ab</td><td>Abbbb<td></tr>
+ *   <tr><td>abc</td><td>Abccc<td></tr>
+ *   <tr><td>xyz</td><td>-<td></tr>
+ * </table></ul>
+ * 
+ * <p>If you want to modify an existing {@link ComboBox} you can use the
  * {@link PrefixSelectionCustomizer} directly to do this.
+ * 
+ * @see PrefixSelectionCustomizer
  */
 public class PrefixSelectionComboBox<T> extends ComboBox<T> {
 
+    /**
+     * Create a non editable {@link ComboBox} with the "prefix selection"
+     * feature installed.
+     */
     public PrefixSelectionComboBox() {
         setEditable(false);
         PrefixSelectionCustomizer.customize(this);

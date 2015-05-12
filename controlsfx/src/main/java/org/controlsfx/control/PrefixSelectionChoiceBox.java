@@ -30,23 +30,41 @@ import impl.org.controlsfx.tools.PrefixSelectionCustomizer;
 import javafx.scene.control.ChoiceBox;
 
 /**
- * A simple extension of the {@link ChoiceBox} which selects an entry of
+ * <p>A simple extension of the {@link ChoiceBox} which selects an entry of
  * its item list based on keyboard input. The user can type letters or 
- * digits on the keyboard and die ChoiceBox will attempt to
+ * digits on the keyboard and die {@link ChoiceBox} will attempt to
  * select the first item it can find with a matching prefix.
  *
- * This feature has been available on the Windows ComboBox control, so many
+ * <p>This feature is available natively on the Windows ComboBox control, so many
  * users have asked for it. There is a feature request to include this feature
- * into JavaFX directly. The class is published as part of ContorlsFX to
- * allow testing and feedback.
+ * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
+ * The class is published as part of ContorlsFX to allow testing and feedback.
  * 
- * See: https://javafx-jira.kenai.com/browse/RT-18064
+ * <h3>Example</h3>
  * 
- * If you want to modify an existing {@link ChoiceBox} you can use the
+ * <p>If the PrefixSelectionChoiceBox offers the items ["Aaaaa", "Abbbb", "Abccc", 
+ * "Abcdd", "Abcde"] and the user types in quick succession:
+ * 
+ * <ul><table>
+ *   <tr><th>Keys typed</th><th>Element selected</th></tr>
+ *   <tr><td>a</td><td>Aaaaa<td></tr>
+ *   <tr><td>aaa</td><td>Aaaaa<td></tr>
+ *   <tr><td>ab</td><td>Abbbb<td></tr>
+ *   <tr><td>abc</td><td>Abccc<td></tr>
+ *   <tr><td>xyz</td><td>-<td></tr>
+ * </table></ul>
+ * 
+ * <p>If you want to modify an existing {@link ChoiceBox} you can use the
  * {@link PrefixSelectionCustomizer} directly to do this.
+ * 
+ * @see PrefixSelectionCustomizer
  */
 public class PrefixSelectionChoiceBox<T> extends ChoiceBox<T> {
 
+    /**
+     * Create a non editable {@link ChoiceBox} with the "prefix selection"
+     * feature installed.
+     */
     public PrefixSelectionChoiceBox() {
         PrefixSelectionCustomizer.customize(this);
     }

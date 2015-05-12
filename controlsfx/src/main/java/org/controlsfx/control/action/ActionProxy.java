@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2014 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,10 +46,11 @@ import org.controlsfx.glyphfont.Glyph;
  *     System.out.println("Action 1.1 is executed");
  * }}</pre>
  * 
- * <p>The ActionProxy annotation is designed to work with two types of methods: 
+ * <p>The ActionProxy annotation is designed to work with three types of methods: 
  * <ol>
  *     <li>Methods with no parameters, 
  *     <li>Methods with one parameter of type {@link ActionEvent}.
+ *     <li>Methods that take both an {@link ActionEvent} and an {@link Action}.
  * </ol> 
  * 
  * <p>The ActionProxy annotation {@link #graphic()} property supports different node types:
@@ -125,4 +126,11 @@ public @interface ActionProxy {
      * shortcut desired for this action.
      */
     String accelerator() default "";
+    
+    /**
+     * The full class-name of a class that implements {@link AnnotatedActionFactory}. {@link ActionMap} will
+     * use this class to instantiate the {@link AnnotatedAction} associated with this method, rather than
+     * using its own action factory.
+     */
+    String factory() default "";
 }

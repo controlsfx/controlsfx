@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -99,6 +100,8 @@ public class FXSampler extends Application {
     @Override public void start(final Stage primaryStage) throws Exception {
         this.stage = primaryStage;
 //        primaryStage.getIcons().add(new Image("/org/controlsfx/samples/controlsfx-logo.png"));
+        
+        ServiceLoader<FXSamplerConfiguration> configurationServiceLoader = ServiceLoader.load(FXSamplerConfiguration.class);
 
         projectsMap = new SampleScanner().discoverSamples();
         buildSampleTree(null);
@@ -202,6 +205,12 @@ public class FXSampler extends Application {
         // put it all together
         Scene scene = new Scene(grid);
         scene.getStylesheets().add(getClass().getResource("fxsampler.css").toExternalForm());
+        for (FXSamplerConfiguration fxsamplerConfiguration : configurationServiceLoader) {
+        	String stylesheet = fxsamplerConfiguration.getSceneStylesheet();
+        	if (stylesheet != null) {
+            	scene.getStylesheets().add(stylesheet);
+        	}
+        }
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(600);

@@ -64,7 +64,7 @@ public final class BeanPropertyUtils {
         return getProperties(bean, false);
     }
     
-	/**
+    /**
      * Given a JavaBean, this method will return a list of {@link Item} intances,
      * which may be directly placed inside a {@link PropertySheet} (via its
      * {@link PropertySheet#getItems() items list}.

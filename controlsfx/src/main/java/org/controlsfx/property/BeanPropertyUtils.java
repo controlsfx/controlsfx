@@ -52,8 +52,8 @@ public final class BeanPropertyUtils {
      * Given a JavaBean, this method will return a list of {@link Item} intances,
      * which may be directly placed inside a {@link PropertySheet} (via its
      * {@link PropertySheet#getItems() items list}.
-	 * <p>
-	 * This method will not return read-only properties.
+     * <p>
+     * This method will not return read-only properties.
      * 
      * @param bean The JavaBean that should be introspected and be editable via
      *      a {@link PropertySheet}.
@@ -71,8 +71,8 @@ public final class BeanPropertyUtils {
      * 
      * @param bean The JavaBean that should be introspected and be editable via
      *      a {@link PropertySheet}.
-	 * @param includeReadOnly Indicates whether read-only properties should be 
-	 *		returned in the resulting list of items.
+     * @param includeReadOnly Indicates whether read-only properties should be 
+     *		returned in the resulting list of items.
      * @return A list of {@link Item} instances representing the properties of the
      *      JavaBean.
      */
@@ -92,11 +92,11 @@ public final class BeanPropertyUtils {
 
         return list;
     }
-	
-	private static boolean isWritable(final PropertyDescriptor p) {
-		return p.getWriteMethod() != null;
-	}
-	
+    
+    private static boolean isWritable(final PropertyDescriptor p) {
+        return p.getWriteMethod() != null;
+    }
+    
     private static boolean isProperty(final PropertyDescriptor p) {
         //TODO  Add more filtering
         return ! p.getPropertyType().isAssignableFrom(EventHandler.class);

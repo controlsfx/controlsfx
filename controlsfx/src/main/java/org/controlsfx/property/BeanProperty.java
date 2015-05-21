@@ -62,7 +62,7 @@ public class BeanProperty implements PropertySheet.Item {
         this.bean = bean;
         this.beanPropertyDescriptor = propertyDescriptor;
         readMethod = propertyDescriptor.getReadMethod();
-		if (beanPropertyDescriptor.getWriteMethod() == null) {
+        if (beanPropertyDescriptor.getWriteMethod() == null) {
             setEditable(false);
         }
     }

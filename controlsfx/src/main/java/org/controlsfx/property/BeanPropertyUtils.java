@@ -93,12 +93,4 @@ public final class BeanPropertyUtils {
         return list;
     }
     
-//    private static boolean isWritable(final PropertyDescriptor p) {
-//        return p.getWriteMethod() != null;
-//    }
-//    
-//    private static boolean isProperty(final PropertyDescriptor p) {
-//        //TODO  Add more filtering
-//        return ! p.getPropertyType().isAssignableFrom(EventHandler.class);
-//    }
 }

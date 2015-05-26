@@ -30,8 +30,6 @@ import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -40,15 +38,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.CheckListView;
 
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 
 public final class FilterPanel<T> extends Pane {
     
     private final ColumnFilter<T> columnFilter;
-    private final CheckListView<CheckItem> checkListView = new CheckListView<>();
+    private final ListView<CheckItem> checkListView = new ListView<>();
 
     private final FilteredList<CheckItem> filterList;
     private static final String promptText = "Search...";
@@ -66,9 +63,13 @@ public final class FilterPanel<T> extends Pane {
         vBox.getChildren().add(searchBox);
 
         //initialize checklist view
-        ObservableList<CheckItem> checkItems = FXCollections.observableArrayList(columnFilter.getFilterValues().stream().map(CheckItem::new).collect(Collectors.toList()));
+        Function<ColumnFilter.FilterValue<?>,CheckItem>  newCheckItemFx = v -> {
+            CheckItem chkItem = new CheckItem(v);
+            chkItem.checkBox.selectedProperty().setValue(true);
+            return chkItem;
+        };
 
-        filterList = new FilteredList<>(new SortedList<>(checkItems), t -> true);
+        filterList = new FilteredList<>(new SortedList<>(new MappedList<>(this.columnFilter.getFilterValues(), newCheckItemFx)), t -> true);
         checkListView.setItems(filterList);
 
         vBox.getChildren().add(checkListView);

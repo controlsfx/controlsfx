@@ -26,20 +26,30 @@
  */
 package impl.org.controlsfx.table;
 
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
+import impl.org.controlsfx.table.ColumnFilter.FilterValue;
+
+import java.util.function.Function;
+
 import javafx.beans.Observable;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import java.util.function.Function;
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 
 
 public final class FilterPanel<T> extends Pane {
@@ -50,7 +60,8 @@ public final class FilterPanel<T> extends Pane {
     private final FilteredList<CheckItem> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
-
+    private volatile boolean searchMode = false;
+    
     FilterPanel(ColumnFilter<T> columnFilter) {
         this.columnFilter = columnFilter;
 
@@ -78,7 +89,18 @@ public final class FilterPanel<T> extends Pane {
         HBox bttnBox = new HBox();
         Button applyBttn = new Button("APPLY");
 
-        applyBttn.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
+        applyBttn.setOnAction(e -> {
+        	if (searchMode) { 
+        		filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
+        		
+        		columnFilter.getFilterValues().stream()
+        			.filter(v -> filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent() == false)
+        			.forEach(v -> v.getSelectedProperty().setValue(false));
+        		
+        		resetSearchFilter();
+        	}
+        	columnFilter.getTableFilter().executeFilter();
+        });
         
         bttnBox.getChildren().add(applyBttn);
         
@@ -86,7 +108,10 @@ public final class FilterPanel<T> extends Pane {
         //initialize reset buttons
         Button clearButton = new Button("RESET");
 
-        clearButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true)));
+        clearButton.setOnAction(e -> {
+        	columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true));
+        	filterList.setPredicate(v -> true);
+        });
 
         bttnBox.getChildren().add(clearButton);
 
@@ -94,6 +119,7 @@ public final class FilterPanel<T> extends Pane {
         clearAllButton.setOnAction(e -> {
             columnFilter.getTableFilter().getColumnFilters().stream().flatMap(cf -> cf.getFilterValues().stream()).forEach(fv -> fv.getSelectedProperty().setValue(true));
             columnFilter.getTableFilter().executeFilter();
+            resetSearchFilter();
         });
         bttnBox.getChildren().add(clearAllButton);
 
@@ -104,8 +130,10 @@ public final class FilterPanel<T> extends Pane {
     private static final class CheckItem extends HBox {
         private final CheckBox checkBox = new CheckBox();
         private final Label label = new Label();
-
+        private final FilterValue<?> filterValue;
+        
         CheckItem(ColumnFilter.FilterValue<?> filterValue) {
+        	this.filterValue = filterValue;
             label.setText(filterValue.getValueProperty().getValue().toString());
             checkBox.selectedProperty().bindBidirectional(filterValue.getSelectedProperty());
             this.getChildren().addAll(checkBox, label);
@@ -113,6 +141,7 @@ public final class FilterPanel<T> extends Pane {
     }
     public void resetSearchFilter() {
         this.filterList.setPredicate(t -> true);
+        searchBox.clear();
     }
     public static <T> CustomMenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
         
@@ -134,7 +163,10 @@ public final class FilterPanel<T> extends Pane {
         return menuItem;
     }
     private void initializeListeners() { 
-        searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));
+        searchBox.textProperty().addListener(l -> {
+        	searchMode = !searchBox.getText().isEmpty();
+        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.filterValue.toString().contains(searchBox.getText()));
+        });
     }
     
     /* Methods below helps will anchor the context menu under the column */

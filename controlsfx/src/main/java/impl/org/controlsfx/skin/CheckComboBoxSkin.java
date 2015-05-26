@@ -107,18 +107,22 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
             };
         });
         
-        // we render the selection into a custom button cell, so that it can 
-        // be pretty printed (e.g. 'Item 1, Item 2, Item 10').
+        //We render the button cell according to the title defined in the control.
         buttonCell = new ListCell<T>() {
-            @Override protected void updateItem(T item, boolean empty) {
-                // we ignore whatever item is selected, instead choosing
-                // to display the selected item text using commas to separate
-                // each item
-                setText(buildString());
+            @Override
+            protected void updateItem(T item, boolean empty) {
+                /**
+                 * We don't look at the selected item, we just show what the
+                 * control decided to show. It can be an enumeration of the
+                 * selected items or a fixed title.
+                 */
+                setText(control.getTitle());
             }
         };
+        buttonCell.setText(control.getTitle());
         comboBox.setButtonCell(buttonCell);
-        comboBox.setValue((T)buildString());
+        //We set a null value in order to make the title appear, we don't really care of the value.
+        comboBox.setValue(null);
         
         // The zero is a dummy value - it just has to be legally within the bounds of the
         // item count for the CheckComboBox items list.
@@ -165,22 +169,6 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
      * Implementation
      * 
      **************************************************************************/
-    
-    private String buildString() {
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0, max = selectedItems.size(); i < max; i++) {
-            T item = selectedItems.get(i);
-            if (control.getConverter() == null) {
-                sb.append(item);
-            } else {
-                sb.append(control.getConverter().toString(item));
-            }
-            if (i < max - 1) {
-                sb.append(", "); //$NON-NLS-1$
-            }
-        }
-        return sb.toString();
-    }
     
     
     /**************************************************************************

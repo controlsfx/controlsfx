@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Skin;
 import javafx.util.StringConverter;
 
@@ -200,7 +201,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
     // --- converter
     private ObjectProperty<StringConverter<T>> converter = 
             new SimpleObjectProperty<StringConverter<T>>(this, "converter");
-    
+            
     /**
      * A {@link StringConverter} that, given an object of type T, will 
      * return a String that can be used to represent the object visually.
@@ -226,6 +227,28 @@ public class CheckComboBox<T> extends ControlsFXControl {
         return converterProperty().get(); 
     }
     
+    /**
+     * Return the text to be shown in the {@link ComboBox#buttonCell} when a
+     * selection is made. By default, an enumeration of the selected items
+     * separated by commas is shown.
+     *
+     * @return the text to be shown in the {@link ComboBox#buttonCell}.
+     */
+    public String getTitle() {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0, max = getCheckModel().getCheckedItems().size(); i < max; i++) {
+            T item = getCheckModel().getCheckedItems().get(i);
+            if (getConverter() == null) {
+                sb.append(item);
+            } else {
+                sb.append(getConverter().toString(item));
+            }
+            if (i < max - 1) {
+                sb.append(", "); //$NON-NLS-1$
+            }
+        }
+        return sb.toString();
+    }
     
     
     /**************************************************************************

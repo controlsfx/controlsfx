@@ -30,6 +30,8 @@ import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -40,12 +42,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.CheckListView;
 
+import java.util.stream.Collectors;
+
 
 public final class FilterPanel<T> extends Pane {
     
     private final ColumnFilter<T> columnFilter;
-    private final CheckListView<ColumnFilter.FilterValue<?>> checkListView = new CheckListView<>();
-    private final FilteredList<ColumnFilter.FilterValue<?>> filterList;
+    private final CheckListView<CheckItem> checkListView = new CheckListView<>();
+
+    private final FilteredList<CheckItem> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
 
@@ -61,10 +66,10 @@ public final class FilterPanel<T> extends Pane {
         vBox.getChildren().add(searchBox);
 
         //initialize checklist view
+        ObservableList<CheckItem> checkItems = FXCollections.observableArrayList(columnFilter.getFilterValues().stream().map(CheckItem::new).collect(Collectors.toList()));
 
-        filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
-        checkListView.setItems(columnFilter.getFilterValues());
-        checkListView.setCheckModel(columnFilter);
+        filterList = new FilteredList<>(new SortedList<>(checkItems), t -> true);
+        checkListView.setItems(filterList);
 
         vBox.getChildren().add(checkListView);
         
@@ -99,6 +104,16 @@ public final class FilterPanel<T> extends Pane {
         
         vBox.getChildren().add(bttnBox);
         this.getChildren().add(vBox);
+    }
+    private static final class CheckItem extends HBox {
+        private final CheckBox checkBox = new CheckBox();
+        private final Label label = new Label();
+
+        CheckItem(ColumnFilter.FilterValue<?> filterValue) {
+            label.setText(filterValue.getValueProperty().getValue().toString());
+            checkBox.selectedProperty().bindBidirectional(filterValue.getSelectedProperty());
+            this.getChildren().addAll(checkBox, label);
+        }
     }
     public void resetSearchFilter() {
         this.filterList.setPredicate(t -> true);

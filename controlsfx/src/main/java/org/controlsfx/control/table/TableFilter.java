@@ -52,7 +52,6 @@ public final class TableFilter<T> {
         this.filteredList.setPredicate(v -> true);
         tableView.setItems(filteredList);
         this.applyForAllColumns();
-        this.addListeners();
     }
     public ObservableList<T> getBackingList() { 
         return backingList;
@@ -69,12 +68,6 @@ public final class TableFilter<T> {
         filteredList.setPredicate(v -> columnFilters.stream()
                 .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).map(ov -> ov.getSelectedProperty().getValue() == false).orElse(false))
                 .findAny().isPresent() == false);
-    }
-
-    private void addListeners() {
-     /*   backingList.addListener((InvalidationListener) e -> columnFilters.forEach(cf -> cf.rebuildAllVals()));
-
-        columnFilters.forEach(cf -> cf.getTableColumn().onEditCommitProperty().addListener(e -> cf.rebuildAllVals()));*/
     }
 
     public TableView<T> getTableView() {

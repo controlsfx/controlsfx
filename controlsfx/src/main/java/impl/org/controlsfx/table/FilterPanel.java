@@ -78,26 +78,21 @@ public final class FilterPanel<T> extends Pane {
         HBox bttnBox = new HBox();
         Button applyBttn = new Button("APPLY");
 
-        applyBttn.setOnAction(e -> {
-            columnFilter.getTableFilter().executeFilter();
-        });
+        applyBttn.setOnAction(e -> columnFilter.getTableFilter().executeFilter());
         
         bttnBox.getChildren().add(applyBttn);
         
         
-        //initialize clear button
+        //initialize reset buttons
         Button clearButton = new Button("RESET");
 
-        clearButton.setOnAction(e -> {
-            columnFilter.getFilterValues().stream().forEach(v -> v.getSelectedProperty().setValue(true));
-
-        });
+        clearButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true)));
 
         bttnBox.getChildren().add(clearButton);
 
         Button clearAllButton = new Button("RESET ALL");
         clearAllButton.setOnAction(e -> {
-            columnFilter.getTableFilter().getColumnFilters().forEach(cf -> cf.getFilterValues().forEach(fv -> fv.getSelectedProperty().setValue(true)));
+            columnFilter.getTableFilter().getColumnFilters().stream().flatMap(cf -> cf.getFilterValues().stream()).forEach(fv -> fv.getSelectedProperty().setValue(true));
             columnFilter.getTableFilter().executeFilter();
         });
         bttnBox.getChildren().add(clearAllButton);
@@ -119,10 +114,10 @@ public final class FilterPanel<T> extends Pane {
     public void resetSearchFilter() {
         this.filterList.setPredicate(t -> true);
     }
-    public static <T> FilterMenuItem<T> getInMenuItem(ColumnFilter<T> columnFilter) { 
+    public static <T> CustomMenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
         
         FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
-        FilterMenuItem<T> menuItem = new FilterMenuItem<T>(filterPanel);
+        CustomMenuItem menuItem = new CustomMenuItem();
         
         filterPanel.initializeListeners();
         
@@ -137,15 +132,6 @@ public final class FilterPanel<T> extends Pane {
         menuItem.setHideOnClick(false);
         
         return menuItem;
-    }
-    public static class FilterMenuItem<T> extends CustomMenuItem { 
-        private final FilterPanel<T> filterPanel;
-        private FilterMenuItem(FilterPanel<T> filterPanel) { 
-            this.filterPanel = filterPanel;
-        }
-        public FilterPanel<T> getFilterPanel() {
-            return filterPanel;
-        }
     }
     private void initializeListeners() { 
         searchBox.textProperty().addListener(l -> filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.toString().contains(searchBox.getText())));

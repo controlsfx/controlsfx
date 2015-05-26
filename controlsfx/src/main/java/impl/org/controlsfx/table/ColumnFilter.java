@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.table;
 
-import impl.org.controlsfx.table.ColumnFilter.FilterValue;
-
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -35,6 +33,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
 
 import org.controlsfx.control.table.TableFilter;
@@ -49,6 +48,7 @@ public final class ColumnFilter<T> {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
 
+        //Build distinct mapped list of filter values from column values
         this.filterValues = new DistinctMappingList<>(tableFilter.getBackingList(),
                 v -> new FilterValue<>(tableColumn.getCellObservableValue(v)));
 
@@ -109,8 +109,9 @@ public final class ColumnFilter<T> {
         return filterValues.stream().filter(fv -> fv.value.getValue().equals(value.getValue())).findAny();
     }
 
+    /**Leverages tableColumn's context menu to attach filter panel */
     private void attachContextMenu() {
-        FilterPanel.FilterMenuItem<T> item = FilterPanel.getInMenuItem(this);
+        CustomMenuItem item = FilterPanel.getInMenuItem(this);
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);

@@ -30,6 +30,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,6 +53,8 @@ public final class BeanPropertyUtils {
      * Given a JavaBean, this method will return a list of {@link Item} intances,
      * which may be directly placed inside a {@link PropertySheet} (via its
      * {@link PropertySheet#getItems() items list}.
+     * <p>
+     * This method will not return read-only properties.
      * 
      * @param bean The JavaBean that should be introspected and be editable via
      *      a {@link PropertySheet}.
@@ -59,12 +62,27 @@ public final class BeanPropertyUtils {
      *      JavaBean.
      */
     public static ObservableList<Item> getProperties(final Object bean) {
+        return getProperties(bean, (p) -> {return true;} );
+    }
+    
+    /**
+     * Given a JavaBean, this method will return a list of {@link Item} intances,
+     * which may be directly placed inside a {@link PropertySheet} (via its
+     * {@link PropertySheet#getItems() items list}.
+     * 
+     * @param bean The JavaBean that should be introspected and be editable via
+     *      a {@link PropertySheet}.
+     * @param test Predicate to test whether the property should be included in the 
+     *      list of results.
+     * @return A list of {@link Item} instances representing the properties of the
+     *      JavaBean.
+     */
+    public static ObservableList<Item> getProperties(final Object bean, Predicate<PropertyDescriptor> test) {
         ObservableList<Item> list = FXCollections.observableArrayList();
-
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
             for (PropertyDescriptor p : beanInfo.getPropertyDescriptors()) {
-                if (isProperty(p) && ! p.isHidden()) {
+                if (test.test(p)) {
                     list.add(new BeanProperty(bean, p));
                 }
             }
@@ -75,9 +93,4 @@ public final class BeanPropertyUtils {
         return list;
     }
     
-    private static boolean isProperty(final PropertyDescriptor p) {
-        //TODO  Add more filtering
-        return p.getWriteMethod() != null &&
-               !p.getPropertyType().isAssignableFrom(EventHandler.class);  
-    }
 }

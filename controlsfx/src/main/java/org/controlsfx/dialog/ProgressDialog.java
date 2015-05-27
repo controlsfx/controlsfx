@@ -69,10 +69,15 @@ public class ProgressDialog extends Dialog<Void> {
         VBox vbox = new VBox(10, progressMessage, content);
         vbox.setMaxWidth(Double.MAX_VALUE);
         vbox.setPrefSize(300, 100);
-        
-        if (getContentText() != null) {
-            vbox.getChildren().add(0, new Label(getContentText()));
-        }
+        /**
+         * The content Text cannot be set before the constructor and since we
+         * set a Content Node, the contentText will not be shown. If we want to
+         * let the user display a content text, we must recreate it.
+         */
+        Label contentText = new Label();
+        contentText.setWrapText(true);
+        vbox.getChildren().add(0, contentText);
+        contentText.textProperty().bind(dialogPane.contentTextProperty());
         dialogPane.setContent(vbox);
     }
     

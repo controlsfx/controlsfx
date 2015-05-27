@@ -36,12 +36,15 @@ import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
 
 /**
  * A cell column header.
  */
 public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
+    int lastColumnResized = -1;
+    
     public HorizontalHeaderColumn(
             TableViewSkinBase<?, ?, ?, ?, ?, ?> skin, TableColumnBase<?, ?> tc) {
         super(skin, tc);
@@ -52,6 +55,24 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         widthProperty().addListener((Observable observable) -> {
             ((GridViewSkin)skin).hBarValue.clear();
             ((GridViewSkin)skin).rectangleSelection.updateRectangle();
+        });
+        
+        /**
+         * I cannot really determine when a resize is done. Apparently, when
+         * this variable Layout is set to 0, it means the drag is done, so until
+         * a beter solution is shown, it will do the trick.
+         */
+        columnReorderLine.layoutXProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            HorizontalHeader headerRow = (HorizontalHeader) ((GridViewSkin) skin).getTableHeaderRow();
+            GridViewSkin mySkin = ((GridViewSkin) skin);
+            if (newValue.intValue() == 0 && lastColumnResized >= 0) {
+                if (headerRow.selectedColumns.get(lastColumnResized)) {
+                    double width1 = mySkin.getColumns().get(lastColumnResized).getWidth();
+                    for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
+                        mySkin.getColumns().get(i).setPrefWidth(width1);
+                    }
+                }
+            }
         });
     }
 

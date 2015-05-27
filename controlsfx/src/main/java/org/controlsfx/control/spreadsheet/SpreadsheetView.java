@@ -1648,7 +1648,8 @@ public class SpreadsheetView extends Control {
              * FIXME Add a test to prevent the Shift fail case.
              */
         }else if (keyEvent.getCode() != KeyCode.SHIFT && !keyEvent.isShortcutDown() 
-                && !keyEvent.getCode().isNavigationKey()) {
+                && !keyEvent.getCode().isNavigationKey() 
+                && keyEvent.getCode() != KeyCode.ESCAPE) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };

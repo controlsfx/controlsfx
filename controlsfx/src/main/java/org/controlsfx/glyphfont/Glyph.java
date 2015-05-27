@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -177,7 +177,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * @return Returns this instance for fluent API
      */
     public Glyph sizeFactor(int factor) {
-    	Optional.of(GlyphFontRegistry.font(getFont().getFamily())).ifPresent( glyphFont ->{
+    	Optional.ofNullable(GlyphFontRegistry.font(getFont().getFamily())).ifPresent( glyphFont ->{
     		setFontSize(glyphFont.getDefaultSize()* (factor < 1? 1: factor));
     	});
     	return this;

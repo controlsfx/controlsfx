@@ -80,6 +80,8 @@ public class RectangleSelection extends Rectangle {
 
         skin.getHBar().valueProperty().addListener(layoutListener);
         sm.getSelectedCells().addListener((Observable observable) -> {
+            skin.getHorizontalHeader().clearSelectedColumns();
+            skin.verticalHeader.clearSelectedRows();
             selectionRange.fill(sm.getSelectedCells());
             updateRectangle();
         });

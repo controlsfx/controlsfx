@@ -756,6 +756,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     protected TableHeaderRow createTableHeaderRow() {
         return new HorizontalHeader(this);
     }
+    
+    protected HorizontalHeader getHorizontalHeader(){
+        return (HorizontalHeader) getTableHeaderRow();
+    }
 
     BooleanProperty getTableMenuButtonVisibleProperty() {
         return tableMenuButtonVisibleProperty();
@@ -1013,7 +1017,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
     @Override
     protected boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
-         return getSkinnable().resizeColumn(tc, delta);
+        getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
+        return getSkinnable().resizeColumn(tc, delta);
     }
 
     @Override

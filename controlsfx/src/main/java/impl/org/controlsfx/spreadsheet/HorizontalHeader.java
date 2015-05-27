@@ -29,6 +29,7 @@ package impl.org.controlsfx.spreadsheet;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import java.util.BitSet;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -56,6 +57,11 @@ public class HorizontalHeader extends TableHeaderRow {
 
     // Indicate whether the this HorizontalHeader is activated or not
     private boolean working = true;
+    /**
+     * When the columns header are clicked, we consider the column as selected.
+     * This BitSet is reset when a modification on cells is done.
+     */
+    protected BitSet selectedColumns = new BitSet();
 
     /***************************************************************************
      * 
@@ -120,6 +126,9 @@ public class HorizontalHeader extends TableHeaderRow {
         return (HorizontalHeaderColumn) super.getRootHeader();
     }
 
+    void clearSelectedColumns(){
+        selectedColumns.clear();
+    }
     /**************************************************************************
      * 
      * Protected methods
@@ -189,18 +198,26 @@ public class HorizontalHeader extends TableHeaderRow {
     private void headerClicked(TableColumn column, MouseEvent event) {
         TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
         int lastRow = gridViewSkin.spreadsheetView.getGrid().getRowCount() - 1;
+        int indexColumn = column.getTableView().getColumns().indexOf(column);
         TablePosition focusedPosition = sm.getTableView().getFocusModel().getFocusedCell();
         if (event.isShortcutDown()) {
+            BitSet tempSet = (BitSet) selectedColumns.clone();
             sm.selectRange(0, column, lastRow, column);
+            selectedColumns.or(tempSet);
+            selectedColumns.set(indexColumn);
         } else if (event.isShiftDown() && focusedPosition != null && focusedPosition.getTableColumn() != null) {
             sm.clearSelection();
             sm.selectRange(0, column, lastRow, focusedPosition.getTableColumn());
             sm.getTableView().getFocusModel().focus(0, focusedPosition.getTableColumn());
+            int min = Math.min(indexColumn, focusedPosition.getColumn());
+            int max = Math.max(indexColumn, focusedPosition.getColumn());
+            selectedColumns.set(min, max + 1);
         } else {
             sm.clearSelection();
             sm.selectRange(0, column, lastRow, column);
             //And we want to have the focus on the first cell in order to be able to copy/paste between columns.
             sm.getTableView().getFocusModel().focus(0, column);
+            selectedColumns.set(indexColumn);
         }
     }
     /**

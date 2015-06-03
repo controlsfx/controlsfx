@@ -55,6 +55,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -498,6 +499,12 @@ public class Wizard {
                 
             // then give user a chance to modify the default actions
             currentPage.onEnteringPage(this);
+            
+            // Remove from DecorationPane which has been created by e.g. validation
+            if (currentPage.getParent() != null && currentPage.getParent() instanceof Pane) {
+                Pane parentOfCurrentPage = (Pane) currentPage.getParent();
+                parentOfCurrentPage.getChildren().remove(currentPage);
+            }
             
             // and then switch to the new pane
             dialog.setDialogPane(currentPage);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,10 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import javafx.scene.control.Alert;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
-import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.property.editor.PropertyEditor;
 
 /**
@@ -101,14 +101,15 @@ public class BeanProperty implements PropertySheet.Item {
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 e.printStackTrace();
             } catch (Throwable e) {
-				if (e instanceof PropertyVetoException) {
-					Dialogs.create().title(localize(asKey("bean.property.change.error.title"))) //$NON-NLS-1$
-							.message(e.getLocalizedMessage())
-							.masthead(localize(asKey("bean.property.change.error.masthead"))) //$NON-NLS-1$
-							.showError();
-				} else {
-					throw e;
-				}
+                if (e instanceof PropertyVetoException) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(localize(asKey("bean.property.change.error.title")));//$NON-NLS-1$
+                    alert.setHeaderText(localize(asKey("bean.property.change.error.masthead")));//$NON-NLS-1$
+                    alert.setContentText(e.getLocalizedMessage());
+                    alert.showAndWait();
+                } else {
+                    throw e;
+                }
             }
         }
     }

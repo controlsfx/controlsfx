@@ -112,7 +112,7 @@ jar {
         )
         instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
 	instruction 'Import-Package',
-                '!org.controlsfx',
+                '!org.controlsfx*',
                 '*'
 
         instruction 'Export-Package',

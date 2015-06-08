@@ -188,6 +188,11 @@ public class SampleScanner {
                 }
                 return FileVisitResult.CONTINUE;
             }
+
+            @Override public FileVisitResult visitFileFailed(Path file, IOException ex) {
+                System.err.println(ex + " Skipping...");
+                return FileVisitResult.CONTINUE;
+            }
         });
     }
 
@@ -230,6 +235,11 @@ public class SampleScanner {
                         classes.add(clazz);
                     }
                 }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override public FileVisitResult visitFileFailed(Path file, IOException ex) {
+                System.err.println(ex + " Skipping...");
                 return FileVisitResult.CONTINUE;
             }
         });        

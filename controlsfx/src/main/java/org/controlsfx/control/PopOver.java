@@ -51,6 +51,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -90,6 +91,9 @@ public class PopOver extends PopupControl {
         super();
 
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+
+        getRoot().getStylesheets().add(
+                PopOver.class.getResource("popover.css").toExternalForm()); //$NON-NLS-1$
 
         setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
         setOnHiding(new EventHandler<WindowEvent>() {
@@ -153,6 +157,24 @@ public class PopOver extends PopupControl {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PopOverSkin(this);
+    }
+
+    private final StackPane rootPane = new StackPane();
+
+    /**
+     * The root pane stores the content node of the popover. It is accessible via this
+     * method in order to support proper styling.
+     *
+     * <h3>Example:</h3>
+     * <pre>
+     * PopOver popOver = new PopOver();
+     * popOver.getRootPane().getStylesheets().add(...);
+     * </pre>
+     *
+     * @return the root pane
+     */
+    public final StackPane getRoot() {
+    	return rootPane;
     }
 
     // Content support.
@@ -309,7 +331,7 @@ public class PopOver extends PopupControl {
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public final void show(Window ownerWindow, double anchorX, double anchorY){
@@ -318,7 +340,7 @@ public class PopOver extends PopupControl {
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
     }
-    
+
     /**
      * Makes the pop over visible at the give location and associates it with
      * the given owner node. The x and y coordinate will be the target location

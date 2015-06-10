@@ -46,7 +46,6 @@ import javafx.scene.shape.StrokeType;
 import org.controlsfx.control.SnapshotView;
 import org.controlsfx.control.SnapshotView.Boundary;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 /**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 package org.controlsfx.samples.propertysheet;
 
+import java.util.Optional;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -36,14 +37,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
-import org.controlsfx.control.ButtonBar;
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.DialogAction;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.BeanPropertyUtils;
 import org.controlsfx.property.editor.PropertyEditor;
@@ -54,14 +54,6 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private final PropertySheet.Item item;
     private final ObjectProperty<T> value = new SimpleObjectProperty<>();
 
-    final Action actionSave = new DialogAction("Save", ButtonBar.ButtonType.OK_DONE, false, true, true, ae -> { /* real saving code here */ } ) {
-            
-                @Override
-                public String toString() {
-                    return "SAVE";
-                }
-    };
-    
     public PopupPropertyEditor(PropertySheet.Item item) {
         this.item = item;
         if (item.getValue() != null) {
@@ -79,19 +71,19 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
     private void displayPopupEditor() {
         PopupPropertySheet<T> sheet = new PopupPropertySheet<>(item, this);
 
-        Dialog dlg = new Dialog(null, "Popup Property Editor", false);
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setResizable(false);
+        alert.getDialogPane().setContent(sheet);
+        alert.setTitle("Popup Property Editor");
+        ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().addAll(ButtonType.CANCEL, saveButton);
 
-        dlg.setResizable(false);
-        dlg.setIconifiable(false);
-        dlg.setContent(sheet);
-        dlg.getActions().addAll(actionSave, Dialog.ACTION_CANCEL);
-        Action response = dlg.show();
+        Optional<ButtonType> response = alert.showAndWait();
 
-        if (actionSave.equals(response)) {
+        if (response.isPresent() && saveButton.equals(response.get())) {
             item.setValue(sheet.getBean());
             btnEditor.setText(sheet.getBean().toString());
         }
-
     }
 
     @Override

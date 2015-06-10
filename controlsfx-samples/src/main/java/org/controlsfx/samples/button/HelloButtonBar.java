@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,19 +26,6 @@
  */
 package org.controlsfx.samples.button;
 
-import static org.controlsfx.control.ButtonBar.ButtonType.APPLY;
-import static org.controlsfx.control.ButtonBar.ButtonType.BACK_PREVIOUS;
-import static org.controlsfx.control.ButtonBar.ButtonType.CANCEL_CLOSE;
-import static org.controlsfx.control.ButtonBar.ButtonType.FINISH;
-import static org.controlsfx.control.ButtonBar.ButtonType.HELP;
-import static org.controlsfx.control.ButtonBar.ButtonType.HELP_2;
-import static org.controlsfx.control.ButtonBar.ButtonType.LEFT;
-import static org.controlsfx.control.ButtonBar.ButtonType.NEXT_FORWARD;
-import static org.controlsfx.control.ButtonBar.ButtonType.NO;
-import static org.controlsfx.control.ButtonBar.ButtonType.OK_DONE;
-import static org.controlsfx.control.ButtonBar.ButtonType.OTHER;
-import static org.controlsfx.control.ButtonBar.ButtonType.RIGHT;
-import static org.controlsfx.control.ButtonBar.ButtonType.YES;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -46,6 +33,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -59,8 +47,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.ButtonBar;
-import org.controlsfx.control.ButtonBar.ButtonType;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.samples.Utils;
 
@@ -97,25 +83,25 @@ public class HelloButtonBar extends ControlsFXSample {
         
         // create button bar
         buttonBar.getButtons().addAll(
-            createButton("OK", OK_DONE),
-            createButton("Cancel", CANCEL_CLOSE),
-            createButton("Left 1", LEFT),
-            createButton("Left 2", LEFT),
-            createButton("Left 3", LEFT),
-            createButton("Right 1", RIGHT),
-            createButton("Unknown 1", OTHER),
-            createButton("Help(R)", HELP),
-            createButton("Help(L)", HELP_2),
-            createButton("Unknown 2 xxxxxxxxxx", OTHER),
-            createButton("Yes", YES),
-            createButton("No", NO),
-            createButton("Next", NEXT_FORWARD),
-            createButton("Unknown 3", OTHER),
-            createButton("Back", BACK_PREVIOUS),
-            createButton("Right 2", RIGHT),
-            createButton("Finish", FINISH),
-            createButton("Right 3", RIGHT),
-            createButton("Apply", APPLY)
+            createButton("OK", ButtonBar.ButtonData.OK_DONE),
+            createButton("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE),
+            createButton("Left 1", ButtonBar.ButtonData.LEFT),
+            createButton("Left 2", ButtonBar.ButtonData.LEFT),
+            createButton("Left 3", ButtonBar.ButtonData.LEFT),
+            createButton("Right 1", ButtonBar.ButtonData.RIGHT),
+            createButton("Unknown 1", ButtonBar.ButtonData.OTHER),
+            createButton("Help(R)", ButtonBar.ButtonData.HELP),
+            createButton("Help(L)", ButtonBar.ButtonData.HELP_2),
+            createButton("Unknown 2 xxxxxxxxxx", ButtonBar.ButtonData.OTHER),
+            createButton("Yes", ButtonBar.ButtonData.YES),
+            createButton("No", ButtonBar.ButtonData.NO),
+            createButton("Next", ButtonBar.ButtonData.NEXT_FORWARD),
+            createButton("Unknown 3", ButtonBar.ButtonData.OTHER),
+            createButton("Back", ButtonBar.ButtonData.BACK_PREVIOUS),
+            createButton("Right 2", ButtonBar.ButtonData.RIGHT),
+            createButton("Finish", ButtonBar.ButtonData.FINISH),
+            createButton("Right 3", ButtonBar.ButtonData.RIGHT),
+            createButton("Apply", ButtonBar.ButtonData.APPLY)
         );
         
         // put the ButtonBar inside a ScrollPane so that the user can scroll horizontally
@@ -155,7 +141,16 @@ public class HelloButtonBar extends ControlsFXSample {
         uniformSizeLabel.getStyleClass().add("property");
         grid.add(uniformSizeLabel, 0, row);
         final CheckBox uniformButtonBtn = new CheckBox();
-        uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
+        uniformButtonBtn.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean isUniform) {
+                for(Node button :buttonBar.getButtons()){
+                    ButtonBar.setButtonUniformSize(button, isUniform);
+                }
+            }
+        });
+//        uniformButtonBtn.selectedProperty().bindBidirectional( buttonBar.buttonUniformSizeProperty());
         grid.add(uniformButtonBtn, 1, row);
         row++;
         
@@ -190,9 +185,9 @@ public class HelloButtonBar extends ControlsFXSample {
         return btn;
     }
      
-    private Button createButton( String title, ButtonType type) {
+    private Button createButton( String title, ButtonBar.ButtonData buttonData) {
         Button button = new Button(title);
-        ButtonBar.setType(button, type);
+        ButtonBar.setButtonData(button, buttonData);
         return button;
     }
     

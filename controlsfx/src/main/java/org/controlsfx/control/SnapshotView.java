@@ -69,10 +69,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-import com.sun.javafx.css.converters.EnumConverter;
-import com.sun.javafx.css.converters.PaintConverter;
-import com.sun.javafx.css.converters.SizeConverter;
-
 /**
  * A {@code SnapshotView} is a control which allows the user to select an area of a node in the typical manner used by
  * picture editors and crate snapshots of the selection.
@@ -664,8 +660,9 @@ public class SnapshotView extends ControlsFXControl {
     private static final String DEFAULT_STYLE_CLASS = "snapshot-view"; //$NON-NLS-1$
 
     /** {@inheritDoc} */
-    @Override public String getUserAgentStylesheet() {
-        return getUserAgentStylesheet(SnapshotView.class, "snapshot-view.css");
+    @Override
+    public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(SnapshotView.class, "snapshot-view.css"); //$NON-NLS-1$
     }
 
     /**
@@ -775,38 +772,38 @@ public class SnapshotView extends ControlsFXControl {
      * The class which holds this control's {@link CssMetaData} for the different {@link StyleableProperty
      * StyleableProperties}.
      */
-    @SuppressWarnings("javadoc")
+    @SuppressWarnings({ "javadoc", "unchecked" })
     private static class Css {
 
         public static final CssMetaData<SnapshotView, Boundary> SELECTION_AREA_BOUNDARY =
                 createCssMetaData(
                         snapshotView -> snapshotView.selectionAreaBoundary, "-fx-selection-area-boundary", //$NON-NLS-1$
-                        new EnumConverter<>(Boundary.class));
+                        (StyleConverter<?, Boundary>) StyleConverter.getEnumConverter(Boundary.class));
 
         public static final CssMetaData<SnapshotView, Boundary> UNSELECTED_AREA_BOUNDARY =
                 createCssMetaData(
                         snapshotView -> snapshotView.unselectedAreaBoundary, "-fx-unselected-area-boundary", //$NON-NLS-1$
-                        new EnumConverter<>(Boundary.class));
+                        (StyleConverter<?, Boundary>) StyleConverter.getEnumConverter(Boundary.class));
 
         public static final CssMetaData<SnapshotView, Paint> SELECTION_BORDER_PAINT =
                 createCssMetaData(
                         snapshotView -> snapshotView.selectionBorderPaint, "-fx-selection-border-paint", //$NON-NLS-1$
-                        PaintConverter.getInstance());
+                        StyleConverter.getPaintConverter());
 
         public static final CssMetaData<SnapshotView, Number> SELECTION_BORDER_WIDTH =
                 createCssMetaData(
                         snapshotView -> snapshotView.selectionBorderWidth, "-fx-selection-border-width", //$NON-NLS-1$
-                        SizeConverter.getInstance());
+                        StyleConverter.getSizeConverter());
 
         public static final CssMetaData<SnapshotView, Paint> SELECTION_AREA_FILL =
                 createCssMetaData(
                         snapshotView -> snapshotView.selectionAreaFill, "-fx-selection-area-fill", //$NON-NLS-1$
-                        PaintConverter.getInstance());
+                        StyleConverter.getPaintConverter());
 
         public static final CssMetaData<SnapshotView, Paint> UNSELECTED_AREA_FILL =
                 createCssMetaData(
                         snapshotView -> snapshotView.unselectedAreaFill, "-fx-unselected-area-fill", //$NON-NLS-1$
-                        PaintConverter.getInstance());
+                        StyleConverter.getPaintConverter());
 
         /**
          * The {@link CssMetaData} associated with this class, which includes the {@code CssMetaData} of its super

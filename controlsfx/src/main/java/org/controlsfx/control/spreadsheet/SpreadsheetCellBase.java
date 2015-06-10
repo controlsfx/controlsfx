@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,7 @@ import javafx.scene.image.ImageView;
  * }
  * </pre>
  * 
- * <center><img src="dateFormat.png"></center>
+ * <center><img src="dateFormat.PNG"></center>
  * 
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
@@ -141,7 +141,7 @@ import javafx.scene.image.ImageView;
  * }
  * </pre>
  * 
- * <center><img src="triangleCell.png"></center>
+ * <center><img src="triangleCell.PNG"></center>
  * 
  * 
  * <br/>

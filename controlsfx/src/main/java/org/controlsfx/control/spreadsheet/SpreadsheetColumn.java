@@ -186,7 +186,7 @@ public final class SpreadsheetColumn {
      * @param width
      */
     public void setPrefWidth(double width) {
-        column.setPrefWidth(width);
+        column.setPrefWidth(Math.ceil(width));
     }
 
     /**

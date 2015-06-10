@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ import javafx.collections.ObservableList;
  * The {@link #onClick() } method does nothing by default, so you can override it
  * if you want to execute a custom action when the user will click on your Picker.
  * 
- * <h3>Visual:</h3> <center><img src="pickers.png"/></center>
+ * <h3>Visual:</h3> <center><img src="pickers.PNG"/></center>
  * 
  */
 public class Picker {

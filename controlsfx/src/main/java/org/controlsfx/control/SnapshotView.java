@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ import javafx.scene.paint.Paint;
  * The area where the selection is possible is either this entire control or limited to the displayed node.
  * 
  * <h3>Screenshots</h3>
- * <center><img src="snapshotView.png"></center>
+ * <center><img src="snapshotView.png" alt="Screenshot of SnapshotView"></center>
  * 
  * <h3>Code Samples</h3>
  * The following snippet creates a new instance with the ControlsFX logo loaded from the web, sets a selected area and
@@ -88,7 +88,7 @@ import javafx.scene.paint.Paint;
  * 
  * <pre>
  * ImageView controlsFxView = new ImageView(
- *         &quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot);
+ *         &quot;http://cache.fxexperience.com/wp-content/uploads/2013/05/ControlsFX.png&quot;);
  * SnapshotView snapshotView = new SnapshotView(controlsFxView);
  * snapshotView.setSelection(33, 50, 100, 100);
  * snapshotView.setFixedSelectionRatio(1); // (this is actually the default value)

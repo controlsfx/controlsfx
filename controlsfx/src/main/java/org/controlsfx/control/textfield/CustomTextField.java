@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,11 +43,11 @@ import javafx.scene.control.TextField;
  * followed by three CustomTextFields. Note what happens with long text input - 
  * it is prevented from going beneath the left and right graphics. Of course, if 
  * the keyboard caret moves to the right, the text will become visible, but this
- * is because it will all scroll to the left (as is the case in a normal {@link TextField}.
+ * is because it will all scroll to the left (as is the case in a normal {@link TextField}).
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="customTextField.png" />
+ * <img src="customTextField.png" alt="Screenshot of CustomTextField">
  * </center>
  * 
  * @see TextFields

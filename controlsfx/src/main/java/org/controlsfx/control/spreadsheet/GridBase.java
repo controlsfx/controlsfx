@@ -54,7 +54,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
  * You have to use the method {@link #setRowHeightCallback(javafx.util.Callback) }
  * in order to specify a Callback that will give you the index of the row, and you 
  * will give back the height of the row.
- * <br/>
+ * <br>
  * If you just have a {@link Map} available, you can use the {@link MapBasedRowHeightFactory}
  * that will construct the Callback for you.
 
@@ -394,7 +394,7 @@ public class GridBase implements Grid, EventTarget {
 
     /**
      * This class serves as a bridge between row height Callback needed by the
-     * GridBase and a Map<Integer,Double> that one could have (each Integer
+     * GridBase and a Map&lt;Integer,Double&gt; that one could have (each Integer
      * specify a row index and its associated height).
      */
     public static class MapBasedRowHeightFactory implements Callback<Integer, Double> {

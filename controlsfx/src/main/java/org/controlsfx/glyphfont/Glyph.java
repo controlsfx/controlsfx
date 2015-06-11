@@ -59,7 +59,7 @@ import org.controlsfx.tools.Duplicatable;
  * also add effects such as {@link #useHoverEffect()}
  *
  * <p>An ability to retrieve glyph node by combination of font name and glyph name
- * extends to the {@link org.controlsfx.control.action.ActionProxy} graphic attribute, where the "font>"
+ * extends to the {@link org.controlsfx.control.action.ActionProxy} graphic attribute, where the "font&gt;"
  * prefix should be used. For more information see {@link org.controlsfx.control.action.ActionProxy}.
  *
  */

@@ -32,8 +32,8 @@ import javafx.collections.ObservableList;
 
 /**
  *
- * Pickers can display some Images next to the headers. <br/>
- * You can specify the image by providing custom StyleClass :<br/>
+ * Pickers can display some Images next to the headers. <br>
+ * You can specify the image by providing custom StyleClass :<br>
  * 
  * <pre>
  * .picker-label{
@@ -46,7 +46,7 @@ import javafx.collections.ObservableList;
  * The {@link #onClick() } method does nothing by default, so you can override it
  * if you want to execute a custom action when the user will click on your Picker.
  * 
- * <h3>Visual:</h3> <center><img src="pickers.PNG"/></center>
+ * <h3>Visual:</h3> <center><img src="pickers.PNG" alt="Screenshot of Picker"></center>
  * 
  */
 public class Picker {

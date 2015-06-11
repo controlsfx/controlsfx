@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ import javafx.util.Duration;
  * <h3>Screenshot</h3> The following screenshots shows the right side node
  * hovering over a table after it was made visible:
  * 
- * <center><img src="hiddenSidesPane.png" />
+ * <center><img src="hiddenSidesPane.png" alt="Screenshot of HiddenSidesPane">
  * 
  * </center> <h3>Code Sample</h3>
  * 

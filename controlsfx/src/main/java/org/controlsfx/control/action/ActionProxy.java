@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,7 @@ import org.controlsfx.glyphfont.Glyph;
  * <p>The ability for ActionProxy to support glyph fonts is part of the ControlsFX
  * {@link Glyph} API. For more information on how to specify
  * images and glyph fonts, refer to the {@link ActionProxy#graphic()} method.
- * <br/><br/></li>
+ * <br><br></li>
  * 
  * <li>Register your class in the global {@link ActionMap}, preferably in the 
  * class constructor:  
@@ -101,15 +101,15 @@ public @interface ActionProxy {
      * 
      * <p>Because a graphic can come from multiple sources, a simple protocol 
      * prefix is used to designate the type. Currently supported prefixes are 
-     * '<code>image></code>' and '<code>font></code>'. Default protocol is 
-     * '<code>image></code>'. 
+     * '<code>image&gt;</code>' and '<code>font&gt;</code>'. Default protocol is 
+     * '<code>image&gt;</code>'. 
      * 
      * <p>The following are the examples of different graphic nodes:
 	 * <pre>
 	 * &#64;ActionProxy(text="Teacher", graphic="http://icons.iconarchive.com/icons/custom-icon-design/mini-3/16/teacher-male-icon.png")
 	 * &#64;ActionProxy(text="Security", graphic="/org/controlsfx/samples/security-low.png")
-	 * &#64;ActionProxy(text="Security", graphic="image>/org/controlsfx/samples/security-low.png")
-	 * &#64;ActionProxy(text="Star", graphic="font>FontAwesome|STAR")
+	 * &#64;ActionProxy(text="Security", graphic="image&gt;/org/controlsfx/samples/security-low.png")
+	 * &#64;ActionProxy(text="Star", graphic="font&gt;FontAwesome|STAR")
 	 * </pre>     
 	 * 
 	 */

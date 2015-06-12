@@ -22,3 +22,7 @@ If you think you have a feature you can contribute, a bug you want to fix please
 | Version Eye (External project dependencies) | [![Dependency Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/badge.svg?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx) |
 | Version Eye (External project references)   | [![Reference Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/reference_badge.svg?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/references) |
 | License                                     | [![License](http://img.shields.io/badge/license-BSD--3--Clause-red.svg?style=flat)](https://bitbucket.org/controlsfx/controlsfx/src/default/license.txt) |
+
+Thanks to 
+
+[![IntelliJ Idea](https://www.jetbrains.com/idea/docs/logo_intellij_idea.png)](https://www.jetbrains.com/idea)

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,10 @@ import javafx.util.StringConverter;
 
 /**
  * This class is used by some of the {@link SpreadsheetCellType} in order to use
- * a specific format.<br/>
+ * a specific format.<br>
  * 
  * Since the format is specified in the {@link SpreadsheetCell}, we need a
- * converter which provide a runtime method {@link #toStringFormat(Object, String)}.<br/>
+ * converter which provide a runtime method {@link #toStringFormat(Object, String)}.<br>
  * 
  * This class provide two constructors:
  * <ul>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,9 +47,9 @@ import javafx.scene.image.ImageView;
  * <p>Shown below is a screenshot of the InfoOverlay control in both its 
  * collapsed and expanded states:
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="infoOverlay.png"/>
+ * <img src="infoOverlay.png" alt="Screenshot of InfoOverlay">
  * </center>
  */
 public class InfoOverlay extends ControlsFXControl {
@@ -213,7 +213,8 @@ public class InfoOverlay extends ControlsFXControl {
     
     private static final String DEFAULT_STYLE_CLASS = "info-overlay"; //$NON-NLS-1$
 
-//    @Override protected String getUserAgentStylesheet() {
-//        return InfoOverlay.class.getResource("info-overlay.css").toExternalForm(); //$NON-NLS-1$
-//    }
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(InfoOverlay.class, "info-overlay.css");
+    }
 }

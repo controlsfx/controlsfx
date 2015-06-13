@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ import org.controlsfx.property.editor.PropertyEditor;
  * below:
  * 
  * <br>
- * <center><img src="propertySheet.PNG" /></center>
+ * <center><img src="propertySheet.PNG" alt="Screenshot of PropertySheet"></center>
  * 
  * <p>In this property sheet there exists two columns: the left column shows a 
  * label describing the property itself, whereas the right column provides a
@@ -247,14 +247,11 @@ public class PropertySheet extends ControlsFXControl {
         return new PropertySheetSkin(this);
     }
     
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override protected String getUserAgentStylesheet() {
-//        return PropertySheet.class.getResource("propertysheet.css").toExternalForm(); //$NON-NLS-1$
-//    }
-    
-    
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(PropertySheet.class, "propertysheet.css");
+    }
+
     
     /**************************************************************************
      * 

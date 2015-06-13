@@ -127,12 +127,16 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * Return the Row number right after the current TablePosition (including
      * the RowSpan to be on a visible Cell)
      *
-     * @param t
+     * @param pos
      * @param cellsView
      * @return
      */
-    public static int getNextRowNumber(final TablePosition<?, ?> t, SpreadsheetGridView cellsView) {
-        return cellsView.getItems().get(t.getRow()).get(t.getColumn()).getRowSpan()
-                + cellsView.getItems().get(t.getRow()).get(t.getColumn()).getRow();
+    public static int getNextRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView) {
+        return cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRowSpan()
+                + cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow();
+    }
+    
+    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView) {
+        return cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow() -1;
     }
 }

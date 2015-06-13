@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,9 +50,9 @@ import com.sun.javafx.event.EventHandlerManager;
  * 
  * <p>Shown below is a screenshot of the BreadCrumbBar control:
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="breadCrumbBar.png"/>
+ * <img src="breadCrumbBar.png" alt="Screenshot of BreadCrumbBar">
  * </center>
  */
 public class BreadCrumbBar<T> extends ControlsFXControl {
@@ -190,7 +190,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
      * 
      * <p>
      * Consider the following hierarchy:
-     * [Root] > [Folder] > [SubFolder] > [myfile.txt]
+     * [Root] &gt; [Folder] &gt; [SubFolder] &gt; [myfile.txt]
      * 
      * To show the above bread crumb bar, you have to set the [myfile.txt] tree-node as selected crumb.
      */
@@ -336,8 +336,8 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
         return new BreadCrumbBarSkin<>(this);
     }
 
-//    /** {@inheritDoc} */
-//    @Override protected String getUserAgentStylesheet() {
-//        return BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm(); //$NON-NLS-1$
-//    }
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(BreadCrumbBar.class, "breadcrumbbar.css");
+    }
 }

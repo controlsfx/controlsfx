@@ -38,6 +38,8 @@ import java.util.Set;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -46,15 +48,21 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.IndexedCell;
+import javafx.scene.control.ResizeFeaturesBase;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
+import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.util.Callback;
@@ -64,20 +72,11 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.EventHandler;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.ResizeFeaturesBase;
-import javafx.scene.control.TablePositionBase;
-import javafx.scene.control.TableSelectionModel;
-import javafx.scene.input.MouseEvent;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -90,14 +89,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>,ObservableList<SpreadsheetCell>,TableView<ObservableList<SpreadsheetCell>>,TableViewBehavior<ObservableList<SpreadsheetCell>>,TableRow<ObservableList<SpreadsheetCell>>,TableColumn<ObservableList<SpreadsheetCell>,?>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
-    
+        
     /***************************************************************************
      * * STATIC FIELDS * *
      **************************************************************************/
@@ -578,21 +570,18 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we
                  * compute the width needed by the cell and we substract the
-                 * remaining columns width in order not to have a huge width for
-                 * the considered column.
+                 * other columns width.
                  *
-                 * Also if the cell considered is not in the column, then we can
-                 * directly continue because we don't want to take its width
-                 * into account for the current column.
+                 * Also if the cell considered is not in the column, we still
+                 * have to compute because a previous column may have based its
+                 * calculation on the current width which will be modified.
                  */
                 SpreadsheetCell spc = gridRows.get(row).get(indexColumn);
-                if(spc.getColumn() != indexColumn){
-                    getChildren().remove(cell);
-                    continue;
-                }
                 if (spc.getColumnSpan() > 1) {
-                    for (int i = 1; i < spc.getColumnSpan(); ++i) {
-                        width -= spreadsheetView.getColumns().get(indexColumn + i).getWidth();
+                    for (int i = spc.getColumn(); i < spc.getColumn() + spc.getColumnSpan(); ++i) {
+                        if(i != indexColumn){
+                            width -= spreadsheetView.getColumns().get(i).getWidth();
+                        }
                     }
                 }
                 maxWidth = Math.max(maxWidth, width);
@@ -638,7 +627,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * * PRIVATE/PROTECTED METHOD * *
      **************************************************************************/
     protected final void init() {
-        rectangleSelection = new RectangleSelection(this, (SpreadsheetViewSelectionModel) spreadsheetView.getSelectionModel());
+        rectangleSelection = new RectangleSelection(this, (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel());
         getFlow().getVerticalBar().valueProperty().addListener(vbarValueListener);
         verticalHeader = new VerticalHeader(handle);
         getChildren().add(verticalHeader);
@@ -664,7 +653,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     void resize(TableColumnBase<?, ?> tc) {
         if(tc.isResizable()){
-            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), -1);
+            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), 30);
         }
     }
 
@@ -766,6 +755,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     @Override
     protected TableHeaderRow createTableHeaderRow() {
         return new HorizontalHeader(this);
+    }
+    
+    protected HorizontalHeader getHorizontalHeader(){
+        return (HorizontalHeader) getTableHeaderRow();
     }
 
     BooleanProperty getTableMenuButtonVisibleProperty() {
@@ -1024,7 +1017,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
     @Override
     protected boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
-         return getSkinnable().resizeColumn(tc, delta);
+        getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
+        return getSkinnable().resizeColumn(tc, delta);
     }
 
     @Override

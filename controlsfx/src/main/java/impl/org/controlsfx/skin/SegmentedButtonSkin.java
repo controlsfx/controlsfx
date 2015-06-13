@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,19 +37,12 @@ import javafx.scene.layout.HBox;
 
 import org.controlsfx.control.SegmentedButton;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                SegmentedButton.class.getResource("segmentedbutton.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
+        
     private static final String ONLY_BUTTON = "only-button"; //$NON-NLS-1$
     private static final String LEFT_PILL   = "left-pill"; //$NON-NLS-1$
     private static final String CENTER_PILL = "center-pill"; //$NON-NLS-1$

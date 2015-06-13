@@ -71,12 +71,13 @@ public class SpreadsheetViewTest {
         
     }
     
+    
     /**
      * We test that a non-serializable item can be put into the Grid, and then
      * try to copy without throwing an exception.
      */
     @Test public void testCopyClipBoard() {
-        spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));
+        spv.getSelectionModel().select(0, spv.getColumns().get(0));
 
         Grid grid = spv.getGrid();
         SpreadsheetCell cell = new SpreadsheetCellBase(0, 0, 1, 1, SpreadsheetCellType.OBJECT);
@@ -90,7 +91,7 @@ public class SpreadsheetViewTest {
      * We test that a null item does not throw exception in copyClipboard.
      */
     @Test public void testCopyClipBoardNull() {
-        spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));
+        spv.getSelectionModel().select(0, spv.getColumns().get(0));
 
         Grid grid = spv.getGrid();
         SpreadsheetCell cell = new SpreadsheetCellBase(0, 0, 1, 1, SpreadsheetCellType.OBJECT);
@@ -107,7 +108,7 @@ public class SpreadsheetViewTest {
      *
      */
     @Test public void testSelectionModel(){
-        spv.getSelectionModel().select(10, spv.getSelectionModel().getTableView().getColumns().get(10));
+        spv.getSelectionModel().select(10, spv.getColumns().get(10));
         spv.setGrid(buildGrid());
 
         if (spv.getSelectionModel().getSelectedCells().size() != 1) {
@@ -375,7 +376,7 @@ public class SpreadsheetViewTest {
         
         assertEquals(value, spv.getGrid().getRows().get(0).get(0).getItem());
 
-        spv.getSelectionModel().select(0, spv.getSelectionModel().getTableView().getColumns().get(0));
+        spv.getSelectionModel().select(0, spv.getColumns().get(0));
         spv.deleteSelectedCells();
         
         assertNull(spv.getGrid().getRows().get(0).get(0).getItem());

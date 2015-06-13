@@ -42,11 +42,9 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -88,19 +86,19 @@ public class HelloActionProxy extends ControlsFXSample {
     	 System.out.println( "Action 1.2 is executed");
     }
     
-    @ActionProxy(text="Action 2.1", graphic=imagePath)
+    @ActionProxy(text="Action 2.1", graphic=imagePath, factory="org.controlsfx.samples.actions.HelloCustomActionFactory")
     private void action21() {
-    	 System.out.println( "Action 2.1 is executed");
+    	 System.out.println( "Action 2.1 is executed (and used a custom action factory)");
     }
     
     @ActionProxy(text="Action 2.2", graphic=imagePath)
-    private void action22() {
-    	 System.out.println( "Action 2.2 is executed");
+    private void action22( ActionEvent evt ) {
+    	 System.out.println( "Action 2.2 is executed (and received an ActionEvent)");
     }
     
     @ActionProxy(text="Action 2.2.1", graphic=imagePath)
-    private void action221() {
-    	 System.out.println( "Action 2.2.1 is executed");
+    private void action221( ActionEvent evt, Action action ) {
+    	 System.out.println( "Action 2.2.1 is executed (and received both an ActionEvent and an Action)");
     }
     
     @ActionProxy(text="Action 2.2.2", graphic=imagePath)

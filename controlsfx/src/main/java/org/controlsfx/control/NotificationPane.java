@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,26 +75,26 @@ import org.controlsfx.control.action.Action;
  * 
  * <br>
  * <center>
- * <table style="border: 1px solid gray; max-width:750px">
+ * <table style="border: 1px solid gray; max-width:750px" summary="NotificationPane Screenshots">
  *   <tr>
  *     <th width="200"><center><h3>Setting</h3></center></th>
  *     <th width="520"><center><h3>Screenshot</h3></center></th>
  *   </tr>
  *   <tr>
  *     <td valign="top" style="text-align:center;"><strong>Light theme from top:</strong></td>
- *     <td><center><img src="notication-pane-light-top.png"></center></td>
+ *     <td><center><img src="notication-pane-light-top.png" alt="Screenshot of NotificationPane - Light theme from top"></center></td>
  *   </tr>
  *   <tr>
  *     <td valign="top" style="text-align:center;"><strong>Light theme from bottom:</strong></td>
- *     <td><center><img src="notication-pane-light-bottom.png"></center></td>
+ *     <td><center><img src="notication-pane-light-bottom.png" alt="Screenshot of NotificationPane - Light theme from bottom"></center></td>
  *   </tr>
  *   <tr>
  *     <td valign="top" style="text-align:center;"><strong>Dark theme from top:</strong></td>
- *     <td><center><img src="notication-pane-dark-top.png"></center></td>
+ *     <td><center><img src="notication-pane-dark-top.png" alt="Screenshot of NotificationPane - Dark theme from top"></center></td>
  *   </tr>
  *   <tr>
  *     <td valign="top" style="text-align:center;"><strong>Dark theme from bottom:</strong></td>
- *     <td><center><img src="notication-pane-dark-bottom.png"></center></td>
+ *     <td><center><img src="notication-pane-dark-bottom.png" alt="Screenshot of NotificationPane - Dark theme from bottom"></center></td>
  *   </tr>
  * </table>
  * </center>
@@ -140,7 +140,6 @@ import org.controlsfx.control.action.Action;
  *     }
  * }}</pre>
  * 
- * @see Action
  * @see Action
  */
 public class NotificationPane extends ControlsFXControl {
@@ -226,12 +225,10 @@ public class NotificationPane extends ControlsFXControl {
         return new NotificationPaneSkin(this);
     }
     
-//    /** {@inheritDoc} */
-//    @Override protected String getUserAgentStylesheet() {
-//        return NotificationPane.class.getResource("notificationpane.css").toExternalForm(); //$NON-NLS-1$
-//    }
-    
-    
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(NotificationPane.class, "notificationpane.css");
+    }
     
     /***************************************************************************
      * 

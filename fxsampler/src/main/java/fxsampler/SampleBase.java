@@ -1,5 +1,7 @@
 package fxsampler;
 
+import java.util.ServiceLoader;
+
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -22,10 +24,18 @@ public abstract class SampleBase extends Application implements Sample {
     
     /** {@inheritDoc} */
     @Override public void start(Stage primaryStage) throws Exception {
+        ServiceLoader<FXSamplerConfiguration> configurationServiceLoader = ServiceLoader.load(FXSamplerConfiguration.class);
+
         primaryStage.setTitle(getSampleName());
         
         Scene scene = new Scene((Parent)buildSample(this, primaryStage), 800, 800);
         scene.getStylesheets().add(SampleBase.class.getResource("fxsampler.css").toExternalForm());
+        for (FXSamplerConfiguration fxsamplerConfiguration : configurationServiceLoader) {
+        	String stylesheet = fxsamplerConfiguration.getSceneStylesheet();
+        	if (stylesheet != null) {
+            	scene.getStylesheets().add(stylesheet);
+        	}
+        }
         primaryStage.setScene(scene);
         primaryStage.show();
     }

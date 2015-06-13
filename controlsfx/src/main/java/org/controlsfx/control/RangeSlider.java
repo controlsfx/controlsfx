@@ -57,6 +57,7 @@ import com.sun.javafx.Utils;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.StringConverter;
 
@@ -91,14 +92,14 @@ import javafx.util.StringConverter;
  * Because the RangeSlider supports both horizontal and vertical 
  * {@link #orientationProperty() orientation}, there are two screenshots below:
  * 
- * <table border="0">
+ * <table border="0" summary="Screenshot of RangeSlider orientation">
  *   <tr>
  *     <td width="75" valign="center"><strong>Horizontal:</strong></td>
- *     <td><img src="rangeSlider-horizontal.png"></td>
+ *     <td><img src="rangeSlider-horizontal.png" alt="Screenshot of a horizontal RangeSlider"></td>
  *   </tr>
  *   <tr>
  *     <td width="75" valign="top"><strong>Vertical:</strong></td>
- *     <td><img src="rangeSlider-vertical.png"></td>
+ *     <td><img src="rangeSlider-vertical.png" alt="Screenshot of a vertical RangeSlider"></td>
  *   </tr>
  * </table>
  * 
@@ -180,13 +181,11 @@ public class RangeSlider extends ControlsFXControl {
         setLowValue(lowValue);
         setHighValue(highValue);
     }
-    
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override protected String getUserAgentStylesheet() {
-//        return RangeSlider.class.getResource("rangeslider.css").toExternalForm(); //$NON-NLS-1$
-//    }
+        
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(RangeSlider.class, "rangeslider.css");
+    }
     
     /**
      * {@inheritDoc}

@@ -34,14 +34,30 @@ abstract class ControlsFXControl extends Control {
     public ControlsFXControl() {
         VersionChecker.doVersionCheck();
     }
-    
+
+    private String stylesheet;
+
     /**
-     * Overridden and made final due to functional regressions in JavaFX 8u20.
-     * Bug report is at RT-38640. This should hopefully be able to be undone
-     * when we baseline on 8u40, but for now we will use static blocks in the
-     * control skin to load the user agent stylesheets for a control.
+     * A helper method that ensures that the resource based lookup of the user
+     * agent stylesheet only happens once. Caches the external form of the
+     * resource.
+     *
+     * @param clazz
+     *            the class used for the resource lookup
+     * @param fileName
+     *            the name of the user agent stylesheet
+     * @return the external form of the user agent stylesheet (the path)
      */
-    @Override public final String getUserAgentStylesheet() {
-        return null;
+    protected final String getUserAgentStylesheet(Class<?> clazz,
+            String fileName) {
+
+        /*
+         * For more information please see RT-40658
+         */
+        if (stylesheet == null) {
+            stylesheet = clazz.getResource(fileName).toExternalForm();
+        }
+
+        return stylesheet;
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,7 @@ public class Utils {
      * superior, concatenated letters are returned.
      * 
      * 
-     * For example: 0 -> A 1 -> B 26 -> AA 32 -> AG 45 -> AT
+     * For example: 0 -&gt; A 1 -&gt; B 26 -&gt; AA 32 -&gt; AG 45 -&gt; AT
      * 
      * 
      * @param number the number whose Excel Letter is to be found.

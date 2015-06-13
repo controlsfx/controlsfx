@@ -201,11 +201,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     
     @Override
     protected void layoutChildren() {
-        // We don't want to layout everything in case we're editing 
-        // because it has no sense
+        /**
+         * In fact, we must do a layout even when editing, because if the user
+         * resize the window during edition, if we block layout, the view will
+         * be in a wrong state.
+         */
         if (spreadSheetView != null
-                && (spreadSheetView.getEditingCell() == null || spreadSheetView
-                        .getEditingCell().getRow() == -1)) {
+                /*&& (spreadSheetView.getEditingCell() == null || spreadSheetView
+                        .getEditingCell().getRow() == -1)*/) {
             sortRows();
             super.layoutChildren();
             layoutTotal();

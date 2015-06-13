@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013,2014 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ import java.util.Map;
  *  JavaFX Button controls:
  *
  * <br>
- * <center><img src="glyphFont.png"></center>
+ * <center><img src="glyphFont.png" alt="Screenshot of GlyphFont"></center>
  */
 public class GlyphFont {
 

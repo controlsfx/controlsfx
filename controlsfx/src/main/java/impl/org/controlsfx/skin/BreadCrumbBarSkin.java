@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,10 +53,13 @@ import javafx.util.Callback;
 import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import com.sun.javafx.scene.traversal.Algorithm;
+import com.sun.javafx.scene.traversal.Direction;
+import com.sun.javafx.scene.traversal.ParentTraversalEngine;
+import com.sun.javafx.scene.traversal.TraversalContext;
 
 /**
  * Basic Skin implementation for the {@link BreadCrumbBar}
@@ -64,19 +67,65 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
  * @param <T>
  */
 public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, BehaviorBase<BreadCrumbBar<T>>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                BreadCrumbBar.class.getResource("breadcrumbbar.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
+        
     private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 
     public BreadCrumbBarSkin(final BreadCrumbBar<T> control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
         control.selectedCrumbProperty().addListener(selectedPathChangeListener);
         updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
+        fixFocusTraversal();
+    }
+
+    // https://bitbucket.org/controlsfx/controlsfx/issue/453/breadcrumbbar-keyboard-focus-traversal-is
+    // ContainerTabOrder will fail with LEFT/RIGHT navigation, since the buttons in bread crumb overlap
+    private void fixFocusTraversal() {
+
+        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable(), new Algorithm() {
+
+            @Override
+            public Node select(Node owner, Direction dir, TraversalContext context) {
+                Node node = null;
+                int idx = getChildren().indexOf(owner);
+                switch(dir) {
+                    case NEXT:
+                    case NEXT_IN_LINE:
+                    case RIGHT:
+                        if (idx < getChildren().size() - 1) {
+                            node = getChildren().get(idx+1);
+                        }
+                    break;
+                    case PREVIOUS:
+                    case LEFT:
+                        if (idx > 0) {
+                            node = getChildren().get(idx-1);
+                        }
+                        break;
+                }
+                return node;
+            }
+
+            @Override
+            public Node selectFirst(TraversalContext context) {
+                Node first = null;
+                if (!getChildren().isEmpty()) {
+                    first = getChildren().get(0);
+                }
+                return first;
+            }
+
+            @Override
+            public Node selectLast(TraversalContext context) {
+                Node last = null;
+                if (!getChildren().isEmpty()) {
+                    last = getChildren().get(getChildren().size()-1);
+                }
+                return last;
+            }
+        });
+        engine.setOverriddenFocusTraversability(false);
+        getSkinnable().setImpl_traversalEngine(engine);
+
     }
 
     private final ChangeListener<TreeItem<T>> selectedPathChangeListener =
@@ -224,7 +273,6 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
          * Create a BreadCrumbButton
          * 
          * @param text Buttons text
-         * @param first Is this the first / home button?
          */
         public BreadCrumbButton(String text){
             this(text, null);
@@ -234,7 +282,6 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
          * Create a BreadCrumbButton
          * @param text Buttons text
          * @param gfx Gfx of the Button
-         * @param first Is this the first / home button?
          */
         public BreadCrumbButton(String text, Node gfx){
             super(text, gfx);
@@ -267,7 +314,6 @@ public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, Beh
          * 
          * Based upon Uwe / Andy Till code snippet found here:
          * @see http://ustesis.wordpress.com/2013/11/04/implementing-breadcrumbs-in-javafx/
-         * @param first
          * @return
          */
         private Path createButtonShape(){

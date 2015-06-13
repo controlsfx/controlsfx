@@ -32,11 +32,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -134,33 +132,12 @@ public class GridCellEditor {
                 viewCell.commitEdit(modelCell);
                 end();
                 spreadsheetCellEditor.end();
-                
+
                 //We select the cell below if "enter" was typed.
-                if(KeyCode.ENTER.equals(lastKeyPressed)){
-                   TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
-                            getFocusModel().getFocusedCell();
-                    if (position != null) {
-                        int nextRow = FocusModelListener.getNextRowNumber(position, handle.getGridView());
-                        if(nextRow < handle.getView().getGrid().getRowCount()){
-                            handle.getGridView().getSelectionModel().clearAndSelect(nextRow, position.getTableColumn());
-                        }
-                    }
+                if (KeyCode.ENTER.equals(lastKeyPressed)) {
+                    handle.getView().getSelectionModel().clearAndSelectNextCell();
                 } else if (KeyCode.TAB.equals(lastKeyPressed)) {
-                    TablePosition<ObservableList<SpreadsheetCell>, ?> position = (TablePosition<ObservableList<SpreadsheetCell>, ?>) handle.getGridView().
-                            getFocusModel().getFocusedCell();
-                    if (position != null) {
-                        int row = position.getRow();
-                        int column = position.getColumn() + 1;
-                        if (column >= handle.getView().getColumns().size()) {
-                            if (row == handle.getView().getGrid().getRowCount() - 1) {
-                                column--;
-                            } else {
-                                column = 0;
-                                row++;
-                            }
-                        }
-                        handle.getGridView().getSelectionModel().clearAndSelect(row, handle.getGridView().getColumns().get(column));
-                    }
+                    handle.getView().getSelectionModel().clearAndSelectRightCell();
                     handle.getCellsViewSkin().scrollHorizontally();
                 }
             }

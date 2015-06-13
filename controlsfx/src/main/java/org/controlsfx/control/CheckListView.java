@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,8 +51,8 @@ import java.util.Map;
  * <h3>Screenshot</h3>
  * <p>The following screenshot shows the CheckListView with some sample data:
  * 
- * <br/>
- * <img src="checkListView.png"/>
+ * <br>
+ * <img src="checkListView.png" alt="Screenshot of CheckListView">
  * 
  * <h3>Code Example:</h3>
  * <p>To create the CheckListView shown in the screenshot, simply do the 

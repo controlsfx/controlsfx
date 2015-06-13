@@ -28,6 +28,7 @@ package impl.org.controlsfx.spreadsheet;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.When;
@@ -431,17 +432,34 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         SpreadsheetCellType<?> cellType = cell.getCellType();
         Optional<SpreadsheetCellEditor> cellEditor = spv.getEditor(cellType);
 
-        if(cellEditor.isPresent()){
+        if (cellEditor.isPresent()) {
             GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
+            /**
+             * Sometimes, we end up here with the editor already editing. But
+             * this case should not happen. If a cell is calling startEdit,
+             * this means we want to edit the cell and the editor should not be
+             * editing another cell. So we just cancel the edition and give the
+             * editor to the cell because we may not be able to edit anything.
+             */
             if (editor.isEditing()) {
-                return null;
-            } else {
-                editor.updateSpreadsheetCell(this);
-                editor.updateDataCell(cell);
-                editor.updateSpreadsheetCellEditor(cellEditor.get());
-                return editor;
+                if (editor.getModelCell() != null) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("The cell at row ").append(editor.getModelCell().getRow())
+                            .append(" and column ").append(editor.getModelCell().getColumn())
+                            .append(" was in edition and cell at row ").append(cell.getRow())
+                            .append(" and column ").append(cell.getColumn())
+                            .append(" requested edition. This situation should not happen as the previous cell should not be in edition.");
+                    Logger.getLogger("root").warning(builder.toString());
+                }
+
+                editor.endEdit(false);
             }
-        }else{
+            
+            editor.updateSpreadsheetCell(this);
+            editor.updateDataCell(cell);
+            editor.updateSpreadsheetCellEditor(cellEditor.get());
+            return editor;
+        } else {
             return null;
         }
     }

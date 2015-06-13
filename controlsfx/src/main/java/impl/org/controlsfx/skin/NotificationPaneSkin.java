@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 import java.util.Collections;
 
+import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
@@ -41,20 +42,14 @@ import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
-    
-    static {
-        // refer to ControlsFXControl for why this is necessary
-        StyleManager.getInstance().addUserAgentStylesheet(
-                NotificationPane.class.getResource("notificationpane.css").toExternalForm()); //$NON-NLS-1$
-    }
-    
+
     private NotificationBar notificationBar;
     private Node content;
     private Rectangle clip = new Rectangle();
-    
+
     public NotificationPaneSkin(final NotificationPane control) {
         super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
-        
+
         notificationBar = new NotificationBar() {
             @Override public void requestContainerLayout() {
                 control.requestLayout();
@@ -79,11 +74,11 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             @Override public boolean isShowFromTop() {
                 return control.isShowFromTop();
             }
-            
+
             @Override public void hide() {
                 control.hide();
             }
-            
+
             @Override public boolean isCloseButtonVisible() {
                     return control.isCloseButtonVisible();
             }
@@ -91,12 +86,12 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
             @Override public double getContainerHeight() {
                 return control.getHeight();
             }
-            
+
             @Override public void relocateInParent(double x, double y) {
                 notificationBar.relocate(x, y);
             }
         };
-        
+
         control.setClip(clip);
         updateContent();
 
@@ -107,6 +102,11 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         registerChangeListener(control.showingProperty(), "SHOWING"); //$NON-NLS-1$
         registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP"); //$NON-NLS-1$
         registerChangeListener(control.closeButtonVisibleProperty(), "CLOSE_BUTTON_VISIBLE"); //$NON-NLS-1$
+
+        // Fix for Issue #522: Prevent NotificationPane from receiving focus
+        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
+        getSkinnable().setImpl_traversalEngine(engine);
+        engine.setOverriddenFocusTraversability(false);
     }
     
     @Override protected void handleControlPropertyChanged(String p) {

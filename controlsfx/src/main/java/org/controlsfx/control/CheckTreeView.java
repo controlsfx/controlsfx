@@ -51,8 +51,8 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
  * <h3>Screenshot</h3>
  * <p>The following screenshot shows the CheckTreeView with some sample data:
  * 
- * <br/>
- * <img src="checkTreeView.png"/>
+ * <br>
+ * <img src="checkTreeView.png" alt="Screenshot of CheckTreeView">
  * 
  * <h3>Code Example:</h3>
  * <p>To create the CheckTreeView shown in the screenshot, simply do the 

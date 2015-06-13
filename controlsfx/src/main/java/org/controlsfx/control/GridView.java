@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,8 +80,8 @@ import org.controlsfx.control.cell.ColorGridCell;
  * <p>The following screenshot shows the GridView with the {@link ColorGridCell}
  * being used:
  * 
- * <br/>
- * <img src="gridView.png"/>
+ * <br>
+ * <img src="gridView.png" alt="Screenshot of GridView">
  * 
  * <p>To create this GridView was simple. Note that the majority of the code below
  * is related to randomly creating the colours to be represented:
@@ -142,14 +142,10 @@ public class GridView<T> extends ControlsFXControl {
         return new GridViewSkin<>(this);
     }
 
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override protected String getUserAgentStylesheet() {
-//        return GridView.class.getResource("gridview.css").toExternalForm(); //$NON-NLS-1$
-//    }
-    
-    
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(GridView.class, "gridview.css");
+    }
     
     /**************************************************************************
      * 

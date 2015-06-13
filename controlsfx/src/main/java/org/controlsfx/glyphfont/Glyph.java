@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ import org.controlsfx.tools.Duplicatable;
  * also add effects such as {@link #useHoverEffect()}
  *
  * <p>An ability to retrieve glyph node by combination of font name and glyph name
- * extends to the {@link org.controlsfx.control.action.ActionProxy} graphic attribute, where the "font>"
+ * extends to the {@link org.controlsfx.control.action.ActionProxy} graphic attribute, where the "font&gt;"
  * prefix should be used. For more information see {@link org.controlsfx.control.action.ActionProxy}.
  *
  */
@@ -177,7 +177,7 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
      * @return Returns this instance for fluent API
      */
     public Glyph sizeFactor(int factor) {
-    	Optional.of(GlyphFontRegistry.font(getFont().getFamily())).ifPresent( glyphFont ->{
+    	Optional.ofNullable(GlyphFontRegistry.font(getFont().getFamily())).ifPresent( glyphFont ->{
     		setFontSize(glyphFont.getDefaultSize()* (factor < 1? 1: factor));
     	});
     	return this;

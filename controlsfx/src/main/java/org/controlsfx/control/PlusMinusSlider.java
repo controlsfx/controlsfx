@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ import com.sun.javafx.css.converters.EnumConverter;
  * of the mouse button. Scrolling through a large list of items at different
  * speeds is one possible use case for a control like this.
  * 
- * <center> <img src="plus-minus-slider.png"/> </center>
+ * <center> <img src="plus-minus-slider.png" alt="Screenshot of PlusMinusSlider"> </center>
  */
 public class PlusMinusSlider extends ControlsFXControl {
 
@@ -99,10 +99,10 @@ public class PlusMinusSlider extends ControlsFXControl {
 		});
 	}
 
-//	@Override
-//	protected String getUserAgentStylesheet() {
-//		return PlusMinusSlider.class.getResource("plusminusslider.css").toExternalForm(); //$NON-NLS-1$
-//	}
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(PlusMinusSlider.class, "plusminusslider.css");
+    }
 
 	@Override
 	protected Skin<?> createDefaultSkin() {

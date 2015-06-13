@@ -1,7 +1,6 @@
 import org.apache.tools.ant.filters.EscapeUnicode
 
 dependencies {
-    compile 'org.controlsfx:openjfx-dialogs:1.0.3'
     try {
         jdk files(jfxrtJar)
     } catch (MissingPropertyException pne) {

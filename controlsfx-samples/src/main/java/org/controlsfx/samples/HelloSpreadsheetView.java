@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -61,7 +62,6 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
-import org.controlsfx.dialog.Dialogs;
 
 /**
  *
@@ -115,9 +115,9 @@ public class HelloSpreadsheetView extends ControlsFXSample {
 
     @Override
     public String getControlStylesheetURL() {
-    	return "/org/controlsfx/samples/spreadsheetSample.css";
+        return "/org/controlsfx/samples/spreadsheetSample.css";
     }
-    
+
     @Override
     public Node getPanel(Stage stage) {
         centerPane = new StackPane();
@@ -165,75 +165,75 @@ public class HelloSpreadsheetView extends ControlsFXSample {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("This row contains several fictive companies. "
-                                + "The cells are not editable.\n"
-                                + "A custom tooltip is applied for the first cell.")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("This row contains several fictive companies. "
+                        + "The cells are not editable.\n"
+                        + "A custom tooltip is applied for the first cell.");
+                alert.show();
             }
         });
-        
+
         spreadSheetView.getRowPickers().put(1, new Picker() {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("This row contains cells that can only show a list.")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("This row contains cells that can only show a list.");
+                alert.show();
             }
         });
-        
+
         spreadSheetView.getRowPickers().put(2, new Picker() {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("This row contains cells that display some dates.")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("This row contains cells that display some dates.");
+                alert.show();
             }
         });
-        
+
         spreadSheetView.getRowPickers().put(3, new Picker() {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("This row contains some Images displaying logos of the companies.")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("This row contains some Images displaying logos of the companies.");
+                alert.show();
             }
         });
-        
+
         spreadSheetView.getRowPickers().put(4, new Picker() {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("This row contains Double editable cells. "
-                                + "Except for ControlsFX compagny where it's a String.")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("This row contains Double editable cells. "
+                        + "Except for ControlsFX compagny where it's a String.");
+                alert.show();
             }
         });
-        spreadSheetView.getRowPickers().put(5, new Picker("picker-label","picker-label-exclamation") {
+        spreadSheetView.getRowPickers().put(5, new Picker("picker-label", "picker-label-exclamation") {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("This row contains Double editable cells with "
-                                + "a special format (%). Some cells also have "
-                                + "a little icon next to their value.")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("This row contains Double editable cells with "
+                        + "a special format (%). Some cells also have "
+                        + "a little icon next to their value.");
+                alert.show();
             }
         });
-                
-        spreadSheetView.getColumnPickers().put(0, new Picker("picker-label","picker-label-security") {
+
+        spreadSheetView.getColumnPickers().put(0, new Picker("picker-label", "picker-label-security") {
 
             @Override
             public void onClick() {
-                Dialogs.create()
-                        .message("Each cell of this column (except for the "
-                                + "separator in the middle) has a particular css "
-                                + "class for changing its color.\n")
-                        .showInformation();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("Each cell of this column (except for the "
+                        + "separator in the middle) has a particular css "
+                        + "class for changing its color.\n");
+                alert.show();
             }
         });
     }
@@ -245,7 +245,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      */
     private Map<Integer, Double> generateRowHeight() {
         Map<Integer, Double> rowHeight = new HashMap<>();
-        rowHeight.put(3, 100.0);
+        rowHeight.put(1, 100.0);
         return rowHeight;
     }
 
@@ -688,7 +688,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.setEditable(true);
         grid.add(editable, 1, row++);
         spreadSheetView.editableProperty().bind(editable.selectedProperty());
-        
+
         //Row Header width
         Label rowHeaderWidth = new Label("Row header width: ");
         rowHeaderWidth.getStyleClass().add("property");
@@ -696,7 +696,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         Slider slider = new Slider(15, 100, 30);
         spreadSheetView.rowHeaderWidthProperty().bind(slider.valueProperty());
         grid.add(slider, 1, row++);
-        
+
         // Multiple Selection
         Label selectionModeLabel = new Label("Multiple selection: ");
         selectionModeLabel.getStyleClass().add("property");
@@ -710,7 +710,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
                 spreadSheetView.getSelectionModel().setSelectionMode(isSelected ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
             }
         });
-        
+
         return grid;
     }
 }

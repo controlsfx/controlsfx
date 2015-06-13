@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,16 +55,18 @@ import javafx.scene.control.Skin;
  * 
  * <h3>Screenshots</h3> 
  * The picture below shows the default appearance of the StatusBar control: 
- * <center><img src="statusbar.png" /></center> 
+ * <center><img src="statusbar.png" alt="Screenshot of StatusBar"></center> 
  * 
  * <br>
  * The following picture shows the status bar reporting progress of a task:
- * <center><img src="statusbar-progress.png" /></center> 
+ * <center><img src="statusbar-progress.png" alt="Screenshot of StatusBar 
+ * reporting progress of a task"></center> 
  * 
  * <br>
  * The last picture shows the status bar reporting progress, along with a couple 
  * of extra items added to the left and right areas of the bar: 
- * <center><img src="statusbar-items.png" /></center>
+ * <center><img src="statusbar-items.png" alt="Screenshot of StatusBar
+ * reporting progress, along with a couple of extra items"></center>
  * 
  * <h3>Code Sample</h3>
  * 

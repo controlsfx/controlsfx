@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.sun.javafx.scene.traversal.*;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -54,10 +53,13 @@ import javafx.util.Callback;
 import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import com.sun.javafx.scene.traversal.Algorithm;
+import com.sun.javafx.scene.traversal.Direction;
+import com.sun.javafx.scene.traversal.ParentTraversalEngine;
+import com.sun.javafx.scene.traversal.TraversalContext;
 
 /**
  * Basic Skin implementation for the {@link BreadCrumbBar}

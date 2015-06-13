@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,9 @@ import javafx.scene.control.ToggleGroup;
  * (with sub-buttons), rather than as individual buttons. This is better 
  * clarified with a picture:
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="segmentedButton.png"/>
+ * <img src="segmentedButton.png" alt="Screenshot of SegmentedButton">
  * </center>
  * 
  * <h3>Code Samples</h3>

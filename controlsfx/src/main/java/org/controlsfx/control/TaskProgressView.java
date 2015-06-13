@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,13 +52,12 @@ import javafx.util.Callback;
  * <h3>Screenshots</h3>
  * The picture below shows the default appearance of the task progress view
  * control:
- * <center><img src="task-monitor.png" /></center>
+ * <center><img src="task-monitor.png" alt="Screenshot of TaskProgressView"></center>
  *
  * <h3>Code Sample</h3>
- *
  * <pre>
  * TaskProgressView&lt;MyTask&gt; view = new TaskProgressView&lt;&gt;();
- * view.setGraphicFactory(task -> return new ImageView("db-access.png"));
+ * view.setGraphicFactory(task -&gt; return new ImageView("db-access.png"));
  * view.getTasks().add(new MyTask());
  * </pre>
  */

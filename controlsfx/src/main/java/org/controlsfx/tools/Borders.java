@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,7 +71,7 @@ import javax.swing.BorderFactory;
  * like the following:
  * 
  * <br>
- * <center><img src="borders-lineBorder.png" /></center>
+ * <center><img src="borders-lineBorder.png" alt="Screenshot of Borders.LineBorders"></center>
  * 
  * <p>Here's the code:</p>
  * 
@@ -87,7 +87,7 @@ import javax.swing.BorderFactory;
  * like this:
  * 
  * <br>
- * <center><img src="borders-etchedBorder.png" /></center>
+ * <center><img src="borders-etchedBorder.png" alt="Screenshot of Borders.EtchedBorders"></center>
  * 
  * <p>Now that's one good looking border! Here's the code:</p>
  * 
@@ -101,7 +101,7 @@ import javax.swing.BorderFactory;
  * you might two line borders. That's easy:
  * 
  * <br>
- * <center><img src="borders-twoLines.png" /></center>
+ * <center><img src="borders-twoLines.png" alt="Screenshot of two Borders.LineBorders"></center>
  * 
  * <pre>
  * {@code

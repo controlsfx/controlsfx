@@ -308,10 +308,10 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *            the {@link SelectionEvent} to check
      * @return the {@link Cursor} which will be used for the event
      */
-    private static Cursor getCursor(SelectionEvent selectionEvent) {
+    private Cursor getCursor(SelectionEvent selectionEvent) {
         // show the default cursor if the mouse is out of the selection bounds
         if (!selectionEvent.isPointInSelectionBounds()) {
-            return Cursor.DEFAULT;
+            return getRegularCursor();
         }
 
         // otherwise pick a cursor from the relative position
@@ -319,7 +319,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
         case IN_RECTANGLE:
             return Cursor.MOVE;
         case OUT_OF_RECTANGLE:
-            return Cursor.DEFAULT;
+            return getRegularCursor();
         case NORTH_EDGE:
             return Cursor.N_RESIZE;
         case NORTHEAST_EDGE:
@@ -340,6 +340,13 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
             throw new IllegalArgumentException("The position " + selectionEvent.getPosition() //$NON-NLS-1$
                     + " is not fully implemented."); //$NON-NLS-1$
         }
+    }
+
+    /**
+     * @return the cursor from the {@link #getControl() control's} current {@link SnapshotView#cursorProperty() cursor}
+     */
+    private Cursor getRegularCursor() {
+        return getControl().getCursor();
     }
 
     /**

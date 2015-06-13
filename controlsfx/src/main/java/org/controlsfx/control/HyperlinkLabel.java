@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,8 +82,8 @@ import com.sun.javafx.event.EventHandlerManager;
  * <code>"Hello [world]! I [wonder] what hyperlink [you] [will] [click]"</code>
  * was passed in to the HyperlinkLabel instance:
  * 
- * <br/><br/>
- * <center><img src="hyperlinkLabel.PNG"/></center>
+ * <br><br>
+ * <center><img src="hyperlinkLabel.PNG" alt="Screenshot of HyperlinkLabel"></center>
  * 
  * @see Hyperlink
  * @see ActionEvent

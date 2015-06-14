@@ -1,5 +1,0 @@
-.table-row-cell {
-     -fx-cell-size: 0px;
-     -fx-border-width: 0;
-     -fx-text-fill: red;
-}

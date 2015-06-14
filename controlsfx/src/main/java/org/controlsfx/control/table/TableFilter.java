@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * can be made visible by right-clicking the desired column to filter on. 
  *<br><br>
  *<b>Features</b><br>
- *-Convenient filter control holds a checklist of distinct items to include/exclude, much like an Excel filter<br>
+ *-Convenient filter control holds a checklist of distinct items to include/exclude, much like an Excel filter.<br>
  *-New/removed records will be captured by the filter control and reflect new or removed values from checklist.
  *-Filters on more than one column are combined to only display mutually inclusive records on the client's TableView.
  * @param <T>
@@ -87,7 +87,7 @@ public final class TableFilter<T> {
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
     /**
-     * Executes the filter with the selected filter values;
+     * Executes the filter with the selected filter values.
      */
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream()

@@ -1,4 +1,4 @@
-package org.controlsfx.control.table;
+package org.controlsfx.samples.tablefilter;
 
 
 import javafx.application.Application;
@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import org.controlsfx.control.table.TableFilter;
 
 public final class FlightTable extends Application {
 

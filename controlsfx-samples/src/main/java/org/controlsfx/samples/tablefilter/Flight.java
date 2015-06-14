@@ -1,4 +1,4 @@
-package org.controlsfx.control.table;
+package org.controlsfx.samples.tablefilter;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

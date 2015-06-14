@@ -37,6 +37,17 @@ import javafx.scene.control.TableView;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+/**Applies a filtering control to a provided {@link TableView} instance. 
+ * The filter will be applied immediately on construction, and 
+ * can be made visible by right-clicking the desired column to filter on. 
+ *<br><br>
+ *<b>Features</b><br>
+ *-Convenient filter control holds a checklist of distinct items, much like an Excel filter<br>
+ *-New/removed records will be captured by the filter control and reflect new or removed values from checklist.
+ *-Filters on more than one column are combined to only display mutually inclusive records on the client's TableView.
+ * @param <T>
+ */
 public final class TableFilter<T> {
     
     private final TableView<T> tableView;
@@ -44,7 +55,10 @@ public final class TableFilter<T> {
     private final FilteredList<T> filteredList;
     
     private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
- 
+    /**Constructor applies a filtering control to the provided {@link TableView} instance. 
+     * 
+     * @param tableView
+     */
     public TableFilter(TableView<T> tableView) {
         this.tableView = tableView;
         this.backingList = tableView.getItems();
@@ -53,9 +67,17 @@ public final class TableFilter<T> {
         tableView.setItems(filteredList);
         this.applyForAllColumns();
     }
+    /**
+     * Returns the backing {@link ObservableList} originally provided to the constructor.
+     * @return ObservableList
+     */
     public ObservableList<T> getBackingList() { 
         return backingList;
     }
+    /**
+     * Returns the {@link FilteredList} used by this TableFilter and is backing the {@link TableView}. 
+     * @return FilteredList
+     */
     public FilteredList<T> getFilteredList() { 
         return filteredList;
     }
@@ -64,12 +86,17 @@ public final class TableFilter<T> {
         columnFilters.setAll(this.tableView.getColumns().stream()
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
+    /**
+     * Executes the filter with the selected filter values;
+     */
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream()
                 .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).map(ov -> ov.getSelectedProperty().getValue() == false).orElse(false))
                 .findAny().isPresent() == false);
     }
-
+    /**
+     * Returns the {@link TableView} that was applied with this {@link TableFilter}
+     */
     public TableView<T> getTableView() {
         return tableView;
     }

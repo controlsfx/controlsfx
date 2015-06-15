@@ -111,7 +111,7 @@ public final class TableFilter<T> {
     }
     /** 
      * @treatAsPrivate
-     */s
+     */
     public Optional<ColumnFilter<T>> getColumnFilter(TableColumn<T,?> tableColumn) { 
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }

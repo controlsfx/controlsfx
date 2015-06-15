@@ -42,33 +42,64 @@ public final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
     private final TableColumn<T,?> tableColumn;
 
-    private final DistinctMappingList<T,FilterValue<?>> filterValues;
-
+    private final DistinctMappingList<T,FilterValue> filterValues;
+    private final MappedList<FilterValue,T> scopedValues;
+    private volatile boolean lastFilter = false;
+    
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
 
         //Build distinct mapped list of filter values from column values
         this.filterValues = new DistinctMappingList<>(tableFilter.getBackingList(),
-                v -> new FilterValue<>(tableColumn.getCellObservableValue(v)));
+                v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
 
+        this.scopedValues = new MappedList<FilterValue,T>(tableFilter.getTableView().getItems(), 
+        		v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
+        
         this.attachContextMenu();
     }
+    public void applyFilter() { 
+    	tableFilter.executeFilter();
+    	lastFilter = true;
+    	tableFilter.getColumnFilters().stream().filter(c -> !c.equals(this)).forEach(c -> c.lastFilter = false);
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.refreshScope());
+    }
+    public void resetFilter() { 
+    	this.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true));
+    	tableFilter.executeFilter();
+    	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.refreshScope());
+    }
+    public void resetAllFilters() { 
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.isSelected.set(true));
+    	tableFilter.executeFilter();
+    	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.refreshScope());
+    }
+    public static final class FilterValue {
 
-    public static final class FilterValue<V> {
-
-        private final ObservableValue<V> value;
+        private final ObservableValue<?> value;
         private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
-
-        private FilterValue(ObservableValue<V> value) {
+        private final BooleanProperty inScope = new SimpleBooleanProperty(true);
+        private final ColumnFilter<?> columnFilter;
+        
+        private FilterValue(ObservableValue<?> value, ColumnFilter<?> columnFilter) {
             this.value = value;
+            this.columnFilter = columnFilter;
             isSelected.addListener(c -> System.out.println("FilterValue " + value + " set to " + isSelected.getValue()));
         }
-        public ObservableValue<V> getValueProperty() {
+        public ObservableValue<?> getValueProperty() {
             return value;
         }
         public BooleanProperty getSelectedProperty() {
             return isSelected;
+        }
+        public BooleanProperty getInScopeProperty() { 
+        	return inScope;
+        }
+        private void refreshScope() { 
+        	inScope.setValue(columnFilter.lastFilter || columnFilter.scopedValues.contains(this));
         }
 
         @Override
@@ -81,7 +112,7 @@ public final class ColumnFilter<T> {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            FilterValue<?> that = (FilterValue<?>) o;
+            FilterValue that = (FilterValue) o;
 
             return value.getValue().equals(that.value.getValue());
 
@@ -91,10 +122,8 @@ public final class ColumnFilter<T> {
         public int hashCode() {
             return value.getValue().hashCode();
         }
-
-
     }
-    public ObservableList<FilterValue<?>> getFilterValues() {
+    public ObservableList<FilterValue> getFilterValues() {
         return filterValues;
     }
 
@@ -105,7 +134,7 @@ public final class ColumnFilter<T> {
         return tableFilter;
     }
 
-    public Optional<FilterValue<?>> getFilterValue(ObservableValue<?> value) {
+    public Optional<FilterValue> getFilterValue(ObservableValue<?> value) {
         return filterValues.stream().filter(fv -> fv.value.getValue().equals(value.getValue())).findAny();
     }
 

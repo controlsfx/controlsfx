@@ -28,6 +28,7 @@ package impl.org.controlsfx.table;
 
 import impl.org.controlsfx.table.ColumnFilter.FilterValue;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 import javafx.beans.Observable;
@@ -46,10 +47,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
+
 
 
 public final class FilterPanel<T> extends Pane {
@@ -74,13 +77,13 @@ public final class FilterPanel<T> extends Pane {
         vBox.getChildren().add(searchBox);
 
         //initialize checklist view
-        Function<ColumnFilter.FilterValue<?>,CheckItem>  newCheckItemFx = v -> {
+        Function<ColumnFilter.FilterValue,CheckItem>  newCheckItemFx = v -> {
             CheckItem chkItem = new CheckItem(v);
             chkItem.checkBox.selectedProperty().setValue(true);
             return chkItem;
         };
 
-        filterList = new FilteredList<>(new SortedList<>(new MappedList<>(this.columnFilter.getFilterValues(), newCheckItemFx)), t -> true);
+        filterList = new FilteredList<>(new SortedList<>(new MappedList<>(new SortedList<>(this.columnFilter.getFilterValues(), new FilterValueComparator()), newCheckItemFx)), t -> true);
         checkListView.setItems(filterList);
 
         vBox.getChildren().add(checkListView);
@@ -99,7 +102,7 @@ public final class FilterPanel<T> extends Pane {
         		
         		resetSearchFilter();
         	}
-        	columnFilter.getTableFilter().executeFilter();
+        	columnFilter.applyFilter();
         });
         
         bttnBox.getChildren().add(applyBttn);
@@ -109,7 +112,7 @@ public final class FilterPanel<T> extends Pane {
         Button clearButton = new Button("RESET");
 
         clearButton.setOnAction(e -> {
-        	columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true));
+        	columnFilter.resetAllFilters();
         	filterList.setPredicate(v -> true);
         });
 
@@ -117,9 +120,7 @@ public final class FilterPanel<T> extends Pane {
 
         Button clearAllButton = new Button("RESET ALL");
         clearAllButton.setOnAction(e -> {
-            columnFilter.getTableFilter().getColumnFilters().stream().flatMap(cf -> cf.getFilterValues().stream()).forEach(fv -> fv.getSelectedProperty().setValue(true));
-            columnFilter.getTableFilter().executeFilter();
-            resetSearchFilter();
+            columnFilter.resetAllFilters();
         });
         bttnBox.getChildren().add(clearAllButton);
 
@@ -130,14 +131,31 @@ public final class FilterPanel<T> extends Pane {
     private static final class CheckItem extends HBox {
         private final CheckBox checkBox = new CheckBox();
         private final Label label = new Label();
-        private final FilterValue<?> filterValue;
+        private final FilterValue filterValue;
         
-        CheckItem(ColumnFilter.FilterValue<?> filterValue) {
+        CheckItem(ColumnFilter.FilterValue filterValue) {
         	this.filterValue = filterValue;
             label.setText(filterValue.getValueProperty().getValue().toString());
+            
+            filterValue.getInScopeProperty().addListener((Observable v) -> label.textFillProperty().set(filterValue.getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
             checkBox.selectedProperty().bindBidirectional(filterValue.getSelectedProperty());
             this.getChildren().addAll(checkBox, label);
         }
+    }
+    private static final class FilterValueComparator implements Comparator<FilterValue> {
+
+		@Override
+		public int compare(FilterValue first, FilterValue second) {
+			if (first.getInScopeProperty().get() && !second.getInScopeProperty().get())
+				return 1;
+			int compare = first.getValueProperty().getValue().toString().compareTo(second.getValueProperty().getValue().toString());
+			if (compare > 0) 
+				return 1;
+			if (compare < 0) 
+				return -1;
+			return 0;
+		}
+    	
     }
     public void resetSearchFilter() {
         this.filterList.setPredicate(t -> true);

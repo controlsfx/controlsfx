@@ -27,15 +27,16 @@
 package org.controlsfx.control.table;
 
 import impl.org.controlsfx.table.ColumnFilter;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 /**Applies a filtering control to a provided {@link TableView} instance. 
@@ -81,28 +82,36 @@ public final class TableFilter<T> {
     public FilteredList<T> getFilteredList() { 
         return filteredList;
     }
-    
+    /** 
+     * @treatAsPrivate
+     */
     private void applyForAllColumns() { 
         columnFilters.setAll(this.tableView.getColumns().stream()
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
-    /**
-     * Executes the filter with the selected filter values.
+    /** 
+     * @treatAsPrivate
      */
     public void executeFilter() { 
         filteredList.setPredicate(v -> columnFilters.stream()
                 .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).map(ov -> ov.getSelectedProperty().getValue() == false).orElse(false))
                 .findAny().isPresent() == false);
     }
-    /**
-     * Returns the {@link TableView} that was provided to this {@link TableFilter}.
+    /** 
+     * @treatAsPrivate
      */
     public TableView<T> getTableView() {
         return tableView;
     }
+    /** 
+     * @treatAsPrivate
+     */
     public ObservableList<ColumnFilter<T>> getColumnFilters() { 
         return columnFilters;
     }
+    /** 
+     * @treatAsPrivate
+     */s
     public Optional<ColumnFilter<T>> getColumnFilter(TableColumn<T,?> tableColumn) { 
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }

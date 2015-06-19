@@ -31,6 +31,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.controlsfx.control.PrefixSelectionChoiceBox;
+import org.controlsfx.control.PrefixSelectionComboBox;
+
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ChoiceBox;
@@ -40,25 +43,28 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 
-import org.controlsfx.control.PrefixSelectionChoiceBox;
-import org.controlsfx.control.PrefixSelectionComboBox;
-
 /**
  * <p>This utility class can be used to customize a {@link ChoiceBox} or
  * {@link ComboBox} and enable the "prefix selection" feature. This will enable
- * the user to type letters or digits on the keyboard and the {@link ChoiceBox}
- * or {@link ComboBox} will attempt to select the first item it can find with a
- * matching prefix.
+ * the user to type letters or digits on the keyboard while the {@link ChoiceBox}
+ * or {@link ComboBox} has the focus. The {@link ChoiceBox} or {@link ComboBox} 
+ * will attempt to select the first item it can find with a matching prefix ignoring 
+ * case.
  * 
- * <p>This feature is available natively on the Windows ComboBox control, so many
+ * <p>This feature is available natively on the Windows combo box control, so many
  * users have asked for it. There is a feature request to include this feature
  * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
  * The class is published as part of ContorlsFX to allow testing and feedback.
  * 
  * <h3>Example</h3>
- * 
- * <p>If your {@link ChoiceBox} or {@link ComboBox} offers the items ["Aaaaa",
- * "Abbbb", "Abccc", "Abcdd", "Abcde"] and the user types in quick succession:
+ *  
+ * <p>Let's look at an example to clarify this. The combo box offers the items 
+ * ["Aaaaa", "Abbbb", "Abccc", "Abcdd", "Abcde"]. The user now types "abc" in 
+ * quick succession (and then stops typing). The combo box will select a new entry 
+ * on every key pressed. The first entry it will select is "Aaaaa" since it is the 
+ * first entry that starts with an "a" (case ignored). It will then select "Abbbb", 
+ * since this is the first entry that started with "ab" and will finally settle for 
+ * "Abccc".
  * 
  * <ul><table>
  *   <tr><th>Keys typed</th><th>Element selected</th></tr>
@@ -119,6 +125,7 @@ public class PrefixSelectionCustomizer {
         private <T> T getEntryWithKey(String letter, StringConverter<T> converter, ObservableList<T> items, Control control) {
             T result = null;
 
+            // The converter is null by default for the ChoiceBox. The ComboBox has a default converter
             if (converter == null) {
                 converter = new StringConverter<T>() {
                     @Override

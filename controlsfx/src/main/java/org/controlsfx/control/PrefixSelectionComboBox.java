@@ -38,15 +38,20 @@ import javafx.scene.control.ComboBox;
  * This will only be enabled, when the {@link ComboBox} is not editable, so
  * this class will be setup as non editable by default.
  *
- * <p>This feature is available natively on the Windows ComboBox control, so many
+ * <p>This feature is available natively on the Windows combo box control, so many
  * users have asked for it. There is a feature request to include this feature
  * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
  * The class is published as part of ContorlsFX to allow testing and feedback.
  * 
  * <h3>Example</h3>
  * 
- * <p>If the PrefixSelectionChoiceBox offers the items ["Aaaaa", "Abbbb", "Abccc", 
- * "Abcdd", "Abcde"] and the user types in quick succession:
+ * <p>Let's look at an example to clarify this. The combo box offers the items 
+ * ["Aaaaa", "Abbbb", "Abccc", "Abcdd", "Abcde"]. The user now types "abc" in 
+ * quick succession (and then stops typing). The combo box will select a new entry 
+ * on every key pressed. The first entry it will select is "Aaaaa" since it is the 
+ * first entry that starts with an "a" (case ignored). It will then select "Abbbb", 
+ * since this is the first entry that started with "ab" and will finally settle for 
+ * "Abccc".
  * 
  * <ul><table>
  *   <tr><th>Keys typed</th><th>Element selected</th></tr>

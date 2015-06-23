@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,8 @@ import org.controlsfx.validation.ValidationMessage;
 /**
  * Validation decoration to combine several existing decorations into one.
  * Here is example of combining {@link GraphicValidationDecoration} and  {@link StyleClassValidationDecoration} 
- * </br> </br>
- * <img src="CompoundValidationDecoration.png"/>  
+ * <br> <br>
+ * <img src="CompoundValidationDecoration.png" alt="Screenshot of CompoundValidationDecoration">  
  *   
  * 
  */

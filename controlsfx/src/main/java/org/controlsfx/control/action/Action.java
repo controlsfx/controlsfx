@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -90,7 +90,7 @@ public class Action implements EventHandler<ActionEvent> {
    
     /**
      * Creates a new AbstractAction instance with the given String set as the 
-     * {@link #textProperty() text} value, as well as the Consumer<ActionEvent>
+     * {@link #textProperty() text} value, as well as the {@code Consumer<ActionEvent>}
      * set to be called when the action event is fired.
      *  
      * @param text The string to display in the text property of controls such
@@ -411,7 +411,7 @@ public class Action implements EventHandler<ActionEvent> {
      **************************************************************************/
     
     /** 
-     * Defers to the Consumer<ActionEvent> passed in to the Action constructor.
+     * Defers to the {@code Consumer<ActionEvent>} passed in to the Action constructor.
      */
     @Override public final void handle(ActionEvent event) {
         if (eventHandler != null && !isDisabled()) {

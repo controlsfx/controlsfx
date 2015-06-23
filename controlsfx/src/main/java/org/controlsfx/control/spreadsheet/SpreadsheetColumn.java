@@ -75,9 +75,9 @@ import org.controlsfx.tools.Utils;
  * column <b>C</b>. The context menu is being shown and offers the possibility
  * to unfix the column.
  * 
- * <br/>
- * <br/>
- * <center><img src="fixedColumn.png"/></center>
+ * <br>
+ * <br>
+ * <center><img src="fixedColumn.png" alt="Screenshot of SpreadsheetColumn"></center>
  * 
  * @see SpreadsheetView
  */

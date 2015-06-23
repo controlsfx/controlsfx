@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013 - 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -159,7 +159,7 @@ public class PopOver extends PopupControl {
         return new PopOverSkin(this);
     }
 
-    private final StackPane rootPane = new StackPane();
+    private final StackPane root = new StackPane();
 
     /**
      * The root pane stores the content node of the popover. It is accessible via this
@@ -168,13 +168,13 @@ public class PopOver extends PopupControl {
      * <h3>Example:</h3>
      * <pre>
      * PopOver popOver = new PopOver();
-     * popOver.getRootPane().getStylesheets().add(...);
+     * popOver.getRoot().getStylesheets().add(...);
      * </pre>
      *
      * @return the root pane
      */
     public final StackPane getRoot() {
-    	return rootPane;
+    	return root;
     }
 
     // Content support.

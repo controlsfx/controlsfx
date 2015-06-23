@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,9 +67,9 @@ import org.controlsfx.tools.Utils;
  * The following screenshot shows a sample notification rising from the
  * bottom-right corner of my screen:
  * 
- * <br/>
- * <br/>
- * <img src="notifications.png"/>
+ * <br>
+ * <br>
+ * <img src="notifications.png" alt="Screenshot of Notifications">
  * 
  * <h3>Code Example:</h3>
  * <p>

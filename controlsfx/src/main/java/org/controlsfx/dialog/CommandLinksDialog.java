@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,11 +26,11 @@
  */
 package org.controlsfx.dialog;
 
+import static impl.org.controlsfx.i18n.Localization.getString;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.ListChangeListener;
@@ -48,7 +48,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import org.controlsfx.DialogResources;
 
 public class CommandLinksDialog extends Dialog<ButtonType> {
     
@@ -167,7 +166,7 @@ public class CommandLinksDialog extends Dialog<ButtonType> {
         }; 
         setDialogPane(dialogPane);
         
-        setTitle(DialogResources.getString("Dialog.info.title")); //$NON-NLS-1$
+        setTitle(getString("Dialog.info.title")); //$NON-NLS-1$
         dialogPane.getStyleClass().add("command-links-dialog"); //$NON-NLS-1$
         dialogPane.getStylesheets().add(getClass().getResource("dialogs.css").toExternalForm()); //$NON-NLS-1$
         dialogPane.getStylesheets().add(getClass().getResource("commandlink.css").toExternalForm()); //$NON-NLS-1$

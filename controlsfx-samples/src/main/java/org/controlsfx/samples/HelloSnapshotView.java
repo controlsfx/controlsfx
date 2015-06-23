@@ -72,6 +72,7 @@ import org.controlsfx.control.SnapshotView.Boundary;
 /**
  * Demonstrates the {@link SnapshotView}.
  */
+@SuppressWarnings("nls")
 public class HelloSnapshotView extends ControlsFXSample {
 
     /* ************************************************************************
@@ -155,7 +156,7 @@ public class HelloSnapshotView extends ControlsFXSample {
      * 
      * @return an array of {@link Image image}s
      */
-    private Image[] loadImages() {
+    private static Image[] loadImages() {
         Image controlsFX = new Image(HelloSnapshotView.class.getResource("ControlsFX.png").toExternalForm());
         Image duke = new Image(HelloSnapshotView.class.getResource("duke_wave.png").toExternalForm());
         return new Image[] { controlsFX, duke, null };

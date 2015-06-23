@@ -86,7 +86,7 @@ import javafx.util.converter.IntegerStringConverter;
  * <h3>Example</h3> You can create several types which are using the same
  * editor. Suppose you want to handle Double values. You will implement the
  * {@link #createEditor(SpreadsheetView)} method and use the
- * {@link SpreadsheetCellEditor.DoubleEditor}. <br/>
+ * {@link SpreadsheetCellEditor.DoubleEditor}. <br>
  * 
  * Then for each type you will provide your own policy in {@link #match(Object)}
  * and in {@link #isError(Object)}, which most of the time will use your
@@ -110,7 +110,7 @@ import javafx.util.converter.IntegerStringConverter;
  *                 if (item == null || Double.isNaN(item)) {
  *                     return missingLabel; // For example return something else that an empty cell.
  *                 } else{
- *                     if (!("").equals(format) && !Double.isNaN(item)) {
+ *                     if (!("").equals(format) &amp;&amp; !Double.isNaN(item)) {
  *                     //We format here the value
  *                         return new DecimalFormat(format).format(item);
  *                     } else {
@@ -264,7 +264,7 @@ public abstract class SpreadsheetCellType<T> {
     }
     
     /**
-     * This method will be called when a commit is happening.<br/>
+     * This method will be called when a commit is happening.<br>
      * This method will try to convert the value, be sure to call
      * {@link #match(Object)} before to see if this method will succeed.
      * 

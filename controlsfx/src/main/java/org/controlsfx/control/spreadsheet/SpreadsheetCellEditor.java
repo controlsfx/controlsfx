@@ -52,10 +52,10 @@ import javafx.util.StringConverter;
 /**
  * 
  * SpreadsheetCellEditor are used by {@link SpreadsheetCellType} and
- * {@link SpreadsheetCell} in order to control how each value will be entered. <br/>
+ * {@link SpreadsheetCell} in order to control how each value will be entered. <br>
  * 
  * <h3>General behavior:</h3> Editors will be displayed if the user double-click
- * in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ). <br/>
+ * in an editable cell ( see {@link SpreadsheetCell#setEditable(boolean)} ). <br>
  * If the user does anything outside the editor, the editor <b> will be forced
  * </b> to try to commit the edition and close itself. If the value is not
  * valid, the editor will cancel the value and close itself. The editor is just
@@ -65,16 +65,16 @@ import javafx.util.StringConverter;
  * {@link SpreadsheetCellType#match(Object)}.
  * 
  * If the value doesn't meet the requirements when saving the cell, nothing
- * happens and the editor keeps editing. <br/>
- * You can abandon a current modification by pressing "esc" key. <br/>
+ * happens and the editor keeps editing. <br>
+ * You can abandon a current modification by pressing "esc" key. <br>
  * 
  * You can specify a maximum height to your spreadsheetCellEditor with {@link #getMaxHeight()
  * }. This can be used in order to control the display of your editor. If they
  * should grow or not in a big cell. (for example a {@link TextAreaEditor} want
  * to grow with the cell in order to take full space for display.
- * <br/>
+ * <br>
  * <h3>Specific behavior:</h3> This class offers some static classes in order to
- * create a {@link SpreadsheetCellEditor}. Here are their properties: <br/>
+ * create a {@link SpreadsheetCellEditor}. Here are their properties: <br>
  * 
  * <ul>
  * <li> {@link StringEditor}: Basic {@link TextField}, can accept all data and
@@ -91,9 +91,9 @@ import javafx.util.StringConverter;
  * <li> {@link ObjectEditor}: Display a {@link TextField} , accept an Object.</li>
  * </ul>
  * 
- * <br/>
+ * <br>
  * <h3>Creating your editor:</h3> You can of course create your own
- * {@link SpreadsheetCellEditor} for displaying other controls.<br/>
+ * {@link SpreadsheetCellEditor} for displaying other controls.<br>
  * 
  * You just have to override the four abstract methods. <b>Remember</b> that you
  * will never call those methods directly. They will be called by the
@@ -110,31 +110,31 @@ import javafx.util.StringConverter;
  * <li> {@link #end()}: When editing is finished, you can properly close your own
  * control.</li>
  * </ul>
- * <br/>
+ * <br>
  * Keep in mind that you will interact only with {@link #endEdit(boolean)} where
  * a <b>true</b> value means you want to commit, and a <b>false</b> means you
  * want to cancel. The {@link SpreadsheetView} will handle all the rest for you
- * and call your methods at the right moment. <br/>
+ * and call your methods at the right moment. <br>
  * 
- * <h3>Use case :</h3> <td><center><img src="editorScheme.png"></center></td>
+ * <h3>Use case :</h3> <center><img src="editorScheme.png" alt="Use case of SpreadsheetCellEditor"></center>
  * 
  * <h3>Visual:</h3>
- * <table style="border: 1px solid gray;">
+ * <table style="border: 1px solid gray;" summary="Screenshots of various SpreadsheetCellEditor">
  * <tr>
  * <td valign="center" style="text-align:right;"><strong>String</strong></td>
- * <td><center><img src="textEditor.png"></center></td>
+ * <td><center><img src="textEditor.png" alt="Screenshot of SpreadsheetCellEditor.StringEditor"></center></td>
  * </tr>
  * <tr>
  * <td valign="center" style="text-align:right;"><strong>List</strong></td>
- * <td><center><img src="listEditor.png"></center></td>
+ * <td><center><img src="listEditor.png" alt="Screenshot of SpreadsheetCellEditor.ListEditor"></center></td>
  * </tr>
  * <tr>
  * <td valign="center" style="text-align:right;"><strong>Double</strong></td>
- * <td><center><img src="doubleEditor.png"></center></td>
+ * <td><center><img src="doubleEditor.png" alt="Screenshot of SpreadsheetCellEditor.DoubleEditor"></center></td>
  * </tr>
  * <tr>
  * <td valign="center" style="text-align:right;"><strong>Date</strong></td>
- * <td><center><img src="dateEditor.png"></center></td>
+ * <td><center><img src="dateEditor.png" alt="Screenshot of SpreadsheetCellEditor.DateEditor"></center></td>
  * </tr>
  * </table>
  * 
@@ -166,12 +166,12 @@ public abstract class SpreadsheetCellEditor {
      * * Public Final Methods * *
      **************************************************************************/
     /**
-     * Whenever you want to stop the edition, you call that method.<br/>
+     * Whenever you want to stop the edition, you call that method.<br>
      * True means you're trying to commit the value, then
      * {@link SpreadsheetCellType#convertValue(Object)} will be called in order
-     * to verify that the value is correct.<br/>
+     * to verify that the value is correct.<br>
      * False means you're trying to cancel the value and it will be follow by
-     * {@link #end()}.<br/>
+     * {@link #end()}.<br>
      * See SpreadsheetCellEditor description
      * 
      * @param b
@@ -185,7 +185,7 @@ public abstract class SpreadsheetCellEditor {
      * * Public Abstract Methods * *
      **************************************************************************/
     /**
-     * This method will be called when edition start.<br/>
+     * This method will be called when edition start.<br>
      * You will then do all the configuration of your editor.
      * 
      * @param item
@@ -211,7 +211,7 @@ public abstract class SpreadsheetCellEditor {
     public abstract String getControlValue();
 
     /**
-     * This method will be called at the end of edition.<br/>
+     * This method will be called at the end of edition.<br>
      * You will be offered the possibility to do the configuration post editing.
      */
     public abstract void end();
@@ -472,7 +472,7 @@ public abstract class SpreadsheetCellEditor {
      * A {@link SpreadsheetCellEditor} for
      * {@link SpreadsheetCellType.DoubleType} typed cells. It displays a
      * {@link TextField} where the user can type different numbers. Only numbers
-     * will be stored. <br/>
+     * will be stored. <br>
      * Moreover, the {@link TextField} will turn red if the value currently
      * entered if incorrect.
      */
@@ -622,7 +622,7 @@ public abstract class SpreadsheetCellEditor {
      * A {@link SpreadsheetCellEditor} for
      * {@link SpreadsheetCellType.DoubleType} typed cells. It displays a
      * {@link TextField} where the user can type different numbers. Only numbers
-     * will be stored. <br/>
+     * will be stored. <br>
      * Moreover, the {@link TextField} will turn red if the value currently
      * entered if incorrect.
      */

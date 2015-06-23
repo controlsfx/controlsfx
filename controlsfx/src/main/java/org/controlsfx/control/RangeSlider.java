@@ -92,14 +92,14 @@ import javafx.util.StringConverter;
  * Because the RangeSlider supports both horizontal and vertical 
  * {@link #orientationProperty() orientation}, there are two screenshots below:
  * 
- * <table border="0">
+ * <table border="0" summary="Screenshot of RangeSlider orientation">
  *   <tr>
  *     <td width="75" valign="center"><strong>Horizontal:</strong></td>
- *     <td><img src="rangeSlider-horizontal.png"></td>
+ *     <td><img src="rangeSlider-horizontal.png" alt="Screenshot of a horizontal RangeSlider"></td>
  *   </tr>
  *   <tr>
  *     <td width="75" valign="top"><strong>Vertical:</strong></td>
- *     <td><img src="rangeSlider-vertical.png"></td>
+ *     <td><img src="rangeSlider-vertical.png" alt="Screenshot of a vertical RangeSlider"></td>
  *   </tr>
  * </table>
  * 

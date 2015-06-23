@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ import javafx.scene.control.Skin;
  * <h3>Screenshot</h3>
  * To better describe what a master / detail pane is, please refer to the picture
  * below:
- * <center><img src="masterDetailPane.png" /></center>
+ * <center><img src="masterDetailPane.png" alt="Screenshot of MasterDetailPane"></center>
  * <h3>Code Sample</h3>
  * <pre>
  * {@code

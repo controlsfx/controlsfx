@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class HelloNewDialog extends ControlsFXSample {
     
 	@Override
 	public String getSampleName() {
-		return "Dialogs (New)";
+		return "Dialogs";
 	}
 
 	@Override

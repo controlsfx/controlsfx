@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,10 +66,11 @@ public class LoginDialog extends Dialog<Pair<String,String>> {
         
         
         txUserName = (CustomTextField) TextFields.createClearableTextField();
-        txUserName.setLeft(new ImageView(DialogResources.getImage("login.user.icon"))); //$NON-NLS-1$
+        
+        txUserName.setLeft(new ImageView(LoginDialog.class.getResource("/org/controlsfx/dialog/user.png").toExternalForm())); //$NON-NLS-1$
         
         txPassword = (CustomPasswordField) TextFields.createClearablePasswordField();
-        txPassword.setLeft(new ImageView(DialogResources.getImage("login.password.icon"))); //$NON-NLS-1$
+        txPassword.setLeft(new ImageView(LoginDialog.class.getResource("/org/controlsfx/dialog/lock.png").toExternalForm())); //$NON-NLS-1$
         
         Label lbMessage= new Label("");  //$NON-NLS-1$
         lbMessage.getStyleClass().addAll("message-banner"); //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,16 +76,18 @@ import javafx.scene.control.ToolBar;
  * 'Group 3' options are the 'Action 1.1', etc actions that have been specified
  * in the code above):
  *
- * <table border="0">
+ * <table border="0" summary="ActionGroup Screenshots">
  *   <tr>
  *     <td width="75" valign="center"><strong>MenuBar:</strong></td>
- *     <td><img src="actionGroup-menubar.png"></td>
+ *     <td><img src="actionGroup-menubar.png" alt="Screenshot of ActionGroup in a MenuBar"></td>
  *   </tr>
+ *   <tr>
  *     <td width="75" valign="center"><strong>ToolBar:</strong></td>
- *     <td><img src="actionGroup-toolbar.png"></td>
+ *     <td><img src="actionGroup-toolbar.png" alt="Screenshot of ActionGroup in a ToolBar"></td>
  *   </tr>
+ *   <tr>
  *   <td width="75" valign="top"><strong>ContextMenu:</strong></td>
- *     <td><img src="actionGroup-contextmenu.png"></td>
+ *     <td><img src="actionGroup-contextmenu.png" alt="Screenshot of ActionGroup in a ContextMenu"></td>
  *   </tr>
  * </table>
  * 

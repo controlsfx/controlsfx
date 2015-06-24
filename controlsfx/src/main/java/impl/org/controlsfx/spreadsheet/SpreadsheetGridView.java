@@ -28,34 +28,45 @@ package impl.org.controlsfx.spreadsheet;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
-	private final SpreadsheetHandle handle;
+    private final SpreadsheetHandle handle;
 
-        /**
-         * We don't want to show the current value in the TextField when we are
-         * editing by typing a key. We want directly to take those typed letters
-         * and put them into the textfield.
+    /*
+     * cache the stylesheet as lookup takes time and the getUserAgentStylesheet is called repeatedly
+     */
+    private String stylesheet;
+
+    /**
+     * We don't want to show the current value in the TextField when we are
+     * editing by typing a key. We want directly to take those typed letters
+     * and put them into the textfield.
+     */
+    public SpreadsheetGridView(SpreadsheetHandle handle) {
+        this.handle = handle;
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        /*
+         * For more information please see RT-40658
          */
-	public SpreadsheetGridView(SpreadsheetHandle handle) {
-		this.handle = handle;
-	}
+        if (stylesheet == null) {
+            stylesheet = SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
+                    .toExternalForm();
+        }
 
-	@Override
-	public String getUserAgentStylesheet() {
-		return SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
-				.toExternalForm();
-	}
+        return stylesheet;
+    }
 
-	@Override
-	protected javafx.scene.control.Skin<?> createDefaultSkin() {
-		return new GridViewSkin(handle);
-	}
-	
-	public GridViewSkin getGridViewSkin() {
-		return handle.getCellsViewSkin();
-	}
+    @Override
+    protected javafx.scene.control.Skin<?> createDefaultSkin() {
+        return new GridViewSkin(handle);
+    }
+
+    public GridViewSkin getGridViewSkin() {
+        return handle.getCellsViewSkin();
+    }
 };

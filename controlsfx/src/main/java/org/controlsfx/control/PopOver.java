@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013 - 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -66,12 +67,23 @@ import javafx.util.Duration;
  * owner. It stops displaying an arrow and starts displaying a title and a close
  * icon. <br>
  * <br>
- * <center> <img src="popover-detached.png" alt="Screenshot of a detached PopOver"> </center> <br>
+ * <center> <img src="popover-detached.png"
+ * alt="Screenshot of a detached PopOver"> </center> <br>
  * The following image shows a popover with an accordion content node. PopOver
  * controls are automatically resizing themselves when the content node changes
  * its size.<br>
  * <br>
- * <center> <img src="popover-accordion.png" alt="Screenshot of PopOver containing an Accordion"> </center> <br>
+ * <center> <img src="popover-accordion.png"
+ * alt="Screenshot of PopOver containing an Accordion"> </center> <br>
+ * For styling apply stylesheets to the root pane of the PopOver.
+ *
+ * <h3>Example:</h3>
+ *
+ * <pre>
+ * PopOver popOver = new PopOver();
+ * popOver.getRoot().getStylesheets().add(...);
+ * </pre>
+ *
  */
 public class PopOver extends PopupControl {
 
@@ -90,6 +102,9 @@ public class PopOver extends PopupControl {
         super();
 
         getStyleClass().add(DEFAULT_STYLE_CLASS);
+
+        getRoot().getStylesheets().add(
+                PopOver.class.getResource("popover.css").toExternalForm()); //$NON-NLS-1$
 
         setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
         setOnHiding(new EventHandler<WindowEvent>() {
@@ -124,8 +139,7 @@ public class PopOver extends PopupControl {
         arrowIndent.addListener(repositionListener);
 
         /*
-         * A detached popover should of course not automatically hide
-         * itself.
+         * A detached popover should of course not automatically hide itself.
          */
         detached.addListener(it -> {
             if (isDetached()) {
@@ -153,6 +167,25 @@ public class PopOver extends PopupControl {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PopOverSkin(this);
+    }
+
+    private final StackPane root = new StackPane();
+
+    /**
+     * The root pane stores the content node of the popover. It is accessible
+     * via this method in order to support proper styling.
+     *
+     * <h3>Example:</h3>
+     *
+     * <pre>
+     * PopOver popOver = new PopOver();
+     * popOver.getRoot().getStylesheets().add(...);
+     * </pre>
+     *
+     * @return the root pane
+     */
+    public final StackPane getRoot() {
+        return root;
     }
 
     // Content support.
@@ -303,22 +336,22 @@ public class PopOver extends PopupControl {
 
     /** {@inheritDoc} */
     @Override
-    public final void show(Window owner){
+    public final void show(Window owner) {
         super.show(owner);
         ownerWindow = owner;
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
     }
-    
+
     /** {@inheritDoc} */
     @Override
-    public final void show(Window ownerWindow, double anchorX, double anchorY){
+    public final void show(Window ownerWindow, double anchorX, double anchorY) {
         super.show(ownerWindow, anchorX, anchorY);
         this.ownerWindow = ownerWindow;
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
     }
-    
+
     /**
      * Makes the pop over visible at the give location and associates it with
      * the given owner node. The x and y coordinate will be the target location

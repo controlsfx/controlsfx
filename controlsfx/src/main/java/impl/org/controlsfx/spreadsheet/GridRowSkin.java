@@ -32,12 +32,12 @@ import com.sun.javafx.scene.control.skin.CellSkinBase;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
@@ -360,7 +360,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         }
         skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
-        removeUselessCell();
+        removeUselessCell(index);
         if(handle.getCellsViewSkin().lastRowLayout.get() == true){
             handle.getCellsViewSkin().lastRowLayout.setValue(false);
         }
@@ -368,10 +368,21 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
     /**
      * Here we want to remove of the sceneGraph cells that are not used.
+     *
+     * Before we were removing the cells that we were getting from the cache.
+     * But that is not enough because some cells can be added somehow, and stay
+     * within the row. Since we do not often clear the children because of some
+     * deportedCell present inside, we must use that Predicate to clear all
+     * CellView not contained in cells and with the same index. Thus we preserve
+     * the deported cell.
      */
-    private void removeUselessCell() {
-        Collection<CellView> tempCells = getCellsMap().values();
-        getChildren().removeAll(tempCells);
+    private void removeUselessCell(int index) {
+        getChildren().removeIf((Node t) -> {
+            if(t instanceof CellView){
+                return !cells.contains(t) && ((CellView)t).getIndex() == index;
+            }
+            return false;
+        });
     }
 
     /**
@@ -381,6 +392,10 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * @param index
      */
     private void handleFixedCell(List<CellView> fixedCells, int index) {
+        if(fixedCells.isEmpty()){
+            return;
+        }
+        
         /**
          * If we have a fixedCell (in column) and that cell may be recovered by
          * a rowSpan, we want to put that tableCell ahead in term of z-order. So

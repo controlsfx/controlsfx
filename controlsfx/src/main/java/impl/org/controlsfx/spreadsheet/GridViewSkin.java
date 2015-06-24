@@ -614,6 +614,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * column with his mouse, we must force the column to resize because
          * setting the prefWidth again will not trigger the listeners.
          */
+        widthMax = snapSize(widthMax);
         if (col.getPrefWidth() == widthMax && col.getWidth() != widthMax) {
             col.impl_setWidth(widthMax);
         } else {

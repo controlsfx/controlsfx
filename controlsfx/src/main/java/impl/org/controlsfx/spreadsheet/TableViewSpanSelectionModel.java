@@ -379,7 +379,7 @@ public class TableViewSpanSelectionModel extends
             if (position.getKey() < 0
                     || position.getKey() >= itemCount
                     || position.getValue() < 0
-                    || position.getValue() >= columnSize) {
+                    || position.getValue() > columnSize) {
                 continue;
             }
 

@@ -35,7 +35,6 @@ import javafx.scene.control.IndexedCell;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
@@ -136,12 +135,7 @@ public class RectangleSelection extends Rectangle {
             return;
         }
 
-        Grid grid = skin.spreadsheetView.getGrid();
-        if (maxRow >= grid.getRowCount() || maxColumn >= grid.getColumnCount()) {
-            setVisible(false);
-            return;
-        }
-        SpreadsheetCell cell = grid.getRows().get(maxRow).get(maxColumn);
+        SpreadsheetCell cell = skin.spreadsheetView.getGrid().getRows().get(maxRow).get(maxColumn);
         handleHorizontalPositioning(minColumn, maxColumn, cell.getColumnSpan());
 
         //If we are out of sight

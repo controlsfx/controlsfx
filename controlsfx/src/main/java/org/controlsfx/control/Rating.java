@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,9 +51,9 @@ import javafx.scene.control.Skin;
  * standard (horizontal) Rating control looks like when it has five stars, and a 
  * rating of two:
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="rating-horizontal.png"/>
+ * <img src="rating-horizontal.png" alt="Screenshot of horizontal Rating">
  * </center>
  * 
  * <p>To create a Rating control that looks like this is simple:
@@ -73,9 +73,9 @@ import javafx.scene.control.Skin;
  * <p>The end result of making this one line change is shown in the screenshot
  * below:
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="rating-vertical.png"/>
+ * <img src="rating-vertical.png" alt="Screenshot of vertical Rating">
  * </center>
  * 
  * <p>One of the features of the Rating control is that it doesn't just allow
@@ -83,9 +83,9 @@ import javafx.scene.control.Skin;
  * the rating area to set a 'float' rating. This is hard to describe, but easy 
  * to show in a picture:
  * 
- * <br/>
+ * <br>
  * <center>
- * <img src="rating-partial.png"/>
+ * <img src="rating-partial.png" alt="Screenshot of partial Rating">
  * </center>
  * 
  * <p>In essence, in the screenshot above, the user clicked roughly in the 

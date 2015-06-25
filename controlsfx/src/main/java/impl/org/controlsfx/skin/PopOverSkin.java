@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013 - 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -101,11 +101,10 @@ public class PopOverSkin implements Skin<PopOver> {
 
         this.popOver = popOver;
 
-        stackPane = new StackPane();
-        stackPane.getStylesheets().add(
-                PopOver.class.getResource("popover.css").toExternalForm()); //$NON-NLS-1$
+        stackPane = popOver.getRoot();
         stackPane.setPickOnBounds(false);
-        stackPane.getStyleClass().add("popover"); //$NON-NLS-1$
+
+        Bindings.bindContent(stackPane.getStyleClass(), popOver.getStyleClass());
 
         /*
          * The min width and height equal 2 * corner radius + 2 * arrow indent +

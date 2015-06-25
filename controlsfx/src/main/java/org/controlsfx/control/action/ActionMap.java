@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ import java.util.*;
  * Here's a very simple example of how to use ActionMap to register a class (in
  * this class it is the application class itself), and to then retrieve actions
  * out of the ActionMap (via the static {@link ActionMap#action(String)} method:
- * <br/>
+ * <br>
  * 
  * <pre>
  * public class ActionMapDemo extends Application {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ import javafx.util.Callback;
  *
  * <h3>Screenshot</h3>
  *
- * <center><img src="list-selection-view.png" /></center>
+ * <center><img src="list-selection-view.png" alt="Screenshot of ListSelectionView"></center>
  *
  * <h3>Code Example</h3>
  *

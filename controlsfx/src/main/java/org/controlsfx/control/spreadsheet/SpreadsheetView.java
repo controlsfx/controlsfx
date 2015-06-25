@@ -103,27 +103,27 @@ import org.controlsfx.tools.Utils;
  * they are always visible on screen. Only columns without any spanning cells
  * can be fixed.</li>
  * <li>A row header can be switched on in order to display the row number.</li>
- * <li>Rows can be resized just like columns with click & drag.</li>
+ * <li>Rows can be resized just like columns with click &amp; drag.</li>
  * <li>Both row and column header can be visible or invisible.</li>
  * <li>Selection of several cells can be made with a click and drag.</li>
  * <li>A copy/paste context menu is accessible with a right-click. The usual
  * shortcuts are also working.</li>
  * </ul>
  * 
- * <br/>
+ * <br>
  * 
  * <h3>Fixing Rows and Columns</h3> 
- * <br/>
+ * <br>
  * You can fix some rows and some columns by right-clicking on their header. A
  * context menu will appear if it's possible to fix them. The label will then be
  * in italic and the background will turn to dark grey. 
- * <br/>
+ * <br>
  * You have also the possibility to fix them manually by adding and removing
  * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
  * are strongly advised to check if it's possible to do so with
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
  * {@link #isRowFixable(int)} for the fixed rows. 
- * <br/>
+ * <br>
  * 
  * If you want to fix several rows or columns together, and they have a span
  * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
@@ -134,55 +134,55 @@ import org.controlsfx.tools.Utils;
  *
  * Calling those methods prior
  * every move will ensure that no exception will be thrown.
- * <br/>
+ * <br>
  * You have also the possibility to deactivate these possibilities. For example,
  * you force some row/column to be fixed and then the user cannot change the 
  * settings. 
- * <br/>
+ * <br>
  * 
  * <h3>Headers</h3>
- * <br/>
+ * <br>
  * You can also access and toggle header's visibility by using the methods
  * provided like {@link #setShowRowHeader(boolean) } or {@link #setShowColumnHeader(boolean)
  * }.
  * 
- * <br/>
+ * <br>
  * 
  * <h3>Pickers</h3>
- * <br/>
+ * <br>
  * 
  * You can show some little images next to the headers. They will appear on the 
  * left of the VerticalHeader and on top on the HorizontalHeader. They are called
  * "picker" because they were used originally for picking a row or a column to 
  * insert in the SpreadsheetView.
- * <br/>
+ * <br>
  * But you can do anything you want with it. Simply put a row or a column index
  * in {@link #getRowPickers() } and {@link #getColumnPickers() } along with an
  * instance of {@link Picker}. You can override the {@link Picker#onClick() }
  * method in order to react when the user click on the picker.
- * <br/>
+ * <br>
  * The pickers will appear on the top of the column's header and on the left of 
  * the row's header.
- * <br/>
+ * <br>
  * 
  * <h3>Copy pasting</h3> You can copy any cell you want and paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
  * type. Thus the value you're trying to paste must be compatible with the
  * {@link SpreadsheetCellType} of the receiving cell. Pasting a Double into a
  * String will work but the reverse operation will not. 
- * <br/>
+ * <br>
  * See {@link SpreadsheetCellType} <i>Value Verification</i> documentation for more 
  * information.
- * <br/>
+ * <br>
  * A unique cell or a selection of several of them can be copied and pasted.
  * 
- * <br/>
- * <br/>
+ * <br>
+ * <br>
  * <h3>Code Samples</h3> Just like the {@link TableView}, you instantiate the
  * underlying model, a {@link Grid}. You will create some rows filled with {@link SpreadsheetCell}.
  * 
- * <br/>
- * <br/>
+ * <br>
+ * <br>
  * 
  * <pre>
  * int rowCount = 15;
@@ -204,8 +204,8 @@ import org.controlsfx.tools.Utils;
  * </pre>
  * 
  * At that moment you can span some of the cells with the convenient method
- * provided by the grid. Then you just need to instantiate the SpreadsheetView. <br/>
- * <h3>Visual:</h3> <center><img src="spreadsheetView.png"/></center>
+ * provided by the grid. Then you just need to instantiate the SpreadsheetView. <br>
+ * <h3>Visual:</h3> <center><img src="spreadsheetView.png" alt="Screenshot of SpreadsheetView"></center>
  * 
  * @see SpreadsheetCell
  * @see SpreadsheetCellBase
@@ -223,19 +223,19 @@ public class SpreadsheetView extends Control {
     /**
      * The SpanType describes in which state each cell can be. When a spanning
      * is occurring, one cell is becoming larger and the others are becoming
-     * invisible. Thus, that particular cell is masking the others. <br/>
-     * <br/>
+     * invisible. Thus, that particular cell is masking the others. <br>
+     * <br>
      * But the SpanType cannot be known in advance because it's evolving for
      * each cell during the lifetime of the {@link SpreadsheetView}. Suppose you
      * have a cell spanning in row, the first one is in a ROW_VISIBLE state, and
      * all the other below are in a ROW_SPAN_INVISIBLE state. But if the user is
      * scrolling down, the first will go out of sight. At that moment, the
      * second cell is switching from ROW_SPAN_INVISIBLE state to ROW_VISIBLE
-     * state. <br/>
-     * <br/>
+     * state. <br>
+     * <br>
      * 
-     * <center><img src="spanType.png"></center> Refer to
-     * {@link SpreadsheetView} for more information.
+     * <center><img src="spanType.png" alt="Screenshot of SpreadsheetView.SpanType"></center>
+     * Refer to {@link SpreadsheetView} for more information.
      */
     public static enum SpanType {
 

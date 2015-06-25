@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,13 +45,13 @@ import org.controlsfx.validation.ValidationMessage;
 
 /**
  * Validation decorator to decorate validation state using images.
- * <br/>
+ * <br>
  * Validation icons are shown in the bottom-left corner of the control as it is seems to be the most
  * logical location for such information.
  * Required components are marked at the top-left corner with small red triangle.
  * Here is example of such decoration 
- * </br> </br>
- * <img src="GraphicValidationDecorationWithTooltip.png"/>  
+ * <br> <br>
+ * <img src="GraphicValidationDecorationWithTooltip.png" alt="Screenshot of GraphicValidationDecoration">  
  * 
  */
 public class GraphicValidationDecoration extends AbstractValidationDecoration {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,8 +41,8 @@ import org.controlsfx.validation.ValidationMessage;
  * Validation decorator to decorate component validation state using two
  * CSS classes for errors and warnings.
  * Here is example of such decoration 
- * </br> </br>
- * <img src="StyleClassValidationDecoration.png"/>  
+ * <br> <br>
+ * <img src="StyleClassValidationDecoration.png" alt="Screenshot of StyleClassValidationDecoration">  
  */
 public class StyleClassValidationDecoration extends AbstractValidationDecoration {
 

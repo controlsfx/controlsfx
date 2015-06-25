@@ -63,8 +63,8 @@ import org.controlsfx.validation.ValidationSupport;
 import com.sun.javafx.css.StyleManager;
 
 /**
- * <p>The API for creating multi-page Wizards, based on JavaFX {@link Dialog} API.<br/> 
- * Wizard can be setup in following few steps:<p/>
+ * <p>The API for creating multi-page Wizards, based on JavaFX {@link Dialog} API.<br> 
+ * Wizard can be setup in following few steps:</p>
  * <ul>
  *    <li>Design wizard pages by inheriting them from {@link WizardPane}</li>
  *    <li>Define wizard flow by implementing {@link Wizard.Flow}</li>

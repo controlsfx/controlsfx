@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,10 +47,10 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 
 /**
- * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br/>
+ * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br>
  * You will provide them when constructing a {@link Grid}.
  * 
- * <br/>
+ * <br>
  * <h3>SpreadsheetCell Types</h3> Each SpreadsheetCell has its own
  * {@link SpreadsheetCellType} which has its own {@link SpreadsheetCellEditor}
  * in order to control very closely the possible modifications.
@@ -63,7 +63,7 @@ import javafx.scene.image.ImageView;
  * SpreadsheetCell that suits your need.
  * 
  * 
- * <br/>
+ * <br>
  * 
  * <p>
  * If you want to create a SpreadsheetCell of your own, you simply have to
@@ -79,7 +79,7 @@ import javafx.scene.image.ImageView;
  * {@link #setEditable(boolean)}. Be advised that a cell with a rowSpan means
  * that the cell will replace all the cells situated in the rowSpan range. Same
  * with the column span. 
- * <br/>
+ * <br>
  * So the best way to handle spanning is to fill your grid
  * with unique cells, and then call at the end {@link GridBase#spanColumn(int, int, int)}
  * or {@link GridBase#spanRow(int, int, int)}. These methods will handle the span
@@ -113,7 +113,7 @@ import javafx.scene.image.ImageView;
  * }
  * </pre>
  * 
- * <center><img src="dateFormat.png"></center>
+ * <center><img src="dateFormat.PNG" alt="SpreadsheetCellBase with custom format"></center>
  * 
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
@@ -127,7 +127,7 @@ import javafx.scene.image.ImageView;
  * cell.setGraphic(new ImageView(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;))));
  * </pre>
  * 
- * <center><img src="graphicNodeToCell.png"></center> <br>
+ * <center><img src="graphicNodeToCell.png" alt="SpreadsheetCellBase with graphic"></center> <br>
  * In addition to that, you can also specify another graphic property to your
  * cell with {@link #activateCorner(org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition) }.
  * This allow you to activate or deactivate some graphics on the cell in every 
@@ -141,10 +141,10 @@ import javafx.scene.image.ImageView;
  * }
  * </pre>
  * 
- * <center><img src="triangleCell.png"></center>
+ * <center><img src="triangleCell.PNG" alt="SpreadsheetCellBase with a styled cell-corner"></center>
  * 
  * 
- * <br/>
+ * <br>
  * You can also customize the tooltip of your SpreadsheetCell by specifying one
  * with {@link #setTooltip(java.lang.String) }.
  * 
@@ -176,14 +176,14 @@ import javafx.scene.image.ImageView;
  * 
  * <pre>
  * private SpreadsheetCell&lt;?&gt; generateCell(int row, int column, int rowSpan, int colSpan) {
- *     List&lt;String?&gt; stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
+ *     List&lt;String&gt; stringListTextCell = Arrays.asList("Shanghai","Paris","New York City","Bangkok","Singapore","Johannesburg","Berlin","Wellington","London","Montreal");
  *     final double random = Math.random();
  *     if (random &lt; 0.10) {
- *         List&lt;String?&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
+ *         List&lt;String&gt; stringList = Arrays.asList("China","France","New Zealand","United States","Germany","Canada");
  *         cell = SpreadsheetCellType.LIST(stringList).createCell(row, column, rowSpan, colSpan, stringList.get((int) (Math.random() * 6)));
- *     } else if (random ?&gt;= 0.10 && random &lt; 0.25) {
+ *     } else if (random &gt;= 0.10 &amp;&amp; random &lt; 0.25) {
  *         cell = SpreadsheetCellType.STRING.createCell(row, column, rowSpan, colSpan,stringListTextCell.get((int)(Math.random()*10)));
- *     } else if (random ?&gt;= 0.25 && random &lt; 0.75) {
+ *     } else if (random &gt;= 0.25 &amp;&amp; random &lt; 0.75) {
  *         cell = SpreadsheetCellType.DOUBLE.createCell(row, column, rowSpan, colSpan,(double)Math.round((Math.random()*100)*100)/100);
  *     } else {
  *         cell = SpreadsheetCellType.DATE.createCell(row, column, rowSpan, colSpan, LocalDate.now().plusDays((int)(Math.random()*10)));

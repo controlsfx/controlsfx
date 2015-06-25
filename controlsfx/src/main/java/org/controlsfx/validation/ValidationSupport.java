@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,14 +62,14 @@ import org.controlsfx.validation.decoration.ValidationDecoration;
  *        ValidationSupport validationSupport = new ValidationSupport();
  *        validationSupport.registerValidator(textField, Validator.createEmptyValidator("Text is required"));
  *        validationSupport.registerValidator(combobox, Validator.createEmptyValidator( "ComboBox Selection required"));
- *        validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -> 
+ *        validationSupport.registerValidator(checkBox, (Control c, Boolean newValue) -&gt;
  *        	    ValidationResult.fromErrorIf( c, "Checkbox should be checked", !newValue)
  *         );
  *     </pre>
  *     
  *  validationResultProperty provides an ability to react on overall validation result changes:
  *  <pre>
- *     validationSupport.validationResultProperty().addListener( (o, oldValue, newValue) ->
+ *     validationSupport.validationResultProperty().addListener( (o, oldValue, newValue) -&gt;
         	 messageList.getItems().setAll(newValue.getMessages()));
  *  </pre>   
  *  
@@ -78,8 +78,8 @@ import org.controlsfx.validation.decoration.ValidationDecoration;
  *  a {@link Predicate} to check the applicability of the control and a {@link Callback} to extract control's observable value. 
  *  Here is an sample of internal registration of such "extractor" for  a few  controls :
  *  <pre>
- *     ValueExtractor.addObservableValueExtractor( c -> c instanceof TextInputControl, c -> ((TextInputControl)c).textProperty());
- *     ValueExtractor.addObservableValueExtractor( c -> c instanceof ComboBox,         c -> ((ComboBox<?>)c).valueProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -&gt; c instanceof TextInputControl, c -&gt; ((TextInputControl)c).textProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -&gt; c instanceof ComboBox,         c -&gt; ((ComboBox&lt;?&gt;)c).valueProperty());
  *  </pre>
  *   
  */

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,8 +49,8 @@ import javafx.util.StringConverter;
  * <h3>Screenshot</h3>
  * <p>The following screenshot shows the CheckComboBox with some sample data:
  * 
- * <br/>
- * <img src="checkComboBox.png"/>
+ * <br>
+ * <img src="checkComboBox.png" alt="Screenshot of CheckComboBox">
  * 
  * <h3>Code Example:</h3>
  * <p>To create the CheckComboBox shown in the screenshot, simply do the 

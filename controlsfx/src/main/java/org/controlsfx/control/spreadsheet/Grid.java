@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
  * <h3> Code Sample </h3>
  * <pre>
  * Grid grid = ...
- * for (int row = 0; row < grid.getRowCount(); row++) {
+ * for (int row = 0; row &lt; grid.getRowCount(); row++) {
  *     for (int column = 0; column &lt; grid.getColumnCount(); column++) {
  *         SpreadsheetCell&lt;?&gt; cell = getRows().get(row).get(column);
  *         doStuff(cell);

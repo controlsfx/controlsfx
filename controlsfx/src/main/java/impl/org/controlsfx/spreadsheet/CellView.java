@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -486,6 +486,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     
     private final WeakSetChangeListener<String> weakStyleClassListener = new WeakSetChangeListener<>(styleClassListener);
     
+    //Listeners for the styles, not initialized by default in order not to impact performance
+    private ChangeListener<String> styleListener;
+    private WeakChangeListener<String> weakStyleListener;
+    
     /**
      * Method that will select all the cells between the drag place and that
      * cell.
@@ -604,6 +608,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             if (oldItem != null) {
                 oldItem.getStyleClass().removeListener(weakStyleClassListener);
                 oldItem.graphicProperty().removeListener(weakGraphicListener);
+                
+                if(oldItem.styleProperty() != null){
+                    oldItem.styleProperty().removeListener(weakStyleListener);
+                }
             }
             if (newItem != null) {
                 getStyleClass().clear();
@@ -612,7 +620,25 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 newItem.getStyleClass().addListener(weakStyleClassListener);
                 setCellGraphic(newItem);
                 newItem.graphicProperty().addListener(weakGraphicListener);
+                
+                if(newItem.styleProperty() != null){
+                    initStyleListener();
+                    newItem.styleProperty().addListener(weakStyleListener);
+                    setStyle(newItem.getStyle());
+                }else{
+                    //We clear the previous style.
+                    setStyle(null);
+                }
             }
         }
     };
+    
+    private void initStyleListener(){
+        if(styleListener == null){
+            styleListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                styleProperty().set(newValue);
+            };
+        }
+        weakStyleListener = new WeakChangeListener<>(styleListener);
+    }
 }

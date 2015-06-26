@@ -213,6 +213,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     private int columnSpan;
     private final StringProperty format;
     private final StringProperty text;
+    private final StringProperty styleProperty;
     private final ObjectProperty<Node> graphic;
     private String tooltip;
     /**
@@ -271,9 +272,10 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         //Editable is true at the initialisation
         setEditable(true);
         getStyleClass().add("spreadsheet-cell"); //$NON-NLS-1$
+        styleProperty = new SimpleStringProperty();
     }
 
-    /***************************************************************************
+   /***************************************************************************
      * 
      * Public Methods
      * 
@@ -406,6 +408,24 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
             styleClass = FXCollections.observableSet();
         }
         return styleClass;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setStyle(String style){
+        styleProperty.set(style);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public String getStyle(){
+        return styleProperty.get();
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public StringProperty styleProperty(){
+        return styleProperty;
     }
 
     /** {@inheritDoc} */

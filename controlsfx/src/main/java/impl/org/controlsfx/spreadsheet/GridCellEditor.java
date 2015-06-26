@@ -142,11 +142,16 @@ public class GridCellEditor {
                 }
             }
         }
-        if (viewCell != null && editing) {
+        
+        if (editing) {
             editing = false;
-            viewCell.cancelEdit();
+            if(viewCell != null){
+                viewCell.cancelEdit();
+            }
             end();
-            spreadsheetCellEditor.end();
+            if(spreadsheetCellEditor != null){
+                spreadsheetCellEditor.end();
+            }
         }
     }
 

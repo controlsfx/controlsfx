@@ -213,6 +213,18 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             super.layoutChildren();
             layoutTotal();
             layoutFixedRows();
+            
+            /**
+             * Sometimes, the visible amount is not computed when we have few
+             * big rows. If we detect that case, we must compute it manually
+             * otherwise the Vbar is wrongly set.
+             */
+            if (getVbar().getVisibleAmount() == 0.0
+                    && getVbar().isVisible()
+                    && getCells().size() != getCellCount()) {
+                getVbar().setMax(1);
+                getVbar().setVisibleAmount(getCells().size() / (float) getCellCount());
+            }
         }
     }
 

@@ -104,4 +104,14 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
             }
         }
     }
+
+    @Override
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return getSkinnable().prefWidth(height);
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return getSkinnable().prefHeight(width);
+    }
 }

@@ -97,6 +97,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 };
             }
         };
+        comboBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
@@ -151,11 +152,11 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
     }
     
     @Override protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+        return getSkinnable().prefWidth(height);
     }
 
     @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+        return getSkinnable().prefHeight(width);
     }
     
     

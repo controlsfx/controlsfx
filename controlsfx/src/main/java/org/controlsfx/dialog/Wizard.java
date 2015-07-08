@@ -506,25 +506,8 @@ public class Wizard {
                 parentOfCurrentPage.getChildren().remove(currentPage);
             }
             
-            // Get current position and size
-            double previousX = dialog.getX();
-            double previousY = dialog.getY();
-            double previousWidth = dialog.getWidth();
-            double previousHeight = dialog.getHeight();
             // and then switch to the new pane
             dialog.setDialogPane(currentPage);
-            // Resize Wizard to new page
-            Window wizard = currentPage.getScene().getWindow();
-            wizard.sizeToScene();
-            // Center resized Wizard to previous position
-            if (!Double.isNaN(previousX) && !Double.isNaN(previousY)) {
-                double newWidth = dialog.getWidth();
-                double newHeight = dialog.getHeight();
-                int newX = (int) (previousX + (previousWidth / 2.0) - (newWidth / 2.0));
-                int newY = (int) (previousY + (previousHeight / 2.0) - (newHeight / 2.0));
-                dialog.setX(newX);
-                dialog.setY(newY);
-            }
         });
         
         validateActionState();

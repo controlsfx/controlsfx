@@ -389,6 +389,7 @@ public class HelloDialogs extends ControlsFXSample {
     }
     
     private void configureSampleDialog(Dialog<?> dlg, String header) {
+        Window owner = cbSetOwner.isSelected() ? stage : null;
         if (header != null && cbShowMasthead.isSelected()) {
             dlg.getDialogPane().setHeaderText(header);
         }
@@ -398,9 +399,11 @@ public class HelloDialogs extends ControlsFXSample {
         }
         
         dlg.initStyle(styleCombobox.getValue());
+        dlg.initOwner(owner);
     }
     
     private void showDialog(Dialog<?> dlg) {
+        Window owner = cbSetOwner.isSelected() ? stage : null;
         if (cbCloseDialogAutomatically.isSelected()) {
             new Thread(() -> {
                 try {
@@ -412,6 +415,7 @@ public class HelloDialogs extends ControlsFXSample {
                 Platform.runLater(() -> dlg.close());
             }).start();
         }
+        dlg.initOwner(owner);
 
         if (cbUseBlocking.isSelected()) {
             dlg.showAndWait().ifPresent(result -> System.out.println("Result is " + result));
@@ -494,9 +498,10 @@ public class HelloDialogs extends ControlsFXSample {
     }
 
     private void showLinearWizard() {
+        Window owner = cbSetOwner.isSelected() ? stage : null;
         // define pages to show
 
-        Wizard wizard = new Wizard();
+        Wizard wizard = new Wizard(owner);
         wizard.setTitle("Linear Wizard");
         
         // --- page 1
@@ -564,6 +569,7 @@ public class HelloDialogs extends ControlsFXSample {
     }
     
     private void showBranchingWizard() {
+        Window owner = cbSetOwner.isSelected() ? stage : null;
         // define pages to show.
         // Because page1 references page2, we need to declare page2 first.
         final WizardPane page2 = new WizardPane();
@@ -592,7 +598,7 @@ public class HelloDialogs extends ControlsFXSample {
         page3.setContentText("Page 3");
 
         // create wizard
-        Wizard wizard = new Wizard();
+        Wizard wizard = new Wizard(owner);
         wizard.setTitle("Branching Wizard");
         Wizard.Flow branchingFlow = new Wizard.Flow() {
 

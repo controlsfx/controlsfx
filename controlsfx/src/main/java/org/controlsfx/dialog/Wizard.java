@@ -505,7 +505,7 @@ public class Wizard {
                 Pane parentOfCurrentPage = (Pane) currentPage.getParent();
                 parentOfCurrentPage.getChildren().remove(currentPage);
             }
-
+            
             // Get current position and size
             double previousX = dialog.getX();
             double previousY = dialog.getY();

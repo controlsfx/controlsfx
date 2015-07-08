@@ -113,8 +113,10 @@ public class ValidationSupport {
 
     
     private AtomicBoolean dataChanged = new AtomicBoolean(false);
+    
     /**
-     * Creates validation support instance
+     * Creates validation support instance. <br>
+     * If initial decoration is desired invoke {@link #initInitialDecoration()}.
      */
     public ValidationSupport() {
 
@@ -128,7 +130,15 @@ public class ValidationSupport {
         	validationResultProperty.set(ValidationResult.fromResults(validationResults.values()))
         );
 
-        
+    }
+    
+    /**
+     * Activates the initial decoration of validated controls. <br>
+     * By default the decoration will only be applied after the first change of one validated controls value.
+     */
+    public void initInitialDecoration() {
+        dataChanged.set(true);
+        redecorate();
     }
 
     /**

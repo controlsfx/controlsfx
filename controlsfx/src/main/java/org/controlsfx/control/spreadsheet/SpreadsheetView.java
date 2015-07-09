@@ -555,6 +555,17 @@ public class SpreadsheetView extends Control {
     public TablePosition<ObservableList<SpreadsheetCell>, ?> getEditingCell() {
         return cellsView.getEditingCell();
     }
+    
+    /**
+     * Represents the current cell being edited, or null if there is no cell
+     * being edited.
+     *
+     * @return the current cell being edited, or null if there is no cell being
+     * edited.
+     */
+    public ReadOnlyObjectProperty<TablePosition<ObservableList<SpreadsheetCell>, ?>> editingCellProperty() {
+        return cellsView.editingCellProperty();
+    }
 
     /**
      * Return an ObservableList of the {@link SpreadsheetColumn} used. This list
@@ -1392,7 +1403,7 @@ public class SpreadsheetView extends Control {
         for (int row = 0; row < gridBase.getRowCount(); ++row) {
             ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
             for (int column = 0; column < gridBase.getColumnCount(); ++column) {
-                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, "toto"));
             }
             rows.add(currentRow);
         }

@@ -409,7 +409,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     public void resizeRowsToFitContent() {
         int maxRows = handle.getView().getGrid().getRowCount();
         for (int row = 0; row < maxRows; row++) {
-            resizeRowToFitContent(row);
+            if (spreadsheetView.getGrid().isRowResizable(row)) {
+                resizeRowToFitContent(row);
+            }
         }
     }
     
@@ -427,6 +429,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = getSkinnable().getColumns().get(0);
         List<?> items = itemsProperty().get();
         if (items == null || items.isEmpty()) {
+            return;
+        }
+        
+        if (!spreadsheetView.getGrid().isRowResizable(row)) {
             return;
         }
         Callback/* <TableColumn<T, ?>, TableCell<T,?>> */ cellFactory = col.getCellFactory();
@@ -488,7 +494,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         rowHeightMap.clear();
         int maxRows = handle.getView().getGrid().getRowCount();
         for (int row = 0; row < maxRows; row++) {
-            rowHeightMap.put(row, maxHeight);
+            if (spreadsheetView.getGrid().isRowResizable(row)) {
+                rowHeightMap.put(row, maxHeight);
+            }
         }
         rectangleSelection.updateRectangle();
     }
@@ -515,7 +523,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
             double height = getRowHeight(row.getIndex());
             if (row.getHeight() != height) {
-                row.setRowHeight(height);
+                if (spreadsheetView.getGrid().isRowResizable(row.getIndex())) {
+                    row.setRowHeight(height);
+                }
             }
         }
         rectangleSelection.updateRectangle();

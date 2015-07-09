@@ -499,7 +499,11 @@ public class VerticalHeader extends StackPane {
         // We want to select the whole row when clicking on a header.
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
-                headerClicked(row, event);
+                if (event.getClickCount() == 2) {
+                    skin.resizeRowToFitContent(row);
+                } else {
+                    headerClicked(row, event);
+                }
             }
         });
         return label;

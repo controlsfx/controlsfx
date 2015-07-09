@@ -402,11 +402,24 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     }
 
     /**
-     * Will compute for each row the necessary height and fit the line.
+     * Will compute for every row the necessary height and fit the line.
      * This can degrade performance a lot so need to use it wisely. 
      * But I don't see other solutions right now.
      */
     public void resizeRowsToFitContent() {
+        int maxRows = handle.getView().getGrid().getRowCount();
+        for (int row = 0; row < maxRows; row++) {
+            resizeRowToFitContent(row);
+        }
+    }
+    
+    /**
+     * Will compute for the row the necessary height and fit the line.
+     * This can degrade performance a lot so need to use it wisely. 
+     * But I don't see other solutions right now.
+     * @param row
+     */
+    public void resizeRowToFitContent(int row) {
         if(getSkinnable().getColumns().isEmpty()){
             return;
         }
@@ -439,26 +452,26 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
 
         double maxHeight;
-        int maxRows = handle.getView().getGrid().getRowCount();
-        for (int row = 0; row < maxRows; row++) {
-            maxHeight = 0;
-            for (TableColumn column : getSkinnable().getColumns()) {
+//        int maxRows = handle.getView().getGrid().getRowCount();
+//        for (int row = 0; row < maxRows; row++) {
+        maxHeight = 0;
+        for (TableColumn column : getSkinnable().getColumns()) {
 
-                cell.updateTableColumn(column);
-                cell.updateTableView(handle.getGridView());
-                cell.updateIndex(row);
+            cell.updateTableColumn(column);
+            cell.updateTableView(handle.getGridView());
+            cell.updateIndex(row);
 
-                if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
-                    getChildren().add(cell);
-                    cell.setWrapText(true);
+            if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
+                getChildren().add(cell);
+                cell.setWrapText(true);
 
-                    cell.impl_processCSS(false);
-                    maxHeight = Math.max(maxHeight, cell.prefHeight(col.getWidth()));
-                    getChildren().remove(cell);
-                }
+                cell.impl_processCSS(false);
+                maxHeight = Math.max(maxHeight, cell.prefHeight(col.getWidth()));
+                getChildren().remove(cell);
             }
-            rowHeightMap.put(row, maxHeight + padding);
         }
+        rowHeightMap.put(row, maxHeight + padding);
+//        }
         rectangleSelection.updateRectangle();
     }
     

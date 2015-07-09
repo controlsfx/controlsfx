@@ -171,6 +171,12 @@ public class PopOverSkin implements Skin<PopOver> {
                             popOver.setX(
                                     popOver.getX() + popOver.getArrowSize());
                             break;
+                        case TOP_LEFT:
+                        case TOP_CENTER:
+                        case TOP_RIGHT:
+                            popOver.setY(
+                                    popOver.getY() + popOver.getArrowSize());
+                            break;
                         default:
                             break;
                         }

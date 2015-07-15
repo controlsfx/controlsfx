@@ -46,6 +46,9 @@ import static org.controlsfx.control.PopOver.ArrowLocation.TOP_RIGHT;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.PopOver.ArrowLocation;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -70,9 +73,6 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.QuadCurveTo;
 import javafx.scene.shape.VLineTo;
 import javafx.stage.Window;
-
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.PopOver.ArrowLocation;
 
 public class PopOverSkin implements Skin<PopOver> {
 
@@ -157,19 +157,39 @@ public class PopOverSkin implements Skin<PopOver> {
         popOver.contentNodeProperty().addListener(
                 (value, oldContent, newContent) -> content
                         .setCenter(newContent));
-        popOver.detachedProperty().addListener(
-                (value, oldDetached, newDetached) -> {
-                    updatePath();
+        popOver.detachedProperty()
+                .addListener((value, oldDetached, newDetached) -> {
 
                     if (newDetached) {
                         popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
                         content.getStyleClass().add(DETACHED_STYLE_CLASS);
                         content.setTop(titlePane);
+
+                        switch (getSkinnable().getArrowLocation()) {
+                        case LEFT_TOP:
+                        case LEFT_CENTER:
+                        case LEFT_BOTTOM:
+                            popOver.setX(
+                                    popOver.getX() + popOver.getArrowSize());
+                            break;
+                        case TOP_LEFT:
+                        case TOP_CENTER:
+                        case TOP_RIGHT:
+                            popOver.setY(
+                                    popOver.getY() + popOver.getArrowSize());
+                            break;
+                        default:
+                            break;
+                        }
                     } else {
                         popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
                         content.getStyleClass().remove(DETACHED_STYLE_CLASS);
                         content.setTop(null);
                     }
+
+                    popOver.sizeToScene();
+
+                    updatePath();
                 });
 
         path = new Path();

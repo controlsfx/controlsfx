@@ -32,6 +32,7 @@ import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -70,6 +71,8 @@ import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.Wizard.LinearFlow;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 public class HelloDialogs extends ControlsFXSample {
     
@@ -375,7 +378,10 @@ public class HelloDialogs extends ControlsFXSample {
         final Button Hyperlink15b = new Button("Branching Wizard");
         Hyperlink15b.setOnAction(e -> showBranchingWizard());
         
-        grid.add(new HBox(10, Hyperlink15a, Hyperlink15b), 1, row++);
+        final Button Hyperlink15c = new Button("Validated Linear Wizard");
+        Hyperlink15c.setOnAction(e -> showValidatedLinearWizard());
+        
+        grid.add(new HBox(10, Hyperlink15a, Hyperlink15b, Hyperlink15c), 1, row++);
         
         return grid;
     }
@@ -629,11 +635,103 @@ public class HelloDialogs extends ControlsFXSample {
         });
     }
     
+    private void showValidatedLinearWizard() {
+        Window owner = cbSetOwner.isSelected() ? stage : null;
+        Wizard wizard = new Wizard(owner);
+        wizard.setTitle("Validated Linear Wizard");
+        
+        // Page 1
+        WizardPane page1 = new WizardPane() {
+            ValidationSupport vs = new ValidationSupport();
+            {
+                vs.initInitialDecoration();
+                
+                int row = 0;
+
+                GridPane page1Grid = new GridPane();
+                page1Grid.setVgap(10);
+                page1Grid.setHgap(10);
+
+                page1Grid.add(new Label("Username:"), 0, row);
+                TextField txUsername = createTextField("username");
+                vs.registerValidator(txUsername, Validator.createEmptyValidator("EMPTY!"));
+                page1Grid.add(txUsername, 1, row++);
+
+                page1Grid.add(new Label("Full Name:"), 0, row);
+                TextField txFullName = createTextField("fullName");
+                page1Grid.add(txFullName, 1, row);
+                
+                setContent(page1Grid);
+            }
+            
+            @Override
+            public void onEnteringPage(Wizard wizard) {
+                wizard.invalidProperty().unbind();
+                wizard.invalidProperty().bind(vs.invalidProperty());
+            }
+        };
+        
+        // Page 2
+
+        WizardPane page2 = new WizardPane() {
+            ValidationSupport vs = new ValidationSupport();
+            {
+                vs.initInitialDecoration();
+                
+                int row = 0;
+
+                GridPane page2Grid = new GridPane();
+                page2Grid.setVgap(10);
+                page2Grid.setHgap(10);
+
+                page2Grid.add(new Label("ControlsFX is:"), 0, row);
+                ComboBox<String> cbControlsFX = createComboBox("controlsfx");
+                cbControlsFX.setItems(FXCollections.observableArrayList("Cool", "Great"));
+                vs.registerValidator(cbControlsFX, Validator.createEmptyValidator("EMPTY!"));
+                page2Grid.add(cbControlsFX, 1, row++);
+
+                page2Grid.add(new Label("Where have you heard of it?:"), 0, row);
+                TextField txWhere = createTextField("where");
+                vs.registerValidator(txWhere, Validator.createEmptyValidator("EMPTY!"));
+                page2Grid.add(txWhere, 1, row++);
+
+                page2Grid.add(new Label("Free text:"), 0, row);
+                TextField txFreeText = createTextField("freetext");
+                page2Grid.add(txFreeText, 1, row);
+                
+                setContent(page2Grid);
+            }
+            
+            @Override
+            public void onEnteringPage(Wizard wizard) {
+                wizard.invalidProperty().unbind();
+                wizard.invalidProperty().bind(vs.invalidProperty());
+            }
+        };
+
+        // create wizard
+        wizard.setFlow(new LinearFlow(page1, page2));
+
+        // show wizard and wait for response
+        wizard.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.FINISH) {
+                System.out.println("Wizard finished, settings: " + wizard.getSettings());
+            }
+        });
+    }
+    
     private TextField createTextField(String id) {
         TextField textField = new TextField();
         textField.setId(id);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         return textField;
+    }
+    
+    private ComboBox<String> createComboBox(String id) {
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.setId(id);
+        GridPane.setHgrow(comboBox, Priority.ALWAYS);
+        return comboBox;
     }
 
 }

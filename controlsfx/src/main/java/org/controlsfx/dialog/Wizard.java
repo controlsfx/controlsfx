@@ -524,6 +524,7 @@ public class Wizard {
 
         validateButton( BUTTON_PREVIOUS, () -> pageHistory.isEmpty());
         validateButton( BUTTON_NEXT,     () -> invalidProperty.get());
+        validateButton( ButtonType.FINISH,     () -> invalidProperty.get());
 
     }
     

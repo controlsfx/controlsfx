@@ -71,7 +71,7 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.Wizard.LinearFlow;
 
-public class HelloNewDialog extends ControlsFXSample {
+public class HelloDialogs extends ControlsFXSample {
     
 	@Override
 	public String getSampleName() {

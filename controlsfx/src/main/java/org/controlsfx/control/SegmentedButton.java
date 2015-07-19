@@ -91,6 +91,18 @@ import javafx.scene.control.ToggleGroup;
  * SegmentedButton segmentedButton = new SegmentedButton();   
  * segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
  * }</pre>
+ *
+ * <h3>Resizable Range</h3>
+ * <p>By default, the maximum width and height of a SegmentedButton match its
+ * preferred width and height. Thus, the SegmentedButton only fills the area
+ * which is necessary to display the contained buttons. To change this behavior,
+ * the following code can be used:
+ *
+ * <pre>
+ * {@code
+ * SegmentedButton segmentedButton = new SegmentedButton();
+ * segmentedButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+ * }</pre>
  * 
  * @see ToggleButton
  * @see ToggleGroup

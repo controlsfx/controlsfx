@@ -76,7 +76,7 @@ import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
-import com.sun.javafx.scene.control.skin.VirtualScrollBar;
+import javafx.scene.control.ScrollBar;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -393,11 +393,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return getFlow().getCells().size();
     }
 
-    public VirtualScrollBar getHBar() {
+    public ScrollBar getHBar() {
         return getFlow().getHorizontalBar();
     }
 
-    public VirtualScrollBar getVBar() {
+    public ScrollBar getVBar() {
         return getFlow().getVerticalBar();
     }
 

@@ -501,6 +501,7 @@ public class VerticalHeader extends StackPane {
             if (event.isPrimaryButtonDown()) {
                 if (event.getClickCount() == 2) {
                     skin.resizeRowToFitContent(row);
+                    requestLayout();
                 } else {
                     headerClicked(row, event);
                 }

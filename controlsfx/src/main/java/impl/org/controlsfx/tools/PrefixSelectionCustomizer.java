@@ -104,7 +104,7 @@ public class PrefixSelectionCustomizer {
 
         private <T> void keyPressed(KeyEvent event) {
             KeyCode code = event.getCode();
-            if (code.isLetterKey() || code.isDigitKey()) {
+            if (code.isLetterKey() || code.isDigitKey() || code == KeyCode.SPACE) {
                 String letter = code.impl_getChar();
                 if (event.getSource() instanceof ComboBox) {
                     ComboBox<T> comboBox = (ComboBox<T>) event.getSource();

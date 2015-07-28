@@ -318,7 +318,14 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     if (tempHeight > customHeight) {
                         skin.rowHeightMap.put(index, tempHeight);
                         for (CellView cell : cells) {
-                            cell.resize(cell.getWidth(), tempHeight);//cell.getHeight() + (tempHeight - GridViewSkin.DEFAULT_CELL_HEIGHT));
+                            /**
+                             * We need to add the difference between the
+                             * previous height and the new height. If we were
+                             * just setting the new height, the row spanning
+                             * cell would be shorter. That's why we need to use
+                             * the cell height.
+                             */
+                            cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - customHeight));
                         }
                         customHeight = tempHeight;
                         skin.getFlow().layoutChildren();

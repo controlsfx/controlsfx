@@ -29,9 +29,8 @@ public class DistinctMappingList<V, E> extends ObservableListBase<E> {
                 wasAdded(c, backing);
             } else if (c.wasRemoved()) {
                 wasRemoved(c, backing);
-            } else {
-                // throw just for the example
-                throw new IllegalStateException("unexpected change " + c);
+            } else if (c.wasPermutated()) {
+                //not sure
             }
         }
         endChange();

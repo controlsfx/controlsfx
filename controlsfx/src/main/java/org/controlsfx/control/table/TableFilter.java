@@ -54,9 +54,11 @@ public final class TableFilter<T> {
     private final TableView<T> tableView;
     private final ObservableList<T> backingList;
     private final FilteredList<T> filteredList;
-    
+    private final SortedList<T> sortedControlList;
+
     private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
-    /**Constructor applies a filtering control to the provided {@link TableView} instance. 
+
+    /**Constructor applies a filtering control to the provided {@link TableView} instance.
      * 
      * @param tableView
      */
@@ -64,8 +66,13 @@ public final class TableFilter<T> {
         this.tableView = tableView;
         this.backingList = tableView.getItems();
         this.filteredList = new FilteredList<>(new SortedList<>(backingList));
+        this.sortedControlList = new SortedList<>(this.filteredList);
+
         this.filteredList.setPredicate(v -> true);
-        tableView.setItems(filteredList);
+
+        sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
+        tableView.setItems(sortedControlList);
+
         this.applyForAllColumns();
     }
     /**

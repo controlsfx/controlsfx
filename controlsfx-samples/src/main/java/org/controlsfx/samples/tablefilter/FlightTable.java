@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,7 +52,10 @@ public final class FlightTable extends Application {
         BorderPane borderPane = new BorderPane();
         Scene scene = new Scene(borderPane, 800, 600);
 
-        table.setItems(flights);
+        SortedList<Flight> sortedList = new SortedList<>(flights);
+        table.setItems(sortedList);
+        sortedList.comparatorProperty().bind(table.comparatorProperty());
+
         table.setEditable(true);
         TableColumn<Flight, Integer> flightNumCol = new TableColumn<>("FLIGHT NUM");
         flightNumCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper(cellData.getValue().getFlightNumber()));

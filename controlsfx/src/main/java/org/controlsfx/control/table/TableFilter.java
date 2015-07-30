@@ -27,16 +27,15 @@
 package org.controlsfx.control.table;
 
 import impl.org.controlsfx.table.ColumnFilter;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**Applies a filtering control to a provided {@link TableView} instance. 
@@ -100,7 +99,7 @@ public final class TableFilter<T> {
      * @treatAsPrivate
      */
     public void executeFilter() { 
-        filteredList.setPredicate(v -> columnFilters.stream()
+        filteredList.setPredicate(v -> columnFilters.parallelStream()
                 .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).map(ov -> ov.getSelectedProperty().getValue() == false).orElse(false))
                 .findAny().isPresent() == false);
     }

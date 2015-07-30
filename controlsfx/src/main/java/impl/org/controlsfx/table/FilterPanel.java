@@ -26,32 +26,24 @@
  */
 package impl.org.controlsfx.table;
 
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 import impl.org.controlsfx.table.ColumnFilter.FilterValue;
-
-import java.util.Comparator;
-import java.util.function.Function;
-
 import javafx.beans.Observable;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
+import java.util.Comparator;
+import java.util.function.Function;
 
 
 
@@ -92,6 +84,7 @@ public final class FilterPanel<T> extends Pane {
         HBox bttnBox = new HBox();
         Button applyBttn = new Button("APPLY");
 
+        HBox.setHgrow(bttnBox, Priority.ALWAYS);
         applyBttn.setOnAction(e -> {
         	if (searchMode) { 
         		filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
@@ -110,15 +103,18 @@ public final class FilterPanel<T> extends Pane {
         
         //initialize reset buttons
         Button clearButton = new Button("RESET");
+        HBox.setHgrow(clearButton, Priority.ALWAYS);
 
         clearButton.setOnAction(e -> {
-        	columnFilter.resetAllFilters();
-        	filterList.setPredicate(v -> true);
+            columnFilter.resetAllFilters();
+            filterList.setPredicate(v -> true);
         });
 
         bttnBox.getChildren().add(clearButton);
 
         Button clearAllButton = new Button("RESET ALL");
+        HBox.setHgrow(clearAllButton, Priority.ALWAYS);
+
         clearAllButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
         });

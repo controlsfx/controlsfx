@@ -99,9 +99,10 @@ public final class TableFilter<T> {
      * @treatAsPrivate
      */
     public void executeFilter() { 
-        filteredList.setPredicate(v -> columnFilters.parallelStream()
-                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(v)).map(ov -> ov.getSelectedProperty().getValue() == false).orElse(false))
-                .findAny().isPresent() == false);
+        filteredList.setPredicate(r -> !columnFilters.parallelStream()
+                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(r))
+                        .map(ov -> !ov.getSelectedProperty().getValue()).orElse(false))
+                .findAny().isPresent());
     }
     /** 
      * @treatAsPrivate

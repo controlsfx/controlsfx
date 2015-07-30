@@ -31,6 +31,7 @@ import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import impl.org.controlsfx.table.ColumnFilter.FilterValue;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -43,6 +44,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.Function;
 
 
@@ -131,7 +133,7 @@ public final class FilterPanel<T> extends Pane {
         
         CheckItem(ColumnFilter.FilterValue filterValue) {
         	this.filterValue = filterValue;
-            label.setText(filterValue.getValueProperty().getValue().toString());
+            label.setText(Optional.ofNullable(filterValue.getValueProperty()).map(ObservableValue::getValue).map(Object::toString).orElse(null));
             
             filterValue.getInScopeProperty().addListener((Observable v) -> label.textFillProperty().set(filterValue.getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
             checkBox.selectedProperty().bindBidirectional(filterValue.getSelectedProperty());

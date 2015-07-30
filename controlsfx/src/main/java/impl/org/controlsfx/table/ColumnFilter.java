@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.table;
 
-import java.util.Optional;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -35,8 +33,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
-
 import org.controlsfx.control.table.TableFilter;
+
+import java.util.Optional;
 
 public final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
@@ -114,13 +113,13 @@ public final class ColumnFilter<T> {
 
             FilterValue that = (FilterValue) o;
 
-            return value.getValue().equals(that.value.getValue());
+            return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue)) || value.getValue().equals(that.value.getValue());
 
         }
 
         @Override
         public int hashCode() {
-            return value.getValue().hashCode();
+            return value == null || value.getValue() == null ? 0 : value.getValue().hashCode();
         }
     }
     public ObservableList<FilterValue> getFilterValues() {
@@ -135,7 +134,8 @@ public final class ColumnFilter<T> {
     }
 
     public Optional<FilterValue> getFilterValue(ObservableValue<?> value) {
-        return filterValues.stream().filter(fv -> fv.value.getValue().equals(value.getValue())).findAny();
+        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.value).map(v -> v.getValue())
+                .equals(Optional.ofNullable(value).map(v ->v.getValue()))).findAny();
     }
 
     /**Leverages tableColumn's context menu to attach filter panel */

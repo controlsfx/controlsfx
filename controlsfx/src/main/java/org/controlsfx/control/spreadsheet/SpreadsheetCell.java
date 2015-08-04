@@ -143,7 +143,7 @@ public interface SpreadsheetCell {
      * that, like the HTML style attribute, this variable contains style
      * properties and values and not the selector portion of a style rule.
      *
-     * @return
+     * @return a string representation of the CSS style
      */
     public StringProperty styleProperty();
     

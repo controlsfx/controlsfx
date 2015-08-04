@@ -708,7 +708,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         
         if (spreadsheetView.isShowRowHeader() || !spreadsheetView.getRowPickers().isEmpty()) {
             x += verticalHeaderWidth;
-            w -=  verticalHeaderWidth;
+            w -= verticalHeaderWidth;
+        } else {
+            x = 0.0;
         }
 
         

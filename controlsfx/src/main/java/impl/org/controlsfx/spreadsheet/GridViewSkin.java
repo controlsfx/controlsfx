@@ -208,6 +208,13 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * visual to come.
      */
     BooleanProperty lastRowLayout = new SimpleBooleanProperty(true);
+    
+    /**
+     * This boolean is set to "true" when "we" (not the system) are asking to
+     * resize a column. If it's the system, it's at initialisation and some
+     * columns which width have been set to default width must not be resized.
+     */
+    private boolean columnFit = false;
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -554,10 +561,19 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (cell == null) {
             return;
         }
-
+        
         //The current index of that column
         int indexColumn = handle.getGridView().getColumns().indexOf(tc);
         
+        /**
+         * This is to prevent resize of columns that have the same default width
+         * at initialisation.
+         */
+        if(handle.isColumnWidthSet(indexColumn) && !columnFit){
+            return;
+        }
+        
+        columnFit = false;
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
@@ -675,8 +691,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * 
      * @param tc
      */
-    void resize(TableColumnBase<?, ?> tc) {
+    public void resize(TableColumnBase<?, ?> tc) {
         if(tc.isResizable()){
+            columnFit = true;
             resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), 30);
         }
     }

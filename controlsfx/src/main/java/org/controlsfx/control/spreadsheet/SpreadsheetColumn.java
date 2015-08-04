@@ -187,6 +187,7 @@ public final class SpreadsheetColumn {
      */
     public void setPrefWidth(double width) {
         column.setPrefWidth(Math.ceil(width));
+        spreadsheetView.columnWidthSet(indexColumn);
     }
 
     /**
@@ -213,7 +214,7 @@ public final class SpreadsheetColumn {
      */
     public void fitColumn() {
         if (column.isResizable() && spreadsheetView.getCellsViewSkin() != null) {
-            spreadsheetView.getCellsViewSkin().resizeColumnToFitContent(column, 30);
+            spreadsheetView.getCellsViewSkin().resize(column);
         }
     }
 

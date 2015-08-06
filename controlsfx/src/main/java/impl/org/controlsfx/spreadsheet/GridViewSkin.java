@@ -414,9 +414,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * But I don't see other solutions right now.
      */
     public void resizeRowsToFitContent() {
+        Grid grid = spreadsheetView.getGrid();
         int maxRows = handle.getView().getGrid().getRowCount();
         for (int row = 0; row < maxRows; row++) {
-            if (spreadsheetView.getGrid().isRowResizable(row)) {
+            if (grid.isRowResizable(row)) {
                 resizeRowToFitContent(row);
             }
         }
@@ -492,6 +493,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         //First we resize to fit.
         resizeRowsToFitContent();
         
+        Grid grid = spreadsheetView.getGrid();
+        
         //Then we take the maximum and apply it everywhere.
         double maxHeight = 0;
         for(int key:rowHeightMap.keySet()){
@@ -501,7 +504,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         rowHeightMap.clear();
         int maxRows = handle.getView().getGrid().getRowCount();
         for (int row = 0; row < maxRows; row++) {
-            if (spreadsheetView.getGrid().isRowResizable(row)) {
+            if (grid.isRowResizable(row)) {
                 rowHeightMap.put(row, maxHeight);
             }
         }
@@ -510,17 +513,19 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     
     public void resizeRowsToDefault() {
         rowHeightMap.clear();
-
+        Grid grid = spreadsheetView.getGrid();
         /**
          * When resizing to default, we need to go through the visible rows in
          * order to update them directly. Because if the rowHeightMap is empty,
          * the rows will not detect that maybe the height has changed.
          */
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double newHeight = row.computePrefHeight(-1);
-            if (row.getPrefHeight() != newHeight) {
-                row.setRowHeight(newHeight);
-                row.requestLayout();
+            if (grid.isRowResizable(row.getIndex())) {
+                double newHeight = row.computePrefHeight(-1);
+                if (row.getPrefHeight() != newHeight) {
+                    row.setRowHeight(newHeight);
+                    row.requestLayout();
+                }
             }
         }
 
@@ -530,7 +535,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
             double height = getRowHeight(row.getIndex());
             if (row.getHeight() != height) {
-                if (spreadsheetView.getGrid().isRowResizable(row.getIndex())) {
+                if (grid.isRowResizable(row.getIndex())) {
                     row.setRowHeight(height);
                 }
             }

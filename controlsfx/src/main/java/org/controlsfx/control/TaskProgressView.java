@@ -90,7 +90,7 @@ public class TaskProgressView<T extends Task<?>> extends Control {
                                     taskHandler);
                         }
                     } else if (c.wasRemoved()) {
-                        for (Task<?> task : c.getAddedSubList()) {
+                        for (Task<?> task : c.getRemoved()) {
                             task.removeEventHandler(WorkerStateEvent.ANY,
                                     taskHandler);
                         }

@@ -71,9 +71,9 @@ import javafx.util.Callback;
  *       
  * // and listen to the relevant events (e.g. when the selected indices or 
  * // selected items change).
- * checkListView.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
+ * checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
  *     public void onChanged(ListChangeListener.Change<? extends String> c) {
- *         System.out.println(checkListView.getCheckModel().getSelectedItems());
+ *         System.out.println(checkListView.getCheckModel().getCheckedItems());
  *     }
  * });
  * }</pre>

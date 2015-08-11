@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -116,6 +116,37 @@ public interface SpreadsheetCell {
      */
     public void setEditable(boolean editable);
 
+    /**
+     * A string representation of the CSS style associated with this specific
+     * Node. This is analogous to the "style" attribute of an HTML element. Note
+     * that, like the HTML style attribute, this variable contains style
+     * properties and values and not the selector portion of a style rule.
+     *
+     * @param style
+     */
+    public void setStyle(String style);
+    
+    /**
+     * A string representation of the CSS style associated with this specific
+     * Node. This is analogous to the "style" attribute of an HTML element. Note
+     * that, like the HTML style attribute, this variable contains style
+     * properties and values and not the selector portion of a style rule.
+     *
+     * @return The inline CSS style associated with this Node. If this Node does
+     * not have an inline style, an empty String is returned.
+     */
+    public String getStyle();
+    
+    /**
+     * A string representation of the CSS style associated with this specific
+     * Node. This is analogous to the "style" attribute of an HTML element. Note
+     * that, like the HTML style attribute, this variable contains style
+     * properties and values and not the selector portion of a style rule.
+     *
+     * @return a string representation of the CSS style
+     */
+    public StringProperty styleProperty();
+    
     /**
      * This activate the given cornerPosition.
      * @param position

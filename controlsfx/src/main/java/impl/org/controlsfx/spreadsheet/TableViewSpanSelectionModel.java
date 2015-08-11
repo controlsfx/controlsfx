@@ -379,7 +379,7 @@ public class TableViewSpanSelectionModel extends
             if (position.getKey() < 0
                     || position.getKey() >= itemCount
                     || position.getValue() < 0
-                    || position.getValue() > columnSize) {
+                    || position.getValue() >= columnSize) {
                 continue;
             }
 
@@ -562,7 +562,9 @@ public class TableViewSpanSelectionModel extends
 
         if (tp != null) {
             select(tp.getRow(), tp.getTableColumn());
-            getTableView().getFocusModel().focus(tp.getRow(), tp.getTableColumn());
+            //Just like verticalHeader, the focus should be put on the 
+            //first cell to ease copy/paste operation.
+            getTableView().getFocusModel().focus(0, getTableView().getColumns().get(0));
         }
     }
 

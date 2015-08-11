@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,4 +39,6 @@ public abstract class SpreadsheetHandle {
 	protected abstract SpreadsheetGridView getGridView();
 	/** Accesses the grid view (ie cell table view). */
 	protected abstract GridViewSkin getCellsViewSkin();
+        /** Whether that column width has been set by the user. */
+        protected abstract boolean isColumnWidthSet(int indexColumn);
 }

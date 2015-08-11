@@ -29,7 +29,6 @@ package impl.org.controlsfx.spreadsheet;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 
-import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -49,6 +48,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.image.Image;
@@ -254,7 +254,7 @@ public class VerticalHeader extends StackPane {
                 getChildren().add(label);
             }
 
-            VirtualScrollBar hbar = handle.getCellsViewSkin().getHBar();
+            ScrollBar hbar = handle.getCellsViewSkin().getHBar();
             //FIXME handle height.
             if (hbar.isVisible()) {
                 // Last one blank and on top (z-order) of the others
@@ -499,7 +499,12 @@ public class VerticalHeader extends StackPane {
         // We want to select the whole row when clicking on a header.
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
-                headerClicked(row, event);
+                if (event.getClickCount() == 2) {
+                    skin.resizeRowToFitContent(row);
+                    requestLayout();
+                } else {
+                    headerClicked(row, event);
+                }
             }
         });
         return label;

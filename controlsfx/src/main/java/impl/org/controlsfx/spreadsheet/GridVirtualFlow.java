@@ -27,7 +27,6 @@
 package impl.org.controlsfx.spreadsheet;
 
 import com.sun.javafx.scene.control.skin.VirtualFlow;
-import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,6 +39,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableRow;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
@@ -213,6 +213,18 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             super.layoutChildren();
             layoutTotal();
             layoutFixedRows();
+            
+            /**
+             * Sometimes, the visible amount is not computed when we have few
+             * big rows. If we detect that case, we must compute it manually
+             * otherwise the Vbar is wrongly set.
+             */
+            if (getVbar().getVisibleAmount() == 0.0
+                    && getVbar().isVisible()
+                    && getCells().size() != getCellCount()) {
+                getVbar().setMax(1);
+                getVbar().setVisibleAmount(getCells().size() / (float) getCellCount());
+            }
         }
     }
 
@@ -244,10 +256,10 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         }
     }
 
-    protected VirtualScrollBar getVerticalBar() {
+    protected ScrollBar getVerticalBar() {
         return getVbar();
     }
-    protected VirtualScrollBar getHorizontalBar() {
+    protected ScrollBar getHorizontalBar() {
         return getHbar();
     }
 

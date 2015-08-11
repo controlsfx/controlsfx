@@ -304,8 +304,18 @@ public class SpreadsheetView extends Control {
      */
     private final DoubleProperty rowHeaderWidth = new SimpleDoubleProperty(DEFAULT_ROW_HEADER_WIDTH);
 
+    /**
+     * Since the default with applied to TableColumn is 80. If a user sets a
+     * width of 80, the column will be detected as having the default with and
+     * therefore will be requested to be autosized. In order to prevent that, we
+     * must detect which columns has been specifically set and which not. With
+     * that BitSet, we are able to make the difference between a "default" 80
+     * width applied by the system, and a 80 width applid by a user.
+     */
+    private final BitSet columnWidthSet = new BitSet();
     // The handle that bridges with implementation.
     final SpreadsheetHandle handle = new SpreadsheetHandle() {
+        
         @Override
         protected SpreadsheetView getView() {
             return SpreadsheetView.this;
@@ -319,6 +329,11 @@ public class SpreadsheetView extends Control {
         @Override
         protected SpreadsheetGridView getGridView() {
             return SpreadsheetView.this.getCellsView();
+        }
+
+        @Override
+        protected boolean isColumnWidthSet(int indexColumn) {
+            return columnWidthSet.get(indexColumn);
         }
     };
 
@@ -334,6 +349,16 @@ public class SpreadsheetView extends Control {
      */
     final SpreadsheetGridView getCellsView() {
         return cellsView;
+    }
+    
+    /**
+     * Used by {@link SpreadsheetColumn} internally in order to specify if a
+     * column width has been set by the user.
+     *
+     * @param indexColumn
+     */
+    void columnWidthSet(int indexColumn) {
+        columnWidthSet.set(indexColumn);
     }
 
     /***************************************************************************
@@ -554,6 +579,17 @@ public class SpreadsheetView extends Control {
      */
     public TablePosition<ObservableList<SpreadsheetCell>, ?> getEditingCell() {
         return cellsView.getEditingCell();
+    }
+    
+    /**
+     * Represents the current cell being edited, or null if there is no cell
+     * being edited.
+     *
+     * @return the current cell being edited, or null if there is no cell being
+     * edited.
+     */
+    public ReadOnlyObjectProperty<TablePosition<ObservableList<SpreadsheetCell>, ?>> editingCellProperty() {
+        return cellsView.editingCellProperty();
     }
 
     /**
@@ -1392,7 +1428,7 @@ public class SpreadsheetView extends Control {
         for (int row = 0; row < gridBase.getRowCount(); ++row) {
             ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
             for (int column = 0; column < gridBase.getColumnCount(); ++column) {
-                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, "toto"));
             }
             rows.add(currentRow);
         }

@@ -61,8 +61,6 @@ import javafx.stage.Window;
 import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.ValidationSupport;
 
-import com.sun.javafx.css.StyleManager;
-
 /**
  * <p>The API for creating multi-page Wizards, based on JavaFX {@link Dialog} API.<br> 
  * Wizard can be setup in following few steps:</p>
@@ -120,18 +118,6 @@ import com.sun.javafx.css.StyleManager;
  * };}</pre>
  */
 public class Wizard {
-    
-    
-    /**************************************************************************
-     * 
-     * Static fields
-     * 
-     **************************************************************************/
-	static {
-		// refer to ControlsFXControl for why this is necessary
-		StyleManager.getInstance().addUserAgentStylesheet(
-				Wizard.class.getResource("wizard.css").toExternalForm()); //$NON-NLS-1$
-	}
     
     
     /**************************************************************************

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,16 +45,8 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.TaskProgressView;
 
-import com.sun.javafx.css.StyleManager;
-
 public class TaskProgressViewSkin<T extends Task<?>> extends
         SkinBase<TaskProgressView<T>> {
-
-    static {
-        StyleManager.getInstance().addUserAgentStylesheet(
-                TaskProgressView.class
-                        .getResource("taskprogressview.css").toExternalForm()); //$NON-NLS-1$
-    }
 
     public TaskProgressViewSkin(TaskProgressView<T> monitor) {
         super(monitor);

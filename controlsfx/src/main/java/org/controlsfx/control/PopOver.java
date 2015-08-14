@@ -339,6 +339,9 @@ public class PopOver extends PopupControl {
     public final void show(Window owner) {
         super.show(owner);
         ownerWindow = owner;
+
+        showFadeInAnimation(DEFAULT_FADE_DURATION);
+
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
     }
@@ -348,6 +351,9 @@ public class PopOver extends PopupControl {
     public final void show(Window ownerWindow, double anchorX, double anchorY) {
         super.show(ownerWindow, anchorX, anchorY);
         this.ownerWindow = ownerWindow;
+
+        showFadeInAnimation(DEFAULT_FADE_DURATION);
+
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
     }
@@ -445,6 +451,14 @@ public class PopOver extends PopupControl {
 
         super.show(owner, x, y);
 
+        showFadeInAnimation(fadeInDuration);
+
+        // Bug fix - close popup when owner window is closing
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                closePopOverOnOwnerWindowClose);
+    }
+
+    private void showFadeInAnimation(Duration fadeInDuration) {
         // Fade In
         Node skinNode = getSkin().getNode();
         skinNode.setOpacity(0);
@@ -453,10 +467,6 @@ public class PopOver extends PopupControl {
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
         fadeIn.play();
-
-        // Bug fix - close popup when owner window is closing
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                closePopOverOnOwnerWindowClose);
     }
 
     private void ownerWindowClosing() {

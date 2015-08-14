@@ -249,7 +249,7 @@ public class PopOver extends PopupControl {
         @Override
         public void changed(ObservableValue<? extends Number> value,
                 Number oldX, Number newX) {
-            setX(getX() + (newX.doubleValue() - oldX.doubleValue()));
+            setAnchorX(getAnchorX() + (newX.doubleValue() - oldX.doubleValue()));
         }
     };
 
@@ -260,7 +260,7 @@ public class PopOver extends PopupControl {
         @Override
         public void changed(ObservableValue<? extends Number> value,
                 Number oldY, Number newY) {
-            setY(getY() + (newY.doubleValue() - oldY.doubleValue()));
+            setAnchorY(getAnchorY() + (newY.doubleValue() - oldY.doubleValue()));
         }
     };
 
@@ -511,26 +511,26 @@ public class PopOver extends PopupControl {
         case TOP_CENTER:
         case TOP_LEFT:
         case TOP_RIGHT:
-            setX(getX() + bounds.getMinX() - computeXOffset());
-            setY(getY() + bounds.getMinY() + getArrowSize());
+            setAnchorX(getAnchorX() + bounds.getMinX() - computeXOffset());
+            setAnchorY(getAnchorY() + bounds.getMinY() + getArrowSize());
             break;
         case LEFT_TOP:
         case LEFT_CENTER:
         case LEFT_BOTTOM:
-            setX(getX() + bounds.getMinX() + getArrowSize());
-            setY(getY() + bounds.getMinY() - computeYOffset());
+            setAnchorX(getAnchorX() + bounds.getMinX() + getArrowSize());
+            setAnchorY(getAnchorY() + bounds.getMinY() - computeYOffset());
             break;
         case BOTTOM_CENTER:
         case BOTTOM_LEFT:
         case BOTTOM_RIGHT:
-            setX(getX() + bounds.getMinX() - computeXOffset());
-            setY(getY() - bounds.getMinY() - bounds.getMaxY() - 1);
+            setAnchorX(getAnchorX() + bounds.getMinX() - computeXOffset());
+            setAnchorY(getAnchorY() - bounds.getMinY() - bounds.getMaxY() - 1);
             break;
         case RIGHT_TOP:
         case RIGHT_BOTTOM:
         case RIGHT_CENTER:
-            setX(getX() - bounds.getMinX() - bounds.getMaxX() - 1);
-            setY(getY() + bounds.getMinY() - computeYOffset());
+            setAnchorX(getAnchorX() - bounds.getMinX() - bounds.getMaxX() - 1);
+            setAnchorY(getAnchorY() + bounds.getMinY() - computeYOffset());
             break;
         }
     }

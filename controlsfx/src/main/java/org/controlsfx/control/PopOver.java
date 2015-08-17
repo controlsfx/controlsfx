@@ -26,6 +26,8 @@
  */
 package org.controlsfx.control;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import impl.org.controlsfx.skin.PopOverSkin;
@@ -117,7 +119,7 @@ public class PopOver extends PopupControl {
         /*
          * Create some initial content.
          */
-        Label label = new Label("<No Content>"); //$NON-NLS-1$
+        Label label = new Label(localize(asKey("popOver.default.content"))); //$NON-NLS-1$
         label.setPrefSize(200, 200);
         label.setPadding(new Insets(4));
         setContentNode(label);
@@ -787,7 +789,7 @@ public class PopOver extends PopupControl {
     // Detached stage title
 
     private final StringProperty detachedTitle = new SimpleStringProperty(this,
-            "detachedTitle", "Info"); //$NON-NLS-1$ //$NON-NLS-2$
+            "detachedTitle", localize(asKey("popOver.default.title"))); //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Stores the title to display when the pop over becomes detached.

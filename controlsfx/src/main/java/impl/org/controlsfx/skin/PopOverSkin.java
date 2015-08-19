@@ -130,7 +130,7 @@ public class PopOverSkin implements Skin<PopOver> {
         closeIcon.setGraphic(createCloseIcon());
         closeIcon.setMaxSize(MAX_VALUE, MAX_VALUE);
         closeIcon.setContentDisplay(GRAPHIC_ONLY);
-        closeIcon.visibleProperty().bind(popOver.detachedProperty());
+        closeIcon.visibleProperty().bind(popOver.detachedProperty().or(popOver.headerAlwaysVisibleProperty()));
         closeIcon.getStyleClass().add("icon"); //$NON-NLS-1$
         closeIcon.setAlignment(CENTER_LEFT);
         closeIcon.getGraphic().setOnMouseClicked(evt -> popOver.hide());
@@ -144,7 +144,7 @@ public class PopOverSkin implements Skin<PopOver> {
         content.setCenter(popOver.getContentNode());
         content.getStyleClass().add("content"); //$NON-NLS-1$
 
-        if (popOver.isDetached()) {
+        if (popOver.isDetached() || popOver.isHeaderAlwaysVisible()) {
             content.setTop(titlePane);
             popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
             content.getStyleClass().add(DETACHED_STYLE_CLASS);
@@ -184,7 +184,10 @@ public class PopOverSkin implements Skin<PopOver> {
                     } else {
                         popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
                         content.getStyleClass().remove(DETACHED_STYLE_CLASS);
-                        content.setTop(null);
+
+                        if (!popOver.isHeaderAlwaysVisible()) {
+                            content.setTop(null);
+                        }
                     }
 
                     popOver.sizeToScene();

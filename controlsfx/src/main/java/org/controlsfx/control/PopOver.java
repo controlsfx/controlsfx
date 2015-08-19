@@ -597,6 +597,41 @@ public class PopOver extends PopupControl {
         }
     }
 
+    // always show header
+
+    private final BooleanProperty headerAlwaysVisible = new SimpleBooleanProperty(this, "headerAlwaysVisible"); //$NON-NLS-1$
+
+    /**
+     * Determines whether or not the {@link PopOver} header should remain visible, even while attached.
+     */
+    public BooleanProperty headerAlwaysVisibleProperty() {
+        return headerAlwaysVisible;
+    }
+
+    /**
+     * Sets the value of the headerAlwaysVisible property.
+     *
+     * @param visible
+     *            if true, then the header is visible even while attached
+     *
+     * @see #headerAlwaysVisibleProperty()
+     */
+    public final void setHeaderAlwaysVisible(boolean visible) {
+        headerAlwaysVisible.setValue(visible);
+    }
+
+    /**
+     * Returns the value of the detachable property.
+     *
+     * @return true if the header is visible even while attached
+     *
+     * @see #headerAlwaysVisibleProperty()
+     */
+    public final boolean isHeaderAlwaysVisible() {
+        return headerAlwaysVisible.getValue();
+    }
+
+
     // detach support
 
     private final BooleanProperty detachable = new SimpleBooleanProperty(this,

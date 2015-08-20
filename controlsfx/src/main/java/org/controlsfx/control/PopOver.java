@@ -604,7 +604,7 @@ public class PopOver extends PopupControl {
     /**
      * Determines whether or not the {@link PopOver} header should remain visible, even while attached.
      */
-    public BooleanProperty headerAlwaysVisibleProperty() {
+    public final BooleanProperty headerAlwaysVisibleProperty() {
         return headerAlwaysVisible;
     }
 

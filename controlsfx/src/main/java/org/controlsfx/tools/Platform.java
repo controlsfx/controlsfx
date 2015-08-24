@@ -65,19 +65,19 @@ public enum Platform {
     
     private static Platform getCurrentPlatform() {
         String osName = System.getProperty("os.name");
-        if ( osName.startsWith("Windows") ) return WINDOWS;
+        if ( osName.startsWith("Windows") ) return WINDOWS;        
         if ( osName.startsWith("Mac") )     return OSX;
-		if ( osName.startsWith("SunOS") )   return UNIX;
-		if ( osName.startsWith("Linux") ) {
+        if ( osName.startsWith("SunOS") )   return UNIX;
+        if ( osName.startsWith("Linux") ) {
             String javafxPlatform = AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
                 public String run() {
                     return System.getProperty("javafx.platform");
                 }
             });
-			if (! ( "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name")) ) ) // if not Android
-				return UNIX;
-		}
+            if (! ( "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name")) ) ) // if not Android
+                return UNIX;
+        }
         return UNKNOWN;
     }
     

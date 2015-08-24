@@ -26,7 +26,6 @@
  */
 package org.controlsfx.tools;
 
-import com.sun.javafx.Utils;
 /**
  * Represents operating system with appropriate properties 
  *

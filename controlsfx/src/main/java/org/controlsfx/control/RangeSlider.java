@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.RangeSliderSkin;
+import org.controlsfx.tools.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +54,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.Slider;
 
-import com.sun.javafx.Utils;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;

@@ -44,8 +44,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.Rating;
+import org.controlsfx.tools.Utils;
 
-import com.sun.javafx.Utils;
 import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 

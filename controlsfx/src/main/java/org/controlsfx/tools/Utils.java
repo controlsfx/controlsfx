@@ -91,7 +91,7 @@ public class Utils {
         return letter;
     }
 	
-	public static boolean isWindows() { return PlatformUtil.isWindows();}
+    public static boolean isWindows() { return PlatformUtil.isWindows();}
     public static boolean isMac() { return PlatformUtil.isMac(); }
     public static boolean isUnix() { return PlatformUtil.isUnix(); }
 

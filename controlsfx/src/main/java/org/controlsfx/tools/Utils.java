@@ -26,8 +26,6 @@
  */
 package org.controlsfx.tools;
 
-import com.sun.javafx.PlatformUtil;
-
 import java.util.Iterator;
 
 import javafx.scene.Node;
@@ -91,10 +89,6 @@ public class Utils {
         return letter;
     }
 	
-    public static boolean isWindows() { return PlatformUtil.isWindows();}
-    public static boolean isMac() { return PlatformUtil.isMac(); }
-    public static boolean isUnix() { return PlatformUtil.isUnix(); }
-
     /**
      * Simple utility function which clamps the given value to be strictly
      * between the min and max values.

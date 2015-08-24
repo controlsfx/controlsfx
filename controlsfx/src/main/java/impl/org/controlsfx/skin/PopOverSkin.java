@@ -146,9 +146,20 @@ public class PopOverSkin implements Skin<PopOver> {
 
         if (popOver.isDetached() || popOver.isHeaderAlwaysVisible()) {
             content.setTop(titlePane);
+        }
+
+        if (popOver.isDetached()) {
             popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
             content.getStyleClass().add(DETACHED_STYLE_CLASS);
         }
+
+        popOver.headerAlwaysVisibleProperty().addListener((o, oV, isVisible) -> {
+            if (isVisible) {
+                content.setTop(titlePane);
+            } else if (!popOver.isDetached()) {
+                content.setTop(null);
+            }
+        });
 
         InvalidationListener updatePathListener = observable -> updatePath();
         getPopupWindow().xProperty().addListener(updatePathListener);

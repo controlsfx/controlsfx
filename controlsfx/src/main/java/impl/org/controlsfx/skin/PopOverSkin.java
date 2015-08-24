@@ -121,7 +121,7 @@ public class PopOverSkin implements Skin<PopOver> {
         stackPane.minHeightProperty().bind(stackPane.minWidthProperty());
 
         title = new Label();
-        title.textProperty().bind(popOver.detachedTitleProperty());
+        title.textProperty().bind(popOver.titleProperty());
         title.setMaxSize(MAX_VALUE, MAX_VALUE);
         title.setAlignment(Pos.CENTER);
         title.getStyleClass().add("text"); //$NON-NLS-1$

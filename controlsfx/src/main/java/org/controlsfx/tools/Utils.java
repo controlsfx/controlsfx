@@ -28,11 +28,17 @@ package org.controlsfx.tools;
 
 import java.util.Iterator;
 
+import com.sun.javafx.scene.text.TextLayout;
+import com.sun.javafx.tk.Toolkit;
 import javafx.scene.Node;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextBoundsType;
 import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 
 public class Utils {
+
+    private static final TextLayout layout = Toolkit.getToolkit().getTextLayoutFactory().createLayout();
 
     /**
      * Will return a {@link Window} from an object if any can be found. {@code null}
@@ -87,5 +93,33 @@ public class Utils {
         }
 
         return letter;
+    }
+
+    /* Using TextLayout directly for simple text measurement.
+     * Instead of restoring the TextLayout attributes to default values
+     * (each renders the TextLayout unable to efficiently cache layout data).
+     * It always sets all the attributes pertinent to calculation being performed.
+     * Note that lineSpacing and boundsType are important when computing the height
+     * but irrelevant when computing the width.
+     *
+     * Note: This code assumes that TextBoundsType#VISUAL is never used by controls.
+     * */
+
+    public static double computeTextWidth(Font font, String text, double wrappingWidth) {
+        layout.setContent(text != null ? text : "", font.impl_getNativeFont());
+        layout.setWrapWidth((float)wrappingWidth);
+        return layout.getBounds().getWidth();
+    }
+
+    public static double computeTextHeight(Font font, String text, double wrappingWidth, double lineSpacing, TextBoundsType boundsType) {
+        layout.setContent(text != null ? text : "", font.impl_getNativeFont());
+        layout.setWrapWidth((float)wrappingWidth);
+        layout.setLineSpacing((float)lineSpacing);
+        if (boundsType == TextBoundsType.LOGICAL_VERTICAL_CENTER) {
+            layout.setBoundsType(TextLayout.BOUNDS_CENTER);
+        } else {
+            layout.setBoundsType(0);
+        }
+        return layout.getBounds().getHeight();
     }
 }

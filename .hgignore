@@ -13,3 +13,4 @@ bin/*
 doc/*
 .settings/*
 build/*
+lib/*

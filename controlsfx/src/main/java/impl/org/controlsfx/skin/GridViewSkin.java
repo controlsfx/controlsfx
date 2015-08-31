@@ -130,7 +130,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
         
         if (newCount != oldCount) {
             flow.setCellCount(newCount);
-            flow.recreateCells();
+            flow.rebuildCells();
         } else {
             flow.reconfigureCells();
         }

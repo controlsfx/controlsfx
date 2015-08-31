@@ -26,7 +26,9 @@
  */
 package org.controlsfx.tools;
 
-import com.sun.javafx.Utils;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 /**
  * Represents operating system with appropriate properties 
  *
@@ -62,9 +64,20 @@ public enum Platform {
     }
     
     private static Platform getCurrentPlatform() {
-        if ( Utils.isWindows() ) return WINDOWS;
-        if ( Utils.isMac() )     return OSX;
-        if ( Utils.isUnix() )    return UNIX;
+        String osName = System.getProperty("os.name");
+        if ( osName.startsWith("Windows") ) return WINDOWS;        
+        if ( osName.startsWith("Mac") )     return OSX;
+        if ( osName.startsWith("SunOS") )   return UNIX;
+        if ( osName.startsWith("Linux") ) {
+            String javafxPlatform = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                @Override
+                public String run() {
+                    return System.getProperty("javafx.platform");
+                }
+            });
+            if (! ( "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name")) ) ) // if not Android
+                return UNIX;
+        }
         return UNKNOWN;
     }
     

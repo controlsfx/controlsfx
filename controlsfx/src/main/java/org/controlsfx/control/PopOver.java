@@ -249,7 +249,9 @@ public class PopOver extends PopupControl {
         @Override
         public void changed(ObservableValue<? extends Number> value,
                 Number oldX, Number newX) {
-            setAnchorX(getAnchorX() + (newX.doubleValue() - oldX.doubleValue()));
+            if (!isDetached()) {
+                setAnchorX(getAnchorX() + (newX.doubleValue() - oldX.doubleValue()));
+            }
         }
     };
 
@@ -260,7 +262,9 @@ public class PopOver extends PopupControl {
         @Override
         public void changed(ObservableValue<? extends Number> value,
                 Number oldY, Number newY) {
-            setAnchorY(getAnchorY() + (newY.doubleValue() - oldY.doubleValue()));
+            if (!isDetached()) {
+                setAnchorY(getAnchorY() + (newY.doubleValue() - oldY.doubleValue()));
+            }
         }
     };
 

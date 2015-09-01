@@ -30,6 +30,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import javafx.beans.value.ObservableValue;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -145,6 +147,11 @@ public class HelloPropertySheet extends ControlsFXSample {
             customDataMap.put(key, value);
         }
 
+        @Override
+        public Optional<ObservableValue<? extends Object>> getObservableValue() {
+            return Optional.empty();
+        }
+
     }
 
     class ActionShowInPropertySheet extends Action {
@@ -229,11 +236,11 @@ public class HelloPropertySheet extends ControlsFXSample {
         CheckBox toolbarModeVisible = new CheckBox("Show Mode Buttons");
         toolbarModeVisible.selectedProperty().bindBidirectional(propertySheet.modeSwitcherVisibleProperty());
 
-        CheckBox toolbarSeacrhVisible = new CheckBox("Show Search Field");
-        toolbarSeacrhVisible.selectedProperty().bindBidirectional(propertySheet.searchBoxVisibleProperty());
+        CheckBox toolbarSearchVisible = new CheckBox("Show Search Field");
+        toolbarSearchVisible.selectedProperty().bindBidirectional(propertySheet.searchBoxVisibleProperty());
 
         infoPane.getChildren().add(toolbarModeVisible);
-        infoPane.getChildren().add(toolbarSeacrhVisible);
+        infoPane.getChildren().add(toolbarSearchVisible);
         infoPane.getChildren().add(segmentedButton);
         infoPane.getChildren().add(button);
         infoPane.getChildren().add(textField);

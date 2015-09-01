@@ -83,6 +83,13 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
             getObservableValue().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
                 AbstractPropertyEditor.this.property.setValue(getValue());
             });
+            
+            if (property.getObservableValue().isPresent()) {
+                property.getObservableValue().get().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
+                    AbstractPropertyEditor.this.setValue((T) property.getValue());
+                });
+            }
+            
         }
     }
     
@@ -96,7 +103,8 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
     
     /**
      * Returns an {@link ObservableValue} of the property that this property
-     * editor is responsible for editing.
+     * editor is responsible for editing. This is the editor's value, e.g. a 
+     * TextField's textProperty().
      */
     protected abstract ObservableValue<T> getObservableValue();
     

@@ -30,15 +30,21 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.ToggleSwitchSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Skin;
 
 /**
- * Created by pedro_000 on 8/26/2015.
+ * Much like a Toggle Button this control allows the user to toggle between one of two states. It has been popularized
+ * in touch based devices where its usage is particularly useful because unlike a checkbox the finger touch of a user
+ * doesn't obscure the control.
+ *
+ * <p> Shown below is a screenshot of the ToggleSwitch control in its on and off state:
+ * <br>
+ * <center>
+ * <img src="ToggleSwitch.png" alt="Screenshot of ToggleSwitch">
+ * </center>
  */
 public class ToggleSwitch extends Labeled
 {
@@ -50,20 +56,19 @@ public class ToggleSwitch extends Labeled
      **************************************************************************/
 
     /**
-     * Creates a toggle switch with empty strings for its labels.
+     * Creates a toggle switch with empty string for its label.
      */
     public ToggleSwitch() {
         initialize();
     }
 
     /**
-     * Creates a toggle switch with the specified on text and off text.
+     * Creates a toggle switch with the specified label.
      *
-     * @param turnOnText A text string for the on state.
+     * @param text The label string of the control.
      */
-    public ToggleSwitch(String turnOnText, String turnOffText) {
-        setTurnOnText(turnOnText);
-        setTurnOffText(turnOffText);
+    public ToggleSwitch(String text) {
+        super(text);
         initialize();
     }
 
@@ -81,14 +86,24 @@ public class ToggleSwitch extends Labeled
      * Indicates whether this ToggleSwitch is selected.
      */
     private BooleanProperty selected;
+
+    /**
+     * Sets the selected value of this Toggle Switch
+     */
     public final void setSelected(boolean value) {
         selectedProperty().set(value);
     }
 
+    /**
+     * Returns whether this Toggle Switch is selected
+     */
     public final boolean isSelected() {
         return selected == null ? false : selected.get();
     }
 
+    /**
+     * Returns the selected property
+     */
     public final BooleanProperty selectedProperty() {
         if (selected == null) {
             selected = new BooleanPropertyBase() {
@@ -112,31 +127,6 @@ public class ToggleSwitch extends Labeled
         return selected;
     }
 
-    /**
-     * The text to show when this switch is on. The text may be null.
-     */
-    public final StringProperty turnOnTextProperty() {
-        if (turnOnText == null) {
-            turnOnText = new SimpleStringProperty(this, "turnOnText", "");
-        }
-        return turnOnText;
-    }
-    private StringProperty turnOnText;
-    public final void setTurnOnText(String value) { turnOnTextProperty().setValue(value); }
-    public final String getTurnOnText() { return turnOnText == null ? "" : turnOnText.getValue(); }
-
-    /**
-     * The text to show when this switch is off. The text may be null.
-     */
-    public final StringProperty turnOffTextProperty() {
-        if (turnOffText == null) {
-            turnOffText = new SimpleStringProperty(this, "turnOffText", "");
-        }
-        return turnOffText;
-    }
-    private StringProperty turnOffText;
-    public final void setTurnOffText(String value) { turnOffTextProperty().setValue(value); }
-    public final String getTurnOffText() { return turnOffText == null ? "" : turnOffText.getValue(); }
 
     /***************************************************************************
      *                                                                         *
@@ -145,12 +135,8 @@ public class ToggleSwitch extends Labeled
      **************************************************************************/
 
     /**
-     * Toggles the state of the {@code ToggleSwitch}. If allowIndeterminate is
-     * true, then each invocation of this function will advance the CheckBox
-     * through the states checked, unchecked, and undefined. If
-     * allowIndeterminate is false, then the CheckBox will only cycle through
-     * the checked and unchecked states, and forcing indeterminate to equal to
-     * false.
+     * Toggles the state of the {@code ToggleSwitch}. The {@code ToggleSwitch} will cycle through
+     * the selected and unselected states.
      */
     public void fire() {
         if (!isDisabled()) {
@@ -176,6 +162,7 @@ public class ToggleSwitch extends Labeled
     private static final PseudoClass PSEUDO_CLASS_SELECTED =
             PseudoClass.getPseudoClass("selected");
 
+    /** {@inheritDoc} */
     @Override
     public String getUserAgentStylesheet() {
         return getClass().getResource("toggleswitch.css").toExternalForm();

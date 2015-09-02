@@ -32,13 +32,12 @@ import javafx.animation.TranslateTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.tools.Utils;
 
 /**
- * Created by pedro_000 on 8/26/2015.
+ * Basic Skin implementation for the {@link ToggleSwitch}
  */
 public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
 {
@@ -48,9 +47,9 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
     StackPane labelContainer;
 
     /**
-     * Constructor for all SkinBase instances.
+     * Constructor for all ToggleSwitchSkin instances.
      *
-     * @param control The control for which this Skin should attach to.
+     * @param control The ToggleSwitch for which this Skin should attach to.
      */
     public ToggleSwitchSkin(ToggleSwitch control) {
         super(control);
@@ -60,7 +59,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         label = new LabeledText(control);
         labelContainer = new StackPane();
 
-        updateLabel(control);
+        label.setText(control.getText());
         getChildren().addAll(labelContainer, thumbArea, thumb);
         labelContainer.getChildren().addAll(label);
         StackPane.setAlignment(label, Pos.CENTER_LEFT);
@@ -94,9 +93,6 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         toggleSwitch.setSelected(!toggleSwitch.isSelected());
     }
 
-    private void updateLabel(ToggleSwitch skinnable) {
-        label.setText(skinnable.isSelected() ? skinnable.getTurnOnText() : skinnable.getTurnOffText());
-    }
 
     @Override
     protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
@@ -118,48 +114,27 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         labelContainer.setLayoutY(thumbAreaY);
 
         if (!toggleSwitch.isSelected())
-        {
             thumb.setLayoutX(thumbArea.getLayoutX());
-            thumb.setLayoutY(thumbAreaY + (thumbAreaHeight - thumbHeight) / 2);
-        } else
-        {
+        else
             thumb.setLayoutX(thumbArea.getLayoutX() + thumbAreaWidth - thumbWidth);
-            thumb.setLayoutY(thumbAreaY + (thumbAreaHeight - thumbHeight) / 2);
-        }
+        thumb.setLayoutY(thumbAreaY + (thumbAreaHeight - thumbHeight) / 2);
     }
 
 
     @Override protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        final String labelText = label.getText();
-        final Font font = label.getFont();
-        double textWidth = Utils.computeTextWidth(font, labelText, 0);
-
-        return leftInset + textWidth + thumbArea.prefWidth(-1) + rightInset;
+        return leftInset + label.prefWidth(-1) + thumbArea.prefWidth(-1) + rightInset;
     }
 
     @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        final Font font = label.getFont();
-        final String labelText = label.getText();
-        final double textHeight = Utils.computeTextHeight(font, labelText, 0, label.getLineSpacing(), label.getBoundsType());
-
-        return topInset + Math.max(thumb.prefHeight(-1), textHeight) + bottomInset;
+        return topInset + Math.max(thumb.prefHeight(-1), label.prefHeight(-1)) + bottomInset;
     }
 
     @Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        final String labelText = label.getText();
-        final Font font = label.getFont();
-        double textWidth = Utils.computeTextWidth(font, labelText, 0);
-
-        return leftInset + textWidth + 20 + thumbArea.prefWidth(-1) + rightInset;
+        return leftInset + label.prefWidth(-1) + 20 + thumbArea.prefWidth(-1) + rightInset;
     }
 
-    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset)
-    {
-        final Font font = label.getFont();
-        final String labelText = label.getText();
-        final double textHeight = Utils.computeTextHeight(font, labelText, 0, label.getLineSpacing(), label.getBoundsType());
-
-        return topInset + Math.max(thumb.prefHeight(-1), textHeight) + bottomInset;
+    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return topInset + Math.max(thumb.prefHeight(-1), label.prefHeight(-1)) + bottomInset;
     }
 }
 

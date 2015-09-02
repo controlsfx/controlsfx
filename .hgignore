@@ -14,3 +14,4 @@ doc/*
 .settings/*
 build/*
 lib/*
+controlsfx/classes/*

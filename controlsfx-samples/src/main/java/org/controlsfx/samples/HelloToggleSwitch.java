@@ -25,38 +25,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.controlsfx.samples;
 
-package org.controlsfx.control;
-
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.controlsfx.ControlsFXSample;
 
-/**
- * Created by pedro_000 on 8/26/2015.
- */
-public class ToggleSwitchTest extends Application
+import java.io.IOException;
+
+public class HelloToggleSwitch extends ControlsFXSample
 {
     static final String RESOURCE = "ToggleSwitch.fxml";
 
-
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource(RESOURCE));
-        root.getStylesheets().add(getClass().getResource("toggleswitchtest.css").toExternalForm());
-        primaryStage.setTitle("Toggle Switch");
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-//        ScenicView.show(scene);
+    public String getSampleName()
+    {
+        return "ToggleSwitch";
     }
 
+    @Override
+    public Node getPanel(Stage stage)
+    {
+        Parent root = null;
+        try
+        {
+            root = FXMLLoader.load(getClass().getResource(RESOURCE));
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        root.getStylesheets().add(getClass().getResource("toggleSwitchSample.css").toExternalForm());
+        return root;
+    }
+
+    @Override
+    public String getJavaDocURL()
+    {
+        return Utils.JAVADOC_BASE + "org/controlsfx/control/ToggleSwitch.html";
+    }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
-

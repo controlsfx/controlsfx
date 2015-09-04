@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,6 +81,9 @@ public class Address {
         this.state.set(state);
     }
     
+    /**
+     * @return Property that contains the state.
+     */
     public StringProperty stateProperty() {
         return state;
     }
@@ -99,6 +102,9 @@ public class Address {
         this.postcode.set(postcode);
     }
     
+    /**
+     * @return Property that contains the postcode.
+     */
     public StringProperty postcodeProperty() {
         return postcode;
     }

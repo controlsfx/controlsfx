@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -549,6 +550,12 @@ public class ActionUtils {
             @Override protected Node computeValue() {
                 return copyNode(action.graphicProperty().get());
             }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+                super.removeListener(listener);
+                unbind(action.graphicProperty());
+            }
         });
         
         
@@ -572,7 +579,13 @@ public class ActionUtils {
                 // so that not any unnecessary listeners remain when calling unbind().
                 tooltip.setText(longText);
                 return longText == null || longText.isEmpty() ? null : tooltip;
-            } 
+            }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+                super.removeListener(listener);
+                unbind(action.longTextProperty());
+            }
         });
         
         
@@ -632,6 +645,12 @@ public class ActionUtils {
 
             @Override protected Node computeValue() {
                 return copyNode( action.graphicProperty().get());
+            }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+                super.removeListener(listener);
+                unbind(action.graphicProperty());
             }
         });
         

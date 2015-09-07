@@ -63,7 +63,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -85,7 +87,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
 
@@ -214,7 +215,7 @@ import org.controlsfx.tools.Utils;
  * @see GridBase
  * @see Picker
  */
-public class SpreadsheetView extends Control {
+public class SpreadsheetView extends Control{
 
     /***************************************************************************
      * * Static Fields * *
@@ -1607,17 +1608,6 @@ public class SpreadsheetView extends Control {
         }
     };
 
-    /**
-     * Default Callback for the Row and column picker. It does nothing.
-     */
-    private static final Callback<Integer, Void> DEFAULT_CALLBACK = new Callback<Integer, Void>() {
-
-        @Override
-        public Void call(Integer p) {
-            //no-op
-            return null;
-        }
-    };
     private final ChangeListener<ContextMenu> contextMenuChangeListener = new ChangeListener<ContextMenu>() {
         
         @Override
@@ -1689,4 +1679,78 @@ public class SpreadsheetView extends Control {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };
+    
+    /**
+     * This event is thrown on the SpreadsheetView when the user resize a row
+     * with its mouse.
+     */
+    public static class RowHeightEvent extends Event {
+
+        /**
+         * This is the event used by {@link RowHeightEvent}.
+         */
+        public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE = new EventType<>(Event.ANY, "RowHeightChange"); //$NON-NLS-1$
+
+        private final int row;
+        private final double height;
+
+        public RowHeightEvent(int row, double height) {
+            super(ROW_HEIGHT_CHANGE);
+            this.row = row;
+            this.height = height;
+        }
+
+        /**
+         * Return the row index that has been resized.
+         * @return 
+         */
+        public int getRow() {
+            return row;
+        }
+
+        /**
+         * Return the new height for this row.
+         * @return 
+         */
+        public double getHeight() {
+            return height;
+        }
+    }
+    
+    /**
+     * This event is thrown on the SpreadsheetView when the user resize a column
+     * with its mouse.
+     */
+    public static class ColumnWidthEvent extends Event {
+
+        /**
+         * This is the event used by {@link ColumnWidthEvent}.
+         */
+        public static final EventType<ColumnWidthEvent> COLUMN_WIDTH_CHANGE = new EventType<>(Event.ANY, "ColumnWidthChange"); //$NON-NLS-1$
+
+        private final int column;
+        private final double width;
+
+        public ColumnWidthEvent(int column, double width) {
+            super(COLUMN_WIDTH_CHANGE);
+            this.column = column;
+            this.width = width;
+        }
+
+        /**
+         * Return the column index that has been resized.
+         * @return 
+         */
+        public int getColumn() {
+            return column;
+        }
+
+        /**
+         * Return the new width for this column.
+         * @return 
+         */
+        public double getWidth() {
+            return width;
+        }
+    }
 }

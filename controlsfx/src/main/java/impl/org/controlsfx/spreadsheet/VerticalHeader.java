@@ -42,6 +42,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Cursor;
@@ -456,6 +457,7 @@ public class VerticalHeader extends StackPane {
             return;
         }
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(gridRow.getIndex(), newHeight));
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
@@ -477,6 +479,7 @@ public class VerticalHeader extends StackPane {
                 double height = row.getHeight();
                 for (int i = selectedRows.nextSetBit(0); i >= 0; i = selectedRows.nextSetBit(i + 1)) {
                     skin.rowHeightMap.put(i, height);
+                    Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(i, height));
                 }
             }
         }

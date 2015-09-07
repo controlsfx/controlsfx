@@ -76,6 +76,7 @@ import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
+import javafx.event.Event;
 import javafx.scene.control.ScrollBar;
 
 /**
@@ -433,7 +434,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if(getSkinnable().getColumns().isEmpty()){
             return;
         }
-        
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = getSkinnable().getColumns().get(0);
         List<?> items = itemsProperty().get();
         if (items == null || items.isEmpty()) {
@@ -466,8 +466,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
 
         double maxHeight;
-//        int maxRows = handle.getView().getGrid().getRowCount();
-//        for (int row = 0; row < maxRows; row++) {
         maxHeight = 0;
         for (TableColumn column : getSkinnable().getColumns()) {
 
@@ -485,7 +483,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             }
         }
         rowHeightMap.put(row, maxHeight + padding);
-//        }
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight + padding));
+        
         rectangleSelection.updateRectangle();
     }
     
@@ -505,6 +504,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         int maxRows = handle.getView().getGrid().getRowCount();
         for (int row = 0; row < maxRows; row++) {
             if (grid.isRowResizable(row)) {
+                Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight));
                 rowHeightMap.put(row, maxHeight);
             }
         }
@@ -566,7 +566,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (cell == null) {
             return;
         }
-        
+
         //The current index of that column
         int indexColumn = handle.getGridView().getColumns().indexOf(tc);
         
@@ -699,7 +699,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     public void resize(TableColumnBase<?, ?> tc) {
         if(tc.isResizable()){
             columnFit = true;
-            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), 30);
+            int columnIndex = getColumns().indexOf(tc);
+            TableColumn tableColumn = getColumns().get(columnIndex);
+            resizeColumnToFitContent(tableColumn, 30);
+            Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(columnIndex, tableColumn.getWidth()));
         }
     }
 
@@ -1066,7 +1069,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     @Override
     protected boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
         getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
-        return getSkinnable().resizeColumn(tc, delta);
+        boolean returnedValue = getSkinnable().resizeColumn(tc, delta);
+        if(returnedValue){
+            Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(getColumns().indexOf(tc), tc.getWidth()));
+        }
+        return returnedValue;
     }
 
     @Override

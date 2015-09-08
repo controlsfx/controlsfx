@@ -582,7 +582,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
-
+        
         // determine cell padding
         double padding = 10;
         Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
@@ -596,9 +596,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows);
         double maxWidth = 0;
         boolean datePresent = false;
+        cell.updateTableColumn(col);
+        cell.updateTableView(handle.getGridView());
+        /**
+         * Sometime the skin is not set, and the width computed is zero which
+         * destroy the grid... So in that case, we manually set the skin...
+         */
+        if (cell.getSkin() == null) {
+            cell.setSkin(new CellViewSkin((TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>) cell));
+        }
         for (int row = 0; row < rows; row++) {
-            cell.updateTableColumn(col);
-            cell.updateTableView(handle.getGridView());
             cell.updateIndex(row);
             
             if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
@@ -609,7 +616,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 }
                 cell.impl_processCSS(false);
                 double width = cell.prefWidth(-1);
-                
                 /**
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we

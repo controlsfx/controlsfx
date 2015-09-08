@@ -1702,7 +1702,7 @@ public class SpreadsheetView extends Control{
 
         /**
          * Return the row index that has been resized.
-         * @return 
+         * @return the row index that has been resized.
          */
         public int getRow() {
             return row;
@@ -1710,7 +1710,7 @@ public class SpreadsheetView extends Control{
 
         /**
          * Return the new height for this row.
-         * @return 
+         * @return the new height for this row.
          */
         public double getHeight() {
             return height;
@@ -1739,7 +1739,7 @@ public class SpreadsheetView extends Control{
 
         /**
          * Return the column index that has been resized.
-         * @return 
+         * @return the column index that has been resized.
          */
         public int getColumn() {
             return column;
@@ -1747,7 +1747,7 @@ public class SpreadsheetView extends Control{
 
         /**
          * Return the new width for this column.
-         * @return 
+         * @return the new width for this column.
          */
         public double getWidth() {
             return width;

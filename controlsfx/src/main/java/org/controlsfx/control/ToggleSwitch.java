@@ -165,7 +165,7 @@ public class ToggleSwitch extends Labeled
     /** {@inheritDoc} */
     @Override
     public String getUserAgentStylesheet() {
-        return getClass().getResource("toggleswitch.css").toExternalForm();
+        return ToggleSwitch.class.getResource("toggleswitch.css").toExternalForm();
     }
 
 }

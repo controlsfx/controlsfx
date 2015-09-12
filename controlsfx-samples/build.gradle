@@ -39,3 +39,6 @@ jar {
     from sourceSets.main.allJava
 }
 
+/* Don't build Javadocs for ControlsFX Samples */
+javadoc.enabled=false
+javadocJar.enabled=false

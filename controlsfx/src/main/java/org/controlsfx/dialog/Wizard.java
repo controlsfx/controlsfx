@@ -245,6 +245,13 @@ public class Wizard {
     public final Optional<ButtonType> showAndWait() {
         return dialog.showAndWait();
     }
+
+    /**
+     * @return {@link Dialog#resultProperty()} of the {@link Dialog} representing this {@link Wizard}.
+     */
+    public final ObjectProperty<ButtonType> resultProperty() {
+            return dialog.resultProperty();
+    }
     
     /**
      * The settings map is the place where all data from pages is kept once the 

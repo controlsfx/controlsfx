@@ -33,6 +33,7 @@ import java.util.Optional;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Skin;
@@ -164,6 +165,12 @@ public class PropertySheet extends ControlsFXControl {
          * Sets the current value of the property.
          */
         public void setValue(Object value);
+        
+        /**
+         * Returns the underlying ObservableValue, where one exists, that the editor 
+         * can monitor for changes.
+         */
+        public Optional<ObservableValue<? extends Object>> getObservableValue();
         
         /**
          * Returns an Optional wrapping the class of the PropertyEditor that 

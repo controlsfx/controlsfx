@@ -47,7 +47,7 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
 
     private final Item property;
     private final C control;
-    
+    private boolean suspendUpdate;
     
     
     /**************************************************************************
@@ -81,8 +81,23 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
         this.property = property;
         if (! readonly) {
             getObservableValue().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
-                AbstractPropertyEditor.this.property.setValue(getValue());
+                if (! suspendUpdate) {
+                    suspendUpdate = true;
+                    AbstractPropertyEditor.this.property.setValue(getValue());
+                    suspendUpdate = false;
+                }
             });
+            
+            if (property.getObservableValue().isPresent()) {
+                property.getObservableValue().get().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
+                    if (! suspendUpdate) {
+                        suspendUpdate = true;
+                        AbstractPropertyEditor.this.setValue((T) property.getValue());
+                        suspendUpdate = false;
+                    }
+                });
+            }
+            
         }
     }
     
@@ -96,7 +111,8 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
     
     /**
      * Returns an {@link ObservableValue} of the property that this property
-     * editor is responsible for editing.
+     * editor is responsible for editing. This is the editor's value, e.g. a 
+     * TextField's textProperty().
      */
     protected abstract ObservableValue<T> getObservableValue();
     

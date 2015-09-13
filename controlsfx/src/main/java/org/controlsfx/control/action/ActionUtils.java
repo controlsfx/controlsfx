@@ -571,13 +571,11 @@ public class ActionUtils {
             
             { 
                 bind(action.longTextProperty()); 
+                tooltip.textProperty().bind(action.longTextProperty());
             }
             
             @Override protected Tooltip computeValue() {
                 String longText =  action.longTextProperty().get();
-                // The text of the tooltip is explicitly set instead of using a binding
-                // so that not any unnecessary listeners remain when calling unbind().
-                tooltip.setText(longText);
                 return longText == null || longText.isEmpty() ? null : tooltip;
             }
 
@@ -585,6 +583,7 @@ public class ActionUtils {
             public void removeListener(InvalidationListener listener) {
                 super.removeListener(listener);
                 unbind(action.longTextProperty());
+                tooltip.textProperty().unbind();
             }
         });
         

@@ -34,6 +34,9 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Alert;
 
 import org.controlsfx.control.PropertySheet;
@@ -57,6 +60,7 @@ public class BeanProperty implements PropertySheet.Item {
     private final PropertyDescriptor beanPropertyDescriptor;
     private final Method readMethod;
     private boolean editable = true;
+    private Optional<ObservableValue<? extends Object>> observableValue = Optional.empty();
 
     public BeanProperty(Object bean, PropertyDescriptor propertyDescriptor) {
         this.bean = bean;
@@ -65,6 +69,8 @@ public class BeanProperty implements PropertySheet.Item {
         if (beanPropertyDescriptor.getWriteMethod() == null) {
             setEditable(false);
         }
+        
+        findObservableValue();
     }
     
     /** {@inheritDoc} */
@@ -160,5 +166,22 @@ public class BeanProperty implements PropertySheet.Item {
         this.editable = editable;
     }
     
+    /** {@inheritDoc} */
+    @Override public Optional<ObservableValue<? extends Object>> getObservableValue() {
+        return observableValue;
+    }
     
+    private void findObservableValue() {
+        try {
+            String propName = beanPropertyDescriptor.getName() + "Property";
+            Method m = getBean().getClass().getMethod(propName);
+            Object val = m.invoke(getBean());
+            if (val != null && val instanceof ObservableValue) {
+                observableValue = Optional.of((ObservableValue) val);
+            }
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            //Logger.getLogger(BeanProperty.class.getName()).log(Level.SEVERE, null, ex);
+            // ignore it...
+        }
+    }
 }

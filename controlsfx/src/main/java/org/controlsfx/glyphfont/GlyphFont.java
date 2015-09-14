@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2015, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,12 @@
  */
 package org.controlsfx.glyphfont;
 
+import com.sun.javafx.css.StyleManager;
 import javafx.scene.text.Font;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.scene.control.Control;
 
 /**
  *  Represents a glyph font, which can be loaded locally or from a specified URL.
@@ -51,7 +51,12 @@ import javafx.scene.control.Control;
  * <br>
  * <center><img src="glyphFont.png" alt="Screenshot of GlyphFont"></center>
  */
-public class GlyphFont extends Control{
+public class GlyphFont {
+
+    static {
+        StyleManager.getInstance().addUserAgentStylesheet(
+                GlyphFont.class.getResource("glyphfont.css").toExternalForm()); //$NON-NLS-1$
+    }
 
     /***************************************************************************
      *                                                                         *
@@ -150,10 +155,6 @@ public class GlyphFont extends Control{
      *                                                                         *
      **************************************************************************/
 
-    public String getUserAgentStylesheet() {
-        return GlyphFont.class.getResource("glyphfont.css").toExternalForm();
-    }
-    
     /**
      * Returns font name
      * @return font name

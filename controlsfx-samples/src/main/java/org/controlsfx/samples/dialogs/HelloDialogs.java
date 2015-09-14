@@ -506,7 +506,6 @@ public class HelloDialogs extends ControlsFXSample {
     private void showLinearWizard() {
         Window owner = cbSetOwner.isSelected() ? stage : null;
         // define pages to show
-
         Wizard wizard = new Wizard(owner);
         wizard.setTitle("Linear Wizard");
         

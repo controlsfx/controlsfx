@@ -75,20 +75,20 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     private void updateChildren() {
         Node newLeft = leftProperty().get();
         if (newLeft != null) {
+            getChildren().remove(leftPane);
             leftPane = new StackPane(newLeft);
             leftPane.setAlignment(Pos.CENTER_LEFT);
             leftPane.getStyleClass().add("left-pane"); //$NON-NLS-1$
-            getChildren().remove(left);
             getChildren().add(leftPane);
             left = newLeft;
         }
         
         Node newRight = rightProperty().get();
         if (newRight != null) {
+            getChildren().remove(rightPane);
             rightPane = new StackPane(newRight);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
             rightPane.getStyleClass().add("right-pane"); //$NON-NLS-1$
-            getChildren().remove(right);
             getChildren().add(rightPane);
             right = newRight;
         }

@@ -736,8 +736,8 @@ public class SpreadsheetView extends Control{
      * @return true if the column if fixable
      */
     public boolean isColumnFixable(int columnIndex) {
-        return columnIndex < getColumns().size()
-                ? getColumns().get(columnIndex).isColumnFixable() : null;
+        return columnIndex >= 0 && columnIndex < getColumns().size() && isFixingColumnsAllowed()
+                ? getColumns().get(columnIndex).isColumnFixable() : false;
     }
 
     /**
@@ -772,7 +772,7 @@ public class SpreadsheetView extends Control{
         final int columnCount = grid.getColumnCount();
         final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         for (Integer columnIndex : list) {
-            if (columnIndex == null || columnIndex < 0 || columnIndex > columnCount) {
+            if (columnIndex == null || columnIndex < 0 || columnIndex >= columnCount) {
                 return false;
             }
             //If this column is not fixable, we need to identify the maximum span

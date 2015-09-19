@@ -26,21 +26,12 @@
  */
 package org.controlsfx.control;
 
-import static java.util.Objects.requireNonNull;
-import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import impl.org.controlsfx.skin.PopOverSkin;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -55,6 +46,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+
+import static java.util.Objects.requireNonNull;
+import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 
 /**
  * The PopOver control provides detailed information about an owning node in a
@@ -122,14 +116,10 @@ public class PopOver extends PopupControl {
         label.setPadding(new Insets(4));
         setContentNode(label);
 
-        ChangeListener<Object> repositionListener = new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<? extends Object> value,
-                    Object oldObject, Object newObject) {
-                if (isShowing() && !isDetached()) {
-                    show(getOwnerNode(), targetX, targetY);
-                    adjustWindowLocation();
-                }
+        InvalidationListener repositionListener = observable -> {
+            if (isShowing() && !isDetached()) {
+                show(getOwnerNode(), targetX, targetY);
+                adjustWindowLocation();
             }
         };
 
@@ -137,6 +127,7 @@ public class PopOver extends PopupControl {
         cornerRadius.addListener(repositionListener);
         arrowLocation.addListener(repositionListener);
         arrowIndent.addListener(repositionListener);
+        headerAlwaysVisible.addListener(repositionListener);
 
         /*
          * A detached popover should of course not automatically hide itself.
@@ -597,6 +588,41 @@ public class PopOver extends PopupControl {
         }
     }
 
+    // always show header
+
+    private final BooleanProperty headerAlwaysVisible = new SimpleBooleanProperty(this, "headerAlwaysVisible"); //$NON-NLS-1$
+
+    /**
+     * Determines whether or not the {@link PopOver} header should remain visible, even while attached.
+     */
+    public final BooleanProperty headerAlwaysVisibleProperty() {
+        return headerAlwaysVisible;
+    }
+
+    /**
+     * Sets the value of the headerAlwaysVisible property.
+     *
+     * @param visible
+     *            if true, then the header is visible even while attached
+     *
+     * @see #headerAlwaysVisibleProperty()
+     */
+    public final void setHeaderAlwaysVisible(boolean visible) {
+        headerAlwaysVisible.setValue(visible);
+    }
+
+    /**
+     * Returns the value of the detachable property.
+     *
+     * @return true if the header is visible even while attached
+     *
+     * @see #headerAlwaysVisibleProperty()
+     */
+    public final boolean isHeaderAlwaysVisible() {
+        return headerAlwaysVisible.getValue();
+    }
+
+
     // detach support
 
     private final BooleanProperty detachable = new SimpleBooleanProperty(this,
@@ -790,43 +816,39 @@ public class PopOver extends PopupControl {
 
     // Detached stage title
 
-    private final StringProperty detachedTitle = new SimpleStringProperty(this,
-            "detachedTitle", "Info"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final StringProperty title = new SimpleStringProperty(this, "title", "Info"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
-     * Stores the title to display when the pop over becomes detached.
+     * Stores the title to display in the PopOver's header.
      *
-     * @return the detached title property
+     * @return the title property
      */
-    public final StringProperty detachedTitleProperty() {
-        return detachedTitle;
+    public final StringProperty titleProperty() {
+        return title;
     }
 
     /**
-     * Returns the value of the detached title property.
+     * Returns the value of the title property.
      *
      * @return the detached title
-     *
-     * @see #detachedTitleProperty()
+     * @see #titleProperty()
      */
-    public final String getDetachedTitle() {
-        return detachedTitleProperty().get();
+    public final String getTitle() {
+        return titleProperty().get();
     }
 
     /**
-     * Sets the value of the detached title property.
+     * Sets the value of the title property.
      *
-     * @param title
-     *            the title to use when detached
-     *
-     * @see #detachedTitleProperty()
+     * @param title the title to use when detached
+     * @see #titleProperty()
      */
-    public final void setDetachedTitle(String title) {
+    public final void setTitle(String title) {
         if (title == null) {
             throw new IllegalArgumentException("title can not be null"); //$NON-NLS-1$
         }
 
-        detachedTitleProperty().set(title);
+        titleProperty().set(title);
     }
 
     private final ObjectProperty<ArrowLocation> arrowLocation = new SimpleObjectProperty<>(

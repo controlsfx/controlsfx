@@ -121,7 +121,7 @@ public class PopOverSkin implements Skin<PopOver> {
         stackPane.minHeightProperty().bind(stackPane.minWidthProperty());
 
         title = new Label();
-        title.textProperty().bind(popOver.detachedTitleProperty());
+        title.textProperty().bind(popOver.titleProperty());
         title.setMaxSize(MAX_VALUE, MAX_VALUE);
         title.setAlignment(Pos.CENTER);
         title.getStyleClass().add("text"); //$NON-NLS-1$
@@ -130,7 +130,7 @@ public class PopOverSkin implements Skin<PopOver> {
         closeIcon.setGraphic(createCloseIcon());
         closeIcon.setMaxSize(MAX_VALUE, MAX_VALUE);
         closeIcon.setContentDisplay(GRAPHIC_ONLY);
-        closeIcon.visibleProperty().bind(popOver.detachedProperty());
+        closeIcon.visibleProperty().bind(popOver.detachedProperty().or(popOver.headerAlwaysVisibleProperty()));
         closeIcon.getStyleClass().add("icon"); //$NON-NLS-1$
         closeIcon.setAlignment(CENTER_LEFT);
         closeIcon.getGraphic().setOnMouseClicked(evt -> popOver.hide());
@@ -144,11 +144,22 @@ public class PopOverSkin implements Skin<PopOver> {
         content.setCenter(popOver.getContentNode());
         content.getStyleClass().add("content"); //$NON-NLS-1$
 
-        if (popOver.isDetached()) {
+        if (popOver.isDetached() || popOver.isHeaderAlwaysVisible()) {
             content.setTop(titlePane);
+        }
+
+        if (popOver.isDetached()) {
             popOver.getStyleClass().add(DETACHED_STYLE_CLASS);
             content.getStyleClass().add(DETACHED_STYLE_CLASS);
         }
+
+        popOver.headerAlwaysVisibleProperty().addListener((o, oV, isVisible) -> {
+            if (isVisible) {
+                content.setTop(titlePane);
+            } else if (!popOver.isDetached()) {
+                content.setTop(null);
+            }
+        });
 
         InvalidationListener updatePathListener = observable -> updatePath();
         getPopupWindow().xProperty().addListener(updatePathListener);
@@ -184,7 +195,10 @@ public class PopOverSkin implements Skin<PopOver> {
                     } else {
                         popOver.getStyleClass().remove(DETACHED_STYLE_CLASS);
                         content.getStyleClass().remove(DETACHED_STYLE_CLASS);
-                        content.setTop(null);
+
+                        if (!popOver.isHeaderAlwaysVisible()) {
+                            content.setTop(null);
+                        }
                     }
 
                     popOver.sizeToScene();

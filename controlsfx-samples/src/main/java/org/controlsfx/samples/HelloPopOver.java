@@ -30,8 +30,10 @@ import java.text.NumberFormat;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -71,6 +73,7 @@ public class HelloPopOver extends ControlsFXSample {
     private DoubleProperty masterArrowIndent;
     private DoubleProperty masterCornerRadius;
     private ObjectProperty<ArrowLocation> masterArrowLocation;
+    private BooleanProperty masterHeaderAlwaysVisible;
 
     private double targetX;
     private double targetY;
@@ -80,6 +83,8 @@ public class HelloPopOver extends ControlsFXSample {
     private CheckBox detachable;
 
     private CheckBox autoPosition;
+
+    private CheckBox headerAlwaysVisible;
 
     private Circle circle;
 
@@ -121,6 +126,7 @@ public class HelloPopOver extends ControlsFXSample {
         masterArrowIndent = new SimpleDoubleProperty(12);
         masterCornerRadius = new SimpleDoubleProperty(6);
         masterArrowLocation = new SimpleObjectProperty<>(ArrowLocation.LEFT_TOP);
+        masterHeaderAlwaysVisible = new SimpleBooleanProperty(false);
 
         rect.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
@@ -293,7 +299,13 @@ public class HelloPopOver extends ControlsFXSample {
                 popOver.hide();
             }
         });
-        
+
+        headerAlwaysVisible = new CheckBox("Header Always Visible");
+        controls.add(headerAlwaysVisible, 0, 7);
+        GridPane.setColumnSpan(headerAlwaysVisible, 2);
+
+        masterHeaderAlwaysVisible.bind(headerAlwaysVisible.selectedProperty());
+
         circle.visibleProperty().bind(
                 Bindings.not(autoPosition.selectedProperty()));
         line1.visibleProperty().bind(
@@ -312,6 +324,7 @@ public class HelloPopOver extends ControlsFXSample {
         popOver.arrowIndentProperty().bind(masterArrowIndent);
         popOver.arrowLocationProperty().bind(masterArrowLocation);
         popOver.cornerRadiusProperty().bind(masterCornerRadius);
+        popOver.headerAlwaysVisibleProperty().bind(masterHeaderAlwaysVisible);
         return popOver;
     }
 
@@ -339,7 +352,7 @@ public class HelloPopOver extends ControlsFXSample {
                 + " the user to see and edit an objects properties. The pop over gets displayed in its own popup window and"
                 + " can be torn off in order to create several instances of it.";
     }
-    
+
     @Override
     public String getControlStylesheetURL() {
     	return "/org/controlsfx/control/popover.css";

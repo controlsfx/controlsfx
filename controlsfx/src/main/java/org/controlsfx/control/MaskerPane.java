@@ -33,8 +33,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.StackPane;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
-import static impl.org.controlsfx.i18n.Localization.localize;
 
 /**
  * <p>MaskerPane is designed to be placed alongside other controls in a {@link StackPane},
@@ -72,9 +70,9 @@ public class MaskerPane extends ControlsFXControl {
 
     // -- Progress
     private final DoubleProperty progress = new SimpleDoubleProperty(this, "progress", -1.0); //$NON-NLS-1$
-    public DoubleProperty progressProperty() { return progress; }
-    public double getProgress() { return progress.get(); }
-    public void setProgress(double progress) { this.progress.set(progress); }
+    public final DoubleProperty progressProperty() { return progress; }
+    public final double getProgress() { return progress.get(); }
+    public final void setProgress(double progress) { this.progress.set(progress); }
 
     // -- Progress Node
     private final ObjectProperty<Node> progressNode = new SimpleObjectProperty<Node>() {
@@ -87,21 +85,21 @@ public class MaskerPane extends ControlsFXControl {
         @Override public String getName() { return "progressNode"; } //$NON-NLS-1$
         @Override public Object getBean() { return MaskerPane.this; }
     };
-    public ObjectProperty<Node> progressNodeProperty() { return progressNode; }
-    public Node getProgressNode() { return progressNode.get();}
-    public void setProgressNode(Node progressNode) { this.progressNode.set(progressNode); }
+    public final ObjectProperty<Node> progressNodeProperty() { return progressNode; }
+    public final Node getProgressNode() { return progressNode.get();}
+    public final void setProgressNode(Node progressNode) { this.progressNode.set(progressNode); }
 
     // -- Progress Visibility
     private final BooleanProperty progressVisible = new SimpleBooleanProperty(this, "progressVisible", true); //$NON-NLS-1$
-    public BooleanProperty progressVisibleProperty() { return progressVisible; }
-    public boolean getProgressVisible() { return progressVisible.get(); }
-    public void setProgressVisible(boolean progressVisible) { this.progressVisible.set(progressVisible); }
+    public final BooleanProperty progressVisibleProperty() { return progressVisible; }
+    public final boolean getProgressVisible() { return progressVisible.get(); }
+    public final void setProgressVisible(boolean progressVisible) { this.progressVisible.set(progressVisible); }
 
     // -- Text
-    private final StringProperty text = new SimpleStringProperty(this, "text", localize(asKey("maskerPane.text"))); //$NON-NLS-1$
-    public StringProperty textProperty() { return text; }
-    public String getText() { return text.get(); }
-    public void setText(String text) { this.text.set(text); }
+    private final StringProperty text = new SimpleStringProperty(this, "text", "Please Wait..."); //$NON-NLS-1$
+    public final StringProperty textProperty() { return text; }
+    public final String getText() { return text.get(); }
+    public final void setText(String text) { this.text.set(text); }
 
 
 

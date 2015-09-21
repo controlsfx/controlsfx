@@ -82,6 +82,10 @@ public class HorizontalPicker extends StackPane {
     protected void layoutChildren() {
         //Just relocate the inner for sliding.
         innerPicker.relocate(horizontalHeader.getRootHeader().getLayoutX(), snappedTopInset());
+        //We must turn off pickers that are behind fixed columns
+        for (Label label : pickerUsed) {
+            label.setVisible(label.getLayoutX() + innerPicker.getLayoutX() + label.getWidth() > horizontalHeader.gridViewSkin.fixedColumnWidth);
+        }
     }
 
     /**
@@ -120,6 +124,11 @@ public class HorizontalPicker extends StackPane {
         @Override
         protected void layoutChildren() {
             pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
+            //Unbind every picker used before setting new ones.
+            for (Label label : pickerUsed) {
+                label.layoutXProperty().unbind();
+                label.setVisible(true);
+            }
             pickerUsed.clear();
 
             getChildren().clear();

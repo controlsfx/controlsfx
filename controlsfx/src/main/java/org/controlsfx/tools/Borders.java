@@ -26,32 +26,16 @@
  */
 package org.controlsfx.tools;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.SnapshotResult;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 
-import javax.swing.BorderFactory;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A utility class that allows you to wrap JavaFX {@link Node Nodes} with a border,
@@ -728,10 +712,11 @@ public final class Borders {
     // --- Border implementations
     private static class StrokeBorder implements Border {
         private static final int TITLE_PADDING = 3;
+        private static final double GAP_PADDING = TITLE_PADDING * 2 - 1;
         
         private final String title;
         private final BorderStroke[] borderStrokes;
-        
+
         public StrokeBorder(String title, BorderStroke... borderStrokes) {
             this.title = title;
             this.borderStrokes = borderStrokes;
@@ -749,104 +734,72 @@ public final class Borders {
                     // if the title string is set, then also add in the title label
                     if (title != null) {
                         titleLabel = new Label(title);
-                        updateTitleLabelFill();
-                        
-                        // when the scene changes, we should update the title
-                        // label fill (although realistically, this only ever 
-                        // happens on startup).
-                        n.sceneProperty().addListener(new InvalidationListener() {
-                            @Override public void invalidated(Observable o) {
-                                updateTitleLabelFill();
-                            }
-                        });
     
                         // give the text a bit of space on the left...
                         titleLabel.setPadding(new Insets(0, 0, 0, TITLE_PADDING));
                         getChildren().add(titleLabel);
                     }
                 }
-                
-                private final InvalidationListener updateTitleListener = new InvalidationListener() {
-                    @Override public void invalidated(Observable arg0) {
-                        if(n.getScene() != null){
-                            updateTitleLabelFillFromScene(n.getScene());
-                        }
-                    }
-                };
+
                 @Override protected void layoutChildren() {
                     super.layoutChildren();
-                    
-                    // layout the title label
+
                     if (titleLabel != null) {
+                        // layout the title label
                         final double labelHeight = titleLabel.prefHeight(-1);
                         final double labelWidth = titleLabel.prefWidth(labelHeight) + TITLE_PADDING;
                         titleLabel.resize(labelWidth, labelHeight);
                         titleLabel.relocate(TITLE_PADDING * 2, -labelHeight / 2.0 - 1);
-                    }
-                }
-                
-                private void updateTitleLabelFill() {
-                    final Scene s = n.getScene();
-                    
-                    if (s == null) {
-                        BackgroundFill fill = new BackgroundFill(Color.TRANSPARENT, null, null);
-                        titleLabel.setBackground(new Background(fill));
-                    } else {
-                        updateTitleLabelFillFromScene(s);
-                        s.fillProperty().addListener(new WeakInvalidationListener(updateTitleListener));
-                    }
-                }
-                
-                private void updateTitleLabelFillFromScene(Scene s) {
-                    s.snapshot(new Callback<SnapshotResult, Void>() {
-                        @Override
-                        public Void call(SnapshotResult result) {
-                            final Image image = result.getImage();
-                            final PixelReader reader = image.getPixelReader();
-                            // let's go through all pixels and work out an average
-                            // color to use as the background
-                            int start = (int) titleLabel.getLocalToSceneTransform().getTx();
-                            int finish = (int) (start + titleLabel.getWidth());
 
-                            int startY = (int) titleLabel.getLocalToSceneTransform().getTy();
-                            int finishY = (int) (startY + titleLabel.getHeight());
+                        List<BorderStroke> newBorderStrokes = new ArrayList<>(2);
 
-                            Map<Color, Integer> map = new HashMap<>();
-                            for (int row = startY; row < finishY; row++) {
-                                for (int column = start; column < finish; column++) {
-                                    //It may happen that getColor throw a IndexOutOfBounds.
-                                    try {
-                                        Color color = reader.getColor(column, row);
-                                        if (map.containsKey(color)) {
-                                            map.put(color, map.get(color) + 1);
-                                        } else {
-                                            map.put(color, 1);
-                                        }
-                                    } catch (Exception ex) {
+                        // create a line gap for the title label
+                        for (BorderStroke bs : borderStrokes) {
+                            List<Double> dashList = new ArrayList<>();
 
-                                    }
+                            // Create a dash list for the line gap or add it at the beginning of an existing dash list. This gap should be wide enough for the title label.
+                            if (bs.getTopStyle().getDashArray().isEmpty())
+                                dashList.addAll(Arrays.asList(GAP_PADDING, labelWidth, Double.MAX_VALUE));
+                            else { // dash pattern exists
+                                // insert gap in existing dash pattern and multiply original pattern so that gap does not show more then once
+                                double origDashWidth = bs.getTopStyle().getDashArray().stream().mapToDouble(d -> d).sum();
+
+                                if (origDashWidth > GAP_PADDING) {
+                                    dashList.add(GAP_PADDING);
+                                    dashList.add(labelWidth);
+                                } else { // need to insert dash pattern before the gap
+                                    int no = (int) (GAP_PADDING / origDashWidth);
+
+                                    for (int i = 0; i < no; i++)
+                                        dashList.addAll(bs.getTopStyle().getDashArray());
+
+                                    if ((dashList.size() & 1) == 0) // if size is even number, add one more element because gap must be at odd index to be transparent
+                                        dashList.add(0d);
+
+                                    dashList.add(labelWidth + GAP_PADDING - no * origDashWidth);
                                 }
-                            }
-                            double max = 0;
-                            Color color = null;
-                            for (Color colorTemp : map.keySet()) {
-                                if (map.get(colorTemp) > max) {
-                                    color = colorTemp;
-                                    max = map.get(colorTemp);
-                                }
+
+                                for (int i = 0; i < (getWidth() - labelWidth - origDashWidth) / origDashWidth; i++)
+                                    dashList.addAll(bs.getTopStyle().getDashArray());
                             }
 
-                            // with that color we can set the background fill 
-                            // of the titleLabel to perfectly blend in
-                            BackgroundFill fill = new BackgroundFill(color, null, null);
-                            titleLabel.setBackground(new Background(fill));
+                            // create new border stroke style for the top border line with new dash list
+                            BorderStrokeStyle topStrokeStyle = new BorderStrokeStyle(
+                                bs.getTopStyle().getType(), bs.getTopStyle().getLineJoin(), bs.getTopStyle().getLineCap(),
+                                bs.getTopStyle().getMiterLimit(), bs.getTopStyle().getDashOffset(), dashList);
 
-                            return null;
+                            // change existing border stroke to utilize new top border line stroke style
+                            newBorderStrokes.add(new BorderStroke(
+                                bs.getTopStroke(), bs.getRightStroke(), bs.getBottomStroke(), bs.getLeftStroke(),
+                                topStrokeStyle, bs.getRightStyle(), bs.getBottomStyle(), bs.getLeftStyle(),
+                                bs.getRadii(), bs.getWidths(), null));
                         }
-                    }, null);
+
+                        setBorder(new javafx.scene.layout.Border(newBorderStrokes.toArray(new BorderStroke[newBorderStrokes.size()])));
+                    }
                 }
             };
-            
+
             pane.setBorder(new javafx.scene.layout.Border(borderStrokes));
             return pane;
         }

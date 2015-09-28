@@ -49,8 +49,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.stage.Popup;
+import javafx.stage.PopupWindow;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
@@ -318,9 +318,16 @@ public class Notifications {
 
         private void show(Window owner, final Notifications notification) {
             // need to install our CSS
-            if (owner instanceof Stage) {
-                Scene ownerScene = ((Stage) owner).getScene();
-                ownerScene.getStylesheets().add(Notifications.class.getResource("notificationpopup.css").toExternalForm()); //$NON-NLS-1$
+            Window nonPopupOwnerWindow = owner;
+            while (nonPopupOwnerWindow instanceof PopupWindow) {
+                nonPopupOwnerWindow = ((PopupWindow) nonPopupOwnerWindow).getOwnerWindow();
+            }
+            Scene ownerScene = nonPopupOwnerWindow.getScene();
+            if (ownerScene != null) {
+                String stylesheetUrl = Notifications.class.getResource("notificationpopup.css").toExternalForm(); //$NON-NLS-1$
+                if (!ownerScene.getStylesheets().contains(stylesheetUrl)) {
+                    ownerScene.getStylesheets().add(0, stylesheetUrl);
+                }
             }
 
             final Popup popup = new Popup();

@@ -384,6 +384,12 @@ public class SpreadsheetView extends Control{
      */
     public SpreadsheetView(final Grid grid) {
         super();
+        //We want to recompute the rectangleHeight when a fixedRow is resized.
+        addEventHandler(RowHeightEvent.ROW_HEIGHT_CHANGE, (RowHeightEvent event) -> {
+            if(getFixedRows().contains(event.getRow()) && getCellsViewSkin() != null){
+                getCellsViewSkin().computeFixedRowHeight();
+            }
+        });
         getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {

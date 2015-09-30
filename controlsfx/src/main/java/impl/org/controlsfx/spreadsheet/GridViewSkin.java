@@ -458,7 +458,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
         
         // determine cell padding
-        double padding = 10;
+        double padding = 5;
+
         Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
         if (n instanceof Region) {
             Region r = (Region) n;
@@ -467,24 +468,24 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
         double maxHeight;
         maxHeight = 0;
-        for (TableColumn column : getSkinnable().getColumns()) {
+        getChildren().add(cell);
 
+        for (TableColumn column : getSkinnable().getColumns()) {
             cell.updateTableColumn(column);
             cell.updateTableView(handle.getGridView());
             cell.updateIndex(row);
 
             if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
-                getChildren().add(cell);
                 cell.setWrapText(true);
 
                 cell.impl_processCSS(false);
-                maxHeight = Math.max(maxHeight, cell.prefHeight(col.getWidth()));
-                getChildren().remove(cell);
+                maxHeight = Math.max(maxHeight, cell.prefHeight(column.getWidth()));
             }
         }
+        getChildren().remove(cell);
         rowHeightMap.put(row, maxHeight + padding);
         Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight + padding));
-        
+
         rectangleSelection.updateRectangle();
     }
     

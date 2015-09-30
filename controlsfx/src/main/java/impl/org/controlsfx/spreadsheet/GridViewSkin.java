@@ -987,7 +987,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * We compute the total height of the fixedRows so that the selection can
      * use it without performance regression.
      */
-    private void computeFixedRowHeight() {
+    public void computeFixedRowHeight() {
         fixedRowHeight = 0;
         for (int i : getCurrentlyFixedRow()) {
             fixedRowHeight += getRowHeight(i);

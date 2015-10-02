@@ -317,15 +317,20 @@ public class Notifications {
         }
 
         private void show(Window owner, final Notifications notification) {
-            // need to install our CSS
-            Window nonPopupOwnerWindow = owner;
-            while (nonPopupOwnerWindow instanceof PopupWindow) {
-                nonPopupOwnerWindow = ((PopupWindow) nonPopupOwnerWindow).getOwnerWindow();
+            // Stylesheets which are added to the scene of a popup aren't 
+            // considered for styling. For this reason, we need to find the next 
+            // window in the hierarchy which isn't a popup.  
+            Window ownerWindow = owner;
+            while (ownerWindow instanceof PopupWindow) {
+                ownerWindow = ((PopupWindow) ownerWindow).getOwnerWindow();
             }
-            Scene ownerScene = nonPopupOwnerWindow.getScene();
+            // need to install our CSS
+            Scene ownerScene = ownerWindow.getScene();
             if (ownerScene != null) {
                 String stylesheetUrl = Notifications.class.getResource("notificationpopup.css").toExternalForm(); //$NON-NLS-1$
                 if (!ownerScene.getStylesheets().contains(stylesheetUrl)) {
+                    // The stylesheet needs to be added at the beginning so that
+                    // the styling can be adjusted with custom stylesheets.
                     ownerScene.getStylesheets().add(0, stylesheetUrl);
                 }
             }

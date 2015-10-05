@@ -101,7 +101,7 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
 
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
-        return getUserAgentStylesheet();
+        return getUserAgentStylesheet(TaskProgressView.class, "taskprogressview.css");
     }
     
     @Override

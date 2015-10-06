@@ -400,8 +400,36 @@ public class TableViewSpanSelectionModel extends
         }
         selectedCellsMap.setAll(newList);
 
+        final TablePosition finalPos = pos;
         // Then we update visuals just once
         GridViewSkin skin = getSpreadsheetViewSkin();
+        //If the skin is null, we just wait till everything is ready..
+        if (skin == null) {
+            cellsView.skinProperty().addListener(new InvalidationListener() {
+
+                @Override
+                public void invalidated(Observable observable) {
+                    cellsView.skinProperty().removeListener(this);
+                    GridViewSkin skin = getSpreadsheetViewSkin();
+                    if (skin != null) {
+                        updateSelectedVisuals(skin, finalPos, selectedRows, selectedColumns);
+                    }
+                }
+            });
+        } else {
+            updateSelectedVisuals(skin, pos, selectedRows, selectedColumns);
+        }
+    }
+    
+    /**
+     * When all the selection has been made, we just need to light up the indicators that are showing
+     * which indexes are selected. 
+     * @param skin
+     * @param pos
+     * @param selectedRows
+     * @param selectedColumns 
+     */
+    private void updateSelectedVisuals(GridViewSkin skin, TablePosition pos, HashSet<Integer> selectedRows, HashSet<Integer> selectedColumns) {
         if (skin != null) {
             skin.getSelectedRows().addAll(selectedColumns);
             skin.getSelectedColumns().addAll(selectedRows);
@@ -412,7 +440,7 @@ public class TableViewSpanSelectionModel extends
          * confirmation to come when the layout is starting. Doing it before
          * will result in a selected cell with no css applied to it.
          */
-        if (pos != null && getCellsViewSkin() != null) {
+        if (pos != null) {
             getCellsViewSkin().lastRowLayout.set(true);
             getCellsViewSkin().lastRowLayout.addListener(new InvalidationListener() {
 

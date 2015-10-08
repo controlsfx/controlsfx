@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
+import java.util.Arrays;
 import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -144,6 +145,30 @@ public class SpreadsheetViewSelectionModel {
      */
     public void selectCells(List<Pair<Integer, Integer>> selectedCells) {
         selectionModel.verifySelectedCells(selectedCells);
+    }
+    
+    /**
+     * Use this method to select discontinuous cells.
+     *
+     * The {@link Pair} must contain the row index as key and the column index
+     * as value. This is useful when you want to select a great amount of cell
+     * because it will be more efficient than calling
+     * {@link #select(int, org.controlsfx.control.spreadsheet.SpreadsheetColumn) }.
+     * @param selectedCells
+     */
+    public void selectCells(Pair<Integer, Integer>... selectedCells) {
+        selectionModel.verifySelectedCells(Arrays.asList(selectedCells));
+    }
+    
+    /**
+     * Selects the cells in the range (minRow, minColumn) to (maxRow, maxColumn), inclusive.
+     * @param minRow
+     * @param minColumn
+     * @param maxRow
+     * @param maxColumn 
+     */
+    public void selectRange(int minRow, SpreadsheetColumn minColumn, int maxRow, SpreadsheetColumn maxColumn) {
+        selectionModel.selectRange(minRow, minColumn.column, maxRow, maxColumn.column);
     }
     
     /**

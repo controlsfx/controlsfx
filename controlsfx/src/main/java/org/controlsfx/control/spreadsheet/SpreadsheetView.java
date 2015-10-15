@@ -101,8 +101,7 @@ import org.controlsfx.tools.Utils;
  * <li>Rows can be fixed to the top of the {@link SpreadsheetView} so that they
  * are always visible on screen.</li>
  * <li>Columns can be fixed to the left of the {@link SpreadsheetView} so that
- * they are always visible on screen. Only columns without any spanning cells
- * can be fixed.</li>
+ * they are always visible on screen.</li>
  * <li>A row header can be switched on in order to display the row number.</li>
  * <li>Rows can be resized just like columns with click &amp; drag.</li>
  * <li>Both row and column header can be visible or invisible.</li>
@@ -116,16 +115,22 @@ import org.controlsfx.tools.Utils;
  * <h3>Fixing Rows and Columns</h3> 
  * <br>
  * You can fix some rows and some columns by right-clicking on their header. A
- * context menu will appear if it's possible to fix them. The label will then be
- * in italic and the background will turn to dark grey. 
+ * context menu will appear if it's possible to fix them. When fixed, the label
+ * header will then be in italic and the background will turn to dark grey.
  * <br>
  * You have also the possibility to fix them manually by adding and removing
  * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
  * are strongly advised to check if it's possible to do so with
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
- * {@link #isRowFixable(int)} for the fixed rows. 
+ * {@link #isRowFixable(int)} for the fixed rows.
  * <br>
+ *
+ * A set of rows cannot be fixed if any cell inside these rows has a row span
+ * superior to the number of fixed rows. Likewise, a set of columns cannot be
+ * fixed if any cell inside these columns has a column span superior to the
+ * number of fixed columns.
  * 
+ * <br>
  * If you want to fix several rows or columns together, and they have a span
  * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
  * }
@@ -643,6 +648,9 @@ public class SpreadsheetView extends Control{
      * Indicate whether a row can be fixed or not. Call that method before
      * adding an item with {@link #getFixedRows()} .
      *
+     * A row cannot be fixed alone if any cell inside the row has a row span
+     * superior to one.
+     *
      * @param row
      * @return true if the row can be fixed.
      */
@@ -652,6 +660,10 @@ public class SpreadsheetView extends Control{
     
     /**
      * Indicates whether a List of rows can be fixed or not.
+     *
+     * A set of rows cannot be fixed if any cell inside these rows has a row
+     * span superior to the number of fixed rows.
+     *
      * @param list
      * @return true if the List of row can be fixed together.
      */
@@ -750,6 +762,9 @@ public class SpreadsheetView extends Control{
      * Indicates whether a List of {@link SpreadsheetColumn} can be fixed or
      * not.
      *
+     * A set of columns cannot be fixed if any cell inside these columns has a
+     * column span superior to the number of fixed columns.
+     *
      * @param list
      * @return true if the List of columns can be fixed together.
      */
@@ -766,6 +781,9 @@ public class SpreadsheetView extends Control{
     /**
      * This method is the same as {@link #areSpreadsheetColumnsFixable(java.util.List)
      * } but is using a List of {@link SpreadsheetColumn} indexes.
+     *
+     * A set of columns cannot be fixed if any cell inside these columns has a
+     * column span superior to the number of fixed columns.
      *
      * @param list
      * @return true if the List of columns can be fixed together.

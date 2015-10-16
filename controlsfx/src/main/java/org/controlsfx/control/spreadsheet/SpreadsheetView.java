@@ -108,6 +108,8 @@ import org.controlsfx.tools.Utils;
  * <li>Selection of several cells can be made with a click and drag.</li>
  * <li>A copy/paste context menu is accessible with a right-click. The usual
  * shortcuts are also working.</li>
+ * <li>{@link Picker} can be placed above column header or to the side of the
+ * row header.</li>
  * </ul>
  * 
  * <br>
@@ -130,7 +132,7 @@ import org.controlsfx.tools.Utils;
  * fixed if any cell inside these columns has a column span superior to the
  * number of fixed columns.
  * 
- * <br>
+ * <br><br>
  * If you want to fix several rows or columns together, and they have a span
  * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
  * }
@@ -140,7 +142,7 @@ import org.controlsfx.tools.Utils;
  *
  * Calling those methods prior
  * every move will ensure that no exception will be thrown.
- * <br>
+ * <br><br>
  * You have also the possibility to deactivate these possibilities. For example,
  * you force some row/column to be fixed and then the user cannot change the 
  * settings. 
@@ -153,6 +155,10 @@ import org.controlsfx.tools.Utils;
  * }.
  * 
  * <br>
+ * Users can double-click on a column header will resize the column to the best
+ * size in order to fully see each cell in it. Same rule apply for row header.
+ * Also note that double-clicking on the little space between two row or two
+ * columns (when resizable) will also work just like Excel.
  * 
  * <h3>Pickers</h3>
  * <br>
@@ -180,7 +186,7 @@ import org.controlsfx.tools.Utils;
  * See {@link SpreadsheetCellType} <i>Value Verification</i> documentation for more 
  * information.
  * <br>
- * A unique cell or a selection of several of them can be copied and pasted.
+ * A unique cell or a selection can be copied and pasted.
  * 
  * <br>
  * <br>

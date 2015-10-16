@@ -210,12 +210,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     BooleanProperty lastRowLayout = new SimpleBooleanProperty(true);
     
-    /**
-     * This boolean is set to "true" when "we" (not the system) are asking to
-     * resize a column. If it's the system, it's at initialisation and some
-     * columns which width have been set to default width must not be resized.
-     */
-    private boolean columnFit = false;
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -573,13 +567,15 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         
         /**
          * This is to prevent resize of columns that have the same default width
-         * at initialisation.
+         * at initialisation. If the "system" is calling this method, the
+         * maxRows will be set at 30. When we set a prefWidth and it's equal to
+         * the "default width", the system wants to resize the column. We must
+         * prevent that, thus we check if the two conditions are met.
          */
-        if(handle.isColumnWidthSet(indexColumn) && !columnFit){
+        if(maxRows == 30 && handle.isColumnWidthSet(indexColumn)){
             return;
         }
         
-        columnFit = false;
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
@@ -594,7 +590,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
         ObservableList<ObservableList<SpreadsheetCell>> gridRows = spreadsheetView.getGrid().getRows();//.get(row)
         
-        int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows);
+        /**
+         * If maxRows is -1, we take all rows. If it's 30, it means it's coming
+         * from TableColumnHeader during initialization, so we push it to 100.
+         */
+        int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows == 30 ? 100 : maxRows);
         double maxWidth = 0;
         boolean datePresent = false;
         cell.updateTableColumn(col);
@@ -702,13 +702,13 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * click.
      * 
      * @param tc
+     * @param maxRows
      */
-    public void resize(TableColumnBase<?, ?> tc) {
+    public void resize(TableColumnBase<?, ?> tc, int maxRows) {
         if(tc.isResizable()){
-            columnFit = true;
             int columnIndex = getColumns().indexOf(tc);
             TableColumn tableColumn = getColumns().get(columnIndex);
-            resizeColumnToFitContent(tableColumn, 30);
+            resizeColumnToFitContent(tableColumn, maxRows);
             Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(columnIndex, tableColumn.getWidth()));
         }
     }

@@ -91,7 +91,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
                     if (mouseEvent.getClickCount() == 2 && mouseEvent.isPrimaryButtonDown()) {
-                        ((GridViewSkin) (Object) tableViewSkin).resize(col);
+                        ((GridViewSkin) (Object) tableViewSkin).resize(col, -1);
                     }
                 }
             });

@@ -306,7 +306,7 @@ public class VerticalHeader extends StackPane {
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
                     if(row != null){
-                        label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight).add(row.verticalShift.get()));
+                        label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight).add(row.verticalShift));
                     }
                     label.setLayoutX(x);
                     final ObservableList<String> css = label.getStyleClass();
@@ -421,6 +421,10 @@ public class VerticalHeader extends StackPane {
         public void handle(MouseEvent me) {
 
             if (me.getClickCount() == 2 && me.isPrimaryButtonDown()) {
+                Rectangle rect = (Rectangle) me.getSource();
+                GridRow row = (GridRow) rect.getProperties().get(TABLE_ROW_KEY);
+                skin.resizeRowToFitContent(row.getIndex());
+                requestLayout();
             } else {
                 // rather than refer to the rect variable, we just grab
                 // it from the source to prevent a small memory leak.

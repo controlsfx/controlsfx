@@ -37,6 +37,7 @@ import java.util.Stack;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -187,6 +188,10 @@ public class VerticalHeader extends StackPane {
 
     public double getVerticalHeaderWidth() {
         return innerVerticalHeaderWidth.get();
+    }
+    
+    public ReadOnlyDoubleProperty verticalHeaderWidthProperty(){
+        return innerVerticalHeaderWidth;
     }
 
     public double computeHeaderWidth() {

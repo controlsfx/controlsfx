@@ -186,7 +186,12 @@ public final class SpreadsheetColumn {
      * @param width
      */
     public void setPrefWidth(double width) {
-        column.setPrefWidth(Math.ceil(width));
+        width = Math.ceil(width);
+        if (column.getPrefWidth() == width && column.getWidth() != width) {
+            column.impl_setWidth(width);
+        } else {
+            column.setPrefWidth(width);
+        }
         spreadsheetView.columnWidthSet(indexColumn);
     }
 
@@ -262,7 +267,7 @@ public final class SpreadsheetColumn {
                         fixItem.setText(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
                     } else {
                         fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix"))); //$NON-NLS-1$
-                    }
+                }
                 }
             });
             fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$

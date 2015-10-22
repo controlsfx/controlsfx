@@ -28,6 +28,7 @@ package impl.org.controlsfx.spreadsheet;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.MapChangeListener;
@@ -66,10 +67,10 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
          *  FIXME Bug? When re-using the row, it should re-compute the prefHeight and not
          *  keep the old value.
          */
-        this.indexProperty().addListener(setPrefHeightListener);
-        this.visibleProperty().addListener(setPrefHeightListener);
+        this.indexProperty().addListener(weakPrefHeightListener);
+        this.visibleProperty().addListener(weakPrefHeightListener);
         
-        handle.getView().gridProperty().addListener(setPrefHeightListener);
+        handle.getView().gridProperty().addListener(weakPrefHeightListener);
         
         /**
          * When the height is changing elsewhere, we need to update ourself if necessary.
@@ -122,9 +123,10 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         @Override
         public void invalidated(Observable o) {
             setRowHeight(computePrefHeight(-1));
-            
         }
     };
+    
+    private final WeakInvalidationListener weakPrefHeightListener = new WeakInvalidationListener(setPrefHeightListener);
     
     public void setRowHeight(double height) {
         CellView.getValue(() -> {

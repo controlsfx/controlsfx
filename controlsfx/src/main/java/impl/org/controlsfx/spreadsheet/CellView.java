@@ -126,6 +126,19 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             getTableView().edit(-1, null);
             return;
         } 
+        /**
+         * If this CellView has no parent, this means that it was stacked into
+         * the cellsMap of the GridRowSkin, but the weakRef was dropped. So this
+         * CellView is still reacting to events, but it's not part of the
+         * sceneGraph! So we must deactivate this cell and let the real Cell in
+         * the sceneGraph take the edition.
+         */
+        if(getParent() == null){
+            updateTableView(null);
+            updateTableRow(null);
+            updateTableColumn(null);
+            return;
+        }
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         // We start to edit only if the Cell is a normal Cell (aka visible).

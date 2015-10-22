@@ -434,7 +434,7 @@ public abstract class SpreadsheetCellEditor {
 
         @Override
         public double getMaxHeight() {
-            return 500;
+            return Double.MAX_VALUE;
         }
         
         /**

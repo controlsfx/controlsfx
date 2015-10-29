@@ -525,7 +525,10 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
         final SpreadsheetCell otherCell = (SpreadsheetCell) obj;
         return otherCell.getRow() == row && otherCell.getColumn() == column
-                && Objects.equals(otherCell.getText(), getText());
+                && Objects.equals(otherCell.getText(), getText())
+                && rowSpan == otherCell.getRowSpan()
+                && columnSpan == otherCell.getColumnSpan()
+                && Objects.equals(getStyleClass(), otherCell.getStyleClass());
     }
 
     /** {@inheritDoc} */
@@ -535,7 +538,10 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         int result = 1;
         result = prime * result + column;
         result = prime * result + row;
+        result = prime * result + rowSpan;
+        result = prime * result + columnSpan;
         result = prime * result + Objects.hashCode(getText());
+        result = prime * result + Objects.hashCode(getStyleClass());
         return result;
     }
     

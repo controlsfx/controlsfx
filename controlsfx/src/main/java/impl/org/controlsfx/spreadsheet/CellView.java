@@ -115,7 +115,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
         itemProperty().addListener(itemChangeListener);
-    }
+            }
 
     /***************************************************************************
      * * Public Methods * *
@@ -321,12 +321,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else {
             setOnDragOver(null);
             setOnDragDropped(null);
-        }
-    }
-
-    public void show() {
-        if (getItem() != null) {
-            show(getItem());
         }
     }
 
@@ -627,7 +621,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 }
             }
             if (newItem != null) {
-                getStyleClass().clear();
+         getStyleClass().clear();
                 getStyleClass().setAll(newItem.getStyleClass());
 
                 newItem.getStyleClass().addListener(weakStyleClassListener);
@@ -642,7 +636,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     //We clear the previous style.
                     setStyle(null);
                 }
-            }
+    }
         }
     };
     

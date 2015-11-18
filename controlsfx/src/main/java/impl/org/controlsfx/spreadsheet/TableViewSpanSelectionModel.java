@@ -179,7 +179,7 @@ public class TableViewSpanSelectionModel extends
         timer = new Timeline(new KeyFrame(Duration.millis(100), new WeakEventHandler<>((timerEventHandler))));
         cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new WeakEventHandler<>(keyPressedEventHandler));
 
-        cellsView.setOnMousePressed(new WeakEventHandler<>(mousePressedEventHandler));
+        cellsView.addEventFilter(MouseEvent.MOUSE_PRESSED, new WeakEventHandler<>(mousePressedEventHandler));
         cellsView.setOnDragDetected(new WeakEventHandler<>(onDragDetectedEventHandler));
 
         cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));

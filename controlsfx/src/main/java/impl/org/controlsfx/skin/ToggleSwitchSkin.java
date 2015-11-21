@@ -70,7 +70,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         label = new Label();
         labelContainer = new StackPane();
 
-        label.setText(control.getText());
+        label.textProperty().bind(control.textProperty());
         getChildren().addAll(labelContainer, thumbArea, thumb);
         labelContainer.getChildren().addAll(label);
         StackPane.setAlignment(label, Pos.CENTER_LEFT);

@@ -526,29 +526,15 @@ public class Wizard {
     private void validateActionState() {
         final List<ButtonType> currentPaneButtons = dialog.getDialogPane().getButtonTypes();
         
-        // Note that we put the 'next' and 'finish' actions at the beginning of 
-        // the actions list, so that it takes precedence as the default button, 
-        // over, say, cancel. We will probably want to handle this better in the
-        // future...
-        
-        if (!getFlow().canAdvance(currentPage.orElse(null))) {
-            currentPaneButtons.remove(BUTTON_NEXT);
-            
-//            currentPaneActions.add(0, ACTION_FINISH);
-//            ACTION_FINISH.setDisabled( validationSupport.isInvalid());
-        } else {
-            if (currentPaneButtons.contains(BUTTON_NEXT)) {
-                currentPaneButtons.remove(BUTTON_NEXT);
-                currentPaneButtons.add(0, BUTTON_NEXT);
-                Button button = (Button)dialog.getDialogPane().lookupButton(BUTTON_NEXT);
-                button.addEventFilter(ActionEvent.ACTION, BUTTON_NEXT_ACTION_HANDLER);
-            }
+        if (getFlow().canAdvance(currentPage.orElse(null))) {
             currentPaneButtons.remove(ButtonType.FINISH);
-//            ACTION_NEXT.setDisabled( validationSupport.isInvalid());
+        } else {
+            currentPaneButtons.remove(BUTTON_NEXT);
         }
 
         validateButton( BUTTON_PREVIOUS, () -> pageHistory.isEmpty());
         validateButton( BUTTON_NEXT,     () -> invalidProperty.get());
+        validateButton( ButtonType.FINISH,     () -> invalidProperty.get());
 
     }
     

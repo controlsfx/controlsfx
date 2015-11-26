@@ -466,11 +466,6 @@ public class PopOver extends PopupControl {
 
     private void ownerWindowClosing() {
         hide(Duration.ZERO);
-        if (ownerWindow != null) // just to be sure
-        {
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                    closePopOverOnOwnerWindowClose);
-        }
     }
 
     /**
@@ -492,6 +487,11 @@ public class PopOver extends PopupControl {
      * @since 1.0
      */
     public final void hide(Duration fadeOutDuration) {
+        //We must remove EventFilter in order to prevent memory leak.
+        if (ownerWindow != null){
+            ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                    closePopOverOnOwnerWindowClose);
+        }
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;
         }

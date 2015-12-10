@@ -1100,14 +1100,21 @@ public class SpreadsheetView extends Control{
         checkFormat();
 
         final ArrayList<GridChange> list = new ArrayList<>();
-        @SuppressWarnings("rawtypes")
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
         for (final TablePosition<?, ?> p : posList) {
             SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
             // Using SpreadsheetCell change to stock the information
             // FIXME a dedicated class should be used
-            list.add(new GridChange(cell.getRow(), cell.getColumn(), null, cell.getItem() == null ? null : cell.getItem().toString()));
+            /**
+             * We need to add every cell contained in a span otherwise the
+             * rectangles computed when pasting will be wrong.
+             */
+            for (int row = 0; row < cell.getRowSpan(); ++row) {
+                for (int col = 0; col < cell.getColumnSpan(); ++col) {
+                    list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                }
+            }
         }
 
         final ClipboardContent content = new ClipboardContent();

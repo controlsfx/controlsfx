@@ -72,6 +72,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableColumn;
@@ -446,7 +447,7 @@ public class SpreadsheetView extends Control{
          * Keyboard action, maybe use an accelerator
          */
         cellsView.setOnKeyPressed(keyPressedHandler);
-
+        
         /**
          * ContextMenu handling.
          */
@@ -1013,6 +1014,56 @@ public class SpreadsheetView extends Control{
      */
     public void scrollToRow(int row){
         cellsView.scrollTo(row);
+    }
+    
+    /**
+     * Same method as {@link ScrollBar#setValue(double) } on the verticalBar.
+     *
+     * @param value
+     */
+    public void setVBarValue(double value) {
+        if (getCellsViewSkin() == null) {
+            Platform.runLater(() -> {
+                setVBarValue(value);
+            });
+            return;
+        }
+        getCellsViewSkin().getVBar().setValue(value);
+    }
+
+    /**
+     * Same method as {@link ScrollBar#setValue(double) } on the verticalBar.
+     *
+     * @param value
+     */
+    public void setHBarValue(double value) {
+        if (getCellsViewSkin() == null) {
+            Platform.runLater(() -> {
+                setHBarValue(value);
+            });
+            return;
+        }
+        getCellsViewSkin().getHBar().setValue(value);
+    }
+
+    /**
+     * Return the value of the vertical scrollbar. See {@link ScrollBar#getValue()
+     * }
+     *
+     * @return
+     */
+    public double getVBarValue() {
+        return getCellsViewSkin().getVBar().getValue();
+    }
+
+    /**
+     * Return the value of the horizontal scrollbar. See {@link ScrollBar#getValue()
+     * }
+     *
+     * @return
+     */
+    public double getHBarValue() {
+        return getCellsViewSkin().getHBar().getValue();
     }
     
     /**

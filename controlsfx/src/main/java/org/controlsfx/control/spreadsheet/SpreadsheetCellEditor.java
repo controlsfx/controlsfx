@@ -333,7 +333,7 @@ public abstract class SpreadsheetCellEditor {
             attachEnterEscapeEventHandler();
 
             tf.requestFocus();
-            tf.end();
+            tf.selectAll();
         }
 
         @Override
@@ -414,7 +414,7 @@ public abstract class SpreadsheetCellEditor {
             attachEnterEscapeEventHandler();
 
             textArea.requestFocus();
-            textArea.end();
+            textArea.selectAll();
         }
 
         @Override

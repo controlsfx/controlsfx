@@ -41,6 +41,7 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableRow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -99,6 +100,13 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         widthProperty().addListener(hBarValueChangeListener);
         
         sheetChildren = findSheetChildren();
+        
+        //When we click outside of the grid, we want to deselect all cells.
+        setOnMouseClicked((MouseEvent event) -> {
+            if (event.getTarget().getClass() == GridRow.class) {
+                spreadSheetView.getSelectionModel().clearSelection();
+            }
+        });
     }
 
     /***************************************************************************

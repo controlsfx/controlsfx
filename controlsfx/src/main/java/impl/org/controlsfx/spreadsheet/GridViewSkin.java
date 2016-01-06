@@ -76,6 +76,7 @@ import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.scene.control.ScrollBar;
 
@@ -1105,5 +1106,21 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     @Override
     public int getItemCount() {
         return getSkinnable().getItems() == null ? 0 : getSkinnable().getItems().size();
+    }
+
+    /**
+     * If the scene is not yet instantiated, we need to wait otherwise the
+     * VirtualFlow will not shift the cells properly.
+     *
+     * @param value
+     */
+    public void setHbarValue(double value) {
+        if (flow.getScene() == null) {
+            Platform.runLater(() -> {
+                setHbarValue(value);
+            });
+            return;
+        }
+        getHBar().setValue(value);
     }
 }

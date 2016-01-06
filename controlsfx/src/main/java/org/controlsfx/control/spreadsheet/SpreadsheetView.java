@@ -1043,7 +1043,7 @@ public class SpreadsheetView extends Control{
             });
             return;
         }
-        getCellsViewSkin().getHBar().setValue(value);
+        getCellsViewSkin().setHbarValue(value);
     }
 
     /**

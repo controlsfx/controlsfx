@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,9 @@ import javafx.beans.property.IntegerProperty;
  * 
  * <p>To use the autocompletion functionality, refer to the {@link TextFields} class.
  *
+ * The popup size can be modified through its {@link #setVisibleRowCount(int) }
+ * for the height and all the usual methods for the width.
+ * 
  * @param <T> Model-Type of the suggestions
  * @see TextFields
  */
@@ -175,6 +178,60 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      */
     public final IntegerProperty visibleRowCountProperty() {
         return autoCompletionPopup.visibleRowCountProperty();
+    }
+    
+    /**
+     * Sets the prefWidth of the popup.
+     *
+     * @param value
+     */
+    public final void setPrefWidth(double value) {
+        autoCompletionPopup.setPrefWidth(value);
+    }
+
+    /**
+     * Return the pref width of the popup.
+     *
+     * @return the pref width of the popup.
+     */
+    public final double getPrefWidth() {
+        return autoCompletionPopup.getPrefWidth();
+    }
+
+    /**
+     * Sets the minWidth of the popup.
+     *
+     * @param value
+     */
+    public final void setMinWidth(double value) {
+        autoCompletionPopup.setMinWidth(value);
+    }
+
+    /**
+     * Return the min width of the popup.
+     *
+     * @return the min width of the popup.
+     */
+    public final double getMinWidth() {
+        return autoCompletionPopup.getMinWidth();
+    }
+
+    /**
+     * Sets the maxWidth of the popup.
+     *
+     * @param value
+     */
+    public final void setMaxWidth(double value) {
+        autoCompletionPopup.setMaxWidth(value);
+    }
+
+    /**
+     * Return the max width of the popup.
+     *
+     * @return the max width of the popup.
+     */
+    public final double getMaxWidth() {
+        return autoCompletionPopup.getMaxWidth();
     }
 
     /***************************************************************************

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,12 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         suggestionList.prefHeightProperty().bind(
                 Bindings.min(control.visibleRowCountProperty(), Bindings.size(suggestionList.getItems()))
                 .multiply(LIST_CELL_HEIGHT).add(5));
-        suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));               
+        suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));
+        
+        //Allowing the user to control ListView width.
+        suggestionList.prefWidthProperty().bind(control.prefWidthProperty());
+        suggestionList.maxWidthProperty().bind(control.maxWidthProperty());
+        suggestionList.minWidthProperty().bind(control.minWidthProperty());
         registerEventListener();
     }
 

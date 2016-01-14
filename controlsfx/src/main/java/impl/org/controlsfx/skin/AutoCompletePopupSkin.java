@@ -58,7 +58,7 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
          */
         suggestionList.prefHeightProperty().bind(
                 Bindings.min(control.visibleRowCountProperty(), Bindings.size(suggestionList.getItems()))
-                .multiply(LIST_CELL_HEIGHT).add(5));
+                .multiply(LIST_CELL_HEIGHT).add(18));
         suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));
         
         //Allowing the user to control ListView width.

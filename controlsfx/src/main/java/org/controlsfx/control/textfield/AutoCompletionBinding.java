@@ -41,6 +41,7 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.util.Collection;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 
 /**
@@ -199,6 +200,14 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     }
 
     /**
+     * Return the property associated with the pref width.
+     * @return 
+     */
+    public final DoubleProperty prefWidthProperty() {
+        return autoCompletionPopup.prefWidthProperty();
+    }
+
+    /**
      * Sets the minWidth of the popup.
      *
      * @param value
@@ -217,6 +226,14 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     }
 
     /**
+     * Return the property associated with the min width.
+     * @return 
+     */
+    public final DoubleProperty minWidthProperty() {
+        return autoCompletionPopup.minWidthProperty();
+    }
+
+    /**
      * Sets the maxWidth of the popup.
      *
      * @param value
@@ -232,6 +249,14 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      */
     public final double getMaxWidth() {
         return autoCompletionPopup.getMaxWidth();
+    }
+
+    /**
+     * Return the property associated with the max width.
+     * @return 
+     */
+    public final DoubleProperty maxWidthProperty() {
+        return autoCompletionPopup.maxWidthProperty();
     }
 
     /***************************************************************************

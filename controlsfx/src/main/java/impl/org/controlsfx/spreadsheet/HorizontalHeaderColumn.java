@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,9 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         });
         
         /**
-         * I cannot really determine when a resize is done. Apparently, when
+         * We want to resize all other selected columns when we resize one.
+         *
+         * I cannot really determine when a resize is finished. Apparently, when
          * this variable Layout is set to 0, it means the drag is done, so until
          * a beter solution is shown, it will do the trick.
          */
@@ -81,11 +83,15 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         TableViewSkinBase<?,?,?,?,?,TableColumnBase<?,?>> tableViewSkin = getTableViewSkin();
         if (col.getColumns().isEmpty()) {
             final TableColumnHeader columnHeader = new TableColumnHeader(tableViewSkin, col);
+            /**
+             * When the user double click on a header, we want to resize the
+             * column to fit the content.
+             */
             columnHeader.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
-                public void handle(MouseEvent arg0) {
-                    if (arg0.getClickCount() == 2 && arg0.isPrimaryButtonDown()) {
-                        ((GridViewSkin) (Object) tableViewSkin).resize(col);
+                public void handle(MouseEvent mouseEvent) {
+                    if (mouseEvent.getClickCount() == 2 && mouseEvent.isPrimaryButtonDown()) {
+                        ((GridViewSkin) (Object) tableViewSkin).resize(col, -1);
                     }
                 }
             });

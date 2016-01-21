@@ -61,8 +61,6 @@ import javafx.stage.Window;
 import org.controlsfx.tools.ValueExtractor;
 import org.controlsfx.validation.ValidationSupport;
 
-import com.sun.javafx.css.StyleManager;
-
 /**
  * <p>The API for creating multi-page Wizards, based on JavaFX {@link Dialog} API.<br> 
  * Wizard can be setup in following few steps:</p>
@@ -120,18 +118,6 @@ import com.sun.javafx.css.StyleManager;
  * };}</pre>
  */
 public class Wizard {
-    
-    
-    /**************************************************************************
-     * 
-     * Static fields
-     * 
-     **************************************************************************/
-	static {
-		// refer to ControlsFXControl for why this is necessary
-		StyleManager.getInstance().addUserAgentStylesheet(
-				Wizard.class.getResource("wizard.css").toExternalForm()); //$NON-NLS-1$
-	}
     
     
     /**************************************************************************
@@ -244,6 +230,13 @@ public class Wizard {
      */
     public final Optional<ButtonType> showAndWait() {
         return dialog.showAndWait();
+    }
+
+    /**
+     * @return {@link Dialog#resultProperty()} of the {@link Dialog} representing this {@link Wizard}.
+     */
+    public final ObjectProperty<ButtonType> resultProperty() {
+            return dialog.resultProperty();
     }
     
     /**
@@ -506,8 +499,25 @@ public class Wizard {
                 parentOfCurrentPage.getChildren().remove(currentPage);
             }
             
+            // Get current position and size
+            double previousX = dialog.getX();
+            double previousY = dialog.getY();
+            double previousWidth = dialog.getWidth();
+            double previousHeight = dialog.getHeight();
             // and then switch to the new pane
             dialog.setDialogPane(currentPage);
+            // Resize Wizard to new page
+            Window wizard = currentPage.getScene().getWindow();
+            wizard.sizeToScene();
+            // Center resized Wizard to previous position
+            if (!Double.isNaN(previousX) && !Double.isNaN(previousY)) {
+                double newWidth = dialog.getWidth();
+                double newHeight = dialog.getHeight();
+                int newX = (int) (previousX + (previousWidth / 2.0) - (newWidth / 2.0));
+                int newY = (int) (previousY + (previousHeight / 2.0) - (newHeight / 2.0));
+                dialog.setX(newX);
+                dialog.setY(newY);
+            }
         });
         
         validateActionState();
@@ -516,29 +526,15 @@ public class Wizard {
     private void validateActionState() {
         final List<ButtonType> currentPaneButtons = dialog.getDialogPane().getButtonTypes();
         
-        // Note that we put the 'next' and 'finish' actions at the beginning of 
-        // the actions list, so that it takes precedence as the default button, 
-        // over, say, cancel. We will probably want to handle this better in the
-        // future...
-        
-        if (!getFlow().canAdvance(currentPage.orElse(null))) {
-            currentPaneButtons.remove(BUTTON_NEXT);
-            
-//            currentPaneActions.add(0, ACTION_FINISH);
-//            ACTION_FINISH.setDisabled( validationSupport.isInvalid());
-        } else {
-            if (currentPaneButtons.contains(BUTTON_NEXT)) {
-                currentPaneButtons.remove(BUTTON_NEXT);
-                currentPaneButtons.add(0, BUTTON_NEXT);
-                Button button = (Button)dialog.getDialogPane().lookupButton(BUTTON_NEXT);
-                button.addEventFilter(ActionEvent.ACTION, BUTTON_NEXT_ACTION_HANDLER);
-            }
+        if (getFlow().canAdvance(currentPage.orElse(null))) {
             currentPaneButtons.remove(ButtonType.FINISH);
-//            ACTION_NEXT.setDisabled( validationSupport.isInvalid());
+        } else {
+            currentPaneButtons.remove(BUTTON_NEXT);
         }
 
         validateButton( BUTTON_PREVIOUS, () -> pageHistory.isEmpty());
         validateButton( BUTTON_NEXT,     () -> invalidProperty.get());
+        validateButton( ButtonType.FINISH,     () -> invalidProperty.get());
 
     }
     

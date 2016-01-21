@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,8 +46,6 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.PlusMinusSlider;
 import org.controlsfx.control.PlusMinusSlider.PlusMinusEvent;
-
-import com.sun.javafx.css.StyleManager;
 
 public class PlusMinusSliderSkin extends SkinBase<PlusMinusSlider> {
     

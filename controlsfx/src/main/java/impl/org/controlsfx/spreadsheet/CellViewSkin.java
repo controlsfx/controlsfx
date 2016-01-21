@@ -33,7 +33,9 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.TableCell;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
@@ -73,6 +75,25 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         }
     }
 
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        /**
+         * If we have an Image in the Cell, its fitHeight will be affected by
+         * the cell height (see CellView). But during calculation for autofit
+         * option, we want to know the real prefHeight of this cell. Apparently,
+         * the fitHeight option is returned by default so we must override and
+         * return the Height of the image inside.
+         */
+        Node graphic = getSkinnable().getGraphic();
+        if (graphic != null && graphic instanceof ImageView) {
+            ImageView view = (ImageView) graphic;
+            if (view.getImage() != null) {
+                return view.getImage().getHeight();
+            }
+        }
+        return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+    }
+    
     @Override
     protected void layoutChildren(double x, final double y, final double w, final double h) {
         super.layoutChildren(x, y, w, h);

@@ -84,6 +84,7 @@ public class HorizontalHeader extends TableHeaderRow {
 
         //Visibility of vertical Header listener
         spv.showRowHeaderProperty().addListener(verticalHeaderListener);
+        gridViewSkin.verticalHeader.verticalHeaderWidthProperty().addListener(verticalHeaderListener);
 
         //Visibility of horizontal Header listener
         spv.showColumnHeaderProperty().addListener(horizontalHeaderVisibilityListener);
@@ -224,9 +225,10 @@ public class HorizontalHeader extends TableHeaderRow {
      * Whether the Vertical Header is showing, we need to update the width
      * because some space on the left will be available/used.
      */
-    private final ChangeListener<Boolean> verticalHeaderListener = new ChangeListener<Boolean>() {
+    private final InvalidationListener verticalHeaderListener = new InvalidationListener() {
+
         @Override
-        public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+        public void invalidated(Observable observable) {
             updateTableWidth();
         }
     };

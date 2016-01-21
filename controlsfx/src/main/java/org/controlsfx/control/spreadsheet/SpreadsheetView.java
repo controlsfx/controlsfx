@@ -63,7 +63,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -85,7 +87,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
 
@@ -100,14 +101,15 @@ import org.controlsfx.tools.Utils;
  * <li>Rows can be fixed to the top of the {@link SpreadsheetView} so that they
  * are always visible on screen.</li>
  * <li>Columns can be fixed to the left of the {@link SpreadsheetView} so that
- * they are always visible on screen. Only columns without any spanning cells
- * can be fixed.</li>
+ * they are always visible on screen.</li>
  * <li>A row header can be switched on in order to display the row number.</li>
  * <li>Rows can be resized just like columns with click &amp; drag.</li>
  * <li>Both row and column header can be visible or invisible.</li>
  * <li>Selection of several cells can be made with a click and drag.</li>
  * <li>A copy/paste context menu is accessible with a right-click. The usual
  * shortcuts are also working.</li>
+ * <li>{@link Picker} can be placed above column header or to the side of the
+ * row header.</li>
  * </ul>
  * 
  * <br>
@@ -115,16 +117,22 @@ import org.controlsfx.tools.Utils;
  * <h3>Fixing Rows and Columns</h3> 
  * <br>
  * You can fix some rows and some columns by right-clicking on their header. A
- * context menu will appear if it's possible to fix them. The label will then be
- * in italic and the background will turn to dark grey. 
+ * context menu will appear if it's possible to fix them. When fixed, the label
+ * header will then be in italic and the background will turn to dark grey.
  * <br>
  * You have also the possibility to fix them manually by adding and removing
  * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
  * are strongly advised to check if it's possible to do so with
  * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
- * {@link #isRowFixable(int)} for the fixed rows. 
+ * {@link #isRowFixable(int)} for the fixed rows.
  * <br>
+ *
+ * A set of rows cannot be fixed if any cell inside these rows has a row span
+ * superior to the number of fixed rows. Likewise, a set of columns cannot be
+ * fixed if any cell inside these columns has a column span superior to the
+ * number of fixed columns.
  * 
+ * <br><br>
  * If you want to fix several rows or columns together, and they have a span
  * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
  * }
@@ -134,7 +142,7 @@ import org.controlsfx.tools.Utils;
  *
  * Calling those methods prior
  * every move will ensure that no exception will be thrown.
- * <br>
+ * <br><br>
  * You have also the possibility to deactivate these possibilities. For example,
  * you force some row/column to be fixed and then the user cannot change the 
  * settings. 
@@ -147,6 +155,10 @@ import org.controlsfx.tools.Utils;
  * }.
  * 
  * <br>
+ * Users can double-click on a column header will resize the column to the best
+ * size in order to fully see each cell in it. Same rule apply for row header.
+ * Also note that double-clicking on the little space between two row or two
+ * columns (when resizable) will also work just like Excel.
  * 
  * <h3>Pickers</h3>
  * <br>
@@ -174,7 +186,7 @@ import org.controlsfx.tools.Utils;
  * See {@link SpreadsheetCellType} <i>Value Verification</i> documentation for more 
  * information.
  * <br>
- * A unique cell or a selection of several of them can be copied and pasted.
+ * A unique cell or a selection can be copied and pasted.
  * 
  * <br>
  * <br>
@@ -214,7 +226,7 @@ import org.controlsfx.tools.Utils;
  * @see GridBase
  * @see Picker
  */
-public class SpreadsheetView extends Control {
+public class SpreadsheetView extends Control{
 
     /***************************************************************************
      * * Static Fields * *
@@ -383,6 +395,12 @@ public class SpreadsheetView extends Control {
      */
     public SpreadsheetView(final Grid grid) {
         super();
+        //We want to recompute the rectangleHeight when a fixedRow is resized.
+        addEventHandler(RowHeightEvent.ROW_HEIGHT_CHANGE, (RowHeightEvent event) -> {
+            if(getFixedRows().contains(event.getRow()) && getCellsViewSkin() != null){
+                getCellsViewSkin().computeFixedRowHeight();
+            }
+        });
         getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
         // anonymous skin
         setSkin(new Skin<SpreadsheetView>() {
@@ -636,6 +654,9 @@ public class SpreadsheetView extends Control {
      * Indicate whether a row can be fixed or not. Call that method before
      * adding an item with {@link #getFixedRows()} .
      *
+     * A row cannot be fixed alone if any cell inside the row has a row span
+     * superior to one.
+     *
      * @param row
      * @return true if the row can be fixed.
      */
@@ -645,6 +666,10 @@ public class SpreadsheetView extends Control {
     
     /**
      * Indicates whether a List of rows can be fixed or not.
+     *
+     * A set of rows cannot be fixed if any cell inside these rows has a row
+     * span superior to the number of fixed rows.
+     *
      * @param list
      * @return true if the List of row can be fixed together.
      */
@@ -735,13 +760,16 @@ public class SpreadsheetView extends Control {
      * @return true if the column if fixable
      */
     public boolean isColumnFixable(int columnIndex) {
-        return columnIndex < getColumns().size()
-                ? getColumns().get(columnIndex).isColumnFixable() : null;
+        return columnIndex >= 0 && columnIndex < getColumns().size() && isFixingColumnsAllowed()
+                ? getColumns().get(columnIndex).isColumnFixable() : false;
     }
 
     /**
      * Indicates whether a List of {@link SpreadsheetColumn} can be fixed or
      * not.
+     *
+     * A set of columns cannot be fixed if any cell inside these columns has a
+     * column span superior to the number of fixed columns.
      *
      * @param list
      * @return true if the List of columns can be fixed together.
@@ -760,6 +788,9 @@ public class SpreadsheetView extends Control {
      * This method is the same as {@link #areSpreadsheetColumnsFixable(java.util.List)
      * } but is using a List of {@link SpreadsheetColumn} indexes.
      *
+     * A set of columns cannot be fixed if any cell inside these columns has a
+     * column span superior to the number of fixed columns.
+     *
      * @param list
      * @return true if the List of columns can be fixed together.
      */
@@ -771,7 +802,7 @@ public class SpreadsheetView extends Control {
         final int columnCount = grid.getColumnCount();
         final ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
         for (Integer columnIndex : list) {
-            if (columnIndex == null || columnIndex < 0 || columnIndex > columnCount) {
+            if (columnIndex == null || columnIndex < 0 || columnIndex >= columnCount) {
                 return false;
             }
             //If this column is not fixable, we need to identify the maximum span
@@ -1607,17 +1638,6 @@ public class SpreadsheetView extends Control {
         }
     };
 
-    /**
-     * Default Callback for the Row and column picker. It does nothing.
-     */
-    private static final Callback<Integer, Void> DEFAULT_CALLBACK = new Callback<Integer, Void>() {
-
-        @Override
-        public Void call(Integer p) {
-            //no-op
-            return null;
-        }
-    };
     private final ChangeListener<ContextMenu> contextMenuChangeListener = new ChangeListener<ContextMenu>() {
         
         @Override
@@ -1689,4 +1709,78 @@ public class SpreadsheetView extends Control {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }
     };
+    
+    /**
+     * This event is thrown on the SpreadsheetView when the user resize a row
+     * with its mouse.
+     */
+    public static class RowHeightEvent extends Event {
+
+        /**
+         * This is the event used by {@link RowHeightEvent}.
+         */
+        public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE = new EventType<>(Event.ANY, "RowHeightChange"); //$NON-NLS-1$
+
+        private final int row;
+        private final double height;
+
+        public RowHeightEvent(int row, double height) {
+            super(ROW_HEIGHT_CHANGE);
+            this.row = row;
+            this.height = height;
+        }
+
+        /**
+         * Return the row index that has been resized.
+         * @return the row index that has been resized.
+         */
+        public int getRow() {
+            return row;
+        }
+
+        /**
+         * Return the new height for this row.
+         * @return the new height for this row.
+         */
+        public double getHeight() {
+            return height;
+        }
+    }
+    
+    /**
+     * This event is thrown on the SpreadsheetView when the user resize a column
+     * with its mouse.
+     */
+    public static class ColumnWidthEvent extends Event {
+
+        /**
+         * This is the event used by {@link ColumnWidthEvent}.
+         */
+        public static final EventType<ColumnWidthEvent> COLUMN_WIDTH_CHANGE = new EventType<>(Event.ANY, "ColumnWidthChange"); //$NON-NLS-1$
+
+        private final int column;
+        private final double width;
+
+        public ColumnWidthEvent(int column, double width) {
+            super(COLUMN_WIDTH_CHANGE);
+            this.column = column;
+            this.width = width;
+        }
+
+        /**
+         * Return the column index that has been resized.
+         * @return the column index that has been resized.
+         */
+        public int getColumn() {
+            return column;
+        }
+
+        /**
+         * Return the new width for this column.
+         * @return the new width for this column.
+         */
+        public double getWidth() {
+            return width;
+        }
+    }
 }

@@ -214,7 +214,7 @@ public final class SpreadsheetColumn {
      */
     public void fitColumn() {
         if (column.isResizable() && spreadsheetView.getCellsViewSkin() != null) {
-            spreadsheetView.getCellsViewSkin().resize(column);
+            spreadsheetView.getCellsViewSkin().resize(column, 100);
         }
     }
 
@@ -222,7 +222,10 @@ public final class SpreadsheetColumn {
      * Indicate whether this column can be fixed or not. Call that method before
      * calling {@link #setFixed(boolean)} or adding an item to
      * {@link SpreadsheetView#getFixedColumns()}.
-     * 
+     *
+     * A column cannot be fixed alone if any cell inside the column has a column
+     * span superior to one.
+     *
      * @return true if this column is fixable.
      */
     public boolean isColumnFixable() {

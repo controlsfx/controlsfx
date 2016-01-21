@@ -29,8 +29,6 @@ package org.controlsfx.control;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 
-import com.sun.javafx.css.StyleManager;
-
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

@@ -52,8 +52,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import org.controlsfx.control.RangeSlider;
+import org.controlsfx.tools.Utils;
 
-import com.sun.javafx.Utils;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.behavior.OrientedKeyBinding;

@@ -49,7 +49,6 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.RangeSlider;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;

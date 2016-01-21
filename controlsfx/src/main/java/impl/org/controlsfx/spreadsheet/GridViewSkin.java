@@ -76,6 +76,7 @@ import com.sun.javafx.scene.control.behavior.TableViewBehavior;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkinBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
+import javafx.event.Event;
 import javafx.scene.control.ScrollBar;
 
 /**
@@ -209,12 +210,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      */
     BooleanProperty lastRowLayout = new SimpleBooleanProperty(true);
     
-    /**
-     * This boolean is set to "true" when "we" (not the system) are asking to
-     * resize a column. If it's the system, it's at initialisation and some
-     * columns which width have been set to default width must not be resized.
-     */
-    private boolean columnFit = false;
     /***************************************************************************
      * * CONSTRUCTOR * *
      **************************************************************************/
@@ -433,7 +428,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if(getSkinnable().getColumns().isEmpty()){
             return;
         }
-        
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = getSkinnable().getColumns().get(0);
         List<?> items = itemsProperty().get();
         if (items == null || items.isEmpty()) {
@@ -458,7 +452,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
         
         // determine cell padding
-        double padding = 10;
+        double padding = 5;
+
         Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
         if (n instanceof Region) {
             Region r = (Region) n;
@@ -466,26 +461,25 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
 
         double maxHeight;
-//        int maxRows = handle.getView().getGrid().getRowCount();
-//        for (int row = 0; row < maxRows; row++) {
         maxHeight = 0;
-        for (TableColumn column : getSkinnable().getColumns()) {
+        getChildren().add(cell);
 
+        for (TableColumn column : getSkinnable().getColumns()) {
             cell.updateTableColumn(column);
             cell.updateTableView(handle.getGridView());
             cell.updateIndex(row);
 
             if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
-                getChildren().add(cell);
                 cell.setWrapText(true);
 
                 cell.impl_processCSS(false);
-                maxHeight = Math.max(maxHeight, cell.prefHeight(col.getWidth()));
-                getChildren().remove(cell);
+                maxHeight = Math.max(maxHeight, cell.prefHeight(column.getWidth()));
             }
         }
+        getChildren().remove(cell);
         rowHeightMap.put(row, maxHeight + padding);
-//        }
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight + padding));
+
         rectangleSelection.updateRectangle();
     }
     
@@ -505,6 +499,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         int maxRows = handle.getView().getGrid().getRowCount();
         for (int row = 0; row < maxRows; row++) {
             if (grid.isRowResizable(row)) {
+                Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight));
                 rowHeightMap.put(row, maxHeight);
             }
         }
@@ -566,23 +561,25 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (cell == null) {
             return;
         }
-        
+
         //The current index of that column
         int indexColumn = handle.getGridView().getColumns().indexOf(tc);
         
         /**
          * This is to prevent resize of columns that have the same default width
-         * at initialisation.
+         * at initialisation. If the "system" is calling this method, the
+         * maxRows will be set at 30. When we set a prefWidth and it's equal to
+         * the "default width", the system wants to resize the column. We must
+         * prevent that, thus we check if the two conditions are met.
          */
-        if(handle.isColumnWidthSet(indexColumn) && !columnFit){
+        if(maxRows == 30 && handle.isColumnWidthSet(indexColumn)){
             return;
         }
         
-        columnFit = false;
         // set this property to tell the TableCell we want to know its actual
         // preferred width, not the width of the associated TableColumnBase
         cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
-
+        
         // determine cell padding
         double padding = 10;
         Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
@@ -593,12 +590,23 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
         ObservableList<ObservableList<SpreadsheetCell>> gridRows = spreadsheetView.getGrid().getRows();//.get(row)
         
-        int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows);
+        /**
+         * If maxRows is -1, we take all rows. If it's 30, it means it's coming
+         * from TableColumnHeader during initialization, so we push it to 100.
+         */
+        int rows = maxRows == -1 ? items.size() : Math.min(items.size(), maxRows == 30 ? 100 : maxRows);
         double maxWidth = 0;
         boolean datePresent = false;
+        cell.updateTableColumn(col);
+        cell.updateTableView(handle.getGridView());
+        /**
+         * Sometime the skin is not set, and the width computed is zero which
+         * destroy the grid... So in that case, we manually set the skin...
+         */
+        if (cell.getSkin() == null) {
+            cell.setSkin(new CellViewSkin((TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>) cell));
+        }
         for (int row = 0; row < rows; row++) {
-            cell.updateTableColumn(col);
-            cell.updateTableView(handle.getGridView());
             cell.updateIndex(row);
             
             if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
@@ -609,7 +617,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 }
                 cell.impl_processCSS(false);
                 double width = cell.prefWidth(-1);
-                
                 /**
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we
@@ -695,11 +702,14 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * click.
      * 
      * @param tc
+     * @param maxRows
      */
-    public void resize(TableColumnBase<?, ?> tc) {
+    public void resize(TableColumnBase<?, ?> tc, int maxRows) {
         if(tc.isResizable()){
-            columnFit = true;
-            resizeColumnToFitContent(getColumns().get(getColumns().indexOf(tc)), 30);
+            int columnIndex = getColumns().indexOf(tc);
+            TableColumn tableColumn = getColumns().get(columnIndex);
+            resizeColumnToFitContent(tableColumn, maxRows);
+            Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(columnIndex, tableColumn.getWidth()));
         }
     }
 
@@ -977,7 +987,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * We compute the total height of the fixedRows so that the selection can
      * use it without performance regression.
      */
-    private void computeFixedRowHeight() {
+    public void computeFixedRowHeight() {
         fixedRowHeight = 0;
         for (int i : getCurrentlyFixedRow()) {
             fixedRowHeight += getRowHeight(i);
@@ -1066,7 +1076,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     @Override
     protected boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
         getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
-        return getSkinnable().resizeColumn(tc, delta);
+        boolean returnedValue = getSkinnable().resizeColumn(tc, delta);
+        if(returnedValue){
+            Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(getColumns().indexOf(tc), tc.getWidth()));
+        }
+        return returnedValue;
     }
 
     @Override

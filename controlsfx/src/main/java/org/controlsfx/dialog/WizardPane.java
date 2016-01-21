@@ -40,7 +40,8 @@ public class WizardPane extends DialogPane {
      * Creates an instance of wizard pane.
      */
     public WizardPane() {
-            getStyleClass().add("wizard-pane");
+        getStylesheets().add(Wizard.class.getResource("wizard.css").toExternalForm());
+        getStyleClass().add("wizard-pane");
     }
 
     /**

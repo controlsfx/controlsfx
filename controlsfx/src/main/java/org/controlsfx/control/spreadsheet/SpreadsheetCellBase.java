@@ -206,6 +206,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
     //The Bit position for the editable Property.
     private static final int EDITABLE_BIT_POSITION = 4;
+    private static final int WRAP_BIT_POSITION = 5;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -325,6 +326,20 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     public final void setEditable(boolean editable) {
         if(setMask(editable, EDITABLE_BIT_POSITION)){
             Event.fireEvent(this, new Event(EDITABLE_EVENT_TYPE));
+        }
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean isWrapText(){
+        return isSet(WRAP_BIT_POSITION);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setWrapText(boolean wrapText) {
+        if (setMask(wrapText, WRAP_BIT_POSITION)) {
+            Event.fireEvent(this, new Event(WRAP_EVENT_TYPE));
         }
     }
 

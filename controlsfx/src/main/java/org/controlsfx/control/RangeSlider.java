@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.RangeSliderSkin;
+import org.controlsfx.tools.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +54,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.Slider;
 
-import com.sun.javafx.Utils;
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.css.converters.SizeConverter;
@@ -1093,15 +1093,6 @@ public class RangeSlider extends ControlsFXControl {
      */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
-    }
-
-    /**
-     * RT-19263
-     * @deprecated This is an experimental API that is not intended for general use and is subject to change in future versions
-     */
-    @Deprecated
-    @Override protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
-        return getClassCssMetaData();
     }
 
     private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE =

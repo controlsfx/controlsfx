@@ -115,7 +115,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
         itemProperty().addListener(itemChangeListener);
-        setWrapText(true);
     }
 
     /***************************************************************************
@@ -271,8 +270,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
             setTooltip(null);
         }
-        // We want the text to wrap onto another line
-//        setWrapText(true);
+        
+        setWrapText(cell.isWrapText());
+
         setEditable(cell.isEditable());
         
         if (cell.getCellType().acceptDrop()) {

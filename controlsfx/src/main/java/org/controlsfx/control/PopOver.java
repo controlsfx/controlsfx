@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013 - 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,8 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 
@@ -112,7 +114,7 @@ public class PopOver extends PopupControl {
         /*
          * Create some initial content.
          */
-        Label label = new Label("<No Content>"); //$NON-NLS-1$
+        Label label = new Label(localize(asKey("popOver.default.content"))); //$NON-NLS-1$
         label.setPrefSize(200, 200);
         label.setPadding(new Insets(4));
         setContentNode(label);
@@ -818,7 +820,7 @@ public class PopOver extends PopupControl {
 
     // Detached stage title
 
-    private final StringProperty title = new SimpleStringProperty(this, "title", "Info"); //$NON-NLS-1$ //$NON-NLS-2$
+    private final StringProperty title = new SimpleStringProperty(this, "title", localize(asKey("popOver.default.title"))); //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Stores the title to display in the PopOver's header.

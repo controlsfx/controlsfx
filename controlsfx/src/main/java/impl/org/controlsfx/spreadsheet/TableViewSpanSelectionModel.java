@@ -374,11 +374,13 @@ public class TableViewSpanSelectionModel extends
         if (tp.getRow() < 0 || tp.getColumn() < 0) {
             return;
         }
-        TablePosition<ObservableList<SpreadsheetCell>, ?> position;
-        if ((position = isSelectedRange(row, column, tp.getColumn())) != null) {
-            selectedCellsMap.remove(position);
-            removeSelectedRowsAndColumns(position);
-            focus(position.getRow());
+        List<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCells;
+        if ((selectedCells = isSelectedRange(row, column, tp.getColumn())) != null) {
+            for (TablePosition<ObservableList<SpreadsheetCell>, ?> cell : selectedCells) {
+                selectedCellsMap.remove(cell);
+                removeSelectedRowsAndColumns(cell);
+                focus(cell.getRow());
+            }
         } else {
             for (TablePosition<ObservableList<SpreadsheetCell>, ?> pos : getSelectedCells()) {
                 if (pos.equals(tp)) {
@@ -658,7 +660,7 @@ public class TableViewSpanSelectionModel extends
      * @param col
      * @return
      */
-    public TablePosition<ObservableList<SpreadsheetCell>, ?> isSelectedRange(int row,
+    public List<TablePosition<ObservableList<SpreadsheetCell>, ?>> isSelectedRange(int row,
             TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
 
         if (col < 0 || row < 0) {
@@ -671,14 +673,14 @@ public class TableViewSpanSelectionModel extends
 
         final int infCol = cellSpan.getColumn();
         final int supCol = infCol + cellSpan.getColumnSpan();
-
+        List<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCells = new ArrayList<>();
         for (final TablePosition<ObservableList<SpreadsheetCell>, ?> tp : getSelectedCells()) {
             if (tp.getRow() >= infRow && tp.getRow() < supRow && tp.getColumn() >= infCol
                     && tp.getColumn() < supCol) {
-                return tp;
+                selectedCells.add(tp);
             }
         }
-        return null;
+        return selectedCells.isEmpty()? null : selectedCells;
     }
 
     /**

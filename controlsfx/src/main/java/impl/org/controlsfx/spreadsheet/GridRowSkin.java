@@ -40,7 +40,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -183,7 +182,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
 
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
-
+            
             final SpreadsheetCell spreadsheetCell = row.get(indexColumn);
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, spreadsheetCell.getColumnSpan());
 
@@ -250,8 +249,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 //                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
-                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
-                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
+//                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
+//                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
 
                         /**
                          * In case this cell was selected before but we scroll
@@ -259,17 +258,17 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                          * "selected property" to the new Cell in charge of
                          * spanning
                          */
-                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
+//                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
                         // If the selected cell is in the same row, no need to re-select it
-                        if (selectedPosition != null
-                                //When shift selecting, all cells become ROW_VISIBLE so
-                                //We avoid loop selecting here
-                                && skin.containsRow(index)
-                                && selectedPosition.getRow() != index) {
-                            sm.clearSelection(selectedPosition.getRow(),
-                                    selectedPosition.getTableColumn());
-                            sm.select(index, col);
-                        }
+//                        if (selectedPosition != null
+//                                //When shift selecting, all cells become ROW_VISIBLE so
+//                                //We avoid loop selecting here
+//                                && skin.containsRow(index)
+//                                && selectedPosition.getRow() != index) {
+//                            sm.clearSelection(selectedPosition.getRow(),
+//                                    selectedPosition.getTableColumn());
+//                            sm.select(index, col);
+//                        }
                     case NORMAL_CELL: // fall through and carry on
                         if (tableCell.getIndex() != index) {
                             tableCell.updateIndex(index);
@@ -286,7 +285,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         if (tableCell.getParent() == null) {
                             getChildren().add(0, tableCell);
                         }
-                }
+                        }
 
                 if (spreadsheetCell.getColumnSpan() > 1) {
                     /**
@@ -347,7 +346,12 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     }
                 }
 
-                tableCell.resize(width, height);
+                //Fix for JDK-8146406
+                if (spreadsheetView.getFixedRows().contains(index)) {
+                    tableCell.resize(width + 1, height);
+                } else {
+                    tableCell.resize(width, height);
+                }
 
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
@@ -387,7 +391,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         getChildren().removeIf((Node t) -> {
             if(t instanceof CellView){
                 return !cells.contains(t) && ((CellView)t).getIndex() == index;
-            }
+                }
             return false;
         });
     }

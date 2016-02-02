@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,8 @@ import impl.org.controlsfx.spreadsheet.CellView;
 import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -197,13 +199,77 @@ public final class SpreadsheetColumn {
 
     /**
      * Return the actual width of the column.
-     * 
+     *
      * @return the actual width of the column
      */
     public double getWidth() {
         return column.getWidth();
     }
 
+    /**
+     * Return the Property related to the actual width of the column.
+     *
+     * @return
+     */
+    public final ReadOnlyDoubleProperty widthProperty() {
+        return column.widthProperty();
+    }
+
+    /**
+     * Set the minimum width for this SpreadsheetColumn.
+     *
+     * @param value
+     */
+    public final void setMinWidth(double value) {
+        column.setMinWidth(value);
+    }
+
+    /**
+     * Return the minimum width for this SpreadsheetColumn.
+     *
+     * @return
+     */
+    public final double getMinWidth() {
+        return column.getMinWidth();
+    }
+
+    /**
+     * Return the Property related to the minimum width of this
+     * SpreadsheetColumn.
+     *
+     * @return
+     */
+    public final DoubleProperty minWidthProperty() {
+        return column.minWidthProperty();
+    }
+
+    /**
+     * Return the Property related to the maximum width of this
+     * SpreadsheetColumn.
+     *
+     * @return
+     */
+    public final DoubleProperty maxWidthProperty() {
+        return column.maxWidthProperty();
+    }
+
+    /**
+     * Set the maximum width for this SpreadsheetColumn.
+     *
+     * @param value
+     */
+    public final void setMaxWidth(double value) {
+        column.setMaxWidth(value);
+    }
+
+    /**
+     * Return the maximum width for this SpreadsheetColumn.
+     *
+     * @return
+     */
+    public final double getMaxWidth() {
+        return column.getMaxWidth();
+    }
     /**
      * If this column can be resized by the user
      * 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2016, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -105,6 +105,7 @@ public class Notifications {
     private boolean hideCloseButton;
     private EventHandler<ActionEvent> onAction;
     private Window owner;
+    private Screen screen = Screen.getPrimary();
 
     private List<String> styleClass = new ArrayList<>();
 
@@ -163,12 +164,17 @@ public class Notifications {
     }
 
     /**
-     * The dialog window owner - if specified the notifications will be inside
+     * The dialog window owner - which can be {@link Screen}, {@link Window}
+     * or {@link Node}. If specified, the notifications will be inside
      * the owner, otherwise the notifications will be shown within the whole
-     * screen.
+     * primary (default) screen.
      */
     public Notifications owner(Object owner) {
-        this.owner = Utils.getWindow(owner);
+        if (owner instanceof Screen) {
+            this.screen = (Screen) owner;
+        } else {
+            this.owner = Utils.getWindow(owner);
+        }
         return this;
     }
 
@@ -271,8 +277,6 @@ public class Notifications {
 
         private static final NotificationPopupHandler INSTANCE = new NotificationPopupHandler();
 
-        private static final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-
         private double startX;
         private double startY;
         private double screenWidth;
@@ -291,13 +295,14 @@ public class Notifications {
         private boolean isShowing = false;
 
         public void show(Notifications notification) {
-            Window window = null;
+            Window window;
             if (notification.owner == null) {
                 /*
                  * If the owner is not set, we work with the whole screen.
                  */
-                startX = 0;
-                startY = 0;
+                Rectangle2D screenBounds = notification.screen.getVisualBounds();
+                startX = screenBounds.getMinX();
+                startY = screenBounds.getMinY();
                 screenWidth = screenBounds.getWidth();
                 screenHeight = screenBounds.getHeight();
 

@@ -1037,9 +1037,17 @@ public class SpreadsheetView extends Control{
      * @param value
      */
     public void setHBarValue(double value) {
+        setHBarValue(value,0);
+    }
+    
+    private void setHBarValue(double value, int attempt) {
+        if(attempt > 10){
+            return;
+        }
         if (getCellsViewSkin() == null) {
+            final int newAttempt = ++attempt;
             Platform.runLater(() -> {
-                setHBarValue(value);
+                setHBarValue(value, newAttempt);
             });
             return;
         }
@@ -1063,7 +1071,10 @@ public class SpreadsheetView extends Control{
      * @return
      */
     public double getHBarValue() {
-        return getCellsViewSkin().getHBar().getValue();
+        if (getCellsViewSkin() != null && getCellsViewSkin().getHBar() != null) {
+            return getCellsViewSkin().getHBar().getValue();
+        }
+        return 0.0;
     }
     
     /**

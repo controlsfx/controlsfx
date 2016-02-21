@@ -26,6 +26,7 @@
  */
 package org.controlsfx.property;
 
+import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
@@ -51,6 +52,24 @@ import javafx.scene.control.Alert;
  * @see PropertyDescriptor
  */
 public class BeanProperty implements PropertySheet.Item {
+
+    /**
+     * Unique identifier to provide a custom category label within
+     * {@link PropertySheet.Item#getCategory()}.
+     *
+     * How to use it: with a PropertyDescriptor, provide the custom category
+     * through a a named attribute
+     * {@link FeatureDescriptor#setValue(String, Object)}.
+     *
+     * <pre>
+     * final PropertyDescriptor propertyDescriptor = new PropertyDescriptor("yourProperty", YourBean.class);
+     * propertyDescriptor.setDisplayName("Your Display Name");
+     * propertyDescriptor.setShortDescription("Your explanation about this property.");
+     * // then provide a custom category
+     * propertyDescriptor.setValue(BeanProperty.CATEGORY_LABEL_KEY, "Your custom category");
+     * </pre>
+     */
+    public static final String CATEGORY_LABEL_KEY = "propertysheet.item.category.label";
 
     private final Object bean;
     private final PropertyDescriptor beanPropertyDescriptor;
@@ -118,10 +137,8 @@ public class BeanProperty implements PropertySheet.Item {
 
     /** {@inheritDoc} */
     @Override public String getCategory() {
-        String category = null;
-        if (this.beanPropertyDescriptor instanceof BeanPropertyDescriptor) {
-            category = ((BeanPropertyDescriptor) this.beanPropertyDescriptor).getCategory();
-        }
+        String category = (String) this.beanPropertyDescriptor.getValue(BeanProperty.CATEGORY_LABEL_KEY);
+
         // fall back to default behavior if there is no category provided.
         if (category == null) {
             category = Localization.localize(Localization.asKey(this.beanPropertyDescriptor.isExpert()

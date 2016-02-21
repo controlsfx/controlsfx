@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2015, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,6 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Alert;
 
@@ -53,7 +51,6 @@ import org.controlsfx.property.editor.PropertyEditor;
  * @see PropertySheet
  * @see PropertyDescriptor
  */
-@SuppressWarnings("deprecation")
 public class BeanProperty implements PropertySheet.Item {
 
     private final Object bean;
@@ -177,7 +174,7 @@ public class BeanProperty implements PropertySheet.Item {
             Method m = getBean().getClass().getMethod(propName);
             Object val = m.invoke(getBean());
             if (val != null && val instanceof ObservableValue) {
-                observableValue = Optional.of((ObservableValue) val);
+                observableValue = Optional.of((ObservableValue<?>) val);
             }
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             //Logger.getLogger(BeanProperty.class.getName()).log(Level.SEVERE, null, ex);

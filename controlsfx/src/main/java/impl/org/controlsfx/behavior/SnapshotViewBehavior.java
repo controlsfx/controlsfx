@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ import org.controlsfx.control.SnapshotView;
 import org.controlsfx.control.SnapshotView.Boundary;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
+import com.sun.javafx.scene.control.inputmap.InputMap;
 
 /**
  * The behavior for the {@link SnapshotView}. It is concerned with creating and changing selections according to mouse
@@ -89,6 +89,11 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      */
     private final Consumer<Boolean> setSelectionChanging;
 
+    /**
+     * Input map for SnapshotView.
+     */
+    private final InputMap<SnapshotView> inputMap;
+
     /* ************************************************************************
      *                                                                         *
      * Constructor                                                             *
@@ -102,8 +107,15 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *            the control which this behavior will control
      */
     public SnapshotViewBehavior(SnapshotView snapshotView) {
-        super(snapshotView, new ArrayList<KeyBinding>());
+        super(snapshotView);
+
+        this.inputMap = createInputMap();
+
         this.setSelectionChanging = createSetSelectionChanging();
+    }
+
+    @Override public InputMap<SnapshotView> getInputMap() {
+        return inputMap;
     }
 
     /**
@@ -112,7 +124,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return a Boolean {@link Consumer}
      */
     private Consumer<Boolean> createSetSelectionChanging() {
-        return changing -> getControl().getProperties().put(SnapshotView.SELECTION_CHANGING_PROPERTY_KEY, changing);
+        return changing -> getNode().getProperties().put(SnapshotView.SELECTION_CHANGING_PROPERTY_KEY, changing);
     }
 
     /* ************************************************************************
@@ -174,14 +186,14 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return the bounds as a {@link Rectangle2D}
      */
     private Rectangle2D createBoundsForCurrentBoundary() {
-        Boundary boundary = getControl().getSelectionAreaBoundary();
+        Boundary boundary = getNode().getSelectionAreaBoundary();
         switch (boundary) {
         case CONTROL:
             return new Rectangle2D(0, 0, getControlWidth(), getControlHeight());
         case NODE:
-            boolean nodeExists = getNode() != null;
+            boolean nodeExists = getSnapshotNode() != null;
             if (nodeExists) {
-                Bounds nodeBounds = getNode().getBoundsInParent();
+                Bounds nodeBounds = getSnapshotNode().getBoundsInParent();
                 return Rectangles2D.fromBounds(nodeBounds);
             } else {
                 return Rectangle2D.EMPTY;
@@ -201,7 +213,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      *         selection is inactive this always returns {@link CoordinatePosition#OUT_OF_RECTANGLE}.
      */
     private CoordinatePosition computePosition(Point2D point) {
-        boolean noSelection = !getControl().hasSelection() || !getControl().isSelectionActive();
+        boolean noSelection = !getNode().hasSelection() || !getNode().isSelectionActive();
         boolean controlHasNoSpace = getControlWidth() == 0 || getControlHeight() == 0;
         if (noSelection || controlHasNoSpace) {
             return CoordinatePosition.OUT_OF_RECTANGLE;
@@ -262,7 +274,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
 
             // create and begin the selection change
             selectionChange = new SelectionChangeByStrategy(
-                    getControl(), setSelectionChanging, selectionChangeStrategy, cursor, deactivateSelectionIfClick);
+                    getNode(), setSelectionChanging, selectionChangeStrategy, cursor, deactivateSelectionIfClick);
             selectionChange.beginSelectionChange(selectionEvent.getPoint());
         } else {
             // if the mouse is outside the legal bounds, the selection will not actually change
@@ -343,10 +355,10 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
     }
 
     /**
-     * @return the cursor from the {@link #getControl() control's} current {@link SnapshotView#cursorProperty() cursor}
+     * @return the cursor from the {@link #getNode() control's} current {@link SnapshotView#cursorProperty() cursor}
      */
     private Cursor getRegularCursor() {
-        return getControl().getCursor();
+        return getNode().getCursor();
     }
 
     /**
@@ -430,7 +442,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return {@link SnapshotView#getWidth()}
      */
     private double getControlWidth() {
-        return getControl().getWidth();
+        return getNode().getWidth();
     }
 
     /**
@@ -439,7 +451,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return {@link SnapshotView#getHeight()}
      */
     private double getControlHeight() {
-        return getControl().getHeight();
+        return getNode().getHeight();
     }
 
     /**
@@ -447,8 +459,8 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * 
      * @return {@link SnapshotView#getNode()}
      */
-    private Node getNode() {
-        return getControl().getNode();
+    private Node getSnapshotNode() {
+        return getNode().getNode();
     }
 
     /**
@@ -457,7 +469,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return {@link SnapshotView#getSelection()}
      */
     private Rectangle2D getSelection() {
-        return getControl().getSelection();
+        return getNode().getSelection();
     }
     /**
      * Indicates whether the current selection has a fixed ratio.
@@ -465,7 +477,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return {@link SnapshotView#isSelectionRatioFixed()}
      */
     private boolean isSelectionRatioFixed() {
-        return getControl().isSelectionRatioFixed();
+        return getNode().isSelectionRatioFixed();
     }
 
     /**
@@ -474,7 +486,7 @@ public class SnapshotViewBehavior extends BehaviorBase<SnapshotView> {
      * @return {@link SnapshotView#getFixedSelectionRatio()}
      */
     private double getSelectionRatio() {
-        return getControl().getFixedSelectionRatio();
+        return getNode().getFixedSelectionRatio();
     }
 
     /* ************************************************************************

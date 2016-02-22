@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,18 +26,14 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.util.Collections;
+import javafx.scene.control.skin.CellSkinBase;
 
 import org.controlsfx.control.GridCell;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.CellSkinBase;
-
-public class GridCellSkin<T> extends CellSkinBase<GridCell<T>, BehaviorBase<GridCell<T>>> {
+public class GridCellSkin<T> extends CellSkinBase<GridCell<T>> {
 
     public GridCellSkin(GridCell<T> control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
     }
 
 }

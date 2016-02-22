@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -105,7 +105,7 @@ public class PrefixSelectionCustomizer {
         private <T> void keyPressed(KeyEvent event) {
             KeyCode code = event.getCode();
             if (code.isLetterKey() || code.isDigitKey() || code == KeyCode.SPACE) {
-                String letter = code.impl_getChar();
+                String letter = code.getChar();
                 if (event.getSource() instanceof ComboBox) {
                     ComboBox<T> comboBox = (ComboBox<T>) event.getSource();
                     T item = getEntryWithKey(letter, comboBox.getConverter(), comboBox.getItems(), comboBox);

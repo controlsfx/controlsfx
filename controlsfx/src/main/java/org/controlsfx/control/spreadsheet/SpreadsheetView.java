@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1487,7 +1487,7 @@ public class SpreadsheetView extends Control{
             // We don't want to sort the column
             column.setSortable(false);
 
-            column.impl_setReorderable(false);
+            column.setReorderable(false);
 
             // We assign a DataCell for each Cell needed (MODEL).
             column.setCellValueFactory((TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) -> {

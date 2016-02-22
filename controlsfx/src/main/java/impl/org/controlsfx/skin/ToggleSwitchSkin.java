@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 
 package impl.org.controlsfx.skin;
 
-import com.sun.javafx.css.converters.SizeConverter;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.WritableValue;
@@ -35,6 +34,7 @@ import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.SizeConverter;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;

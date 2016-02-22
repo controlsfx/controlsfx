@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2016, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
@@ -49,8 +50,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.input.InputEvent;
-
-import com.sun.javafx.css.converters.EnumConverter;
 
 /**
  * A plus minus slider allows the user to continously fire an event carrying a

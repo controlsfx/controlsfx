@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 ControlsFX All rights reserved.
+ * Copyright (c) 2015, 2016 ControlsFX All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: *
@@ -87,7 +87,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
         if (isShiftDown && getAnchor() != null) {
 
-            final SpreadsheetCell cell = getControl().getItems().get(fm.getFocusedIndex()).get(focusedCell.getColumn());
+            final SpreadsheetCell cell = getNode().getItems().get(fm.getFocusedIndex()).get(focusedCell.getColumn());
             sm.direction = new Pair<>(delta, 0);
             /**
              * If the delta is >0, it means we want to go down, so we need to
@@ -113,8 +113,8 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
             sm.clearSelection();
             if (minColumn != -1 && maxColumn != -1) {
-                sm.selectRange(minRow, getControl().getColumns().get(minColumn), maxRow,
-                        getControl().getColumns().get(maxColumn));
+                sm.selectRange(minRow, getNode().getColumns().get(minColumn), maxRow,
+                        getNode().getColumns().get(maxColumn));
             }
             fm.focus(newRow, focusedCell.getTableColumn());
         } else {
@@ -153,7 +153,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
         if (isShiftDown && getAnchor() != null) {
             final int columnPos = getVisibleLeafIndex(focusedCell.getTableColumn());
 
-            final SpreadsheetCell cell = getControl().getItems().get(focusedCellRow).get(columnPos);
+            final SpreadsheetCell cell = getNode().getItems().get(focusedCellRow).get(columnPos);
             
             sm.direction = new Pair<>(0, delta);
             final int newColumn;// = columnCell + delta;
@@ -170,8 +170,8 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
             sm.clearSelection();
             if (minColumn != -1 && maxColumn != -1) {
-                sm.selectRange(minRow, getControl().getColumns().get(minColumn), maxRow,
-                        getControl().getColumns().get(maxColumn));
+                sm.selectRange(minRow, getNode().getColumns().get(minColumn), maxRow,
+                        getNode().getColumns().get(maxColumn));
             }
             fm.focus(focusedCell.getRow(), getColumn(newColumn));
         } else {
@@ -236,7 +236,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
             return;
         }
 
-        final SpreadsheetCell cell = getControl().getItems().get(focusedCell.getRow()).get(focusedCell.getColumn());
+        final SpreadsheetCell cell = getNode().getItems().get(focusedCell.getRow()).get(focusedCell.getColumn());
         sm.clearAndSelect(previous ? findPreviousRow(focusedCell, cell) : findNextRow(focusedCell, cell), focusedCell.getTableColumn());
         skin.focusScroll();
     }
@@ -256,14 +256,14 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
             return;
         }
 
-        final SpreadsheetCell cell = getControl().getItems().get(focusedCell.getRow()).get(focusedCell.getColumn());
+        final SpreadsheetCell cell = getNode().getItems().get(focusedCell.getRow()).get(focusedCell.getColumn());
 
-        sm.clearAndSelect(focusedCell.getRow(), getControl().getColumns().get(previous ? findPreviousColumn(focusedCell, cell) : findNextColumn(focusedCell, cell)));
+        sm.clearAndSelect(focusedCell.getRow(), getNode().getColumns().get(previous ? findPreviousColumn(focusedCell, cell) : findNextColumn(focusedCell, cell)));
         skin.focusScroll();
     }
 
     private int findPreviousRow(TablePositionBase focusedCell, SpreadsheetCell cell) {
-        final ObservableList<ObservableList<SpreadsheetCell>> items = getControl().getItems();
+        final ObservableList<ObservableList<SpreadsheetCell>> items = getNode().getItems();
         SpreadsheetCell temp;
         //If my cell is empty, I seek the next non-empty
         if (isEmpty(cell)) {
@@ -328,7 +328,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
     }
 
     private int findNextRow(TablePositionBase focusedCell, SpreadsheetCell cell) {
-        final ObservableList<ObservableList<SpreadsheetCell>> items = getControl().getItems();
+        final ObservableList<ObservableList<SpreadsheetCell>> items = getNode().getItems();
         final int itemCount = getItemCount();
         SpreadsheetCell temp;
         //If my cell is empty, I seek the next non-empty
@@ -372,7 +372,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
             return;
         }
 
-        final SpreadsheetCell cell = getControl().getItems().get(fm.getFocusedIndex()).get(focusedCell.getColumn());
+        final SpreadsheetCell cell = getNode().getItems().get(fm.getFocusedIndex()).get(focusedCell.getColumn());
 
         /**
          * If the delta is >0, it means we want to go down, so we need to target
@@ -393,8 +393,8 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
         sm.clearSelection();
         if (minColumn != -1 && maxColumn != -1) {
-            sm.selectRange(minRow, getControl().getColumns().get(minColumn), maxRow,
-                    getControl().getColumns().get(maxColumn));
+            sm.selectRange(minRow, getNode().getColumns().get(minColumn), maxRow,
+                    getNode().getColumns().get(maxColumn));
         }
         fm.focus(newRow, focusedCell.getTableColumn());
         skin.focusScroll();
@@ -417,7 +417,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
         final int columnPos = getVisibleLeafIndex(focusedCell.getTableColumn());
         int focusedCellRow = focusedCell.getRow();
-        final SpreadsheetCell cell = getControl().getItems().get(focusedCellRow).get(columnPos);
+        final SpreadsheetCell cell = getNode().getItems().get(focusedCellRow).get(columnPos);
 
         final int newColumn = previous ? findPreviousColumn(focusedCell, cell) : findNextColumn(focusedCell, cell);
 
@@ -429,16 +429,16 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
         sm.clearSelection();
         if (minColumn != -1 && maxColumn != -1) {
-            sm.selectRange(minRow, getControl().getColumns().get(minColumn), maxRow,
-                    getControl().getColumns().get(maxColumn));
+            sm.selectRange(minRow, getNode().getColumns().get(minColumn), maxRow,
+                    getNode().getColumns().get(maxColumn));
         }
         fm.focus(focusedCell.getRow(), getColumn(newColumn));
         skin.focusScroll();
     }
 
     private int findNextColumn(TablePositionBase focusedCell, SpreadsheetCell cell) {
-        final ObservableList<ObservableList<SpreadsheetCell>> items = getControl().getItems();
-        final int itemCount = getControl().getColumns().size();
+        final ObservableList<ObservableList<SpreadsheetCell>> items = getNode().getItems();
+        final int itemCount = getNode().getColumns().size();
         SpreadsheetCell temp;
         //If my cell is empty, I seek the next non-empty
         if (isEmpty(cell)) {
@@ -467,7 +467,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
     }
 
     private int findPreviousColumn(TablePositionBase focusedCell, SpreadsheetCell cell) {
-        final ObservableList<ObservableList<SpreadsheetCell>> items = getControl().getItems();
+        final ObservableList<ObservableList<SpreadsheetCell>> items = getNode().getItems();
         SpreadsheetCell temp;
         //If my cell is empty, I seek the next non-empty
         if (isEmpty(cell)) {

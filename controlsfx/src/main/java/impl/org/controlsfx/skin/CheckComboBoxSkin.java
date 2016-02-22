@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,25 +26,21 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.util.Collections;
-
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SkinBase;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.util.Callback;
 
 import org.controlsfx.control.CheckComboBox;
 
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 
-public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, BehaviorBase<CheckComboBox<T>>> {
+public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
     
     /**************************************************************************
      * 
@@ -79,7 +75,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
 
     @SuppressWarnings("unchecked")
     public CheckComboBoxSkin(final CheckComboBox<T> control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
         
         this.control = control;
         this.items = control.getItems();
@@ -90,9 +86,9 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         comboBox = new ComboBox<T>(items) {
             @Override protected javafx.scene.control.Skin<?> createDefaultSkin() {
                 return new ComboBoxListViewSkin<T>(this) {
-                    // overridden to prevent the popup from disappearing
-                    @Override protected boolean isHideOnClickEnabled() {
-                        return false;
+                    // prevent the popup from disappearing
+                    {
+                        setHideOnClick(false);
                     }
                 };
             }

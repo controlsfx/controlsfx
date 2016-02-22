@@ -24,8 +24,8 @@ subprojects {
     group = 'org.controlsfx'
     version = specification_version + artifact_suffix
 
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = '1.9'
+    targetCompatibility = '1.9'
 
     repositories {
        mavenCentral()

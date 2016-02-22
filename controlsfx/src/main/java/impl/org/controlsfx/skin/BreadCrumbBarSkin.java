@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.SkinBase;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.paint.Color;
@@ -53,9 +54,6 @@ import javafx.util.Callback;
 import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.traversal.Algorithm;
 import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
@@ -66,12 +64,12 @@ import com.sun.javafx.scene.traversal.TraversalContext;
  *
  * @param <T>
  */
-public class BreadCrumbBarSkin<T> extends BehaviorSkinBase<BreadCrumbBar<T>, BehaviorBase<BreadCrumbBar<T>>> {
+public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
         
     private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 
     public BreadCrumbBarSkin(final BreadCrumbBar<T> control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
         control.selectedCrumbProperty().addListener(selectedPathChangeListener);
         updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
         fixFocusTraversal();

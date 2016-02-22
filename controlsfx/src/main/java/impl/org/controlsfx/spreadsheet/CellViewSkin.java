@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.skin.TableCellSkin;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -36,6 +35,7 @@ import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.skin.TableCellSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;

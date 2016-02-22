@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,10 +39,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeTableView;
-
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
-import com.sun.javafx.scene.control.skin.TableViewSkinBase;
+import javafx.scene.control.skin.TableHeaderRow;
+import javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.control.skin.TableViewSkinBase;
 
 /**
  * A utility class for API revolving around the JavaFX {@link TableView} and

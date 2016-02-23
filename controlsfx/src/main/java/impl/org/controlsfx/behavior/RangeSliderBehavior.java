@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@ package impl.org.controlsfx.behavior;
 
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.END;
-import static javafx.scene.input.KeyCode.F4;
 import static javafx.scene.input.KeyCode.HOME;
 import static javafx.scene.input.KeyCode.KP_DOWN;
 import static javafx.scene.input.KeyCode.KP_LEFT;
@@ -39,15 +38,8 @@ import static javafx.scene.input.KeyCode.RIGHT;
 import static javafx.scene.input.KeyCode.UP;
 import static javafx.scene.input.KeyEvent.KEY_RELEASED;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javafx.event.EventType;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
@@ -55,55 +47,60 @@ import org.controlsfx.control.RangeSlider;
 import org.controlsfx.tools.Utils;
 
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.behavior.OrientedKeyBinding;
+import com.sun.javafx.scene.control.behavior.FocusTraversalInputMap;
+import com.sun.javafx.scene.control.inputmap.InputMap;
 
 public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     
-     /**************************************************************************
-     *                          Setup KeyBindings                             *
-     *                                                                        *
-     * We manually specify the focus traversal keys because Slider has        *
-     * different usage for up/down arrow keys.                                *
-     *************************************************************************/
-    private static final List<KeyBinding> RANGESLIDER_BINDINGS = new ArrayList<>();
-    static {
-        RANGESLIDER_BINDINGS.add(new KeyBinding(F4, "TraverseDebug").alt().ctrl().shift()); //$NON-NLS-1$
+    /**
+     * Input map for RangeSlider.
+     */
+    private final InputMap<RangeSlider> inputMap;
 
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(LEFT, "DecrementValue")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_LEFT, "DecrementValue")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(UP, "IncrementValue").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_UP, "IncrementValue").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(RIGHT, "IncrementValue")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_RIGHT, "IncrementValue")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(DOWN, "DecrementValue").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_DOWN, "DecrementValue").vertical()); //$NON-NLS-1$
-
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(LEFT, "TraverseLeft").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_LEFT, "TraverseLeft").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(UP, "TraverseUp")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_UP, "TraverseUp")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(RIGHT, "TraverseRight").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_RIGHT, "TraverseRight").vertical()); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(DOWN, "TraverseDown")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new RangeSliderKeyBinding(KP_DOWN, "TraverseDown")); //$NON-NLS-1$
-
-        RANGESLIDER_BINDINGS.add(new KeyBinding(HOME, KEY_RELEASED, "Home")); //$NON-NLS-1$
-        RANGESLIDER_BINDINGS.add(new KeyBinding(END, KEY_RELEASED, "End")); //$NON-NLS-1$
-    }
-    
     public RangeSliderBehavior(RangeSlider slider) {
-        super(slider, RANGESLIDER_BINDINGS);
+        super(slider);
+
+        // InputMap of RangeSlider
+        inputMap = createInputMap();
+
+        // Default mappings
+        addDefaultMapping(inputMap,
+            new InputMap.KeyMapping(LEFT, FocusTraversalInputMap::traverseLeft),
+            new InputMap.KeyMapping(KP_LEFT, FocusTraversalInputMap::traverseLeft),
+            new InputMap.KeyMapping(UP, FocusTraversalInputMap::traverseUp),
+            new InputMap.KeyMapping(KP_UP, FocusTraversalInputMap::traverseUp),
+            new InputMap.KeyMapping(RIGHT, FocusTraversalInputMap::traverseRight),
+            new InputMap.KeyMapping(KP_RIGHT, FocusTraversalInputMap::traverseRight),
+            new InputMap.KeyMapping(DOWN, FocusTraversalInputMap::traverseDown),
+            new InputMap.KeyMapping(KP_DOWN, FocusTraversalInputMap::traverseDown),
+
+            new InputMap.KeyMapping(HOME, KEY_RELEASED, e -> home()),
+            new InputMap.KeyMapping(END, KEY_RELEASED, e -> end())
+        );
+
+        // Horizontal mappings
+        InputMap<RangeSlider> horizontalMappings = new InputMap<>(slider);
+        horizontalMappings.setInterceptor(e -> slider.getOrientation() != Orientation.HORIZONTAL);
+        horizontalMappings.getMappings().addAll(
+            new InputMap.KeyMapping(LEFT, e -> rtl(slider, this::incrementValue, this::decrementValue)),
+            new InputMap.KeyMapping(KP_LEFT, e -> rtl(slider, this::incrementValue, this::decrementValue)),
+            new InputMap.KeyMapping(RIGHT, e -> rtl(slider, this::decrementValue, this::incrementValue)),
+            new InputMap.KeyMapping(KP_RIGHT, e -> rtl(slider, this::decrementValue, this::incrementValue))
+        );
+        addDefaultChildMap(inputMap, horizontalMappings);
+        
+        // Vertical mappings
+        InputMap<RangeSlider> verticalMappings = new InputMap<>(slider);
+        verticalMappings.setInterceptor(e -> slider.getOrientation() != Orientation.VERTICAL);
+        verticalMappings.getMappings().addAll(
+                new InputMap.KeyMapping(DOWN, e -> decrementValue()),
+                new InputMap.KeyMapping(KP_DOWN, e -> decrementValue()),
+                new InputMap.KeyMapping(UP, e -> incrementValue()),
+                new InputMap.KeyMapping(KP_UP, e -> incrementValue())
+        );
+        addDefaultChildMap(inputMap, verticalMappings);
     }
 
-    @Override protected void callAction(String s) {
-        if ("Home".equals(s) || "Home2".equals(s)) home(); //$NON-NLS-1$ //$NON-NLS-2$
-        else if ("End".equals(s) || "End2".equals(s)) end(); //$NON-NLS-1$ //$NON-NLS-2$
-        else if ("IncrementValue".equals(s) || "IncrementValue2".equals(s)) incrementValue(); //$NON-NLS-1$ //$NON-NLS-2$
-        else if ("DecrementValue".equals(s) || "DecrementValue2".equals(s)) decrementValue(); //$NON-NLS-1$ //$NON-NLS-2$
-        else super.callAction(s);
-    }
-     
     /**************************************************************************
      *                         State and Functions                            *
      *************************************************************************/
@@ -112,6 +109,11 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     public void setSelectedValue(Callback<Void, FocusedChild> c) {
         selectedValue = c;
     }
+
+    @Override public InputMap<RangeSlider> getInputMap() {
+        return inputMap;
+    }
+
     /**
      * Invoked by the RangeSlider {@link Skin} implementation whenever a mouse press
      * occurs on the "track" of the slider. This will cause the thumb to be
@@ -123,7 +125,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     public void trackPress(MouseEvent e, double position) {
         // determine the percentage of the way between min and max
         // represented by this mouse event
-        final RangeSlider rangeSlider = getControl();
+        final RangeSlider rangeSlider = getNode();
         // If not already focused, request focus
         if (!rangeSlider.isFocused()) {
             rangeSlider.requestFocus();
@@ -160,7 +162,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
      */
     public void lowThumbPressed(MouseEvent e, double position) {
         // If not already focused, request focus
-        final RangeSlider rangeSlider = getControl();
+        final RangeSlider rangeSlider = getNode();
         if (!rangeSlider.isFocused())  rangeSlider.requestFocus();
         rangeSlider.setLowValueChanging(true);
     }
@@ -170,7 +172,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
      *        track and 1.0 being the end
      */
     public void lowThumbDragged(MouseEvent e, double position) {
-        final RangeSlider rangeSlider = getControl();
+        final RangeSlider rangeSlider = getNode();
         double newValue = Utils.clamp(rangeSlider.getMin(), 
                 (position * (rangeSlider.getMax() - rangeSlider.getMin())) + rangeSlider.getMin(), 
                 rangeSlider.getMax());
@@ -181,7 +183,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
      * When lowThumb is released lowValueChanging should be set to false.
      */
     public void lowThumbReleased(MouseEvent e) {
-        final RangeSlider rangeSlider = getControl();
+        final RangeSlider rangeSlider = getNode();
         rangeSlider.setLowValueChanging(false);
         // RT-15207 When snapToTicks is true, slider value calculated in drag
         // is then snapped to the nearest tick on mouse release.
@@ -191,12 +193,12 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     }
     
     void home() {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         slider.adjustHighValue(slider.getMin());
     }
 
     void decrementValue() {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         if (selectedValue != null) {
             if (selectedValue.call(null) == FocusedChild.HIGH_THUMB) {
                 if (slider.isSnapToTicks())
@@ -213,12 +215,12 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     }
 
     void end() {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         slider.adjustHighValue(slider.getMax());
     }
 
     void incrementValue() {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         if (selectedValue != null) {
             if (selectedValue.call(null) == FocusedChild.HIGH_THUMB) {
                 if (slider.isSnapToTicks())
@@ -236,7 +238,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     }
 
     double computeIncrement() {
-        RangeSlider rangeSlider = (RangeSlider) getControl();
+        RangeSlider rangeSlider = (RangeSlider) getNode();
         double d = 0.0D;
         if (rangeSlider.getMinorTickCount() != 0)
             d = rangeSlider.getMajorTickUnit() / (double) (Math.max(rangeSlider.getMinorTickCount(), 0) + 1);
@@ -248,8 +250,15 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
             return rangeSlider.getBlockIncrement();
     }
 
+    void rtl(RangeSlider node, Runnable rtlMethod, Runnable nonRtlMethod) {
+        switch(node.getEffectiveNodeOrientation()) {
+            case RIGHT_TO_LEFT: rtlMethod.run(); break;
+            default: nonRtlMethod.run(); break;
+        }
+    }
+
     private double snapValueToTicks(double d) {
-        RangeSlider rangeSlider = (RangeSlider) getControl();
+        RangeSlider rangeSlider = (RangeSlider) getNode();
         double d1 = d;
         double d2 = 0.0D;
         if (rangeSlider.getMinorTickCount() != 0)
@@ -265,26 +274,26 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
 
     // when high thumb is released, highValueChanging is set to false.
     public void highThumbReleased(MouseEvent e) {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         slider.setHighValueChanging(false);
         if (slider.isSnapToTicks())
             slider.setHighValue(snapValueToTicks(slider.getHighValue()));
     }
 
     public void highThumbPressed(MouseEvent e, double position) {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         if (!slider.isFocused())
             slider.requestFocus();
         slider.setHighValueChanging(true);
     }
 
     public void highThumbDragged(MouseEvent e, double position) {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         slider.setHighValue(Utils.clamp(slider.getMin(), position * (slider.getMax() - slider.getMin()) + slider.getMin(), slider.getMax()));
     }
     
     public void moveRange(double position) {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
         final double min = slider.getMin();
         final double max = slider.getMax();
         final double lowValue = slider.getLowValue();
@@ -302,7 +311,7 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
     }
     
       public void confirmRange() {
-        RangeSlider slider = (RangeSlider) getControl();
+        RangeSlider slider = (RangeSlider) getNode();
 
         slider.setLowValueChanging(false);
         if (slider.isSnapToTicks()) {
@@ -315,20 +324,6 @@ public class RangeSliderBehavior extends BehaviorBase<RangeSlider> {
 
     }
     
-    public static class RangeSliderKeyBinding extends OrientedKeyBinding {
-        public RangeSliderKeyBinding(KeyCode code, String action) {
-            super(code, action);
-        }
-
-        public RangeSliderKeyBinding(KeyCode code, EventType<KeyEvent> type, String action) {
-            super(code, type, action);
-        }
-
-        public @Override boolean getVertical(Control control) {
-            return ((RangeSlider)control).getOrientation() == Orientation.VERTICAL;
-        }
-    }
-     
     public enum FocusedChild {
         LOW_THUMB,
         HIGH_THUMB,

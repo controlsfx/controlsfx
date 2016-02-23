@@ -516,7 +516,7 @@ public class Wizard {
             
             
             if (!Double.isNaN(previousX) && !Double.isNaN(previousY)) {
-            	double newWidth = dialog.getWidth();
+                double newWidth = dialog.getWidth();
                 double newHeight = dialog.getHeight();
                 int newX = (int) (previousX + (previousWidth / 2.0) - (newWidth / 2.0));
                 int newY = (int) (previousY + (previousHeight / 2.0) - (newHeight / 2.0));
@@ -529,16 +529,16 @@ public class Wizard {
                 int minY = (int)Math.round(scrBounds.getMinY());
                 int maxY = (int)Math.round(scrBounds.getMaxY());
                 if(newX + newWidth > maxX) {
-                	newX = maxX - (int)Math.round(newWidth);
+                    newX = maxX - (int)Math.round(newWidth);
                 }
                 if(newY + newHeight > maxY) {
-                	newY = maxY - (int)Math.round(newHeight);
+                    newY = maxY - (int)Math.round(newHeight);
                 }                
                 if(newX < minX) {
-                	newX = minX;
+                    newX = minX;
                 }
                 if(newY < minY) {
-                	newY = minY;
+                    newY = minY;
                 }
 
                 dialog.setX(newX);

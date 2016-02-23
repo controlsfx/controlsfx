@@ -46,11 +46,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -58,7 +56,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.layout.Pane;
-import javafx.stage.Screen;
 import javafx.stage.Window;
 
 import org.controlsfx.tools.ValueExtractor;
@@ -513,34 +510,11 @@ public class Wizard {
             Window wizard = currentPage.getScene().getWindow();
             wizard.sizeToScene();
             // Center resized Wizard to previous position
-            
-            
             if (!Double.isNaN(previousX) && !Double.isNaN(previousY)) {
                 double newWidth = dialog.getWidth();
                 double newHeight = dialog.getHeight();
                 int newX = (int) (previousX + (previousWidth / 2.0) - (newWidth / 2.0));
                 int newY = (int) (previousY + (previousHeight / 2.0) - (newHeight / 2.0));
-
-                ObservableList<Screen> screens = Screen.getScreensForRectangle(previousX, previousY, 1, 1);
-                Screen screen = screens.isEmpty() ? Screen.getPrimary() : screens.get(0);
-                Rectangle2D scrBounds = screen.getBounds();
-                int minX = (int)Math.round(scrBounds.getMinX());
-                int maxX = (int)Math.round(scrBounds.getMaxX());
-                int minY = (int)Math.round(scrBounds.getMinY());
-                int maxY = (int)Math.round(scrBounds.getMaxY());
-                if(newX + newWidth > maxX) {
-                    newX = maxX - (int)Math.round(newWidth);
-                }
-                if(newY + newHeight > maxY) {
-                    newY = maxY - (int)Math.round(newHeight);
-                }                
-                if(newX < minX) {
-                    newX = minX;
-                }
-                if(newY < minY) {
-                    newY = minY;
-                }
-
                 dialog.setX(newX);
                 dialog.setY(newY);
             }

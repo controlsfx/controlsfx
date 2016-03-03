@@ -85,7 +85,15 @@ public final class FlightTable extends Application {
         gateNumber.setEditable(true);
         table.getColumns().add(gateNumber);
 
-        new TableFilter<>(table);
+        TableFilter<Flight> tableFilter = new TableFilter<>(table);
+
+        tableFilter.setSearchStrategy((input,target) -> {
+            try {
+                return target.matches(input);
+            } catch (Exception e) {
+                return false;
+            }
+        });
 
         borderPane.setCenter(table);
 

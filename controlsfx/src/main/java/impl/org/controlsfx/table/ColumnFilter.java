@@ -36,6 +36,7 @@ import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.TableFilter;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 public final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
@@ -44,7 +45,9 @@ public final class ColumnFilter<T> {
     private final DistinctMappingList<T,FilterValue> filterValues;
     private final MappedList<FilterValue,T> scopedValues;
     private volatile boolean lastFilter = false;
-    
+
+    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
+
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
@@ -57,6 +60,12 @@ public final class ColumnFilter<T> {
         		v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
         
         this.attachContextMenu();
+    }
+    public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
+        this.searchStrategy = searchStrategy;
+    }
+    public BiPredicate<String,String> getSearchStrategy() {
+        return searchStrategy;
     }
     public void applyFilter() { 
     	tableFilter.executeFilter();

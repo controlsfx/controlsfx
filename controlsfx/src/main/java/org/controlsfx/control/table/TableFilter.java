@@ -35,6 +35,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 
@@ -73,6 +74,19 @@ public final class TableFilter<T> {
         tableView.setItems(sortedControlList);
 
         this.applyForAllColumns();
+    }
+
+    /**
+     * Allows specifying a different behavior for the search box on the TableFilter.
+     * By default, the contains() method on a String is used to evaluate the search box input to qualify the distinct filter values.
+     * But you can specify a different behavior by providing a simple BiPredicate argument to this method.
+     * The BiPredicate argument allows you take the input value and target value and use a lambda to evaluate a boolean.
+     * For instance, you can implement a comparison by assuming the input value is a regular expression, and call matches()
+     * on the target value to see if it aligns to the pattern.
+     * @param searchStrategy
+     */
+    public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
+        columnFilters.forEach(cf -> cf.setSearchStrategy(searchStrategy));
     }
     /**
      * Returns the backing {@link ObservableList} originally provided to the constructor.

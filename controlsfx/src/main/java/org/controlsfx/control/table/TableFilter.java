@@ -35,6 +35,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 
@@ -73,6 +74,9 @@ public final class TableFilter<T> {
         tableView.setItems(sortedControlList);
 
         this.applyForAllColumns();
+    }
+    public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
+        columnFilters.forEach(cf -> cf.setSearchStrategy(searchStrategy));
     }
     /**
      * Returns the backing {@link ObservableList} originally provided to the constructor.

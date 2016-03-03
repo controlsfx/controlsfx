@@ -48,7 +48,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-
 public final class FilterPanel<T> extends Pane {
     
     private final ColumnFilter<T> columnFilter;
@@ -58,7 +57,8 @@ public final class FilterPanel<T> extends Pane {
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
     private volatile boolean searchMode = false;
-    
+
+
     FilterPanel(ColumnFilter<T> columnFilter) {
         this.columnFilter = columnFilter;
 
@@ -92,7 +92,7 @@ public final class FilterPanel<T> extends Pane {
         		filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
         		
         		columnFilter.getFilterValues().stream()
-        			.filter(v -> filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent() == false)
+        			.filter(v -> !filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent())
         			.forEach(v -> v.getSelectedProperty().setValue(false));
         		
         		resetSearchFilter();
@@ -184,7 +184,7 @@ public final class FilterPanel<T> extends Pane {
     private void initializeListeners() { 
         searchBox.textProperty().addListener(l -> {
         	searchMode = !searchBox.getText().isEmpty();
-        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.filterValue.toString().contains(searchBox.getText()));
+        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.searchStrategy.test(searchBox.getText(), val.filterValue.toString()));
         });
     }
     

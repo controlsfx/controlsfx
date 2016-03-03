@@ -112,7 +112,8 @@ public final class ColumnFilter<T> {
 
             FilterValue that = (FilterValue) o;
 
-            return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue)) || value.getValue().equals(that.value.getValue());
+            return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue))
+                    || Optional.ofNullable(value.getValue()).equals(Optional.ofNullable(that.value.getValue()));
 
         }
 

@@ -46,7 +46,7 @@ public final class ColumnFilter<T> {
     private final MappedList<FilterValue,T> scopedValues;
     private volatile boolean lastFilter = false;
 
-    volatile BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
+    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
 
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
@@ -63,6 +63,9 @@ public final class ColumnFilter<T> {
     }
     public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
         this.searchStrategy = searchStrategy;
+    }
+    public BiPredicate<String,String> getSearchStrategy() {
+        return searchStrategy;
     }
     public void applyFilter() { 
     	tableFilter.executeFilter();

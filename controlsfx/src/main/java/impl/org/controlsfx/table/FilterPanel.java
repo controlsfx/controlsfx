@@ -184,7 +184,7 @@ public final class FilterPanel<T> extends Pane {
     private void initializeListeners() { 
         searchBox.textProperty().addListener(l -> {
         	searchMode = !searchBox.getText().isEmpty();
-        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.searchStrategy.test(searchBox.getText(), val.filterValue.toString()));
+        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.getSearchStrategy().test(searchBox.getText(), val.filterValue.toString()));
         });
     }
     

@@ -146,7 +146,10 @@ public final class FilterPanel<T> extends Pane {
 		public int compare(FilterValue first, FilterValue second) {
 			if (first.getInScopeProperty().get() && !second.getInScopeProperty().get())
 				return 1;
-			int compare = first.getValueProperty().getValue().toString().compareTo(second.getValueProperty().getValue().toString());
+
+			int compare = Optional.ofNullable(first.getValueProperty().getValue()).map(Object::toString).orElse("")
+                    .compareTo(Optional.ofNullable(second.getValueProperty().getValue()).map(Object::toString).orElse(""));
+
 			if (compare > 0) 
 				return 1;
 			if (compare < 0) 

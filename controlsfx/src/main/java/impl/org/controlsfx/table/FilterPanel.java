@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2016, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,6 @@ public final class FilterPanel<T> extends VBox {
         this.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
-        searchBox.setPadding(new Insets(0, 0, 10, 0));
         this.getChildren().add(searchBox);
 
         //initialize checklist view

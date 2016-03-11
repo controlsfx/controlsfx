@@ -397,6 +397,7 @@ public abstract class SpreadsheetCellEditor {
         public TextAreaEditor(SpreadsheetView view) {
             super(view);
             textArea = new TextArea();
+            textArea.setWrapText(true);
             //The textArea is not respecting the maxHeight if we are not setting the min..
             textArea.minHeightProperty().bind(textArea.maxHeightProperty());
         }

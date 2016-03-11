@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2016, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -48,27 +48,25 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-
-public final class FilterPanel<T> extends Pane {
+public final class FilterPanel<T> extends VBox {
     
     private final ColumnFilter<T> columnFilter;
-    private final ListView<CheckItem> checkListView = new ListView<>();
 
     private final FilteredList<CheckItem> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
     private volatile boolean searchMode = false;
-    
+
+
     FilterPanel(ColumnFilter<T> columnFilter) {
         this.columnFilter = columnFilter;
 
         //initialize search box
-        VBox vBox = new VBox();
-        vBox.setPadding(new Insets(3));
+        //VBox vBox = new VBox();
+        this.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
-        searchBox.setPadding(new Insets(0, 0, 10, 0));
-        vBox.getChildren().add(searchBox);
+        this.getChildren().add(searchBox);
 
         //initialize checklist view
         Function<ColumnFilter.FilterValue,CheckItem>  newCheckItemFx = v -> {
@@ -78,9 +76,10 @@ public final class FilterPanel<T> extends Pane {
         };
 
         filterList = new FilteredList<>(new SortedList<>(new MappedList<>(new SortedList<>(this.columnFilter.getFilterValues(), new FilterValueComparator()), newCheckItemFx)), t -> true);
+        ListView<CheckItem> checkListView = new ListView<>();
         checkListView.setItems(filterList);
 
-        vBox.getChildren().add(checkListView);
+        this.getChildren().add(checkListView);
         
         //initialize apply button
         HBox bttnBox = new HBox();
@@ -92,7 +91,7 @@ public final class FilterPanel<T> extends Pane {
         		filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
         		
         		columnFilter.getFilterValues().stream()
-        			.filter(v -> filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent() == false)
+        			.filter(v -> !filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent())
         			.forEach(v -> v.getSelectedProperty().setValue(false));
         		
         		resetSearchFilter();
@@ -102,9 +101,17 @@ public final class FilterPanel<T> extends Pane {
         
         bttnBox.getChildren().add(applyBttn);
         
-        
+
+        //initialize unselect all button
+        Button unselectAllButton = new Button("NONE");
+        HBox.setHgrow(unselectAllButton, Priority.ALWAYS);
+        unselectAllButton.setOnAction(e -> {
+            columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().set(false));
+        });
+        bttnBox.getChildren().add(unselectAllButton);
+
         //initialize reset buttons
-        Button clearButton = new Button("RESET");
+        Button clearButton = new Button("ALL");
         HBox.setHgrow(clearButton, Priority.ALWAYS);
 
         clearButton.setOnAction(e -> {
@@ -121,10 +128,10 @@ public final class FilterPanel<T> extends Pane {
             columnFilter.resetAllFilters();
         });
         bttnBox.getChildren().add(clearAllButton);
+        bttnBox.setAlignment(Pos.BASELINE_CENTER);
 
-        
-        vBox.getChildren().add(bttnBox);
-        this.getChildren().add(vBox);
+        this.getChildren().add(bttnBox);
+        //this.getChildren().add(vBox);
     }
     private static final class CheckItem extends HBox {
         private final CheckBox checkBox = new CheckBox();
@@ -146,7 +153,10 @@ public final class FilterPanel<T> extends Pane {
 		public int compare(FilterValue first, FilterValue second) {
 			if (first.getInScopeProperty().get() && !second.getInScopeProperty().get())
 				return 1;
-			int compare = first.getValueProperty().getValue().toString().compareTo(second.getValueProperty().getValue().toString());
+
+			int compare = Optional.ofNullable(first.getValueProperty().getValue()).map(Object::toString).orElse("")
+                    .compareTo(Optional.ofNullable(second.getValueProperty().getValue()).map(Object::toString).orElse(""));
+
 			if (compare > 0) 
 				return 1;
 			if (compare < 0) 
@@ -181,7 +191,7 @@ public final class FilterPanel<T> extends Pane {
     private void initializeListeners() { 
         searchBox.textProperty().addListener(l -> {
         	searchMode = !searchBox.getText().isEmpty();
-        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || val.filterValue.toString().contains(searchBox.getText()));
+        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.getSearchStrategy().test(searchBox.getText(), val.filterValue.toString()));
         });
     }
     

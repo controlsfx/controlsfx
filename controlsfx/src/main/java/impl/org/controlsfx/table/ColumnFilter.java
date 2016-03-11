@@ -36,6 +36,7 @@ import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.TableFilter;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 public final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
@@ -44,7 +45,9 @@ public final class ColumnFilter<T> {
     private final DistinctMappingList<T,FilterValue> filterValues;
     private final MappedList<FilterValue,T> scopedValues;
     private volatile boolean lastFilter = false;
-    
+
+    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
+
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
@@ -58,23 +61,29 @@ public final class ColumnFilter<T> {
         
         this.attachContextMenu();
     }
+    public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
+        this.searchStrategy = searchStrategy;
+    }
+    public BiPredicate<String,String> getSearchStrategy() {
+        return searchStrategy;
+    }
     public void applyFilter() { 
     	tableFilter.executeFilter();
     	lastFilter = true;
     	tableFilter.getColumnFilters().stream().filter(c -> !c.equals(this)).forEach(c -> c.lastFilter = false);
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.refreshScope());
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
     public void resetFilter() { 
     	this.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true));
     	tableFilter.executeFilter();
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.refreshScope());
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
     public void resetAllFilters() { 
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.isSelected.set(true));
     	tableFilter.executeFilter();
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.refreshScope());
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
     public static final class FilterValue {
 
@@ -86,7 +95,6 @@ public final class ColumnFilter<T> {
         private FilterValue(ObservableValue<?> value, ColumnFilter<?> columnFilter) {
             this.value = value;
             this.columnFilter = columnFilter;
-            isSelected.addListener(c -> System.out.println("FilterValue " + value + " set to " + isSelected.getValue()));
         }
         public ObservableValue<?> getValueProperty() {
             return value;
@@ -113,7 +121,8 @@ public final class ColumnFilter<T> {
 
             FilterValue that = (FilterValue) o;
 
-            return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue)) || value.getValue().equals(that.value.getValue());
+            return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue))
+                    || Optional.ofNullable(value.getValue()).equals(Optional.ofNullable(that.value.getValue()));
 
         }
 
@@ -134,8 +143,8 @@ public final class ColumnFilter<T> {
     }
 
     public Optional<FilterValue> getFilterValue(ObservableValue<?> value) {
-        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.value).map(v -> v.getValue())
-                .equals(Optional.ofNullable(value).map(v ->v.getValue()))).findAny();
+        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.value).map(ObservableValue::getValue)
+                .equals(Optional.ofNullable(value).map(ObservableValue::getValue))).findAny();
     }
 
     /**Leverages tableColumn's context menu to attach filter panel */

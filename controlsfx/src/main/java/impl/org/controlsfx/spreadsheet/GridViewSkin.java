@@ -397,7 +397,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     }
 
     public ScrollBar getHBar() {
-        return getFlow().getHorizontalBar();
+        if (getFlow() != null) {
+            return getFlow().getHorizontalBar();
+        }
+        return null;
     }
 
     public ScrollBar getVBar() {
@@ -1115,9 +1118,17 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @param value
      */
     public void setHbarValue(double value) {
+        setHbarValue(value, 0);
+    }
+
+    public void setHbarValue(double value, int count) {
+        if (count > 5) {
+            return;
+        }
+        final int newCount = count + 1;
         if (flow.getScene() == null) {
             Platform.runLater(() -> {
-                setHbarValue(value);
+                setHbarValue(value, newCount);
             });
             return;
         }

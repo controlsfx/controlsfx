@@ -56,8 +56,8 @@ public final class ColumnFilter<T> {
         this.filterValues = new DistinctMappingList<>(tableFilter.getBackingList(),
                 v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
 
-        this.scopedValues = new MappedList<FilterValue,T>(tableFilter.getTableView().getItems(), 
-        		v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
+        this.scopedValues = new MappedList<>(tableFilter.getTableView().getItems(),
+                v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
         
         this.attachContextMenu();
     }
@@ -73,12 +73,7 @@ public final class ColumnFilter<T> {
     	tableFilter.getColumnFilters().stream().filter(c -> !c.equals(this)).forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
-    public void resetFilter() { 
-    	this.getFilterValues().forEach(v -> v.getSelectedProperty().setValue(true));
-    	tableFilter.executeFilter();
-    	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
-    }
+
     public void resetAllFilters() { 
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.isSelected.set(true));
     	tableFilter.executeFilter();
@@ -153,7 +148,5 @@ public final class ColumnFilter<T> {
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);
-
-        //contextMenu.setOnHiding(e -> item.getFilterPanel().resetSearchFilter());
     }
 }

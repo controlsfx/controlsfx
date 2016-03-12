@@ -64,16 +64,17 @@ public final class TableFilter<T> {
      */
     public TableFilter(TableView<T> tableView) {
         this.tableView = tableView;
-        this.backingList = tableView.getItems();
-        this.filteredList = new FilteredList<>(new SortedList<>(backingList));
-        this.sortedControlList = new SortedList<>(this.filteredList);
+        backingList = tableView.getItems();
+        filteredList = new FilteredList<>(new SortedList<>(backingList));
+        sortedControlList = new SortedList<>(this.filteredList);
 
-        this.filteredList.setPredicate(v -> true);
+        filteredList.setPredicate(v -> true);
 
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        this.applyForAllColumns();
+        applyForAllColumns();
+        tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
     }
 
     /**

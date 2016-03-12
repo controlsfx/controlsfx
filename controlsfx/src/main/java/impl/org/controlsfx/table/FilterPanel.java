@@ -210,7 +210,7 @@ public final class FilterPanel<T> extends VBox {
             }
         });
         menuItem.setHideOnClick(false);
-        menuItem.setStyle("filter-menu-item");
+        menuItem.getStyleClass().add("filter-menu-item");
         return menuItem;
     }
     private void initializeListeners() { 

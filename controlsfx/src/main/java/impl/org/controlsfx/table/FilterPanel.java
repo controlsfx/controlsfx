@@ -37,7 +37,10 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -46,6 +49,7 @@ import javafx.scene.paint.Color;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public final class FilterPanel<T> extends VBox {
@@ -55,14 +59,23 @@ public final class FilterPanel<T> extends VBox {
     private final FilteredList<CheckItem> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
-    private volatile boolean searchMode = false;
+    private boolean searchMode = false;
+    private boolean bumpedWidth = false;
 
+    private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
+
+    private static final Supplier<ImageView> filterImageView = () -> {
+        ImageView imageView = new ImageView(filterIcon);
+        imageView.setFitHeight(15);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    };
 
     FilterPanel(ColumnFilter<T> columnFilter) {
         this.columnFilter = columnFilter;
 
+
         //initialize search box
-        //VBox vBox = new VBox();
         this.setPadding(new Insets(3));
         
         searchBox.setPromptText(promptText);
@@ -96,7 +109,17 @@ public final class FilterPanel<T> extends VBox {
         		
         		resetSearchFilter();
         	}
-        	columnFilter.applyFilter();
+            if (columnFilter.getFilterValues().stream().filter(v -> v.getSelectedProperty().get()).findAny().isPresent()) {
+                columnFilter.applyFilter();
+                columnFilter.getTableColumn().setGraphic(filterImageView.get());
+                if (!bumpedWidth) {
+                    columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 15);
+                    bumpedWidth = true;
+                }
+            }
+            else {
+                resetSearchFilter();
+            }
         });
         
         bttnBox.getChildren().add(applyBttn);
@@ -126,6 +149,7 @@ public final class FilterPanel<T> extends VBox {
 
         clearAllButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
+            columnFilter.getTableFilter().getColumnFilters().stream().forEach(cf -> cf.getTableColumn().setGraphic(null));
         });
         bttnBox.getChildren().add(clearAllButton);
         bttnBox.setAlignment(Pos.BASELINE_CENTER);
@@ -171,9 +195,10 @@ public final class FilterPanel<T> extends VBox {
     }
     public static <T> CustomMenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
         
-        FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
+        FilterPanel<T> filterPanel = new FilterPanel<>(columnFilter);
+
         CustomMenuItem menuItem = new CustomMenuItem();
-        
+
         filterPanel.initializeListeners();
         
         menuItem.contentProperty().set(filterPanel);
@@ -185,7 +210,7 @@ public final class FilterPanel<T> extends VBox {
             }
         });
         menuItem.setHideOnClick(false);
-        
+
         return menuItem;
     }
     private void initializeListeners() { 

@@ -148,6 +148,6 @@ public final class ColumnFilter<T> {
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(item);
         tableColumn.setContextMenu(contextMenu);
-        tableColumn.getTableView().getStylesheets().add("/impl/org/controlsfx/table/tablefilter_style.css");
+        //tableColumn.getTableView().getStylesheets().add("/impl/org/controlsfx/table/tablefilter_style.css");
     }
 }

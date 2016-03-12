@@ -154,7 +154,6 @@ public final class FilterPanel<T> extends VBox {
         bttnBox.getChildren().add(clearAllButton);
         bttnBox.setAlignment(Pos.BASELINE_CENTER);
 
-        setStyle("-fx-background-color: white;");
         getChildren().add(bttnBox);
     }
     private static final class CheckItem extends HBox {

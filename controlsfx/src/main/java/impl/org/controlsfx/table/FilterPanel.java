@@ -92,7 +92,7 @@ public final class FilterPanel<T> extends VBox {
         ListView<CheckItem> checkListView = new ListView<>();
         checkListView.setItems(filterList);
 
-        this.getChildren().add(checkListView);
+        getChildren().add(checkListView);
         
         //initialize apply button
         HBox bttnBox = new HBox();
@@ -154,8 +154,8 @@ public final class FilterPanel<T> extends VBox {
         bttnBox.getChildren().add(clearAllButton);
         bttnBox.setAlignment(Pos.BASELINE_CENTER);
 
-        this.getChildren().add(bttnBox);
-        //this.getChildren().add(vBox);
+        setStyle("-fx-background-color: white;");
+        getChildren().add(bttnBox);
     }
     private static final class CheckItem extends HBox {
         private final CheckBox checkBox = new CheckBox();

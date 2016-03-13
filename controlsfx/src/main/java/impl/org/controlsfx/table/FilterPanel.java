@@ -73,7 +73,7 @@ public final class FilterPanel<T> extends VBox {
 
     FilterPanel(ColumnFilter<T> columnFilter) {
         this.columnFilter = columnFilter;
-
+        this.getStyleClass().add("filter-panel");
 
         //initialize search box
         this.setPadding(new Insets(3));
@@ -95,10 +95,11 @@ public final class FilterPanel<T> extends VBox {
         getChildren().add(checkListView);
         
         //initialize apply button
-        HBox bttnBox = new HBox();
+        ButtonBar buttonBar = new ButtonBar();
+        buttonBar.setMaxWidth(240);
+
         Button applyBttn = new Button("APPLY");
 
-        HBox.setHgrow(bttnBox, Priority.ALWAYS);
         applyBttn.setOnAction(e -> {
         	if (searchMode) { 
         		filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
@@ -122,39 +123,32 @@ public final class FilterPanel<T> extends VBox {
             }
         });
         
-        bttnBox.getChildren().add(applyBttn);
-        
+        buttonBar.getButtons().add(applyBttn);
 
         //initialize unselect all button
         Button unselectAllButton = new Button("NONE");
-        HBox.setHgrow(unselectAllButton, Priority.ALWAYS);
-        unselectAllButton.setOnAction(e -> {
-            columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().set(false));
-        });
-        bttnBox.getChildren().add(unselectAllButton);
+
+        unselectAllButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().set(false)));
+        buttonBar.getButtons().add(unselectAllButton);
 
         //initialize reset buttons
         Button clearButton = new Button("ALL");
-        HBox.setHgrow(clearButton, Priority.ALWAYS);
-
         clearButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
             filterList.setPredicate(v -> true);
         });
 
-        bttnBox.getChildren().add(clearButton);
+        buttonBar.getButtons().add(clearButton);
 
         Button clearAllButton = new Button("RESET ALL");
-        HBox.setHgrow(clearAllButton, Priority.ALWAYS);
 
         clearAllButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
             columnFilter.getTableFilter().getColumnFilters().stream().forEach(cf -> cf.getTableColumn().setGraphic(null));
         });
-        bttnBox.getChildren().add(clearAllButton);
-        bttnBox.setAlignment(Pos.BASELINE_CENTER);
+        buttonBar.getButtons().add(clearAllButton);
 
-        getChildren().add(bttnBox);
+        getChildren().add(buttonBar);
     }
     private static final class CheckItem extends HBox {
         private final CheckBox checkBox = new CheckBox();

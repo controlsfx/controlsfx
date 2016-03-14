@@ -17,22 +17,25 @@ public final class FilterValue {
         this.value = value;
         this.columnFilter = columnFilter;
     }
-    public ObservableValue<?> getValueProperty() {
+
+    public ObservableValue<?> valueProperty() {
         return value;
     }
-    public BooleanProperty getSelectedProperty() {
+
+    public BooleanProperty selectedProperty() {
         return isSelected;
     }
     public BooleanProperty getInScopeProperty() {
         return inScope;
     }
+
     void refreshScope() {
-        inScope.setValue(columnFilter.wasLastFiltered() || columnFilter.getScopedValues().contains(this));
+        inScope.setValue(columnFilter.wasLastFiltered() || columnFilter.getVisibleValues().contains(this));
     }
 
     @Override
     public String toString() {
-        return value.getValue().toString();
+        return value == null ? "" : value.getValue().toString();
     }
 
     @Override

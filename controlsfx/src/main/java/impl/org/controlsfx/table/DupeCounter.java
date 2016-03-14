@@ -8,7 +8,7 @@ final class DupeCounter<T> {
 
     public int add(T value) {
         Integer prev = counts.get(value);
-        int newVal = 0;
+        int newVal;
         if (prev == null) {
             newVal = 1;
             counts.put(value, newVal);

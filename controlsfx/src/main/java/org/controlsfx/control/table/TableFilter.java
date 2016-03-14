@@ -116,7 +116,7 @@ public final class TableFilter<T> {
     public void executeFilter() { 
         filteredList.setPredicate(r -> !columnFilters.parallelStream()
                 .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(r))
-                        .map(ov -> !ov.getSelectedProperty().getValue()).orElse(false))
+                        .map(ov -> !ov.selectedProperty().getValue()).orElse(false))
                 .findAny().isPresent());
     }
     /** 

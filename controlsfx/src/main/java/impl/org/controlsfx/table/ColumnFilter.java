@@ -27,6 +27,8 @@
 package impl.org.controlsfx.table;
 
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -35,36 +37,48 @@ import org.controlsfx.control.table.TableFilter;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 public final class ColumnFilter<T> {
     private final TableFilter<T> tableFilter;
     private final TableColumn<T,?> tableColumn;
 
-    private final DistinctMappingList<T,FilterValue> filterValues;
-    private final MappedList<FilterValue,T> scopedValues;
-    private final DupeCounter<T> dupeCounter = new DupeCounter<>();
+    private final ObservableList<FilterValue> filterValues;
+    private final ObservableList<FilterValue> visibleValues;
+
+    private final DupeCounter<Object> filterValuesDupeCounter = new DupeCounter<>();
+    private final DupeCounter<Object> visibleValuesDupeCounter = new DupeCounter<>();
 
     private boolean lastFilter = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
 
+
+    private final Function<T,FilterValue> itemToFilterValue;
+
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
+        this.itemToFilterValue = t -> new FilterValue(tableColumn.getCellObservableValue(t),this);
 
         //Build distinct mapped list of filter values from column values
-        this.filterValues = new DistinctMappingList<>(tableFilter.getBackingList(),
+       /* this.filterValues = new DistinctMappingList<>(tableFilter.getBackingList(),
                 v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
 
-        this.scopedValues = new MappedList<>(tableFilter.getTableView().getItems(),
+        this.visibleValues = new MappedList<>(tableFilter.getTableView().getItems(),
                 v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
-        
+                */
+
+        this.filterValues = FXCollections.observableArrayList();
+        this.visibleValues = FXCollections.observableArrayList();
         this.attachContextMenu();
     }
-    public MappedList<FilterValue,T> getScopedValues() {
-        return scopedValues;
-    }
-    void setIsFiltered(boolean value) {
 
+    public void initialize() {
+        initializeValues();
+        initializeListeners();
+    }
+    public ObservableList<FilterValue> getVisibleValues() {
+        return visibleValues;
     }
     public boolean wasLastFiltered() {
         return lastFilter;
@@ -83,13 +97,13 @@ public final class ColumnFilter<T> {
     }
 
     public void resetAllFilters() { 
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.getSelectedProperty().set(true));
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.selectedProperty().set(true));
     	tableFilter.executeFilter();
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
     public boolean isFiltered() {
-        return filterValues.stream().filter(v -> !v.getSelectedProperty().get()).findAny().isPresent();
+        return filterValues.stream().filter(v -> !v.selectedProperty().get()).findAny().isPresent();
     }
 
     public ObservableList<FilterValue> getFilterValues() {
@@ -104,8 +118,70 @@ public final class ColumnFilter<T> {
     }
 
     public Optional<FilterValue> getFilterValue(ObservableValue<?> value) {
-        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.getValueProperty()).map(ObservableValue::getValue)
-                .equals(Optional.ofNullable(value).map(ObservableValue::getValue))).findAny();
+        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.valueProperty())
+                    .map(ObservableValue::getValue)
+                        .equals(Optional.ofNullable(value).map(ObservableValue::getValue)))
+                .findAny();
+    }
+
+    private void initializeValues() {
+        tableFilter.getBackingList().stream()
+                .map(itemToFilterValue)
+                .filter(t -> filterValuesDupeCounter.add(t) == 1).forEach(filterValues::add);
+
+        tableFilter.getBackingList().stream()
+                .map(itemToFilterValue)
+                .filter(t -> visibleValuesDupeCounter.add(t) == 1).forEach(visibleValues::add);
+    }
+    private void addBackingItem(T item) {
+        FilterValue newValue = itemToFilterValue.apply(item);
+        if (filterValuesDupeCounter.add(newValue) == 1) {
+            filterValues.add(newValue);
+        }
+    }
+    private void removeBackingItem(T item) {
+        FilterValue newValue = itemToFilterValue.apply(item);
+        if (filterValuesDupeCounter.remove(newValue) == 0) {
+            filterValues.remove(newValue);
+        }
+    }
+    private void addVisibleItem(T item) {
+        FilterValue newValue = itemToFilterValue.apply(item);
+        if (visibleValuesDupeCounter.add(newValue) == 1) {
+            visibleValues.add(newValue);
+        }
+    }
+    private void removeVisibleItem(T item) {
+        FilterValue newValue = itemToFilterValue.apply(item);
+        if (visibleValuesDupeCounter.remove(newValue) == 0) {
+            visibleValues.remove(newValue);
+        }
+    }
+    private void initializeListeners() {
+
+        //listen to backing list and update distinct values accordingly
+        tableFilter.getBackingList().addListener((ListChangeListener<T>) lc -> {
+            while (lc.next()) {
+                if (lc.wasAdded()) {
+                    lc.getAddedSubList().stream().forEach(this::addBackingItem);
+                }
+                if (lc.wasRemoved()) {
+                    lc.getRemoved().stream().forEach(this::removeBackingItem);
+                }
+            }
+        });
+
+        //listen to visible items and update visible values accordingly
+        tableFilter.getTableView().getItems().addListener((ListChangeListener<T>) lc -> {
+            while (lc.next()) {
+                if (lc.wasAdded()) {
+                    lc.getAddedSubList().stream().forEach(this::addVisibleItem);
+                }
+                if (lc.wasRemoved()) {
+                    lc.getRemoved().stream().forEach(this::removeVisibleItem);
+                }
+            }
+        });
     }
 
     /**Leverages tableColumn's context menu to attach filter panel */
@@ -117,7 +193,5 @@ public final class ColumnFilter<T> {
         contextMenu.getItems().add(item);
 
         tableColumn.setContextMenu(contextMenu);
-
-
     }
 }

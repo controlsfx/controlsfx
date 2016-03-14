@@ -100,15 +100,15 @@ public final class FilterPanel<T> extends VBox {
 
         applyBttn.setOnAction(e -> {
             if (searchMode) {
-                filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
+                filterList.forEach(v -> v.filterValue.selectedProperty().setValue(true));
 
                 columnFilter.getFilterValues().stream()
                         .filter(v -> !filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent())
-                        .forEach(v -> v.getSelectedProperty().setValue(false));
+                        .forEach(v -> v.selectedProperty().setValue(false));
 
                 resetSearchFilter();
             }
-            if (columnFilter.getFilterValues().stream().filter(v -> v.getSelectedProperty().get()).findAny().isPresent()) {
+            if (columnFilter.getFilterValues().stream().filter(v -> v.selectedProperty().get()).findAny().isPresent()) {
                 columnFilter.applyFilter();
                 columnFilter.getTableColumn().setGraphic(filterImageView.get());
                 if (!bumpedWidth) {
@@ -127,7 +127,7 @@ public final class FilterPanel<T> extends VBox {
         Button unselectAllButton = new Button("NONE");
         HBox.setHgrow(unselectAllButton, Priority.ALWAYS);
 
-        unselectAllButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().set(false)));
+        unselectAllButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.selectedProperty().set(false)));
         buttonBox.getChildren().add(unselectAllButton);
 
         //initialize reset buttons
@@ -162,10 +162,10 @@ public final class FilterPanel<T> extends VBox {
 
         CheckItem(FilterValue filterValue) {
             this.filterValue = filterValue;
-            label.setText(Optional.ofNullable(filterValue.getValueProperty()).map(ObservableValue::getValue).map(Object::toString).orElse(null));
+            label.setText(Optional.ofNullable(filterValue.valueProperty()).map(ObservableValue::getValue).map(Object::toString).orElse(null));
 
             filterValue.getInScopeProperty().addListener((Observable v) -> label.textFillProperty().set(filterValue.getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
-            checkBox.selectedProperty().bindBidirectional(filterValue.getSelectedProperty());
+            checkBox.selectedProperty().bindBidirectional(filterValue.selectedProperty());
             this.getChildren().addAll(checkBox, label);
         }
     }
@@ -176,8 +176,8 @@ public final class FilterPanel<T> extends VBox {
             if (first.getInScopeProperty().get() && !second.getInScopeProperty().get())
                 return 1;
 
-            int compare = Optional.ofNullable(first.getValueProperty().getValue()).map(Object::toString).orElse("")
-                    .compareTo(Optional.ofNullable(second.getValueProperty().getValue()).map(Object::toString).orElse(""));
+            int compare = Optional.ofNullable(first.valueProperty().getValue()).map(Object::toString).orElse("")
+                    .compareTo(Optional.ofNullable(second.valueProperty().getValue()).map(Object::toString).orElse(""));
 
             if (compare > 0)
                 return 1;

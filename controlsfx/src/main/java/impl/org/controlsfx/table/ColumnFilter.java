@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.table;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
@@ -44,8 +42,9 @@ public final class ColumnFilter<T> {
 
     private final DistinctMappingList<T,FilterValue> filterValues;
     private final MappedList<FilterValue,T> scopedValues;
-    private volatile boolean lastFilter = false;
+    private final DupeCounter<T> dupeCounter = new DupeCounter<>();
 
+    private boolean lastFilter = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
 
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
@@ -61,13 +60,22 @@ public final class ColumnFilter<T> {
         
         this.attachContextMenu();
     }
+    public MappedList<FilterValue,T> getScopedValues() {
+        return scopedValues;
+    }
+    void setIsFiltered(boolean value) {
+
+    }
+    public boolean wasLastFiltered() {
+        return lastFilter;
+    }
     public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
         this.searchStrategy = searchStrategy;
     }
     public BiPredicate<String,String> getSearchStrategy() {
         return searchStrategy;
     }
-    public void applyFilter() { 
+    public void applyFilter() {
     	tableFilter.executeFilter();
     	lastFilter = true;
     	tableFilter.getColumnFilters().stream().filter(c -> !c.equals(this)).forEach(c -> c.lastFilter = false);
@@ -75,57 +83,15 @@ public final class ColumnFilter<T> {
     }
 
     public void resetAllFilters() { 
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.isSelected.set(true));
+    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.getSelectedProperty().set(true));
     	tableFilter.executeFilter();
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
-    public static final class FilterValue {
-
-        private final ObservableValue<?> value;
-        private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
-        private final BooleanProperty inScope = new SimpleBooleanProperty(true);
-        private final ColumnFilter<?> columnFilter;
-        
-        private FilterValue(ObservableValue<?> value, ColumnFilter<?> columnFilter) {
-            this.value = value;
-            this.columnFilter = columnFilter;
-        }
-        public ObservableValue<?> getValueProperty() {
-            return value;
-        }
-        public BooleanProperty getSelectedProperty() {
-            return isSelected;
-        }
-        public BooleanProperty getInScopeProperty() { 
-        	return inScope;
-        }
-        private void refreshScope() { 
-        	inScope.setValue(columnFilter.lastFilter || columnFilter.scopedValues.contains(this));
-        }
-
-        @Override
-        public String toString() {
-            return value.getValue().toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            FilterValue that = (FilterValue) o;
-
-            return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue))
-                    || Optional.ofNullable(value.getValue()).equals(Optional.ofNullable(that.value.getValue()));
-
-        }
-
-        @Override
-        public int hashCode() {
-            return value == null || value.getValue() == null ? 0 : value.getValue().hashCode();
-        }
+    public boolean isFiltered() {
+        return filterValues.stream().filter(v -> !v.getSelectedProperty().get()).findAny().isPresent();
     }
+
     public ObservableList<FilterValue> getFilterValues() {
         return filterValues;
     }
@@ -138,7 +104,7 @@ public final class ColumnFilter<T> {
     }
 
     public Optional<FilterValue> getFilterValue(ObservableValue<?> value) {
-        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.value).map(ObservableValue::getValue)
+        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.getValueProperty()).map(ObservableValue::getValue)
                 .equals(Optional.ofNullable(value).map(ObservableValue::getValue))).findAny();
     }
 

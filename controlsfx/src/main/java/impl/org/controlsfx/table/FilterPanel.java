@@ -29,7 +29,6 @@ package impl.org.controlsfx.table;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
-import impl.org.controlsfx.table.ColumnFilter.FilterValue;
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
@@ -37,7 +36,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -82,7 +80,7 @@ public final class FilterPanel<T> extends VBox {
         this.getChildren().add(searchBox);
 
         //initialize checklist view
-        Function<ColumnFilter.FilterValue,CheckItem>  newCheckItemFx = v -> {
+        Function<FilterValue,CheckItem>  newCheckItemFx = v -> {
             CheckItem chkItem = new CheckItem(v);
             chkItem.checkBox.selectedProperty().setValue(true);
             return chkItem;
@@ -162,7 +160,7 @@ public final class FilterPanel<T> extends VBox {
         private final Label label = new Label();
         private final FilterValue filterValue;
 
-        CheckItem(ColumnFilter.FilterValue filterValue) {
+        CheckItem(FilterValue filterValue) {
             this.filterValue = filterValue;
             label.setText(Optional.ofNullable(filterValue.getValueProperty()).map(ObservableValue::getValue).map(Object::toString).orElse(null));
 

@@ -75,6 +75,7 @@ public final class TableFilter<T> {
 
         applyForAllColumns();
         tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
+        columnFilters.forEach(ColumnFilter::initialize);
     }
 
     /**
@@ -115,8 +116,7 @@ public final class TableFilter<T> {
      */
     public void executeFilter() { 
         filteredList.setPredicate(r -> !columnFilters.parallelStream()
-                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(r))
-                        .map(ov -> !ov.selectedProperty().getValue()).orElse(false))
+                .filter(cf -> cf.evaluate(cf.getTableColumn().getCellObservableValue(r)))
                 .findAny().isPresent());
     }
     /** 

@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.table;
 
+import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -35,7 +36,7 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.TableFilter;
 
-import java.util.Optional;
+import java.util.HashSet;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -48,6 +49,7 @@ public final class ColumnFilter<T> {
 
     private final DupeCounter<Object> filterValuesDupeCounter = new DupeCounter<>();
     private final DupeCounter<Object> visibleValuesDupeCounter = new DupeCounter<>();
+    private final HashSet<ObservableValue<?>> unselectedValues = new HashSet<>();
 
     private boolean lastFilter = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
@@ -68,14 +70,14 @@ public final class ColumnFilter<T> {
                 v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
                 */
 
-        this.filterValues = FXCollections.observableArrayList();
+        this.filterValues = FXCollections.observableArrayList(cb -> new Observable[] { cb.selectedProperty()});
         this.visibleValues = FXCollections.observableArrayList();
         this.attachContextMenu();
     }
 
     public void initialize() {
-        initializeValues();
         initializeListeners();
+        initializeValues();
     }
     public ObservableList<FilterValue> getVisibleValues() {
         return visibleValues;
@@ -116,12 +118,8 @@ public final class ColumnFilter<T> {
     public TableFilter<T> getTableFilter() { 
         return tableFilter;
     }
-
-    public Optional<FilterValue> getFilterValue(ObservableValue<?> value) {
-        return filterValues.stream().filter(fv -> Optional.ofNullable(fv.valueProperty())
-                    .map(ObservableValue::getValue)
-                        .equals(Optional.ofNullable(value).map(ObservableValue::getValue)))
-                .findAny();
+    public boolean evaluate(ObservableValue<?> value) {
+        return unselectedValues.size() == 0 || unselectedValues.contains(value);
     }
 
     private void initializeValues() {
@@ -179,6 +177,30 @@ public final class ColumnFilter<T> {
                 }
                 if (lc.wasRemoved()) {
                     lc.getRemoved().stream().forEach(this::removeVisibleItem);
+                }
+            }
+        });
+
+        //listen to selections on filterValues
+        filterValues.addListener((ListChangeListener<FilterValue>) lc -> {
+            while (lc.next()) {
+                if (lc.wasRemoved()) {
+                    lc.getRemoved().stream()
+                            .filter(v -> !v.selectedProperty().get())
+                            .forEach(unselectedValues::remove);
+                }
+                if (lc.wasUpdated()) {
+                    int from = lc.getFrom();
+                    int to = lc.getTo();
+                    lc.getList().subList(from,to).forEach(v -> {
+                        boolean value = v.selectedProperty().getValue();
+                        if (value) {
+                            unselectedValues.remove(v.valueProperty());
+                        }
+                        else {
+                            unselectedValues.add(v.valueProperty());
+                        }
+                    });
                 }
             }
         });

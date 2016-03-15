@@ -85,6 +85,9 @@ public final class ColumnFilter<T,R> {
     public boolean isFiltered() {
         return unselectedValues.size() > 0;
     }
+    public boolean valueIsVisible(FilterValue<T,R> value) {
+        return visibleValuesDupeCounter.get(value) > 1;
+    }
     public void applyFilter() {
     	tableFilter.executeFilter();
     	lastFilter = true;
@@ -94,7 +97,7 @@ public final class ColumnFilter<T,R> {
 
     public void resetAllFilters() { 
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.selectedProperty().set(true));
-    	tableFilter.executeFilter();
+    	tableFilter.resetFilter();
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }

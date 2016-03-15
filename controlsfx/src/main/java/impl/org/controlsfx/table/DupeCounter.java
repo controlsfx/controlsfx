@@ -1,6 +1,7 @@
 package impl.org.controlsfx.table;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 final class DupeCounter<T> {
 
@@ -17,6 +18,9 @@ final class DupeCounter<T> {
             counts.put(value, newVal);
         }
         return newVal;
+    }
+    public int get(T value) {
+        return Optional.ofNullable(counts.get(value)).orElse(0);
     }
     public int remove(T value) {
         Integer prev = counts.get(value);

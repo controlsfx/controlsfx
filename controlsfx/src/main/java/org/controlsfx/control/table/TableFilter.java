@@ -117,6 +117,9 @@ public final class TableFilter<T> {
                     .filter(cf -> !cf.evaluate(item))
                     .findAny().isPresent());
     }
+    public void resetFilter() {
+        filteredList.setPredicate(item -> true);
+    }
     /** 
      * @treatAsPrivate
      */

@@ -50,11 +50,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 
-public final class FilterPanel<T> extends VBox {
+public final class FilterPanel<T,R> extends VBox {
 
-    private final ColumnFilter<T> columnFilter;
+    private final ColumnFilter<T,R> columnFilter;
 
-    private final FilteredList<CheckItem> filterList;
+    private final FilteredList<FilterValue> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
     private boolean searchMode = false;
@@ -69,25 +69,20 @@ public final class FilterPanel<T> extends VBox {
         return imageView;
     };
 
-    FilterPanel(ColumnFilter<T> columnFilter) {
+    FilterPanel(ColumnFilter<T,R> columnFilter) {
         this.columnFilter = columnFilter;
-        this.getStyleClass().add("filter-panel");
+        getStyleClass().add("filter-panel");
 
         //initialize search box
-        this.setPadding(new Insets(3));
+        setPadding(new Insets(3));
 
         searchBox.setPromptText(promptText);
-        this.getChildren().add(searchBox);
+        getChildren().add(searchBox);
 
         //initialize checklist view
-        Function<FilterValue,CheckItem>  newCheckItemFx = v -> {
-            CheckItem chkItem = new CheckItem(v);
-            chkItem.checkBox.selectedProperty().setValue(true);
-            return chkItem;
-        };
 
-        filterList = new FilteredList<>(new SortedList<>(new MappedList<>(new SortedList<>(this.columnFilter.getFilterValues(), new FilterValueComparator()), newCheckItemFx)), t -> true);
-        ListView<CheckItem> checkListView = new ListView<>();
+        filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
+        ListView<FilterValue> checkListView = new ListView<>();
         checkListView.setItems(filterList);
 
         getChildren().add(checkListView);
@@ -100,15 +95,15 @@ public final class FilterPanel<T> extends VBox {
 
         applyBttn.setOnAction(e -> {
             if (searchMode) {
-                filterList.forEach(v -> v.filterValue.selectedProperty().setValue(true));
+                filterList.forEach(v -> v.selectedProperty().setValue(true));
 
                 columnFilter.getFilterValues().stream()
-                        .filter(v -> !filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent())
+                        .filter(v -> !filterList.stream().filter(fl -> fl.equals(v)).findAny().isPresent())
                         .forEach(v -> v.selectedProperty().setValue(false));
 
                 resetSearchFilter();
             }
-            if (columnFilter.getFilterValues().stream().filter(v -> v.selectedProperty().get()).findAny().isPresent()) {
+            if (columnFilter.isFiltered()) {
                 columnFilter.applyFilter();
                 columnFilter.getTableColumn().setGraphic(filterImageView.get());
                 if (!bumpedWidth) {
@@ -155,45 +150,14 @@ public final class FilterPanel<T> extends VBox {
 
         getChildren().add(buttonBox);
     }
-    private static final class CheckItem extends HBox {
-        private final CheckBox checkBox = new CheckBox();
-        private final Label label = new Label();
-        private final FilterValue filterValue;
 
-        CheckItem(FilterValue filterValue) {
-            this.filterValue = filterValue;
-            label.setText(Optional.ofNullable(filterValue.valueProperty()).map(ObservableValue::getValue).map(Object::toString).orElse(null));
-
-            filterValue.getInScopeProperty().addListener((Observable v) -> label.textFillProperty().set(filterValue.getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
-            checkBox.selectedProperty().bindBidirectional(filterValue.selectedProperty());
-            this.getChildren().addAll(checkBox, label);
-        }
-    }
-    private static final class FilterValueComparator implements Comparator<FilterValue> {
-
-        @Override
-        public int compare(FilterValue first, FilterValue second) {
-            if (first.getInScopeProperty().get() && !second.getInScopeProperty().get())
-                return 1;
-
-            int compare = Optional.ofNullable(first.valueProperty().getValue()).map(Object::toString).orElse("")
-                    .compareTo(Optional.ofNullable(second.valueProperty().getValue()).map(Object::toString).orElse(""));
-
-            if (compare > 0)
-                return 1;
-            if (compare < 0)
-                return -1;
-            return 0;
-        }
-
-    }
     public void resetSearchFilter() {
         this.filterList.setPredicate(t -> true);
         searchBox.clear();
     }
-    public static <T> CustomMenuItem getInMenuItem(ColumnFilter<T> columnFilter) {
+    public static <T,R> CustomMenuItem getInMenuItem(ColumnFilter<T,R> columnFilter) {
 
-        FilterPanel<T> filterPanel = new FilterPanel<>(columnFilter);
+        FilterPanel<T,R> filterPanel = new FilterPanel<>(columnFilter);
 
         CustomMenuItem menuItem = new CustomMenuItem();
 
@@ -213,7 +177,7 @@ public final class FilterPanel<T> extends VBox {
     private void initializeListeners() {
         searchBox.textProperty().addListener(l -> {
             searchMode = !searchBox.getText().isEmpty();
-            filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.getSearchStrategy().test(searchBox.getText(), val.filterValue.toString()));
+            filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.getSearchStrategy().test(searchBox.getText(), val.valueProperty().getValue().toString()));
         });
     }
 

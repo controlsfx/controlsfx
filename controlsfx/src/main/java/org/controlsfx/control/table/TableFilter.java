@@ -56,7 +56,7 @@ public final class TableFilter<T> {
     private final FilteredList<T> filteredList;
     private final SortedList<T> sortedControlList;
 
-    private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
+    private final ObservableList<ColumnFilter<T,?>> columnFilters = FXCollections.observableArrayList();
 
     /**Constructor applies a filtering control to the provided {@link TableView} instance.
      * 
@@ -115,8 +115,8 @@ public final class TableFilter<T> {
      * @treatAsPrivate
      */
     public void executeFilter() { 
-        filteredList.setPredicate(r -> !columnFilters.parallelStream()
-                .filter(cf -> cf.evaluate(cf.getTableColumn().getCellObservableValue(r)))
+        filteredList.setPredicate(item -> !columnFilters.stream()
+                .filter(cf -> cf.evaluate(item))
                 .findAny().isPresent());
     }
     /** 
@@ -128,13 +128,13 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    public ObservableList<ColumnFilter<T>> getColumnFilters() { 
+    public ObservableList<ColumnFilter<T,?>> getColumnFilters() {
         return columnFilters;
     }
     /** 
      * @treatAsPrivate
      */
-    public Optional<ColumnFilter<T>> getColumnFilter(TableColumn<T,?> tableColumn) { 
+    public Optional<ColumnFilter<T,?>> getColumnFilter(TableColumn<T,?> tableColumn) {
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }
     

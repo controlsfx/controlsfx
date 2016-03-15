@@ -40,35 +40,26 @@ import java.util.HashSet;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-public final class ColumnFilter<T> {
+public final class ColumnFilter<T,R> {
     private final TableFilter<T> tableFilter;
-    private final TableColumn<T,?> tableColumn;
+    private final TableColumn<T,R> tableColumn;
 
-    private final ObservableList<FilterValue> filterValues;
-    private final ObservableList<FilterValue> visibleValues;
+    private final ObservableList<FilterValue<T,R>> filterValues;
+    private final ObservableList<FilterValue<T,R>> visibleValues;
 
-    private final DupeCounter<Object> filterValuesDupeCounter = new DupeCounter<>();
-    private final DupeCounter<Object> visibleValuesDupeCounter = new DupeCounter<>();
-    private final HashSet<ObservableValue<?>> unselectedValues = new HashSet<>();
+    private final DupeCounter<FilterValue<T,R>> filterValuesDupeCounter = new DupeCounter<>();
+    private final DupeCounter<FilterValue<T,R>> visibleValuesDupeCounter = new DupeCounter<>();
+    private final HashSet<R> unselectedValues = new HashSet<>();
 
     private boolean lastFilter = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
 
+    private final Function<T,FilterValue<T,R>> itemToFilterValue;
 
-    private final Function<T,FilterValue> itemToFilterValue;
-
-    public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,?> tableColumn) {
+    public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
-        this.itemToFilterValue = t -> new FilterValue(tableColumn.getCellObservableValue(t),this);
-
-        //Build distinct mapped list of filter values from column values
-       /* this.filterValues = new DistinctMappingList<>(tableFilter.getBackingList(),
-                v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
-
-        this.visibleValues = new MappedList<>(tableFilter.getTableView().getItems(),
-                v -> new FilterValue(tableColumn.getCellObservableValue(v), this));
-                */
+        this.itemToFilterValue = t -> new FilterValue<>(tableColumn.getCellObservableValue(t), this);
 
         this.filterValues = FXCollections.observableArrayList(cb -> new Observable[] { cb.selectedProperty()});
         this.visibleValues = FXCollections.observableArrayList();
@@ -79,7 +70,7 @@ public final class ColumnFilter<T> {
         initializeListeners();
         initializeValues();
     }
-    public ObservableList<FilterValue> getVisibleValues() {
+    public ObservableList<FilterValue<T,R>> getVisibleValues() {
         return visibleValues;
     }
     public boolean wasLastFiltered() {
@@ -90,6 +81,9 @@ public final class ColumnFilter<T> {
     }
     public BiPredicate<String,String> getSearchStrategy() {
         return searchStrategy;
+    }
+    public boolean isFiltered() {
+        return unselectedValues.size() > 0;
     }
     public void applyFilter() {
     	tableFilter.executeFilter();
@@ -104,11 +98,8 @@ public final class ColumnFilter<T> {
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
     }
-    public boolean isFiltered() {
-        return filterValues.stream().filter(v -> !v.selectedProperty().get()).findAny().isPresent();
-    }
 
-    public ObservableList<FilterValue> getFilterValues() {
+    public ObservableList<FilterValue<T,R>> getFilterValues() {
         return filterValues;
     }
 
@@ -118,41 +109,45 @@ public final class ColumnFilter<T> {
     public TableFilter<T> getTableFilter() { 
         return tableFilter;
     }
-    public boolean evaluate(ObservableValue<?> value) {
-        return unselectedValues.size() == 0 || unselectedValues.contains(value);
+    public boolean evaluate(T item) {
+        ObservableValue<R> value = tableColumn.getCellObservableValue(item);
+
+        return unselectedValues.size() == 0
+                || unselectedValues.contains(value.getValue());
     }
 
     private void initializeValues() {
-        tableFilter.getBackingList().stream()
-                .map(itemToFilterValue)
-                .filter(t -> filterValuesDupeCounter.add(t) == 1).forEach(filterValues::add);
+        tableFilter.getBackingList().stream().forEach(this::addBackingItem);
 
-        tableFilter.getBackingList().stream()
-                .map(itemToFilterValue)
-                .filter(t -> visibleValuesDupeCounter.add(t) == 1).forEach(visibleValues::add);
+        tableFilter.getTableView().getItems().stream().forEach(this::addVisibleItem);
     }
     private void addBackingItem(T item) {
-        FilterValue newValue = itemToFilterValue.apply(item);
+        FilterValue<T,R> newValue = itemToFilterValue.apply(item);
         if (filterValuesDupeCounter.add(newValue) == 1) {
             filterValues.add(newValue);
+            newValue.initialize();
+            System.out.println("Added " + newValue);
         }
     }
     private void removeBackingItem(T item) {
         FilterValue newValue = itemToFilterValue.apply(item);
         if (filterValuesDupeCounter.remove(newValue) == 0) {
             filterValues.remove(newValue);
+            System.out.println("Removed " + newValue);
         }
     }
     private void addVisibleItem(T item) {
         FilterValue newValue = itemToFilterValue.apply(item);
         if (visibleValuesDupeCounter.add(newValue) == 1) {
             visibleValues.add(newValue);
+            System.out.println("Added Visible " + newValue);
         }
     }
     private void removeVisibleItem(T item) {
         FilterValue newValue = itemToFilterValue.apply(item);
         if (visibleValuesDupeCounter.remove(newValue) == 0) {
             visibleValues.remove(newValue);
+            System.out.println("Removed Visible " + newValue);
         }
     }
     private void initializeListeners() {
@@ -182,11 +177,12 @@ public final class ColumnFilter<T> {
         });
 
         //listen to selections on filterValues
-        filterValues.addListener((ListChangeListener<FilterValue>) lc -> {
+        filterValues.addListener((ListChangeListener<FilterValue<T,R>>) lc -> {
             while (lc.next()) {
                 if (lc.wasRemoved()) {
                     lc.getRemoved().stream()
                             .filter(v -> !v.selectedProperty().get())
+                            .peek(v -> System.out.println("Removing " + v + " from selections"))
                             .forEach(unselectedValues::remove);
                 }
                 if (lc.wasUpdated()) {
@@ -194,11 +190,13 @@ public final class ColumnFilter<T> {
                     int to = lc.getTo();
                     lc.getList().subList(from,to).forEach(v -> {
                         boolean value = v.selectedProperty().getValue();
-                        if (value) {
-                            unselectedValues.remove(v.valueProperty());
+                        if (!value) {
+                            unselectedValues.add(v.valueProperty().getValue());
+                            System.out.println("Unselecting " + v);
                         }
                         else {
-                            unselectedValues.add(v.valueProperty());
+                            unselectedValues.remove(v.valueProperty().getValue());
+                            System.out.println("Selecting " + v);
                         }
                     });
                 }

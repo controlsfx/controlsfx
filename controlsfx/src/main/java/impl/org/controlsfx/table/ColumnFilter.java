@@ -130,21 +130,21 @@ public final class ColumnFilter<T,R> {
         }
     }
     private void removeBackingItem(T item) {
-        FilterValue newValue = itemToFilterValue.apply(item);
+        FilterValue<T,R> newValue = itemToFilterValue.apply(item);
         if (filterValuesDupeCounter.remove(newValue) == 0) {
             filterValues.remove(newValue);
             System.out.println("Removed " + newValue);
         }
     }
     private void addVisibleItem(T item) {
-        FilterValue newValue = itemToFilterValue.apply(item);
+        FilterValue<T,R>  newValue = itemToFilterValue.apply(item);
         if (visibleValuesDupeCounter.add(newValue) == 1) {
             visibleValues.add(newValue);
             System.out.println("Added Visible " + newValue);
         }
     }
     private void removeVisibleItem(T item) {
-        FilterValue newValue = itemToFilterValue.apply(item);
+        FilterValue<T,R>  newValue = itemToFilterValue.apply(item);
         if (visibleValuesDupeCounter.remove(newValue) == 0) {
             visibleValues.remove(newValue);
             System.out.println("Removed Visible " + newValue);

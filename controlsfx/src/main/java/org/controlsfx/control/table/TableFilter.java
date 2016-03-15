@@ -111,13 +111,11 @@ public final class TableFilter<T> {
         columnFilters.setAll(this.tableView.getColumns().stream()
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
-    /** 
-     * @treatAsPrivate
-     */
+
     public void executeFilter() { 
         filteredList.setPredicate(item -> !columnFilters.stream()
-                .filter(cf -> cf.evaluate(item))
-                .findAny().isPresent());
+                    .filter(cf -> !cf.evaluate(item))
+                    .findAny().isPresent());
     }
     /** 
      * @treatAsPrivate

@@ -113,7 +113,7 @@ public final class ColumnFilter<T,R> {
         ObservableValue<R> value = tableColumn.getCellObservableValue(item);
 
         return unselectedValues.size() == 0
-                || unselectedValues.contains(value.getValue());
+                || !unselectedValues.contains(value.getValue());
     }
 
     private void initializeValues() {
@@ -126,28 +126,24 @@ public final class ColumnFilter<T,R> {
         if (filterValuesDupeCounter.add(newValue) == 1) {
             filterValues.add(newValue);
             newValue.initialize();
-            System.out.println("Added " + newValue);
         }
     }
     private void removeBackingItem(T item) {
         FilterValue<T,R> newValue = itemToFilterValue.apply(item);
         if (filterValuesDupeCounter.remove(newValue) == 0) {
             filterValues.remove(newValue);
-            System.out.println("Removed " + newValue);
         }
     }
     private void addVisibleItem(T item) {
         FilterValue<T,R>  newValue = itemToFilterValue.apply(item);
         if (visibleValuesDupeCounter.add(newValue) == 1) {
             visibleValues.add(newValue);
-            System.out.println("Added Visible " + newValue);
         }
     }
     private void removeVisibleItem(T item) {
         FilterValue<T,R>  newValue = itemToFilterValue.apply(item);
         if (visibleValuesDupeCounter.remove(newValue) == 0) {
             visibleValues.remove(newValue);
-            System.out.println("Removed Visible " + newValue);
         }
     }
     private void initializeListeners() {
@@ -182,7 +178,6 @@ public final class ColumnFilter<T,R> {
                 if (lc.wasRemoved()) {
                     lc.getRemoved().stream()
                             .filter(v -> !v.selectedProperty().get())
-                            .peek(v -> System.out.println("Removing " + v + " from selections"))
                             .forEach(unselectedValues::remove);
                 }
                 if (lc.wasUpdated()) {
@@ -192,11 +187,9 @@ public final class ColumnFilter<T,R> {
                         boolean value = v.selectedProperty().getValue();
                         if (!value) {
                             unselectedValues.add(v.valueProperty().getValue());
-                            System.out.println("Unselecting " + v);
                         }
                         else {
                             unselectedValues.remove(v.valueProperty().getValue());
-                            System.out.println("Selecting " + v);
                         }
                     });
                 }

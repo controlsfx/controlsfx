@@ -17,22 +17,17 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue> {
     private final BooleanProperty inScope = new SimpleBooleanProperty(true);
     private final ColumnFilter<T,R> columnFilter;
 
-    private boolean initialized = false;
 
     FilterValue(R value, ColumnFilter<T,R> columnFilter) {
         this.value = value;
         this.columnFilter = columnFilter;
-    }
-    public void initialize() {
-        if (!initialized) {
-            final CheckBox checkBox = new CheckBox();
-            final Label label = new Label();
-            label.setText(Optional.ofNullable(value).map(Object::toString).orElse(null));
-            inScope.addListener((Observable v) -> label.textFillProperty().set(getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
-            checkBox.selectedProperty().bindBidirectional(selectedProperty());
-            initialized = true;
-            getChildren().addAll(checkBox,label);
-        }
+
+        final CheckBox checkBox = new CheckBox();
+        final Label label = new Label();
+        label.setText(Optional.ofNullable(value).map(Object::toString).orElse(null));
+        inScope.addListener((Observable v) -> label.textFillProperty().set(getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
+        checkBox.selectedProperty().bindBidirectional(selectedProperty());
+        getChildren().addAll(checkBox,label);
     }
 
     public R getValue() {

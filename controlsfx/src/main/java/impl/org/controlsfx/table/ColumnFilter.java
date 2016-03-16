@@ -140,7 +140,7 @@ public final class ColumnFilter<T,R> {
             }
             if (filterValuesDupeCounter.remove(oldValue) == 0) {
                 FilterValue<T,R> existingFilterValue = filterValues.stream()
-                        .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(newValue))).findAny().get();
+                        .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
                 filterValues.remove(existingFilterValue);
             }
         };

@@ -34,7 +34,7 @@ final class DupeCounter<T> {
             return newVal;
         }
         else {
-            return 0;
+            throw new IllegalStateException();
         }
     }
 }

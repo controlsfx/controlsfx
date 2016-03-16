@@ -27,6 +27,8 @@
 package impl.org.controlsfx.table;
 
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -36,6 +38,7 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
 import org.controlsfx.control.table.TableFilter;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -50,7 +53,8 @@ public final class ColumnFilter<T,R> {
     private final DupeCounter<FilterValue<T,R>> filterValuesDupeCounter = new DupeCounter<>();
     private final DupeCounter<FilterValue<T,R>> visibleValuesDupeCounter = new DupeCounter<>();
     private final HashSet<R> unselectedValues = new HashSet<>();
-
+    private final HashMap<TrackedCellValue<R>,ChangeListener<R>> trackedCells = new HashMap<>();
+    
     private boolean lastFilter = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
 
@@ -120,31 +124,49 @@ public final class ColumnFilter<T,R> {
     }
 
     private void initializeValues() {
-        tableFilter.getBackingList().stream().forEach(this::addBackingItem);
+        tableFilter.getBackingList().stream().map(itemToFilterValue::apply).forEach(this::addBackingItem);
 
-        tableFilter.getTableView().getItems().stream().forEach(this::addVisibleItem);
+        tableFilter.getTableView().getItems().stream()
+                .map(itemToFilterValue::apply).forEach(this::addVisibleItem);
     }
-    private void addBackingItem(T item) {
-        FilterValue<T,R> newValue = itemToFilterValue.apply(item);
-        if (filterValuesDupeCounter.add(newValue) == 1) {
-            filterValues.add(newValue);
-            newValue.initialize();
+    private void addBackingItem(FilterValue<T,R> filterValue) {
+        if (filterValuesDupeCounter.add(filterValue) == 1) {
+            filterValues.add(filterValue);
+            filterValue.initialize();
         }
+
+        //listen to cell value and track it
+        TrackedCellValue<R> trackedCellValue = new TrackedCellValue<>(filterValue.valueProperty());
+        ChangeListener<R> changeListener = (observable, oldValue, newValue1) -> {
+            FilterValue<T,R> oldFilterValue = new FilterValue<>(new SimpleObjectProperty<>(oldValue),this);
+
+            if (filterValuesDupeCounter.add(filterValue) == 1) {
+                filterValues.remove(oldFilterValue);
+                filterValues.add(filterValue);
+                filterValue.initialize();
+            }
+            if (filterValuesDupeCounter.remove(oldFilterValue) == 0) {
+                filterValues.remove(oldFilterValue);
+            }
+        };
+        trackedCellValue.cellValue.addListener(changeListener);
+        trackedCells.put(trackedCellValue,changeListener);
     }
-    private void removeBackingItem(T item) {
-        FilterValue<T,R> newValue = itemToFilterValue.apply(item);
+    private void removeBackingItem(FilterValue<T,R>  newValue) {
         if (filterValuesDupeCounter.remove(newValue) == 0) {
             filterValues.remove(newValue);
         }
+        //remove listener from cell
+        ChangeListener<R> listener = trackedCells.get(new TrackedCellValue<>(newValue.valueProperty()));
+        newValue.valueProperty().removeListener(listener);
+        trackedCells.remove(new TrackedCellValue<>(newValue.valueProperty()));
     }
-    private void addVisibleItem(T item) {
-        FilterValue<T,R>  newValue = itemToFilterValue.apply(item);
+    private void addVisibleItem(FilterValue<T,R>  newValue) {
         if (visibleValuesDupeCounter.add(newValue) == 1) {
             visibleValues.add(newValue);
         }
     }
-    private void removeVisibleItem(T item) {
-        FilterValue<T,R>  newValue = itemToFilterValue.apply(item);
+    private void removeVisibleItem(FilterValue<T,R>  newValue) {
         if (visibleValuesDupeCounter.remove(newValue) == 0) {
             visibleValues.remove(newValue);
         }
@@ -155,10 +177,11 @@ public final class ColumnFilter<T,R> {
         tableFilter.getBackingList().addListener((ListChangeListener<T>) lc -> {
             while (lc.next()) {
                 if (lc.wasAdded()) {
-                    lc.getAddedSubList().stream().forEach(this::addBackingItem);
+                    lc.getAddedSubList().stream()
+                            .map(itemToFilterValue::apply).forEach(this::addBackingItem);
                 }
                 if (lc.wasRemoved()) {
-                    lc.getRemoved().stream().forEach(this::removeBackingItem);
+                    lc.getRemoved().stream().map(itemToFilterValue::apply).forEach(this::removeBackingItem);
                 }
             }
         });
@@ -167,10 +190,14 @@ public final class ColumnFilter<T,R> {
         tableFilter.getTableView().getItems().addListener((ListChangeListener<T>) lc -> {
             while (lc.next()) {
                 if (lc.wasAdded()) {
-                    lc.getAddedSubList().stream().forEach(this::addVisibleItem);
+                    lc.getAddedSubList().stream()
+                            .map(itemToFilterValue::apply)
+                            .forEach(this::addVisibleItem);
                 }
                 if (lc.wasRemoved()) {
-                    lc.getRemoved().stream().forEach(this::removeVisibleItem);
+                    lc.getRemoved().stream()
+                            .map(itemToFilterValue::apply)
+                            .forEach(this::removeVisibleItem);
                 }
             }
         });
@@ -209,5 +236,23 @@ public final class ColumnFilter<T,R> {
         contextMenu.getItems().add(item);
 
         tableColumn.setContextMenu(contextMenu);
+    }
+
+    private static final class TrackedCellValue<R> {
+        private final ObservableValue<R> cellValue;
+
+        TrackedCellValue(ObservableValue<R> cellValue) {
+            this.cellValue = cellValue;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return this == other;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(cellValue);
+        }
     }
 }

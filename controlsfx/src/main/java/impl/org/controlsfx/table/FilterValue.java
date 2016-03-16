@@ -63,8 +63,7 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue> {
 
         FilterValue that = (FilterValue) o;
 
-        return Optional.ofNullable(value).map(ObservableValue::getValue).equals(Optional.ofNullable(that.value).map(ObservableValue::getValue))
-                || Optional.ofNullable(value.getValue()).equals(Optional.ofNullable(that.value.getValue()));
+        return Optional.ofNullable(value.getValue()).equals(Optional.ofNullable(that.value.getValue()));
 
     }
     @Override

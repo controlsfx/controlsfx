@@ -124,6 +124,9 @@ public final class ColumnFilter<T,R> {
                 .map(tableColumn::getCellObservableValue).forEach(this::addVisibleItem);
     }
     private void addBackingItem(ObservableValue<R> cellValue) {
+        if (cellValue == null) {
+            return;
+        }
         if (filterValuesDupeCounter.add(cellValue.getValue()) == 1) {
             filterValues.add(new FilterValue<>(cellValue.getValue(),this));
         }
@@ -151,6 +154,9 @@ public final class ColumnFilter<T,R> {
         trackedCells.put(trackedCellValue,changeListener);
     }
     private void removeBackingItem(ObservableValue<R> cellValue) {
+        if (cellValue == null) {
+            return;
+        }
         if (filterValuesDupeCounter.remove(cellValue.getValue()) == 0) {
             FilterValue<T,R> existingFilterValue = filterValues.stream()
                     .filter(fv -> fv.getValue().equals(cellValue.getValue())).findAny().get();
@@ -162,12 +168,12 @@ public final class ColumnFilter<T,R> {
         trackedCells.remove(new CellIdentity<>(cellValue));
     }
     private void addVisibleItem(ObservableValue<R>  cellValue) {
-        if (visibleValuesDupeCounter.add(cellValue.getValue()) == 1) {
+        if (cellValue != null && visibleValuesDupeCounter.add(cellValue.getValue()) == 1) {
             visibleValues.add(cellValue);
         }
     }
     private void removeVisibleItem(ObservableValue<R>  cellValue) {
-        if (visibleValuesDupeCounter.remove(cellValue.getValue()) == 0) {
+        if (cellValue != null && visibleValuesDupeCounter.remove(cellValue.getValue()) == 0) {
             visibleValues.remove(cellValue);
         }
     }

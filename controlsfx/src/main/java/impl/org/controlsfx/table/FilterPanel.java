@@ -30,7 +30,6 @@ import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -42,11 +41,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
-import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -177,7 +173,8 @@ public final class FilterPanel<T,R> extends VBox {
     private void initializeListeners() {
         searchBox.textProperty().addListener(l -> {
             searchMode = !searchBox.getText().isEmpty();
-            filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.getSearchStrategy().test(searchBox.getText(), val.valueProperty().getValue().toString()));
+            filterList.setPredicate(val -> searchBox.getText().isEmpty() ||
+                    columnFilter.getSearchStrategy().test(searchBox.getText(), Optional.ofNullable(val.getValue()).map(Object::toString).orElse("")));
         });
     }
 

@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 
 import java.util.Optional;
 
-final class FilterValue<T,R> extends HBox implements Comparable<FilterValue> {
+final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>> {
 
     private final R value;
     private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
@@ -52,7 +52,12 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue> {
 
 
     @Override
-    public int compareTo(FilterValue other) {
+    public int compareTo(FilterValue<T,R> other) {
+        if (value != null && other.value != null) {
+            if (value instanceof Comparable<?> && other.value instanceof Comparable<?>) {
+                return ((Comparable<Object>) value).compareTo(((Comparable<Object>) other.value));
+            }
+        }
         return Optional.ofNullable(value).map(Object::toString).orElse("")
                 .compareTo(Optional.ofNullable(other).map(Object::toString).orElse(""));
     }

@@ -79,7 +79,7 @@ public final class FilterPanel<T,R> extends VBox {
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
         ListView<FilterValue> checkListView = new ListView<>();
-        checkListView.setItems(filterList);
+        checkListView.setItems(new SortedList<>(filterList, FilterValue::compareTo));
 
         getChildren().add(checkListView);
 

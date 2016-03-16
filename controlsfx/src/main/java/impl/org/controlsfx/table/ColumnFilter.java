@@ -143,6 +143,12 @@ public final class ColumnFilter<T,R> {
                         .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
                 filterValues.remove(existingFilterValue);
             }
+            if (visibleValuesDupeCounter.remove(oldValue) == 0) {
+                visibleValues.remove(cellValue);
+            }
+            if (visibleValuesDupeCounter.add(newValue) == 1) {
+                visibleValues.add(cellValue);
+            }
         };
         trackedCellValue.cellValue.addListener(changeListener);
         trackedCells.put(trackedCellValue,changeListener);

@@ -27,6 +27,7 @@
 package impl.org.controlsfx.table;
 
 import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -47,7 +48,6 @@ public final class ColumnFilter<T,R> {
     private final TableColumn<T,R> tableColumn;
 
     private final ObservableList<FilterValue<T,R>> filterValues;
-    private final ObservableList<ObservableValue<R>> visibleValues;
 
     private final DupeCounter<R> filterValuesDupeCounter = new DupeCounter<>();
     private final DupeCounter<R> visibleValuesDupeCounter = new DupeCounter<>();
@@ -62,7 +62,6 @@ public final class ColumnFilter<T,R> {
         this.tableColumn = tableColumn;
 
         this.filterValues = FXCollections.observableArrayList(cb -> new Observable[] { cb.selectedProperty()});
-        this.visibleValues = FXCollections.observableArrayList();
         this.attachContextMenu();
     }
 
@@ -83,7 +82,7 @@ public final class ColumnFilter<T,R> {
         return unselectedValues.size() > 0;
     }
     public boolean valueIsVisible(R value) {
-        return visibleValuesDupeCounter.get(value) > 1;
+        return visibleValuesDupeCounter.get(value) > 0;
     }
     public void applyFilter() {
     	tableFilter.executeFilter();
@@ -119,9 +118,9 @@ public final class ColumnFilter<T,R> {
     private void initializeValues() {
         tableFilter.getBackingList().stream()
                 .map(tableColumn::getCellObservableValue).forEach(this::addBackingItem);
-
         tableFilter.getTableView().getItems().stream()
                 .map(tableColumn::getCellObservableValue).forEach(this::addVisibleItem);
+
     }
     private void addBackingItem(ObservableValue<R> cellValue) {
         if (cellValue == null) {
@@ -143,12 +142,9 @@ public final class ColumnFilter<T,R> {
                         .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
                 filterValues.remove(existingFilterValue);
             }
-            if (visibleValuesDupeCounter.remove(oldValue) == 0) {
-                visibleValues.remove(cellValue);
-            }
-            if (visibleValuesDupeCounter.add(newValue) == 1) {
-                visibleValues.add(cellValue);
-            }
+
+            removeVisibleItem(new ReadOnlyObjectWrapper<>(oldValue));
+            addVisibleItem(new ReadOnlyObjectWrapper<>(newValue));
         };
         trackedCellValue.cellValue.addListener(changeListener);
         trackedCells.put(trackedCellValue,changeListener);
@@ -162,19 +158,20 @@ public final class ColumnFilter<T,R> {
                     .filter(fv -> fv.getValue().equals(cellValue.getValue())).findAny().get();
             filterValues.remove(existingFilterValue);
         }
+
         //remove listener from cell
         ChangeListener<R> listener = trackedCells.get(new CellIdentity<>(cellValue));
         cellValue.removeListener(listener);
         trackedCells.remove(new CellIdentity<>(cellValue));
     }
     private void addVisibleItem(ObservableValue<R>  cellValue) {
-        if (cellValue != null && visibleValuesDupeCounter.add(cellValue.getValue()) == 1) {
-            visibleValues.add(cellValue);
+        if (cellValue != null) {
+            visibleValuesDupeCounter.add(cellValue.getValue());
         }
     }
     private void removeVisibleItem(ObservableValue<R>  cellValue) {
-        if (cellValue != null && visibleValuesDupeCounter.remove(cellValue.getValue()) == 0) {
-            visibleValues.remove(cellValue);
+        if (cellValue != null) {
+            visibleValuesDupeCounter.remove(cellValue.getValue());
         }
     }
     private void initializeListeners() {
@@ -184,10 +181,12 @@ public final class ColumnFilter<T,R> {
             while (lc.next()) {
                 if (lc.wasAdded()) {
                     lc.getAddedSubList().stream()
-                            .map(tableColumn::getCellObservableValue).forEach(this::addBackingItem);
+                            .<ObservableValue<R>>map(tableColumn::getCellObservableValue)
+                            .forEach(this::addBackingItem);
                 }
                 if (lc.wasRemoved()) {
-                    lc.getRemoved().stream().map(tableColumn::getCellObservableValue).forEach(this::removeBackingItem);
+                    lc.getRemoved().stream().map(tableColumn::getCellObservableValue)
+                            .forEach(this::removeBackingItem);
                 }
             }
         });
@@ -253,7 +252,7 @@ public final class ColumnFilter<T,R> {
 
         @Override
         public boolean equals(Object other) {
-            return this == other;
+            return this.cellValue == ((CellIdentity<?>)other).cellValue;
         }
 
         @Override

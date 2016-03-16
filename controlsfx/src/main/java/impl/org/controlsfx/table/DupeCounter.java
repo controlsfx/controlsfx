@@ -37,4 +37,9 @@ final class DupeCounter<T> {
             throw new IllegalStateException();
         }
     }
+
+    @Override
+    public String toString() {
+        return counts.toString();
+    }
 }

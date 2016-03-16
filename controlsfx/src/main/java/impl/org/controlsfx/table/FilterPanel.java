@@ -122,15 +122,15 @@ public final class FilterPanel<T,R> extends VBox {
         buttonBox.getChildren().add(unselectAllButton);
 
         //initialize reset buttons
-        Button clearButton = new Button("ALL");
-        HBox.setHgrow(clearButton, Priority.ALWAYS);
+        Button selectAllButton = new Button("ALL");
+        HBox.setHgrow(selectAllButton, Priority.ALWAYS);
 
-        clearButton.setOnAction(e -> {
-            columnFilter.resetAllFilters();
-            filterList.setPredicate(v -> true);
+        selectAllButton.setOnAction(e -> {
+            columnFilter.getFilterValues().forEach(v -> v.selectedProperty().set(true));
+            columnFilter.getTableColumn().setGraphic(null);
         });
 
-        buttonBox.getChildren().add(clearButton);
+        buttonBox.getChildren().add(selectAllButton);
 
         Button clearAllButton = new Button("RESET ALL");
         HBox.setHgrow(clearAllButton, Priority.ALWAYS);

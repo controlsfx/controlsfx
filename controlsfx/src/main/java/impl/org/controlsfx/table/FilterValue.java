@@ -42,7 +42,7 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>
     }
 
     public void refreshScope() {
-        inScope.setValue(columnFilter.wasLastFiltered() || columnFilter.valueIsVisible(this.value));
+        inScope.setValue(columnFilter.wasLastFiltered() || columnFilter.valueIsVisible(value));
     }
 
     @Override

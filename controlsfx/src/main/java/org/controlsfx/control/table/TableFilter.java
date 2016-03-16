@@ -112,10 +112,15 @@ public final class TableFilter<T> {
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
 
-    public void executeFilter() { 
-        filteredList.setPredicate(item -> !columnFilters.stream()
+    public void executeFilter() {
+        if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
+            filteredList.setPredicate(item -> !columnFilters.stream()
                     .filter(cf -> !cf.evaluate(item))
                     .findAny().isPresent());
+        }
+        else {
+            resetFilter();
+        }
     }
     public void resetFilter() {
         filteredList.setPredicate(item -> true);
@@ -138,6 +143,8 @@ public final class TableFilter<T> {
     public Optional<ColumnFilter<T,?>> getColumnFilter(TableColumn<T,?> tableColumn) {
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }
-    
+    public boolean isDirty() {
+        return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+    }
     
 }

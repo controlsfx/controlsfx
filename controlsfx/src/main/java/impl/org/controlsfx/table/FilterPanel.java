@@ -66,6 +66,7 @@ public final class FilterPanel<T,R> extends VBox {
     };
 
     FilterPanel(ColumnFilter<T,R> columnFilter) {
+        columnFilter.setFilterPanel(this);
         this.columnFilter = columnFilter;
         getStyleClass().add("filter-panel");
 
@@ -90,27 +91,31 @@ public final class FilterPanel<T,R> extends VBox {
         HBox.setHgrow(applyBttn, Priority.ALWAYS);
 
         applyBttn.setOnAction(e -> {
-            if (searchMode) {
-                filterList.forEach(v -> v.selectedProperty().setValue(true));
+                    if (searchMode) {
+                        filterList.forEach(v -> v.selectedProperty().setValue(true));
 
-                columnFilter.getFilterValues().stream()
-                        .filter(v -> !filterList.stream().filter(fl -> fl.equals(v)).findAny().isPresent())
-                        .forEach(v -> v.selectedProperty().setValue(false));
+                        columnFilter.getFilterValues().stream()
+                                .filter(v -> !filterList.stream().filter(fl -> fl.equals(v)).findAny().isPresent())
+                                .forEach(v -> v.selectedProperty().setValue(false));
 
-                resetSearchFilter();
-            }
-            if (columnFilter.isFiltered()) {
-                columnFilter.applyFilter();
-                columnFilter.getTableColumn().setGraphic(filterImageView.get());
-                if (!bumpedWidth) {
-                    columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 15);
-                    bumpedWidth = true;
-                }
-            }
-            else {
-                resetSearchFilter();
-            }
-        });
+                        resetSearchFilter();
+                    }
+                    if (columnFilter.getTableFilter().isDirty()) {
+                        columnFilter.applyFilter();
+                        columnFilter.getTableFilter().getColumnFilters().stream().map(ColumnFilter::getFilterPanel)
+                                .forEach(fp -> {
+                                    if (!fp.columnFilter.hasUnselections()) {
+                                        fp.columnFilter.getTableColumn().setGraphic(null);
+                                    } else {
+                                        fp.columnFilter.getTableColumn().setGraphic(filterImageView.get());
+                                        if (!bumpedWidth) {
+                                            fp.columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 15);
+                                            bumpedWidth = true;
+                                        }
+                                    }
+                                });
+                    }
+                });
 
         buttonBox.getChildren().add(applyBttn);
 
@@ -127,7 +132,6 @@ public final class FilterPanel<T,R> extends VBox {
 
         selectAllButton.setOnAction(e -> {
             columnFilter.getFilterValues().forEach(v -> v.selectedProperty().set(true));
-            columnFilter.getTableColumn().setGraphic(null);
         });
 
         buttonBox.getChildren().add(selectAllButton);

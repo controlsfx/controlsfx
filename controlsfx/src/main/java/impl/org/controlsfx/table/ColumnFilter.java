@@ -55,7 +55,9 @@ public final class ColumnFilter<T,R> {
     private final HashMap<CellIdentity<R>,ChangeListener<R>> trackedCells = new HashMap<>();
     
     private boolean lastFilter = false;
+    private boolean isDirty = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
+    private FilterPanel filterPanel;
 
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
@@ -64,13 +66,21 @@ public final class ColumnFilter<T,R> {
         this.filterValues = FXCollections.observableArrayList(cb -> new Observable[] { cb.selectedProperty()});
         this.attachContextMenu();
     }
-
+    void setFilterPanel(FilterPanel filterPanel) {
+        this.filterPanel = filterPanel;
+    }
+    FilterPanel getFilterPanel() {
+        return filterPanel;
+    }
     public void initialize() {
         initializeListeners();
         initializeValues();
     }
     public boolean wasLastFiltered() {
         return lastFilter;
+    }
+    public boolean hasUnselections() {
+        return unselectedValues.size() != 0;
     }
     public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
         this.searchStrategy = searchStrategy;
@@ -79,7 +89,7 @@ public final class ColumnFilter<T,R> {
         return searchStrategy;
     }
     public boolean isFiltered() {
-        return unselectedValues.size() > 0;
+        return isDirty || unselectedValues.size() > 0;
     }
     public boolean valueIsVisible(R value) {
         return visibleValuesDupeCounter.get(value) > 0;
@@ -89,6 +99,7 @@ public final class ColumnFilter<T,R> {
     	lastFilter = true;
     	tableFilter.getColumnFilters().stream().filter(c -> !c.equals(this)).forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
+        isDirty = false;
     }
 
     public void resetAllFilters() { 
@@ -96,6 +107,7 @@ public final class ColumnFilter<T,R> {
     	tableFilter.resetFilter();
     	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
     	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
+        isDirty = false;
     }
 
     public ObservableList<FilterValue<T,R>> getFilterValues() {
@@ -221,9 +233,11 @@ public final class ColumnFilter<T,R> {
                     lc.getList().subList(from,to).forEach(v -> {
                         boolean value = v.selectedProperty().getValue();
                         if (!value) {
+                            isDirty = true;
                             unselectedValues.add(v.getValue());
                         }
                         else {
+                            isDirty = true;
                             unselectedValues.remove(v.getValue());
                         }
                     });

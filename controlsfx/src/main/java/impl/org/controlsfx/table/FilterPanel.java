@@ -109,7 +109,7 @@ public final class FilterPanel<T,R> extends VBox {
                                     } else {
                                         fp.columnFilter.getTableColumn().setGraphic(filterImageView.get());
                                         if (!bumpedWidth) {
-                                            fp.columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 15);
+                                            fp.columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 20);
                                             bumpedWidth = true;
                                         }
                                     }

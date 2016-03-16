@@ -167,7 +167,7 @@ public final class ColumnFilter<T,R> {
         }
         if (filterValuesDupeCounter.remove(cellValue.getValue()) == 0) {
             FilterValue<T,R> existingFilterValue = filterValues.stream()
-                    .filter(fv -> fv.getValue().equals(cellValue.getValue())).findAny().get();
+                    .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(cellValue.getValue()))).findAny().get();
             filterValues.remove(existingFilterValue);
         }
 

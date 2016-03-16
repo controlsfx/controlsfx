@@ -70,9 +70,6 @@ public final class ColumnFilter<T,R> {
         initializeListeners();
         initializeValues();
     }
-    public ObservableList<ObservableValue<R>> getVisibleValues() {
-        return visibleValues;
-    }
     public boolean wasLastFiltered() {
         return lastFilter;
     }

@@ -51,7 +51,7 @@ public final class ColumnFilter<T,R> {
     private final DupeCounter<R> filterValuesDupeCounter = new DupeCounter<>(true);
     private final DupeCounter<R> visibleValuesDupeCounter = new DupeCounter<>(false);
     private final HashSet<R> unselectedValues = new HashSet<>();
-    private final HashMap<CellIdentity<R>,ChangeListener<R>> trackedCells = new HashMap<>();
+    private final HashMap<CellIdentity<T>,ChangeListener<R>> trackedCells = new HashMap<>();
     
     private boolean lastFilter = false;
     private boolean isDirty = false;
@@ -128,12 +128,12 @@ public final class ColumnFilter<T,R> {
 
     private void initializeValues() {
         tableFilter.getBackingList().stream()
-                .map(tableColumn::getCellObservableValue).forEach(this::addBackingItem);
+                .forEach(t -> addBackingItem(t, tableColumn.getCellObservableValue(t)));
         tableFilter.getTableView().getItems().stream()
                 .map(tableColumn::getCellObservableValue).forEach(this::addVisibleItem);
 
     }
-    private void addBackingItem(ObservableValue<R> cellValue) {
+    private void addBackingItem(T item, ObservableValue<R> cellValue) {
         if (cellValue == null) {
             return;
         }
@@ -142,7 +142,7 @@ public final class ColumnFilter<T,R> {
         }
 
         //listen to cell value and track it
-        CellIdentity<R> trackedCellValue = new CellIdentity<>(cellValue);
+        CellIdentity<T> trackedCellValue = new CellIdentity<>(item);
         ChangeListener<R> changeListener = (observable, oldValue, newValue) -> {
 
             if (filterValuesDupeCounter.add(newValue) == 1) {
@@ -154,10 +154,10 @@ public final class ColumnFilter<T,R> {
                 filterValues.remove(existingFilterValue);
             }
         };
-        trackedCellValue.cellValue.addListener(changeListener);
+        cellValue.addListener(changeListener);
         trackedCells.put(trackedCellValue,changeListener);
     }
-    private void removeBackingItem(ObservableValue<R> cellValue) {
+    private void removeBackingItem(T item, ObservableValue<R> cellValue) {
         if (cellValue == null) {
             return;
         }
@@ -168,9 +168,9 @@ public final class ColumnFilter<T,R> {
         }
 
         //remove listener from cell
-        ChangeListener<R> listener = trackedCells.get(new CellIdentity<>(cellValue));
+        ChangeListener<R> listener = trackedCells.get(new CellIdentity<>(item));
         cellValue.removeListener(listener);
-        trackedCells.remove(new CellIdentity<>(cellValue));
+        trackedCells.remove(new CellIdentity<>(item));
     }
     private void addVisibleItem(ObservableValue<R>  cellValue) {
         if (cellValue != null) {
@@ -189,16 +189,14 @@ public final class ColumnFilter<T,R> {
             while (lc.next()) {
                 if (lc.wasAdded()) {
                     lc.getAddedSubList().stream()
-                            .<ObservableValue<R>>map(tableColumn::getCellObservableValue)
-                            .forEach(this::addBackingItem);
+                            .forEach(t -> addBackingItem(t,tableColumn.getCellObservableValue(t)));
                 }
                 if (lc.wasRemoved()) {
-                    lc.getRemoved().stream().map(tableColumn::getCellObservableValue)
-                            .forEach(this::removeBackingItem);
+                    lc.getRemoved().stream()
+                            .forEach(t -> removeBackingItem(t,tableColumn.getCellObservableValue(t)));
                 }
             }
         });
-
         //listen to visible items and update visible values accordingly
         tableFilter.getTableView().getItems().addListener((ListChangeListener<T>) lc -> {
             while (lc.next()) {
@@ -253,21 +251,21 @@ public final class ColumnFilter<T,R> {
         tableColumn.setContextMenu(contextMenu);
     }
 
-    private static final class CellIdentity<R> {
-        private final ObservableValue<R> cellValue;
+    private static final class CellIdentity<T> {
+        private final T item;
 
-        CellIdentity(ObservableValue<R> cellValue) {
-            this.cellValue = cellValue;
+        CellIdentity(T item) {
+            this.item = item;
         }
 
         @Override
         public boolean equals(Object other) {
-            return this.cellValue == ((CellIdentity<?>)other).cellValue;
+            return this.item == ((CellIdentity<?>)other).item;
         }
 
         @Override
         public int hashCode() {
-            return System.identityHashCode(cellValue);
+            return System.identityHashCode(item);
         }
     }
 }

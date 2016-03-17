@@ -27,7 +27,6 @@
 package impl.org.controlsfx.table;
 
 import javafx.beans.Observable;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -49,8 +48,8 @@ public final class ColumnFilter<T,R> {
 
     private final ObservableList<FilterValue<T,R>> filterValues;
 
-    private final DupeCounter<R> filterValuesDupeCounter = new DupeCounter<>();
-    private final DupeCounter<R> visibleValuesDupeCounter = new DupeCounter<>();
+    private final DupeCounter<R> filterValuesDupeCounter = new DupeCounter<>(true);
+    private final DupeCounter<R> visibleValuesDupeCounter = new DupeCounter<>(false);
     private final HashSet<R> unselectedValues = new HashSet<>();
     private final HashMap<CellIdentity<R>,ChangeListener<R>> trackedCells = new HashMap<>();
     
@@ -154,9 +153,6 @@ public final class ColumnFilter<T,R> {
                         .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
                 filterValues.remove(existingFilterValue);
             }
-
-            removeVisibleItem(new ReadOnlyObjectWrapper<>(oldValue));
-            addVisibleItem(new ReadOnlyObjectWrapper<>(newValue));
         };
         trackedCellValue.cellValue.addListener(changeListener);
         trackedCells.put(trackedCellValue,changeListener);

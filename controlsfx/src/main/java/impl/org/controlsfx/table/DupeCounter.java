@@ -6,7 +6,11 @@ import java.util.Optional;
 final class DupeCounter<T> {
 
     private final HashMap<T,Integer> counts = new HashMap<>();
+    private final boolean enforceFloor;
 
+    public DupeCounter(boolean enforceFloor) {
+        this.enforceFloor = enforceFloor;
+    }
     public int add(T value) {
         Integer prev = counts.get(value);
         int newVal;
@@ -33,8 +37,11 @@ final class DupeCounter<T> {
             }
             return newVal;
         }
-        else {
+        else if (enforceFloor) {
             throw new IllegalStateException();
+        }
+        else {
+            return 0;
         }
     }
 

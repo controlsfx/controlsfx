@@ -79,7 +79,7 @@ import org.controlsfx.validation.decoration.ValidationDecoration;
  *  Here is an sample of internal registration of such "extractor" for  a few  controls :
  *  <pre>
  *     ValueExtractor.addObservableValueExtractor( c -&gt; c instanceof TextInputControl, c -&gt; ((TextInputControl)c).textProperty());
- *     ValueExtractor.addObservableValueExtractor( c -&gt; c instanceof ComboBox,         c -&gt; ((ComboBox&lt;?&gt;)c).valueProperty());
+ *     ValueExtractor.addObservableValueExtractor( c -&gt; c instanceof ComboBox,         c -&gt; ((ComboBox&lt;?&gt;)c).getValue());
  *  </pre>
  *   
  */

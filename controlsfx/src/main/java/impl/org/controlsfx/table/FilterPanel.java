@@ -29,172 +29,159 @@ package impl.org.controlsfx.table;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
-import impl.org.controlsfx.table.ColumnFilter.FilterValue;
 import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
-import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 
-public final class FilterPanel<T> extends VBox {
-    
-    private final ColumnFilter<T> columnFilter;
+public final class FilterPanel<T,R> extends VBox {
 
-    private final FilteredList<CheckItem> filterList;
+    private final ColumnFilter<T,R> columnFilter;
+
+    private final FilteredList<FilterValue> filterList;
     private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
-    private volatile boolean searchMode = false;
+    private boolean searchMode = false;
+    private boolean bumpedWidth = false;
 
+    private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
 
-    FilterPanel(ColumnFilter<T> columnFilter) {
+    private static final Supplier<ImageView> filterImageView = () -> {
+        ImageView imageView = new ImageView(filterIcon);
+        imageView.setFitHeight(15);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    };
+
+    FilterPanel(ColumnFilter<T,R> columnFilter) {
+        columnFilter.setFilterPanel(this);
         this.columnFilter = columnFilter;
+        getStyleClass().add("filter-panel");
 
         //initialize search box
-        //VBox vBox = new VBox();
-        this.setPadding(new Insets(3));
-        
+        setPadding(new Insets(3));
+
         searchBox.setPromptText(promptText);
-        this.getChildren().add(searchBox);
+        getChildren().add(searchBox);
 
         //initialize checklist view
-        Function<ColumnFilter.FilterValue,CheckItem>  newCheckItemFx = v -> {
-            CheckItem chkItem = new CheckItem(v);
-            chkItem.checkBox.selectedProperty().setValue(true);
-            return chkItem;
-        };
 
-        filterList = new FilteredList<>(new SortedList<>(new MappedList<>(new SortedList<>(this.columnFilter.getFilterValues(), new FilterValueComparator()), newCheckItemFx)), t -> true);
-        ListView<CheckItem> checkListView = new ListView<>();
-        checkListView.setItems(filterList);
+        filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
+        ListView<FilterValue> checkListView = new ListView<>();
+        checkListView.setItems(new SortedList<>(filterList, FilterValue::compareTo));
 
-        this.getChildren().add(checkListView);
-        
+        getChildren().add(checkListView);
+
         //initialize apply button
-        HBox bttnBox = new HBox();
-        Button applyBttn = new Button("APPLY");
+        HBox buttonBox = new HBox();
 
-        HBox.setHgrow(bttnBox, Priority.ALWAYS);
+        Button applyBttn = new Button("APPLY");
+        HBox.setHgrow(applyBttn, Priority.ALWAYS);
+
         applyBttn.setOnAction(e -> {
-        	if (searchMode) { 
-        		filterList.forEach(v -> v.filterValue.getSelectedProperty().setValue(true));
-        		
-        		columnFilter.getFilterValues().stream()
-        			.filter(v -> !filterList.stream().filter(fl -> fl.filterValue.equals(v)).findAny().isPresent())
-        			.forEach(v -> v.getSelectedProperty().setValue(false));
-        		
-        		resetSearchFilter();
-        	}
-        	columnFilter.applyFilter();
-        });
-        
-        bttnBox.getChildren().add(applyBttn);
-        
+                    if (searchMode) {
+                        filterList.forEach(v -> v.selectedProperty().setValue(true));
+
+                        columnFilter.getFilterValues().stream()
+                                .filter(v -> !filterList.stream().filter(fl -> fl.equals(v)).findAny().isPresent())
+                                .forEach(v -> v.selectedProperty().setValue(false));
+
+                        resetSearchFilter();
+                    }
+                    if (columnFilter.getTableFilter().isDirty()) {
+                        columnFilter.applyFilter();
+                        columnFilter.getTableFilter().getColumnFilters().stream().map(ColumnFilter::getFilterPanel)
+                                .forEach(fp -> {
+                                    if (!fp.columnFilter.hasUnselections()) {
+                                        fp.columnFilter.getTableColumn().setGraphic(null);
+                                    } else {
+                                        fp.columnFilter.getTableColumn().setGraphic(filterImageView.get());
+                                        if (!bumpedWidth) {
+                                            fp.columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 20);
+                                            bumpedWidth = true;
+                                        }
+                                    }
+                                });
+                    }
+                });
+
+        buttonBox.getChildren().add(applyBttn);
 
         //initialize unselect all button
         Button unselectAllButton = new Button("NONE");
         HBox.setHgrow(unselectAllButton, Priority.ALWAYS);
-        unselectAllButton.setOnAction(e -> {
-            columnFilter.getFilterValues().forEach(v -> v.getSelectedProperty().set(false));
-        });
-        bttnBox.getChildren().add(unselectAllButton);
+
+        unselectAllButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.selectedProperty().set(false)));
+        buttonBox.getChildren().add(unselectAllButton);
 
         //initialize reset buttons
-        Button clearButton = new Button("ALL");
-        HBox.setHgrow(clearButton, Priority.ALWAYS);
+        Button selectAllButton = new Button("ALL");
+        HBox.setHgrow(selectAllButton, Priority.ALWAYS);
 
-        clearButton.setOnAction(e -> {
-            columnFilter.resetAllFilters();
-            filterList.setPredicate(v -> true);
+        selectAllButton.setOnAction(e -> {
+            columnFilter.getFilterValues().forEach(v -> v.selectedProperty().set(true));
         });
 
-        bttnBox.getChildren().add(clearButton);
+        buttonBox.getChildren().add(selectAllButton);
 
         Button clearAllButton = new Button("RESET ALL");
         HBox.setHgrow(clearAllButton, Priority.ALWAYS);
 
         clearAllButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
+            columnFilter.getTableFilter().getColumnFilters().stream().forEach(cf -> cf.getTableColumn().setGraphic(null));
         });
-        bttnBox.getChildren().add(clearAllButton);
-        bttnBox.setAlignment(Pos.BASELINE_CENTER);
+        buttonBox.getChildren().add(clearAllButton);
 
-        this.getChildren().add(bttnBox);
-        //this.getChildren().add(vBox);
+        buttonBox.setAlignment(Pos.BASELINE_CENTER);
+
+
+        getChildren().add(buttonBox);
     }
-    private static final class CheckItem extends HBox {
-        private final CheckBox checkBox = new CheckBox();
-        private final Label label = new Label();
-        private final FilterValue filterValue;
-        
-        CheckItem(ColumnFilter.FilterValue filterValue) {
-        	this.filterValue = filterValue;
-            label.setText(Optional.ofNullable(filterValue.getValueProperty()).map(ObservableValue::getValue).map(Object::toString).orElse(null));
-            
-            filterValue.getInScopeProperty().addListener((Observable v) -> label.textFillProperty().set(filterValue.getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
-            checkBox.selectedProperty().bindBidirectional(filterValue.getSelectedProperty());
-            this.getChildren().addAll(checkBox, label);
-        }
-    }
-    private static final class FilterValueComparator implements Comparator<FilterValue> {
 
-		@Override
-		public int compare(FilterValue first, FilterValue second) {
-			if (first.getInScopeProperty().get() && !second.getInScopeProperty().get())
-				return 1;
-
-			int compare = Optional.ofNullable(first.getValueProperty().getValue()).map(Object::toString).orElse("")
-                    .compareTo(Optional.ofNullable(second.getValueProperty().getValue()).map(Object::toString).orElse(""));
-
-			if (compare > 0) 
-				return 1;
-			if (compare < 0) 
-				return -1;
-			return 0;
-		}
-    	
-    }
     public void resetSearchFilter() {
         this.filterList.setPredicate(t -> true);
         searchBox.clear();
     }
-    public static <T> CustomMenuItem getInMenuItem(ColumnFilter<T> columnFilter) { 
-        
-        FilterPanel<T> filterPanel = new FilterPanel<T>(columnFilter);
+    public static <T,R> CustomMenuItem getInMenuItem(ColumnFilter<T,R> columnFilter) {
+
+        FilterPanel<T,R> filterPanel = new FilterPanel<>(columnFilter);
+
         CustomMenuItem menuItem = new CustomMenuItem();
-        
+
         filterPanel.initializeListeners();
-        
+
         menuItem.contentProperty().set(filterPanel);
-        
+
         columnFilter.getTableFilter().getTableView().skinProperty().addListener((w, o, n) -> {
             if (n instanceof TableViewSkin) {
                 TableViewSkin<?> skin = (TableViewSkin<?>) n;
-                    checkChangeContextMenu(skin, columnFilter.getTableColumn());
+                checkChangeContextMenu(skin, columnFilter.getTableColumn());
             }
         });
         menuItem.setHideOnClick(false);
-        
         return menuItem;
     }
-    private void initializeListeners() { 
+    private void initializeListeners() {
         searchBox.textProperty().addListener(l -> {
-        	searchMode = !searchBox.getText().isEmpty();
-        	filterList.setPredicate(val -> searchBox.getText().isEmpty() || columnFilter.getSearchStrategy().test(searchBox.getText(), val.filterValue.toString()));
+            searchMode = !searchBox.getText().isEmpty();
+            filterList.setPredicate(val -> searchBox.getText().isEmpty() ||
+                    columnFilter.getSearchStrategy().test(searchBox.getText(), Optional.ofNullable(val.getValue()).map(Object::toString).orElse("")));
         });
     }
-    
+
     /* Methods below helps will anchor the context menu under the column */
     private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column) {
         NestedTableColumnHeader header = skin.getTableHeaderRow()
@@ -217,7 +204,7 @@ public final class FilterPanel<T> extends VBox {
     }
 
     private static TableColumnHeader scan(TableColumn<?, ?> search,
-            TableColumnHeader header) {
+                                          TableColumnHeader header) {
         // firstly test that the parent isn't what we are looking for
         if (search.equals(header.getTableColumn())) {
             return header;

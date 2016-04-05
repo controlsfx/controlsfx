@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -82,11 +83,13 @@ public final class FlightTable extends Application {
 
         TableColumn<Flight,String> gateNumber = new TableColumn<>("GATE NO.");
         gateNumber.setCellValueFactory(cellData -> cellData.getValue().getGateNumber());
+        gateNumber.setCellFactory(TextFieldTableCell.forTableColumn());
         gateNumber.setEditable(true);
         table.getColumns().add(gateNumber);
 
         TableFilter<Flight> tableFilter = new TableFilter<>(table);
 
+        table.setEditable(true);
         tableFilter.setSearchStrategy((input,target) -> {
             try {
                 return target.matches(input);

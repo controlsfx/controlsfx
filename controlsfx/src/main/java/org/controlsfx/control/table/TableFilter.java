@@ -56,7 +56,7 @@ public final class TableFilter<T> {
     private final FilteredList<T> filteredList;
     private final SortedList<T> sortedControlList;
 
-    private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
+    private final ObservableList<ColumnFilter<T,?>> columnFilters = FXCollections.observableArrayList();
 
     /**Constructor applies a filtering control to the provided {@link TableView} instance.
      * 
@@ -64,16 +64,18 @@ public final class TableFilter<T> {
      */
     public TableFilter(TableView<T> tableView) {
         this.tableView = tableView;
-        this.backingList = tableView.getItems();
-        this.filteredList = new FilteredList<>(new SortedList<>(backingList));
-        this.sortedControlList = new SortedList<>(this.filteredList);
+        backingList = tableView.getItems();
+        filteredList = new FilteredList<>(new SortedList<>(backingList));
+        sortedControlList = new SortedList<>(this.filteredList);
 
-        this.filteredList.setPredicate(v -> true);
+        filteredList.setPredicate(v -> true);
 
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        this.applyForAllColumns();
+        applyForAllColumns();
+        tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
+        columnFilters.forEach(ColumnFilter::initialize);
     }
 
     /**
@@ -109,14 +111,19 @@ public final class TableFilter<T> {
         columnFilters.setAll(this.tableView.getColumns().stream()
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
-    /** 
-     * @treatAsPrivate
-     */
-    public void executeFilter() { 
-        filteredList.setPredicate(r -> !columnFilters.parallelStream()
-                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(r))
-                        .map(ov -> !ov.getSelectedProperty().getValue()).orElse(false))
-                .findAny().isPresent());
+
+    public void executeFilter() {
+        if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
+            filteredList.setPredicate(item -> !columnFilters.stream()
+                    .filter(cf -> !cf.evaluate(item))
+                    .findAny().isPresent());
+        }
+        else {
+            resetFilter();
+        }
+    }
+    public void resetFilter() {
+        filteredList.setPredicate(item -> true);
     }
     /** 
      * @treatAsPrivate
@@ -127,15 +134,17 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    public ObservableList<ColumnFilter<T>> getColumnFilters() { 
+    public ObservableList<ColumnFilter<T,?>> getColumnFilters() {
         return columnFilters;
     }
     /** 
      * @treatAsPrivate
      */
-    public Optional<ColumnFilter<T>> getColumnFilter(TableColumn<T,?> tableColumn) { 
+    public Optional<ColumnFilter<T,?>> getColumnFilter(TableColumn<T,?> tableColumn) {
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }
-    
+    public boolean isDirty() {
+        return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+    }
     
 }

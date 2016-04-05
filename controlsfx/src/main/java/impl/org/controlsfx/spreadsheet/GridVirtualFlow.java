@@ -102,7 +102,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         sheetChildren = findSheetChildren();
         
         //When we click outside of the grid, we want to deselect all cells.
-        setOnMouseReleased((MouseEvent event) -> {
+        addEventHandler(MouseEvent.MOUSE_PRESSED, (MouseEvent event) -> {
             if (event.getTarget().getClass() == GridRow.class) {
                 spreadSheetView.getSelectionModel().clearSelection();
             }

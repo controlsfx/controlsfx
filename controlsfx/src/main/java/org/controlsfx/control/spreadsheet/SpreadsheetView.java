@@ -964,8 +964,10 @@ public class SpreadsheetView extends Control{
      * a height where each content of each cell could be fully visible.\n
      * Use this method wisely because it can degrade performance on great grid.
      */
-    public void resizeRowsToFitContent(){
-        getCellsViewSkin().resizeRowsToFitContent();
+    public void resizeRowsToFitContent() {
+        if (getCellsViewSkin() != null) {
+            getCellsViewSkin().resizeRowsToFitContent();
+        }
     }
     
     /**
@@ -975,15 +977,19 @@ public class SpreadsheetView extends Control{
      * your performance on great grid.
      */
     public void resizeRowsToMaximum(){
-        getCellsViewSkin().resizeRowsToMaximum();
+        if (getCellsViewSkin() != null) {
+            getCellsViewSkin().resizeRowsToMaximum();
+        }
     }
     
     /**
      * This method will wipe all changes made to the row's height and set all row's
      * height back to their default height defined in the model Grid.
      */
-    public void resizeRowsToDefault(){
-        getCellsViewSkin().resizeRowsToDefault();
+    public void resizeRowsToDefault() {
+        if (getCellsViewSkin() != null) {
+            getCellsViewSkin().resizeRowsToDefault();
+        }
     }
     
     /**
@@ -1061,7 +1067,10 @@ public class SpreadsheetView extends Control{
      * @return
      */
     public double getVBarValue() {
-        return getCellsViewSkin().getVBar().getValue();
+        if (getCellsViewSkin() != null && getCellsViewSkin().getVBar() != null) {
+            return getCellsViewSkin().getVBar().getValue();
+        }
+        return 0.0;
     }
 
     /**
@@ -1401,7 +1410,7 @@ public class SpreadsheetView extends Control{
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
                 SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
-            }
+                }
         });
         final MenuItem topRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-right"))); //$NON-NLS-1$
         topRightItem.setOnAction(new EventHandler<ActionEvent>() {

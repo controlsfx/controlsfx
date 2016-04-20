@@ -48,7 +48,7 @@ public final class ColumnFilter<T,R> {
 
     private final ObservableList<FilterValue<T,R>> filterValues;
 
-    private final DupeCounter<R> filterValuesDupeCounter = new DupeCounter<>(true);
+    private final DupeCounter<R> filterValuesDupeCounter = new DupeCounter<>(false);
     private final DupeCounter<R> visibleValuesDupeCounter = new DupeCounter<>(false);
     private final HashSet<R> unselectedValues = new HashSet<>();
     private final HashMap<CellIdentity<T>,ChangeListener<R>> trackedCells = new HashMap<>();

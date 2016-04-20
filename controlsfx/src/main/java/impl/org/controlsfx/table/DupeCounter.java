@@ -38,8 +38,7 @@ final class DupeCounter<T> {
             return newVal;
         }
         else if (enforceFloor) {
-            //throw new IllegalStateException();
-            return 0;
+            throw new IllegalStateException();
         }
         else {
             return 0;

@@ -37,7 +37,7 @@ import javafx.scene.control.TableView;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
-
+import java.util.stream.*;
 
 /**Applies a filtering control to a provided {@link TableView} instance. 
  * The filter will be applied immediately on construction, and 
@@ -108,10 +108,16 @@ public final class TableFilter<T> {
      * @treatAsPrivate
      */
     private void applyForAllColumns() { 
-        columnFilters.setAll(this.tableView.getColumns().stream()
+        columnFilters.setAll(tableView.getColumns().stream().flatMap(this::extractNestedColumns)
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
-
+    private <S> Stream<TableColumn<T,?>> extractNestedColumns(TableColumn<T,S> tableColumn) {
+        if (tableColumn.getColumns().size() == 0) {
+            return Stream.of(tableColumn);
+        } else {
+            return tableColumn.getColumns().stream().flatMap(this::extractNestedColumns);
+        }
+    }
     public void executeFilter() {
         if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
             filteredList.setPredicate(item -> !columnFilters.stream()

@@ -35,14 +35,17 @@ public final class LargeTableFilterTest extends Application {
         TableColumn<DataItem,String> randomLetter = new TableColumn<>("Letter");
         randomLetter.setCellValueFactory(cb -> new ReadOnlyObjectWrapper<>(cb.getValue().getRandomLetter()));
 
+        TableColumn randomStrings = new TableColumn("Random Strings");
+
         TableColumn<DataItem,String> randomString1 = new TableColumn<>("AlphaNum 1");
         randomString1.setCellValueFactory(cb -> new ReadOnlyObjectWrapper<>(cb.getValue().getRandomStr1()));
-
 
         TableColumn<DataItem,String> randomString2 = new TableColumn<>("AlphaNum 2");
         randomString2.setCellValueFactory(cb -> new ReadOnlyObjectWrapper<>(cb.getValue().getRandomStr2()));
 
-        tableView.getColumns().addAll(smallInt, largeInt, randomLetter, randomString1,randomString2);
+        randomStrings.getColumns().addAll(randomString1,randomString2);
+
+        tableView.getColumns().addAll(smallInt, largeInt, randomLetter, randomStrings);
 
         Platform.runLater(() -> new TableFilter<>(tableView));
 

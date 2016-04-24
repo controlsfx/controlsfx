@@ -60,13 +60,16 @@ public final class FlightTable extends Application {
         flightNumCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getFlightNumber()));
         table.getColumns().add(flightNumCol);
 
+        TableColumn itinerary = new TableColumn("ITINERARY");
+
         TableColumn<Flight,String> origCol = new TableColumn<>("ORIG");
         origCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getOrig()));
-        table.getColumns().add(origCol);
 
         TableColumn<Flight,String> destCol = new TableColumn<>("DEST");
         destCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDest()));
-        table.getColumns().add(destCol);
+
+        itinerary.getColumns().addAll(origCol,destCol);
+        table.getColumns().add(itinerary);
 
         TableColumn<Flight,LocalDate> depDateCol = new TableColumn<>("DEP DATE");
         depDateCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getDepartureDate()));
@@ -126,10 +129,6 @@ public final class FlightTable extends Application {
 
         primaryStage.show();
     }
-
-    private void addFlight() {
-    }
-
     public static void main(String[] args) {
         Application.launch(args);
     }

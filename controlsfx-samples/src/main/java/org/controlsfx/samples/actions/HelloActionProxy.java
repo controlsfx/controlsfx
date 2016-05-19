@@ -29,6 +29,7 @@ package org.controlsfx.samples.actions;
 import static org.controlsfx.control.action.ActionMap.action;
 import static org.controlsfx.control.action.ActionMap.actions;
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
+import static org.controlsfx.control.action.ActionUtils.ACTION_SPAN;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,7 +71,8 @@ public class HelloActionProxy extends ControlsFXSample {
 		actions = Arrays.asList(
 	        new ActionGroup("Group 1", image, actions("action11","action12") ),
 			new ActionGroup("Group 2", image, actions("action21","---","action22", "action221","action222","action23") ),
-			ACTION_SEPARATOR,                                    
+            ACTION_SPAN,
+            ACTION_SEPARATOR,
 			action("action3"),
 			new ActionGroup("Group 4",  image, actions("action41","action42"))
 		);

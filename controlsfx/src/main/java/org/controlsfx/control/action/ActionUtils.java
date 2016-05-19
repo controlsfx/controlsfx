@@ -56,6 +56,9 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.tools.Duplicatable;
 
@@ -357,6 +360,14 @@ public class ActionUtils {
         };
     };
 
+    public static Action ACTION_SPAN = new Action(null, null) {
+        @Override public String toString() {
+            return "Span";  //$NON-NLS-1$
+        };
+    };
+
+
+
     /**
      * Takes the provided {@link Collection} of {@link Action} (or subclasses,
      * such as {@link ActionGroup}) instances and returns a {@link ToolBar}
@@ -394,6 +405,10 @@ public class ActionUtils {
                 toolbar.getItems().add(menu);
             } else if ( action == ACTION_SEPARATOR ) {
                 toolbar.getItems().add( new Separator());
+            } else if ( action == ACTION_SPAN ) {
+                Pane span = new Pane();
+                HBox.setHgrow(span, Priority.ALWAYS);
+                toolbar.getItems().add(span);
             } else if ( action == null ) {
             } else {
                 Button button = createButton(action,textBehavior);
@@ -434,7 +449,7 @@ public class ActionUtils {
         menuBar.getMenus().clear();
         for (Action action : actions) {
 
-            if ( action == ACTION_SEPARATOR ) continue;
+            if ( action == ACTION_SEPARATOR || action == ACTION_SPAN ) continue;
 
             Menu menu = createMenu( action );
 
@@ -479,9 +494,7 @@ public class ActionUtils {
         for (Action action : actions) {
             if ( action instanceof ActionGroup ) {
                 // no-op
-            } else if ( action == ACTION_SEPARATOR ) {
-                // no-op
-            } else if ( action == null ) {
+            } else if ( action == ACTION_SPAN || action == ACTION_SEPARATOR || action == null ) {
                 // no-op
             } else {
                 buttonBar.getButtons().add(createButton(action, ActionTextBehavior.SHOW));
@@ -545,7 +558,7 @@ public class ActionUtils {
 
                 items.add( new SeparatorMenuItem());
 
-            } else if ( action == null ) {
+            } else if ( action == null || action == ACTION_SPAN) {
             } else {
 
                 items.add( createMenuItem(action));

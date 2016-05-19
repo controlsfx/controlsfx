@@ -59,6 +59,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.tools.Duplicatable;
 
@@ -408,6 +409,7 @@ public class ActionUtils {
             } else if ( action == ACTION_SPAN ) {
                 Pane span = new Pane();
                 HBox.setHgrow(span, Priority.ALWAYS);
+                VBox.setVgrow(span, Priority.ALWAYS);
                 toolbar.getItems().add(span);
             } else if ( action == null ) {
             } else {

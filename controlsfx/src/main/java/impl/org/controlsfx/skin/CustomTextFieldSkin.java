@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -137,7 +137,7 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
         final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
     
-        return pw + leftWidth + rightWidth + leftInset + rightInset;
+        return pw + leftWidth + rightWidth;
     }
     
     @Override

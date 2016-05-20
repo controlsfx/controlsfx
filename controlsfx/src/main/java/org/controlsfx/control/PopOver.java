@@ -343,6 +343,8 @@ public class PopOver extends PopupControl {
 
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
+                closePopOverOnOwnerWindowClose);
     }
 
     /** {@inheritDoc} */
@@ -354,6 +356,8 @@ public class PopOver extends PopupControl {
         showFadeInAnimation(DEFAULT_FADE_DURATION);
 
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                closePopOverOnOwnerWindowClose);
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
                 closePopOverOnOwnerWindowClose);
     }
 
@@ -455,6 +459,8 @@ public class PopOver extends PopupControl {
         // Bug fix - close popup when owner window is closing
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
+                closePopOverOnOwnerWindowClose);
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
@@ -495,6 +501,8 @@ public class PopOver extends PopupControl {
         if (ownerWindow != null){
             ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                     closePopOverOnOwnerWindowClose);
+            ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
+                closePopOverOnOwnerWindowClose);
         }
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,20 +75,20 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     private void updateChildren() {
         Node newLeft = leftProperty().get();
         if (newLeft != null) {
+            getChildren().remove(leftPane);
             leftPane = new StackPane(newLeft);
             leftPane.setAlignment(Pos.CENTER_LEFT);
             leftPane.getStyleClass().add("left-pane"); //$NON-NLS-1$
-            getChildren().remove(left);
             getChildren().add(leftPane);
             left = newLeft;
         }
         
         Node newRight = rightProperty().get();
         if (newRight != null) {
+            getChildren().remove(rightPane);
             rightPane = new StackPane(newRight);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
             rightPane.getStyleClass().add("right-pane"); //$NON-NLS-1$
-            getChildren().remove(right);
             getChildren().add(rightPane);
             right = newRight;
         }
@@ -137,7 +137,7 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
         final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
     
-        return pw + leftWidth + rightWidth + leftInset + rightInset;
+        return pw + leftWidth + rightWidth;
     }
     
     @Override

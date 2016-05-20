@@ -1,0 +1,51 @@
+/*******************************************************************************
+ *                                                                             *
+ * ToggleSwitch                                                                *
+ *                                                                             *
+ ******************************************************************************/
+.toggle-switch{
+    -thumb-move-animation-time: 200;
+}
+
+.toggle-switch .text {
+    -fx-font-size: 1em;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.toggle-switch .thumb {
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)),
+                            -fx-inner-border,
+                            -fx-body-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
+    -fx-padding: 0.75em;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+}
+
+.toggle-switch .thumb-area{
+    -fx-background-radius: 1em;
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)), #f5f5f5;
+    -fx-background-insets: 0, 1;
+}
+
+.toggle-switch:hover .thumb{
+    -fx-color: -fx-hover-base
+}
+
+.toggle-switch:selected .thumb-area{
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)),
+                            linear-gradient(to bottom, derive(#0b99c9, 30%), #0b99c9);
+    -fx-background-insets: 0, 1;
+
+}
+
+.toggle-switch .thumb-area
+{
+    -fx-padding: 0.75em 1.333333em 0.75em 1.333333em; /* 7 16 7 16 */
+}
+
+.toggle-switch:disabled
+{
+    -fx-opacity: 0.4;
+}

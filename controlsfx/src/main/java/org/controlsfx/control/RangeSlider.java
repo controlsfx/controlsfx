@@ -1095,15 +1095,6 @@ public class RangeSlider extends ControlsFXControl {
         return StyleableProperties.STYLEABLES;
     }
 
-    /**
-     * RT-19263
-     * @deprecated This is an experimental API that is not intended for general use and is subject to change in future versions
-     */
-    @Deprecated
-    @Override protected List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
-        return getClassCssMetaData();
-    }
-
     private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE =
             PseudoClass.getPseudoClass("vertical"); //$NON-NLS-1$
     private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE =

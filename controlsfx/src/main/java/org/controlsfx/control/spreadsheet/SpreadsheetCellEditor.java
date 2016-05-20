@@ -333,7 +333,7 @@ public abstract class SpreadsheetCellEditor {
             attachEnterEscapeEventHandler();
 
             tf.requestFocus();
-            tf.end();
+            tf.selectAll();
         }
 
         @Override
@@ -397,6 +397,9 @@ public abstract class SpreadsheetCellEditor {
         public TextAreaEditor(SpreadsheetView view) {
             super(view);
             textArea = new TextArea();
+            textArea.setWrapText(true);
+            //The textArea is not respecting the maxHeight if we are not setting the min..
+            textArea.minHeightProperty().bind(textArea.maxHeightProperty());
         }
 
         /**
@@ -412,7 +415,7 @@ public abstract class SpreadsheetCellEditor {
             attachEnterEscapeEventHandler();
 
             textArea.requestFocus();
-            textArea.end();
+            textArea.selectAll();
         }
 
         @Override
@@ -432,7 +435,7 @@ public abstract class SpreadsheetCellEditor {
 
         @Override
         public double getMaxHeight() {
-            return 500;
+            return Double.MAX_VALUE;
         }
         
         /**

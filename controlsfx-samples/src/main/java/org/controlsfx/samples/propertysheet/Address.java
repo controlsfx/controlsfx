@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,15 @@
  */
 package org.controlsfx.samples.propertysheet;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Address {
 
     private String addressLine;
     private String suburb;
-    private String state;
-    private String postcode;
+    private final StringProperty state = new SimpleStringProperty();
+    private final StringProperty postcode = new SimpleStringProperty();
 
     public Address() {
     }
@@ -68,33 +71,47 @@ public class Address {
      * @return the state
      */
     public String getState() {
-        return state;
+        return state.get();
     }
 
     /**
      * @param state the state to set
      */
     public void setState(String state) {
-        this.state = state;
+        this.state.set(state);
     }
-
+    
+    /**
+     * @return Property that contains the state.
+     */
+    public StringProperty stateProperty() {
+        return state;
+    }
+    
     /**
      * @return the postcode
      */
     public String getPostcode() {
-        return postcode;
+        return postcode.get();
     }
 
     /**
      * @param postcode the postcode to set
      */
     public void setPostcode(String postcode) {
-        this.postcode = postcode;
+        this.postcode.set(postcode);
     }
-
+    
+    /**
+     * @return Property that contains the postcode.
+     */
+    public StringProperty postcodeProperty() {
+        return postcode;
+    }
+    
     @Override
     public String toString() {
-        return addressLine + " " + suburb + " " + state + " " + postcode;
+        return addressLine + " " + suburb + " " + state.get() + " " + postcode.get();
     }
 
 }

@@ -52,6 +52,12 @@ public interface SpreadsheetCell {
     
     /**
      * This EventType can be used with an {@link EventHandler} in order to catch
+     * when the wrap text state of a SpreadsheetCell is changed.
+     */
+    public static final EventType WRAP_EVENT_TYPE = new EventType("WrapTextEventType"); //$NON-NLS-1$
+    
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
      * when a corner state of a SpreadsheetCell is changed.
      */
     public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType"); //$NON-NLS-1$
@@ -115,6 +121,21 @@ public interface SpreadsheetCell {
      * @param editable
      */
     public void setEditable(boolean editable);
+    
+    /**
+     * If a run of text exceeds the width of the Labeled, then this variable
+     * indicates whether the text should wrap onto another line.
+     *
+     * @return the value of wrapText property.
+     */
+    public boolean isWrapText();
+
+    /**
+     * If a run of text exceeds the width of the Labeled, then this variable
+     * indicates whether the text should wrap onto another line.
+     * @param wrapText
+     */
+    public void setWrapText(boolean wrapText);
 
     /**
      * A string representation of the CSS style associated with this specific

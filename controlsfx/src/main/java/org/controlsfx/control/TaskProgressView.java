@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
@@ -61,7 +60,7 @@ import javafx.util.Callback;
  * view.getTasks().add(new MyTask());
  * </pre>
  */
-public class TaskProgressView<T extends Task<?>> extends Control {
+public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
 
     /**
      * Constructs a new task progress view.
@@ -100,6 +99,11 @@ public class TaskProgressView<T extends Task<?>> extends Control {
         });
     }
 
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(TaskProgressView.class, "taskprogressview.css");
+    }
+    
     @Override
     protected Skin<?> createDefaultSkin() {
         return new TaskProgressViewSkin<>(this);

@@ -149,6 +149,7 @@ public abstract class NotificationBar extends Region {
         closeBtn.setGraphic(graphic);
         closeBtn.setMinSize(17, 17);
         closeBtn.setPrefSize(17, 17);
+        closeBtn.setFocusTraversable(false);
         closeBtn.opacityProperty().bind(transition);
         GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
         

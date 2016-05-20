@@ -33,7 +33,10 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.TableCell;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
@@ -67,12 +70,31 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
         super(tableCell);
-        tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
+        tableCell.itemProperty().addListener(weakItemChangeListener);
         if (tableCell.getItem() != null) {
-            tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+            tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, weakTriangleEventHandler);
         }
     }
 
+    @Override
+    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        /**
+         * If we have an Image in the Cell, its fitHeight will be affected by
+         * the cell height (see CellView). But during calculation for autofit
+         * option, we want to know the real prefHeight of this cell. Apparently,
+         * the fitHeight option is returned by default so we must override and
+         * return the Height of the image inside.
+         */
+        Node graphic = getSkinnable().getGraphic();
+        if (graphic != null && graphic instanceof ImageView) {
+            ImageView view = (ImageView) graphic;
+            if (view.getImage() != null) {
+                return view.getImage().getHeight();
+            }
+        }
+        return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+    }
+    
     @Override
     protected void layoutChildren(double x, final double y, final double w, final double h) {
         super.layoutChildren(x, y, w, h);
@@ -181,20 +203,22 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             getSkinnable().requestLayout();
         }
     };
+    private final WeakEventHandler weakTriangleEventHandler = new WeakEventHandler(triangleEventHandler);
 
     private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
         @Override
         public void changed(ObservableValue<? extends SpreadsheetCell> arg0, SpreadsheetCell oldCell,
                 SpreadsheetCell newCell) {
             if (oldCell != null) {
-                oldCell.removeEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+                oldCell.removeEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, weakTriangleEventHandler);
             }
             if (newCell != null) {
-                newCell.addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, triangleEventHandler);
+                newCell.addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, weakTriangleEventHandler);
             }
             if (getSkinnable().getItem() != null) {
                 layoutTriangle();
             }
         }
     };
+    private final WeakChangeListener<SpreadsheetCell> weakItemChangeListener = new WeakChangeListener<>(itemChangeListener);
 }

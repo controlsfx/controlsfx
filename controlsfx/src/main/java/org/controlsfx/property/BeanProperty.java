@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2015, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,85 +26,106 @@
  */
 package org.controlsfx.property;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
-import static impl.org.controlsfx.i18n.Localization.localize;
-
+import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
-import javafx.scene.control.Alert;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.editor.PropertyEditor;
 
+import impl.org.controlsfx.i18n.Localization;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Alert;
+
 /**
- * A convenience class for creating a {@link Item} for use in the 
- * {@link PropertySheet} control based on a property belonging to a 
+ * A convenience class for creating a {@link Item} for use in the
+ * {@link PropertySheet} control based on a property belonging to a
  * JavaBean - simply provide a {@link PropertyDescriptor} and the rest will be
  * taken care of automatically.
- * 
+ *
  * @see Item
  * @see PropertySheet
  * @see PropertyDescriptor
  */
-@SuppressWarnings("deprecation")
 public class BeanProperty implements PropertySheet.Item {
+
+    /**
+     * Unique identifier to provide a custom category label within
+     * {@link PropertySheet.Item#getCategory()}.
+     *
+     * How to use it: with a PropertyDescriptor, provide the custom category
+     * through a a named attribute
+     * {@link FeatureDescriptor#setValue(String, Object)}.
+     *
+     * <pre>
+     * final PropertyDescriptor propertyDescriptor = new PropertyDescriptor("yourProperty", YourBean.class);
+     * propertyDescriptor.setDisplayName("Your Display Name");
+     * propertyDescriptor.setShortDescription("Your explanation about this property.");
+     * // then provide a custom category
+     * propertyDescriptor.setValue(BeanProperty.CATEGORY_LABEL_KEY, "Your custom category");
+     * </pre>
+     */
+    public static final String CATEGORY_LABEL_KEY = "propertysheet.item.category.label";
 
     private final Object bean;
     private final PropertyDescriptor beanPropertyDescriptor;
     private final Method readMethod;
     private boolean editable = true;
+    private Optional<ObservableValue<? extends Object>> observableValue = Optional.empty();
 
-    public BeanProperty(Object bean, PropertyDescriptor propertyDescriptor) {
+    public BeanProperty(final Object bean, final PropertyDescriptor propertyDescriptor) {
         this.bean = bean;
         this.beanPropertyDescriptor = propertyDescriptor;
-        readMethod = propertyDescriptor.getReadMethod();
-        if (beanPropertyDescriptor.getWriteMethod() == null) {
-            setEditable(false);
+        this.readMethod = propertyDescriptor.getReadMethod();
+        if (this.beanPropertyDescriptor.getWriteMethod() == null) {
+            this.setEditable(false);
         }
+
+        this.findObservableValue();
     }
-    
+
     /** {@inheritDoc} */
     @Override public String getName() {
-        return beanPropertyDescriptor.getDisplayName();
+        return this.beanPropertyDescriptor.getDisplayName();
     }
-    
+
     /** {@inheritDoc} */
     @Override public String getDescription() {
-        return beanPropertyDescriptor.getShortDescription();
+        return this.beanPropertyDescriptor.getShortDescription();
     }
-    
+
     /** {@inheritDoc} */
     @Override public Class<?> getType() {
-        return beanPropertyDescriptor.getPropertyType();
+        return this.beanPropertyDescriptor.getPropertyType();
     }
 
     /** {@inheritDoc} */
     @Override public Object getValue() {
         try {
-            return readMethod.invoke(bean);
+            return this.readMethod.invoke(this.bean);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
     /** {@inheritDoc} */
-    @Override public void setValue(Object value) {
-        Method writeMethod = beanPropertyDescriptor.getWriteMethod();
+    @Override public void setValue(final Object value) {
+        final Method writeMethod = this.beanPropertyDescriptor.getWriteMethod();
         if ( writeMethod != null ) {
             try {
-                writeMethod.invoke(bean, value);
+                writeMethod.invoke(this.bean, value);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 e.printStackTrace();
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 if (e instanceof PropertyVetoException) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle(localize(asKey("bean.property.change.error.title")));//$NON-NLS-1$
-                    alert.setHeaderText(localize(asKey("bean.property.change.error.masthead")));//$NON-NLS-1$
+                    final Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(Localization.localize(Localization.asKey("bean.property.change.error.title")));//$NON-NLS-1$
+                    alert.setHeaderText(Localization.localize(Localization.asKey("bean.property.change.error.masthead")));//$NON-NLS-1$
                     alert.setContentText(e.getLocalizedMessage());
                     alert.showAndWait();
                 } else {
@@ -116,49 +137,72 @@ public class BeanProperty implements PropertySheet.Item {
 
     /** {@inheritDoc} */
     @Override public String getCategory() {
-        return localize(asKey(beanPropertyDescriptor.isExpert()?
-        		   "bean.property.category.expert":"bean.property.category.basic")); //$NON-NLS-1$ //$NON-NLS-2$
+        String category = (String) this.beanPropertyDescriptor.getValue(BeanProperty.CATEGORY_LABEL_KEY);
+
+        // fall back to default behavior if there is no category provided.
+        if (category == null) {
+            category = Localization.localize(Localization.asKey(this.beanPropertyDescriptor.isExpert()
+                    ? "bean.property.category.expert" : "bean.property.category.basic")); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return category;
     }
-	
-    /** 
+
+    /**
      * @return The object passed in to the constructor of the BeanProperty.
      */
     public Object getBean() {
-        return bean;
+        return this.bean;
     }
 
-    /** 
-     * @return The {@link PropertyDescriptor} passed in to the constructor of 
+    /**
+     * @return The {@link PropertyDescriptor} passed in to the constructor of
      * the BeanProperty.
      */
     public PropertyDescriptor getPropertyDescriptor() {
-        return beanPropertyDescriptor;
+        return this.beanPropertyDescriptor;
     }
-    
+
     /** {@inheritDoc} */
     @SuppressWarnings({ "unchecked" })
-	@Override public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
-        
-        if (beanPropertyDescriptor.getPropertyEditorClass() != null && 
-                PropertyEditor.class.isAssignableFrom(beanPropertyDescriptor.getPropertyEditorClass())) {
-            
-            return Optional.of((Class<PropertyEditor<?>>)beanPropertyDescriptor.getPropertyEditorClass());
+    @Override public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
+
+        if ((this.beanPropertyDescriptor.getPropertyEditorClass() != null) &&
+                PropertyEditor.class.isAssignableFrom(this.beanPropertyDescriptor.getPropertyEditorClass())) {
+
+            return Optional.of((Class<PropertyEditor<?>>)this.beanPropertyDescriptor.getPropertyEditorClass());
         }
-        
+
         return Item.super.getPropertyEditorClass();
     }
-    
+
     /** {@inheritDoc} */
     @Override public boolean isEditable() {
-        return editable;
+        return this.editable;
     }
-    
+
     /**
      * @param editable Whether this property should be editable in the PropertySheet.
      */
-    public void setEditable(boolean editable) {
+    public void setEditable(final boolean editable) {
         this.editable = editable;
     }
-    
-    
+
+    /** {@inheritDoc} */
+    @Override public Optional<ObservableValue<? extends Object>> getObservableValue() {
+        return this.observableValue;
+    }
+
+    private void findObservableValue() {
+        try {
+            final String propName = this.beanPropertyDescriptor.getName() + "Property";
+            final Method m = this.getBean().getClass().getMethod(propName);
+            final Object val = m.invoke(this.getBean());
+            if ((val != null) && (val instanceof ObservableValue)) {
+                this.observableValue = Optional.of((ObservableValue<?>) val);
+            }
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            //Logger.getLogger(BeanProperty.class.getName()).log(Level.SEVERE, null, ex);
+            // ignore it...
+        }
+    }
 }

@@ -206,6 +206,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
     //The Bit position for the editable Property.
     private static final int EDITABLE_BIT_POSITION = 4;
+    private static final int WRAP_BIT_POSITION = 5;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -325,6 +326,20 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     public final void setEditable(boolean editable) {
         if(setMask(editable, EDITABLE_BIT_POSITION)){
             Event.fireEvent(this, new Event(EDITABLE_EVENT_TYPE));
+        }
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean isWrapText(){
+        return isSet(WRAP_BIT_POSITION);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setWrapText(boolean wrapText) {
+        if (setMask(wrapText, WRAP_BIT_POSITION)) {
+            Event.fireEvent(this, new Event(WRAP_EVENT_TYPE));
         }
     }
 
@@ -510,7 +525,10 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
         final SpreadsheetCell otherCell = (SpreadsheetCell) obj;
         return otherCell.getRow() == row && otherCell.getColumn() == column
-                && Objects.equals(otherCell.getText(), getText());
+                && Objects.equals(otherCell.getText(), getText())
+                && rowSpan == otherCell.getRowSpan()
+                && columnSpan == otherCell.getColumnSpan()
+                && Objects.equals(getStyleClass(), otherCell.getStyleClass());
     }
 
     /** {@inheritDoc} */
@@ -520,7 +538,10 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         int result = 1;
         result = prime * result + column;
         result = prime * result + row;
+        result = prime * result + rowSpan;
+        result = prime * result + columnSpan;
         result = prime * result + Objects.hashCode(getText());
+        result = prime * result + Objects.hashCode(getStyleClass());
         return result;
     }
     

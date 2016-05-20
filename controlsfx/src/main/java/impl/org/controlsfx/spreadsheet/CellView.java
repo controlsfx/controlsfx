@@ -115,8 +115,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
         
         itemProperty().addListener(itemChangeListener);
-        setWrapText(true);
-    }
+            }
 
     /***************************************************************************
      * * Public Methods * *
@@ -127,6 +126,19 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             getTableView().edit(-1, null);
             return;
         } 
+        /**
+         * If this CellView has no parent, this means that it was stacked into
+         * the cellsMap of the GridRowSkin, but the weakRef was dropped. So this
+         * CellView is still reacting to events, but it's not part of the
+         * sceneGraph! So we must deactivate this cell and let the real Cell in
+         * the sceneGraph take the edition.
+         */
+        if(getParent() == null){
+            updateTableView(null);
+            updateTableRow(null);
+            updateTableColumn(null);
+            return;
+        }
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         // We start to edit only if the Cell is a normal Cell (aka visible).
@@ -271,8 +283,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
             setTooltip(null);
         }
-        // We want the text to wrap onto another line
-//        setWrapText(true);
+        
+        setWrapText(cell.isWrapText());
+
         setEditable(cell.isEditable());
         
         if (cell.getCellType().acceptDrop()) {
@@ -308,12 +321,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else {
             setOnDragOver(null);
             setOnDragDropped(null);
-        }
-    }
-
-    public void show() {
-        if (getItem() != null) {
-            show(getItem());
         }
     }
 
@@ -614,7 +621,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 }
             }
             if (newItem != null) {
-                getStyleClass().clear();
+         getStyleClass().clear();
                 getStyleClass().setAll(newItem.getStyleClass());
 
                 newItem.getStyleClass().addListener(weakStyleClassListener);
@@ -629,7 +636,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     //We clear the previous style.
                     setStyle(null);
                 }
-            }
+    }
         }
     };
     

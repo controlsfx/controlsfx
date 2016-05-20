@@ -70,14 +70,32 @@ public class PopupPropertyEditor<T> implements PropertyEditor<T> {
 
     private void displayPopupEditor() {
         PopupPropertySheet<T> sheet = new PopupPropertySheet<>(item, this);
-
+        sheet.setPrefWidth(500);
         Alert alert = new Alert(Alert.AlertType.NONE);
+//        alert.setWidth(700);
+//        alert.setResizable(true);
         alert.setResizable(false);
         alert.getDialogPane().setContent(sheet);
         alert.setTitle("Popup Property Editor");
         ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
-        alert.getButtonTypes().addAll(ButtonType.CANCEL, saveButton);
-
+        ButtonType testButton = new ButtonType("Change Postcode", ButtonBar.ButtonData.OTHER);
+        alert.getButtonTypes().addAll(ButtonType.CANCEL, saveButton, testButton);
+        
+        final Button btTest = (Button) alert.getDialogPane().lookupButton(testButton);
+        btTest.addEventFilter(ActionEvent.ACTION, event -> {
+            Address addr = null;
+            if (item.getValue() != null && item.getValue() instanceof Address) {
+                addr = (Address) item.getValue();
+            } else if (sheet.getBean() != null && sheet.getBean() instanceof Address) {
+                addr = (Address) sheet.getBean();
+            }
+            if (addr != null) {
+                int pc = (int) (Math.random() * 8000);
+                addr.setPostcode(Integer.toString(pc));
+            }
+            event.consume();
+        });
+        
         Optional<ButtonType> response = alert.showAndWait();
 
         if (response.isPresent() && saveButton.equals(response.get())) {

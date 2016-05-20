@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,6 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.RangeSlider;
 
-import com.sun.javafx.css.StyleManager;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
@@ -293,6 +292,14 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         getChildren().add(rangeBar);
     }
 
+    /**
+     * When ticks or labels are changing of visibility, we compute the new
+     * visibility and add the necessary objets. After this method, we must be
+     * sure to add the high Thumb and the rangeBar.
+     *
+     * @param ticksVisible
+     * @param labelsVisible
+     */
     private void setShowTickMarks(boolean ticksVisible, boolean labelsVisible) {
         showTickMarks = (ticksVisible || labelsVisible);
         RangeSlider rangeSlider = getSkinnable();
@@ -349,6 +356,10 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             getSkinnable().requestLayout();
         } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
             setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
+            if (!getChildren().contains(highThumb))
+                getChildren().add(highThumb);
+            if (!getChildren().contains(rangeBar))
+                getChildren().add(rangeBar);
         }  else if ("MAJOR_TICK_UNIT".equals(p)) { //$NON-NLS-1$
             if (tickLine != null) {
                 tickLine.setTickUnit(getSkinnable().getMajorTickUnit());
@@ -366,9 +377,6 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         } else if ("HIGH_VALUE".equals(p)) { //$NON-NLS-1$
             positionHighThumb();
             rangeBar.resize(rangeEnd-rangeStart, rangeBar.getHeight());
-        } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
-            if (!getChildren().contains(highThumb))
-                getChildren().add(highThumb);
         }
         super.handleControlPropertyChanged(p);
     }

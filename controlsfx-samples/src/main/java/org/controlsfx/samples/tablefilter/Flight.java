@@ -18,12 +18,13 @@ public final class Flight {
     private final BooleanProperty cancelledInd = new SimpleBooleanProperty(false);
     private final StringProperty gateNumber = new SimpleStringProperty();
 
-    public Flight(int flightNumber, String orig, String dest, LocalDate departureTime, int mileage) {
+    public Flight(int flightNumber, String orig, String dest, LocalDate departureTime, int mileage, String gateNumber) {
         this.flightNumber = flightNumber;
         this.orig = orig;
         this.dest = dest;
         this.departureTime = departureTime;
         this.mileaage = mileage;
+        this.gateNumber.set(gateNumber);
     }
 
     public int getFlightNumber() {

@@ -33,6 +33,7 @@ import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
+import javafx.util.Pair;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 /**
@@ -72,7 +73,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
     @Override
     protected void updateCellVerticalSelection(int delta, Runnable defaultAction) {
-        TableSelectionModel sm = getSelectionModel();
+        TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) getSelectionModel();
         if (sm == null || sm.getSelectionMode() == SelectionMode.SINGLE) {
             return;
         }
@@ -87,7 +88,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
         if (isShiftDown && getAnchor() != null) {
 
             final SpreadsheetCell cell = getControl().getItems().get(fm.getFocusedIndex()).get(focusedCell.getColumn());
-
+            sm.direction = new Pair<>(delta, 0);
             /**
              * If the delta is >0, it means we want to go down, so we need to
              * target the cell that is after our cell. So we need to take the
@@ -127,7 +128,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
     @Override
     protected void updateCellHorizontalSelection(int delta, Runnable defaultAction) {
-        TableSelectionModel sm = getSelectionModel();
+        TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) getSelectionModel();
         if (sm == null || sm.getSelectionMode() == SelectionMode.SINGLE) {
             return;
         }
@@ -153,7 +154,8 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
             final int columnPos = getVisibleLeafIndex(focusedCell.getTableColumn());
 
             final SpreadsheetCell cell = getControl().getItems().get(focusedCellRow).get(columnPos);
-
+            
+            sm.direction = new Pair<>(0, delta);
             final int newColumn;// = columnCell + delta;
             if (delta < 0) {
                 newColumn = cell.getColumn() + delta;
@@ -290,6 +292,39 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
         //If we're here, we then select the last on
         return 0;
+    }
+
+    
+    @Override
+    protected void selectCell(int rowDiff, int columnDiff) {
+        TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) getSelectionModel();
+        if (sm == null) {
+            return;
+        }
+        sm.direction = new Pair<>(rowDiff, columnDiff);
+
+        TableFocusModel fm = getFocusModel();
+        if (fm == null) {
+            return;
+        }
+
+        TablePositionBase focusedCell = getFocusedCell();
+        int currentRow = focusedCell.getRow();
+        int currentColumn = getVisibleLeafIndex(focusedCell.getTableColumn());
+
+        if (rowDiff < 0 && currentRow <= 0) return;
+        else if (rowDiff > 0 && currentRow >= getItemCount() - 1) return;
+        else if (columnDiff < 0 && currentColumn <= 0) return;
+        else if (columnDiff > 0 && currentColumn >= getVisibleLeafColumns().size() - 1) return;
+        else if (columnDiff > 0 && currentColumn == -1) return;
+
+        TableColumnBase tc = focusedCell.getTableColumn();
+        tc = getColumn(tc, columnDiff);
+
+        int row = focusedCell.getRow() + rowDiff;
+        
+        sm.clearAndSelect(row, tc);
+        setAnchor(row, tc);
     }
 
     private int findNextRow(TablePositionBase focusedCell, SpreadsheetCell cell) {

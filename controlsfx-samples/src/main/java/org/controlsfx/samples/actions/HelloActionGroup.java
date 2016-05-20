@@ -27,6 +27,7 @@
 package org.controlsfx.samples.actions;
 
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
+import static org.controlsfx.control.action.ActionUtils.ACTION_SPAN;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +67,8 @@ public class HelloActionGroup extends ControlsFXSample {
                                           new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
                                                                         new DummyAction("Action 2.2.2")),
                                           new DummyAction("Action 2.3") ),
-        ACTION_SEPARATOR,                                    
+        ACTION_SPAN,
+        ACTION_SEPARATOR,
         new DummyAction("Action 3", image),
         new ActionGroup("Group 4",  image, new DummyAction("Action 4.1", image), 
                                            new DummyAction("Action 4.2"))

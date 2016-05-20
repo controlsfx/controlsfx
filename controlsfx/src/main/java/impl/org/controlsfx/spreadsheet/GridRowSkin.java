@@ -40,7 +40,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -160,7 +159,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          */
         double controlHeight = getTableRowHeight(index);
         double customHeight = controlHeight == Grid.AUTOFIT ? GridViewSkin.DEFAULT_CELL_HEIGHT : controlHeight;
-        
+
         final GridViewSkin skin = handle.getCellsViewSkin();
         skin.hBarValue.set(index, true);
 
@@ -180,6 +179,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         putCellsInCache();
 
         boolean firstVisibleCell = false;
+        CellView lastCell = null;
+        boolean needToBeShifted = false;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
 
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
@@ -250,26 +251,26 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 //                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
-                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
-                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
+//                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
+//                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
 
-                        /**
-                         * In case this cell was selected before but we scroll
-                         * up/down and it's invisible now. It has to pass his
+                    /**
+                     * In case this cell was selected before but we scroll
+                     * up/down and it's invisible now. It has to pass his
                          * "selected property" to the new Cell in charge of
                          * spanning
-                         */
-                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
-                        // If the selected cell is in the same row, no need to re-select it
-                        if (selectedPosition != null
-                                //When shift selecting, all cells become ROW_VISIBLE so
-                                //We avoid loop selecting here
-                                && skin.containsRow(index)
-                                && selectedPosition.getRow() != index) {
-                            sm.clearSelection(selectedPosition.getRow(),
-                                    selectedPosition.getTableColumn());
-                            sm.select(index, col);
-                        }
+                     */
+//                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
+                    // If the selected cell is in the same row, no need to re-select it
+//                        if (selectedPosition != null
+//                                //When shift selecting, all cells become ROW_VISIBLE so
+//                                //We avoid loop selecting here
+//                                && skin.containsRow(index)
+//                                && selectedPosition.getRow() != index) {
+//                            sm.clearSelection(selectedPosition.getRow(),
+//                                    selectedPosition.getTableColumn());
+//                            sm.select(index, col);
+//                        }
                     case NORMAL_CELL: // fall through and carry on
                         if (tableCell.getIndex() != index) {
                             tableCell.updateIndex(index);
@@ -331,7 +332,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         skin.getFlow().layoutChildren();
                     }
                 }
-                
+
                 height = customHeight;
                 height = snapSize(height) - snapSize(verticalPadding);
                 /**
@@ -347,15 +348,33 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     }
                 }
 
-                tableCell.resize(width, height);
-
+                //Fix for JDK-8146406
+                needToBeShifted = false;
+                /**
+                 * If the current cell has no left border, and the previous cell
+                 * had no right border, and we're fixed. We may have the problem
+                 * where there is a tiny gap between the cells when scrolling
+                 * horizontally. Thus we must enlarge this cell a bit, and shift
+                 * it a bit in order to mask that gap. If the cell has a border
+                 * defined, the problem seems not to happen.
+                 */
+                if (spreadsheetView.getFixedRows().contains(index) 
+                        && lastCell != null 
+                        && !hasRightBorder(lastCell)
+                        && !hasLeftBorder(tableCell)) {
+                    tableCell.resize(width +1, height);
+                    needToBeShifted = true;
+                } else {
+                    tableCell.resize(width, height);
+                }
+                lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
                 for (int p = spreadsheetCell.getRow(); p < index; ++p) {
                     spaceBetweenTopAndMe += skin.getRowHeight(p);
                 }
 
-                tableCell.relocate(x + tableCellX, snappedTopInset()
+                tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
                         - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
 
                 // Request layout is here as (partial) fix for RT-28684
@@ -368,9 +387,21 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
         removeUselessCell(index);
-        if(handle.getCellsViewSkin().lastRowLayout.get() == true){
+        if (handle.getCellsViewSkin().lastRowLayout.get() == true) {
             handle.getCellsViewSkin().lastRowLayout.setValue(false);
         }
+    }
+
+    private boolean hasRightBorder(CellView tableCell) {
+        return tableCell.getBorder() != null 
+                && !tableCell.getBorder().isEmpty() 
+                && tableCell.getBorder().getStrokes().get(0).getWidths().getRight() > 0;
+    }
+    
+    private boolean hasLeftBorder(CellView tableCell) {
+        return tableCell.getBorder() != null 
+                && !tableCell.getBorder().isEmpty() 
+                && tableCell.getBorder().getStrokes().get(0).getWidths().getLeft()> 0;
     }
 
     /**
@@ -385,8 +416,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      */
     private void removeUselessCell(int index) {
         getChildren().removeIf((Node t) -> {
-            if(t instanceof CellView){
-                return !cells.contains(t) && ((CellView)t).getIndex() == index;
+            if (t instanceof CellView) {
+                return !cells.contains(t) && ((CellView) t).getIndex() == index;
             }
             return false;
         });
@@ -399,10 +430,10 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * @param index
      */
     private void handleFixedCell(List<CellView> fixedCells, int index) {
-        if(fixedCells.isEmpty()){
+        if (fixedCells.isEmpty()) {
             return;
         }
-        
+
         /**
          * If we have a fixedCell (in column) and that cell may be recovered by
          * a rowSpan, we want to put that tableCell ahead in term of z-order. So

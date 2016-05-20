@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableRow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -99,6 +100,13 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         widthProperty().addListener(hBarValueChangeListener);
         
         sheetChildren = findSheetChildren();
+        
+        //When we click outside of the grid, we want to deselect all cells.
+        addEventHandler(MouseEvent.MOUSE_PRESSED, (MouseEvent event) -> {
+            if (event.getTarget().getClass() == GridRow.class) {
+                spreadSheetView.getSelectionModel().clearSelection();
+            }
+        });
     }
 
     /***************************************************************************
@@ -166,7 +174,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
         layoutTotal();
         layoutFixedRows();
-    }
+                }
 
     @Override
     public double adjustPixels(final double delta) {
@@ -250,7 +258,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         }
         
         for (GridRow cell : (List<GridRow>)getCells()) {
-            if (cell != null &&  (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
+            if (cell != null && cell.getIndex() >= 0 && (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
                 cell.requestLayout();
             }
         }

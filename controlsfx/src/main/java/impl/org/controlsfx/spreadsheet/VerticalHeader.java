@@ -37,11 +37,13 @@ import java.util.Stack;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Cursor;
@@ -187,6 +189,10 @@ public class VerticalHeader extends StackPane {
     public double getVerticalHeaderWidth() {
         return innerVerticalHeaderWidth.get();
     }
+    
+    public ReadOnlyDoubleProperty verticalHeaderWidthProperty(){
+        return innerVerticalHeaderWidth;
+    }
 
     public double computeHeaderWidth() {
         double width = 0;
@@ -305,7 +311,7 @@ public class VerticalHeader extends StackPane {
                     label.resize(spreadsheetView.getRowHeaderWidth(), rowHeight);
                     label.setContextMenu(getRowContextMenu(rowIndex));
                     if(row != null){
-                        label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight).add(row.verticalShift.get()));
+                        label.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight).add(row.verticalShift));
                     }
                     label.setLayoutX(x);
                     final ObservableList<String> css = label.getStyleClass();
@@ -420,6 +426,10 @@ public class VerticalHeader extends StackPane {
         public void handle(MouseEvent me) {
 
             if (me.getClickCount() == 2 && me.isPrimaryButtonDown()) {
+                Rectangle rect = (Rectangle) me.getSource();
+                GridRow row = (GridRow) rect.getProperties().get(TABLE_ROW_KEY);
+                skin.resizeRowToFitContent(row.getIndex());
+                requestLayout();
             } else {
                 // rather than refer to the rect variable, we just grab
                 // it from the source to prevent a small memory leak.
@@ -456,6 +466,7 @@ public class VerticalHeader extends StackPane {
             return;
         }
         handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(gridRow.getIndex(), newHeight));
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
@@ -477,6 +488,7 @@ public class VerticalHeader extends StackPane {
                 double height = row.getHeight();
                 for (int i = selectedRows.nextSetBit(0); i >= 0; i = selectedRows.nextSetBit(i + 1)) {
                     skin.rowHeightMap.put(i, height);
+                    Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(i, height));
                 }
             }
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,6 @@ package org.controlsfx.control;
 
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
-
-import com.sun.javafx.css.StyleManager;
 
 import impl.org.controlsfx.skin.StatusBarSkin;
 import javafx.beans.property.DoubleProperty;

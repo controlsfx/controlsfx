@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -151,6 +152,17 @@ public class ActionUtils {
         return configure(button, action, ActionTextBehavior.SHOW);
     }
 
+    /**
+     * Removes all bindings and listeners which were added when the supplied
+     * {@link ButtonBase} was bound to an {@link Action} via one of the methods
+     * of this class.
+     *
+     * @param button a {@link ButtonBase} that was bound to an {@link Action}
+     */
+    public static void unconfigureButton(ButtonBase button) {
+        unconfigure(button);
+    }
+	    
     /**
      * Takes the provided {@link Action} and returns a {@link MenuButton} instance
      * with all relevant properties bound to the properties of the Action.
@@ -305,6 +317,17 @@ public class ActionUtils {
         return configure(menuItem, action);
     }
 
+    /**
+     * Removes all bindings and listeners which were added when the supplied
+     * {@link MenuItem} was bound to an {@link Action} via one of the methods
+     * of this class.
+     *
+     * @param menuItem a {@link MenuItem} that was bound to an {@link Action}
+     */
+    public static void unconfigureMenuItem(final MenuItem menuItem) {
+        unconfigure(menuItem);
+    }
+    
     /**
      * Takes the provided {@link Action} and returns a {@link Menu} instance
      * with all relevant properties bound to the properties of the Action.
@@ -605,6 +628,12 @@ public class ActionUtils {
             @Override protected Node computeValue() {
                 return copyNode(action.graphicProperty().get());
             }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+                super.removeListener(listener);
+                unbind(action.graphicProperty());
+            }
         });
 
 
@@ -627,6 +656,13 @@ public class ActionUtils {
                 String longText =  action.longTextProperty().get();
                 return longText == null || longText.isEmpty() ? null : tooltip;
             }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+                super.removeListener(listener);
+                unbind(action.longTextProperty());
+                tooltip.textProperty().unbind();
+            }
         });
 
 
@@ -644,6 +680,29 @@ public class ActionUtils {
         return btn;
     }
 
+    private static void unconfigure(final ButtonBase btn) {
+        if (btn == null || !(btn.getOnAction() instanceof Action)) {
+            return;
+        }
+
+        Action action = (Action) btn.getOnAction();
+
+        btn.styleProperty().unbind();
+        btn.textProperty().unbind();
+        btn.disableProperty().unbind();
+        btn.graphicProperty().unbind();
+
+        action.getProperties().removeListener(new ButtonPropertiesMapChangeListener<>(btn, action));
+
+        btn.tooltipProperty().unbind();
+
+        if (btn instanceof ToggleButton) {
+            ((ToggleButton) btn).selectedProperty().unbindBidirectional(action.selectedProperty());
+        }
+
+        btn.setOnAction(null);
+    }
+    
     private static <T extends MenuItem> T configure(final T menuItem, final Action action) {
         if (action == null) {
             throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
@@ -660,6 +719,12 @@ public class ActionUtils {
 
             @Override protected Node computeValue() {
                 return copyNode( action.graphicProperty().get());
+            }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+                super.removeListener(listener);
+                unbind(action.graphicProperty());
             }
         });
 
@@ -685,6 +750,30 @@ public class ActionUtils {
         return menuItem;
     }
 
+    private static void unconfigure(final MenuItem menuItem) {
+        if (menuItem == null || !(menuItem.getOnAction() instanceof Action)) {
+            return;
+        }
+
+        Action action = (Action) menuItem.getOnAction();
+
+        menuItem.styleProperty().unbind();
+        menuItem.textProperty().unbind();
+        menuItem.disableProperty().unbind();
+        menuItem.acceleratorProperty().unbind();
+        menuItem.graphicProperty().unbind();
+
+        action.getProperties().removeListener(new MenuItemPropertiesMapChangeListener<>(menuItem, action));
+
+        if (menuItem instanceof RadioMenuItem) {
+            ((RadioMenuItem) menuItem).selectedProperty().unbindBidirectional(action.selectedProperty());
+        } else if (menuItem instanceof CheckMenuItem) {
+            ((CheckMenuItem) menuItem).selectedProperty().unbindBidirectional(action.selectedProperty());
+        }
+
+        menuItem.setOnAction(null);
+    }
+
     private static class ButtonPropertiesMapChangeListener<T extends ButtonBase> implements MapChangeListener<Object, Object> {
 
         private final WeakReference<T> btnWeakReference;
@@ -704,26 +793,81 @@ public class ActionUtils {
                 btn.getProperties().putAll(action.getProperties());
             }
         }
+
+        @Override
+        public boolean equals(Object otherObject) {
+            if (this == otherObject) {
+                return true;
+            }
+            if (otherObject == null || getClass() != otherObject.getClass()) {
+                return false;
+            }
+
+            ButtonPropertiesMapChangeListener<?> otherListener = (ButtonPropertiesMapChangeListener<?>) otherObject;
+
+            T btn = btnWeakReference.get();
+            ButtonBase otherBtn = otherListener.btnWeakReference.get();
+            if (btn != null ? !btn.equals(otherBtn) : otherBtn != null) {
+                return false;
+            }
+            return action.equals(otherListener.action);
+        }
+
+        @Override
+        public int hashCode() {
+            T btn = btnWeakReference.get();
+            int result = btn != null ? btn.hashCode() : 0;
+            result = 31 * result + action.hashCode();
+            return result;
+        }
     }
 
     private static class MenuItemPropertiesMapChangeListener<T extends MenuItem> implements MapChangeListener<Object, Object> {
 
-        private final WeakReference<T> btnWeakReference;
+        private final WeakReference<T> menuItemWeakReference;
         private final Action action;
 
-        private MenuItemPropertiesMapChangeListener(T btn, Action action) {
-            btnWeakReference = new WeakReference<>(btn);
+        private MenuItemPropertiesMapChangeListener(T menuItem, Action action) {
+            menuItemWeakReference = new WeakReference<>(menuItem);
             this.action = action;
         }
 
         @Override public void onChanged(MapChangeListener.Change<?, ?> change) {
-            T btn = btnWeakReference.get();
-            if (btn == null) {
+            T menuItem = menuItemWeakReference.get();
+            if (menuItem == null) {
                 action.getProperties().removeListener(this);
             } else {
-                btn.getProperties().clear();
-                btn.getProperties().putAll(action.getProperties());
+                menuItem.getProperties().clear();
+                menuItem.getProperties().putAll(action.getProperties());
             }
+        }
+
+        @Override
+        public boolean equals(Object otherObject) {
+            if (this == otherObject) {
+                return true;
+            }
+            if (otherObject == null || getClass() != otherObject.getClass()) {
+                return false;
+            }
+
+            MenuItemPropertiesMapChangeListener<?> otherListener = (MenuItemPropertiesMapChangeListener<?>) otherObject;
+
+            T menuItem = menuItemWeakReference.get();
+            MenuItem otherMenuItem = otherListener.menuItemWeakReference.get();
+            if (menuItem != null ? !menuItem.equals(otherMenuItem) : otherMenuItem != null) {
+                return false;
+            }
+            return action.equals(otherListener.action);
+
+        }
+
+        @Override
+        public int hashCode() {
+            T menuItem = menuItemWeakReference.get();
+            int result = menuItem != null ? menuItem.hashCode() : 0;
+            result = 31 * result + action.hashCode();
+            return result;
         }
     }
 }

@@ -681,13 +681,10 @@ public class ActionUtils {
     }
 
     private static void unconfigure(final ButtonBase btn) {
-        if (btn == null) {
+        if (btn == null || !(btn.getOnAction() instanceof Action)) {
             return;
         }
 
-        if (!(btn.getOnAction() instanceof Action)) {
-            throw new IllegalStateException("ButtonBase isn't bound to an action."); //$NON-NLS-1$
-        }
         Action action = (Action) btn.getOnAction();
 
         btn.styleProperty().unbind();
@@ -754,13 +751,10 @@ public class ActionUtils {
     }
 
     private static void unconfigure(final MenuItem menuItem) {
-        if (menuItem == null) {
+        if (menuItem == null || !(menuItem.getOnAction() instanceof Action)) {
             return;
         }
 
-        if (!(menuItem.getOnAction() instanceof Action)) {
-            throw new IllegalStateException("MenuItem isn't bound to an action."); //$NON-NLS-1$
-        }
         Action action = (Action) menuItem.getOnAction();
 
         menuItem.styleProperty().unbind();

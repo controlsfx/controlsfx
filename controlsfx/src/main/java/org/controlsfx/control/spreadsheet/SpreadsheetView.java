@@ -36,6 +36,9 @@ import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.IdentityHashMap;
@@ -1183,11 +1186,15 @@ public class SpreadsheetView extends Control{
              */
             for (int row = 0; row < cell.getRowSpan(); ++row) {
                 for (int col = 0; col < cell.getColumnSpan(); ++col) {
-                    list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                    try {
+                        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
+                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
+                    } catch (IOException exception) {
+                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                    }
                 }
             }
         }
-
         final ClipboardContent content = new ClipboardContent();
         content.put(fmt, list);
         Clipboard.getSystemClipboard().setContent(content);

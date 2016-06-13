@@ -770,7 +770,7 @@ public abstract class SpreadsheetCellType<T> {
 
                 @Override
                 public String toStringFormat(LocalDate item, String format) {
-                    if (("").equals(format)) { //$NON-NLS-1$
+                    if (("").equals(format) && item != null) { //$NON-NLS-1$
                         return item.toString();
                     } else if (item != null) {
                         return item.format(DateTimeFormatter.ofPattern(format));

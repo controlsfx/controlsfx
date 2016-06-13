@@ -180,7 +180,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
         boolean firstVisibleCell = false;
         CellView lastCell = null;
-        boolean needToBeShifted = false;
+        boolean needToBeShifted;
+        boolean rowHeightChange = false;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
 
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
@@ -317,6 +318,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
                     double tempHeight = tableCell.prefHeight(width);
                     if (tempHeight > customHeight) {
+                        rowHeightChange = true;
                         skin.rowHeightMap.put(index, tempHeight);
                         for (CellView cell : cells) {
                             /**
@@ -389,6 +391,14 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         removeUselessCell(index);
         if (handle.getCellsViewSkin().lastRowLayout.get() == true) {
             handle.getCellsViewSkin().lastRowLayout.setValue(false);
+        }
+        /**
+         * If we modified an height here, ROW_HEIGHT_CHANGE will not be
+         * triggered, because it's not the user who has modified that. So the
+         * rectangle will not update, we need to force it here.
+         */
+        if (rowHeightChange && spreadsheetView.getFixedRows().contains(index)) {
+            skin.computeFixedRowHeight();
         }
     }
 

@@ -92,6 +92,9 @@ public class PopOver extends PopupControl {
 
     private double targetY;
 
+    private final ObjectProperty<Duration> fadeInDuration = new SimpleObjectProperty<>(DEFAULT_FADE_DURATION);
+    private final ObjectProperty<Duration> fadeOutDuration = new SimpleObjectProperty<>(DEFAULT_FADE_DURATION);
+
     /**
      * Creates a pop over with a label as the content node.
      */
@@ -339,9 +342,11 @@ public class PopOver extends PopupControl {
         super.show(owner);
         ownerWindow = owner;
 
-        showFadeInAnimation(DEFAULT_FADE_DURATION);
+        showFadeInAnimation(getFadeInDuration());
 
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                closePopOverOnOwnerWindowClose);
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
                 closePopOverOnOwnerWindowClose);
     }
 
@@ -351,9 +356,11 @@ public class PopOver extends PopupControl {
         super.show(ownerWindow, anchorX, anchorY);
         this.ownerWindow = ownerWindow;
 
-        showFadeInAnimation(DEFAULT_FADE_DURATION);
+        showFadeInAnimation(getFadeInDuration());
 
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
+                closePopOverOnOwnerWindowClose);
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
                 closePopOverOnOwnerWindowClose);
     }
 
@@ -371,7 +378,7 @@ public class PopOver extends PopupControl {
      */
     @Override
     public final void show(Node owner, double x, double y) {
-        show(owner, x, y, DEFAULT_FADE_DURATION);
+        show(owner, x, y, getFadeInDuration());
     }
 
     /**
@@ -386,7 +393,7 @@ public class PopOver extends PopupControl {
      * @param y
      *            the y coordinate for the pop over arrow tip
      * @param fadeInDuration
-     *            the time it takes for the pop over to be fully visible
+     *            the time it takes for the pop over to be fully visible. This duration takes precedence over the fade-in property without setting.
      */
     public final void show(Node owner, double x, double y,
             Duration fadeInDuration) {
@@ -455,6 +462,8 @@ public class PopOver extends PopupControl {
         // Bug fix - close popup when owner window is closing
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
+                closePopOverOnOwnerWindowClose);
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
@@ -479,7 +488,7 @@ public class PopOver extends PopupControl {
      */
     @Override
     public final void hide() {
-        hide(DEFAULT_FADE_DURATION);
+        hide(getFadeOutDuration());
     }
 
     /**
@@ -495,6 +504,8 @@ public class PopOver extends PopupControl {
         if (ownerWindow != null){
             ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                     closePopOverOnOwnerWindowClose);
+            ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
+                closePopOverOnOwnerWindowClose);
         }
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;
@@ -898,5 +909,63 @@ public class PopOver extends PopupControl {
      */
     public enum ArrowLocation {
         LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM, RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM, TOP_LEFT, TOP_CENTER, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT;
+    }
+
+    /**
+     * Stores the fade-in duration. This should be set before calling PopOver.show(..).
+     *
+     * @return the fade-in duration property
+     */
+    public final ObjectProperty<Duration> fadeInDurationProperty() {
+        return fadeInDuration;
+    }
+
+    /**
+     * Stores the fade-out duration.
+     *
+     * @return the fade-out duration property
+     */
+    public final ObjectProperty<Duration> fadeOutDurationProperty() {
+        return fadeOutDuration;
+    }
+
+    /**
+     * Returns the value of the fade-in duration property.
+     *
+     * @return the fade-in duration
+     * @see #fadeInDurationProperty()
+     */
+    public final Duration getFadeInDuration() {
+        return fadeInDurationProperty().get();
+    }
+
+    /**
+     * Sets the value of the fade-in duration property. This should be set before calling PopOver.show(..).
+     *
+     * @param duration the requested fade-in duration
+     * @see #fadeInDurationProperty()
+     */
+    public final void setFadeInDuration(Duration duration) {
+        fadeInDurationProperty().setValue(duration);
+    }
+
+    /**
+     * Returns the value of the fade-out duration property.
+     *
+     * @return the fade-out duration
+     * @see #fadeOutDurationProperty()
+     */
+    public final Duration getFadeOutDuration() {
+        return fadeOutDurationProperty().get();
+    }
+
+    /**
+     * Sets the value of the fade-out duration property.
+     *
+     * @param duration the requested fade-out duration
+     * @see #fadeOutDurationProperty()
+     */
+    public final void setFadeOutDuration(Duration duration) {
+        fadeOutDurationProperty().setValue(duration);
     }
 }

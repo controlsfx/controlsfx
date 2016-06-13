@@ -31,8 +31,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.binding.When;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -358,13 +362,13 @@ public class ActionUtils {
     public static Action ACTION_SEPARATOR = new Action(null, null) {
         @Override public String toString() {
             return "Separator";  //$NON-NLS-1$
-        };
+        }
     };
 
     public static Action ACTION_SPAN = new Action(null, null) {
         @Override public String toString() {
             return "Span";  //$NON-NLS-1$
-        };
+        }
     };
 
 
@@ -592,6 +596,21 @@ public class ActionUtils {
 
         btn.styleProperty().bind(action.styleProperty());
 
+        // carry changes to acton style classes to the button
+        // binding as not a good solution since it wipes out existing button classes
+        btn.getStyleClass().addAll( action.getStyleClass() );
+        action.getStyleClass().addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> c) {
+                if (c.wasRemoved()) {
+                    btn.getStyleClass().removeAll(c.getRemoved());
+                }
+                if (c.wasAdded()) {
+                    btn.getStyleClass().addAll(c.getAddedSubList());
+                }
+            }
+        });
+
         //btn.textProperty().bind(action.textProperty());
         if ( textBahavior == ActionTextBehavior.SHOW ) {
             btn.textProperty().bind(action.textProperty());
@@ -617,15 +636,16 @@ public class ActionUtils {
         // the text property is null
         btn.tooltipProperty().bind(new ObjectBinding<Tooltip>() {
             private Tooltip tooltip = new Tooltip();
+            private StringBinding textBinding = new When(action.longTextProperty().isEmpty()).then(action.textProperty()).otherwise(action.longTextProperty());
 
             {
-                bind(action.longTextProperty());
-                tooltip.textProperty().bind(action.longTextProperty());
+                bind(textBinding);
+                tooltip.textProperty().bind(textBinding);
             }
 
             @Override protected Tooltip computeValue() {
-                String longText =  action.longTextProperty().get();
-                return longText == null || longText.isEmpty() ? null : tooltip;
+                String longText =  textBinding.get();
+                return longText == null || textBinding.get().isEmpty() ? null : tooltip;
             }
         });
 

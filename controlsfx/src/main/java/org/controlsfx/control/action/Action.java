@@ -100,6 +100,7 @@ public class Action implements EventHandler<ActionEvent> {
     public Action(@NamedArg("text") String text, Consumer<ActionEvent> eventHandler) {
         setText(text);
         setEventHandler(eventHandler);
+        getStyleClass().add( "action" ); // this class will be added to all bound controls
     }
     
     protected void lock() {
@@ -133,7 +134,7 @@ public class Action implements EventHandler<ActionEvent> {
             style = new SimpleStringProperty(this, "style") { //$NON-NLS-1$
             	@Override
             	public void set(String style) {
-            		if (locked) throw new UnsupportedOperationException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+            		if (locked) throw new UnsupportedOperationException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
             		super.set(style);
             	}
             };
@@ -160,9 +161,9 @@ public class Action implements EventHandler<ActionEvent> {
     // --- selected 
     private final BooleanProperty selectedProperty = new SimpleBooleanProperty(this, "selected") { //$NON-NLS-1$
     	@Override public void set(boolean selected) {
-    		if (locked) throw new UnsupportedOperationException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		if (locked) throw new UnsupportedOperationException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
     		super.set(selected);
-    	};
+    	}
     };
     
     /**
@@ -196,7 +197,7 @@ public class Action implements EventHandler<ActionEvent> {
     // --- text
     private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"){ //$NON-NLS-1$
     	@Override public void set(String value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
     		super.set(value);
     	}
     };
@@ -231,7 +232,7 @@ public class Action implements EventHandler<ActionEvent> {
     // --- disabled
     private final BooleanProperty disabledProperty = new SimpleBooleanProperty(this, "disabled"){ //$NON-NLS-1$
         @Override public void set(boolean value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
     		super.set(value);
     	}
     };
@@ -270,10 +271,10 @@ public class Action implements EventHandler<ActionEvent> {
     // --- longText
     private final StringProperty longTextProperty = new SimpleLocalizedStringProperty(this, "longText"){ //$NON-NLS-1$
         @Override public void set(String value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
     		super.set(value);
 
-    	};
+    	}
     };
     
     /**
@@ -309,10 +310,10 @@ public class Action implements EventHandler<ActionEvent> {
     // --- graphic
     private final ObjectProperty<Node> graphicProperty = new SimpleObjectProperty<Node>(this, "graphic"){ //$NON-NLS-1$
         @Override public void set(Node value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
     		super.set(value);
 
-    	};
+    	}
     };
     
     /**
@@ -345,7 +346,7 @@ public class Action implements EventHandler<ActionEvent> {
     // --- accelerator
     private final ObjectProperty<KeyCombination> acceleratorProperty = new SimpleObjectProperty<KeyCombination>(this, "accelerator"){ //$NON-NLS-1$
         @Override public void set(KeyCombination value) {
-    		if ( locked ) throw new RuntimeException("The action is immutable, property change suppport is disabled."); //$NON-NLS-1$
+    		if ( locked ) throw new RuntimeException("The action is immutable, property change support is disabled."); //$NON-NLS-1$
     		super.set(value);
 
     	}

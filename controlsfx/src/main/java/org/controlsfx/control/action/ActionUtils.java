@@ -26,43 +26,28 @@
  */
 package org.controlsfx.control.action;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.binding.When;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonBase;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.Separator;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.tools.Duplicatable;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Convenience class for users of the {@link Action} API. Primarily this class
@@ -381,13 +366,13 @@ public class ActionUtils {
     public static Action ACTION_SEPARATOR = new Action(null, null) {
         @Override public String toString() {
             return "Separator";  //$NON-NLS-1$
-        };
+        }
     };
 
     public static Action ACTION_SPAN = new Action(null, null) {
         @Override public String toString() {
             return "Span";  //$NON-NLS-1$
-        };
+        }
     };
 
 
@@ -615,6 +600,21 @@ public class ActionUtils {
 
         btn.styleProperty().bind(action.styleProperty());
 
+        // carry changes to acton style classes to the button
+        // binding as not a good solution since it wipes out existing button classes
+        btn.getStyleClass().addAll( action.getStyleClass() );
+        action.getStyleClass().addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> c) {
+                if (c.wasRemoved()) {
+                    btn.getStyleClass().removeAll(c.getRemoved());
+                }
+                if (c.wasAdded()) {
+                    btn.getStyleClass().addAll(c.getAddedSubList());
+                }
+            }
+        });
+
         //btn.textProperty().bind(action.textProperty());
         if ( textBahavior == ActionTextBehavior.SHOW ) {
             btn.textProperty().bind(action.textProperty());
@@ -646,15 +646,16 @@ public class ActionUtils {
         // the text property is null
         btn.tooltipProperty().bind(new ObjectBinding<Tooltip>() {
             private Tooltip tooltip = new Tooltip();
+            private StringBinding textBinding = new When(action.longTextProperty().isEmpty()).then(action.textProperty()).otherwise(action.longTextProperty());
 
             {
-                bind(action.longTextProperty());
-                tooltip.textProperty().bind(action.longTextProperty());
+                bind(textBinding);
+                tooltip.textProperty().bind(textBinding);
             }
 
             @Override protected Tooltip computeValue() {
-                String longText =  action.longTextProperty().get();
-                return longText == null || longText.isEmpty() ? null : tooltip;
+                String longText =  textBinding.get();
+                return longText == null || textBinding.get().isEmpty() ? null : tooltip;
             }
 
             @Override

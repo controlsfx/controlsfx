@@ -993,6 +993,7 @@ public class PopOver extends PopupControl {
      * Returns the value of the "animated" property.
      *
      * @return true if the PopOver will be shown and hidden with a short fade animation
+     * @see #animatedProperty()
      */
     public final boolean isAnimated() {
         return animatedProperty().get();
@@ -1001,7 +1002,8 @@ public class PopOver extends PopupControl {
     /**
      * Sets the value of the "animated" property.
      *
-     * @param animated if true the PopOver will be shown with a short fade animation
+     * @param animated if true the PopOver will be shown and hidden with a short fade animation
+     * @see #animatedProperty()
      */
     public final void setAnimated(boolean animated) {
         animatedProperty().set(animated);

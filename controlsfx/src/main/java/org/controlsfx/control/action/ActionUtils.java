@@ -295,7 +295,15 @@ public class ActionUtils {
      *      {@link Action}
      */
     public static MenuItem createMenuItem(final Action action) {
-        return configure(new MenuItem(), action);
+
+        MenuItem menuItem;
+        if ( action.getClass().getAnnotationsByType(ActionCheck.class) != null) {
+            menuItem = new CheckMenuItem();
+        } else {
+            menuItem = new MenuItem();
+        }
+
+        return configure( menuItem, action);
     }
 
     public static MenuItem configureMenuItem(final Action action, MenuItem menuItem) {
@@ -421,7 +429,13 @@ public class ActionUtils {
                 toolbar.getItems().add(span);
             } else if ( action == null ) {
             } else {
-                Button button = createButton(action,textBehavior);
+
+                ButtonBase button;
+                if ( action.getClass().getAnnotation(ActionCheck.class) != null ) {
+                    button = createToggleButton(action, textBehavior);
+                } else {
+                    button = createButton(action, textBehavior);
+                }
                 button.setFocusTraversable(false);
                 toolbar.getItems().add(button);
             }

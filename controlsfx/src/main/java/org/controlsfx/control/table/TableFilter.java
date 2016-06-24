@@ -118,18 +118,34 @@ public final class TableFilter<T> {
             return tableColumn.getColumns().stream().flatMap(this::extractNestedColumns);
         }
     }
+
+    /**
+     * Programmatically selects value for the specified TableColumn
+     */
     public void selectValue(TableColumn<?,?> column, Object value) {
         columnFilters.stream().filter(c -> c.getTableColumn() == column)
                 .forEach(c -> c.selectValue(value));
     }
+    /**
+     * Programmatically unselects value for the specified TableColumn
+     */
     public void unselectValue(TableColumn<?,?> column, Object value) {
         columnFilters.stream().filter(c -> c.getTableColumn() == column)
                 .forEach(c -> c.unselectValue(value));
     }
+
+    /**
+     * Programmatically selects all values for the specified TableColumn
+
+     */
     public void selectAllValues(TableColumn<?,?> column) {
         columnFilters.stream().filter(c -> c.getTableColumn() == column)
                 .forEach(ColumnFilter::selectAllValues);
     }
+
+    /**
+     * Programmatically unselect all values for the specified TableColumn
+     */
     public void unSelectAllValues(TableColumn<?,?> column) {
         columnFilters.stream().filter(c -> c.getTableColumn() == column)
                 .forEach(ColumnFilter::unSelectAllValues);

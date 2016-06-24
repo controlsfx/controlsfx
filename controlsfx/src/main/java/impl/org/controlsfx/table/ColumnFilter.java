@@ -56,7 +56,7 @@ public final class ColumnFilter<T,R> {
     private boolean lastFilter = false;
     private boolean isDirty = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
-    private FilterPanel filterPanel;
+    private volatile FilterPanel filterPanel;
 
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
@@ -74,6 +74,19 @@ public final class ColumnFilter<T,R> {
     public void initialize() {
         initializeListeners();
         initializeValues();
+    }
+
+    public void selectValue(Object value) {
+        filterPanel.selectValue(value);
+    }
+    public void unselectValue(Object value) {
+        filterPanel.unSelectValue(value);
+    }
+    public void selectAllValues() {
+        filterPanel.selectAllValues();
+    }
+    public void unSelectAllValues() {
+        filterPanel.unSelectAllValues();
     }
     public boolean wasLastFiltered() {
         return lastFilter;
@@ -242,9 +255,11 @@ public final class ColumnFilter<T,R> {
 
     /**Leverages tableColumn's context menu to attach filter panel */
     private void attachContextMenu() {
-        CustomMenuItem item = FilterPanel.getInMenuItem(this);
 
         ContextMenu contextMenu = new ContextMenu();
+
+        CustomMenuItem item = FilterPanel.getInMenuItem(this, contextMenu);
+
         contextMenu.getStyleClass().add("column-filter");
         contextMenu.getItems().add(item);
 

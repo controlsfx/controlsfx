@@ -118,6 +118,22 @@ public final class TableFilter<T> {
             return tableColumn.getColumns().stream().flatMap(this::extractNestedColumns);
         }
     }
+    public void selectValue(TableColumn<?,?> column, Object value) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(c -> c.selectValue(value));
+    }
+    public void unselectValue(TableColumn<?,?> column, Object value) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(c -> c.unselectValue(value));
+    }
+    public void selectAllValues(TableColumn<?,?> column) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(ColumnFilter::selectAllValues);
+    }
+    public void unSelectAllValues(TableColumn<?,?> column) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(ColumnFilter::unSelectAllValues);
+    }
     public void executeFilter() {
         if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
             filteredList.setPredicate(item -> !columnFilters.stream()

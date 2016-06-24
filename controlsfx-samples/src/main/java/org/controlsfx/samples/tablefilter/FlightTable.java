@@ -101,6 +101,10 @@ public final class FlightTable extends Application {
             }
         });
 
+        tableFilter.unSelectAllValues(origCol);
+        tableFilter.selectValue(origCol,"ABQ");
+        tableFilter.executeFilter();
+
         borderPane.setCenter(table);
 
         Button addFlightButton = new Button("APPEND");

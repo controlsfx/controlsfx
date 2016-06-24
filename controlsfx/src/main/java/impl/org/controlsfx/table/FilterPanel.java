@@ -56,6 +56,8 @@ public final class FilterPanel<T,R> extends VBox {
     private boolean searchMode = false;
     private boolean bumpedWidth = false;
 
+    private final ListView<FilterValue> checkListView;
+
     private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
 
     private static final Supplier<ImageView> filterImageView = () -> {
@@ -65,7 +67,24 @@ public final class FilterPanel<T,R> extends VBox {
         return imageView;
     };
 
-    FilterPanel(ColumnFilter<T,R> columnFilter) {
+    void selectAllValues() {
+        checkListView.getItems().stream()
+                .forEach(item -> item.selectedProperty().set(true));
+    }
+    void unSelectAllValues() {
+        checkListView.getItems().stream()
+                .forEach(item -> item.selectedProperty().set(false));
+    }
+    void selectValue(Object value) {
+        checkListView.getItems().stream().filter(item -> item.getValue().equals(value))
+                .forEach(item -> item.selectedProperty().set(true));
+    }
+    void unSelectValue(Object value) {
+        checkListView.getItems().stream().filter(item -> item.getValue() == value)
+                .forEach(item -> item.selectedProperty().set(false));
+    }
+
+    FilterPanel(ColumnFilter<T,R> columnFilter, ContextMenu contextMenu) {
         columnFilter.setFilterPanel(this);
         this.columnFilter = columnFilter;
         getStyleClass().add("filter-panel");
@@ -79,7 +98,7 @@ public final class FilterPanel<T,R> extends VBox {
         //initialize checklist view
 
         filterList = new FilteredList<>(new SortedList<>(columnFilter.getFilterValues()), t -> true);
-        ListView<FilterValue> checkListView = new ListView<>();
+        checkListView = new ListView<>();
         checkListView.setItems(new SortedList<>(filterList, FilterValue::compareTo));
 
         getChildren().add(checkListView);
@@ -115,6 +134,7 @@ public final class FilterPanel<T,R> extends VBox {
                                     }
                                 });
                     }
+                contextMenu.hide();
                 });
 
         buttonBox.getChildren().add(applyBttn);
@@ -142,6 +162,7 @@ public final class FilterPanel<T,R> extends VBox {
         clearAllButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
             columnFilter.getTableFilter().getColumnFilters().stream().forEach(cf -> cf.getTableColumn().setGraphic(null));
+            contextMenu.hide();
         });
         buttonBox.getChildren().add(clearAllButton);
 
@@ -155,9 +176,9 @@ public final class FilterPanel<T,R> extends VBox {
         this.filterList.setPredicate(t -> true);
         searchBox.clear();
     }
-    public static <T,R> CustomMenuItem getInMenuItem(ColumnFilter<T,R> columnFilter) {
+    public static <T,R> CustomMenuItem getInMenuItem(ColumnFilter<T,R> columnFilter, ContextMenu contextMenu) {
 
-        FilterPanel<T,R> filterPanel = new FilterPanel<>(columnFilter);
+        FilterPanel<T,R> filterPanel = new FilterPanel<>(columnFilter, contextMenu);
 
         CustomMenuItem menuItem = new CustomMenuItem();
 

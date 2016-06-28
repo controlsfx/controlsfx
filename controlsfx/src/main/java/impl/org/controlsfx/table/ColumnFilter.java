@@ -77,8 +77,8 @@ public final class ColumnFilter<T,R> {
         if (!initialized) {
             initializeListeners();
             initializeValues();
+            initialized = true;
         }
-        initialized = true;
     }
     public boolean isInitialized() {
         return initialized;

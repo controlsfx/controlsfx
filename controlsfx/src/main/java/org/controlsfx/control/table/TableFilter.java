@@ -213,7 +213,7 @@ public final class TableFilter<T> {
         private Builder(TableView<T> tableView) {
             this.tableView = tableView;
         }
-        public Builder<T> islazy(boolean isLazy) {
+        public Builder<T> lazy(boolean isLazy) {
             this.lazyInd = isLazy;
             return this;
         }

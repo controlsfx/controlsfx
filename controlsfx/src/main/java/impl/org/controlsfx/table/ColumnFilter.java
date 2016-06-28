@@ -58,6 +58,8 @@ public final class ColumnFilter<T,R> {
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
     private volatile FilterPanel filterPanel;
 
+    private boolean initialized = false;
+
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
@@ -72,8 +74,14 @@ public final class ColumnFilter<T,R> {
         return filterPanel;
     }
     public void initialize() {
-        initializeListeners();
-        initializeValues();
+        if (!initialized) {
+            initializeListeners();
+            initializeValues();
+        }
+        initialized = true;
+    }
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public void selectValue(Object value) {
@@ -264,6 +272,8 @@ public final class ColumnFilter<T,R> {
         contextMenu.getItems().add(item);
 
         tableColumn.setContextMenu(contextMenu);
+
+        contextMenu.setOnShowing(ae -> initialize());
     }
 
     private static final class CellIdentity<T> {

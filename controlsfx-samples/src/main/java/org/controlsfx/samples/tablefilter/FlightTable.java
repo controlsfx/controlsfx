@@ -90,7 +90,7 @@ public final class FlightTable extends Application {
         gateNumber.setEditable(true);
         table.getColumns().add(gateNumber);
 
-        TableFilter<Flight> tableFilter = new TableFilter<>(table);
+        TableFilter<Flight> tableFilter = TableFilter.forTableView(table).islazy(true).apply();
 
         table.setEditable(true);
         tableFilter.setSearchStrategy((input,target) -> {

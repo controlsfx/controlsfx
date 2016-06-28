@@ -54,28 +54,35 @@ public final class TableFilter<T> {
     private final TableView<T> tableView;
     private final ObservableList<T> backingList;
     private final FilteredList<T> filteredList;
-    private final SortedList<T> sortedControlList;
 
     private final ObservableList<ColumnFilter<T,?>> columnFilters = FXCollections.observableArrayList();
 
-    /**Constructor applies a filtering control to the provided {@link TableView} instance.
-     * 
-     * @param tableView
+
+    /**
+     * Use TableFilter.forTableView() factory and leverage Builder
      */
+    @Deprecated
     public TableFilter(TableView<T> tableView) {
+        this(tableView,false);
+    }
+
+    private TableFilter(TableView<T> tableView, boolean isLazy) {
         this.tableView = tableView;
         backingList = tableView.getItems();
         filteredList = new FilteredList<>(new SortedList<>(backingList));
-        sortedControlList = new SortedList<>(this.filteredList);
+        SortedList<T> sortedControlList = new SortedList<>(this.filteredList);
 
         filteredList.setPredicate(v -> true);
 
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        applyForAllColumns();
+        applyForAllColumns(isLazy);
         tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
-        columnFilters.forEach(ColumnFilter::initialize);
+
+        if (!isLazy) {
+            columnFilters.forEach(ColumnFilter::initialize);
+        }
     }
 
     /**
@@ -107,7 +114,7 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    private void applyForAllColumns() { 
+    private void applyForAllColumns(boolean isLazy) {
         columnFilters.setAll(tableView.getColumns().stream().flatMap(this::extractNestedColumns)
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
@@ -183,6 +190,36 @@ public final class TableFilter<T> {
     }
     public boolean isDirty() {
         return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+    }
+
+    /**
+     * Returns a TableFilter.Builder to configure a TableFilter on the specified TableView. Call apply() to initialize and return the TableFilter
+     * @param tableView
+     * @param <T>
+     */
+    public static <T> Builder<T> forTableView(TableView<T> tableView) {
+        return new Builder<T>(tableView);
+    }
+
+    /**
+     * A Builder for a TableFilter against a specified TableView
+     * @param <T>
+     */
+    public static final class Builder<T> {
+
+        private final TableView<T> tableView;
+        private volatile boolean lazyInd = false;
+
+        private Builder(TableView<T> tableView) {
+            this.tableView = tableView;
+        }
+        public Builder<T> islazy(boolean isLazy) {
+            this.lazyInd = isLazy;
+            return this;
+        }
+        public TableFilter<T> apply() {
+            return new TableFilter<>(tableView, lazyInd);
+        }
     }
     
 }

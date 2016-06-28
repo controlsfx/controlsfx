@@ -1,7 +1,6 @@
 package org.controlsfx.samples.tablefilter;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
@@ -47,7 +46,7 @@ public final class LargeTableFilterTest extends Application {
 
         tableView.getColumns().addAll(smallInt, largeInt, randomLetter, randomStrings);
 
-        Platform.runLater(() -> new TableFilter<>(tableView));
+        TableFilter.forTableView(tableView).lazy(false).apply();
 
         GridPane grp = new GridPane();
 

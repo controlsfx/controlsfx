@@ -90,7 +90,7 @@ public final class FlightTable extends Application {
         gateNumber.setEditable(true);
         table.getColumns().add(gateNumber);
 
-        TableFilter<Flight> tableFilter = new TableFilter<>(table);
+        TableFilter<Flight> tableFilter = TableFilter.forTableView(table).lazy(true).apply();
 
         table.setEditable(true);
         tableFilter.setSearchStrategy((input,target) -> {
@@ -100,6 +100,10 @@ public final class FlightTable extends Application {
                 return false;
             }
         });
+
+        tableFilter.unSelectAllValues(origCol);
+        tableFilter.selectValue(origCol,"ABQ");
+        tableFilter.executeFilter();
 
         borderPane.setCenter(table);
 

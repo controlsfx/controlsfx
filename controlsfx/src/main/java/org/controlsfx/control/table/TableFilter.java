@@ -54,28 +54,35 @@ public final class TableFilter<T> {
     private final TableView<T> tableView;
     private final ObservableList<T> backingList;
     private final FilteredList<T> filteredList;
-    private final SortedList<T> sortedControlList;
 
     private final ObservableList<ColumnFilter<T,?>> columnFilters = FXCollections.observableArrayList();
 
-    /**Constructor applies a filtering control to the provided {@link TableView} instance.
-     * 
-     * @param tableView
+
+    /**
+     * Use TableFilter.forTableView() factory and leverage Builder
      */
+    @Deprecated
     public TableFilter(TableView<T> tableView) {
+        this(tableView,false);
+    }
+
+    private TableFilter(TableView<T> tableView, boolean isLazy) {
         this.tableView = tableView;
         backingList = tableView.getItems();
         filteredList = new FilteredList<>(new SortedList<>(backingList));
-        sortedControlList = new SortedList<>(this.filteredList);
+        SortedList<T> sortedControlList = new SortedList<>(this.filteredList);
 
         filteredList.setPredicate(v -> true);
 
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        applyForAllColumns();
+        applyForAllColumns(isLazy);
         tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
-        columnFilters.forEach(ColumnFilter::initialize);
+
+        if (!isLazy) {
+            columnFilters.forEach(ColumnFilter::initialize);
+        }
     }
 
     /**
@@ -107,7 +114,7 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    private void applyForAllColumns() { 
+    private void applyForAllColumns(boolean isLazy) {
         columnFilters.setAll(tableView.getColumns().stream().flatMap(this::extractNestedColumns)
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
@@ -117,6 +124,38 @@ public final class TableFilter<T> {
         } else {
             return tableColumn.getColumns().stream().flatMap(this::extractNestedColumns);
         }
+    }
+
+    /**
+     * Programmatically selects value for the specified TableColumn
+     */
+    public void selectValue(TableColumn<?,?> column, Object value) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(c -> c.selectValue(value));
+    }
+    /**
+     * Programmatically unselects value for the specified TableColumn
+     */
+    public void unselectValue(TableColumn<?,?> column, Object value) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(c -> c.unselectValue(value));
+    }
+
+    /**
+     * Programmatically selects all values for the specified TableColumn
+
+     */
+    public void selectAllValues(TableColumn<?,?> column) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(ColumnFilter::selectAllValues);
+    }
+
+    /**
+     * Programmatically unselect all values for the specified TableColumn
+     */
+    public void unSelectAllValues(TableColumn<?,?> column) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(ColumnFilter::unSelectAllValues);
     }
     public void executeFilter() {
         if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
@@ -151,6 +190,36 @@ public final class TableFilter<T> {
     }
     public boolean isDirty() {
         return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+    }
+
+    /**
+     * Returns a TableFilter.Builder to configure a TableFilter on the specified TableView. Call apply() to initialize and return the TableFilter
+     * @param tableView
+     * @param <T>
+     */
+    public static <T> Builder<T> forTableView(TableView<T> tableView) {
+        return new Builder<T>(tableView);
+    }
+
+    /**
+     * A Builder for a TableFilter against a specified TableView
+     * @param <T>
+     */
+    public static final class Builder<T> {
+
+        private final TableView<T> tableView;
+        private volatile boolean lazyInd = false;
+
+        private Builder(TableView<T> tableView) {
+            this.tableView = tableView;
+        }
+        public Builder<T> lazy(boolean isLazy) {
+            this.lazyInd = isLazy;
+            return this;
+        }
+        public TableFilter<T> apply() {
+            return new TableFilter<>(tableView, lazyInd);
+        }
     }
     
 }

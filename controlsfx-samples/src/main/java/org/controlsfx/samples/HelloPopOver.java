@@ -86,6 +86,8 @@ public class HelloPopOver extends ControlsFXSample {
 
     private CheckBox headerAlwaysVisible;
 
+    private CheckBox animated;
+
     private Circle circle;
 
     private Line line1;
@@ -306,6 +308,11 @@ public class HelloPopOver extends ControlsFXSample {
 
         masterHeaderAlwaysVisible.bind(headerAlwaysVisible.selectedProperty());
 
+        animated = new CheckBox("Animated");
+        animated.setSelected(true);
+        controls.add(animated, 0, 8);
+        GridPane.setColumnSpan(animated, 2);
+
         circle.visibleProperty().bind(
                 Bindings.not(autoPosition.selectedProperty()));
         line1.visibleProperty().bind(
@@ -325,6 +332,7 @@ public class HelloPopOver extends ControlsFXSample {
         popOver.arrowLocationProperty().bind(masterArrowLocation);
         popOver.cornerRadiusProperty().bind(masterCornerRadius);
         popOver.headerAlwaysVisibleProperty().bind(masterHeaderAlwaysVisible);
+        popOver.setAnimated(animated.isSelected());
         return popOver;
     }
 

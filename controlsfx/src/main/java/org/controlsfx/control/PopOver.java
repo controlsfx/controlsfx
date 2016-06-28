@@ -92,6 +92,7 @@ public class PopOver extends PopupControl {
 
     private double targetY;
 
+    private final SimpleBooleanProperty animated = new SimpleBooleanProperty(true);
     private final ObjectProperty<Duration> fadeInDuration = new SimpleObjectProperty<>(DEFAULT_FADE_DURATION);
     private final ObjectProperty<Duration> fadeOutDuration = new SimpleObjectProperty<>(DEFAULT_FADE_DURATION);
 
@@ -342,7 +343,9 @@ public class PopOver extends PopupControl {
         super.show(owner);
         ownerWindow = owner;
 
-        showFadeInAnimation(getFadeInDuration());
+        if (isAnimated()) {
+            showFadeInAnimation(getFadeInDuration());
+        }
 
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
@@ -356,7 +359,9 @@ public class PopOver extends PopupControl {
         super.show(ownerWindow, anchorX, anchorY);
         this.ownerWindow = ownerWindow;
 
-        showFadeInAnimation(getFadeInDuration());
+        if (isAnimated()) {
+            showFadeInAnimation(getFadeInDuration());
+        }
 
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                 closePopOverOnOwnerWindowClose);
@@ -457,7 +462,9 @@ public class PopOver extends PopupControl {
 
         super.show(owner, x, y);
 
-        showFadeInAnimation(fadeInDuration);
+        if (isAnimated()) {
+            showFadeInAnimation(fadeInDuration);
+        }
 
         // Bug fix - close popup when owner window is closing
         ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
@@ -504,7 +511,7 @@ public class PopOver extends PopupControl {
         if (ownerWindow != null){
             ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
                     closePopOverOnOwnerWindowClose);
-            ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
+            ownerWindow.removeEventFilter(WindowEvent.WINDOW_HIDING,
                 closePopOverOnOwnerWindowClose);
         }
         if (fadeOutDuration == null) {
@@ -512,15 +519,19 @@ public class PopOver extends PopupControl {
         }
 
         if (isShowing()) {
-            // Fade Out
-            Node skinNode = getSkin().getNode();
+            if (isAnimated()) {
+                // Fade Out
+                Node skinNode = getSkin().getNode();
 
-            FadeTransition fadeOut = new FadeTransition(fadeOutDuration,
-                    skinNode);
-            fadeOut.setFromValue(skinNode.getOpacity());
-            fadeOut.setToValue(0);
-            fadeOut.setOnFinished(evt -> super.hide());
-            fadeOut.play();
+                FadeTransition fadeOut = new FadeTransition(fadeOutDuration,
+                        skinNode);
+                fadeOut.setFromValue(skinNode.getOpacity());
+                fadeOut.setToValue(0);
+                fadeOut.setOnFinished(evt -> super.hide());
+                fadeOut.play();
+            } else {
+                super.hide();
+            }
         }
     }
 
@@ -967,5 +978,34 @@ public class PopOver extends PopupControl {
      */
     public final void setFadeOutDuration(Duration duration) {
         fadeOutDurationProperty().setValue(duration);
+    }
+
+    /**
+     * Stores the "animated" flag. If true then the PopOver will be shown / hidden with a short fade in / out animation.
+     *
+     * @return the "animated" property
+     */
+    public final BooleanProperty animatedProperty() {
+        return animated;
+    }
+
+    /**
+     * Returns the value of the "animated" property.
+     *
+     * @return true if the PopOver will be shown and hidden with a short fade animation
+     * @see #animatedProperty()
+     */
+    public final boolean isAnimated() {
+        return animatedProperty().get();
+    }
+
+    /**
+     * Sets the value of the "animated" property.
+     *
+     * @param animated if true the PopOver will be shown and hidden with a short fade animation
+     * @see #animatedProperty()
+     */
+    public final void setAnimated(boolean animated) {
+        animatedProperty().set(animated);
     }
 }

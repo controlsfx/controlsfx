@@ -568,7 +568,11 @@ public class Wizard {
     private void validateButton( ButtonType buttonType, BooleanSupplier condition) {
     	Button btn = (Button)dialog.getDialogPane().lookupButton(buttonType);
         if ( btn != null ) {
-        	btn.setDisable(condition.getAsBoolean());
+            Node focusOwner = (btn.getScene() != null) ? btn.getScene().getFocusOwner() : null;
+            btn.setDisable(condition.getAsBoolean());
+            if(focusOwner != null) {
+                focusOwner.requestFocus();
+            }
         }
     }
     

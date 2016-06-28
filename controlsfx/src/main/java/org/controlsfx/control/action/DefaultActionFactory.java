@@ -26,12 +26,13 @@
  */
 package org.controlsfx.control.action;
 
-import java.lang.reflect.Method;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 import org.controlsfx.glyphfont.Glyph;
+
+import java.lang.reflect.Method;
 
 /**
  * The default {@link AnnotatedActionFactory} to be used when no alternative has been specified. This class creates
@@ -49,7 +50,13 @@ public class DefaultActionFactory implements AnnotatedActionFactory {
      */
     @Override
     public AnnotatedAction createAction( ActionProxy annotation, Method method, Object target ) {
-        AnnotatedAction action = new AnnotatedAction( annotation.text(), method, target );
+        AnnotatedAction action;
+        ActionCheck[] checkAnnotations = method.getAnnotationsByType(ActionCheck.class);
+        if (  checkAnnotations != null && checkAnnotations.length > 0) {
+            action = new AnnotatedCheckAction(annotation.text(), method, target);
+        } else {
+            action = new AnnotatedAction(annotation.text(), method, target);
+        }
         
         configureAction( annotation, action );
         
@@ -76,9 +83,10 @@ public class DefaultActionFactory implements AnnotatedActionFactory {
         
         // set accelerator
         String acceleratorText = annotation.accelerator().trim();
-        if (acceleratorText != null && ! acceleratorText.isEmpty()) {
+        if (!acceleratorText.isEmpty()) {
             action.setAccelerator(KeyCombination.keyCombination(acceleratorText));
         }
+
     }
     
     

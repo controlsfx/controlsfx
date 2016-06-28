@@ -26,13 +26,13 @@
  */
 package org.controlsfx.control.action;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.annotation.RetentionPolicy;
-
 import javafx.event.ActionEvent;
 import org.controlsfx.glyphfont.Glyph;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * An annotation to allow conversion of class methods to {@link Action} instances.
@@ -72,6 +72,8 @@ import org.controlsfx.glyphfont.Glyph;
  * annotations and are accessible from {@link ActionMap}, which provides several 
  * convenience methods to access actions by id. Refer to the {@link ActionMap}
  * class for more details on how to use it.</li>
+ *
+ * <p>{@link ActionCheck} annotation is supported on the same method where @ActionProxy is applied}</p>
  * </ol>
  * 
  * @see Action

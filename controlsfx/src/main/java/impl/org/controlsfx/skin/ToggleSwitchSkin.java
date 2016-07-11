@@ -156,6 +156,9 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         double thumbHeight = snapSize(thumb.prefHeight(-1));
         thumb.resize(thumbWidth, thumbHeight);
         //We must reset the TranslateX otherwise the thumb is mis-aligned when window is resized.
+         if (transition != null) {
+            transition.stop();
+        }
         thumb.setTranslateX(0);
 
         double thumbAreaY = snapPosition(contentY);

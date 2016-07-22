@@ -296,12 +296,8 @@ public class ActionUtils {
      */
     public static MenuItem createMenuItem(final Action action) {
 
-        MenuItem menuItem;
-        if ( action.getClass().getAnnotationsByType(ActionCheck.class) != null) {
-            menuItem = new CheckMenuItem();
-        } else {
-            menuItem = new MenuItem();
-        }
+        MenuItem menuItem =
+            action.getClass().isAnnotationPresent(ActionCheck.class)? new CheckMenuItem(): new MenuItem();
 
         return configure( menuItem, action);
     }

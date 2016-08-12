@@ -9,4 +9,4 @@ pipelines:
     - step:
         script: # Modify the commands below to build your repository.
           - chmod +x gradlew
-          - ./gradlew build
+          - ./gradlew build -x test

@@ -34,6 +34,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.Styleable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -601,6 +602,23 @@ public class ActionUtils {
         }
     }
 
+    // Carry over acton style classes changes to the styleable
+    // Binding as not a good solution since it wipes out existing styleable classes
+    private static void bindStyle(final Styleable styleable, final Action action ) {
+        styleable.getStyleClass().addAll( action.getStyleClass() );
+        action.getStyleClass().addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> c) {
+                if (c.wasRemoved()) {
+                    styleable.getStyleClass().removeAll(c.getRemoved());
+                }
+                if (c.wasAdded()) {
+                    styleable.getStyleClass().addAll(c.getAddedSubList());
+                }
+            }
+        });
+    }
+
     private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBahavior) {
         if (action == null) {
             throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
@@ -608,22 +626,7 @@ public class ActionUtils {
 
         // button bind to action properties
 
-        btn.styleProperty().bind(action.styleProperty());
-
-        // carry changes to acton style classes to the button
-        // binding as not a good solution since it wipes out existing button classes
-        btn.getStyleClass().addAll( action.getStyleClass() );
-        action.getStyleClass().addListener(new ListChangeListener<String>() {
-            @Override
-            public void onChanged(Change<? extends String> c) {
-                if (c.wasRemoved()) {
-                    btn.getStyleClass().removeAll(c.getRemoved());
-                }
-                if (c.wasAdded()) {
-                    btn.getStyleClass().addAll(c.getAddedSubList());
-                }
-            }
-        });
+        bindStyle(btn,action);
 
         //btn.textProperty().bind(action.textProperty());
         if ( textBahavior == ActionTextBehavior.SHOW ) {
@@ -720,7 +723,8 @@ public class ActionUtils {
         }
 
         // button bind to action properties
-        menuItem.styleProperty().bind(action.styleProperty());
+        bindStyle(menuItem,action);
+
         menuItem.textProperty().bind(action.textProperty());
         menuItem.disableProperty().bind(action.disabledProperty());
         menuItem.acceleratorProperty().bind(action.acceleratorProperty());

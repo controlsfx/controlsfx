@@ -51,8 +51,7 @@ public class DefaultActionFactory implements AnnotatedActionFactory {
     @Override
     public AnnotatedAction createAction( ActionProxy annotation, Method method, Object target ) {
         AnnotatedAction action;
-        ActionCheck[] checkAnnotations = method.getAnnotationsByType(ActionCheck.class);
-        if (  checkAnnotations != null && checkAnnotations.length > 0) {
+        if ( method.isAnnotationPresent(ActionCheck.class)) {
             action = new AnnotatedCheckAction(annotation.text(), method, target);
         } else {
             action = new AnnotatedAction(annotation.text(), method, target);

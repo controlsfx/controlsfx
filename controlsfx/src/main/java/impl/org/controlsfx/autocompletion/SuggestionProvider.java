@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -193,8 +193,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
         protected boolean isMatch(T suggestion, ISuggestionRequest request) {
             String userTextLower = request.getUserText().toLowerCase();
             String suggestionStr = suggestion.toString().toLowerCase();
-            return suggestionStr.contains(userTextLower) 
-                    && !suggestionStr.equals(userTextLower);
+            return suggestionStr.contains(userTextLower);
         }
     }
 }

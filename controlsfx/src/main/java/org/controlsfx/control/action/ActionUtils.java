@@ -425,6 +425,7 @@ public class ActionUtils {
                 VBox.setVgrow(span, Priority.ALWAYS);
                 toolbar.getItems().add(span);
             } else if ( action == null ) {
+                //no-op
             } else {
 
                 ButtonBase button;
@@ -477,6 +478,7 @@ public class ActionUtils {
             if ( action instanceof ActionGroup ) {
                 menu.getItems().addAll( toMenuItems( ((ActionGroup)action).getActions()));
             } else if ( action == null ) {
+                //no-op
             }
 
             menuBar.getMenus().add(menu);
@@ -580,6 +582,7 @@ public class ActionUtils {
                 items.add( new SeparatorMenuItem());
 
             } else if ( action == null || action == ACTION_SPAN) {
+                // no-op
             } else {
 
                 items.add( createMenuItem(action));
@@ -602,7 +605,7 @@ public class ActionUtils {
         }
     }
 
-    // Carry over acton style classes changes to the styleable
+    // Carry over action style classes changes to the styleable
     // Binding as not a good solution since it wipes out existing styleable classes
     private static void bindStyle(final Styleable styleable, final Action action ) {
         styleable.getStyleClass().addAll( action.getStyleClass() );
@@ -619,7 +622,7 @@ public class ActionUtils {
         });
     }
 
-    private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBahavior) {
+    private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBehavior) {
         if (action == null) {
             throw new NullPointerException("Action can not be null"); //$NON-NLS-1$
         }
@@ -629,7 +632,7 @@ public class ActionUtils {
         bindStyle(btn,action);
 
         //btn.textProperty().bind(action.textProperty());
-        if ( textBahavior == ActionTextBehavior.SHOW ) {
+        if ( textBehavior == ActionTextBehavior.SHOW ) {
             btn.textProperty().bind(action.textProperty());
         }
         btn.disableProperty().bind(action.disabledProperty());
@@ -870,10 +873,7 @@ public class ActionUtils {
 
             T menuItem = menuItemWeakReference.get();
             MenuItem otherMenuItem = otherListener.menuItemWeakReference.get();
-            if (menuItem != null ? !menuItem.equals(otherMenuItem) : otherMenuItem != null) {
-                return false;
-            }
-            return action.equals(otherListener.action);
+            return menuItem != null ? menuItem.equals(otherMenuItem) : otherMenuItem == null && action.equals(otherListener.action);
 
         }
 

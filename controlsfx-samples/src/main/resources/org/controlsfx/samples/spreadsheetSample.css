@@ -3,7 +3,7 @@
 .spreadsheet-cell.first-cell:filled:selected ,
 .spreadsheet-cell.first-cell:filled:focused:selected,
 .spreadsheet-cell.first-cell:filled:focused:selected:hover {
-    -fx-background-color: #FFDA8C;
+    -fx-background-color: #8cb1ff;
 }
 .spreadsheet-cell.first-cell:hover {
     -fx-background-color: #988490;
@@ -22,14 +22,14 @@
 }
 
 .spreadsheet-cell.separator:selected{
-    -fx-background-color: #FFDA8C;
+    -fx-background-color: #8cb1ff;
 }
 
 /* COMPAGNIES */
 .spreadsheet-cell.compagny:filled:selected ,
 .spreadsheet-cell.compagny:filled:focused:selected,
 .spreadsheet-cell.compagny:filled:focused:selected:hover {
-    -fx-background-color: #FFDA8C;
+    -fx-background-color: #8cb1ff;
     -fx-text-fill: -fx-selection-bar-text;
 }
 .spreadsheet-cell.compagny:hover,
@@ -55,7 +55,7 @@
     -fx-background-color: #988490;
 }
 .spreadsheet-cell.logo:selected{
-    -fx-background-color: #FFDA8C;
+    -fx-background-color: #8cb1ff;
     -fx-alignment: center;
 }
 
@@ -63,7 +63,7 @@
 .spreadsheet-cell.five_rows:filled:selected ,
 .spreadsheet-cell.five_rows:filled:focused:selected,
 .spreadsheet-cell.five_rows:filled:focused:selected:hover {
-    -fx-background-color: #FFDA8C ;
+    -fx-background-color: #8cb1ff ;
     -fx-text-fill: -fx-selection-bar-text;
 }
 .spreadsheet-cell.five_rows:hover,

@@ -612,11 +612,13 @@ public class ActionUtils {
         action.getStyleClass().addListener(new ListChangeListener<String>() {
             @Override
             public void onChanged(Change<? extends String> c) {
-                if (c.wasRemoved()) {
-                    styleable.getStyleClass().removeAll(c.getRemoved());
-                }
-                if (c.wasAdded()) {
-                    styleable.getStyleClass().addAll(c.getAddedSubList());
+                while(c.next()) {
+                    if (c.wasRemoved()) {
+                        styleable.getStyleClass().removeAll(c.getRemoved());
+                    }
+                    if (c.wasAdded()) {
+                        styleable.getStyleClass().addAll(c.getAddedSubList());
+                    }
                 }
             }
         });

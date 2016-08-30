@@ -52,6 +52,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -1159,6 +1160,31 @@ public class SpreadsheetView extends Control{
      */
     public final BooleanProperty editableProperty() {
         return cellsView.editableProperty();
+    }
+
+    /**
+     * This Node is shown to the user when the SpreadsheetView has no content to show.
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        return cellsView.placeholderProperty();
+    }
+
+    /**
+     * Sets the value of the placeholder property
+     *
+     * @param placeholder the node to show when the SpreadsheetView has no content to show.
+     */
+    public final void setPlaceholder(final Node placeholder) {
+        cellsView.setPlaceholder(placeholder);
+    }
+
+    /**
+     * Gets the value of the placeholder property.
+     *
+     * @return the Node used as a placeholder that is shown when the SpreadsheetView has no content to show.
+     */
+    public final Node getPlaceholder() {
+        return cellsView.getPlaceholder();
     }
 
     

@@ -28,6 +28,7 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.NotificationBar;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -598,17 +599,7 @@ public class Notifications {
                 final double oldAnchorY = _popup.getAnchorY();
                 final double distance = anchorYTarget - oldAnchorY;
 
-                Transition t = new Transition() {
-                    {
-                        setCycleDuration(Duration.millis(350));
-                    }
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        double newAnchorY = oldAnchorY + distance * frac;
-                        _popup.setAnchorY(newAnchorY);
-                    }
-                };
+                Transition t = new CustomTransition(_popup, oldAnchorY, distance);
                 t.setCycleCount(1);
                 parallelTransition.getChildren().add(t);
             }
@@ -624,6 +615,30 @@ public class Notifications {
             default:
                 return false;
             }
+        }
+
+        class CustomTransition extends Transition {
+
+            private WeakReference<Popup> popupWeakReference;
+            private double oldAnchorY;
+            private double distance;
+
+            CustomTransition(Popup popup, double oldAnchorY, double distance) {
+                popupWeakReference = new WeakReference<>(popup);
+                this.oldAnchorY = oldAnchorY;
+                this.distance = distance;
+                setCycleDuration(Duration.millis(350.0));
+            }
+
+            @Override
+            protected void interpolate(double frac) {
+                Popup popup = popupWeakReference.get();
+                if (popup != null) {
+                    double newAnchorY = oldAnchorY + distance * frac;
+                    popup.setAnchorY(newAnchorY);
+                }
+            }
+
         }
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -104,7 +104,7 @@ public class HelloTableRowExpander extends ControlsFXSample {
     @Override
     public String getSampleDescription() {
         return "An extension to TableView which lets the user expand a table row to reveal a custom "
-                + "editor right below the cells of the current row."
+                + "editor right below the cells of the current row. "
                 + "Any arbitrary Node can be used as the expanded row editor and there is an API to "
                 + "toggle the expanded state of each row. "
                 + "The toggle button can be customized by providing setting a custom cellFactory "

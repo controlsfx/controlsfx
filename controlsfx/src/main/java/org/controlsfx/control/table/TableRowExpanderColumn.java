@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 package org.controlsfx.control.table;
 
 import impl.org.controlsfx.skin.ExpandableTableRowSkin;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -90,7 +91,7 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
     private static final String EXPANDER_BUTTON_STYLE_CLASS = "expander-button";
 
     private final Map<S, Node> expandedNodeCache = new HashMap<>();
-    private final Map<S, SimpleBooleanProperty> expansionState = new HashMap<>();
+    private final Map<S, BooleanProperty> expansionState = new HashMap<>();
     private Callback<TableRowDataFeatures<S>, Node> expandedNodeCallback;
 
     /**
@@ -100,8 +101,8 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
      * @param item The item corresponding to a table row
      * @return The boolean property
      */
-    public SimpleBooleanProperty getExpandedProperty(S item) {
-        SimpleBooleanProperty value = expansionState.get(item);
+    public BooleanProperty getExpandedProperty(S item) {
+        BooleanProperty value = expansionState.get(item);
         if (value == null) {
             value = new SimpleBooleanProperty(item, "expanded", false) {
                 /**
@@ -224,7 +225,7 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
      * @param index The index of the row you want to toggle expansion for.
      */
     public void toggleExpanded(int index) {
-        SimpleBooleanProperty expanded = (SimpleBooleanProperty) getCellObservableValue(index);
+        BooleanProperty expanded = (BooleanProperty) getCellObservableValue(index);
         expanded.setValue(!expanded.getValue());
     }
 
@@ -239,16 +240,16 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
      *
      * @param <S> The type of items in the TableView
      */
-    public static class TableRowDataFeatures<S> {
+    public static final class TableRowDataFeatures<S> {
         private TableRow<S> tableRow;
         private TableRowExpanderColumn<S> tableColumn;
-        private SimpleBooleanProperty expandedProperty;
+        private BooleanProperty expandedProperty;
         private S value;
 
         public TableRowDataFeatures(TableRow<S> tableRow, TableRowExpanderColumn<S> tableColumn, S value) {
             this.tableRow = tableRow;
             this.tableColumn = tableColumn;
-            this.expandedProperty = (SimpleBooleanProperty) tableColumn.getCellObservableValue(tableRow.getIndex());
+            this.expandedProperty = (BooleanProperty) tableColumn.getCellObservableValue(tableRow.getIndex());
             this.value = value;
         }
 
@@ -279,7 +280,7 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
          *
          * @return The expanded property
          */
-        public SimpleBooleanProperty expandedProperty() {
+        public BooleanProperty expandedProperty() {
             return expandedProperty;
         }
 
@@ -287,7 +288,7 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
          * Toggle the expanded state of this row editor.
          */
         public void toggleExpanded() {
-            SimpleBooleanProperty expanded = expandedProperty();
+            BooleanProperty expanded = expandedProperty();
             expanded.setValue(!expanded.getValue());
         }
 

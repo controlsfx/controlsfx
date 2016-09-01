@@ -13,16 +13,17 @@ If you think you have a feature you can contribute, a bug you want to fix please
 ## Build Status and Project Links
 
 |                                                                                                                                          |
-|---------------------------------------------|--------------------------------------------------------------------------------------------|
-| Jenkins (ControlsFX build status)           | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/ControlsFX.svg?style=flat)        |
-| Jenkins (ControlsFX samples build status)   | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/ControlsFX%20Samples.svg?style=flat) |
-| Jenkins (FXSampler build status)            | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/FXSampler.svg?style=flat)          | 
-| Latest published version in Maven Central   | [![Maven Central](http://img.shields.io/maven-central/v/org.controlsfx/controlsfx.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/org.controlsfx/controlsfx) |
-| Open Hub (Repository stats)                 | [![Open Hub project report for ControlsFX](https://www.openhub.net/p/controlsfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/controlsfx?ref=sample) |
-| Version Eye (External project dependencies) | [![Dependency Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/badge.svg?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx) |
-| Version Eye (External project references)   | [![Reference Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/reference_badge.svg?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/references) |
-| License                                     | [![License](http://img.shields.io/badge/license-BSD--3--Clause-red.svg?style=flat)](https://bitbucket.org/controlsfx/controlsfx/src/default/license.txt) |
+|----------------------------------------------|--------------------------------------------------------------------------------------------|
+| Jenkins (ControlsFX 8 build status)           | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/ControlsFX.svg?style=flat)        |
+| Jenkins (ControlsFX 9 build status)           | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/ControlsFX%209.svg?style=flat)        |
+| Jenkins (ControlsFX samples build status)     | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/ControlsFX%20Samples.svg?style=flat) |
+| Jenkins (FXSampler build status)              | ![Build Status](http://img.shields.io/jenkins/s/http/jonathangiles.no-ip.biz%3a81/FXSampler.svg?style=flat)          | 
+| Latest published version in Maven Central     | [![Maven Central](http://img.shields.io/maven-central/v/org.controlsfx/controlsfx.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/org.controlsfx/controlsfx) |
+| Open Hub (Repository stats)                   | [![Open Hub project report for ControlsFX](https://www.openhub.net/p/controlsfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/controlsfx?ref=sample) |
+| Version Eye (External project dependencies)   | [![Dependency Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/badge.svg?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx) |
+| Version Eye (External project references)     | [![Reference Status](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/reference_badge.svg?style=flat)](http://www.versioneye.com/java/org.controlsfx%3Acontrolsfx/references) |
+| License                                       | [![License](http://img.shields.io/badge/license-BSD--3--Clause-red.svg?style=flat)](https://bitbucket.org/controlsfx/controlsfx/src/default/license.txt) |
 
 Thanks to 
 
-[![IntelliJ Idea](https://www.jetbrains.com/idea/docs/logo_intellij_idea.png)](https://www.jetbrains.com/idea)
+[![IntelliJ Idea](http://resources.jetbrains.com/assets/media/open-graph/intellij-idea_250x250.png)](https://www.jetbrains.com/idea)

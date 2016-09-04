@@ -29,9 +29,11 @@ package impl.org.controlsfx.table;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
@@ -59,6 +61,69 @@ public final class ColumnFilter<T,R> {
     private volatile FilterPanel filterPanel;
 
     private boolean initialized = false;
+
+    private final ListChangeListener<T> backingListListener = lc -> {
+        while (lc.next()) {
+            if (lc.wasAdded()) {
+                lc.getAddedSubList().stream()
+                        .forEach(t -> addBackingItem(t, getTableColumn().getCellObservableValue(t)));
+            }
+            if (lc.wasRemoved()) {
+                lc.getRemoved().stream()
+                        .forEach(t -> removeBackingItem(t, getTableColumn().getCellObservableValue(t)));
+            }
+        }
+    };
+
+    private final ListChangeListener<T> itemsListener = lc -> {
+        while (lc.next()) {
+            if (lc.wasAdded()) {
+                lc.getAddedSubList().stream()
+                        .map(getTableColumn()::getCellObservableValue)
+                        .forEach(this::addVisibleItem);
+            }
+            if (lc.wasRemoved()) {
+                lc.getRemoved().stream()
+                        .map(getTableColumn()::getCellObservableValue)
+                        .forEach(this::removeVisibleItem);
+            }
+        }
+    };
+
+    private final ChangeListener<R> changeListener = (observable, oldValue, newValue) -> {
+        if (filterValuesDupeCounter.add(newValue) == 1) {
+            getFilterValues().add(new FilterValue<>(newValue,this));
+        }
+        if (filterValuesDupeCounter.remove(oldValue) == 0) {
+            FilterValue<T,R> existingFilterValue = getFilterValues().stream()
+                    .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
+            getFilterValues().remove(existingFilterValue);
+        }
+    };
+
+    private final ListChangeListener<FilterValue<T, R>> filterValueListChangeListener = lc -> {
+        while (lc.next()) {
+            if (lc.wasRemoved()) {
+                lc.getRemoved().stream()
+                        .filter(v -> !v.selectedProperty().get())
+                        .forEach(unselectedValues::remove);
+            }
+            if (lc.wasUpdated()) {
+                int from = lc.getFrom();
+                int to = lc.getTo();
+                lc.getList().subList(from, to).forEach(v -> {
+                    boolean value = v.selectedProperty().getValue();
+                    if (!value) {
+                        isDirty = true;
+                        unselectedValues.add(v.getValue());
+                    } else {
+                        isDirty = true;
+                        unselectedValues.remove(v.getValue());
+                    }
+                });
+            }
+        }
+    };
 
     public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
@@ -134,7 +199,7 @@ public final class ColumnFilter<T,R> {
         return filterValues;
     }
 
-    public TableColumn<T,?> getTableColumn() { 
+    public TableColumn<T,R> getTableColumn() {
         return tableColumn;
     }
     public TableFilter<T> getTableFilter() { 
@@ -154,6 +219,7 @@ public final class ColumnFilter<T,R> {
                 .map(tableColumn::getCellObservableValue).forEach(this::addVisibleItem);
 
     }
+
     private void addBackingItem(T item, ObservableValue<R> cellValue) {
         if (cellValue == null) {
             return;
@@ -164,19 +230,10 @@ public final class ColumnFilter<T,R> {
 
         //listen to cell value and track it
         CellIdentity<T> trackedCellValue = new CellIdentity<>(item);
-        ChangeListener<R> changeListener = (observable, oldValue, newValue) -> {
 
-            if (filterValuesDupeCounter.add(newValue) == 1) {
-                filterValues.add(new FilterValue<>(newValue,this));
-            }
-            if (filterValuesDupeCounter.remove(oldValue) == 0) {
-                FilterValue<T,R> existingFilterValue = filterValues.stream()
-                        .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
-                filterValues.remove(existingFilterValue);
-            }
-        };
-        cellValue.addListener(changeListener);
-        trackedCells.put(trackedCellValue,changeListener);
+		ChangeListener<R> cellListener = new WeakChangeListener(changeListener);
+        cellValue.addListener(cellListener);
+        trackedCells.put(trackedCellValue,cellListener);
     }
     private void removeBackingItem(T item, ObservableValue<R> cellValue) {
         if (cellValue == null) {
@@ -204,61 +261,14 @@ public final class ColumnFilter<T,R> {
         }
     }
     private void initializeListeners() {
-
         //listen to backing list and update distinct values accordingly
-        tableFilter.getBackingList().addListener((ListChangeListener<T>) lc -> {
-            while (lc.next()) {
-                if (lc.wasAdded()) {
-                    lc.getAddedSubList().stream()
-                            .forEach(t -> addBackingItem(t,tableColumn.getCellObservableValue(t)));
-                }
-                if (lc.wasRemoved()) {
-                    lc.getRemoved().stream()
-                            .forEach(t -> removeBackingItem(t,tableColumn.getCellObservableValue(t)));
-                }
-            }
-        });
+        tableFilter.getBackingList().addListener(new WeakListChangeListener<T>(backingListListener));
+
         //listen to visible items and update visible values accordingly
-        tableFilter.getTableView().getItems().addListener((ListChangeListener<T>) lc -> {
-            while (lc.next()) {
-                if (lc.wasAdded()) {
-                    lc.getAddedSubList().stream()
-                            .map(tableColumn::getCellObservableValue)
-                            .forEach(this::addVisibleItem);
-                }
-                if (lc.wasRemoved()) {
-                    lc.getRemoved().stream()
-                            .map(tableColumn::getCellObservableValue)
-                            .forEach(this::removeVisibleItem);
-                }
-            }
-        });
+        tableFilter.getTableView().getItems().addListener(new WeakListChangeListener<T>(itemsListener));
 
         //listen to selections on filterValues
-        filterValues.addListener((ListChangeListener<FilterValue<T,R>>) lc -> {
-            while (lc.next()) {
-                if (lc.wasRemoved()) {
-                    lc.getRemoved().stream()
-                            .filter(v -> !v.selectedProperty().get())
-                            .forEach(unselectedValues::remove);
-                }
-                if (lc.wasUpdated()) {
-                    int from = lc.getFrom();
-                    int to = lc.getTo();
-                    lc.getList().subList(from,to).forEach(v -> {
-                        boolean value = v.selectedProperty().getValue();
-                        if (!value) {
-                            isDirty = true;
-                            unselectedValues.add(v.getValue());
-                        }
-                        else {
-                            isDirty = true;
-                            unselectedValues.remove(v.getValue());
-                        }
-                    });
-                }
-            }
-        });
+        filterValues.addListener(new WeakListChangeListener<>(filterValueListChangeListener));
     }
 
     /**Leverages tableColumn's context menu to attach filter panel */

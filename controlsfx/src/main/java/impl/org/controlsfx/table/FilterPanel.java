@@ -29,7 +29,11 @@ package impl.org.controlsfx.table;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
@@ -42,6 +46,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -57,6 +63,9 @@ public final class FilterPanel<T,R> extends VBox {
     private boolean bumpedWidth = false;
 
     private final ListView<FilterValue> checkListView;
+	
+    // This collection will reference column header listeners. References must be kept locally because weak listeners are registered
+    private final Collection<InvalidationListener> columnHeadersChangeListeners = new ArrayList();
 
     private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
 
@@ -65,6 +74,16 @@ public final class FilterPanel<T,R> extends VBox {
         imageView.setFitHeight(15);
         imageView.setPreserveRatio(true);
         return imageView;
+    };
+
+    private final ChangeListener<Skin<?>> skinListener = (w, o, n) -> {
+        // Clear references to listeners, this will (eventually) cause the WeakListeners to expire
+        columnHeadersChangeListeners.clear();
+
+        if (n instanceof TableViewSkin) {
+            TableViewSkin<?> skin = (TableViewSkin<?>) n;
+            checkChangeContextMenu(skin, getColumnFilter().getTableColumn(), this);
+        }
     };
 
     void selectAllValues() {
@@ -186,12 +205,8 @@ public final class FilterPanel<T,R> extends VBox {
 
         menuItem.contentProperty().set(filterPanel);
 
-        columnFilter.getTableFilter().getTableView().skinProperty().addListener((w, o, n) -> {
-            if (n instanceof TableViewSkin) {
-                TableViewSkin<?> skin = (TableViewSkin<?>) n;
-                checkChangeContextMenu(skin, columnFilter.getTableColumn());
-            }
-        });
+        columnFilter.getTableFilter().getTableView().skinProperty().addListener(new WeakChangeListener<>(filterPanel.skinListener));
+
         menuItem.setHideOnClick(false);
         return menuItem;
     }
@@ -204,11 +219,20 @@ public final class FilterPanel<T,R> extends VBox {
     }
 
     /* Methods below helps will anchor the context menu under the column */
-    private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column) {
-        NestedTableColumnHeader header = skin.getTableHeaderRow()
-                .getRootHeader();
-        header.getColumnHeaders().addListener((Observable obs) -> changeContextMenu(header,column));
+    private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column, FilterPanel filterPanel) {
+        NestedTableColumnHeader header = skin.getTableHeaderRow().getRootHeader();
+        InvalidationListener listener = filterPanel.getOrCreateChangeListener(header, column);
+        header.getColumnHeaders().addListener(new WeakInvalidationListener(listener));
         changeContextMenu(header, column);
+    }
+
+    private InvalidationListener getOrCreateChangeListener(NestedTableColumnHeader header, TableColumn<?, ?> column) {
+        InvalidationListener listener = (Observable obs) -> changeContextMenu(header, column);
+
+        // Keep a reference locally because this listener will be used with a WeakInvalidationListener
+        columnHeadersChangeListeners.add(listener);
+
+        return listener;
     }
 
     private static void changeContextMenu(NestedTableColumnHeader header, TableColumn<?, ?> column) {
@@ -243,5 +267,9 @@ public final class FilterPanel<T,R> extends VBox {
         }
 
         return null;
+    }
+
+    public ColumnFilter<T,R> getColumnFilter() {
+        return columnFilter;
     }
 }

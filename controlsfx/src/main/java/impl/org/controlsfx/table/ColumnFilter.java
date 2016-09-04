@@ -41,6 +41,7 @@ import org.controlsfx.control.table.TableFilter;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
@@ -94,11 +95,7 @@ public final class ColumnFilter<T,R> {
         if (filterValuesDupeCounter.add(newValue) == 1) {
             getFilterValues().add(new FilterValue<>(newValue,this));
         }
-        if (filterValuesDupeCounter.remove(oldValue) == 0) {
-            FilterValue<T,R> existingFilterValue = getFilterValues().stream()
-                    .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(oldValue))).findAny().get();
-            getFilterValues().remove(existingFilterValue);
-        }
+        removeValue(oldValue);
     };
 
     private final ListChangeListener<FilterValue<T, R>> filterValueListChangeListener = lc -> {
@@ -112,12 +109,12 @@ public final class ColumnFilter<T,R> {
                 int from = lc.getFrom();
                 int to = lc.getTo();
                 lc.getList().subList(from, to).forEach(v -> {
+                    isDirty = true;
+
                     boolean value = v.selectedProperty().getValue();
                     if (!value) {
-                        isDirty = true;
                         unselectedValues.add(v.getValue());
                     } else {
-                        isDirty = true;
                         unselectedValues.remove(v.getValue());
                     }
                 });
@@ -239,16 +236,21 @@ public final class ColumnFilter<T,R> {
         if (cellValue == null) {
             return;
         }
-        if (filterValuesDupeCounter.remove(cellValue.getValue()) == 0) {
-            FilterValue<T,R> existingFilterValue = filterValues.stream()
-                    .filter(fv -> Optional.ofNullable(fv.getValue()).equals(Optional.ofNullable(cellValue.getValue()))).findAny().get();
-            filterValues.remove(existingFilterValue);
-        }
+        removeValue(cellValue.getValue());
 
         //remove listener from cell
         ChangeListener<R> listener = trackedCells.get(new CellIdentity<>(item));
         cellValue.removeListener(listener);
         trackedCells.remove(new CellIdentity<>(item));
+    }
+    private void removeValue(R value) {
+        boolean removedLastDuplicate = filterValuesDupeCounter.remove(value) == 0;
+        if (removedLastDuplicate) {
+            // Remove the FilterValue associated with the value
+            FilterValue<T,R> existingFilterValue = getFilterValues().stream()
+                    .filter(fv -> Objects.equals(fv.getValue(), value)).findAny().get();
+            getFilterValues().remove(existingFilterValue);
+        }
     }
     private void addVisibleItem(ObservableValue<R>  cellValue) {
         if (cellValue != null) {

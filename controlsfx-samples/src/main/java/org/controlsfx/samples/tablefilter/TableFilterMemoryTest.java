@@ -15,7 +15,7 @@ import org.controlsfx.control.table.TableFilter;
 import java.util.Random;
 
 /**
- * This test class is used to investigate memory usage as TableFilters while created multiple times for the same table.
+ * This test class helps investigate memory usage of TableFilters while created multiple times for the same table.
  * Inspection of memory is not part of the class and should be done externally.
  */
 public class TableFilterMemoryTest extends Application {

@@ -1,6 +1,8 @@
 package impl.org.controlsfx.table;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.CheckBox;
@@ -16,6 +18,7 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>
     private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
     private final BooleanProperty inScope = new SimpleBooleanProperty(true);
     private final ColumnFilter<T,R> columnFilter;
+    private final InvalidationListener scopeListener;
 
 
     FilterValue(R value, ColumnFilter<T,R> columnFilter) {
@@ -25,7 +28,8 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>
         final CheckBox checkBox = new CheckBox();
         final Label label = new Label();
         label.setText(Optional.ofNullable(value).map(Object::toString).orElse(null));
-        inScope.addListener((Observable v) -> label.textFillProperty().set(getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY));
+        scopeListener = (Observable v) -> label.textFillProperty().set(getInScopeProperty().get() ? Color.BLACK : Color.LIGHTGRAY);
+        inScope.addListener(new WeakInvalidationListener(scopeListener));
         checkBox.selectedProperty().bindBidirectional(selectedProperty());
         getChildren().addAll(checkBox,label);
     }

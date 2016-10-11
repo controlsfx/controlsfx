@@ -29,6 +29,7 @@ package impl.org.controlsfx.table;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
+import static impl.org.controlsfx.i18n.Localization.getString;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
@@ -57,7 +58,6 @@ public final class FilterPanel<T,R> extends VBox {
     private final ColumnFilter<T,R> columnFilter;
 
     private final FilteredList<FilterValue> filterList;
-    private static final String promptText = "Search...";
     private final TextField searchBox = new TextField();
     private boolean searchMode = false;
     private boolean bumpedWidth = false;
@@ -111,7 +111,7 @@ public final class FilterPanel<T,R> extends VBox {
         //initialize search box
         setPadding(new Insets(3));
 
-        searchBox.setPromptText(promptText);
+        searchBox.setPromptText(getString("filterpanel.search.field")); //$NON-NLS-1$
         getChildren().add(searchBox);
 
         //initialize checklist view
@@ -125,7 +125,7 @@ public final class FilterPanel<T,R> extends VBox {
         //initialize apply button
         HBox buttonBox = new HBox();
 
-        Button applyBttn = new Button("APPLY");
+        Button applyBttn = new Button(getString("filterpanel.apply.button")); //$NON-NLS-1$
         HBox.setHgrow(applyBttn, Priority.ALWAYS);
 
         applyBttn.setOnAction(e -> {
@@ -159,14 +159,14 @@ public final class FilterPanel<T,R> extends VBox {
         buttonBox.getChildren().add(applyBttn);
 
         //initialize unselect all button
-        Button unselectAllButton = new Button("NONE");
+        Button unselectAllButton = new Button(getString("filterpanel.none.button")); //$NON-NLS-1$
         HBox.setHgrow(unselectAllButton, Priority.ALWAYS);
 
         unselectAllButton.setOnAction(e -> columnFilter.getFilterValues().forEach(v -> v.selectedProperty().set(false)));
         buttonBox.getChildren().add(unselectAllButton);
 
         //initialize reset buttons
-        Button selectAllButton = new Button("ALL");
+        Button selectAllButton = new Button(getString("filterpanel.all.button")); //$NON-NLS-1$
         HBox.setHgrow(selectAllButton, Priority.ALWAYS);
 
         selectAllButton.setOnAction(e -> {
@@ -175,7 +175,7 @@ public final class FilterPanel<T,R> extends VBox {
 
         buttonBox.getChildren().add(selectAllButton);
 
-        Button clearAllButton = new Button("RESET ALL");
+        Button clearAllButton = new Button(getString("filterpanel.resetall.button")); //$NON-NLS-1$
         HBox.setHgrow(clearAllButton, Priority.ALWAYS);
 
         clearAllButton.setOnAction(e -> {

@@ -75,7 +75,10 @@ HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected >
 
 /* HORIZONTAL HEADER VISIBILITY */
 .column-header-background.invisible { visibility: hidden; -fx-padding: -1em; }
-
+.column-header-background,
+.table-view .filler{
+    -fx-background-color:transparent;
+}
 .cell-corner{
     -fx-background-color: red;
 }

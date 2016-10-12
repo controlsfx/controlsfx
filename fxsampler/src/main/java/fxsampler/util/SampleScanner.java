@@ -271,8 +271,8 @@ public class SampleScanner {
             clazz = Class.forName(className);
         } catch (Throwable e) {
             // Throwable, could be all sorts of bad reasons the class won't instantiate
-            System.out.println("ERROR: Class name: " + className);
-            System.out.println("ERROR: Initial filename: " + name);
+//            System.out.println("ERROR: Class name: " + className);
+//            System.out.println("ERROR: Initial filename: " + name);
 //            e.printStackTrace();
         }
         return clazz;

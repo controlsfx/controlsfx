@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -350,25 +350,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     }
                 }
 
-                //Fix for JDK-8146406
-                needToBeShifted = false;
-                /**
-                 * If the current cell has no left border, and the previous cell
-                 * had no right border, and we're fixed. We may have the problem
-                 * where there is a tiny gap between the cells when scrolling
-                 * horizontally. Thus we must enlarge this cell a bit, and shift
-                 * it a bit in order to mask that gap. If the cell has a border
-                 * defined, the problem seems not to happen.
-                 */
-                if (spreadsheetView.getFixedRows().contains(index) 
-                        && lastCell != null 
-                        && !hasRightBorder(lastCell)
-                        && !hasLeftBorder(tableCell)) {
-                    tableCell.resize(width +1, height);
-                    needToBeShifted = true;
-                } else {
-                    tableCell.resize(width, height);
-                }
+                tableCell.resize(width, height);
                 lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
@@ -376,7 +358,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     spaceBetweenTopAndMe += skin.getRowHeight(p);
                 }
 
-                tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
+                tableCell.relocate(x + tableCellX, snappedTopInset()
                         - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
 
                 // Request layout is here as (partial) fix for RT-28684

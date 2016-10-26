@@ -151,7 +151,8 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     private final EventHandler<MouseEvent> dragDetectedEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
-            if (event.getTarget().getClass().equals(GridRow.class) && event.getPickResult().getIntersectedNode() != null) {
+            if (event.getTarget().getClass().equals(GridRow.class) && event.getPickResult().getIntersectedNode() != null 
+                    && event.getPickResult().getIntersectedNode().getClass().equals(CellView.class)) {
                 Event.fireEvent(event.getPickResult().getIntersectedNode(), event);
             }
         }

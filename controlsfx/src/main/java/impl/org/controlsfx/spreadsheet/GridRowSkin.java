@@ -384,18 +384,6 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         }
     }
 
-    private boolean hasRightBorder(CellView tableCell) {
-        return tableCell.getBorder() != null 
-                && !tableCell.getBorder().isEmpty() 
-                && tableCell.getBorder().getStrokes().get(0).getWidths().getRight() > 0;
-    }
-    
-    private boolean hasLeftBorder(CellView tableCell) {
-        return tableCell.getBorder() != null 
-                && !tableCell.getBorder().isEmpty() 
-                && tableCell.getBorder().getStrokes().get(0).getWidths().getLeft()> 0;
-    }
-
     /**
      * Here we want to remove of the sceneGraph cells that are not used.
      *

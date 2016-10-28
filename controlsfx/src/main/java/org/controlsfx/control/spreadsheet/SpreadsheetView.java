@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,6 +71,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -91,6 +92,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.transform.Scale;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
@@ -320,6 +323,12 @@ public class SpreadsheetView extends Control{
      * The vertical header width, just for the Label, not the Pickers.
      */
     private final DoubleProperty rowHeaderWidth = new SimpleDoubleProperty(DEFAULT_ROW_HEADER_WIDTH);
+    
+    //Zoom for the SpreadsheetView.
+    private DoubleProperty zoomFactor = new SimpleDoubleProperty(1);
+    private static final double MIN_ZOOM = 0.25;
+    private static final double MAX_ZOOM = 2;
+    private static final double STEP_ZOOM = 0.15;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -423,6 +432,7 @@ public class SpreadsheetView extends Control{
             public void dispose() {
                 // no-op
             }
+            
         });
 
         this.cellsView = new SpreadsheetGridView(handle);
@@ -467,11 +477,90 @@ public class SpreadsheetView extends Control{
         // Listeners & handlers
         fixedRows.addListener(fixedRowsListener);
         fixedColumns.addListener(fixedColumnsListener);
+        Scale scale = new Scale(1, 1);
+            getTransforms().add(scale);
+
+            zoomFactor.addListener(new ChangeListener<Number>() {
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    scale.setX(newValue.doubleValue());
+                    scale.setY(newValue.doubleValue());
+                    requestLayout();
+                }
+            });
+        //Zoom
+        addEventFilter(ScrollEvent.ANY, (ScrollEvent event) -> {
+            if (event.isShortcutDown()) {
+                if (event.getTextDeltaY() > 0) {
+                    incrementZoom();
+                } else {
+                    decrementZoom();
+                }
+                event.consume();
+            }
+        });
     }
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
+    @Override
+    protected void layoutChildren() {
+        super.layoutChildren();
+        Pos pos = Pos.TOP_LEFT;
+        double width = getWidth();
+        double height = getHeight();
+        double top = getInsets().getTop();
+        double right = getInsets().getRight();
+        double left = getInsets().getLeft();
+        double bottom = getInsets().getBottom();
+        double contentWidth = (width - left - right) / zoomFactor.get();
+        double contentHeight = (height - top - bottom) / zoomFactor.get();
+        layoutInArea(getChildren().get(0), left, top,
+                contentWidth, contentHeight,
+                0, null,
+                pos.getHpos(),
+                pos.getVpos());
+    }
 
+    /**
+     * Return the zoomFactor used for the SpreadsheetView.
+     * @return 
+     */
+    public final Double getZoomFactor() {
+        return zoomFactor.get();
+    }
+
+    /**
+     * Set a new zoomFactor for the SpreadsheetView. 
+     * Advice is not to go beyond 3 and below 0.25.
+     * @param zoomFactor 
+     */
+    public final void setZoomFactor(Double zoomFactor) {
+        this.zoomFactor.set(zoomFactor);
+    }
+
+    /**
+     * Return the zoomFactor used for the SpreadsheetView.
+     * @return 
+     */
+    public final DoubleProperty zoomFactorProperty() {
+        return zoomFactor;
+    }
+
+    /**
+     * Increment the level of zoom by 0.15. It will block at 2.
+     */
+    public void incrementZoom() {
+        double newZoom = getZoomFactor() + STEP_ZOOM;
+        setZoomFactor(newZoom > MAX_ZOOM ? MAX_ZOOM : newZoom);
+    }
+
+    /**
+     * Decrement the level of zoom by 0.15. It will block at 0.25.
+     */
+    public void decrementZoom() {
+        double newZoom = getZoomFactor() - STEP_ZOOM;
+        setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
+    }
     /**
      * Set a new Grid for the SpreadsheetView. This will be called by default by
      * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
@@ -1818,6 +1907,9 @@ public class SpreadsheetView extends Control{
                 && !keyEvent.getCode().isNavigationKey() 
                 && keyEvent.getCode() != KeyCode.ESCAPE) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
+        }else if(keyEvent.isShortcutDown() && KeyCode.NUMPAD0.equals(keyEvent.getCode())){
+            //Reset zoom to zero.
+            setZoomFactor(1.0);
         }
     };
     

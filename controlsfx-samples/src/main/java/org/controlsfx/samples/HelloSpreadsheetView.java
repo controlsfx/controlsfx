@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -696,6 +696,14 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         Slider slider = new Slider(15, 100, 30);
         spreadSheetView.rowHeaderWidthProperty().bind(slider.valueProperty());
         grid.add(slider, 1, row++);
+        
+        //Zoom
+        Label zoom = new Label("Zoom: ");
+        zoom.getStyleClass().add("property");
+        grid.add(zoom, 0, row);
+        Slider sliderZoom = new Slider(0.25, 2, 1);
+        spreadSheetView.zoomFactorProperty().bindBidirectional(sliderZoom.valueProperty());
+        grid.add(sliderZoom, 1, row++);
 
         // Multiple Selection
         Label selectionModeLabel = new Label("Multiple selection: ");

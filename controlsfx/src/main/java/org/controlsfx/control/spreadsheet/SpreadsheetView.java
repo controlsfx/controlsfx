@@ -547,20 +547,29 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Increment the level of zoom by 0.15. It will block at 2.
+     * Increment the level of zoom by 0.15. The base is 1 so we will try to stay
+     * of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1 etc).
+     *
      */
     public void incrementZoom() {
-        double newZoom = getZoomFactor() + STEP_ZOOM;
+        double newZoom = getZoomFactor();
+        int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
+        newZoom = (prevValue + 1) * STEP_ZOOM + MIN_ZOOM;
         setZoomFactor(newZoom > MAX_ZOOM ? MAX_ZOOM : newZoom);
     }
 
     /**
-     * Decrement the level of zoom by 0.15. It will block at 0.25.
+     * Decrement the level of zoom by 0.15. It will block at 0.25.The base is 1
+     * so we will try to stay of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1
+     * etc).
      */
     public void decrementZoom() {
-        double newZoom = getZoomFactor() - STEP_ZOOM;
+        double newZoom = getZoomFactor()- 0.01;
+        int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
+        newZoom = (prevValue) * STEP_ZOOM + MIN_ZOOM;
         setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
     }
+    
     /**
      * Set a new Grid for the SpreadsheetView. This will be called by default by
      * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
@@ -1882,7 +1891,9 @@ public class SpreadsheetView extends Control{
             }
             getCellsViewSkin().scrollHorizontally();
             // Go to next cell
-        } else if (getEditingCell() == null && KeyCode.TAB.equals(keyEvent.getCode())) {
+        } else if (getEditingCell() == null 
+                && KeyCode.TAB.equals(keyEvent.getCode()) 
+                && !keyEvent.isShortcutDown()) {
             if (position != null) {
                 if (keyEvent.isShiftDown()) {
                     getSelectionModel().clearAndSelectLeftCell();
@@ -1910,6 +1921,10 @@ public class SpreadsheetView extends Control{
         }else if(keyEvent.isShortcutDown() && KeyCode.NUMPAD0.equals(keyEvent.getCode())){
             //Reset zoom to zero.
             setZoomFactor(1.0);
+        }else if(keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())){
+            incrementZoom();
+        }else if(keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())){
+            decrementZoom();
         }
     };
     

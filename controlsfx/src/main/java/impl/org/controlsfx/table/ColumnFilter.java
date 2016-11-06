@@ -247,9 +247,11 @@ public final class ColumnFilter<T,R> {
         boolean removedLastDuplicate = filterValuesDupeCounter.remove(value) == 0;
         if (removedLastDuplicate) {
             // Remove the FilterValue associated with the value
-            FilterValue<T,R> existingFilterValue = getFilterValues().stream()
-                    .filter(fv -> Objects.equals(fv.getValue(), value)).findAny().get();
-            getFilterValues().remove(existingFilterValue);
+            Optional<FilterValue<T,R>> existingFilterValue = getFilterValues().stream()
+                    .filter(fv -> Objects.equals(fv.getValue(), value)).findAny();
+
+            if (existingFilterValue.isPresent())
+                getFilterValues().remove(existingFilterValue.get());
         }
     }
     private void addVisibleItem(ObservableValue<R>  cellValue) {

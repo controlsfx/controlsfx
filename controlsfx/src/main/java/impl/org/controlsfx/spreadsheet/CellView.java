@@ -204,6 +204,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setContentDisplay(ContentDisplay.LEFT);
         updateItem(getItem(), false);
 
+        //We release the editor if it has not been done.
+        GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
+        if (editor.isEditing()) {
+            editor.endEdit(false);
+        }
         if (getTableView() != null) {
             getTableView().requestFocus();
         }

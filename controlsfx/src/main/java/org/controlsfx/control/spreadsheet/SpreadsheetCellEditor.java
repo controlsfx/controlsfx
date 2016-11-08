@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -191,6 +191,19 @@ public abstract class SpreadsheetCellEditor {
      * @param item
      */
     public abstract void startEdit(Object item);
+    
+    /**
+     * Does the same as {@link #startEdit(java.lang.Object) } but you have also
+     * the {@link SpreadsheetCell#getFormat() } sent. This is useful when
+     * editing Date for example, when you want to display it with the cell
+     * format.
+     *
+     * @param item
+     * @param format
+     */
+    public void startEdit(Object item, String format) {
+        startEdit(item);
+    }
 
     /**
      * Return the control used for controlling the input. This is called at the

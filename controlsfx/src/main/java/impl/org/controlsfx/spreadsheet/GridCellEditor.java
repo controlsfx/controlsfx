@@ -194,7 +194,7 @@ public class GridCellEditor {
             editor.setPrefWidth(viewCell.getWidth());
         }
 
-        spreadsheetCellEditor.startEdit(value);
+        spreadsheetCellEditor.startEdit(value, modelCell.getFormat());
         
         if (editor != null) {
             focusProperty = getFocusProperty(editor);

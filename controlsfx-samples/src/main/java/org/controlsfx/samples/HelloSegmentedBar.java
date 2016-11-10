@@ -26,8 +26,10 @@
  */
 package org.controlsfx.samples;
 
-import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -44,8 +46,79 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
     private Label popOverLabel;
 
-    public static void main(String[] args) {
-        launch(args);
+    private VBox vbox = new VBox(10);
+
+    private HBox hbox = new HBox(10);
+
+    private SegmentedBar<TypeSegment> innerShadowBar = new SegmentedBar<>();
+
+    private SegmentedBar<IssueStatusSegment> issueStatusBar = new SegmentedBar<>();
+
+    private SegmentedBar<SegmentedBar.Segment> simpleBar = new SegmentedBar<>();
+
+    private SegmentedBar<TypeSegment> typesBar = new SegmentedBar<>();
+
+    private StackPane innerShadowPane = new StackPane();
+
+    private StackPane contentPane = new StackPane();
+
+    public HelloSegmentedBar() {
+        vbox.setSpacing(40);
+        vbox.setFillWidth(true);
+        vbox.setPadding(new Insets(20));
+
+        hbox.setSpacing(40);
+        hbox.setFillHeight(true);
+        hbox.setPadding(new Insets(20));
+
+        // The out of the box bar. It uses the already set default cell factory.
+        simpleBar.orientationProperty().bind(orientation);
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(50));
+
+        // A bar used for visualizing the number of issues (e.g. JIRA) based on
+        // their status.
+        issueStatusBar.orientationProperty().bind(orientation);
+        issueStatusBar.setSegmentViewFactory(segment -> new IssueStatusSegmentView(segment));
+        issueStatusBar.getSegments().add(new IssueStatusSegment(30, IssueStatus.TODO));
+        issueStatusBar.getSegments().add(new IssueStatusSegment(20, IssueStatus.INPROGRESS));
+        issueStatusBar.getSegments().add(new IssueStatusSegment(50, IssueStatus.DONE));
+
+        // A bar used to visualize the disk space used by various media types (e.g. iTunes).
+        typesBar.orientationProperty().bind(orientation);
+        typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        typesBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
+        typesBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
+        typesBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
+        typesBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
+        typesBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
+        typesBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+
+
+        // A bar like above but with an inner shadow
+        innerShadowBar.orientationProperty().bind(orientation);
+        innerShadowBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        innerShadowBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
+        innerShadowBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
+        innerShadowBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
+        innerShadowBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
+        innerShadowBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
+        innerShadowBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+
+        innerShadowPane.setStyle("-fx-background-color: darkgrey;");
+        innerShadowPane.getChildren().add(innerShadowBar);
+        innerShadowPane.setEffect(new InnerShadow());
+
+        StackPane.setAlignment(vbox, Pos.CENTER);
+        StackPane.setAlignment(hbox, Pos.CENTER);
+
+        orientation.addListener(it -> updateParentPane());
+
+        updateParentPane();
     }
 
     @Override
@@ -74,74 +147,36 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        SegmentedBar<SegmentedBar.Segment> simpleBar = new SegmentedBar<>();
+        return contentPane;
+    }
 
-        // The out of the box bar. It uses the already set default cell factory.
-        simpleBar.setPrefWidth(600);
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(50));
+    private void updateParentPane() {
+        Pane pane = vbox;
+        if (popOver != null) {
+            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+        }
+        if (orientation.get().equals(Orientation.VERTICAL)) {
+            pane = hbox;
+            if (popOver != null) {
+                popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
+            }
+        }
 
-        // A bar used for visualizing the number of issues (e.g. JIRA) based on
-        // their status.
-        SegmentedBar<IssueStatusSegment> issueStatusBar = new SegmentedBar<>();
-        issueStatusBar.setPrefWidth(600);
-        issueStatusBar.setSegmentViewFactory(segment -> new IssueStatusSegmentView(segment));
-        issueStatusBar.getSegments().add(new IssueStatusSegment(30, IssueStatus.TODO));
-        issueStatusBar.getSegments().add(new IssueStatusSegment(20, IssueStatus.INPROGRESS));
-        issueStatusBar.getSegments().add(new IssueStatusSegment(50, IssueStatus.DONE));
+        pane.getChildren().clear();
 
-        // A bar used to visualize the disk space used by various media types (e.g. iTunes).
-        SegmentedBar<TypeSegment> typesBar = new SegmentedBar<>();
-        typesBar.setPrefWidth(600);
-        typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
-        typesBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
-        typesBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
-        typesBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
-        typesBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
-        typesBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
-        typesBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+        if (orientation.get().equals(Orientation.HORIZONTAL)) {
+            pane.getChildren().add(new WrapperPane("Simple Bar", simpleBar));
+            pane.getChildren().add(new WrapperPane("Issue Status (Hover for PopOver)", issueStatusBar));
+            pane.getChildren().add(new WrapperPane("Disk Usage (Hover for PopOver)", typesBar));
+            pane.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowPane));
+        } else {
+            pane.getChildren().add(simpleBar);
+            pane.getChildren().add(issueStatusBar);
+            pane.getChildren().add(typesBar);
+            pane.getChildren().add(innerShadowPane);
+        }
 
-
-        // A bar like above but with an inner shadow
-        SegmentedBar<TypeSegment> innerShadowBar = new SegmentedBar<>();
-        innerShadowBar.setPrefWidth(600);
-        innerShadowBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
-        innerShadowBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
-        innerShadowBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
-        innerShadowBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
-        innerShadowBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
-        innerShadowBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
-        innerShadowBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
-
-        StackPane innerShadowPane = new StackPane();
-        innerShadowPane.setStyle("-fx-background-color: darkgrey;");
-        innerShadowPane.getChildren().add(innerShadowBar);
-        innerShadowPane.setEffect(new InnerShadow());
-
-        VBox box = new VBox();
-        box.setSpacing(40);
-        box.setFillWidth(true);
-        box.getChildren().add(new WrapperPane("Simple Bar", simpleBar));
-        box.getChildren().add(new WrapperPane("Issue Status (Hover for PopOver)", issueStatusBar));
-        box.getChildren().add(new WrapperPane("Disk Usage (Hover for PopOver)", typesBar));
-        box.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowPane));
-
-        box.setPadding(new Insets(20));
-        box.setStyle("-fx-background-color: white; fx-border-color: gray;");
-        box.maxHeightProperty().bind(Bindings.add(simpleBar.prefHeightProperty(), 40));
-        box.maxWidthProperty().bind(Bindings.add(simpleBar.prefWidthProperty(), 100));
-
-        StackPane.setAlignment(box, Pos.CENTER);
-
-        StackPane pane = new StackPane();
-        StackPane.setAlignment(simpleBar, Pos.CENTER);
-        pane.getChildren().add(box);
-
-        return pane;
+        contentPane.getChildren().setAll(pane);
     }
 
     private class WrapperPane extends BorderPane {
@@ -149,7 +184,7 @@ public class HelloSegmentedBar extends ControlsFXSample {
         public WrapperPane(String title, Node content) {
             BorderPane.setMargin(content, new Insets(5, 0, 0, 0));
             setTop(new Label(title));
-            setCenter(content);
+            setBottom(content);
         }
     }
 
@@ -164,7 +199,6 @@ public class HelloSegmentedBar extends ControlsFXSample {
             StackPane.setAlignment(label, Pos.CENTER_LEFT);
 
             getChildren().add(label);
-            label.setTooltip(new Tooltip(segment.getValue() + " GB"));
             switch (segment.getType()) {
                 case APPS:
                     label.setText("Apps");
@@ -217,13 +251,14 @@ public class HelloSegmentedBar extends ControlsFXSample {
         }
 
         popOverLabel.setText(label);
-        popOver.show(owner, -8);
+        popOver.show(owner, -2);
     }
 
     public class IssueStatusSegmentView extends Region {
 
         public IssueStatusSegmentView(IssueStatusSegment segment) {
             setPrefHeight(16);
+            setPrefWidth(16);
 
             switch (segment.getStatus()) {
                 case DONE:
@@ -285,8 +320,18 @@ public class HelloSegmentedBar extends ControlsFXSample {
         }
     }
 
+    private ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(Orientation.HORIZONTAL);
+
     @Override
     public Node getControlPanel() {
-        return null;
+        ComboBox<Orientation> box = new ComboBox<>();
+        box.getItems().addAll(Orientation.values());
+        box.getSelectionModel().select(Orientation.HORIZONTAL);
+        orientation.bind(box.valueProperty());
+        return box;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

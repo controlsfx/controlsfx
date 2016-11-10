@@ -26,7 +26,10 @@
  */
 package impl.org.controlsfx.skin;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.util.Callback;
@@ -38,21 +41,77 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
 
     private Map<T, Node> segmentNodes = new HashMap<>();
 
+    private InvalidationListener buildListener = it -> buildSegments();
+
+    private WeakInvalidationListener weakBuildListener = new WeakInvalidationListener(buildListener);
+
     public SegmentedBarSkin(SegmentedBar bar) {
         super(bar);
 
-        bar.getSegments().addListener((Observable it) -> buildSegments());
+        bar.segmentViewFactoryProperty().addListener(weakBuildListener);
+        bar.getSegments().addListener(weakBuildListener);
+
         buildSegments();
     }
 
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return getChildren().stream().mapToDouble(node -> node.prefHeight(-1)).max().getAsDouble();
+        if (getSkinnable().getOrientation().equals(Orientation.HORIZONTAL)) {
+            OptionalDouble maxHeight = getChildren().stream().mapToDouble(node -> node.prefHeight(-1)).max();
+            if (maxHeight.isPresent()) {
+                return maxHeight.getAsDouble();
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    protected double computePrefWidth(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        if (getSkinnable().getOrientation().equals(Orientation.VERTICAL)) {
+            OptionalDouble maxWidth = getChildren().stream().mapToDouble(node -> node.prefWidth(-1)).max();
+            if (maxWidth.isPresent()) {
+                return maxWidth.getAsDouble();
+            }
+        }
+
+        return 0;
     }
 
     @Override
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+        if (getSkinnable().getOrientation().equals(Orientation.HORIZONTAL)) {
+            return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+        }
+
+        return 0;
+    }
+
+    @Override
+    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        if (getSkinnable().getOrientation().equals(Orientation.VERTICAL)) {
+            return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+        }
+
+        return 0;
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        if (getSkinnable().getOrientation().equals(Orientation.HORIZONTAL)) {
+            return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+        }
+
+        return Double.MAX_VALUE;
+    }
+
+    @Override
+    protected double computeMaxWidth(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        if (getSkinnable().getOrientation().equals(Orientation.VERTICAL)) {
+            return computePrefWidth(width, topInset, rightInset, bottomInset, leftInset);
+        }
+
+        return Double.MAX_VALUE;
     }
 
     private void buildSegments() {
@@ -91,20 +150,27 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
     @Override
     protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
         double total = getSkinnable().getTotal();
-        double x = contentX;
 
         List<T> segments = getSkinnable().getSegments();
         int size = segments.size();
 
+        double x = contentX;
+        double y = contentY + contentHeight;
+
         for (int i = 0; i < size; i++) {
             SegmentedBar.Segment segment = segments.get(i);
-
-            double segmentValue = segment.getValue();
-            double segmentWidth = segmentValue / total * contentWidth;
-
             Node segmentNode = segmentNodes.get(segment);
-            segmentNode.resizeRelocate(x, contentY, segmentWidth, contentHeight);
-            x += segmentWidth;
+            double segmentValue = segment.getValue();
+
+            if (getSkinnable().getOrientation().equals(Orientation.HORIZONTAL)) {
+                double segmentWidth = segmentValue / total * contentWidth;
+                segmentNode.resizeRelocate(x, contentY, segmentWidth, contentHeight);
+                x += segmentWidth;
+            } else {
+                double segmentHeight = segmentValue / total * contentHeight;
+                segmentNode.resizeRelocate(contentX, y - segmentHeight, contentWidth, segmentHeight);
+                y -= segmentHeight;
+            }
         }
     }
 }

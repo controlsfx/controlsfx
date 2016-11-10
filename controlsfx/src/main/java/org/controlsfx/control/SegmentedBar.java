@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control;
 
+import com.sun.javafx.css.converters.EnumConverter;
 import impl.org.controlsfx.skin.SegmentedBarSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -33,11 +34,17 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.*;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -62,12 +69,16 @@ import java.util.stream.Collectors;
  * typesBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
  * typesBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
  * </pre>
-
+ *
  * @param <T></T> the segment type
  */
 public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXControl {
 
     private static final String DEFAULT_STYLE = "segmented-bar";
+
+    private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("vertical");
+
+    private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("horizontal");
 
     /**
      * Constructs a new segmented bar.
@@ -79,10 +90,13 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         setSegmentViewFactory(segment -> {
             Region region = new Region();
             region.setPrefHeight(16);
+            region.setPrefWidth(16);
             return region;
         });
 
         getStyleClass().add(DEFAULT_STYLE);
+
+        orientationProperty().addListener(it -> requestLayout());
     }
 
     @Override
@@ -93,6 +107,66 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
     @Override
     public String getUserAgentStylesheet() {
         return getUserAgentStylesheet(SegmentedBar.class, "segmentedbar.css");
+    }
+
+
+    // orientation
+
+    private ObjectProperty<Orientation> orientation= new StyleableObjectProperty<Orientation>(null) {
+        @Override
+        protected void invalidated() {
+            final boolean vertical = (get() == Orientation.VERTICAL);
+            pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE,
+                    vertical);
+            pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE,
+                    !vertical);
+        }
+
+        @Override
+        public CssMetaData<SegmentedBar, Orientation> getCssMetaData() {
+            return StyleableProperties.ORIENTATION;
+        }
+
+        @Override
+        public Object getBean() {
+            return SegmentedBar.this;
+        }
+
+        @Override
+        public String getName() {
+            return "orientation"; //$NON-NLS-1$
+        }
+    };
+
+    /**
+     * Sets the value of the orientation property.
+     *
+     * @param value the new orientation (horizontal, vertical).
+     * @see #orientationProperty()
+     */
+    public final void setOrientation(Orientation value) {
+        orientationProperty().set(value);
+    }
+
+    /**
+     * Returns the value of the orientation property.
+     *
+     * @return the current orientation of the control
+     * @see #orientationProperty()
+     */
+    public final Orientation getOrientation() {
+        return orientation == null ? Orientation.HORIZONTAL : orientation.get();
+    }
+
+    /**
+     * Returns the styleable object property used for storing the orientation of
+     * the segmented bar. The CSS property "-fx-orientation" can be used to
+     * initialize this value.
+     *
+     * @return the orientation property
+     */
+    public final ObjectProperty<Orientation> orientationProperty() {
+        return orientation;
     }
 
     private final ObjectProperty<Callback<T, Node>> segmentViewFactory = new SimpleObjectProperty<>(this, "segmentViewFactory");
@@ -211,6 +285,41 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
          */
         public final double getValue() {
             return value;
+        }
+    }
+
+    private static class StyleableProperties {
+
+        private static final CssMetaData<SegmentedBar, Orientation> ORIENTATION = new CssMetaData<SegmentedBar, Orientation>(
+                "-fx-orientation", new EnumConverter<>( //$NON-NLS-1$
+                Orientation.class), Orientation.VERTICAL) {
+
+            @Override
+            public Orientation getInitialValue(SegmentedBar node) {
+                // A vertical bar should remain vertical
+                return node.getOrientation();
+            }
+
+            @Override
+            public boolean isSettable(SegmentedBar n) {
+                return n.orientation == null || !n.orientation.isBound();
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public StyleableProperty<Orientation> getStyleableProperty(
+                    SegmentedBar n) {
+                return (StyleableProperty<Orientation>) n.orientationProperty();
+            }
+        };
+
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(ORIENTATION);
+
+            STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
 }

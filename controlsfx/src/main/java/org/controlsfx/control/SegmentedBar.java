@@ -1,5 +1,32 @@
+/**
+ * Copyright (c) 2016, ControlsFX
+ * All rights reserved.
+ * <p>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ * <p>
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control;
 
+import impl.org.controlsfx.skin.SegmentedBarSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
@@ -11,21 +38,45 @@ import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Created by dirk on 08/11/16.
+ * A control that makes it easy to create a horizontal bar that visualizes the
+ * segmentation of a total value. It consists of several segments, each segment
+ * representing a value. The sum of all values are the total value of the bar
+ * (see {@link #totalProperty()}). The bar can be customized by setting a
+ * factory for the creation of the segment views.
+ * <br>
+ * <center> <img src="segmentedbar.png" alt="Segmented Bar"> </center> <br>
+ * <h3>Example:</h3>
+ * In this example the bar is used to visualize the usage of disk space for
+ * various media types (photos, videos, music, ...).
+ * <pre>
+ * SegmentedBar<TypeSegment> typesBar = new SegmentedBar<>();
+ * typesBar.setPrefWidth(600);
+ * typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+ * typesBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
+ * typesBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
+ * typesBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
+ * typesBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
+ * typesBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
+ * typesBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+ * </pre>
+
+ * @param <T></T> the segment type
  */
 public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXControl {
 
     private static final String DEFAULT_STYLE = "segmented-bar";
 
+    /**
+     * Constructs a new segmented bar.
+     */
     public SegmentedBar() {
         segments.addListener((Observable it) -> listenToValues());
         listenToValues();
 
-        setCellFactory(segment -> {
+        setSegmentViewFactory(segment -> {
             Region region = new Region();
             region.setPrefHeight(16);
             return region;
@@ -44,40 +95,82 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         return getUserAgentStylesheet(SegmentedBar.class, "segmentedbar.css");
     }
 
-    private final ObjectProperty<Callback<T, Node>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
+    private final ObjectProperty<Callback<T, Node>> segmentViewFactory = new SimpleObjectProperty<>(this, "segmentViewFactory");
 
-    public final ObjectProperty<Callback<T, Node>> cellFactoryProperty() {
-        return cellFactory;
+    /**
+     * Stores the segment view factory that is used to create one view for each segment added to
+     * the control.
+     *
+     * @return the property that stores the factory
+     */
+    public final ObjectProperty<Callback<T, Node>> segmentViewFactoryProperty() {
+        return segmentViewFactory;
     }
 
-    public final Callback<T, Node> getCellFactory() {
-        return cellFactory.get();
+    /**
+     * Returns the value of {@link #segmentViewFactoryProperty()}.
+     *
+     * @return the segment view factory
+     */
+    public final Callback<T, Node> getSegmentViewFactory() {
+        return segmentViewFactory.get();
     }
 
-    public final void setCellFactory(Callback<T, Node> cellFactory) {
-        this.cellFactory.set(cellFactory);
+    /**
+     * Sets the value of {@link #segmentViewFactoryProperty()}.
+     *
+     * @param factory the segment view factory
+     */
+    public final void setSegmentViewFactory(Callback<T, Node> factory) {
+        this.segmentViewFactory.set(factory);
     }
 
     private final ListProperty<T> segments = new SimpleListProperty<>(this, "segments", FXCollections.observableArrayList());
 
+    /**
+     * A property used to store the list of segments shown by the bar.
+     *
+     * @return the segment list
+     */
     public final ListProperty<T> segmentsProperty() {
         return segments;
     }
 
+    /**
+     * Returns the list of segments (the model).
+     *
+     * @return the list of segments shown by the bar
+     */
     public final ObservableList<T> getSegments() {
         return segments.get();
     }
 
+    /**
+     * Sets the list of segments (the model).
+     *
+     * @param segments the list of segments shown by the bar
+     */
     public void setSegments(ObservableList<T> segments) {
         this.segments.set(segments);
     }
 
     private final ReadOnlyDoubleWrapper total = new ReadOnlyDoubleWrapper(this, "total");
 
+    /**
+     * A read-only property that stores the sum of all segment values attached
+     * to the bar.
+     *
+     * @return the total value of the bar (sum of segments)
+     */
     public final ReadOnlyDoubleProperty totalProperty() {
         return total.getReadOnlyProperty();
     }
 
+    /**
+     * Returns the value of {@link #totalProperty()}.
+     *
+     * @return the total value of the bar (sum of segments)
+     */
     public final double getTotal() {
         return total.get();
     }
@@ -91,20 +184,31 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         segments.get().addListener(weakSumListener);
     }
 
+    /**
+     * A model class used by the {@link SegmentedBar} control. Applications
+     * usually subclass this type for their own specific needs.
+     */
     public static class Segment {
 
-        private String style;
         private double value;
 
-        public Segment(double value, String style) {
-            this.style = Objects.requireNonNull(style, "missing segment style");
+        /**
+         * Constructs a new segment with the given value.
+         *
+         * @param value the segment value
+         */
+        public Segment(double value) {
+            if (value < 0) {
+                throw new IllegalArgumentException("value must be larger or equal to 0 but was " + value);
+            }
             this.value = value;
         }
 
-        public final String getStyle() {
-            return style;
-        }
-
+        /**
+         * Returns the value represented by the segment.
+         *
+         * @return the segment value
+         */
         public final double getValue() {
             return value;
         }

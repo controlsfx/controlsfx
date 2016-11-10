@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2016, ControlsFX
  * All rights reserved.
  * <p>
  * Redistribution and use in source and binary forms, with or without
@@ -31,19 +31,18 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.effect.InnerShadow;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.InfoOverlay;
+import org.controlsfx.control.PopOver;
 import org.controlsfx.control.SegmentedBar;
 
-import java.util.Stack;
-
 public class HelloSegmentedBar extends ControlsFXSample {
+
+    private PopOver popOver;
+
+    private Label popOverLabel;
 
     public static void main(String[] args) {
         launch(args);
@@ -67,32 +66,70 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
     @Override
     public String getSampleDescription() {
-        return "A simple horizontal bar showing multiple segments, each representing a fraction of a total value.";
+        return "This control is a simple horizontal bar showing multiple segments, " +
+                "each representing a fraction of a total value. A cell factory can be " +
+                "used to create the segment views dynamically. The value passed to the " +
+                "factory makes it possible to completely customize each segment.";
     }
 
     @Override
     public Node getPanel(Stage stage) {
         SegmentedBar<SegmentedBar.Segment> simpleBar = new SegmentedBar<>();
 
+        // The out of the box bar. It uses the already set default cell factory.
         simpleBar.setPrefWidth(600);
-        simpleBar.getSegments().add(new SegmentedBar.Segment(30, "segment1"));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(20, "segment2"));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(50, "segment3"));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
+        simpleBar.getSegments().add(new SegmentedBar.Segment(50));
 
+        // A bar used for visualizing the number of issues (e.g. JIRA) based on
+        // their status.
+        SegmentedBar<IssueStatusSegment> issueStatusBar = new SegmentedBar<>();
+        issueStatusBar.setPrefWidth(600);
+        issueStatusBar.setSegmentViewFactory(segment -> new IssueStatusSegmentView(segment));
+        issueStatusBar.getSegments().add(new IssueStatusSegment(30, IssueStatus.TODO));
+        issueStatusBar.getSegments().add(new IssueStatusSegment(20, IssueStatus.INPROGRESS));
+        issueStatusBar.getSegments().add(new IssueStatusSegment(50, IssueStatus.DONE));
+
+        // A bar used to visualize the disk space used by various media types (e.g. iTunes).
         SegmentedBar<TypeSegment> typesBar = new SegmentedBar<>();
         typesBar.setPrefWidth(600);
-        typesBar.setCellFactory(segment -> new TypeSegmentView(segment));
-        typesBar.getSegments().add(new TypeSegment(14, "Photos", "segment1"));
-        typesBar.getSegments().add(new TypeSegment(32, "Videos", "segment2"));
-        typesBar.getSegments().add(new TypeSegment(9, "Apps", "segment3"));
-        typesBar.getSegments().add(new TypeSegment(40, "Music", "segment4"));
-        typesBar.getSegments().add(new TypeSegment(5, "Other", "segment5"));
-        typesBar.getSegments().add(new TypeSegment(35, "Free", "segment6"));
+        typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        typesBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
+        typesBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
+        typesBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
+        typesBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
+        typesBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
+        typesBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+
+
+        // A bar like above but with an inner shadow
+        SegmentedBar<TypeSegment> innerShadowBar = new SegmentedBar<>();
+        innerShadowBar.setPrefWidth(600);
+        innerShadowBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        innerShadowBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
+        innerShadowBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
+        innerShadowBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
+        innerShadowBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
+        innerShadowBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
+        innerShadowBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+
+        StackPane innerShadowPane = new StackPane();
+        innerShadowPane.setStyle("-fx-background-color: darkgrey;");
+        innerShadowPane.getChildren().add(innerShadowBar);
+        innerShadowPane.setEffect(new InnerShadow());
 
         VBox box = new VBox();
         box.setSpacing(40);
         box.setFillWidth(true);
-        box.getChildren().addAll(simpleBar, typesBar);
+        box.getChildren().add(new WrapperPane("Simple Bar", simpleBar));
+        box.getChildren().add(new WrapperPane("Issue Status (Hover for PopOver)", issueStatusBar));
+        box.getChildren().add(new WrapperPane("Disk Usage (Hover for PopOver)", typesBar));
+        box.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowPane));
+
         box.setPadding(new Insets(20));
         box.setStyle("-fx-background-color: white; fx-border-color: gray;");
         box.maxHeightProperty().bind(Bindings.add(simpleBar.prefHeightProperty(), 40));
@@ -107,26 +144,144 @@ public class HelloSegmentedBar extends ControlsFXSample {
         return pane;
     }
 
-    public static class TypeSegmentView extends Label {
+    private class WrapperPane extends BorderPane {
+
+        public WrapperPane(String title, Node content) {
+            BorderPane.setMargin(content, new Insets(5, 0, 0, 0));
+            setTop(new Label(title));
+            setCenter(content);
+        }
+    }
+
+    public class TypeSegmentView extends StackPane {
+
+        private Label label;
 
         public TypeSegmentView(TypeSegment segment) {
-            super(segment.getName());
-            setTextOverrun(OverrunStyle.CLIP);
-            setStyle("-fx-pref-height: 30; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 1.2em;");
+            label = new Label();
+            label.setStyle("-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 1.2em;");
+            label.setTextOverrun(OverrunStyle.CLIP);
+            StackPane.setAlignment(label, Pos.CENTER_LEFT);
+
+            getChildren().add(label);
+            label.setTooltip(new Tooltip(segment.getValue() + " GB"));
+            switch (segment.getType()) {
+                case APPS:
+                    label.setText("Apps");
+                    setStyle("-fx-background-color: orange;");
+                    break;
+                case FREE:
+                    label.setText("Free");
+                    setStyle("-fx-border-width: 1px; -fx-background-color: steelblue;");
+                    break;
+                case OTHER:
+                    label.setText("Other");
+                    setStyle("-fx-background-color: green;");
+                    break;
+                case PHOTOS:
+                    label.setText("Photos");
+                    setStyle("-fx-background-color: purple;");
+                    break;
+                case VIDEO:
+                    label.setText("Video");
+                    setStyle("-fx-background-color: cadetblue;");
+                    break;
+                case MUSIC:
+                    label.setText("Music");
+                    setStyle("-fx-background-color: lightcoral;");
+                    break;
+            }
+            setPadding(new Insets(5));
+            setPrefHeight(30);
+
+            setOnMouseEntered(evt -> showPopOver(this, label.getText() + " " + segment.getValue() + " GB"));
         }
+
+        @Override
+        protected void layoutChildren() {
+            super.layoutChildren();
+            label.setVisible(label.prefWidth(-1) < getWidth() - getPadding().getLeft() - getPadding().getRight());
+        }
+    }
+
+    private void showPopOver(Node owner, String label) {
+        if (popOver == null) {
+            popOverLabel = new Label();
+            popOverLabel.setStyle("-fx-font-weight: bold; -fx-padding: 5;");
+            popOver = new PopOver(popOverLabel);
+            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+            popOver.setDetachable(false);
+            popOver.setArrowSize(6);
+            popOver.setCornerRadius(3);
+            popOver.setAutoFix(false);
+        }
+
+        popOverLabel.setText(label);
+        popOver.show(owner, -8);
+    }
+
+    public class IssueStatusSegmentView extends Region {
+
+        public IssueStatusSegmentView(IssueStatusSegment segment) {
+            setPrefHeight(16);
+
+            switch (segment.getStatus()) {
+                case DONE:
+                    setStyle("-fx-background-color: green;");
+                    setOnMouseEntered(evt -> showPopOver(this, "Done: " + (int) segment.getValue()));
+                    break;
+                case INPROGRESS:
+                    setStyle("-fx-background-color: orange;");
+                    setOnMouseEntered(evt -> showPopOver(this, "In Progress: " + (int) segment.getValue()));
+                    break;
+                case TODO:
+                    setStyle("-fx-background-color: steelblue;");
+                    setOnMouseEntered(evt -> showPopOver(this, "To Do: " + (int) segment.getValue()));
+                    break;
+            }
+        }
+    }
+
+    public enum MediaType {
+        MUSIC,
+        VIDEO,
+        FREE,
+        OTHER,
+        PHOTOS,
+        APPS;
     }
 
     public static class TypeSegment extends SegmentedBar.Segment {
 
-        private String name;
+        private MediaType type;
 
-        public TypeSegment(double value, String name, String style) {
-            super(value, style);
-            this.name = name;
+        public TypeSegment(double value, MediaType type) {
+            super(value);
+            this.type = type;
         }
 
-        public String getName() {
-            return name;
+        public MediaType getType() {
+            return type;
+        }
+    }
+
+    public enum IssueStatus {
+        DONE,
+        INPROGRESS,
+        TODO;
+    }
+
+    public static class IssueStatusSegment extends SegmentedBar.Segment {
+
+        private IssueStatus status;
+
+        public IssueStatusSegment(double value, IssueStatus status) {
+            super(value);
+            this.status = status;
+        }
+
+        public IssueStatus getStatus() {
+            return status;
         }
     }
 

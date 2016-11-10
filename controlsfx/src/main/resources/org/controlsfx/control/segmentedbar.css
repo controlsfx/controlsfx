@@ -1,6 +1,10 @@
 .segmented-bar {
 }
 
+.segmented-bar > .segment {
+    -fx-background-color: steelblue;
+}
+
 .segmented-bar > .only-segment {
     -fx-background-radius: 3;
     -fx-border-radius: 3;
@@ -11,37 +15,13 @@
     -fx-background-radius: 3 0 0 3;
 }
 
-.segmented-bar > .last-segment {
-    -fx-background-radius: 0 3 3 0;
-    -fx-border-radius: 0 3 3 0;
-}
-
 .segmented-bar > .middle-segment {
     -fx-background-insets: 0 2 0 0;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
 }
 
-.segmented-bar > .segment {
-    -fx-background-color: black;
-}
-
-.segmented-bar > .segment:hover {
-    -fx-background-color: white;
-}
-
-.segmented-bar > .segment1 {
-    -fx-background-color: darkgreen;
-}
-
-.segmented-bar > .segment2 {
-    -fx-background-color: orange;
-}
-
-.segmented-bar > .segment3 {
-    -fx-background-color: steelblue;
-}
-
-.segmented-bar > .segment4 {
-    -fx-background-color: orange;
+.segmented-bar > .last-segment {
+    -fx-background-radius: 0 3 3 0;
+    -fx-border-radius: 0 3 3 0;
 }

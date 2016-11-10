@@ -1,7 +1,4 @@
 .segmented-bar {
-    -fx-pref-height: 10;
-    -fx-pref-width: 100;
-    -fx-background-color: white;
 }
 
 .segmented-bar > .only-segment {

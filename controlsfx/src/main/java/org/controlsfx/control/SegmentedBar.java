@@ -3,13 +3,13 @@ package org.controlsfx.control;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
-import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.Region;
+import javafx.util.Callback;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,13 +17,19 @@ import java.util.stream.Collectors;
 /**
  * Created by dirk on 08/11/16.
  */
-public class SegmentedBar extends ControlsFXControl {
+public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXControl {
 
     private static final String DEFAULT_STYLE = "segmented-bar";
 
     public SegmentedBar() {
         segments.addListener((Observable it) -> listenToValues());
         listenToValues();
+
+        setCellFactory(segment -> {
+            Region region = new Region();
+            region.setPrefHeight(16);
+            return region;
+        });
 
         getStyleClass().add(DEFAULT_STYLE);
     }
@@ -38,17 +44,31 @@ public class SegmentedBar extends ControlsFXControl {
         return getUserAgentStylesheet(SegmentedBar.class, "segmentedbar.css");
     }
 
-    private final ListProperty<Segment> segments = new SimpleListProperty<>(this, "segments", FXCollections.observableArrayList());
+    private final ObjectProperty<Callback<T, Node>> cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
 
-    public final ListProperty<Segment> segmentsProperty() {
+    public final ObjectProperty<Callback<T, Node>> cellFactoryProperty() {
+        return cellFactory;
+    }
+
+    public final Callback<T, Node> getCellFactory() {
+        return cellFactory.get();
+    }
+
+    public final void setCellFactory(Callback<T, Node> cellFactory) {
+        this.cellFactory.set(cellFactory);
+    }
+
+    private final ListProperty<T> segments = new SimpleListProperty<>(this, "segments", FXCollections.observableArrayList());
+
+    public final ListProperty<T> segmentsProperty() {
         return segments;
     }
 
-    public final ObservableList<Segment> getSegments() {
+    public final ObservableList<T> getSegments() {
         return segments.get();
     }
 
-    public void setSegments(ObservableList<Segment> segments) {
+    public void setSegments(ObservableList<T> segments) {
         this.segments.set(segments);
     }
 

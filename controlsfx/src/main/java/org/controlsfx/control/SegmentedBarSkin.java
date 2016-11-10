@@ -1,13 +1,15 @@
 package org.controlsfx.control;
 
 import javafx.beans.Observable;
+import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
-import javafx.scene.layout.Region;
+import javafx.util.Callback;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class SegmentedBarSkin extends SkinBase<SegmentedBar> {
+public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<SegmentedBar<T>> {
+
+    private Map<T, Node> segmentNodes = new HashMap<>();
 
     public SegmentedBarSkin(SegmentedBar bar) {
         super(bar);
@@ -16,14 +18,14 @@ public class SegmentedBarSkin extends SkinBase<SegmentedBar> {
         buildSegments();
     }
 
-    private void buildSegments() {
-        getChildren().clear();
-        getSkinnable().requestLayout();
-    }
-
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return getSkinnable().getPrefHeight();
+        double prefHeight = 0;
+        for (Node node : getChildren()) {
+            prefHeight = Math.max(prefHeight, node.prefHeight(-1));
+        }
+        System.out.println("ph: " + prefHeight);
+        return prefHeight;
     }
 
     @Override
@@ -33,13 +35,45 @@ public class SegmentedBarSkin extends SkinBase<SegmentedBar> {
 
     @Override
     protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-        return getSkinnable().getPrefHeight();
+        return computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
 
     @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-        // only compute PREF width, we still want the bar to be resizable, so no min or max
         return getSkinnable().getPrefWidth();
+    }
+
+    private void buildSegments() {
+        segmentNodes.clear();
+        getChildren().clear();
+
+        List<T> segments = getSkinnable().getSegments();
+        int size = segments.size();
+
+        Callback<T, Node> cellFactory = getSkinnable().getCellFactory();
+
+        for (int i = 0; i < size; i++) {
+            T segment = segments.get(i);
+            Node segmentNode = cellFactory.call(segment);
+            segmentNodes.put(segment, segmentNode);
+            getChildren().add(segmentNode);
+
+            segmentNode.getStyleClass().addAll("segment", segment.getStyle());
+
+            if (i == 0) {
+                if (size == 1) {
+                    segmentNode.getStyleClass().add("only-segment");
+                } else {
+                    segmentNode.getStyleClass().add("first-segment");
+                }
+            } else if (i == size - 1) {
+                segmentNode.getStyleClass().add("last-segment");
+            } else {
+                segmentNode.getStyleClass().add("middle-segment");
+            }
+        }
+
+        getSkinnable().requestLayout();
     }
 
     @Override
@@ -47,7 +81,7 @@ public class SegmentedBarSkin extends SkinBase<SegmentedBar> {
         double total = getSkinnable().getTotal();
         double x = contentX;
 
-        List<SegmentedBar.Segment> segments = getSkinnable().getSegments();
+        List<T> segments = getSkinnable().getSegments();
         int size = segments.size();
 
         for (int i = 0; i < size; i++) {
@@ -56,26 +90,9 @@ public class SegmentedBarSkin extends SkinBase<SegmentedBar> {
             double segmentValue = segment.getValue();
             double segmentWidth = segmentValue / total * contentWidth;
 
-            Region segmentRegion = new Region();
-            getChildren().add(segmentRegion);
-            segmentRegion.resizeRelocate(x, contentY, segmentWidth, contentHeight);
+            Node segmentNode = segmentNodes.get(segment);
+            segmentNode.resizeRelocate(x, contentY, segmentWidth, contentHeight);
             x += segmentWidth;
-
-            segmentRegion.getStyleClass().addAll("segment", segment.getStyle());
-
-            if (i == 0) {
-                if (size == 1) {
-                    segmentRegion.getStyleClass().add("only-segment");
-                } else {
-                    segmentRegion.getStyleClass().add("first-segment");
-                }
-            } else if (i == size - 1) {
-                segmentRegion.getStyleClass().add("last-segment");
-            } else {
-                segmentRegion.getStyleClass().add("middle-segment");
-            }
-
-            System.out.println("styles: " + Arrays.toString(segmentRegion.getStyleClass().toArray()));
         }
     }
 }

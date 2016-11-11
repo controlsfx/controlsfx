@@ -45,11 +45,16 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
 
     private WeakInvalidationListener weakBuildListener = new WeakInvalidationListener(buildListener);
 
+    private InvalidationListener layoutListener = it -> getSkinnable().requestLayout();
+
+    private WeakInvalidationListener weakLayoutListener = new WeakInvalidationListener(layoutListener);
+
     public SegmentedBarSkin(SegmentedBar bar) {
         super(bar);
 
         bar.segmentViewFactoryProperty().addListener(weakBuildListener);
         bar.getSegments().addListener(weakBuildListener);
+        bar.orientationProperty().addListener(weakLayoutListener);
 
         buildSegments();
     }
@@ -63,7 +68,7 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
             }
         }
 
-        return 0;
+        return getSkinnable().getPrefHeight();
     }
 
     @Override
@@ -75,7 +80,7 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
             }
         }
 
-        return 0;
+        return getSkinnable().getPrefWidth();
     }
 
     @Override

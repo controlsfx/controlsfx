@@ -73,41 +73,48 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
         // The out of the box bar. It uses the already set default cell factory.
         simpleBar.orientationProperty().bind(orientation);
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(10));
-        simpleBar.getSegments().add(new SegmentedBar.Segment(50));
+        simpleBar.getSegments().addAll(
+                new SegmentedBar.Segment(10),
+                new SegmentedBar.Segment(10),
+                new SegmentedBar.Segment(10),
+                new SegmentedBar.Segment(10),
+                new SegmentedBar.Segment(10),
+                new SegmentedBar.Segment(50));
 
         // A bar used for visualizing the number of issues (e.g. JIRA) based on
         // their status.
         issueStatusBar.orientationProperty().bind(orientation);
         issueStatusBar.setSegmentViewFactory(segment -> new IssueStatusSegmentView(segment));
-        issueStatusBar.getSegments().add(new IssueStatusSegment(30, IssueStatus.TODO));
-        issueStatusBar.getSegments().add(new IssueStatusSegment(20, IssueStatus.INPROGRESS));
-        issueStatusBar.getSegments().add(new IssueStatusSegment(50, IssueStatus.DONE));
+
+        issueStatusBar.getSegments().addAll(
+                new IssueStatusSegment(30, IssueStatus.TODO),
+                new IssueStatusSegment(20, IssueStatus.INPROGRESS),
+                new IssueStatusSegment(50, IssueStatus.DONE)
+        );
 
         // A bar used to visualize the disk space used by various media types (e.g. iTunes).
         typesBar.orientationProperty().bind(orientation);
         typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
-        typesBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
-        typesBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
-        typesBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
-        typesBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
-        typesBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
-        typesBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+        typesBar.getSegments().addAll(
+                new TypeSegment(14, MediaType.PHOTOS),
+                new TypeSegment(32, MediaType.VIDEO),
+                new TypeSegment(9, MediaType.APPS),
+                new TypeSegment(40, MediaType.MUSIC),
+                new TypeSegment(5, MediaType.OTHER),
+                new TypeSegment(35, MediaType.FREE)
+        );
 
 
         // A bar like above but with an inner shadow
         innerShadowBar.orientationProperty().bind(orientation);
         innerShadowBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
-        innerShadowBar.getSegments().add(new TypeSegment(14, MediaType.PHOTOS));
-        innerShadowBar.getSegments().add(new TypeSegment(32, MediaType.VIDEO));
-        innerShadowBar.getSegments().add(new TypeSegment(9, MediaType.APPS));
-        innerShadowBar.getSegments().add(new TypeSegment(40, MediaType.MUSIC));
-        innerShadowBar.getSegments().add(new TypeSegment(5, MediaType.OTHER));
-        innerShadowBar.getSegments().add(new TypeSegment(35, MediaType.FREE));
+        innerShadowBar.getSegments().addAll(new TypeSegment(14, MediaType.PHOTOS),
+                new TypeSegment(32, MediaType.VIDEO),
+                new TypeSegment(9, MediaType.APPS),
+                new TypeSegment(40, MediaType.MUSIC),
+                new TypeSegment(5, MediaType.OTHER),
+                new TypeSegment(35, MediaType.FREE)
+        );
 
         innerShadowPane.setStyle("-fx-background-color: darkgrey;");
         innerShadowPane.getChildren().add(innerShadowBar);

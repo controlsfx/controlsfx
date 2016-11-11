@@ -95,8 +95,6 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         });
 
         getStyleClass().add(DEFAULT_STYLE);
-
-        orientationProperty().addListener(it -> requestLayout());
     }
 
     @Override

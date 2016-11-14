@@ -27,7 +27,6 @@
 package impl.org.controlsfx.skin;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;

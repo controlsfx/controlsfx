@@ -74,12 +74,12 @@ public class HelloSegmentedBar extends ControlsFXSample {
         // The out of the box bar. It uses the already set default cell factory.
         simpleBar.orientationProperty().bind(orientation);
         simpleBar.getSegments().addAll(
-                new SegmentedBar.Segment(10),
-                new SegmentedBar.Segment(10),
-                new SegmentedBar.Segment(10),
-                new SegmentedBar.Segment(10),
-                new SegmentedBar.Segment(10),
-                new SegmentedBar.Segment(50));
+                new SegmentedBar.Segment(10, "10"),
+                new SegmentedBar.Segment(10, "10"),
+                new SegmentedBar.Segment(10, "10"),
+                new SegmentedBar.Segment(10, "10"),
+                new SegmentedBar.Segment(10, "10"),
+                new SegmentedBar.Segment(50, "50"));
 
         // A bar used for visualizing the number of issues (e.g. JIRA) based on
         // their status.

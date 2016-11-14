@@ -38,6 +38,7 @@ import javafx.css.*;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
@@ -87,12 +88,7 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         segments.addListener((Observable it) -> listenToValues());
         listenToValues();
 
-        setSegmentViewFactory(segment -> {
-            Region region = new Region();
-            region.setPrefHeight(16);
-            region.setPrefWidth(16);
-            return region;
-        });
+        setSegmentViewFactory(segment -> new Label(segment.getLabel()));
 
         getStyleClass().add(DEFAULT_STYLE);
     }
@@ -110,7 +106,7 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
 
     // orientation
 
-    private ObjectProperty<Orientation> orientation= new StyleableObjectProperty<Orientation>(null) {
+    private ObjectProperty<Orientation> orientation = new StyleableObjectProperty<Orientation>(null) {
         @Override
         protected void invalidated() {
             final boolean vertical = (get() == Orientation.VERTICAL);
@@ -263,11 +259,12 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
     public static class Segment {
 
         private double value;
+        private String label;
 
         /**
          * Constructs a new segment with the given value.
          *
-         * @param value the segment value
+         * @param value the segment's value
          */
         public Segment(double value) {
             if (value < 0) {
@@ -277,12 +274,35 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         }
 
         /**
+         * Constructs a new segment with the given value.
+         *
+         * @param value the segment's value
+         * @param label the segment's label
+         */
+        public Segment(double value, String label) {
+            if (value < 0) {
+                throw new IllegalArgumentException("value must be larger or equal to 0 but was " + value);
+            }
+            this.value = value;
+            this.label = label;
+        }
+
+        /**
          * Returns the value represented by the segment.
          *
-         * @return the segment value
+         * @return the segment's value
          */
         public final double getValue() {
             return value;
+        }
+
+        /**
+         * Returns the label shown by the segment.
+         *
+         * @return the segment's label
+         */
+        public String getLabel() {
+            return label;
         }
     }
 

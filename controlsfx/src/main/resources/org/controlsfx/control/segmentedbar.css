@@ -1,6 +1,13 @@
 .segmented-bar {
 }
 
+.segmented-bar > .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.2em;
+    -fx-padding: 4;
+}
+
 .segmented-bar > .segment {
     -fx-background-color: steelblue;
 }

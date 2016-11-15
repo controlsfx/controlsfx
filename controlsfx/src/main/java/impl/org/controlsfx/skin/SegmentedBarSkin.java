@@ -32,6 +32,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.util.Callback;
+import org.controlsfx.control.PopOver;
 import org.controlsfx.control.SegmentedBar;
 
 import java.util.*;
@@ -48,12 +49,29 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
 
     private WeakInvalidationListener weakLayoutListener = new WeakInvalidationListener(layoutListener);
 
-    public SegmentedBarSkin(SegmentedBar bar) {
+    private PopOver popOver;
+
+    public SegmentedBarSkin(SegmentedBar<T> bar) {
         super(bar);
 
         bar.segmentViewFactoryProperty().addListener(weakBuildListener);
         bar.getSegments().addListener(weakBuildListener);
         bar.orientationProperty().addListener(weakLayoutListener);
+        bar.totalProperty().addListener(weakBuildListener);
+
+        bar.orientationProperty().addListener(it -> {
+            if (popOver == null) {
+                return;
+            }
+            switch (bar.getOrientation()) {
+                case HORIZONTAL:
+                    popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+                    break;
+                case VERTICAL:
+                    popOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_CENTER);
+                    break;
+            }
+        });
 
         buildSegments();
     }
@@ -146,9 +164,35 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
             } else {
                 segmentNode.getStyleClass().add("middle-segment");
             }
+
+            segmentNode.setOnMouseEntered(evt -> showPopOver(segmentNode, segment));
         }
 
         getSkinnable().requestLayout();
+    }
+
+    private void showPopOver(Node owner, T segment) {
+        if (popOver == null) {
+            popOver = new PopOver();
+            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+            popOver.setDetachable(false);
+            popOver.setArrowSize(6);
+            popOver.setCornerRadius(3);
+            popOver.setAutoFix(false);
+            popOver.setAutoHide(true);
+        }
+
+        Callback<T, Node> infoNodeFactory = getSkinnable().getInfoNodeFactory();
+
+        Node infoNode = null;
+        if (infoNodeFactory != null) {
+            infoNode = infoNodeFactory.call(segment);
+        }
+
+        if (infoNode != null) {
+            popOver.setContentNode(infoNode);
+            popOver.show(owner, -2);
+        }
     }
 
     @Override

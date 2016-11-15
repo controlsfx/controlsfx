@@ -37,14 +37,9 @@ import javafx.scene.effect.InnerShadow;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.PopOver;
 import org.controlsfx.control.SegmentedBar;
 
 public class HelloSegmentedBar extends ControlsFXSample {
-
-    private PopOver popOver;
-
-    private Label popOverLabel;
 
     private VBox vbox = new VBox(10);
 
@@ -85,16 +80,17 @@ public class HelloSegmentedBar extends ControlsFXSample {
         // their status.
         issueStatusBar.orientationProperty().bind(orientation);
         issueStatusBar.setSegmentViewFactory(segment -> new IssueStatusSegmentView(segment));
-
+        issueStatusBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getStatus() + ": " + segment.getValue() + " Issues"));
         issueStatusBar.getSegments().addAll(
-                new IssueStatusSegment(30, IssueStatus.TODO),
-                new IssueStatusSegment(20, IssueStatus.INPROGRESS),
-                new IssueStatusSegment(50, IssueStatus.DONE)
+                new IssueStatusSegment(3, IssueStatus.TODO),
+                new IssueStatusSegment(2, IssueStatus.INPROGRESS),
+                new IssueStatusSegment(5, IssueStatus.DONE)
         );
 
         // A bar used to visualize the disk space used by various media types (e.g. iTunes).
         typesBar.orientationProperty().bind(orientation);
         typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        typesBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getText() + " " + segment.getValue() + " GB"));
         typesBar.getSegments().addAll(
                 new TypeSegment(14, MediaType.PHOTOS),
                 new TypeSegment(32, MediaType.VIDEO),
@@ -108,6 +104,7 @@ public class HelloSegmentedBar extends ControlsFXSample {
         // A bar like above but with an inner shadow
         innerShadowBar.orientationProperty().bind(orientation);
         innerShadowBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        innerShadowBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getText() + " " + segment.getValue() + " GB"));
         innerShadowBar.getSegments().addAll(new TypeSegment(14, MediaType.PHOTOS),
                 new TypeSegment(32, MediaType.VIDEO),
                 new TypeSegment(9, MediaType.APPS),
@@ -126,6 +123,15 @@ public class HelloSegmentedBar extends ControlsFXSample {
         orientation.addListener(it -> updateParentPane());
 
         updateParentPane();
+    }
+
+    class InfoLabel extends Label {
+
+        public InfoLabel(String text) {
+            super(text);
+            setPadding(new Insets(4));
+            setStyle("-fx-font-weight: bold; -fx-font-size: 1.2em;");
+        }
     }
 
     @Override
@@ -159,15 +165,6 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
     private void updateParentPane() {
         Pane pane = vbox;
-        if (popOver != null) {
-            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
-        }
-        if (orientation.get().equals(Orientation.VERTICAL)) {
-            pane = hbox;
-            if (popOver != null) {
-                popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
-            }
-        }
 
         pane.getChildren().clear();
 
@@ -175,7 +172,7 @@ public class HelloSegmentedBar extends ControlsFXSample {
             pane.getChildren().add(new WrapperPane("Simple Bar", simpleBar));
             pane.getChildren().add(new WrapperPane("Issue Status (Hover for PopOver)", issueStatusBar));
             pane.getChildren().add(new WrapperPane("Disk Usage (Hover for PopOver)", typesBar));
-            pane.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowPane));
+            pane.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowBar, innerShadowPane));
         } else {
             pane.getChildren().add(simpleBar);
             pane.getChildren().add(issueStatusBar);
@@ -186,12 +183,21 @@ public class HelloSegmentedBar extends ControlsFXSample {
         contentPane.getChildren().setAll(pane);
     }
 
-    private class WrapperPane extends BorderPane {
+    private class WrapperPane extends VBox {
 
-        public WrapperPane(String title, Node content) {
+        public WrapperPane(String title, SegmentedBar bar) {
+            this(title, bar, bar);
+        }
+
+        public WrapperPane(String title, SegmentedBar bar, Node content) {
             BorderPane.setMargin(content, new Insets(5, 0, 0, 0));
-            setTop(new Label(title));
-            setBottom(content);
+            getChildren().add(new Label(title));
+            getChildren().add(content);
+
+            Label total = new Label();
+            getChildren().add(total);
+            total.setText("Total: " + bar.getTotal());
+            bar.totalProperty().addListener(it -> total.setText("Total: " + bar.getTotal()));
         }
     }
 
@@ -203,39 +209,32 @@ public class HelloSegmentedBar extends ControlsFXSample {
             label = new Label();
             label.setStyle("-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 1.2em;");
             label.setTextOverrun(OverrunStyle.CLIP);
+            label.textProperty().bind(segment.textProperty());
             StackPane.setAlignment(label, Pos.CENTER_LEFT);
 
             getChildren().add(label);
             switch (segment.getType()) {
                 case APPS:
-                    label.setText("Apps");
                     setStyle("-fx-background-color: orange;");
                     break;
                 case FREE:
-                    label.setText("Free");
                     setStyle("-fx-border-width: 1px; -fx-background-color: steelblue;");
                     break;
                 case OTHER:
-                    label.setText("Other");
                     setStyle("-fx-background-color: green;");
                     break;
                 case PHOTOS:
-                    label.setText("Photos");
                     setStyle("-fx-background-color: purple;");
                     break;
                 case VIDEO:
-                    label.setText("Video");
                     setStyle("-fx-background-color: cadetblue;");
                     break;
                 case MUSIC:
-                    label.setText("Music");
                     setStyle("-fx-background-color: lightcoral;");
                     break;
             }
             setPadding(new Insets(5));
             setPrefHeight(30);
-
-            setOnMouseEntered(evt -> showPopOver(this, label.getText() + " " + segment.getValue() + " GB"));
         }
 
         @Override
@@ -245,42 +244,33 @@ public class HelloSegmentedBar extends ControlsFXSample {
         }
     }
 
-    private void showPopOver(Node owner, String label) {
-        if (popOver == null) {
-            popOverLabel = new Label();
-            popOverLabel.setStyle("-fx-font-weight: bold; -fx-padding: 5;");
-            popOver = new PopOver(popOverLabel);
-            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
-            popOver.setDetachable(false);
-            popOver.setArrowSize(6);
-            popOver.setCornerRadius(3);
-            popOver.setAutoFix(false);
-        }
-
-        popOverLabel.setText(label);
-        popOver.show(owner, -2);
-    }
-
     public class IssueStatusSegmentView extends Region {
 
-        public IssueStatusSegmentView(IssueStatusSegment segment) {
+        public IssueStatusSegmentView(final IssueStatusSegment segment) {
             setPrefHeight(16);
             setPrefWidth(16);
 
             switch (segment.getStatus()) {
                 case DONE:
                     setStyle("-fx-background-color: green;");
-                    setOnMouseEntered(evt -> showPopOver(this, "Done: " + (int) segment.getValue()));
                     break;
                 case INPROGRESS:
                     setStyle("-fx-background-color: orange;");
-                    setOnMouseEntered(evt -> showPopOver(this, "In Progress: " + (int) segment.getValue()));
                     break;
                 case TODO:
                     setStyle("-fx-background-color: steelblue;");
-                    setOnMouseEntered(evt -> showPopOver(this, "To Do: " + (int) segment.getValue()));
                     break;
             }
+
+            ContextMenu menu = new ContextMenu();
+            for (int i = 1; i <= 10; i++) {
+                MenuItem item = new MenuItem(Integer.toString(i));
+                final int value = i;
+                item.setOnAction(evt -> segment.setValue(value));
+                menu.getItems().add(item);
+            }
+
+            setOnContextMenuRequested(evt -> menu.show(getScene().getWindow()));
         }
     }
 
@@ -300,6 +290,27 @@ public class HelloSegmentedBar extends ControlsFXSample {
         public TypeSegment(double value, MediaType type) {
             super(value);
             this.type = type;
+
+            switch (type) {
+                case APPS:
+                    setText("Apps");
+                    break;
+                case FREE:
+                    setText("Free");
+                    break;
+                case OTHER:
+                    setText("Other");
+                    break;
+                case PHOTOS:
+                    setText("Photos");
+                    break;
+                case VIDEO:
+                    setText("Video");
+                    break;
+                case MUSIC:
+                    setText("Music");
+                    break;
+            }
         }
 
         public MediaType getType() {

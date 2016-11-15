@@ -43,7 +43,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Skin;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 
@@ -92,9 +91,15 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         segments.addListener((Observable it) -> listenToValues());
         listenToValues();
 
-        setSegmentViewFactory(segment -> new SegmentView(segment));
-
         getStyleClass().add(DEFAULT_STYLE);
+
+        setSegmentViewFactory(segment -> new SegmentView(segment));
+        setInfoNodeFactory(segment -> {
+            Label label = new Label("Value: " + segment.getValue());
+            label.setPadding(new Insets(4));
+            return label;
+        });
+
     }
 
     @Override
@@ -107,6 +112,21 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         return getUserAgentStylesheet(SegmentedBar.class, "segmentedbar.css");
     }
 
+    // popover node factory
+
+    private final ObjectProperty<Callback<T, Node>> infoNodeFactory = new SimpleObjectProperty<>(this, "infoNodeFactory");
+
+    public final ObjectProperty<Callback<T, Node>> infoNodeFactoryProperty() {
+        return infoNodeFactory;
+    }
+
+    public final Callback<T, Node> getInfoNodeFactory() {
+        return infoNodeFactory.get();
+    }
+
+    public void setInfoNodeFactory(Callback<T, Node> infoNodeFactory) {
+        this.infoNodeFactory.set(infoNodeFactory);
+    }
 
     // orientation
 
@@ -254,6 +274,12 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
 
     private void listenToValues() {
         segments.get().addListener(weakSumListener);
+
+        getSegments().forEach(segment -> {
+            // first remove then add listener to ensure listener is only added once
+            segment.valueProperty().removeListener(weakSumListener);
+            segment.valueProperty().addListener(weakSumListener);
+        });
     }
 
     /**
@@ -261,9 +287,6 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
      * usually subclass this type for their own specific needs.
      */
     public static class Segment {
-
-        private double value;
-        private String label;
 
         /**
          * Constructs a new segment with the given value.
@@ -274,39 +297,58 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
             if (value < 0) {
                 throw new IllegalArgumentException("value must be larger or equal to 0 but was " + value);
             }
-            this.value = value;
+            setValue(value);
         }
 
         /**
          * Constructs a new segment with the given value.
          *
          * @param value the segment's value
-         * @param label the segment's label
+         * @param text  the segment's text
          */
-        public Segment(double value, String label) {
-            if (value < 0) {
-                throw new IllegalArgumentException("value must be larger or equal to 0 but was " + value);
-            }
-            this.value = value;
-            this.label = label;
+        public Segment(double value, String text) {
+            this(value);
+            setText(text);
         }
 
-        /**
-         * Returns the value represented by the segment.
-         *
-         * @return the segment's value
-         */
-        public final double getValue() {
+        // text support
+
+        private final StringProperty text = new SimpleStringProperty(this, "text");
+
+        public final StringProperty textProperty() {
+            return text;
+        }
+
+        public final void setText(String text) {
+            this.text.set(text);
+        }
+
+        public final String getText() {
+            return text.get();
+        }
+
+        // value support
+
+        private final DoubleProperty value = new SimpleDoubleProperty(this, "value") {
+            @Override
+            public void set(double newValue) {
+                if (newValue < 0) {
+                    throw new IllegalArgumentException("segment value must be >= 0 but was " + newValue);
+                }
+                super.set(newValue);
+            }
+        };
+
+        public final DoubleProperty valueProperty() {
             return value;
         }
 
-        /**
-         * Returns the label shown by the segment.
-         *
-         * @return the segment's label
-         */
-        public String getLabel() {
-            return label;
+        public final void setValue(double value) {
+            this.value.set(value);
+        }
+
+        public final double getValue() {
+            return value.get();
         }
     }
 
@@ -345,19 +387,19 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         }
     }
 
-    public static class SegmentView extends StackPane {
+    public class SegmentView extends StackPane {
 
         private Label label;
 
-        public SegmentView(Segment segment) {
+        public SegmentView(T segment) {
             getStyleClass().add("segment-view");
 
-            label = new Label(segment.getLabel());
+            label = new Label();
+            label.textProperty().bind(segment.textProperty());
             label.setTextOverrun(OverrunStyle.CLIP);
             StackPane.setAlignment(label, Pos.CENTER_LEFT);
 
             getChildren().add(label);
-//            setOnMouseEntered(evt -> showPopOver(this, label.getText() + " " + segment.getValue() + " GB"));
         }
 
         @Override

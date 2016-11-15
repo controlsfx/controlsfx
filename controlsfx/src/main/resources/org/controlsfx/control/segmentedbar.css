@@ -1,7 +1,7 @@
 .segmented-bar {
 }
 
-.segmented-bar > .label {
+.segmented-bar > .segment-view > .label {
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 1.2em;

@@ -35,12 +35,16 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
@@ -88,7 +92,7 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         segments.addListener((Observable it) -> listenToValues());
         listenToValues();
 
-        setSegmentViewFactory(segment -> new Label(segment.getLabel()));
+        setSegmentViewFactory(segment -> new SegmentView(segment));
 
         getStyleClass().add(DEFAULT_STYLE);
     }
@@ -338,6 +342,28 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
             styleables.add(ORIENTATION);
 
             STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
+
+    public static class SegmentView extends StackPane {
+
+        private Label label;
+
+        public SegmentView(Segment segment) {
+            getStyleClass().add("segment-view");
+
+            label = new Label(segment.getLabel());
+            label.setTextOverrun(OverrunStyle.CLIP);
+            StackPane.setAlignment(label, Pos.CENTER_LEFT);
+
+            getChildren().add(label);
+//            setOnMouseEntered(evt -> showPopOver(this, label.getText() + " " + segment.getValue() + " GB"));
+        }
+
+        @Override
+        protected void layoutChildren() {
+            super.layoutChildren();
+            label.setVisible(label.prefWidth(-1) < getWidth() - getPadding().getLeft() - getPadding().getRight());
         }
     }
 }

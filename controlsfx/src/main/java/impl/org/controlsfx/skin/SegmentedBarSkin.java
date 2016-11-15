@@ -166,22 +166,13 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
             }
 
             segmentNode.setOnMouseEntered(evt -> showPopOver(segmentNode, segment));
+            segmentNode.setOnMouseExited(evt -> hidePopOver());
         }
 
         getSkinnable().requestLayout();
     }
 
     private void showPopOver(Node owner, T segment) {
-        if (popOver == null) {
-            popOver = new PopOver();
-            popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
-            popOver.setDetachable(false);
-            popOver.setArrowSize(6);
-            popOver.setCornerRadius(3);
-            popOver.setAutoFix(false);
-            popOver.setAutoHide(true);
-        }
-
         Callback<T, Node> infoNodeFactory = getSkinnable().getInfoNodeFactory();
 
         Node infoNode = null;
@@ -190,8 +181,26 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
         }
 
         if (infoNode != null) {
+
+            if (popOver == null) {
+                popOver = new PopOver();
+                popOver.setAnimated(false);
+                popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+                popOver.setDetachable(false);
+                popOver.setArrowSize(6);
+                popOver.setCornerRadius(3);
+                popOver.setAutoFix(false);
+                popOver.setAutoHide(true);
+            }
+
             popOver.setContentNode(infoNode);
             popOver.show(owner, -2);
+        }
+    }
+
+    private void hidePopOver() {
+        if (popOver != null && popOver.isShowing()) {
+            popOver.hide();
         }
     }
 

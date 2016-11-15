@@ -402,13 +402,13 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         protected Void call() throws Exception {
             Callback<ISuggestionRequest, Collection<T>> provider = suggestionProvider;
             if(provider != null){
-            	long startTime = System.currentTimeMillis();
+                long startTime = System.currentTimeMillis();
                 long sleepTime = startTime + delay - System.currentTimeMillis();
                 if (sleepTime > 0 && !isCancelled()) {
-                	Thread.sleep(sleepTime);
+                    Thread.sleep(sleepTime);
                 }
                 if(!isCancelled()){
-                	final Collection<T> fetchedSuggestions = provider.call(this);
+                    final Collection<T> fetchedSuggestions = provider.call(this);
                     Platform.runLater(() -> {
                         if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
                             autoCompletionPopup.getSuggestions().setAll(fetchedSuggestions);

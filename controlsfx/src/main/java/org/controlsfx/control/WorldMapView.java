@@ -1,119 +1,34 @@
 package org.controlsfx.control;
 
+import impl.org.controlsfx.worldmap.WorldMapViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.*;
-import javafx.scene.CacheHint;
-import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.control.Skin;
 import javafx.scene.shape.SVGPath;
-import javafx.scene.shape.Shape;
 import javafx.util.Callback;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class WorldMapView extends Region {
+public class WorldMapView extends ControlsFXControl {
 
-    private static final double PREFERRED_WIDTH = 1009;
-    private static final double PREFERRED_HEIGHT = 665;
-    private static final double MINIMUM_WIDTH = 100;
-    private static final double MINIMUM_HEIGHT = 66;
-    private static final double MAXIMUM_WIDTH = 2018;
-    private static final double MAXIMUM_HEIGHT = 1330;
-    private static double MAP_OFFSET_X = -PREFERRED_WIDTH * 0.0285;
-    private static double MAP_OFFSET_Y = PREFERRED_HEIGHT * 0.195;
-    private static final double ASPECT_RATIO = PREFERRED_HEIGHT / PREFERRED_WIDTH;
-    private double width;
-    private double height;
+    private static final String DEFAULT_STYLE_CLASS = "world";
 
-    protected Pane pane;
-    protected ScalableContentPane scalableContentPane;
-    protected Map<String, List<CountryPath>> countryPaths;
-    protected ObservableMap<Location, Shape> locationMap;
-
-
-    // ******************** Constructors **************************************
     public WorldMapView() {
-
-        countryPaths = new HashMap<>();
-        locationMap = FXCollections.observableHashMap();
-
-        //locationIconCode     = MaterialDesign.MDI_CHECKBOX_BLANK_CIRCLE;
-        pane = new Pane();
-        scalableContentPane = new ScalableContentPane();
-
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
         setCountryFactory(country -> country.getPaths());
-
-        ListChangeListener<? super Location> locationsListener = change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(location -> addLocation(location));
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(location -> removeLocation(location));
-                }
-            }
-        };
-
-        getLocations().addListener(locationsListener);
-
-        initGraphics();
-        registerListeners();
-    }
-
-    private void registerListeners() {
-        widthProperty().addListener(o -> resize());
-        heightProperty().addListener(o -> resize());
-        locationMap.addListener((MapChangeListener<Location, Shape>) change -> {
-            if (change.wasAdded()) {
-                pane.getChildren().add(change.getValueAdded());
-            } else if (change.wasRemoved()) {
-                pane.getChildren().remove(change.getValueRemoved());
-            }
-        });
     }
 
     @Override
-    protected double computeMinWidth(final double HEIGHT) {
-        return MINIMUM_WIDTH;
+    protected Skin<?> createDefaultSkin() {
+        return new WorldMapViewSkin(this);
     }
 
     @Override
-    protected double computeMinHeight(final double WIDTH) {
-        return MINIMUM_HEIGHT;
-    }
-
-    @Override
-    protected double computePrefWidth(final double HEIGHT) {
-        return super.computePrefWidth(HEIGHT);
-    }
-
-    @Override
-    protected double computePrefHeight(final double WIDTH) {
-        return super.computePrefHeight(WIDTH);
-    }
-
-    @Override
-    protected double computeMaxWidth(final double HEIGHT) {
-        return MAXIMUM_WIDTH;
-    }
-
-    @Override
-    protected double computeMaxHeight(final double WIDTH) {
-        return MAXIMUM_HEIGHT;
-    }
-
-    @Override
-    public ObservableList<Node> getChildren() {
-        return super.getChildren();
-    }
-
-    public Map<String, List<CountryPath>> getCountryPaths() {
-        return countryPaths;
+    public String getUserAgentStylesheet() {
+        return getUserAgentStylesheet(WorldMapView.class, "world.css");
     }
 
     private ObservableList<Location> locations;
@@ -124,34 +39,6 @@ public class WorldMapView extends Region {
         }
 
         return locations;
-    }
-
-    private void addLocation(final Location LOCATION) {
-        double x = (LOCATION.getLongitude() + 180) * (PREFERRED_WIDTH / 360) + MAP_OFFSET_X;
-        double y = (PREFERRED_HEIGHT / 2) - (PREFERRED_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(LOCATION.getLatitude()) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
-
-        Shape locationIcon = new Circle(x, y, 3);
-        locationIcon.setFill(null == LOCATION.getColor() ? Color.RED : LOCATION.getColor());
-
-        StringBuilder tooltipBuilder = new StringBuilder();
-        if (!LOCATION.getName().isEmpty()) tooltipBuilder.append(LOCATION.getName());
-        if (!LOCATION.getInfo().isEmpty()) tooltipBuilder.append("\n").append(LOCATION.getInfo());
-        String tooltipText = tooltipBuilder.toString();
-        if (!tooltipText.isEmpty()) {
-            Tooltip.install(locationIcon, new Tooltip(tooltipText));
-        }
-
-        locationMap.put(LOCATION, locationIcon);
-    }
-
-    private void removeLocation(final Location LOCATION) {
-        locationMap.remove(LOCATION);
-    }
-
-    private void addLocations(final Location... LOCATIONS) {
-        for (Location location : LOCATIONS) {
-            addLocation(location);
-        }
     }
 
     private final ObjectProperty<Callback<Country, List<CountryPath>>> countryFactory = new SimpleObjectProperty(this, "countryFactory");
@@ -168,68 +55,16 @@ public class WorldMapView extends Region {
         return countryFactory.get();
     }
 
-    private void initGraphics() {
-        if (Double.compare(getPrefWidth(), 0.0) <= 0 || Double.compare(getPrefHeight(), 0.0) <= 0 ||
-                Double.compare(getWidth(), 0.0) <= 0 || Double.compare(getHeight(), 0.0) <= 0) {
-            if (getPrefWidth() > 0 && getPrefHeight() > 0) {
-                setPrefSize(getPrefWidth(), getPrefHeight());
-            } else {
-                setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-            }
-        }
-
-        getStyleClass().add("world");
-
-        for(Country country : Country.values()) {
-            List<CountryPath> paths = country.getPaths();
-            pane.getChildren().addAll(paths);
-            countryPaths.put(country.name(), paths);
-        }
-
-        scalableContentPane.setContent(pane);
-
-        getChildren().setAll(scalableContentPane);
-    }
-
-    // ******************** Style related *************************************
-    @Override
-    public String getUserAgentStylesheet() {
-        return WorldMapView.class.getResource("world.css").toExternalForm();
-    }
-
-    // ******************** Resizing ******************************************
-    private void resize() {
-        width = getWidth() - getInsets().getLeft() - getInsets().getRight();
-        height = getHeight() - getInsets().getTop() - getInsets().getBottom();
-
-        if (ASPECT_RATIO * width > height) {
-            width = 1 / (ASPECT_RATIO / height);
-        } else if (1 / (ASPECT_RATIO / height) > width) {
-            height = ASPECT_RATIO * width;
-        }
-
-        if (width > 0 && height > 0) {
-            pane.setCache(true);
-            pane.setCacheHint(CacheHint.SCALE);
-
-            scalableContentPane.setMaxSize(width, height);
-            scalableContentPane.setPrefSize(width, height);
-            scalableContentPane.relocate((getWidth() - width) * 0.5, (getHeight() - height) * 0.5);
-
-            pane.setCache(false);
-        }
-    }
-
     public static class CountryPath extends SVGPath {
 
         private final Country country;
-        private final Locale LOCALE;
+        private final Locale locale;
 
         public CountryPath(Country country, String path) {
             super();
             setContent(path);
             this.country = Objects.requireNonNull(country);
-            this.LOCALE = new Locale("", country.name());
+            this.locale = new Locale("", country.name());
         }
 
 
@@ -238,11 +73,11 @@ public class WorldMapView extends Region {
         }
 
         public Locale getLocale() {
-            return LOCALE;
+            return locale;
         }
     }
 
-    public static enum Country {
+    public enum Country {
         AE("M619.87,393.72L620.37,393.57L620.48,394.41L622.67,393.93L624.99,394.01L626.68,394.1L628.6,392.03L630.7,390.05L632.47,388.15L633,389.2L633.38,391.64L631.95,391.65L631.72,393.65L632.22,394.07L630.95,394.67L630.94,395.92L630.12,397.18L630.05,398.39L629.48,399.03L621.06,397.51L619.98,394.43z"),
         AF("M646.88,356.9L649.74,358.2L651.85,357.74L652.44,356.19L654.65,355.67L656.23,354.62L656.79,351.83L659.15,351.15L659.59,349.9L660.92,350.84L661.76,350.95L663.32,350.98L665.44,351.72L666.29,352.14L668.32,351.02L669.27,351.69L670.17,350.09L671.85,350.16L672.28,349.64L672.58,348.21L673.79,346.98L675.3,347.78L675,348.87L675.85,349.04L675.58,351.99L676.69,353.14L677.67,352.4L678.92,352.06L680.66,350.49L682.59,350.75L685.49,350.75L685.99,351.76L684.35,352.15L682.93,352.8L679.71,353.2L676.7,353.93L675.06,355.44L675.72,356.9L676.05,358.6L674.65,360.03L674.77,361.33L674,362.55L671.33,362.44L672.43,364.66L670.65,365.51L669.46,367.51L669.61,369.49L668.51,370.41L667.48,370.11L665.33,370.54L665.03,371.45L662.94,371.45L661.38,373.29L661.28,376.04L657.63,377.37L655.68,377.09L655.11,377.79L653.44,377.39L650.63,377.87L645.94,376.23L648.48,373.3L648.25,371.2L646.13,370.65L645.91,368.56L644.99,365.92L646.19,364.09L644.97,363.6L645.74,361.15z"),
         AL("M532.98,334.66L532.63,335.93L533.03,337.52L534.19,338.42L534.13,339.39L533.22,339.93L533.05,341.12L531.75,342.88L531.27,342.63L531.22,341.83L529.66,340.6L529.42,338.85L529.66,336.32L530.04,335.16L529.57,334.57L529.38,333.38L530.6,331.51L530.77,332.23L531.53,331.89L532.13,332.91L532.8,333.29z"),
@@ -437,105 +272,34 @@ public class WorldMapView extends Region {
         }
     }
 
-    /**
-     * Created by hansolo on 20.11.16.
-     */
     public class Location {
-        private static final double EARTH_RADIUS = 6_371_000; // [m]
+        private static final double EARTH_RADIUS = 6_371_000;
         private String name;
         private double latitude;
         private double longitude;
-        private String info;
-        private Color color;
-        private Node iconCode;
 
-
-        // ******************** Constructors **************************************
-        public Location() {
-            this("", 0, 0, "", null, null);
-        }
-
-        public Location(final String NAME) {
-            this(NAME, 0, 0, "", null, null);
-        }
 
         public Location(final double LATITUDE, final double LONGITUDE) {
-            this("", LATITUDE, LONGITUDE, "", null, null);
-        }
-
-        public Location(final double LATITUDE, final double LONGITUDE, final Node ICON_CODE) {
-            this("", LATITUDE, LONGITUDE, "", null, ICON_CODE);
-        }
-
-        public Location(final double LATITUDE, final double LONGITUDE, final Color COLOR, final Node ICON_CODE) {
-            this("", LATITUDE, LONGITUDE, "", COLOR, ICON_CODE);
+            this("", LATITUDE, LONGITUDE);
         }
 
         public Location(final String NAME, final double LATITUDE, final double LONGITUDE) {
-            this(NAME, LATITUDE, LONGITUDE, "", null, null);
-        }
-
-        public Location(final String NAME, final double LATITUDE, final double LONGITUDE, final Node ICON_CODE) {
-            this(NAME, LATITUDE, LONGITUDE, "", null, ICON_CODE);
-        }
-
-        public Location(final String NAME, final double LATITUDE, final double LONGITUDE, final Color COLOR) {
-            this(NAME, LATITUDE, LONGITUDE, "", COLOR, null);
-        }
-
-        public Location(final String NAME, final double LATITUDE, final double LONGITUDE, final Color COLOR, final Node ICON_CODE) {
-            this(NAME, LATITUDE, LONGITUDE, "", COLOR, ICON_CODE);
-        }
-
-        public Location(final String NAME, final double LATITUDE, final double LONGITUDE, final String INFO, final Color COLOR, final Node ICON_CODE) {
             name = NAME;
             latitude = LATITUDE;
             longitude = LONGITUDE;
-            info = INFO;
-            color = COLOR;
-            iconCode = ICON_CODE;
         }
 
 
-        // ******************** Methods *******************************************
         public String getName() {
             return name;
-        }
-
-        public void setName(final String NAME) {
-            name = NAME;
         }
 
         public double getLatitude() {
             return latitude;
         }
 
-        public void setLatitude(final double LATITUDE) {
-            latitude = LATITUDE;
-        }
-
         public double getLongitude() {
             return longitude;
-        }
-
-        public void setLongitude(final double LONGITUDE) {
-            longitude = LONGITUDE;
-        }
-
-        public String getInfo() {
-            return info;
-        }
-
-        public void setInfo(final String INFO) {
-            info = INFO;
-        }
-
-        public Color getColor() {
-            return color;
-        }
-
-        public void setColor(final Color COLOR) {
-            color = COLOR;
         }
 
         public double getDistanceTo(final Location LOCATION) {

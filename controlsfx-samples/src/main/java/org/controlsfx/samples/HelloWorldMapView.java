@@ -26,7 +26,9 @@
  */
 package org.controlsfx.samples;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.WorldMapView;
@@ -61,7 +63,10 @@ public class HelloWorldMapView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        return worldMapView;
+        StackPane stackPane = new StackPane();
+        StackPane.setAlignment(worldMapView, Pos.CENTER);
+        stackPane.getChildren().add(worldMapView);
+        return stackPane;
     }
 
     @Override

@@ -16,3 +16,15 @@
     -fx-fill: darkgreen;
     -fx-stroke: green;
 }
+
+.country:selected {
+    -fx-fill: red;
+}
+
+.country:selected:hover {
+    -fx-fill: orangered;
+}
+
+.country:selected:pressed {
+    -fx-fill: darkred;
+}

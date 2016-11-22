@@ -28,15 +28,15 @@ package org.controlsfx.samples;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.WorldMapView;
@@ -111,11 +111,33 @@ public class HelloWorldMapView extends ControlsFXSample {
         clearButton.setMaxWidth(Double.MAX_VALUE);
         clearButton.setOnAction(evt -> listView.getSelectionModel().clearSelection());
 
+        Slider zoomSlider = new Slider();
+        zoomSlider.setMin(1);
+        zoomSlider.setMax(10);
+        Bindings.bindBidirectional(zoomSlider.valueProperty(), worldMapView.zoomFactorProperty());
+
+        ComboBox<WorldMapView.SelectionMode> selectionModeComboBox = new ComboBox<>();
+        selectionModeComboBox.getItems().addAll(WorldMapView.SelectionMode.values());
+        Bindings.bindBidirectional(selectionModeComboBox.valueProperty(), worldMapView.selectionModeProperty());
+
+        HBox hbox = new HBox(10);
+        Label label = new Label("Use SHIFT or CTRL/CMD");
+        hbox.setAlignment(Pos.BASELINE_LEFT);
+        label.visibleProperty().bind(Bindings.equal(WorldMapView.SelectionMode.MULTIPLE, worldMapView.selectionModeProperty()));
+        hbox.getChildren().addAll(selectionModeComboBox, label);
+
+
+        VBox optionsBox = new VBox(10);
+        optionsBox.getChildren().add(zoomSlider);
+        optionsBox.getChildren().add(hbox);
+
         BorderPane borderPane = new BorderPane();
         BorderPane.setMargin(clearButton, new Insets(0, 0, 10, 0));
+        BorderPane.setMargin(optionsBox, new Insets(10, 0, 10, 0));
 
         borderPane.setTop(clearButton);
         borderPane.setCenter(listView);
+        borderPane.setBottom(optionsBox);
 
         return borderPane;
     }

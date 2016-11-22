@@ -1,16 +1,24 @@
 package impl.org.controlsfx.worldmap;
 
-import javafx.collections.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.scene.Group;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
+import javafx.util.Callback;
 import org.controlsfx.control.WorldMapView;
 
-import java.util.*;
+import javafx.beans.Observable;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
@@ -37,7 +45,8 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
         countryPane = new Pane();
         countryPane.getChildren().add(group);
 
-        ListChangeListener<? super WorldMapView.Location> locationsListener = change -> {
+        // locations
+        final ListChangeListener<? super WorldMapView.Location> locationsListener = change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(location -> addLocation(location));
@@ -48,6 +57,11 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
         };
 
         view.getLocations().addListener(locationsListener);
+//        view.locationsProperty().addListener((Observable it) -> view.getLocations().addListener(locationsListener));
+
+        // countries
+        final ListChangeListener<? super WorldMapView.Country> countriesListener = change -> buildView();
+        view.getCountries().addListener(countriesListener);
 
         locationMap.addListener((MapChangeListener<WorldMapView.Location, Shape>) change -> {
             if (change.wasAdded()) {
@@ -56,6 +70,7 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
                 countryPane.getChildren().remove(change.getValueRemoved());
             }
         });
+
 
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(countryPane);
@@ -99,16 +114,26 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
             }
         }
 
+        Callback<WorldMapView.Country, List<WorldMapView.CountryPath>> factory = getSkinnable().getCountryFactory();
         for (WorldMapView.Country country : WorldMapView.Country.values()) {
-            List<WorldMapView.CountryPath> paths = country.getPaths();
-            group.getChildren().addAll(paths);
-            countryPaths.put(country.name(), paths);
+            if (getSkinnable().getCountries().isEmpty() || getSkinnable().getCountries().contains(country)) {
+                List<WorldMapView.CountryPath> paths = factory.call(country);
+                group.getChildren().addAll(paths);
+                countryPaths.put(country.name(), paths);
+            }
         }
+
+        System.out.println("group bounds: " + group.getLayoutBounds());
+
+        getSkinnable().requestLayout();
     }
 
     @Override
     protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
         super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
+
+        double offsetX = group.getLayoutX();
+        double offsetY = group.getLayoutY();
 
         double prefWidth = group.prefWidth(-1);
         double prefHeight = group.prefHeight(-1);
@@ -117,6 +142,9 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
         double scaleY = contentHeight / prefHeight;
 
         double scale = Math.min(scaleX, scaleY);
+
+        group.setTranslateX(-group.getLayoutBounds().getMinX());
+        group.setTranslateY(-group.getLayoutBounds().getMinY());
 
         group.setScaleX(scale);
         group.setScaleY(scale);

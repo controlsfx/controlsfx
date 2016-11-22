@@ -1,7 +1,10 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.worldmap.WorldMapViewSkin;
+import javafx.beans.Observable;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.*;
 import javafx.scene.control.Skin;
@@ -18,7 +21,12 @@ public class WorldMapView extends ControlsFXControl {
 
     public WorldMapView() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
-        setCountryFactory(country -> country.getPaths());
+        setCountryFactory(country -> {
+            List<CountryPath> paths = country.getPaths();
+            paths.forEach(path -> path.getStyleClass().add("country"));
+            return paths;
+        });
+        countries.addListener((Observable it) -> System.out.println("new countries list: " + getCountries()));
     }
 
     @Override
@@ -31,14 +39,32 @@ public class WorldMapView extends ControlsFXControl {
         return getUserAgentStylesheet(WorldMapView.class, "world.css");
     }
 
-    private ObservableList<Location> locations;
+    private final ListProperty<Country> countries = new SimpleListProperty<>(this, "countries", FXCollections.observableArrayList());
 
-    public ObservableList<Location> getLocations() {
-        if (locations == null) {
-            locations = FXCollections.observableArrayList();
-        }
+    public final ListProperty<Country> countriesProperty() {
+        return countries;
+    }
 
+    public final ObservableList<Country> getCountries() {
+        return countries.get();
+    }
+
+    public final void setCountries(ObservableList<Country> countries) {
+        this.countries.set(countries);
+    }
+
+    private final ListProperty<Location> locations = new SimpleListProperty<>(this, "locations", FXCollections.observableArrayList());
+
+    public final ListProperty<Location> locationsProperty() {
         return locations;
+    }
+
+    public final ObservableList<Location> getLocations() {
+        return locations.get();
+    }
+
+    public final void setLocations(ObservableList<Location> locations) {
+        this.locations.set(locations);
     }
 
     private final ObjectProperty<Callback<Country, List<CountryPath>>> countryFactory = new SimpleObjectProperty(this, "countryFactory");
@@ -58,22 +84,19 @@ public class WorldMapView extends ControlsFXControl {
     public static class CountryPath extends SVGPath {
 
         private final Country country;
-        private final Locale locale;
 
         public CountryPath(Country country, String path) {
             super();
             setContent(path);
             this.country = Objects.requireNonNull(country);
-            this.locale = new Locale("", country.name());
         }
 
+        public Country getCountry() {
+            return country;
+        }
 
         public String getName() {
             return country.name();
-        }
-
-        public Locale getLocale() {
-            return locale;
         }
     }
 
@@ -259,8 +282,15 @@ public class WorldMapView extends ControlsFXControl {
 
         private List<CountryPath> countryPaths;
 
+        private final Locale locale;
+
         Country(final String... p) {
             paths = new ArrayList<>(Arrays.asList(p));
+            this.locale = new Locale("", name());
+        }
+
+        public Locale getLocale() {
+            return locale;
         }
 
         public List<CountryPath> getPaths() {

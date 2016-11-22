@@ -26,12 +26,24 @@
  */
 package org.controlsfx.samples;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.WorldMapView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class HelloWorldMapView extends ControlsFXSample {
 
@@ -71,7 +83,41 @@ public class HelloWorldMapView extends ControlsFXSample {
 
     @Override
     public Node getControlPanel() {
-        return null;
+        List<WorldMapView.Country> countries = new ArrayList<>();
+        for (WorldMapView.Country c : WorldMapView.Country.values()) {
+            countries.add(c);
+        }
+
+        Collections.sort(countries, (c1, c2) -> c1.getLocale().getDisplayCountry().compareTo(c2.getLocale().getDisplayCountry()));
+
+        ListView<WorldMapView.Country> listView = new ListView<>();
+        listView.getItems().setAll(countries);
+        listView.setCellFactory(list -> new ListCell<WorldMapView.Country>() {
+            @Override
+            protected void updateItem(WorldMapView.Country item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item.getLocale().getDisplayCountry());
+                }
+            }
+        });
+
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listView.getSelectionModel().getSelectedItems().addListener((Observable it) -> {
+            worldMapView.getCountries().setAll(listView.getSelectionModel().getSelectedItems());
+        });
+
+        Button clearButton = new Button("Clear / Show World");
+        clearButton.setMaxWidth(Double.MAX_VALUE);
+        clearButton.setOnAction(evt -> listView.getSelectionModel().clearSelection());
+
+        BorderPane borderPane = new BorderPane();
+        BorderPane.setMargin(clearButton, new Insets(0, 0, 10, 0));
+
+        borderPane.setTop(clearButton);
+        borderPane.setCenter(listView);
+
+        return borderPane;
     }
 
     public static void main(String[] args) {

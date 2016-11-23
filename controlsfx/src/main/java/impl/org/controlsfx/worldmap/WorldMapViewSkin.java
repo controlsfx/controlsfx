@@ -1,17 +1,18 @@
 package impl.org.controlsfx.worldmap;
 
+import javafx.beans.Observable;
 import javafx.collections.*;
 import javafx.css.PseudoClass;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
 import javafx.util.Callback;
 import org.controlsfx.control.WorldMapView;
 
 import java.io.IOException;
+
 import java.util.*;
 
 public class WorldMapViewSkin extends SkinBase<WorldMapView> {
@@ -20,14 +21,12 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
     private static final double PREFERRED_WIDTH = 1009;
     private static final double PREFERRED_HEIGHT = 665;
-    private static double MAP_OFFSET_X = -PREFERRED_WIDTH * 0.0285;
-    private static double MAP_OFFSET_Y = PREFERRED_HEIGHT * 0.195;
 
-    private final Map<WorldMapView.Country, List<? extends WorldMapView.CountryPath>> countryPathMap = new HashMap<>();
+    private final Map<WorldMapView.Country, List<? extends WorldMapView.CountryView>> countryPathMap = new HashMap<>();
 
     protected Pane countryPane;
     protected Group group;
-    protected ObservableMap<WorldMapView.Location, Shape> locationMap;
+    protected ObservableMap<WorldMapView.Location, Node> locationMap;
 
 
     public WorldMapViewSkin(WorldMapView view) {
@@ -41,28 +40,17 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
         countryPane = new Pane();
         countryPane.getChildren().add(group);
 
-        // locations
-        final ListChangeListener<? super WorldMapView.Location> locationsListener = change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(location -> addLocation(location));
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(location -> removeLocation(location));
-                }
-            }
-        };
-
         view.getLocations().addListener(locationsListener);
 
         // countries
         final ListChangeListener<? super WorldMapView.Country> countriesListener = change -> buildView();
         view.getCountries().addListener(countriesListener);
 
-        locationMap.addListener((MapChangeListener<WorldMapView.Location, Shape>) change -> {
+        locationMap.addListener((MapChangeListener<WorldMapView.Location, Node>) change -> {
             if (change.wasAdded()) {
-                countryPane.getChildren().add(change.getValueAdded());
+                group.getChildren().add(change.getValueAdded());
             } else if (change.wasRemoved()) {
-                countryPane.getChildren().remove(change.getValueRemoved());
+                group.getChildren().remove(change.getValueRemoved());
             }
         });
 
@@ -74,7 +62,7 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
         view.zoomFactorProperty().addListener(it -> view.requestLayout());
 
-        view.setCountryFactory(country -> countryPathMap.get(country));
+        view.setCountryViewFactory(country -> countryPathMap.get(country));
 
         Properties data = loadData();
         for (WorldMapView.Country country : WorldMapView.Country.values()) {
@@ -84,22 +72,40 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
             } else {
                 StringTokenizer st = new StringTokenizer(path, ";");
-                List<WorldMapView.CountryPath> countryPaths = new ArrayList<>();
+                List<WorldMapView.CountryView> countryViews = new ArrayList<>();
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
-                    WorldMapView.CountryPath countryPath = new WorldMapView.CountryPath(country, token);
-                    countryPath.getStyleClass().add("country");
-                    countryPaths.add(countryPath);
+                    WorldMapView.CountryView countryView = new WorldMapView.CountryView(country, token);
+                    countryView.getStyleClass().add("country");
+                    countryViews.add(countryView);
                 }
-                countryPathMap.put(country, countryPaths);
+                countryPathMap.put(country, countryViews);
             }
         }
 
         buildView();
 
         view.getSelectedCountries().addListener(weakSelectionListener);
-        view.selectedCountriesProperty().addListener((javafx.beans.Observable it) -> view.getSelectedCountries().addListener(weakSelectionListener));
+        view.selectedCountriesProperty().addListener((Observable it) -> view.getSelectedCountries().addListener(weakSelectionListener));
+
+        view.getLocations().addListener(weakLocationsListener);
+        view.locationsProperty().addListener((Observable it) -> view.getLocations().addListener(weakLocationsListener));
+
+        view.getLocations().forEach(location -> addLocation(location));
     }
+
+    // locations
+    private final ListChangeListener<? super WorldMapView.Location> locationsListener = change -> {
+        while (change.next()) {
+            if (change.wasAdded()) {
+                change.getAddedSubList().forEach(location -> addLocation(location));
+            } else if (change.wasRemoved()) {
+                change.getRemoved().forEach(location -> removeLocation(location));
+            }
+        }
+    };
+
+    private final WeakListChangeListener weakLocationsListener = new WeakListChangeListener(locationsListener);
 
     private final ListChangeListener<? super WorldMapView.Country> selectionListener = change -> {
         while (change.next()) {
@@ -115,26 +121,19 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
     private final WeakListChangeListener weakSelectionListener = new WeakListChangeListener(selectionListener);
 
-    private void addLocation(final WorldMapView.Location LOCATION) {
-        double x = (LOCATION.getLongitude() + 180) * (PREFERRED_WIDTH / 360) + MAP_OFFSET_X;
-        double y = (PREFERRED_HEIGHT / 2) - (PREFERRED_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(LOCATION.getLatitude()) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
+    private void addLocation(WorldMapView.Location location) {
+        double x = (location.getLongitude() + 180) * (group.prefWidth(-1) / 360);
+        double y = (group.prefHeight(-1) / 2) - (group.prefWidth(-1) * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(location.getLatitude()) / 2)))) / (2 * Math.PI));
 
-        Shape locationIcon = new Circle(x, y, 3);
-//        locationIcon.setFill(null == LOCATION.getColor() ? Color.RED : LOCATION.getColor());
-
-        StringBuilder tooltipBuilder = new StringBuilder();
-        if (!LOCATION.getName().isEmpty()) tooltipBuilder.append(LOCATION.getName());
-//        if (!LOCATION.getInfo().isEmpty()) tooltipBuilder.append("\n").append(LOCATION.getInfo());
-//        String tooltipText = tooltipBuilder.toString();
-//        if (!tooltipText.isEmpty()) {
-//            Tooltip.install(locationIcon, new Tooltip(tooltipText));
-//        }
-
-        locationMap.put(LOCATION, locationIcon);
+        Callback<WorldMapView.Location, Node> locationViewFactory = getSkinnable().getLocationViewFactory();
+        Node view = locationViewFactory.call(location);
+        view.setLayoutX(x);
+        view.setLayoutY(y);
+        locationMap.put(location, view);
     }
 
-    private void removeLocation(final WorldMapView.Location LOCATION) {
-        locationMap.remove(LOCATION);
+    private void removeLocation(WorldMapView.Location location) {
+        locationMap.remove(location);
     }
 
     private void buildView() {
@@ -149,10 +148,10 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
             }
         }
 
-        Callback<WorldMapView.Country, List<? extends WorldMapView.CountryPath>> factory = getSkinnable().getCountryFactory();
+        Callback<WorldMapView.Country, List<? extends WorldMapView.CountryView>> factory = getSkinnable().getCountryViewFactory();
         for (WorldMapView.Country country : WorldMapView.Country.values()) {
             if (getSkinnable().getCountries().isEmpty() || getSkinnable().getCountries().contains(country)) {
-                List<? extends WorldMapView.CountryPath> paths = factory.call(country);
+                List<? extends WorldMapView.CountryView> paths = factory.call(country);
                 if (paths != null) {
                     group.getChildren().addAll(paths);
                 }

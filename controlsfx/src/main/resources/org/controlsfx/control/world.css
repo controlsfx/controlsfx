@@ -1,4 +1,4 @@
-.world {
+.world-map {
     -fx-background-color: #0b99c9;
 }
 
@@ -27,4 +27,14 @@
 
 .country:selected:pressed {
     -fx-fill: darkred;
+}
+
+.location {
+    -fx-fill: orange;
+    -fx-stroke: black;
+}
+
+.location:hover {
+    -fx-fill: darkorange;
+    -fx-stroke: black;
 }

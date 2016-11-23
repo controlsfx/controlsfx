@@ -190,7 +190,9 @@ public abstract class SpreadsheetCellEditor {
      * 
      * @param item
      */
-    public abstract void startEdit(Object item);
+    public void startEdit(Object item){
+        startEdit(item, null);
+    }
     
     /**
      * Does the same as {@link #startEdit(java.lang.Object) } but you have also
@@ -201,9 +203,7 @@ public abstract class SpreadsheetCellEditor {
      * @param item
      * @param format
      */
-    public void startEdit(Object item, String format) {
-        startEdit(item);
-    }
+    public abstract void startEdit(Object item, String format);
 
     /**
      * Return the control used for controlling the input. This is called at the
@@ -268,7 +268,7 @@ public abstract class SpreadsheetCellEditor {
          * * Public Methods * *
          **************************************************************************/
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof String) {
                 tf.setText(value.toString());
             }
@@ -338,7 +338,7 @@ public abstract class SpreadsheetCellEditor {
          * * Public Methods * *
          **************************************************************************/
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
 
             if (value instanceof String || value == null) {
                 tf.setText((String) value);
@@ -421,7 +421,7 @@ public abstract class SpreadsheetCellEditor {
          * ************************************************************************
          */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof String || value == null) {
                 textArea.setText((String) value);
             }
@@ -540,7 +540,7 @@ public abstract class SpreadsheetCellEditor {
          **************************************************************************/
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof Double) {
                 //We want to set the text in its proper form regarding the Locale.
                 decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Localization.getLocale()));
@@ -666,7 +666,7 @@ public abstract class SpreadsheetCellEditor {
          **************************************************************************/
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof Integer) {
                 tf.setText(Integer.toString((Integer) value));
             } else {
@@ -776,7 +776,7 @@ public abstract class SpreadsheetCellEditor {
 
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof String) {
                 originalValue = value.toString();
             } else {
@@ -868,7 +868,7 @@ public abstract class SpreadsheetCellEditor {
          **************************************************************************/
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof LocalDate) {
                 datePicker.setValue((LocalDate) value);
             }

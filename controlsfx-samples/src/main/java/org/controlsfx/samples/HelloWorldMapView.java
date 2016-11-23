@@ -144,10 +144,12 @@ public class HelloWorldMapView extends ControlsFXSample {
         label.visibleProperty().bind(Bindings.equal(WorldMapView.SelectionMode.MULTIPLE, worldMapView.selectionModeProperty()));
         hbox.getChildren().addAll(selectionModeComboBox, label);
 
+        CheckBox showLocations = new CheckBox("Show Locations");
+        showLocations.setSelected(true);
+        worldMapView.showLocationsProperty().bind(showLocations.selectedProperty());
 
         VBox optionsBox = new VBox(10);
-        optionsBox.getChildren().add(zoomSlider);
-        optionsBox.getChildren().add(hbox);
+        optionsBox.getChildren().addAll(zoomSlider, hbox, showLocations);
 
         BorderPane borderPane = new BorderPane();
         BorderPane.setMargin(clearButton, new Insets(0, 0, 10, 0));

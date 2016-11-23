@@ -6,7 +6,7 @@ import javafx.collections.*;
 import javafx.event.EventTarget;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.util.Callback;
@@ -29,19 +29,23 @@ public class WorldMapView extends ControlsFXControl {
         });
 
         addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
-            EventTarget target = evt.getTarget();
-            if (target instanceof CountryView) {
-                CountryView path = (CountryView) target;
-                boolean wasSelected = getSelectedCountries().contains(target);
-                if (getSelectionMode().equals(SelectionMode.SINGLE) ||
-                        !(evt.isShortcutDown() || evt.isShiftDown())) {
-                    getSelectedCountries().clear();
-                }
-                Country country = path.getCountry();
-                if (wasSelected) {
-                    getSelectedCountries().remove(country);
+            if (evt.getButton().equals(MouseButton.PRIMARY)) {
+                EventTarget target = evt.getTarget();
+                if (target instanceof CountryView) {
+                    CountryView path = (CountryView) target;
+                    boolean wasSelected = getSelectedCountries().contains(target);
+                    if (getSelectionMode().equals(SelectionMode.SINGLE) ||
+                            !(evt.isShortcutDown() || evt.isShiftDown())) {
+                        getSelectedCountries().clear();
+                    }
+                    Country country = path.getCountry();
+                    if (wasSelected) {
+                        getSelectedCountries().remove(country);
+                    } else {
+                        getSelectedCountries().add(country);
+                    }
                 } else {
-                    getSelectedCountries().add(country);
+                    getSelectedCountries().clear();
                 }
             }
         });
@@ -135,6 +139,20 @@ public class WorldMapView extends ControlsFXControl {
 
     public final void setLocations(ObservableList<Location> locations) {
         this.locations.set(locations);
+    }
+
+    private final BooleanProperty showLocations = new SimpleBooleanProperty(this, "showLocations", true);
+
+    public final BooleanProperty showLocationsProperty() {
+        return showLocations;
+    }
+
+    public final boolean isShowLocations() {
+        return showLocations.get();
+    }
+
+    public final void setShowLocations(boolean showLocations) {
+        this.showLocations.set(showLocations);
     }
 
     // Location view factory.

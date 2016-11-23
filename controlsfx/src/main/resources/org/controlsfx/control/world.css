@@ -35,6 +35,11 @@
 }
 
 .location:hover {
-    -fx-fill: darkorange;
+    -fx-fill: red;
+    -fx-stroke: black;
+}
+
+.location:pressed {
+    -fx-fill: darkred;
     -fx-stroke: black;
 }

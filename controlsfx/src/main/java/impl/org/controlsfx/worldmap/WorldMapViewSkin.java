@@ -3,9 +3,14 @@ package impl.org.controlsfx.worldmap;
 import javafx.beans.Observable;
 import javafx.collections.*;
 import javafx.css.PseudoClass;
+import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
@@ -21,11 +26,14 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
     private static final double PREFERRED_WIDTH = 1009;
     private static final double PREFERRED_HEIGHT = 665;
+    private static double MAP_OFFSET_X = -PREFERRED_WIDTH * 0.0285;
+    private static double MAP_OFFSET_Y = PREFERRED_HEIGHT * 0.195;
 
     private final Map<WorldMapView.Country, List<? extends WorldMapView.CountryView>> countryPathMap = new HashMap<>();
 
-    protected Pane countryPane;
-    protected Group group;
+    private Pane countryPane;
+    private Group group;
+    private Group locationsGroup;
     protected ObservableMap<WorldMapView.Location, Node> locationMap;
 
 
@@ -36,6 +44,10 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
         group = new Group();
         group.setManaged(false);
+
+        locationsGroup = new Group();
+        locationsGroup.setManaged(false);
+        locationsGroup.visibleProperty().bind(view.showLocationsProperty());
 
         countryPane = new Pane();
         countryPane.getChildren().add(group);
@@ -48,9 +60,9 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
         locationMap.addListener((MapChangeListener<WorldMapView.Location, Node>) change -> {
             if (change.wasAdded()) {
-                group.getChildren().add(change.getValueAdded());
+                locationsGroup.getChildren().add(change.getValueAdded());
             } else if (change.wasRemoved()) {
-                group.getChildren().remove(change.getValueRemoved());
+                locationsGroup.getChildren().remove(change.getValueRemoved());
             }
         });
 
@@ -69,7 +81,6 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
             String path = (String) data.get(country.name());
             if (path == null) {
                 System.out.println("Missing SVG path for country " + country.getLocale().getDisplayCountry() + " (" + country + ")");
-
             } else {
                 StringTokenizer st = new StringTokenizer(path, ";");
                 List<WorldMapView.CountryView> countryViews = new ArrayList<>();
@@ -92,7 +103,47 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
         view.locationsProperty().addListener((Observable it) -> view.getLocations().addListener(weakLocationsListener));
 
         view.getLocations().forEach(location -> addLocation(location));
+
+        view.addEventHandler(ScrollEvent.SCROLL, evt -> {
+            evt.consume();
+        });
+
+        view.addEventHandler(ZoomEvent.ZOOM, evt -> {
+            double factor = evt.getZoomFactor();
+            System.out.println(factor);
+            double tx = group.getTranslateX();
+            double ty = group.getTranslateY();
+            view.setZoomFactor(view.getZoomFactor() * factor);
+//            group.setTranslateX(tx - ((factor-1) * PREFERRED_WIDTH));
+//            group.setTranslateY(ty - ((factor-1) * PREFERRED_HEIGHT));
+            evt.consume();
+        });
+
+        view.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
+            dragX = evt.getX();
+            dragY = evt.getY();
+        });
+
+        view.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
+            double deltaX = evt.getX() - dragX;
+            double deltaY = evt.getY() - dragY;
+            group.setTranslateX(group.getTranslateX() + deltaX);
+            group.setTranslateY(group.getTranslateY() + deltaY);
+            dragX = evt.getX();
+            dragY = evt.getY();
+        });
     }
+
+    private double clamp(final double MIN, final double MAX, final double VALUE) {
+        if (VALUE < MIN) return MIN;
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+
+    private double dragX;
+    private double dragY;
+    private double zoomSceneX;
+    private double zoomSceneY;
 
     // locations
     private final ListChangeListener<? super WorldMapView.Location> locationsListener = change -> {
@@ -121,14 +172,22 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
     private final WeakListChangeListener weakSelectionListener = new WeakListChangeListener(selectionListener);
 
-    private void addLocation(WorldMapView.Location location) {
-        double x = (location.getLongitude() + 180) * (group.prefWidth(-1) / 360);
-        double y = (group.prefHeight(-1) / 2) - (group.prefWidth(-1) * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(location.getLatitude()) / 2)))) / (2 * Math.PI));
+    private Point2D getLocationCoordinates(WorldMapView.Location location) {
+        double x = (location.getLongitude() + 180) * (PREFERRED_WIDTH / 360) + MAP_OFFSET_X;
+        double y = (PREFERRED_HEIGHT / 2) - (PREFERRED_WIDTH * (Math.log(Math.tan((Math.PI / 4) + (Math.toRadians(location.getLatitude()) / 2)))) / (2 * Math.PI)) + MAP_OFFSET_Y;
+        return new Point2D(x, y);
+    }
 
+    private void addLocation(WorldMapView.Location location) {
+        Point2D coordinates = getLocationCoordinates(location);
         Callback<WorldMapView.Location, Node> locationViewFactory = getSkinnable().getLocationViewFactory();
         Node view = locationViewFactory.call(location);
-        view.setLayoutX(x);
-        view.setLayoutY(y);
+        if (view == null) {
+            throw new IllegalArgumentException("location view factory returned NULL");
+        }
+        view.applyCss();
+        view.setLayoutX(coordinates.getX() - view.prefWidth(-1) / 2);
+        view.setLayoutY(coordinates.getY() - view.prefHeight(-1) / 2);
         locationMap.put(location, view);
     }
 
@@ -138,6 +197,7 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
 
     private void buildView() {
         group.getChildren().clear();
+        locationsGroup.getChildren().clear();
 
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
                 Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
@@ -158,6 +218,15 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
             }
         }
 
+        for (WorldMapView.Location location : locationMap.keySet()) {
+            Point2D coordinates = getLocationCoordinates(location);
+            if (group.getLayoutBounds().contains(coordinates)) {
+                locationsGroup.getChildren().add(locationMap.get(location));
+            }
+        }
+
+        group.getChildren().add(locationsGroup);
+
         getSkinnable().requestLayout();
     }
 
@@ -172,9 +241,6 @@ public class WorldMapViewSkin extends SkinBase<WorldMapView> {
         double scaleY = contentHeight / prefHeight;
 
         double scale = Math.min(scaleX, scaleY) * getSkinnable().getZoomFactor();
-
-        group.setTranslateX(-group.getLayoutBounds().getMinX());
-        group.setTranslateY(-group.getLayoutBounds().getMinY());
 
         group.setScaleX(scale);
         group.setScaleY(scale);

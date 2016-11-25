@@ -48,6 +48,12 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
     private final List<T> possibleSuggestions = new ArrayList<>();
     private final Object possibleSuggestionsLock = new Object();
 
+    // Add possibility to add all suggestions if empty text
+    private boolean showAllIfEmpty = false;
+
+    public void setShowAllIfEmpty(boolean showAllIfEmpty) {
+        this.showAllIfEmpty = showAllIfEmpty;
+    }
 
     /**
      * Add the given new possible suggestions to this  SuggestionProvider
@@ -88,6 +94,12 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
                 }
             }
             Collections.sort(suggestions, getComparator());
+        } else {
+            if (showAllIfEmpty) {
+                synchronized (possibleSuggestionsLock) {
+                    suggestions.addAll(possibleSuggestions);
+                }
+            }
         }
         return suggestions;
     }

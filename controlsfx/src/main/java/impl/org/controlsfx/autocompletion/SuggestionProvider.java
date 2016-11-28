@@ -48,9 +48,12 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
     private final List<T> possibleSuggestions = new ArrayList<>();
     private final Object possibleSuggestionsLock = new Object();
 
-    // Add possibility to add all suggestions if empty text
     private boolean showAllIfEmpty = false;
 
+    /**
+     * Add possibility to show all suggestions if empty text
+     * @param showAllIfEmpty
+     */
     public void setShowAllIfEmpty(boolean showAllIfEmpty) {
         this.showAllIfEmpty = showAllIfEmpty;
     }

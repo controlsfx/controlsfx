@@ -28,18 +28,23 @@ package org.controlsfx.samples;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.collections.ListChangeListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.WorldMapView;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +53,8 @@ import java.util.List;
 public class HelloWorldMapView extends ControlsFXSample {
 
     private WorldMapView worldMapView = new WorldMapView();
+
+    private FontAwesome fontAwesome = new FontAwesome();
 
     public HelloWorldMapView() {
     }
@@ -96,15 +103,69 @@ public class HelloWorldMapView extends ControlsFXSample {
                 new WorldMapView.Location("NRT", 35.766948, 140.385254),
                 new WorldMapView.Location("SYD", -33.939040, 151.174996));
 
+        worldMapView.getStylesheets().add(HelloWorldMapView.class.getResource("world.css").toExternalForm());
+
+        configureCountryAndLocationViewFactories();
+
         return stackPane;
     }
+
+    private void configureCountryAndLocationViewFactories() {
+        final Tooltip tooltip = new Tooltip();
+
+        worldMapView.setCountryViewFactory(country -> {
+            WorldMapView.CountryView view = new WorldMapView.CountryView(country);
+            if (showColorsProperty.get()) {
+                /*
+                 * We have 8 different colors defined in sample stylesheet "world.css".
+                 */
+                view.getStyleClass().add("country" + ((country.ordinal() % 8) + 1));
+            }
+            return view;
+        });
+
+        worldMapView.setLocationViewFactory(location -> {
+            /*
+             * The translates are needed because the location nodes will be anchored
+             * with their upper left corner at the location's coordinates. So usually
+             * these views needed to be shifted to the upper left to have them
+             * centered on the location.
+             */
+            if (location.getName().equals("RKV")) {
+                final Glyph glyph = fontAwesome.create(FontAwesome.Glyph.STAR);
+                glyph.setFontSize(32);
+                glyph.setStyle("-fx-text-fill: yellow; -fx-stroke: orange;");
+                glyph.setEffect(new DropShadow());
+                glyph.setTranslateX(-8);
+                glyph.setTranslateY(-8);
+                glyph.setOnMouseClicked(evt -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("World Map Info");
+                    alert.setContentText("This is Reykjavík, the capitol of Iceland!");
+                    alert.show();
+                });
+                glyph.setOnMouseEntered(evt -> tooltip.setText(location.getName()));
+                Tooltip.install(glyph, tooltip);
+                return glyph;
+            } else {
+                Circle circle = new Circle();
+                circle.getStyleClass().add("location");
+                circle.setRadius(4);
+                circle.setTranslateX(-4);
+                circle.setTranslateY(-4);
+                circle.setOnMouseEntered(evt -> tooltip.setText(location.getName()));
+                Tooltip.install(circle, tooltip);
+                return circle;
+            }
+        });
+    }
+
+    private BooleanProperty showColorsProperty = new SimpleBooleanProperty(this, "showColors", false);
 
     @Override
     public Node getControlPanel() {
         List<WorldMapView.Country> countries = new ArrayList<>();
-        for (WorldMapView.Country c : WorldMapView.Country.values()) {
-            countries.add(c);
-        }
+        Collections.addAll(countries, WorldMapView.Country.values());
 
         Collections.sort(countries, (c1, c2) -> c1.getLocale().getDisplayCountry().compareTo(c2.getLocale().getDisplayCountry()));
 
@@ -135,21 +196,34 @@ public class HelloWorldMapView extends ControlsFXSample {
         Bindings.bindBidirectional(zoomSlider.valueProperty(), worldMapView.zoomFactorProperty());
 
         ComboBox<WorldMapView.SelectionMode> selectionModeComboBox = new ComboBox<>();
+        selectionModeComboBox.setTooltip(new Tooltip("Selection Mode (Countries & Locations)"));
         selectionModeComboBox.getItems().addAll(WorldMapView.SelectionMode.values());
-        Bindings.bindBidirectional(selectionModeComboBox.valueProperty(), worldMapView.selectionModeProperty());
+        Bindings.bindBidirectional(selectionModeComboBox.valueProperty(), worldMapView.countrySelectionModeProperty());
+        Bindings.bindBidirectional(selectionModeComboBox.valueProperty(), worldMapView.locationSelectionModeProperty());
 
         HBox hbox = new HBox(10);
         Label label = new Label("Use SHIFT or CTRL/CMD");
         hbox.setAlignment(Pos.BASELINE_LEFT);
-        label.visibleProperty().bind(Bindings.equal(WorldMapView.SelectionMode.MULTIPLE, worldMapView.selectionModeProperty()));
+        label.visibleProperty().bind(Bindings.equal(WorldMapView.SelectionMode.MULTIPLE, worldMapView.countrySelectionModeProperty()));
         hbox.getChildren().addAll(selectionModeComboBox, label);
 
         CheckBox showLocations = new CheckBox("Show Locations");
         showLocations.setSelected(true);
         worldMapView.showLocationsProperty().bind(showLocations.selectedProperty());
 
+        CheckBox showColors = new CheckBox("Show Colors");
+        showColors.setSelected(showColorsProperty.get());
+        showColorsProperty.bind(showColors.selectedProperty());
+        showColorsProperty.addListener(it -> configureCountryAndLocationViewFactories());
+
+        WorldMapView smallMapView = new WorldMapView();
+        smallMapView.setPrefSize(200, 160);
+        Bindings.bindContent(smallMapView.getCountries(), worldMapView.getCountries());
+        Bindings.bindContent(smallMapView.getSelectedCountries(), worldMapView.getSelectedCountries());
+        Bindings.bindContent(smallMapView.getLocations(), worldMapView.getLocations());
+
         VBox optionsBox = new VBox(10);
-        optionsBox.getChildren().addAll(zoomSlider, hbox, showLocations);
+        optionsBox.getChildren().addAll(smallMapView, zoomSlider, hbox, showLocations, showColors);
 
         BorderPane borderPane = new BorderPane();
         BorderPane.setMargin(clearButton, new Insets(0, 0, 10, 0));

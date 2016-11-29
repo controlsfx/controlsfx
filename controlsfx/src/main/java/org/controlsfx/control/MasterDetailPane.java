@@ -215,7 +215,7 @@ public class MasterDetailPane extends ControlsFXControl {
                 break;
         }
 
-        setDividerPosition(position);
+        setDividerPosition(Math.min(1, Math.max(0, position)));
 
         if (!wasShowing) {
             setShowDetailNode(wasShowing);
@@ -459,7 +459,7 @@ public class MasterDetailPane extends ControlsFXControl {
         /**
          * See https://bitbucket.org/controlsfx/controlsfx/issue/145/divider-position-in-masterdetailpane-is
          *
-         * Thie work-around is not the best ever found but at least it works.
+         * This work-around is not the best ever found but at least it works.
          */
         if (getDividerPosition() == position) {
             dividerPosition.set(-1);

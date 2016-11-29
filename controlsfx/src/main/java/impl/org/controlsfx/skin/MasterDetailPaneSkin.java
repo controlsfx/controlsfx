@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2014, 2015 ControlsFX
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
+ * * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
+ * * Redistributions in binary form must reproduce the above copyright
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- *     * Neither the name of ControlsFX, any associated website, nor the
+ * * Neither the name of ControlsFX, any associated website, nor the
  * names of its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,12 +26,6 @@
  */
 package impl.org.controlsfx.skin;
 
-import static java.lang.Double.MAX_VALUE;
-import static javafx.geometry.Orientation.HORIZONTAL;
-import static javafx.geometry.Orientation.VERTICAL;
-
-import java.util.List;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -43,15 +37,19 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.SplitPane.Divider;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
-
 import org.controlsfx.control.MasterDetailPane;
+
+import java.util.List;
+
+import static java.lang.Double.MAX_VALUE;
+import static javafx.geometry.Orientation.HORIZONTAL;
+import static javafx.geometry.Orientation.VERTICAL;
 
 public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
@@ -71,20 +69,16 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
          * we listen to their position to update correctly the dividerPosition of 
          * the MasterDetailPane.
          */
-        this.splitPane.getDividers().addListener(new ListChangeListener<Divider>() {
-
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends Divider> change) {
-                while (change.next()) {
-                    if (change.wasAdded()) {
-                        change.getAddedSubList().get(0).positionProperty().addListener(updateDividerPositionListener);
-                    } else if (change.wasRemoved()) {
-                        change.getRemoved().get(0).positionProperty().removeListener(updateDividerPositionListener);
-                    }
+        this.splitPane.getDividers().addListener((ListChangeListener.Change<? extends Divider> change) -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().get(0).positionProperty().addListener(updateDividerPositionListener);
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().get(0).positionProperty().removeListener(updateDividerPositionListener);
                 }
             }
         });
-        
+
         SplitPane.setResizableWithParent(getSkinnable().getDetailNode(), false);
 
         switch (getSkinnable().getDetailSide()) {
@@ -98,233 +92,218 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
                 break;
         }
 
-        getSkinnable().masterNodeProperty().addListener(
-                new ChangeListener<Node>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Node> value,
-                            Node oldNode, Node newNode) {
+        getSkinnable().masterNodeProperty().addListener((observable, oldNode, newNode) -> {
 
-                        if (oldNode != null) {
-                            splitPane.getItems().remove(oldNode);
-                        }
+            if (oldNode != null) {
+                splitPane.getItems().remove(oldNode);
+            }
 
-                        if (newNode != null) {
+            if (newNode != null) {
 
-                            updateMinAndMaxSizes();
+                updateMinAndMaxSizes();
 
-                            int masterIndex = 0;
-                            switch (splitPane.getOrientation()) {
-                                case HORIZONTAL:
-                                    switch (getSkinnable().getDetailSide()) {
-                                        case LEFT:
-                                            masterIndex = 1;
-                                            break;
-                                        case RIGHT:
-                                            masterIndex = 0;
-                                            break;
-                                        default:
-                                            throw new IllegalArgumentException(
-                                                    "illegal details position " //$NON-NLS-1$
-                                                            + getSkinnable()
-                                                            .getDetailSide()
-                                                            + " for orientation " //$NON-NLS-1$
-                                                            + splitPane
-                                                            .getOrientation());
-                                    }
-                                    break;
-                                case VERTICAL:
-                                    switch (getSkinnable().getDetailSide()) {
-                                        case TOP:
-                                            masterIndex = 1;
-                                            break;
-                                        case BOTTOM:
-                                            masterIndex = 0;
-                                            break;
-                                        default:
-                                            throw new IllegalArgumentException(
-                                                    "illegal details position " //$NON-NLS-1$
-                                                            + getSkinnable()
-                                                            .getDetailSide()
-                                                            + " for orientation " //$NON-NLS-1$
-                                                            + splitPane
-                                                            .getOrientation());
-                                    }
-                                    break;
-                            }
-                            List<Node> items = splitPane.getItems();
-                            if (items.isEmpty()) {
-                                items.add(newNode);
-                            } else {
-                                items.add(masterIndex, newNode);
-                            }
-                        }
-                    }
-                });
-
-        getSkinnable().detailNodeProperty().addListener(
-                new ChangeListener<Node>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Node> value,
-                            Node oldNode, Node newNode) {
-
-                        if (oldNode != null) {
-                            splitPane.getItems().remove(oldNode);
-                        }
-
-                        /**
-                        * If the detailNode is not showing, we do not force
-                        * it to show.
-                        */
-                        if (newNode != null && getSkinnable().isShowDetailNode()) {
-
-                            /**
-                             * Force the divider to take the value of the Pane,
-                             * and not compute his.
-                             */
-                            splitPane.setDividerPositions(getSkinnable().getDividerPosition());
-                            updateMinAndMaxSizes();
-
-                            SplitPane.setResizableWithParent(newNode, false);
-
-                            int detailsIndex = 0;
-                            switch (splitPane.getOrientation()) {
-                                case HORIZONTAL:
-                                    switch (getSkinnable().getDetailSide()) {
-                                        case LEFT:
-                                            detailsIndex = 0;
-                                            break;
-                                        case RIGHT:
-                                            detailsIndex = 1;
-                                            break;
-                                        default:
-                                            throw new IllegalArgumentException(
-                                                    "illegal details position " //$NON-NLS-1$
-                                                    + getSkinnable()
-                                                    .getDetailSide()
-                                                    + " for orientation " //$NON-NLS-1$
-                                                    + splitPane
-                                                    .getOrientation());
-                                    }
-                                    break;
-                                case VERTICAL:
-                                    switch (getSkinnable().getDetailSide()) {
-                                        case TOP:
-                                            detailsIndex = 0;
-                                            break;
-                                        case BOTTOM:
-                                            detailsIndex = 1;
-                                            break;
-                                        default:
-                                            throw new IllegalArgumentException(
-                                                    "illegal details position " //$NON-NLS-1$
-                                                    + getSkinnable()
-                                                    .getDetailSide()
-                                                    + " for orientation " //$NON-NLS-1$
-                                                    + splitPane
-                                                    .getOrientation());
-                                    }
-                                    break;
-                            }
-                            List<Node> items = splitPane.getItems();
-                            if (items.isEmpty()) {
-                                items.add(newNode);
-                            } else {
-                                items.add(detailsIndex, newNode);
-                            }
-                        }
-                    }
-                });
-
-        getSkinnable().showDetailNodeProperty().addListener(
-                new ChangeListener<Boolean>() {
-                    @Override
-                    public void changed(
-                            ObservableValue<? extends Boolean> value,
-                            Boolean oldShow, Boolean newShow) {
-                                /**
-                                 * https://bitbucket.org/controlsfx/controlsfx/issue/456/masterdetailpane-bug-of-adding-infinite
-                                 *
-                                 * Fixed bug - when close or show is still animated jump to last frame of animation
-                                 ** and fire finished event to complete the previous demand
-                                 *
-                                 */
-                                if (getSkinnable().isAnimated() && timeline.getStatus() == Animation.Status.RUNNING) {
-                                    timeline.jumpTo("endAnimation");
-                                    timeline.getOnFinished().handle(null);
-                                }
-
-                                if (newShow) {
-                                    open();
-                                } else {
-                                    close();
-                                }
-                            }
-                });
-
-        getSkinnable().detailSideProperty().addListener(
-                new ChangeListener<Side>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Side> value,
-                            Side oldPos, Side newPos) {
-                        if (getSkinnable().isShowDetailNode()) {
-                            splitPane.getItems().clear();
-                        }
-                        switch (newPos) {
-                            case TOP:
-                            case BOTTOM:
-                                splitPane.setOrientation(VERTICAL);
+                int masterIndex = 0;
+                switch (splitPane.getOrientation()) {
+                    case HORIZONTAL:
+                        switch (getSkinnable().getDetailSide()) {
+                            case LEFT:
+                                masterIndex = 1;
                                 break;
-                            case LEFT:
                             case RIGHT:
-                                splitPane.setOrientation(HORIZONTAL);
+                                masterIndex = 0;
+                                break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "illegal details position " //$NON-NLS-1$
+                                                + getSkinnable()
+                                                .getDetailSide()
+                                                + " for orientation " //$NON-NLS-1$
+                                                + splitPane
+                                                .getOrientation());
                         }
-                        switch (newPos) {
+                        break;
+                    case VERTICAL:
+                        switch (getSkinnable().getDetailSide()) {
                             case TOP:
-                            case LEFT:
-                                if (getSkinnable().isShowDetailNode()) {
-                                    splitPane.getItems().add(
-                                            getSkinnable().getDetailNode());
-                                    splitPane.getItems().add(
-                                            getSkinnable().getMasterNode());
-                                }
-                                switch (oldPos) {
-                                    case BOTTOM:
-                                    case RIGHT:
-                                        getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                masterIndex = 1;
                                 break;
                             case BOTTOM:
-                            case RIGHT:
-                                if (getSkinnable().isShowDetailNode()) {
-                                    splitPane.getItems().add(
-                                            getSkinnable().getMasterNode());
-                                    splitPane.getItems().add(
-                                            getSkinnable().getDetailNode());
-                                }
-                                switch (oldPos) {
-                                    case TOP:
-                                    case LEFT:
-                                        getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                masterIndex = 0;
                                 break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "illegal details position " //$NON-NLS-1$
+                                                + getSkinnable()
+                                                .getDetailSide()
+                                                + " for orientation " //$NON-NLS-1$
+                                                + splitPane
+                                                .getOrientation());
                         }
-                        if (getSkinnable().isShowDetailNode()) {
-                            splitPane.setDividerPositions(getSkinnable().getDividerPosition());
+                        break;
+                }
+                List<Node> items = splitPane.getItems();
+                if (items.isEmpty()) {
+                    items.add(newNode);
+                } else {
+                    items.add(masterIndex, newNode);
+                }
+            }
+        });
+
+        getSkinnable().detailNodeProperty().addListener((observable, oldNode, newNode) -> {
+
+            if (oldNode != null) {
+                splitPane.getItems().remove(oldNode);
+            }
+
+            /**
+             * If the detailNode is not showing, we do not force
+             * it to show.
+             */
+            if (newNode != null && getSkinnable().isShowDetailNode()) {
+
+                /**
+                 * Force the divider to take the value of the Pane,
+                 * and not compute his.
+                 */
+                splitPane.setDividerPositions(getSkinnable().getDividerPosition());
+                updateMinAndMaxSizes();
+
+                SplitPane.setResizableWithParent(newNode, false);
+
+                int detailsIndex = 0;
+                switch (splitPane.getOrientation()) {
+                    case HORIZONTAL:
+                        switch (getSkinnable().getDetailSide()) {
+                            case LEFT:
+                                detailsIndex = 0;
+                                break;
+                            case RIGHT:
+                                detailsIndex = 1;
+                                break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "illegal details position " //$NON-NLS-1$
+                                                + getSkinnable()
+                                                .getDetailSide()
+                                                + " for orientation " //$NON-NLS-1$
+                                                + splitPane
+                                                .getOrientation());
                         }
+                        break;
+                    case VERTICAL:
+                        switch (getSkinnable().getDetailSide()) {
+                            case TOP:
+                                detailsIndex = 0;
+                                break;
+                            case BOTTOM:
+                                detailsIndex = 1;
+                                break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "illegal details position " //$NON-NLS-1$
+                                                + getSkinnable()
+                                                .getDetailSide()
+                                                + " for orientation " //$NON-NLS-1$
+                                                + splitPane
+                                                .getOrientation());
+                        }
+                        break;
+                }
+                List<Node> items = splitPane.getItems();
+                if (items.isEmpty()) {
+                    items.add(newNode);
+                } else {
+                    items.add(detailsIndex, newNode);
+                }
+            }
+        });
+
+        getSkinnable().showDetailNodeProperty().addListener((observable, oldShow, newShow) -> {
+
+            /**
+             * https://bitbucket.org/controlsfx/controlsfx/issue/456/masterdetailpane-bug-of-adding-infinite
+             *
+             * Fixed bug - when close or show is still animated jump to last frame of animation
+             ** and fire finished event to complete the previous demand
+             *
+             */
+            if (getSkinnable().isAnimated() && timeline.getStatus() == Animation.Status.RUNNING) {
+                timeline.jumpTo("endAnimation");
+                timeline.getOnFinished().handle(null);
+            }
+
+            if (newShow) {
+                open();
+            } else {
+                close();
+            }
+        });
+
+        getSkinnable().detailSideProperty().addListener((observable, oldPos, newPos) -> {
+            final Node detailNode = getSkinnable().getDetailNode();
+            final Node masterNode = getSkinnable().getMasterNode();
+
+            final boolean showDetailNode = getSkinnable().isShowDetailNode() && detailNode != null;
+
+            if (showDetailNode) {
+                splitPane.getItems().clear();
+            }
+
+            switch (newPos) {
+                case TOP:
+                case BOTTOM:
+                    splitPane.setOrientation(VERTICAL);
+                    break;
+                case LEFT:
+                case RIGHT:
+                    splitPane.setOrientation(HORIZONTAL);
+            }
+
+            switch (newPos) {
+                case TOP:
+                case LEFT:
+                    if (showDetailNode) {
+                        splitPane.getItems().add(detailNode);
+                        splitPane.getItems().add(masterNode);
                     }
-                });
+                    switch (oldPos) {
+                        case BOTTOM:
+                        case RIGHT:
+                            getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case BOTTOM:
+                case RIGHT:
+                    if (showDetailNode) {
+                        splitPane.getItems().add(masterNode);
+                        splitPane.getItems().add(detailNode);
+                    }
+                    switch (oldPos) {
+                        case TOP:
+                        case LEFT:
+                            getSkinnable().setDividerPosition(1 - getSkinnable().getDividerPosition());
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+            }
+            if (showDetailNode) {
+                splitPane.setDividerPositions(getSkinnable().getDividerPosition());
+            }
+        });
 
         updateMinAndMaxSizes();
 
         getChildren().add(splitPane);
 
-        splitPane.getItems().add(getSkinnable().getMasterNode());
+        splitPane.getItems().
+
+                add(getSkinnable().getMasterNode());
 
         if (getSkinnable().isShowDetailNode()) {
             switch (getSkinnable().getDetailSide()) {
@@ -386,6 +365,9 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     private void open() {
         changing = true;
         Node node = getSkinnable().getDetailNode();
+        if (node == null) {
+            return;
+        }
 
         switch (getSkinnable().getDetailSide()) {
             case TOP:
@@ -427,7 +409,13 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
     }
 
     private void maybeAnimatePositionChange(final double position,
-            final boolean showDetail) {
+                                            final boolean showDetail) {
+
+        Node detailNode = getSkinnable().getDetailNode();
+        if (detailNode == null) {
+            return;
+        }
+
         showDetailForTimeline.set(showDetail);
 
         Divider divider = splitPane.getDividers().get(0);
@@ -437,11 +425,10 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
             bindDividerPosition();
         }
 
-        if (getSkinnable().isAnimated()) {
+        if (getSkinnable().isAnimated() && detailNode != null) {
             KeyValue positionKeyValue = new KeyValue(
                     divider.positionProperty(), position);
-            KeyValue opacityKeyValue = new KeyValue(getSkinnable()
-                    .getDetailNode().opacityProperty(), showDetailForTimeline.get() ? 1 : 0);
+            KeyValue opacityKeyValue = new KeyValue(detailNode.opacityProperty(), showDetailForTimeline.get() ? 1 : 0);
 
             KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), "endAnimation", positionKeyValue, opacityKeyValue);
 
@@ -450,7 +437,7 @@ public class MasterDetailPaneSkin extends SkinBase<MasterDetailPane> {
 
             timeline.playFromStart();
         } else {
-            getSkinnable().getDetailNode().setOpacity(1);
+            detailNode.setOpacity(1);
             divider.setPosition(position);
 
             if (!showDetailForTimeline.get()) {

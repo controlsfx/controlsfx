@@ -158,14 +158,18 @@ public class MasterDetailPane extends ControlsFXControl {
      */
     public final void resetDividerPosition() {
 
+        Node node = getDetailNode();
+
+        if (node == null) {
+            return;
+        }
+
         /*
          * Store the current state in order to recreate it once the
          * divider position has been updated.
          */
         boolean wasShowing = isShowDetailNode();
         boolean wasAnimated = isAnimated();
-
-        Node node = getDetailNode();
 
         if (!wasShowing) {
             /*
@@ -390,7 +394,6 @@ public class MasterDetailPane extends ControlsFXControl {
      * @param node the new master node
      */
     public final void setDetailNode(Node node) {
-        Objects.requireNonNull(node);
         detailNodeProperty().set(node);
     }
 

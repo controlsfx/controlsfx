@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2014, 2015, ControlsFX
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
+ * * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
+ * * Redistributions in binary form must reproduce the above copyright
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- *     * Neither the name of ControlsFX, any associated website, nor the
+ * * Neither the name of ControlsFX, any associated website, nor the
  * names of its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -49,7 +49,7 @@ import javafx.scene.control.Skin;
  * information is required and can be made visible via the detail node. By
  * default the detail appears with a short slide-in animation and disappears
  * with a slide-out. This control allows the detail node to be positioned in
- * four different locations (top, bottom, left, or right). 
+ * four different locations (top, bottom, left, or right).
  * <h3>Screenshot</h3>
  * To better describe what a master / detail pane is, please refer to the picture
  * below:
@@ -68,26 +68,22 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Constructs a new pane.
-     * 
-     * @param side
-     *            the position where the detail will be shown (top, bottom,
-     *            left, right)
-     * @param masterNode
-     *            the master node (always visible)
-     * @param detailNode
-     *            the detail node (slides in and out)
-     * @param showDetail
-     *            the initial state of the detail node (shown or hidden)
+     *
+     * @param side       the position where the detail will be shown (top, bottom,
+     *                   left, right)
+     * @param masterNode the master node (always visible)
+     * @param detailNode the detail node (slides in and out)
+     * @param showDetail the initial state of the detail node (shown or hidden)
      */
     public MasterDetailPane(Side side, Node masterNode, Node detailNode,
-            boolean showDetail) {
+                            boolean showDetail) {
 
         super();
 
         Objects.requireNonNull(side);
         Objects.requireNonNull(masterNode);
         Objects.requireNonNull(detailNode);
-        
+
         getStyleClass().add("master-detail-pane"); //$NON-NLS-1$
 
         setDetailSide(side);
@@ -96,28 +92,26 @@ public class MasterDetailPane extends ControlsFXControl {
         setShowDetailNode(showDetail);
 
         switch (side) {
-        case BOTTOM:
-        case RIGHT:
-            setDividerPosition(.8);
-            break;
-        case TOP:
-        case LEFT:
-            setDividerPosition(.2);
-            break;
-        default:
-            break;
+            case BOTTOM:
+            case RIGHT:
+                setDividerPosition(.8);
+                break;
+            case TOP:
+            case LEFT:
+                setDividerPosition(.2);
+                break;
+            default:
+                break;
 
         }
     }
 
     /**
      * Constructs a new pane with two placeholder nodes.
-     * 
-     * @param pos
-     *            the position where the details will be shown (top, bottom,
-     *            left, right)
-     * @param showDetail
-     *            the initial state of the detail node (shown or hidden)
+     *
+     * @param pos        the position where the details will be shown (top, bottom,
+     *                   left, right)
+     * @param showDetail the initial state of the detail node (shown or hidden)
      */
     public MasterDetailPane(Side pos, boolean showDetail) {
         this(pos, new Placeholder(true), new Placeholder(false), showDetail);
@@ -126,9 +120,8 @@ public class MasterDetailPane extends ControlsFXControl {
     /**
      * Constructs a new pane with two placeholder nodes. The detail node will be
      * shown.
-     * 
-     * @param pos
-     *            the position where the details will be shown (top, bottom,
+     *
+     * @param pos the position where the details will be shown (top, bottom,
      *            left, right)
      */
     public MasterDetailPane(Side pos) {
@@ -143,24 +136,139 @@ public class MasterDetailPane extends ControlsFXControl {
         this(Side.RIGHT, new Placeholder(true), new Placeholder(false), true);
     }
 
-    /** {@inheritDoc} */
-    @Override protected Skin<?> createDefaultSkin() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Skin<?> createDefaultSkin() {
         return new MasterDetailPaneSkin(this);
     }
-    
-    /** {@inheritDoc} */
-    @Override public String getUserAgentStylesheet() {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getUserAgentStylesheet() {
         return getUserAgentStylesheet(MasterDetailPane.class, "masterdetailpane.css");
     }
 
-    // Detail postion support
+    /**
+     * Resets the divider position to a value that ensures that the detail node will be fully
+     * visible at its preferred width or height.
+     */
+    public final void resetDividerPosition() {
+
+        /*
+         * Store the current state in order to recreate it once the
+         * divider position has been updated.
+         */
+        boolean wasShowing = isShowDetailNode();
+        boolean wasAnimated = isAnimated();
+
+        Node node = getDetailNode();
+
+        if (!wasShowing) {
+            /*
+             * We have to disable animation, otherwise the updates to the scene
+             * graph will happen too late.
+             */
+            setAnimated(false);
+            setShowDetailNode(true);
+
+            /*
+             * Force CSS pass to ensure that calls to prefWidth/Height will
+             * return proper values.
+             */
+            node.applyCss();
+        }
+
+        double dividerSize = getDividerSizeHint();
+
+        double ps;
+
+        switch (getDetailSide()) {
+            case LEFT:
+            case RIGHT:
+                ps = node.prefWidth(-1) + dividerSize;
+                break;
+            case TOP:
+            case BOTTOM:
+            default:
+                ps = node.prefHeight(-1) + dividerSize;
+                break;
+        }
+
+        double position = 0;
+
+        switch (getDetailSide()) {
+            case LEFT:
+                position = ps / getWidth();
+                break;
+            case RIGHT:
+                position = 1 - (ps / getWidth());
+                break;
+            case TOP:
+                position = ps / getHeight();
+                break;
+            case BOTTOM:
+                position = 1 - (ps / getHeight());
+                break;
+        }
+
+        setDividerPosition(position);
+
+        if (!wasShowing) {
+            setShowDetailNode(wasShowing);
+            setAnimated(wasAnimated);
+        }
+    }
+
+    // Divider size support
+
+    private final DoubleProperty dividerSizeHint = new SimpleDoubleProperty(this, "dividerSizeHint", 10) {
+        @Override
+        public void set(double newValue) {
+            super.set(Math.max(0, newValue));
+        }
+    };
+
+    /**
+     * Returns a property that is used to let the master detail pane know how big the divider
+     * handles are. This value is needed by the {@link #resetDividerPosition()} method in order to properly
+     * calculate the divider location that is needed to fully show the detail node.
+     *
+     * @return the divider size hint property
+     */
+    public final DoubleProperty dividerSizeHintProperty() {
+        return dividerSizeHint;
+    }
+
+    /**
+     * Sets the value of {@link #dividerSizeHintProperty()}.
+     *
+     * @param size the expected divider size (width or height depending on detail's side)
+     */
+    public final void setDividerSizeHint(double size) {
+        dividerSizeHint.set(size);
+    }
+
+    /**
+     * Returns the value of {@link #dividerSizeHintProperty()}.
+     *
+     * @return the expected divider size (width or height depending on detail's side)
+     */
+    public final double getDividerSizeHint() {
+        return dividerSizeHint.get();
+    }
+
+    // Detail position support
 
     private final ObjectProperty<Side> detailSide = new SimpleObjectProperty<>(
             this, "detailSide", Side.RIGHT); //$NON-NLS-1$
 
     /**
      * The property used to store the side where the detail node will be shown.
-     * 
+     *
      * @return the details side property
      */
     public final ObjectProperty<Side> detailSideProperty() {
@@ -169,9 +277,9 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Returns the value of the detail side property.
-     * 
+     *
      * @return the side where the detail node will be shown (left, right, top,
-     *         bottom)
+     * bottom)
      */
     public final Side getDetailSide() {
         return detailSideProperty().get();
@@ -179,10 +287,9 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Sets the value of the detail side property.
-     * 
-     * @param side
-     *            the side where the detail node will be shown (left, right,
-     *            top, bottom)
+     *
+     * @param side the side where the detail node will be shown (left, right,
+     *             top, bottom)
      */
     public final void setDetailSide(Side side) {
         Objects.requireNonNull(side);
@@ -196,7 +303,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * The property used to store the visibility of the detail node.
-     * 
+     *
      * @return true if the pane is currently expanded (shows the detail node)
      */
     public final BooleanProperty showDetailNodeProperty() {
@@ -205,7 +312,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Returns the value of the "show detail node" property.
-     * 
+     *
      * @return true if the pane is currently expanded (shows the detail node)
      */
     public final boolean isShowDetailNode() {
@@ -214,9 +321,8 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Sets the value of the "show detail node" property.
-     * 
-     * @param show
-     *            if true the pane will show the detail node
+     *
+     * @param show if true the pane will show the detail node
      */
     public final void setShowDetailNode(boolean show) {
         showDetailNodeProperty().set(show);
@@ -229,7 +335,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * The property used to store the master node.
-     * 
+     *
      * @return the master node property
      */
     public final ObjectProperty<Node> masterNodeProperty() {
@@ -238,7 +344,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Returns the value of the master node property.
-     * 
+     *
      * @return the master node
      */
     public final Node getMasterNode() {
@@ -247,9 +353,8 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Sets the value of the master node property.
-     * 
-     * @param node
-     *            the new master node
+     *
+     * @param node the new master node
      */
     public final void setMasterNode(Node node) {
         Objects.requireNonNull(node);
@@ -263,7 +368,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * The property used to store the detail node.
-     * 
+     *
      * @return the detail node property
      */
     public final ObjectProperty<Node> detailNodeProperty() {
@@ -272,7 +377,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Returns the value of the detail node property.
-     * 
+     *
      * @return the detail node
      */
     public final Node getDetailNode() {
@@ -281,9 +386,8 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Sets the value of the detail node property.
-     * 
-     * @param node
-     *            the new master node
+     *
+     * @param node the new master node
      */
     public final void setDetailNode(Node node) {
         Objects.requireNonNull(node);
@@ -298,7 +402,7 @@ public class MasterDetailPane extends ControlsFXControl {
     /**
      * The property used to store the "animated" flag. If true then the detail
      * node will be shown / hidden with a short slide in / out animation.
-     * 
+     *
      * @return the "animated" property
      */
     public final BooleanProperty animatedProperty() {
@@ -307,9 +411,9 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Returns the value of the "animated" property.
-     * 
+     *
      * @return true if the detail node will be shown with a short animation
-     *         (slide in)
+     * (slide in)
      */
     public final boolean isAnimated() {
         return animatedProperty().get();
@@ -317,10 +421,9 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Sets the value of the "animated" property.
-     * 
-     * @param animated
-     *            if true the detail node will be shown with a short animation
-     *            (slide in)
+     *
+     * @param animated if true the detail node will be shown with a short animation
+     *                 (slide in)
      */
     public final void setAnimated(boolean animated) {
         animatedProperty().set(animated);
@@ -331,7 +434,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Stores the location of the divider.
-     * 
+     *
      * @return the divider location
      */
     public final DoubleProperty dividerPositionProperty() {
@@ -340,7 +443,7 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Returns the value of the divider position property.
-     * 
+     *
      * @return the position of the divider
      */
     public final double getDividerPosition() {
@@ -349,17 +452,16 @@ public class MasterDetailPane extends ControlsFXControl {
 
     /**
      * Sets the value of the divider position property.
-     * 
-     * @param position
-     *            the new divider position.
+     *
+     * @param position the new divider position.
      */
     public final void setDividerPosition(double position) {
         /**
          * See https://bitbucket.org/controlsfx/controlsfx/issue/145/divider-position-in-masterdetailpane-is
-         * 
+         *
          * Thie work-around is not the best ever found but at least it works.
          */
-        if(getDividerPosition() == position){
+        if (getDividerPosition() == position) {
             dividerPosition.set(-1);
         }
         dividerPosition.set(position);

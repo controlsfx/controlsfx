@@ -30,6 +30,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -99,6 +100,11 @@ public class HelloMasterDetailPane extends ControlsFXSample {
         grid.add(positionBox, 1, row++);
         positionBox.setValue(masterDetailPane.getDetailSide());
         masterDetailPane.detailSideProperty().bind(positionBox.valueProperty());
+
+        // reset position
+        Button resetButton = new Button("Reset Divider");
+        resetButton.setOnAction(evt -> masterDetailPane.resetDividerPosition());
+        grid.add(resetButton, 1, row++);
 
         return grid;
     }

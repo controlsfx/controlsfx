@@ -523,7 +523,7 @@ public class SpreadsheetView extends Control{
 
     /**
      * Return the zoomFactor used for the SpreadsheetView.
-     * @return 
+     * @return the zoomFactor used for the SpreadsheetView.
      */
     public final Double getZoomFactor() {
         return zoomFactor.get();
@@ -540,7 +540,7 @@ public class SpreadsheetView extends Control{
 
     /**
      * Return the zoomFactor used for the SpreadsheetView.
-     * @return 
+     * @return the zoomFactor used for the SpreadsheetView.
      */
     public final DoubleProperty zoomFactorProperty() {
         return zoomFactor;
@@ -1166,7 +1166,7 @@ public class SpreadsheetView extends Control{
      * Return the value of the vertical scrollbar. See {@link ScrollBar#getValue()
      * }
      *
-     * @return
+     * @return the value of the vertical scrollbar.
      */
     public double getVBarValue() {
         if (getCellsViewSkin() != null && getCellsViewSkin().getVBar() != null) {
@@ -1179,7 +1179,7 @@ public class SpreadsheetView extends Control{
      * Return the value of the horizontal scrollbar. See {@link ScrollBar#getValue()
      * }
      *
-     * @return
+     * @return the value of the horizontal scrollbar.
      */
     public double getHBarValue() {
         if (getCellsViewSkin() != null && getCellsViewSkin().getHBar() != null) {

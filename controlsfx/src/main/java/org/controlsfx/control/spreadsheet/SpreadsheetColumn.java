@@ -209,7 +209,7 @@ public final class SpreadsheetColumn {
     /**
      * Return the Property related to the actual width of the column.
      *
-     * @return
+     * @return the Property related to the actual width of the column.
      */
     public final ReadOnlyDoubleProperty widthProperty() {
         return column.widthProperty();
@@ -227,7 +227,7 @@ public final class SpreadsheetColumn {
     /**
      * Return the minimum width for this SpreadsheetColumn.
      *
-     * @return
+     * @return the minimum width for this SpreadsheetColumn.
      */
     public final double getMinWidth() {
         return column.getMinWidth();
@@ -237,7 +237,8 @@ public final class SpreadsheetColumn {
      * Return the Property related to the minimum width of this
      * SpreadsheetColumn.
      *
-     * @return
+     * @return the Property related to the minimum width of this
+     * SpreadsheetColumn.
      */
     public final DoubleProperty minWidthProperty() {
         return column.minWidthProperty();
@@ -247,7 +248,8 @@ public final class SpreadsheetColumn {
      * Return the Property related to the maximum width of this
      * SpreadsheetColumn.
      *
-     * @return
+     * @return the Property related to the maximum width of this
+     * SpreadsheetColumn.
      */
     public final DoubleProperty maxWidthProperty() {
         return column.maxWidthProperty();
@@ -265,7 +267,7 @@ public final class SpreadsheetColumn {
     /**
      * Return the maximum width for this SpreadsheetColumn.
      *
-     * @return
+     * @return the maximum width for this SpreadsheetColumn.
      */
     public final double getMaxWidth() {
         return column.getMaxWidth();

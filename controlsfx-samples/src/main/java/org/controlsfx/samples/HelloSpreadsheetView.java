@@ -78,6 +78,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
     private final CheckBox rowHeader = new CheckBox();
     private final CheckBox columnHeader = new CheckBox();
     private final CheckBox selectionMode = new CheckBox();
+    private final CheckBox displaySelection = new CheckBox();
     private final CheckBox editable = new CheckBox();
 
     /**
@@ -677,7 +678,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
                 spreadSheetView.setShowColumnHeader(arg2);
-            }
+                }
         });
 
         // editable
@@ -716,6 +717,20 @@ public class HelloSpreadsheetView extends ControlsFXSample {
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean isSelected) {
                 spreadSheetView.getSelectionModel().clearSelection();
                 spreadSheetView.getSelectionModel().setSelectionMode(isSelected ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
+            }
+        });
+        
+        // Display selection
+        Label displaySelectionLabel = new Label("Display selection: ");
+        displaySelectionLabel.getStyleClass().add("property");
+        grid.add(displaySelectionLabel, 0, row);
+        displaySelection.setSelected(true);
+        grid.add(displaySelection, 1, row++);
+        displaySelection.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean isSelected) {
+                spreadSheetView.getGrid().setDisplaySelection(isSelected);
+                spreadSheetView.getSelectionModel().clearSelection();
             }
         });
 

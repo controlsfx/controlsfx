@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,12 @@ package org.controlsfx.control.spreadsheet;
 
 import com.sun.javafx.event.EventHandlerManager;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import static impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange.key;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -107,6 +109,9 @@ public class GridBase implements Grid, EventTarget {
     private final ObservableList<String> rowsHeader;
     private final ObservableList<String> columnsHeader;
     private BitSet resizableRow;
+    private final TreeSet<Long> displaySelectionCells = new TreeSet<>();
+    private final TreeSet<Long> noDisplaySelectionCells = new TreeSet<>();
+    private final BooleanProperty displaySelection = new SimpleBooleanProperty(true);
 
     /***************************************************************************
      * 
@@ -348,6 +353,59 @@ public class GridBase implements Grid, EventTarget {
     @Override
     public boolean isRowResizable(int row) {
         return resizableRow.get(row);
+    }
+   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isDisplaySelection() {
+        return displaySelection.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setDisplaySelection(boolean value) {
+        displaySelection.setValue(value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BooleanProperty displaySelectionProperty() {
+        return displaySelection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCellDisplaySelection(int row, int column, boolean displaySelection) {
+        Long key = key(row, column);
+        if (displaySelection) {
+            displaySelectionCells.add(key);
+            noDisplaySelectionCells.remove(key);
+        } else {
+            displaySelectionCells.remove(key);
+            noDisplaySelectionCells.add(key);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCellDisplaySelection(int row, int column) {
+        Long key = key(row, column);
+        if (displaySelectionCells.contains(key)) {
+            return true;
+        } else if (noDisplaySelectionCells.contains(key)) {
+            return false;
+        }
+        return isDisplaySelection();
     }
     
     /** {@inheritDoc} */

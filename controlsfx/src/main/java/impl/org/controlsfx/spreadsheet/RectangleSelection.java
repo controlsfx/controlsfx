@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -83,7 +83,7 @@ public class RectangleSelection extends Rectangle {
         sm.getSelectedCells().addListener((Observable observable) -> {
             skin.getHorizontalHeader().clearSelectedColumns();
             skin.verticalHeader.clearSelectedRows();
-            selectionRange.fill(sm.getSelectedCells());
+            selectionRange.fill(sm.getSelectedCells(), skin.spreadsheetView.getGrid());
             updateRectangle();
         });
     }
@@ -318,22 +318,39 @@ public class RectangleSelection extends Rectangle {
         public SelectionRange() {
         }
 
-        /**
-         * Construct a SelectionRange with a List of Pair where the value is the
-         * row (of the WsGrid) and the value is column(of the WsGrid).
-         *
-         * @param list
-         */
         public void fill(List<TablePosition> list) {
             set.clear();
             for (TablePosition pos : list) {
-                set.add(key(pos.getRow(), pos.getColumn()));
+                long key = key(pos.getRow(), pos.getColumn());
+                set.add(key);
             }
+            computeRange();
+        }
+        /**
+         * Construct a SelectionRange with a List of Pair where the value is the
+         * row and the value is column.
+         *
+         * @param list
+         * @param grid
+         */
+        public void fill(List<TablePosition> list, Grid grid) {
+            set.clear();
+            range = null;
+             for (TablePosition pos : list) {
+                long key = key(pos.getRow(), pos.getColumn());
+                set.add(key);
+                //I just check that a selected cell is not against it.
+                if (!grid.isCellDisplaySelection(pos.getRow(), pos.getColumn())) {
+                    return;
+                }
+            }
+
             computeRange();
         }
         
         public void fillGridRange(List<GridChange> list) {
             set.clear();
+            range = null;
             for (GridChange pos : list) {
                 set.add(key(pos.getRow(), pos.getColumn()));
             }
@@ -343,7 +360,8 @@ public class RectangleSelection extends Rectangle {
         public GridRange getRange(){
             return range;
         }
-        private Long key(int row, int column) {
+        
+        public static Long key(int row, int column) {
             return (((long) row) << 32) | column;
         }
 

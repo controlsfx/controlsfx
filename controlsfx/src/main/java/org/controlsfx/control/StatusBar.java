@@ -156,7 +156,8 @@ public class StatusBar extends ControlsFXControl {
 
     private final StringProperty styleTextProperty = new SimpleStringProperty();
     /**
-     * Allow to style the text directly.
+     * A string representation of the CSS style associated with this Text.{@link Node#setStyle(java.lang.String)
+     * }
      *
      * @param style
      */
@@ -165,7 +166,8 @@ public class StatusBar extends ControlsFXControl {
     }
 
     /**
-     * Return the style applied on the text.
+     * A string representation of the CSS style associated with this Text. {@link Node#getStyle()
+     * }
      *
      * @return the style applied on the text.
      */
@@ -178,7 +180,7 @@ public class StatusBar extends ControlsFXControl {
      *
      * @return the BooleanProperty associated with the style applied to the text.
      */
-    public StringProperty stylePropertyText() {
+    public final StringProperty styleTextProperty() {
         return styleTextProperty;
     }
     

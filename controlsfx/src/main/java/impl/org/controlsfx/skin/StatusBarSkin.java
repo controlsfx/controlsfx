@@ -57,15 +57,13 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
 
         progressBar = new ProgressBar();
        
-//        progressBar.visibleProperty().bind(
-//                Bindings.notEqual(0, statusBar.progressProperty()));
 
         label = new Label();
         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         label.textProperty().bind(statusBar.textProperty());
         label.graphicProperty().bind(statusBar.graphicProperty());
         label.getStyleClass().add("status-label"); //$NON-NLS-1$
-        label.styleProperty().bind(statusBar.stylePropertyText());
+        label.styleProperty().bind(getSkinnable().styleProperty());
 
         leftBox.getChildren().setAll(getSkinnable().getLeftItems());
 
@@ -99,6 +97,11 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
 
         getChildren().add(gridPane);
         
+        /**
+         * We want to remove the progressBar from the GridPane when no Task is
+         * being executed. We used to toggle its visibility but the progressBar
+         * was still there and messing with the alignment.
+         */
         progressBar.progressProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
             if (newValue.doubleValue() > 0.0) {
                 if (!gridPane.getChildren().contains(progressBar)) {

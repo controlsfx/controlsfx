@@ -97,9 +97,9 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
              */
             int newRow;
             if (delta < 0) {
-                newRow = cell.getRow() + delta;
+                newRow = skin.spreadsheetView.getViewRow(cell.getRow()) + delta;
             } else {
-                newRow = cell.getRow() + cell.getRowSpan() - 1 + delta;
+                newRow = skin.spreadsheetView.getViewRow(cell.getRow()) + skin.spreadsheetView.getRowSpan(cell) - 1 + delta;
             }
 
             // we don't let the newRow go outside the bounds of the data

@@ -132,7 +132,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             return;
         }
 
-        final List<SpreadsheetCell> row = grid.getRows().get(index);
+        final List<SpreadsheetCell> row = getSkinnable().getItem();//.get(index);
         final List<SpreadsheetColumn> columns = spreadsheetView.getColumns();
         final ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> tableViewColumns = gridView.getColumns();
         /**

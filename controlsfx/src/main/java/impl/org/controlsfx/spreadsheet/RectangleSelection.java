@@ -141,7 +141,7 @@ public class RectangleSelection extends Rectangle {
             setVisible(false);
             return;
         }
-        SpreadsheetCell cell = grid.getRows().get(maxRow).get(maxColumn);
+        SpreadsheetCell cell = skin.getSkinnable().getItems().get(maxRow).get(maxColumn);
         handleHorizontalPositioning(minColumn, maxColumn, cell.getColumnSpan());
 
         //If we are out of sight

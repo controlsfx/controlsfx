@@ -30,6 +30,7 @@ import com.sun.javafx.event.EventHandlerManager;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import static impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange.key;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -38,7 +39,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
@@ -99,7 +99,7 @@ public class GridBase implements Grid, EventTarget {
      * Private Fields
      * 
      **************************************************************************/
-    private FilteredList<ObservableList<SpreadsheetCell>> rows;
+    private ObservableList<ObservableList<SpreadsheetCell>> rows;
 
     private int rowCount;
     private int columnCount;
@@ -132,7 +132,7 @@ public class GridBase implements Grid, EventTarget {
         columnsHeader = FXCollections.observableArrayList();
         locked = new SimpleBooleanProperty(false);
         rowHeightFactory = new MapBasedRowHeightFactory(new HashMap<>());
-        rows = new FilteredList(FXCollections.observableArrayList());
+        rows = FXCollections.observableArrayList();
         rows.addListener((Observable observable) -> {
             setRowCount(rows.size());
         });
@@ -148,7 +148,7 @@ public class GridBase implements Grid, EventTarget {
 
     /** {@inheritDoc} */
     @Override
-    public FilteredList<ObservableList<SpreadsheetCell>> getRows() {
+    public ObservableList<ObservableList<SpreadsheetCell>> getRows() {
         return rows;
     }
 
@@ -156,7 +156,7 @@ public class GridBase implements Grid, EventTarget {
     @Override
     public void setCellValue(int modelRow, int column, Object value) {
         if (modelRow < getRowCount() && column < columnCount && !isLocked()) {
-            SpreadsheetCell cell = getRows().getSource().get(modelRow).get(column);
+            SpreadsheetCell cell = getRows().get(modelRow).get(column);
             Object previousItem = cell.getItem();
             Object convertedValue = cell.getCellType().convertValue(value);
             cell.setItem(convertedValue);
@@ -329,11 +329,12 @@ public class GridBase implements Grid, EventTarget {
 
     /** {@inheritDoc} */
     @Override
-    public void setRows(ObservableList<ObservableList<SpreadsheetCell>> rows) {
-        this.rows = new FilteredList<ObservableList<SpreadsheetCell>>(rows);
+    public void setRows(Collection<ObservableList<SpreadsheetCell>> rows) {
+        this.rows.clear();
+        this.rows.addAll(rows);
 
         setRowCount(rows.size());
-        setColumnCount(getRowCount() == 0 ? 0 : this.rows.get(0).size());
+        setColumnCount(rowCount == 0 ? 0 : this.rows.get(0).size());
     }
 
     /**

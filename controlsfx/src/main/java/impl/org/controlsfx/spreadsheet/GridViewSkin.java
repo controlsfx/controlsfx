@@ -500,7 +500,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
         
         rowHeightMap.clear();
-        int maxRows = handle.getView().getGrid().getRows().getSource().size();
+        int maxRows = handle.getView().getGrid().getRows().size();
         for (int row = 0; row < maxRows; row++) {
             if (grid.isRowResizable(row)) {
                 Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight));
@@ -959,18 +959,18 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             while (c.next()) {
                 if (c.wasPermutated()) {
                     for (Integer fixedRow : c.getList()) {
-                        rowToLayout.set(spreadsheetView.getModelRow(fixedRow), true);
+                        rowToLayout.set(fixedRow, true);
                     }
                 } else {
                     for (Integer unfixedRow : c.getRemoved()) {
-                        rowToLayout.set(spreadsheetView.getModelRow(unfixedRow), false);
+                        rowToLayout.set(unfixedRow, false);
                     //If the grid permits it, we check the spanning in order not
                         //to remove a row that might need layout.
                         if (spreadsheetView.getGrid().getRows().size() > unfixedRow) {
                             List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
                             for (SpreadsheetCell cell : myRow) {
                                 if (spreadsheetView.getRowSpan(cell) > 1 || cell.getColumnSpan() > 1) {
-                                    rowToLayout.set(spreadsheetView.getModelRow(unfixedRow), true);
+                                    rowToLayout.set(unfixedRow, true);
                                     break;
                                 }
                             }
@@ -979,7 +979,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
                     //We check for the newly fixedRow
                     for (Integer fixedRow : c.getAddedSubList()) {
-                        rowToLayout.set(spreadsheetView.getModelRow(fixedRow), true);
+                        rowToLayout.set(fixedRow, true);
                     }
                 }
             }

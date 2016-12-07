@@ -26,9 +26,9 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.Collection;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
@@ -96,7 +96,7 @@ public interface Grid {
      * @return an ObservableList of ObservableList of {@link SpreadsheetCell}
      * instances
      */
-    public FilteredList<ObservableList<SpreadsheetCell>> getRows();
+    public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
     /**
      * Change the value situated at the intersection if possible.
@@ -172,7 +172,7 @@ public interface Grid {
      * This method sets the rows used by the grid, and updates the rowCount.
      * @param rows
      */
-    public void setRows(ObservableList<ObservableList<SpreadsheetCell>> rows);
+    public void setRows(Collection<ObservableList<SpreadsheetCell>> rows);
     
     /**
      * Return true if the selection (black rectangle) is displayed on the Grid.

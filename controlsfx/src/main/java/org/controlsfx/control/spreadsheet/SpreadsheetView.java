@@ -70,6 +70,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -536,6 +537,7 @@ public class SpreadsheetView extends Control{
     private ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
     private HashMap<Integer,Integer> rowMap = new HashMap<>();
     private Integer filteredRow;
+    private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
     
     public boolean isRowHidden(int row){
         return hiddenRowsProperty.get().get(row);
@@ -575,19 +577,19 @@ public class SpreadsheetView extends Control{
     }
     
     private void computeRowMap(){
-        rowMap = new HashMap<>(getGrid().getRows().getSource().size());
+        rowMap = new HashMap<>(getGrid().getRows().size());
         int visibleRow = 0;
-        for(int i=0;i<getGrid().getRows().getSource().size();++i ){
+        for(int i=0;i<getGrid().getRows().size();++i ){
             if(!getHiddenRows().get(i)){
                rowMap.put(i,visibleRow++);
             }else{
               rowMap.put(i,visibleRow);
             }
         }
-        getGrid().getRows().setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
+        filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
             @Override
             public boolean test(ObservableList<SpreadsheetCell> t) {
-                return !getHiddenRows().get(getGrid().getRows().getSource().indexOf(t));
+                return !getHiddenRows().get(getGrid().getRows().indexOf(t));
             }
         });
     }
@@ -611,7 +613,7 @@ public class SpreadsheetView extends Control{
 
     public int getModelRow(int viewRow) {
         try {
-            return getGrid().getRows().getSourceIndex(viewRow);
+            return filteredList.getSourceIndex(viewRow);
         } catch (NullPointerException | IndexOutOfBoundsException ex) {
             System.out.println("Problem in getModelRow for " + viewRow);
             return viewRow;
@@ -689,7 +691,8 @@ public class SpreadsheetView extends Control{
         // Reactivate that after
 //        verifyGrid(grid);
         gridProperty.set(grid);
-        setHiddenRows(new BitSet(grid.getRows().getSource().size()));
+        filteredList = new FilteredList<>(grid.getRows());
+        setHiddenRows(new BitSet(filteredList.getSource().size()));
         initRowFix(grid);
 
         /**
@@ -734,8 +737,8 @@ public class SpreadsheetView extends Control{
         if (grid.getRows() != null) {
 //            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
 //                    .observableArrayList(grid.getRows());
-            cellsView.getItems().clear();
-            cellsView.setItems(grid.getRows());
+//            cellsView.getItems().clear();
+            cellsView.setItems(filteredList);
 
             final int columnCount = grid.getColumnCount();
             columns.clear();

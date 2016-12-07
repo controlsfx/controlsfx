@@ -41,15 +41,19 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -318,7 +322,7 @@ public class SpreadsheetView extends Control{
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private final SpreadsheetViewSelectionModel selectionModel;
-    
+
     /**
      * The vertical header width, just for the Label, not the Pickers.
      */
@@ -411,8 +415,15 @@ public class SpreadsheetView extends Control{
         super();
         //We want to recompute the rectangleHeight when a fixedRow is resized.
         addEventHandler(RowHeightEvent.ROW_HEIGHT_CHANGE, (RowHeightEvent event) -> {
-            if(getFixedRows().contains(event.getRow()) && getCellsViewSkin() != null){
+            if(getFixedRows().contains(getModelRow(event.getRow())) && getCellsViewSkin() != null){
                 getCellsViewSkin().computeFixedRowHeight();
+            }
+        });
+        hiddenRowsProperty.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                computeRowMap();
+                 initRowFix(grid);
             }
         });
         getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
@@ -521,6 +532,99 @@ public class SpreadsheetView extends Control{
                 pos.getVpos());
     }
 
+    //The visible rows.
+    private ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
+    private HashMap<Integer,Integer> rowMap = new HashMap<>();
+    private Integer filteredRow;
+    
+    public boolean isRowHidden(int row){
+        return hiddenRowsProperty.get().get(row);
+    }
+    
+    public BitSet getHiddenRows(){
+        return hiddenRowsProperty.get();
+    }
+    
+    public final ObjectProperty<BitSet> hiddenRowsProperty(){
+        return hiddenRowsProperty;
+    }
+    
+    public void setHiddenRows(BitSet hiddenRows){
+        this.hiddenRowsProperty.setValue(hiddenRows);
+        requestLayout();
+    }
+    
+    public Integer getFilteredRow(){
+        return filteredRow;
+    }
+    
+    public void setFilteredRow(Integer row) {
+        if (row == null || row > getGrid().getRowCount()) {
+            filteredRow = null;
+        } else {
+            filteredRow = row;
+        }
+    }
+    
+    public void hideRow(int row){
+        if(getHiddenRows().get(row)){
+            return;
+        }
+        getHiddenRows().set(row, false);
+        computeRowMap();
+    }
+    
+    private void computeRowMap(){
+        rowMap = new HashMap<>(getGrid().getRows().getSource().size());
+        int visibleRow = 0;
+        for(int i=0;i<getGrid().getRows().getSource().size();++i ){
+            if(!getHiddenRows().get(i)){
+               rowMap.put(i,visibleRow++);
+            }else{
+              rowMap.put(i,visibleRow);
+            }
+        }
+        getGrid().getRows().setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
+            @Override
+            public boolean test(ObservableList<SpreadsheetCell> t) {
+                return !getHiddenRows().get(getGrid().getRows().getSource().indexOf(t));
+            }
+        });
+    }
+    
+    public void showRow(int row){
+        if(!getHiddenRows().get(row)){
+            return;
+        }
+         getHiddenRows().set(row, true);
+        computeRowMap();
+    }
+    
+    public int getViewRow(int modelRow) {
+        try {
+            return rowMap.get(modelRow);
+        } catch (NullPointerException ex) {
+            System.out.println("Problem in getViewRow for " + modelRow);
+            return modelRow;
+        }
+    }
+
+    public int getModelRow(int viewRow) {
+        try {
+            return getGrid().getRows().getSourceIndex(viewRow);
+        } catch (NullPointerException | IndexOutOfBoundsException ex) {
+            System.out.println("Problem in getModelRow for " + viewRow);
+            return viewRow;
+        }
+    }
+    
+    public int getRowSpan(SpreadsheetCell cell) {
+        int rowSpan = cell.getRowSpan();
+        for (int i = cell.getRow(); i < cell.getRow() + cell.getRowSpan(); ++i) {
+            rowSpan -= getHiddenRows().get(i) ? 1 : 0;
+        }
+        return rowSpan;
+    }
     /**
      * Return the zoomFactor used for the SpreadsheetView.
      * @return the zoomFactor used for the SpreadsheetView.
@@ -585,6 +689,7 @@ public class SpreadsheetView extends Control{
         // Reactivate that after
 //        verifyGrid(grid);
         gridProperty.set(grid);
+        setHiddenRows(new BitSet(grid.getRows().getSource().size()));
         initRowFix(grid);
 
         /**
@@ -627,10 +732,10 @@ public class SpreadsheetView extends Control{
         final Pair<Integer, Integer> finalPair = focusedPair;
         
         if (grid.getRows() != null) {
-            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
-                    .observableArrayList(grid.getRows());
+//            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
+//                    .observableArrayList(grid.getRows());
             cellsView.getItems().clear();
-            cellsView.setItems(observableRows);
+            cellsView.setItems(grid.getRows());
 
             final int columnCount = grid.getColumnCount();
             columns.clear();
@@ -797,7 +902,7 @@ public class SpreadsheetView extends Control{
                         return false;
                     }
                     //We only want to consider the original cell.
-                    if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
+                    if (getRowSpan(cell) > maxSpan && cell.getRow() == row) {
                         maxSpan = cell.getRowSpan();
                     }
                 }
@@ -1308,7 +1413,7 @@ public class SpreadsheetView extends Control{
              * We need to add every cell contained in a span otherwise the
              * rectangles computed when pasting will be wrong.
              */
-            for (int row = 0; row < cell.getRowSpan(); ++row) {
+            for (int row = 0; row < getRowSpan(cell); ++row) {
                 for (int col = 0; col < cell.getColumnSpan(); ++col) {
                     try {
                         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
@@ -1663,7 +1768,7 @@ public class SpreadsheetView extends Control{
      */
     private static Grid getSampleGrid() {
         GridBase gridBase = new GridBase(100, 15);
-        List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+        ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         for (int row = 0; row < gridBase.getRowCount(); ++row) {
             ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
@@ -1683,7 +1788,7 @@ public class SpreadsheetView extends Control{
         for (int r = 0; r < rows.size(); ++r) {
             ObservableList<SpreadsheetCell> row = rows.get(r);
             for (SpreadsheetCell cell : row) {
-                if (cell.getRowSpan() > 1) {
+                if (getRowSpan(cell) > 1) {
                     continue rows;
                 }
             }
@@ -1932,12 +2037,12 @@ public class SpreadsheetView extends Control{
          */
         public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE = new EventType<>(Event.ANY, "RowHeightChange"); //$NON-NLS-1$
 
-        private final int row;
+        private final int viewRow;
         private final double height;
 
         public RowHeightEvent(int row, double height) {
             super(ROW_HEIGHT_CHANGE);
-            this.row = row;
+            this.viewRow = row;
             this.height = height;
         }
 
@@ -1946,7 +2051,7 @@ public class SpreadsheetView extends Control{
          * @return the row index that has been resized.
          */
         public int getRow() {
-            return row;
+            return viewRow;
         }
 
         /**

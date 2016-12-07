@@ -154,6 +154,7 @@ public class VerticalHeader extends StackPane {
 
         // When the Grid is changing, we need to update our information.
         handle.getView().gridProperty().addListener(layout);
+        handle.getView().hiddenRowsProperty().addListener(layout);
 
         // Clip property to stay within bounds
         clip = new Rectangle(getVerticalHeaderWidth(), snapSize(skin.getSkinnable().getHeight()));
@@ -279,19 +280,41 @@ public class VerticalHeader extends StackPane {
         }
     }
 
+    /**
+     * Return true if there are no fixed rows when taking hidden rows in
+     * consideration.
+     *
+     * @param spreadsheetView
+     * @return
+     */
+    public static boolean isFixedRowEmpty(SpreadsheetView spreadsheetView) {
+        for (Integer fixedRow : spreadsheetView.getFixedRows()) {
+            if (!spreadsheetView.getHiddenRows().get(fixedRow)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private int addFixedRows(int rowCount, double x, int cellSize) {
         double spaceUsedByFixedRows = 0;
         int rowIndex;
         Label label;
         final Set<Integer> currentlyFixedRow = handle.getCellsViewSkin().getCurrentlyFixedRow();
         // Then we iterate over the FixedRows if any
-        if (!spreadsheetView.getFixedRows().isEmpty() && cellSize != 0) {
+        if (!isFixedRowEmpty(spreadsheetView) && cellSize != 0) {
             for (int j = 0; j < spreadsheetView.getFixedRows().size(); ++j) {
 
                 rowIndex = spreadsheetView.getFixedRows().get(j);
+                if(spreadsheetView.getHiddenRows().get(rowIndex)){
+                    continue;
+                }
+                //Changing the index right
+                rowIndex = spreadsheetView.getViewRow(rowIndex);
                 if (!currentlyFixedRow.contains(rowIndex)) {
                     break;
                 }
+                
                 double rowHeight = skin.getRowHeight(rowIndex);
                 double y = spreadsheetView.showColumnHeaderProperty().get() ? snappedTopInset() + horizontalHeaderHeight + spaceUsedByFixedRows
                         : snappedTopInset() + spaceUsedByFixedRows;
@@ -357,7 +380,7 @@ public class VerticalHeader extends StackPane {
 
         Label label;
         // We don't want to add Label if there are no rows associated with.
-        final int modelRowCount = spreadsheetView.getGrid().getRowCount();
+        final int viewRowCount = skin.getItemCount();
 
         int i = 0;
 
@@ -368,7 +391,7 @@ public class VerticalHeader extends StackPane {
         double height;
 
         // We iterate over the visibleRows
-        while (cellSize != 0 && row != null && row.getIndex() < modelRowCount) {
+        while (cellSize != 0 && row != null && row.getIndex() < viewRowCount) {
             rowIndex = row.getIndex();
             height = row.getHeight();
             /**
@@ -398,7 +421,7 @@ public class VerticalHeader extends StackPane {
                 } else {
                     css.removeAll("selected"); //$NON-NLS-1$
                 }
-                if (spreadsheetView.getFixedRows().contains(rowIndex)) {
+                if (spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(rowIndex))) {
                     css.addAll("fixed"); //$NON-NLS-1$
                 } else {
                     css.removeAll("fixed"); //$NON-NLS-1$
@@ -407,7 +430,7 @@ public class VerticalHeader extends StackPane {
                 y += height;
 
                 // position drag overlay to intercept row resize requests if authorized by the grid.
-                if (spreadsheetView.getGrid().isRowResizable(rowIndex)) {
+                if (spreadsheetView.getGrid().isRowResizable(spreadsheetView.getModelRow(rowIndex))) {
                     Rectangle dragRect = getDragRect(rowCount++);
                     dragRect.getProperties().put(TABLE_ROW_KEY, row);
                     dragRect.getProperties().put(TABLE_LABEL_KEY, label);
@@ -418,7 +441,7 @@ public class VerticalHeader extends StackPane {
             }
             row = skin.getRow(++i);
         }
-        return rowCount;
+        return viewRowCount;
     }
 
     private final EventHandler<MouseEvent> rectMousePressed = new EventHandler<MouseEvent>() {
@@ -428,7 +451,7 @@ public class VerticalHeader extends StackPane {
             if (me.getClickCount() == 2 && me.isPrimaryButtonDown()) {
                 Rectangle rect = (Rectangle) me.getSource();
                 GridRow row = (GridRow) rect.getProperties().get(TABLE_ROW_KEY);
-                skin.resizeRowToFitContent(row.getIndex());
+                skin.resizeRowToFitContent(spreadsheetView.getModelRow(row.getIndex()));
                 requestLayout();
             } else {
                 // rather than refer to the rect variable, we just grab
@@ -465,7 +488,7 @@ public class VerticalHeader extends StackPane {
         if (newHeight < 0) {
             return;
         }
-        handle.getCellsViewSkin().rowHeightMap.put(gridRow.getIndex(), newHeight);
+        handle.getCellsViewSkin().rowHeightMap.put(spreadsheetView.getModelRow(gridRow.getIndex()), newHeight);
         Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(gridRow.getIndex(), newHeight));
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
@@ -512,7 +535,7 @@ public class VerticalHeader extends StackPane {
         label.setOnMousePressed(row == null ? null : (MouseEvent event) -> {
             if (event.isPrimaryButtonDown()) {
                 if (event.getClickCount() == 2) {
-                    skin.resizeRowToFitContent(row);
+                    skin.resizeRowToFitContent(spreadsheetView.getModelRow(row));
                     requestLayout();
                 } else {
                     headerClicked(row, event);
@@ -533,7 +556,7 @@ public class VerticalHeader extends StackPane {
     private void headerClicked(int row, MouseEvent event) {
         TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = handle.getGridView().getSelectionModel();
         int focusedRow = sm.getFocusedIndex();
-        int rowCount = handle.getView().getGrid().getRowCount();
+        int rowCount = handle.getCellsViewSkin().getItemCount();
         ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> columns = sm.getTableView().getColumns();
         TableColumn<ObservableList<SpreadsheetCell>, ?> firstColumn = columns.get(0);
         TableColumn<ObservableList<SpreadsheetCell>, ?> lastColumn = columns.get(columns.size() - 1);
@@ -626,7 +649,7 @@ public class VerticalHeader extends StackPane {
 
                 @Override
                 public void handle(WindowEvent event) {
-                    if (spreadsheetView.getFixedRows().contains(row)) {
+                    if (spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
                         fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.unfix"))); //$NON-NLS-1$
                     } else {
                         fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.fix"))); //$NON-NLS-1$
@@ -638,10 +661,11 @@ public class VerticalHeader extends StackPane {
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
-                    if (spreadsheetView.getFixedRows().contains(row)) {
-                        spreadsheetView.getFixedRows().remove(row);
+                    Integer modelRow = spreadsheetView.getModelRow(row);
+                    if (spreadsheetView.getFixedRows().contains(modelRow)) {
+                        spreadsheetView.getFixedRows().remove(modelRow);
                     } else {
-                        spreadsheetView.getFixedRows().add(row);
+                        spreadsheetView.getFixedRows().add(modelRow);
                     }
                 }
             });
@@ -660,8 +684,9 @@ public class VerticalHeader extends StackPane {
      * @return
      */
     private String getRowHeader(int index) {
-        return spreadsheetView.getGrid().getRowHeaders().size() > index ? spreadsheetView
-                .getGrid().getRowHeaders().get(index) : String.valueOf(index + 1);
+        int newIndex = spreadsheetView.getModelRow(index);
+        return spreadsheetView.getGrid().getRowHeaders().size() > newIndex ? spreadsheetView
+                .getGrid().getRowHeaders().get(newIndex) : String.valueOf(newIndex + 1);
     }
 
     /**

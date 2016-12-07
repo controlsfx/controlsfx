@@ -158,7 +158,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         spv.getFixedRows().addListener((Observable observable) -> {
             List<T> toRemove = new ArrayList<>();
             for (T cell : myFixedCells) {
-                if (!spv.getFixedRows().contains(cell.getIndex())) {
+                if (!spv.getFixedRows().contains(spreadSheetView.getModelRow(cell.getIndex()))) {
                     cell.setManaged(false);
                     cell.setVisible(false);
                     toRemove.add(cell);

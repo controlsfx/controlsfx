@@ -198,7 +198,7 @@ public class HorizontalHeader extends TableHeaderRow {
      */
     private void headerClicked(TableColumn column, MouseEvent event) {
         TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
-        int lastRow = gridViewSkin.spreadsheetView.getGrid().getRowCount() - 1;
+        int lastRow = gridViewSkin.getItemCount() - 1;
         int indexColumn = column.getTableView().getColumns().indexOf(column);
         TablePosition focusedPosition = sm.getTableView().getFocusModel().getFocusedCell();
         if (event.isShortcutDown()) {

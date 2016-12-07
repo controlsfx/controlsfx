@@ -58,6 +58,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
+import org.controlsfx.control.spreadsheet.Filter;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
@@ -70,7 +71,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  * {@link SpreadsheetCell}.
  */
 public class CellView extends TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
-    private final SpreadsheetHandle handle;
+    final SpreadsheetHandle handle;
     /**
      * Because we don't want to recreate Tooltip each time the TableCell is
      * re-used. We save it properly here so we avoid recreating it each time
@@ -170,6 +171,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 getTableView().edit(-1, null);
             }
         }
+    }
+
+    /**
+     * Return the Filter associated to this cell or null otherwise.
+     * @return 
+     */
+    Filter getFilter() {
+        Filter filter = getItem() != null ? handle.getView().getColumns().get(getItem().getColumn()).getFilter() : null;
+        return filter != null &&  handle.getView().getFilteredRow()== getIndex() ? filter : null;
     }
 
     @Override
@@ -516,7 +526,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
         // For spanned Cells
         final SpreadsheetCell cell = (SpreadsheetCell) getItem();
-        final int rowCell = cell.getRow() + cell.getRowSpan() - 1;
+        final int rowCell = handle.getView().getViewRow(cell.getRow()) + handle.getView().getRowSpan(cell) - 1;
         final int columnCell = cell.getColumn() + cell.getColumnSpan() - 1;
 
         final TableViewFocusModel<?> fm = tableView.getFocusModel();

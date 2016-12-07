@@ -218,7 +218,7 @@ public class SpreadsheetViewSelectionModel {
      */
     public void clearAndSelectPreviousCell() {
         TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
-        int nextRow = FocusModelListener.getPreviousRowNumber(position, selectionModel.getTableView());
+        int nextRow = FocusModelListener.getPreviousRowNumber(position, selectionModel.getTableView(), spv);
         if (nextRow >= 0) {
             clearAndSelect(nextRow, spv.getColumns().get(position.getColumn()));
         }
@@ -229,7 +229,7 @@ public class SpreadsheetViewSelectionModel {
      */
     public void clearAndSelectNextCell() {
         TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
-        int nextRow = FocusModelListener.getNextRowNumber(position, selectionModel.getTableView());
+        int nextRow = FocusModelListener.getNextRowNumber(position, selectionModel.getTableView(), spv);
         if (nextRow < spv.getGrid().getRowCount()) {
             clearAndSelect(nextRow, spv.getColumns().get(position.getColumn()));
         }

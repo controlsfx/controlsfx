@@ -61,7 +61,7 @@ public interface SpreadsheetCell {
      * when a corner state of a SpreadsheetCell is changed.
      */
     public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType"); //$NON-NLS-1$
-
+    
     /**
      * This enum states the four different corner available for positioning 
      * some elements in a cell.

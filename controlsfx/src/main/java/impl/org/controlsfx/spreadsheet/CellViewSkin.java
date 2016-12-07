@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,11 +33,15 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.MenuButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
+import org.controlsfx.control.spreadsheet.Filter;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
 
@@ -51,6 +55,12 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
  */
 public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
 
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
+     * when a SpreadsheetCell filter is activated/deactivated on this column.
+     */
+    public static final EventType FILTER_EVENT_TYPE = new EventType("FilterEventType"); //$NON-NLS-1$
+    
     private final static String TOP_LEFT_CLASS = "top-left"; //$NON-NLS-1$
     private final static String TOP_RIGHT_CLASS = "top-right"; //$NON-NLS-1$
     private final static String BOTTOM_RIGHT_CLASS = "bottom-right"; //$NON-NLS-1$
@@ -67,10 +77,12 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     private Region topRightRegion = null;
     private Region bottomRightRegion = null;
     private Region bottomLeftRegion = null;
+    private MenuButton filterButton = null;
 
-    public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
+    public CellViewSkin(CellView tableCell) {
         super(tableCell);
         tableCell.itemProperty().addListener(weakItemChangeListener);
+        tableCell.getTableColumn().addEventHandler(FILTER_EVENT_TYPE, triangleEventHandler);
         if (tableCell.getItem() != null) {
             tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, weakTriangleEventHandler);
         }
@@ -100,6 +112,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         super.layoutChildren(x, y, w, h);
         if (getSkinnable().getItem() != null) {
             layoutTriangle();
+            handleFilter(x,y,w,h);
         }
     }
 
@@ -112,6 +125,20 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         handleBottomRight(cell);
 
         getSkinnable().requestLayout();
+    }
+
+    private void handleFilter(double x, final double y, final double w, final double h) {
+        Filter filter = ((CellView) getSkinnable()).getFilter();
+        if (filter != null) {
+            filterButton = filter.getMenuButton();
+            if (!getChildren().contains(filterButton)) {
+                getChildren().add(filterButton);
+            }
+            layoutInArea(filterButton, x, y, w, h, 0, HPos.RIGHT, VPos.BOTTOM);
+        } else if (filterButton != null) {
+            getChildren().remove(filterButton);
+            filterButton = null;
+        }
     }
 
     private void handleTopLeft(SpreadsheetCell cell) {

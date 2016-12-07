@@ -342,10 +342,12 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.
                  */
-                if (spreadsheetCell.getRowSpan() > 1) {
+                int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell);
+                int spvRow = spreadsheetView.getViewRow(spreadsheetCell.getRow());
+                if (rowSpan > 1) {
                     height = 0;
-                    final int maxRow = spreadsheetCell.getRow() + spreadsheetCell.getRowSpan();
-                    for (int i = spreadsheetCell.getRow(); i < maxRow; ++i) {
+                    final int maxRow = spvRow + rowSpan;
+                    for (int i = spvRow; i < maxRow; ++i) {
                         height += snapSize(skin.getRowHeight(i));
                     }
                 }
@@ -379,7 +381,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          * triggered, because it's not the user who has modified that. So the
          * rectangle will not update, we need to force it here.
          */
-        if (rowHeightChange && spreadsheetView.getFixedRows().contains(index)) {
+        if (rowHeightChange && spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(index))) {
             skin.computeFixedRowHeight();
         }
     }
@@ -509,14 +511,16 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      */
     private double getFixedRowShift(int index) {
         double tableCellY = 0;
-        int positionY = spreadsheetView.getFixedRows().indexOf(index);
+        int positionY = spreadsheetView.getFixedRows().indexOf(spreadsheetView.getModelRow(index));
 
         //FIXME Integrate if fixedCellSize is enabled
         //Computing how much space we need to translate
         //because each row has different space.
         double space = 0;
         for (int o = 0; o < positionY; ++o) {
-            space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
+            if(!spreadsheetView.isRowHidden(o)){
+                space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getViewRow(spreadsheetView.getFixedRows().get(o)));
+            }
         }
 
         //If true, this row is fixed
@@ -537,8 +541,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * @return
      */
     private double getTableRowHeight(int row) {
-        Double rowHeightCache = handle.getCellsViewSkin().rowHeightMap.get(row);
-        return rowHeightCache == null ? handle.getView().getGrid().getRowHeight(row) : rowHeightCache;
+        Double rowHeightCache = handle.getCellsViewSkin().rowHeightMap.get(spreadsheetView.getModelRow(row));
+        return rowHeightCache == null ? handle.getView().getGrid().getRowHeight(spreadsheetView.getModelRow(row)) : rowHeightCache;
     }
 
     /**

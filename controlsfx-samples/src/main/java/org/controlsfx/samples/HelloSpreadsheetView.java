@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +55,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
+import org.controlsfx.control.spreadsheet.Filter;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -143,6 +143,9 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         spreadSheetView.getColumns().get(1).setPrefWidth(250);
         centerPane.getChildren().setAll(spreadSheetView);
 
+        spreadSheetView.setFilteredRow(0);
+        Filter filter = new Filter(spreadSheetView, 0);
+        spreadSheetView.getColumns().get(0).setFilter(filter);
         spreadSheetView.getStylesheets().add(getClass().getResource("spreadsheetSample.css").toExternalForm());
         return centerPane;
     }
@@ -594,7 +597,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
      * @param grid
      */
     private void buildGrid(GridBase grid) {
-        ArrayList<ObservableList<SpreadsheetCell>> rows = new ArrayList<>(grid.getRowCount());
+        ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         int rowIndex = 0;
         rows.add(getCompanies(grid, rowIndex++));
@@ -611,7 +614,7 @@ public class HelloSpreadsheetView extends ControlsFXSample {
         rows.add(getSeparator(grid, rowIndex++));
         rows.add(getSeparator(grid, rowIndex++));
 
-        for (int i = rowIndex; i < rowIndex + 20; ++i) {
+        for (int i = rowIndex; i < rowIndex + 1000; ++i) {
             final ObservableList<SpreadsheetCell> randomRow = FXCollections.observableArrayList();
 
             SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(i, 0, 1, 1, "Random " + (i + 1));

@@ -75,6 +75,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         this.visibleProperty().addListener(weakPrefHeightListener);
         
         handle.getView().gridProperty().addListener(weakPrefHeightListener);
+        handle.getView().hiddenRowsProperty().addListener(weakPrefHeightListener);
         
         /**
          * When the height is changing elsewhere, we need to update ourself if necessary.
@@ -83,9 +84,9 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 
             @Override
             public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
-                if (change.wasAdded() && change.getKey() == getIndex()) {
+                if (change.wasAdded() && change.getKey() == handle.getView().getModelRow(getIndex())) {
                     setRowHeight(change.getValueAdded());
-                } else if (change.wasRemoved() && change.getKey() == getIndex()) {
+                } else if (change.wasRemoved() && change.getKey() == handle.getView().getModelRow(getIndex())) {
                     setRowHeight(computePrefHeight(-1));
                 }
             }

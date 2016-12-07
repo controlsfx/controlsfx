@@ -137,7 +137,7 @@ public class RectangleSelection extends Rectangle {
         }
 
         Grid grid = skin.spreadsheetView.getGrid();
-        if (maxRow >= grid.getRowCount() || maxColumn >= grid.getColumnCount()) {
+        if (maxRow >= skin.getItemCount() || maxColumn >= grid.getColumnCount()) {
             setVisible(false);
             return;
         }
@@ -157,7 +157,7 @@ public class RectangleSelection extends Rectangle {
         }
         setVisible(true);
 
-        handleVerticalPositioning(minRow, maxRow, gridMinRow, gridMaxRow, cell.getRowSpan());
+        handleVerticalPositioning(minRow, maxRow, gridMinRow, gridMaxRow, skin.spreadsheetView.getRowSpan(cell));
     }
 
     /**

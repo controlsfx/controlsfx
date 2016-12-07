@@ -70,7 +70,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                 // already on the cell and we wanted to go below.
                 if (!spreadsheetView.isPressed() && oldPosition.getColumn() == newPosition.getColumn() && oldPosition.getRow() == newPosition.getRow() - 1) {
                     Platform.runLater(() -> {
-                        tfm.focus(getNextRowNumber(oldPosition, cellsView), oldPosition.getTableColumn());
+                        tfm.focus(getNextRowNumber(oldPosition, cellsView, spreadsheetView), oldPosition.getTableColumn());
                     });
 
                 } else {
@@ -131,12 +131,12 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * @param cellsView
      * @return
      */
-    public static int getNextRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView) {
-        return cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRowSpan()
-                + cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow();
+    public static int getNextRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
+        return spv.getRowSpan(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()))
+                + spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow());
     }
     
-    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView) {
-        return cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow() -1;
+    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
+        return spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow()) -1;
     }
 }

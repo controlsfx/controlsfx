@@ -1692,7 +1692,7 @@ public class SpreadsheetView extends Control{
      */
     public void deleteSelectedCells() {
         for (TablePosition<ObservableList<SpreadsheetCell>, ?> position : getSelectionModel().getSelectedCells()) {
-            getGrid().setCellValue(position.getRow(), position.getColumn(), null);
+            getGrid().setCellValue(getModelRow(position.getRow()), position.getColumn(), null);
         }
     }
     

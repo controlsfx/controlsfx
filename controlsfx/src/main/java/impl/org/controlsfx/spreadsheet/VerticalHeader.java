@@ -489,7 +489,7 @@ public class VerticalHeader extends StackPane {
             return;
         }
         handle.getCellsViewSkin().rowHeightMap.put(spreadsheetView.getModelRow(gridRow.getIndex()), newHeight);
-        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(gridRow.getIndex(), newHeight));
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(spreadsheetView.getModelRow(gridRow.getIndex()), newHeight));
         label.resize(spreadsheetView.getRowHeaderWidth(), newHeight);
         gridRow.setPrefHeight(newHeight);
         gridRow.requestLayout();
@@ -511,7 +511,7 @@ public class VerticalHeader extends StackPane {
                 double height = row.getHeight();
                 for (int i = selectedRows.nextSetBit(0); i >= 0; i = selectedRows.nextSetBit(i + 1)) {
                     skin.rowHeightMap.put(i, height);
-                    Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(i, height));
+                    Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(spreadsheetView.getModelRow(i), height));
                 }
             }
         }

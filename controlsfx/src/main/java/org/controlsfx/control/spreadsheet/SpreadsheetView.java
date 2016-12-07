@@ -612,6 +612,9 @@ public class SpreadsheetView extends Control{
     }
 
     public int getModelRow(int viewRow) {
+        if (viewRow < 0) {
+            return viewRow;
+        }
         try {
             return filteredList.getSourceIndex(viewRow);
         } catch (NullPointerException | IndexOutOfBoundsException ex) {
@@ -1703,15 +1706,15 @@ public class SpreadsheetView extends Control{
      * Return the {@link SpanType} of a cell, this is a shorcut for 
      * {@link Grid#getSpanType(org.controlsfx.control.spreadsheet.SpreadsheetView, int, int) }.
      * 
-     * @param row
+     * @param viewRow
      * @param column
      * @return The {@link SpanType} of a cell
      */
-    public SpanType getSpanType(final int row, final int column) {
+    public SpanType getSpanType(final int viewRow, final int column) {
         if (getGrid() == null) {
             return SpanType.NORMAL_CELL;
         }
-        return getGrid().getSpanType(this, row, column);
+        return getGrid().getSpanType(this, viewRow, column);
     }
 
     /***************************************************************************
@@ -2040,12 +2043,12 @@ public class SpreadsheetView extends Control{
          */
         public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE = new EventType<>(Event.ANY, "RowHeightChange"); //$NON-NLS-1$
 
-        private final int viewRow;
+        private final int modelRow;
         private final double height;
 
         public RowHeightEvent(int row, double height) {
             super(ROW_HEIGHT_CHANGE);
-            this.viewRow = row;
+            this.modelRow = row;
             this.height = height;
         }
 
@@ -2054,7 +2057,7 @@ public class SpreadsheetView extends Control{
          * @return the row index that has been resized.
          */
         public int getRow() {
-            return viewRow;
+            return modelRow;
         }
 
         /**

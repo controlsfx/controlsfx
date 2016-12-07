@@ -182,11 +182,11 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public SpanType getSpanType(final SpreadsheetView spv, final int viewRow, final int column) {
-        if (viewRow < 0 || column < 0 || viewRow >= getRows().size() || column >= columnCount) {
+        if (viewRow < 0 || column < 0 || viewRow >= getRowCount() || column >= columnCount) {
             return SpanType.NORMAL_CELL;
         }
         
-        final SpreadsheetCell cell =  getRows().get(viewRow).get(column);
+        final SpreadsheetCell cell =  spv.getCellsView().getItems().get(viewRow).get(column);
 
         final int cellColumn = cell.getColumn();
         final int cellRow = spv.getViewRow(cell.getRow());

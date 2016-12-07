@@ -318,6 +318,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public double getRowHeight(int row) {
+        if (row == -1) {
+            return DEFAULT_CELL_HEIGHT;
+        }
         Double rowHeightCache = rowHeightMap.get(spreadsheetView.getModelRow(row));
         if (rowHeightCache == null) {
             double rowHeight = handle.getView().getGrid().getRowHeight(spreadsheetView.getModelRow(row));
@@ -482,7 +485,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
         getChildren().remove(cell);
         rowHeightMap.put(modelRow, maxHeight + padding);
-        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(spreadsheetView.getViewRow(modelRow), maxHeight + padding));
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(modelRow, maxHeight + padding));
 
         rectangleSelection.updateRectangle();
     }
@@ -501,10 +504,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         
         rowHeightMap.clear();
         int maxRows = handle.getView().getGrid().getRows().size();
-        for (int row = 0; row < maxRows; row++) {
-            if (grid.isRowResizable(row)) {
-                Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight));
-                rowHeightMap.put(row, maxHeight);
+        for (int modelRow = 0; modelRow < maxRows; modelRow++) {
+            if (grid.isRowResizable(modelRow)) {
+                Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(modelRow, maxHeight));
+                rowHeightMap.put(modelRow, maxHeight);
             }
         }
         rectangleSelection.updateRectangle();

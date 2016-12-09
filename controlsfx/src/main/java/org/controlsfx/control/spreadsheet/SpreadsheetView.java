@@ -647,7 +647,9 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenRows().set(row, true);
-        setHiddenRows(getHiddenRows());
+        BitSet bitSet = new BitSet(getHiddenRows().size());
+        bitSet.or(getHiddenRows());
+        setHiddenRows(bitSet);
     }
 
     /**
@@ -661,7 +663,9 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenColumns().set(indexColumn, true);
-        setHiddenColumns(getHiddenColumns());
+         BitSet bitSet = new BitSet(getHiddenColumns().size());
+        bitSet.or(getHiddenColumns());
+        setHiddenColumns(bitSet);
     }
 
     private void computeRowMap() {
@@ -713,7 +717,9 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenRows().set(row, false);
-        computeRowMap();
+         BitSet bitSet = new BitSet(getHiddenRows().size());
+        bitSet.or(getHiddenRows());
+        setHiddenRows(bitSet);
     }
 
     /**
@@ -727,7 +733,9 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenColumns().set(indexColumn, false);
-        setHiddenColumns(getHiddenColumns());
+         BitSet bitSet = new BitSet(getHiddenColumns().size());
+        bitSet.or(getHiddenColumns());
+        setHiddenColumns(bitSet);
     }
 
     /**
